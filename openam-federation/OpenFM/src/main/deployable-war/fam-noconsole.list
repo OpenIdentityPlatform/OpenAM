@@ -645,7 +645,6 @@
 ./WEB-INF/classes/cliBase_ko.properties
 ./WEB-INF/classes/cliBase_zh.properties
 ./WEB-INF/classes/cliBase_zh_TW.properties
-./WEB-INF/classes/click-page.properties
 ./WEB-INF/classes/configuration.properties
 ./WEB-INF/classes/configuration_de.properties
 ./WEB-INF/classes/configuration_en.properties
@@ -1242,8 +1241,6 @@
 ./WEB-INF/lib/cc_zh_CN.jar
 ./WEB-INF/lib/cc_zh_HK.jar
 ./WEB-INF/lib/cc_zh_TW.jar
-./WEB-INF/lib/click-extras-2.3.0.jar
-./WEB-INF/lib/click-nodeps-2.3.0.jar
 ./WEB-INF/lib/commons-codec-1.4.jar
 ./WEB-INF/lib/commons-collections-3.2.1.jar
 ./WEB-INF/lib/commons-fileupload-1.2.1.jar
@@ -1331,7 +1328,6 @@
 ./WEB-INF/SessionResponse.dtd
 ./WEB-INF/auth.tld
 ./WEB-INF/cc.tld
-./WEB-INF/click.xml
 ./WEB-INF/debug.dtd
 ./WEB-INF/distUI_auth.tld
 ./WEB-INF/jato.tld
