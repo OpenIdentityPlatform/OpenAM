@@ -80,7 +80,7 @@
             ${page.getLocalizedString('upgrade.new.version')} ${newVersion}
         </div>
         <div style="overflow: auto; border: solid 1px; height: 180px; width: 90%; margin: 0 auto;">
-            ${changelist}
+            ${changelist?no_esc}
         </div>
     </div>
     <div id="upgradeFooter" style="padding-bottom: 10px" class="clearfix">

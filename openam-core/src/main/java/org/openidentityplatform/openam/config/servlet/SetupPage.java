@@ -194,11 +194,6 @@ public abstract class SetupPage {
         }
     }
 
-    public String getQuoteEscapedLocalizedString(String i18nKey) {
-        String value = getLocalizedString(i18nKey);
-        return value.replace("'", "\\'");
-    }
-
     public String getLocalizedString(String i18nKey) {
         if (rb == null) {
             initializeResourceBundle();

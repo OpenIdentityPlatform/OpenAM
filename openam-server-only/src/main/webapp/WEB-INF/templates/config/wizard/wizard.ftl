@@ -224,7 +224,7 @@
             function storeServerValidated( type, response ) {
                 if( response.responseText == "true" ) {
                     eval( type + "StoreHostValid = true;" );
-                    $(type + 'StoreHostStatus').innerHTML = '<img class="pointer" src="${context}/assets/images/check_true.JPG"> ' + '<small>${page.getLocalizedString('ok.string')}</small>';
+                    $(type + 'StoreHostStatus').innerHTML = '<img class="pointer" src="${context}/assets/images/check_true.JPG"> ' + '<small>${page.getLocalizedString('ok.string')?js_string?no_esc}</small>';
                 } else {
                     eval( type + "StoreHostValid = true;" );
                     $(type + 'StoreHostStatus').innerHTML = response.responseText;
@@ -236,7 +236,7 @@
                 if( response.responseText == "true" ) {
                     eval( type + "StoreBaseDNValid = true;" );
                     $(type + 'StoreBaseDNStatus').innerHTML = '<img class="pointer" src="${context}/assets/images/check_true.JPG"> ' +
-                                                           '<small>${page.getLocalizedString('ok.string')}</small>';
+                                                           '<small>${page.getLocalizedString('ok.string')?js_string?no_esc}</small>';
                 } else {
                     eval( type + "StoreBaseDNValid = true;" );
                     $(type + 'StoreBaseDNStatus').innerHTML = response.responseText;
@@ -248,7 +248,7 @@
                 if( response.responseText == "true" ) {
                     eval( type + "StoreLoginIdValid = true;" );
                     $(type + 'StoreLoginIdStatus').innerHTML = '<img class="pointer" src="${context}/assets/images/check_true.JPG"> ' +
-                                                           '<small>${page.getLocalizedString('ok.string')}</small>';
+                                                           '<small>${page.getLocalizedString('ok.string')?js_string?no_esc}</small>';
                 } else {
                     eval( type + "StoreLoginIdValid = true;" );
                     $(type + 'StoreLoginIdStatus').innerHTML = response.responseText;

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
 
+import freemarker.core.HTMLOutputFormat;
 import freemarker.template.TemplateExceptionHandler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -227,6 +228,12 @@ public class ConfiguratorServlet extends HttpServlet {
                     config.setDefaultEncoding("UTF-8");
                     config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
                     config.setLogTemplateExceptions(false);
+                    // Every ${...} is HTML-escaped unless the template opts out with ?no_esc. Click did
+                    // no escaping at all, so the wizard echoed session values such as configStoreHost and
+                    // rootSuffix straight into value="..." attributes. The handful of model entries that
+                    // legitimately carry markup - Step2's initialCheck, Upgrade's changelist, and the
+                    // checked="checked" fragments Step3/Step4 build - are marked ?no_esc at their use site.
+                    config.setOutputFormat(HTMLOutputFormat.INSTANCE);
                     freemarkerConfig = config;
                 }
             }

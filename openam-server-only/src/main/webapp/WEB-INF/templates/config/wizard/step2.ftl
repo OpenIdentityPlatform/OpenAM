@@ -134,7 +134,7 @@
                         <input id="configDirectory" name="configDirectory"
                         type="text" class="text" size="40"
                         value="${configDirectory}" onkeyup="APP.callDelayed(this, validateConfigDir)" />
-                        <span id="configDirectoryStatus">${initialCheck}</span>
+                        <span id="configDirectoryStatus">${initialCheck?no_esc}</span>
                     </td>
                 </tr>
             </table>

@@ -138,10 +138,10 @@
                 var message = "";
                 if (resp.replication == "true") {
                     document.getElementById("existingRepPort").disabled = true;
-		    message = '<small>${page.getQuoteEscapedLocalizedString('existing.port.values.replication')}</small>';
+		    message = '<small>${page.getLocalizedString('existing.port.values.replication')?js_string?no_esc}</small>';
                 } else {
                     document.getElementById("existingRepPort").disabled = false;
-		    message='<small>${page.getQuoteEscapedLocalizedString('existing.port.values.noreplication')}</small>';
+		    message='<small>${page.getLocalizedString('existing.port.values.noreplication')?js_string?no_esc}</small>';
                 }
                 document.getElementById("replicationMessage").innerHTML= message;
                 document.getElementById("existingRepPort").value = resp.replicationPort;
@@ -171,7 +171,7 @@
     }
 
     function validateHostName() {
-        $('existingHostStatus').innerHTML = '${page.getQuoteEscapedLocalizedString('validating.url.string')}';
+        $('existingHostStatus').innerHTML = '${page.getLocalizedString('validating.url.string')?js_string?no_esc}';
         var call = "${context}${path}?actionLink=validateHostName";
         var hostname = "&hostName=" + $('existingHost').value;
         $('nextTabButton').disabled = true;
@@ -385,9 +385,9 @@
     <h1>${page.getLocalizedString('step3.title')}<img class="pointer"
         src="${context}/assets/images/message.gif"/></h1>
     <p>${page.getLocalizedString('step3.description')}</p>
-    <input type="radio" id="existingNo" name="existingInstance" value="false" onclick="disableExisting();" ${selectFirstSetup} />
+    <input type="radio" id="existingNo" name="existingInstance" value="false" onclick="disableExisting();" ${selectFirstSetup?no_esc} />
         ${page.getLocalizedString('create.new.instance')}
-    <input type="radio" id="existingYes" name="existingInstance" value="true" onclick="enableExisting();" ${selectExistingSetup} />
+    <input type="radio" id="existingYes" name="existingInstance" value="true" onclick="enableExisting();" ${selectExistingSetup?no_esc} />
         ${page.getLocalizedString('add.existing.instance')}
 
     <!-- EMBEDDED STORE PROPERTIES -->
@@ -414,11 +414,11 @@
                              </label></td>
                         <td>
                         <input type="radio" id="configStoreDefault" name="configStoreCustom"
-                           style="margin-left:1em" value="false" ${selectEmbedded}
+                           style="margin-left:1em" value="false" ${selectEmbedded?no_esc}
                            onclick="disableRemote();"/>
                             ${page.getLocalizedString('step3.embedded.option')}
                         <input type="radio" id="configStoreCustom" name="configStoreCustom"
-                           style="margin-left:1em" value="true" ${selectExternal}
+                           style="margin-left:1em" value="true" ${selectExternal?no_esc}
                            onclick="enableRemote();"/>
                             ${page.getLocalizedString('step3.external.option')}
                         </td>
@@ -433,7 +433,7 @@
                         <td>
                             <input id="configStoreSSL" name="configStoreSSL"
                                type="checkbox" value="SSL"
-                               onClick="APP.callDelayed(this, validateConfigStoreSSL)" ${selectConfigStoreSSL} /></td>
+                               onClick="APP.callDelayed(this, validateConfigStoreSSL)" ${selectConfigStoreSSL?no_esc} /></td>
                     </tr>
                     <tr id="host">
                         <td><label for="configStoreHost"><em>*&nbsp;</em>

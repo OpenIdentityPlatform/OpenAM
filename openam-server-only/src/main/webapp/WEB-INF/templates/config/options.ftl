@@ -90,7 +90,7 @@
     var ie7fix = 1;
 
     var okImage = '<img class="pointer" src="${context}/assets/images/ok.jpg">';
-    var okString = okImage + '<small>${page.getLocalizedString('ok.string')}</small>';
+    var okString = okImage + '<small>${page.getLocalizedString('ok.string')?js_string?no_esc}</small>';
     var errorImage = '<img class="pointer" src="${context}/assets/images/error.jpg">';
     var warningImage = '<img class="pointer" src="${context}/assets/images/warning.jpg">';
     var userStoreChoice;
@@ -359,7 +359,7 @@
             <#if upgrade || upgradeCompleted>
             <div style="width: 100%">
                 <h3>${page.getLocalizedString('upgrade.title')}</h3>
-            ${page.getLocalizedString('upgrade.description')}
+            ${page.getLocalizedString('upgrade.description')?no_esc}
                 <a id="upgradeLink" class="blue pointer disabled">${page.getLocalizedString('upgrade.link')}</a>
             <#else>
             <div class="borderRight">
@@ -484,7 +484,7 @@
         <div class="singlecolumn">
                 <p>${page.getLocalizedString('cannot.continue.text1')}</p>
                 <p>${page.getLocalizedString('cannot.continue.text2')} ${odsdir!""}</p>
-                <p>${page.getLocalizedString('cannot.continue.text3')}</p>
+                <p>${page.getLocalizedString('cannot.continue.text3')?no_esc}</p>
             </div>
         </div>
     </div>

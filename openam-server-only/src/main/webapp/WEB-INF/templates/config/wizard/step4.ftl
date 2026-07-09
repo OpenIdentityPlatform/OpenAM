@@ -273,15 +273,15 @@
 
     <label for="userStoreDefault" style="float:none">
         <input type="radio" id="userStoreDefault" name="userStoreCustom"
-            style="margin-left:1em" value="false" ${selectEmbeddedUM}
-            ${radioDataTypeDisabled} onclick="enableEmbeddedConfig();"/>
+            style="margin-left:1em" value="false" ${selectEmbeddedUM?no_esc}
+            ${radioDataTypeDisabled?no_esc} onclick="enableEmbeddedConfig();"/>
         <span>${page.getLocalizedString('configurator.embedded')}</span><br/>
     </label>
 
     <label for="userStoreCustom" style="float:none">
         <input type="radio" id="userStoreCustom" name="userStoreCustom"
-            style="margin-left:1em" value="true" ${selectExternalUM}
-            ${radioDataTypeDisabled} onclick="enableExternalConfig();"/>
+            style="margin-left:1em" value="true" ${selectExternalUM?no_esc}
+            ${radioDataTypeDisabled?no_esc} onclick="enableExternalConfig();"/>
         <span>${page.getLocalizedString('configurator.remote')}</span>
     </label>
 
@@ -308,16 +308,16 @@
                         <td>
                             <table id="userStoreCustomTypes">
                                 <tr>
-                                    <td><label for="ldapv3opends" style="float:none"><input type="radio" id="ldapv3opends" name="userStoreType" value="LDAPv3ForOpenDS" ${selectLDAPv3opends!""} onclick="setOpenDS();"/>&nbsp;${page.getLocalizedString('opends.ldap.schema')}</label></td>
-                                    <td><label for="ldapv3odsee" style="float:none"><input type="radio" id="ldapv3odsee" name="userStoreType" value="LDAPv3ForODSEE" ${selectLDAPv3odsee} onclick="setODSEE();"/>&nbsp;${page.getLocalizedString('odsee.ldap.schema')}</label></td>
+                                    <td><label for="ldapv3opends" style="float:none"><input type="radio" id="ldapv3opends" name="userStoreType" value="LDAPv3ForOpenDS" ${(selectLDAPv3opends!"")?no_esc} onclick="setOpenDS();"/>&nbsp;${page.getLocalizedString('opends.ldap.schema')}</label></td>
+                                    <td><label for="ldapv3odsee" style="float:none"><input type="radio" id="ldapv3odsee" name="userStoreType" value="LDAPv3ForODSEE" ${selectLDAPv3odsee?no_esc} onclick="setODSEE();"/>&nbsp;${page.getLocalizedString('odsee.ldap.schema')}</label></td>
                                 </tr>
                                 <tr>
-                                    <td><label for="ldapv3adforDomainName" style="float:none"><input type="radio" id="ldapv3adforDomainName" name="userStoreType" value="LDAPv3ForADDC" ${selectLDAPv3addc} onclick="setADforDomainName();"/>&nbsp;${page.getLocalizedString('activedirectoryfordomainname.ldap.schema')}</label></td>
-                                    <td><label for="ldapv3ad" style="float:none"><input type="radio" id="ldapv3ad" name="userStoreType" value="LDAPv3ForAD" ${selectLDAPv3ad} onclick="setAD();"/>&nbsp;${page.getLocalizedString('activedirectory.ldap.schema')}</label><br></td>
+                                    <td><label for="ldapv3adforDomainName" style="float:none"><input type="radio" id="ldapv3adforDomainName" name="userStoreType" value="LDAPv3ForADDC" ${selectLDAPv3addc?no_esc} onclick="setADforDomainName();"/>&nbsp;${page.getLocalizedString('activedirectoryfordomainname.ldap.schema')}</label></td>
+                                    <td><label for="ldapv3ad" style="float:none"><input type="radio" id="ldapv3ad" name="userStoreType" value="LDAPv3ForAD" ${selectLDAPv3ad?no_esc} onclick="setAD();"/>&nbsp;${page.getLocalizedString('activedirectory.ldap.schema')}</label><br></td>
                                 </tr>
                                 <tr>
-                                    <td><label for="ldapv3tivoli" style="float:none"><input type="radio" id="ldapv3tivoli" name="userStoreType" value="LDAPv3ForTivoli" ${selectLDAPv3tivoli} onclick="setTivoli();"/>&nbsp;${page.getLocalizedString('tivoli.ldap.schema')}</label></td>
-                                    <td><label for="ldapv3adam" style="float:none"><input type="radio" id="ldapv3adam" name="userStoreType" value="LDAPv3ForADAM" ${selectLDAPv3adam} onclick="setADAM();"/>&nbsp;${page.getLocalizedString('adam.ldap.schema')}</label></td>
+                                    <td><label for="ldapv3tivoli" style="float:none"><input type="radio" id="ldapv3tivoli" name="userStoreType" value="LDAPv3ForTivoli" ${selectLDAPv3tivoli?no_esc} onclick="setTivoli();"/>&nbsp;${page.getLocalizedString('tivoli.ldap.schema')}</label></td>
+                                    <td><label for="ldapv3adam" style="float:none"><input type="radio" id="ldapv3adam" name="userStoreType" value="LDAPv3ForADAM" ${selectLDAPv3adam?no_esc} onclick="setADAM();"/>&nbsp;${page.getLocalizedString('adam.ldap.schema')}</label></td>
                                 </tr>
                             </table>
                         </td>
@@ -328,7 +328,7 @@
                         <td><label for="userStoreSSL"><em>*&nbsp;</em>${page.getLocalizedString('directory.ssl.label')}</label></td>
                         <td>
                             <input id="userStoreSSL" name="userStoreSSL"
-                                type="checkbox" value="SSL" ${selectUserStoreSSL}
+                                type="checkbox" value="SSL" ${selectUserStoreSSL?no_esc}
                                 onClick="APP.callDelayed(this, validateUserStoreSSL)"/>
                         </td>
                     </tr>
@@ -394,7 +394,7 @@
                         <td><label for="ADuserStoreSSL"><em>*&nbsp;</em>${page.getLocalizedString('directory.ssl.label')}</label></td>
                         <td>
                             <input id="ADuserStoreSSL" name="ADuserStoreSSL"
-                                type="checkbox" value="SSL" ${selectADUserStoreSSL!""}
+                                type="checkbox" value="SSL" ${(selectADUserStoreSSL!"")?no_esc}
                                 onClick="APP.callDelayed(this, validateADUserStoreSSL)"/>
                         </td>
                     </tr>

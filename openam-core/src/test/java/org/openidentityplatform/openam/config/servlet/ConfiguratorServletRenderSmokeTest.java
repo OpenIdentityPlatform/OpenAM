@@ -67,10 +67,15 @@ public class ConfiguratorServletRenderSmokeTest extends PowerMockTestCase {
             "../openam-server-only/src/main/webapp/WEB-INF/templates/config";
     private static final String RESOURCE_PREFIX = "/WEB-INF/templates/config";
 
+    private static final String STEP3_PATH = "/config/wizard/step3.htm";
     private static final String STEP7_PATH = "/config/wizard/step7.htm";
+    private static final String OPTIONS_PATH = "/config/options.htm";
     private static final String CONFIG_PORT = "50389";
     private static final String ADMIN_PORT = "4444";
     private static final String JMX_PORT = "1689";
+
+    /** Breaks out of {@code value="..."} and opens a script element, if nothing escapes it. */
+    private static final String XSS_PAYLOAD = "\"><script>alert(1)</script>";
 
     private ConfiguratorServlet servlet;
     private ServletContext servletContext;
@@ -209,6 +214,64 @@ public class ConfiguratorServletRenderSmokeTest extends PowerMockTestCase {
                 .doesNotContain("JMX Port")
                 .doesNotContain(ADMIN_PORT)
                 .doesNotContain(JMX_PORT);
+    }
+
+    /**
+     * The configurator's FreeMarker {@code Configuration} sets {@code HTMLOutputFormat}, so a session
+     * value echoed into an attribute cannot close that attribute. Click escaped nothing.
+     */
+    @Test
+    public void autoEscapingNeutralizesMarkupInSessionSuppliedValues() throws Exception {
+        populateSessionForPage(STEP3_PATH);
+        sessionAttributes.put("configStoreHost", XSS_PAYLOAD);
+
+        when(request.getServletPath()).thenReturn(STEP3_PATH);
+        servlet.service(request, response);
+
+        assertThat(responseBody.toString())
+                .doesNotContain(XSS_PAYLOAD)
+                .doesNotContain("<script>alert(1)")
+                .contains("value=\"&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;\"");
+    }
+
+    /**
+     * {@code Step3.onInit()} hands the template the literal attribute fragment
+     * {@code checked="checked"}, which only survives because step3.ftl marks it {@code ?no_esc}.
+     * Without that the quotes would become {@code &quot;} and the radio button would never preselect.
+     */
+    @Test
+    public void markupBearingModelValuesBypassAutoEscaping() throws Exception {
+        populateSessionForPage(STEP3_PATH);
+
+        when(request.getServletPath()).thenReturn(STEP3_PATH);
+        servlet.service(request, response);
+
+        assertThat(responseBody.toString())
+                .contains("checked=\"checked\"")
+                .doesNotContain("checked=&quot;checked&quot;");
+    }
+
+    /**
+     * Localized strings assembled into JavaScript string literals go through {@code ?js_string?no_esc}
+     * rather than the HTML escaper, which would emit {@code &#39;} - an entity a {@code <script>} body
+     * never decodes. Covers both a bare literal and one wrapped in markup by the template.
+     */
+    @Test
+    public void javaScriptStringLiteralsEscapeForJavaScriptNotHtml() throws Exception {
+        when(request.getServletPath()).thenReturn(OPTIONS_PATH);
+        servlet.service(request, response);
+
+        assertThat(responseBody.toString()).contains("<small>OK</small>");
+
+        responseBody.getBuffer().setLength(0);
+        populateSessionForPage(STEP3_PATH);
+        when(request.getServletPath()).thenReturn(STEP3_PATH);
+        servlet.service(request, response);
+
+        assertThat(responseBody.toString())
+                .contains("<small>The existing OpenAM instance is already set up for replication"
+                        + " on the following ports</small>")
+                .contains("innerHTML = 'validating url...'");
     }
 
     /** Pins otherwise free-port-derived values so the assertions above can match exact strings. */
