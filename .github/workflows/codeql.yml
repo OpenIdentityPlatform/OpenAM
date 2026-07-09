@@ -93,7 +93,6 @@ jobs:
               - '**/node_modules/**'
               - '**/test-output/**'
               - 'openam-ui/openam-ui-ria/src/main/js/libs/**'
-              - 'openam-ui/openam-ui-js-sdk/src/lib/**'
               # .NET build output (generated AssemblyInfo, compiled artifacts).
               - '**/obj/**'
               - '**/bin/**'
