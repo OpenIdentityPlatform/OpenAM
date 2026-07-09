@@ -141,26 +141,6 @@
                 resetWizard();
             }
 
-            function onPushNewInstanceConfigResponse( response ) {
-                if ( response.responseText == "true" ) {
-                    setTimeout("YAHOO.sun.identity.config.options.wizard.pushingConfig.hide()", 1500);
-                    setTimeout("YAHOO.sun.identity.config.options.confComplete.show()", 1500);
-                } else {
-                    alert(response.responseText);
-                }
-            }
-
-            function pushNewInstanceConfig() {
-                YAHOO.sun.identity.config.options.wizard.pushConfigDialog.hide();
-                YAHOO.sun.identity.config.options.wizard.pushingConfig.show();
-                ie7fix++;
-                AjaxUtils.call( "${context}${path}?actionLink=pushConfig&ie7fix=" + ie7fix,
-                    onPushNewInstanceConfigResponse );
-            }
-            function cancelPushNewInstanceConfig() {
-                document.location = "${context}/commonTasks.htm";
-            }
-
             function writeConfigurationAsync() {
                 ie7fix++;
                 AjaxUtils.call("${context}${path}?actionLink=createConfig&ie7fix=" + ie7fix,
@@ -320,32 +300,6 @@
                 YAHOO.sun.identity.config.options.wizard.writeConf.setHeader("Writing configuration.  Please wait...");
                 YAHOO.sun.identity.config.options.wizard.writeConf.setBody('<img src="${context}/assets/images/rel_interstitial_loading.gif" />');
                 YAHOO.sun.identity.config.options.wizard.writeConf.render(document.body);
-
-                YAHOO.sun.identity.config.options.wizard.pushingConfig = new YAHOO.widget.Panel("pushingConfig", { width:"260px", fixedcenter:true, close:false, draggable:false, zindex:4, modal:true, visible:false });
-                YAHOO.sun.identity.config.options.wizard.pushingConfig.setHeader("Pushing configuration to new instance.  Please wait...");
-                YAHOO.sun.identity.config.options.wizard.pushingConfig.setBody('<img src="${context}/assets/images/rel_interstitial_loading.gif" />');
-                YAHOO.sun.identity.config.options.wizard.pushingConfig.render(document.body);
-
-                YAHOO.sun.identity.config.options.wizard.pushConfigDialog = new YAHOO.widget.SimpleDialog("pushConfigDialog", {
-                    width: "260px",
-                    effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.25},
-                    fixedcenter:true,
-                    modal:true,
-                    visible:false,
-                    draggable:false });
-
-                var dlg = YAHOO.sun.identity.config.options.wizard.pushConfigDialog; //alias for convenience
-                dlg.setHeader("Push Configuration?")
-                dlg.setBody("Do you want to push configuration data to the new instance?");
-                dlg.cfg.setProperty("icon", YAHOO.widget.SimpleDialog.ICON_INFO);
-
-                var pushConfigButtons = [ { text:"Yes",
-                    handler:pushNewInstanceConfig,
-                    isDefault:true },
-                { text:"No",
-                    handler:cancelPushNewInstanceConfig } ];
-                dlg.cfg.queueProperty("buttons", pushConfigButtons);
-                dlg.render(document.body);
 
                 YAHOO.sun.identity.config.options.wizard.confComplete = new YAHOO.widget.Panel("confComplete", { fixedcenter: true, close: false, modal:true, visible:false, constraintoviewport:true });
                 YAHOO.sun.identity.config.options.wizard.confComplete.render();

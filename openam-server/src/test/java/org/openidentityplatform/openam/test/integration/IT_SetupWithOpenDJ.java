@@ -82,8 +82,8 @@ public class IT_SetupWithOpenDJ extends CargoBaseTest {
     private void testOpenAmInstallation(String openamUrl, Integer opendjPort) throws Exception {
         driver.get(openamUrl);
 
-        //wait for setup page is loaded
-        waitForElement(By.id("pushConfigDialog_c"));
+        //wait for setup page is loaded: confComplete_c is created by the wizard fragment's wizardInit()
+        waitForElement(By.id("confComplete_c"));
         WebElement createLink = driver.findElement(By.id("CreateNewConf"));
         createLink.click();
 

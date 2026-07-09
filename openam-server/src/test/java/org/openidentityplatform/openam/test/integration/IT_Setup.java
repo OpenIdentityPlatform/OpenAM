@@ -38,8 +38,8 @@ public class IT_Setup extends CargoBaseTest {
 
         driver.get(openamUrl);
 
-        //wait for setup page is loaded
-        waitForElement(By.id("pushConfigDialog_c"));
+        //wait for setup page is loaded: confComplete_c is created by the wizard fragment's wizardInit()
+        waitForElement(By.id("confComplete_c"));
         WebElement createDefaultLink = driver.findElement(By.id("DemoConfiguration"));
         createDefaultLink.click();
 
