@@ -66,10 +66,9 @@ public class IDPPFacade extends IDPPBaseContainer {
      public Object getContainerObject(Map userMap) throws IDPPException {
 
          IDPPUtils.debug.message("IDPPFacade:getContainerObject:Init");
-         try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+             PPType ppType = new PPElement();
              FacadeElement fe = 
-                  IDPPUtils.getIDPPFactory().createFacadeElement();
+                  new FacadeElement();
 
              String mugShot = CollectionHelper.getMapAttr(
                 userMap, getAttributeMapper().getDSAttribute(
@@ -109,12 +108,6 @@ public class IDPPFacade extends IDPPBaseContainer {
              ppType.setFacade(fe);
 
              return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPFacade:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
-         }
      }
 
      /**

@@ -45,7 +45,7 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
@@ -222,8 +222,8 @@ public class SAML2 extends AMLoginModule {
                     bundle.getString("samlLocalConfigFailed"));
         }
 
-        List<SingleSignOnServiceElement> ssoServiceList = idpsso.getSingleSignOnService();
-        final SingleSignOnServiceElement endPoint = SPSSOFederate
+        List<EndpointType> ssoServiceList = idpsso.getSingleSignOnService();
+        final EndpointType endPoint = SPSSOFederate
                 .getSingleSignOnServiceEndpoint(ssoServiceList, reqBinding);
 
         if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {

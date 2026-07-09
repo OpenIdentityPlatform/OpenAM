@@ -47,14 +47,14 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.NotIdentifiableEvent;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.helpers.DefaultValidationEventHandler;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.NotIdentifiableEvent;
+import jakarta.xml.bind.PropertyException;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.helpers.DefaultValidationEventHandler;
 import javax.xml.namespace.QName;
 import jakarta.xml.soap.MessageFactory;
 import jakarta.xml.soap.SOAPMessage;
@@ -326,7 +326,7 @@ public class Utils {
                           throws JAXBException {
         Marshaller m = jc.createMarshaller();
         try {
-            m.setProperty("com.sun.xml.bind.namespacePrefixMapper",
+            m.setProperty("org.glassfish.jaxb.namespacePrefixMapper",
                     new NamespacePrefixMapperImpl());
         } catch(PropertyException ex) {
             debug.error("Utils.convertJAXBToElement", ex);
@@ -353,7 +353,7 @@ public class Utils {
             boolean checkIdref) throws JAXBException {
         Marshaller m = jc.createMarshaller();
         try {
-            m.setProperty("com.sun.xml.bind.namespacePrefixMapper",
+            m.setProperty("org.glassfish.jaxb.namespacePrefixMapper",
                     new NamespacePrefixMapperImpl());
             
         } catch(PropertyException ex) {

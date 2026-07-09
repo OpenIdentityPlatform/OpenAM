@@ -28,7 +28,7 @@ import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import org.json.JSONException;
 import org.testng.annotations.Test;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

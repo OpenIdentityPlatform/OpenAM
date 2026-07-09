@@ -27,11 +27,11 @@
  */
 package com.sun.identity.wss.policy;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Iterator;
-        
+
 import com.sun.identity.wsfederation.jaxb.wspolicy.PolicyElement;
 import com.sun.identity.wsfederation.jaxb.wspolicy.ExactlyOneElement;
 import com.sun.identity.wsfederation.jaxb.wspolicy.AllElement;
@@ -77,16 +77,16 @@ import com.sun.identity.wss.sts.config.STSRemoteConfig;
  * WS-Security Policy and vice versa.
  */
 public class WSSPolicyManager {
-    
+
     private static final String INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT =
             "http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/" +
             "IncludeToken/AlwaysToRecipient";
     private static com.sun.identity.wsfederation.jaxb.wspolicy.ObjectFactory
-             wsPolicyFactory = 
+             wsPolicyFactory =
              new com.sun.identity.wsfederation.jaxb.wspolicy.ObjectFactory();
-    
+
     private static com.sun.identity.wsfederation.jaxb.wsspolicy.ObjectFactory
-             wssPolicyFactory = 
+             wssPolicyFactory =
              new com.sun.identity.wsfederation.jaxb.wsspolicy.ObjectFactory();
     
     private static com.sun.identity.wsfederation.jaxb.wsaddr.ObjectFactory
@@ -363,7 +363,6 @@ public class WSSPolicyManager {
     private InitiatorTokenElement createInitiatorTokenElement(
             String secMech) throws WSSPolicyException {
         
-        try {
             InitiatorTokenElement ite = 
                     wssPolicyFactory.createInitiatorTokenElement();
             PolicyElement policyElement1 = 
@@ -439,18 +438,13 @@ public class WSSPolicyManager {
             }
             
             return ite;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createInitiateTokenElement: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
-        }
+
         
     }
     
     private RecipientTokenElement createRecipientTokenElement() 
             throws WSSPolicyException {
         
-        try {
             RecipientTokenElement rte = 
                     wssPolicyFactory.createRecipientTokenElement();
             PolicyElement policyElement1 = 
@@ -470,17 +464,12 @@ public class WSSPolicyManager {
             policyElement2.getPolicyOrAllOrExactlyOne().add(
                        wssX509v3TokenElement);
             return rte;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createRecipientTokenElement:"
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
-        }
+
     }
     
     private AlgorithmSuiteElement createAlgorithmSuiteElement(
             ProviderConfig config) throws WSSPolicyException {
         
-        try {
             AlgorithmSuiteElement ase = 
                     wssPolicyFactory.createAlgorithmSuiteElement();
             PolicyElement policyElement1 = 
@@ -520,15 +509,10 @@ public class WSSPolicyManager {
                return null; 
             }
             return ase;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createAlgorithmSuite: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
-        }
+
     }
     
     private LayoutElement createLayoutElement() throws WSSPolicyException {
-        try {
             LayoutElement le = 
                     wssPolicyFactory.createLayoutElement();
             PolicyElement policyElement1 = 
@@ -537,11 +521,7 @@ public class WSSPolicyManager {
             policyElement1.getPolicyOrAllOrExactlyOne().add(
                     wssPolicyFactory.createLaxElement());
             return le;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createLayout: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
-        }
+
         
     }
        
@@ -549,7 +529,6 @@ public class WSSPolicyManager {
     private ProtectionTokenElement createProtectionTokenElement(
             String secMech) throws WSSPolicyException {
         
-        try {
             ProtectionTokenElement protectionElement =
                     wssPolicyFactory.createProtectionTokenElement();
             PolicyElement policyElement1 = 
@@ -575,17 +554,12 @@ public class WSSPolicyManager {
             }
             
             return protectionElement;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createProtectionToken: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
-        }
+
     }
     
     private IssuedTokenElement createIssuedTokenElement() 
             throws WSSPolicyException {
         
-        try {
             IssuedTokenElement issuedTokenElement =
                     wssPolicyFactory.createIssuedTokenElement();
             issuedTokenElement.setIncludeToken(
@@ -601,11 +575,7 @@ public class WSSPolicyManager {
                     wssPolicyFactory.createRequestSecurityTokenTemplateType();
             issuedTokenElement.setRequestSecurityTokenTemplate(rstTemplate);
             return issuedTokenElement;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createIssuedTokenElement: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
-        }
+
         
     }
 

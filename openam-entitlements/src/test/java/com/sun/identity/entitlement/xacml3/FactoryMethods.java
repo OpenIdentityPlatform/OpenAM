@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import org.forgerock.openam.entitlement.conditions.environment.SessionCondition;
 import static org.forgerock.openam.utils.CollectionUtils.asSet;
 import org.json.JSONException;

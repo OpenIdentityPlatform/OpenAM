@@ -44,7 +44,7 @@ import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * Creates Remote Service Provider.
@@ -117,8 +117,6 @@ public class CreateRemoteSP
                 manager.setEntityConfig(realm, config);
             }
         } catch (SAML2MetaException e) {
-            throw new WorkflowException(e.getMessage());
-        } catch (JAXBException e) {
             throw new WorkflowException(e.getMessage());
         }
 

@@ -320,10 +320,12 @@ public class KeyUtil {
                     Iterator cIter = cList.iterator();
                     while (cIter.hasNext()) {
                         Object cObject = cIter.next();
-                        if (cObject instanceof EncryptionMethodType.KeySize) {
-                            keySize =
-                                ((EncryptionMethodType.KeySize)(cList.get(0))).
-                                    getValue().intValue();
+                        if (cObject instanceof jakarta.xml.bind.JAXBElement &&
+                            "KeySize".equals(((jakarta.xml.bind.JAXBElement<?>)cObject).getName().getLocalPart())) {
+                            @SuppressWarnings("unchecked")
+                            jakarta.xml.bind.JAXBElement<java.math.BigInteger> keySizeElem =
+                                (jakarta.xml.bind.JAXBElement<java.math.BigInteger>) cList.get(0);
+                            keySize = keySizeElem.getValue().intValue();
                             break;
                         }
                     }
@@ -359,7 +361,7 @@ public class KeyUtil {
         List<KeyDescriptorType> keyDescriptorsWithoutUsage = new ArrayList<>(keyDescriptors.size());
 
         for (KeyDescriptorType keyDescriptor : keyDescriptors) {
-            String use = keyDescriptor.getUse();
+            String use = keyDescriptor.getUse() != null ? keyDescriptor.getUse().value() : null;
             if (StringUtils.isBlank(use)) {
                 keyDescriptorsWithoutUsage.add(keyDescriptor);
             } else if (use.trim().toLowerCase().equals(usage)) {
@@ -422,19 +424,23 @@ public class KeyUtil {
         }
         //iterate and search the X509Certificate node
         it = data.getX509IssuerSerialOrX509SKIOrX509SubjectName().iterator();
-        com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509Certificate cert = null;
-        while ((cert == null) && it.hasNext()) {
+        byte[] certBytes = null;
+        while ((certBytes == null) && it.hasNext()) {
             Object content = it.next();
-            if (content instanceof 
-                com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509Certificate) {
-                cert = (com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509Certificate) content;
+            if (content instanceof jakarta.xml.bind.JAXBElement) {
+                @SuppressWarnings("unchecked")
+                jakarta.xml.bind.JAXBElement<byte[]> certElem =
+                    (jakarta.xml.bind.JAXBElement<byte[]>) content;
+                if ("X509Certificate".equals(certElem.getName().getLocalPart())) {
+                    certBytes = certElem.getValue();
+                }
             }
         }
-        if (cert == null) {
+        if (certBytes == null) {
             SAML2SDKUtils.debug.error(classMethod + "No X509Certificate.");
             return null;
         }
-        byte[] bt = cert.getValue();
+        byte[] bt = certBytes;
         CertificateFactory cf = null;
         try {
             cf = CertificateFactory.getInstance("X.509");
@@ -555,9 +561,13 @@ public class KeyUtil {
                 algorithm = em.getAlgorithm();
                 List cList = em.getContent();
                 if (cList != null) {
-                    keySize =
-                        ((EncryptionMethodType.KeySize)(cList.get(0))).
-                        getValue().intValue();
+                    if (!cList.isEmpty() && cList.get(0) instanceof jakarta.xml.bind.JAXBElement &&
+                        "KeySize".equals(((jakarta.xml.bind.JAXBElement<?>)cList.get(0)).getName().getLocalPart())) {
+                        @SuppressWarnings("unchecked")
+                        jakarta.xml.bind.JAXBElement<java.math.BigInteger> keySizeElem =
+                            (jakarta.xml.bind.JAXBElement<java.math.BigInteger>) cList.get(0);
+                        keySize = keySizeElem.getValue().intValue();
+                    }
                 }
             }
         }

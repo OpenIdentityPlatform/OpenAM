@@ -62,7 +62,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -318,7 +318,9 @@ public class ImportMetaData extends AuthenticatedCommand {
                  */
                 if (configElt != null && configElt.isHosted()) {
                     List<com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType> config =
-                            configElt.getIDPSSOConfigOrSPSSOConfig();
+                            configElt.getIDPSSOConfigOrSPSSOConfig().stream()
+                            .map(jakarta.xml.bind.JAXBElement::getValue)
+                            .collect(java.util.stream.Collectors.toList());
                     if (CollectionUtils.isNotEmpty(config)) {
                         realm = WSFederationMetaUtils.getRealmByMetaAlias(config.get(0).getMetaAlias());
                         newMetaAliases = getMetaAliasesWsFed(config);

@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Iterator;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.Document;

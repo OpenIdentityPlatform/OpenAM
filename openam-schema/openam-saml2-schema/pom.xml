@@ -33,7 +33,6 @@
     <!-- Build -->
     <build>
         <plugins>
-<!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
@@ -44,23 +43,47 @@
                             <goal>xjc</goal>
                         </goals>
                     </execution>
-               </executions>
-               <configuration>
+                </executions>
+                <configuration>
                     <extension>true</extension>
-                    <schemaFiles>
-						entity-config-schema.xsd,
-						saml-schema-assertion-2.0.xsd,
-						saml-schema-metadata-2.0.xsd,
-						schema.xsd,
-						sstc-saml-metadata-ext-query.xsd,
-						sstc-saml-metadata-x509-query.xsd,
-						sstc-metadata-attr.xsd,
-						sstc-saml-attribute-ext.xsd,
-						sstc-saml-idp-discovery.xsd
-                    </schemaFiles>
-               </configuration>
-           </plugin>
--->
+                    <noGeneratedHeaderComments>true</noGeneratedHeaderComments>
+                </configuration>
+            </plugin>
+            <!-- Several hand-written files in src/main/java/ replace XJC-generated
+                 counterparts to fix JAXB 4.x behavioural incompatibilities (abstract
+                 class instantiation, @XmlElementRefs wrapping, @XmlRootElement
+                 precedence, null Boolean auto-unbox). Delete the generated copies
+                 before the compile phase so the compiler sees only one version. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>remove-generated-sources-overridden-by-hand-written</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- entityconfig package -->
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/entityconfig/BaseConfigType.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/entityconfig/EntityConfigType.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/entityconfig/ObjectFactory.java"/>
+                                <!-- metadata package -->
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/metadata/ObjectFactory.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/metadata/EntityDescriptorType.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/metadata/IndexedEndpointType.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/metadata/SSODescriptorType.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/metadata/SPSSODescriptorType.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/metadata/IDPSSODescriptorType.java"/>
+                                <!-- xmlsig package -->
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/saml2/jaxb/xmlsig/KeyInfoType.java"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -70,14 +93,15 @@
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.glassfish.metro</groupId>
-			<artifactId>wsit-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb1-impl</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.5</version>
+        </dependency>
     </dependencies>
 </project>
-

@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.bind.JAXBException;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.liberty.ws.disco.common.DiscoConstants;
@@ -325,15 +324,7 @@ public class DiscoEntryHandlerImplUtils {
         List newEntryIDs = new LinkedList();
         while (i.hasNext()) {
             insertEntry = (InsertEntryType) i.next();
-            try {
-                de = DiscoUtils.getDiscoEntryFactory().
-                    createDiscoEntryElement();
-            } catch (JAXBException je) {
-                debug.error(
-                    "DiscoEntryHandlerImplUtils.handleInserts: couldn't "
-                    + "create DiscoEntry: ", je);
-                return insertResults;
-            }
+            de = DiscoUtils.getDiscoEntryFactory().createDiscoEntryElement();
             resOff = insertEntry.getResourceOffering();
             String newEntryID = SAMLUtils.generateID();
             if (debug.messageEnabled()) {

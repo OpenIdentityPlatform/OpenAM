@@ -69,8 +69,7 @@ public class IDPPAddressCard extends IDPPBaseContainer {
      public Object getContainerObject(Map userMap) throws IDPPException {
 
          IDPPUtils.debug.message("IDPPAddressCard:getContainerObject:Init");
-         try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+             PPType ppType = new PPElement();
 
              Set addressCards = (Set)userMap.get(
                   getAttributeMapper().getDSAttribute(
@@ -91,19 +90,12 @@ public class IDPPAddressCard extends IDPPBaseContainer {
              }
 
              return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPContainers:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
-         }
      }
 
     /**
      * Parses the entry and creates an address card element from the given map
      */
-     private AddressCardElement parseEntry(String entry, Map userMap)
-       throws JAXBException {
+     private AddressCardElement parseEntry(String entry, Map userMap) {
 
          if(entry == null || entry.length() == 0) {
             return null;
@@ -116,7 +108,7 @@ public class IDPPAddressCard extends IDPPBaseContainer {
          }
 
          AddressCardElement ace =
-            IDPPUtils.getIDPPFactory().createAddressCardElement();
+            new AddressCardElement();
 
          StringTokenizer st = new StringTokenizer(entry, 
               IDPPConstants.ATTRIBUTE_SEPARATOR);
@@ -182,7 +174,7 @@ public class IDPPAddressCard extends IDPPBaseContainer {
             return null;
          }
 
-         AddressType ae = IDPPUtils.getIDPPFactory().createAddressElement();
+         AddressType ae = new AddressElement();
          ae.setC(getDSTString(country));
          ae.setSt(getDSTString(state));
          ae.setL(getDSTString(city));

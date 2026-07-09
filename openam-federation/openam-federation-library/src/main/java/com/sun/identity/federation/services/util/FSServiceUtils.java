@@ -936,9 +936,9 @@ public class FSServiceUtils {
         List urls = spDescriptor.getAssertionConsumerServiceURL();
         if (urls != null && !urls.isEmpty()) {
             Iterator iter = urls.iterator();
-            SPDescriptorType.AssertionConsumerServiceURLType curUrl = null;
+            SPDescriptorType.AssertionConsumerServiceURL curUrl = null;
             while (iter.hasNext()) {
-                curUrl = (SPDescriptorType.AssertionConsumerServiceURLType)
+                curUrl = (SPDescriptorType.AssertionConsumerServiceURL)
                     iter.next();
                 String curId = curUrl.getId();
                 String curValue = curUrl.getValue();

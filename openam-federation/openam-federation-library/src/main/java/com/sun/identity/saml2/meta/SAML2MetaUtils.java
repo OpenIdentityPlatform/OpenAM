@@ -40,10 +40,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -82,15 +82,14 @@ public final class SAML2MetaUtils {
         "com.sun.identity.saml2.jaxb.assertion:" +
         "com.sun.identity.saml2.jaxb.metadata:" +
 	"com.sun.identity.saml2.jaxb.metadataattr:" +
-        "com.sun.identity.saml2.jaxb.entityconfig:" +
-        "com.sun.identity.saml2.jaxb.schema";
+        "com.sun.identity.saml2.jaxb.entityconfig";
     private static final String JAXB_PACKAGE_LIST_PROP =
         "com.sun.identity.liberty.ws.jaxb.packageList";
     private static JAXBContext jaxbContext = null;
     private static final String PROP_JAXB_FORMATTED_OUTPUT =
                                         "jaxb.formatted.output";
     private static final String PROP_NAMESPACE_PREFIX_MAPPER =
-                                    "com.sun.xml.bind.namespacePrefixMapper";
+                                    "org.glassfish.jaxb.namespacePrefixMapper";
 
     private static NamespacePrefixMapperImpl nsPrefixMapper =
                                             new NamespacePrefixMapperImpl();
@@ -109,7 +108,8 @@ public final class SAML2MetaUtils {
                 debug.message("SAML2MetaUtils.static: " +
                     "jaxbPackages = " + jaxbPackages);
             }
-            jaxbContext = JAXBContext.newInstance(jaxbPackages);
+            jaxbContext = JAXBContext.newInstance(jaxbPackages,
+                Thread.currentThread().getContextClassLoader());
         } catch (JAXBException jaxbe) {
             debug.error("SAML2MetaUtils.static:", jaxbe);
         }

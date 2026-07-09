@@ -61,7 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import jakarta.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 public class IDFFModelImpl
         extends EntityModelImpl
@@ -690,7 +690,7 @@ public class IDFFModelImpl
                         (String) AMAdminUtils.getValue((Set) attrValues.get(
                         ATTR_FEDERATION_TERMINATION_NOTIFICATION_PROTOCOL_PROFILE)))) {
                     pDesc.getFederationTerminationNotificationProtocolProfile().add(
-                            federationTerminationProfileList.get(i));
+                            (String) federationTerminationProfileList.get(i));
                 }
             }
 
@@ -704,7 +704,7 @@ public class IDFFModelImpl
                         (String) AMAdminUtils.getValue((Set) attrValues.get(
                         ATTR_SINGLE_LOGOUT_PROTOCOL_PROFILE)))) {
                     pDesc.getSingleLogoutProtocolProfile().add(
-                            singleLogoutProfileList.get(i));
+                            (String) singleLogoutProfileList.get(i));
                 }
             }
 
@@ -718,7 +718,7 @@ public class IDFFModelImpl
                         (String) AMAdminUtils.getValue((Set) attrValues.get(
                         ATTR_REGISTRATION_NAME_IDENTIFIER_PROFILE_PROFILE)))) {
                     pDesc.getRegisterNameIdentifierProtocolProfile().add(
-                            nameRegistrationProfileList.get(i));
+                            (String) nameRegistrationProfileList.get(i));
                 }
             }
 
@@ -762,14 +762,6 @@ public class IDFFModelImpl
                     {realm, entityName, "IDFF", "SP-Standard Metadata", strError};
             logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR", paramsEx);
             throw new AMConsoleException(strError);
-        } catch (JAXBException e) {
-            debug.error("JAXBException, updateEntitySPDescriptor");
-            String strError = getErrorString(e);
-            String[] paramsEx =
-                    {realm, entityName, "IDFF", "SP-Standard Metadata", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR", paramsEx);
-            throw new AMConsoleException(strError);
-
         }
     }
 
@@ -849,7 +841,7 @@ public class IDFFModelImpl
                         (String) AMAdminUtils.getValue((Set) attrValues.get(
                         ATTR_FEDERATION_TERMINATION_NOTIFICATION_PROTOCOL_PROFILE)))) {
                     pDesc.getFederationTerminationNotificationProtocolProfile().add(
-                            federationTerminationProfileList.get(i));
+                            (String) federationTerminationProfileList.get(i));
                 }
             }
 
@@ -863,7 +855,7 @@ public class IDFFModelImpl
                         (String) AMAdminUtils.getValue((Set) attrValues.get(
                         ATTR_SINGLE_LOGOUT_PROTOCOL_PROFILE)))) {
                     pDesc.getSingleLogoutProtocolProfile().add(
-                            singleLogoutProfileList.get(i));
+                            (String) singleLogoutProfileList.get(i));
                 }
             }
 
@@ -877,7 +869,7 @@ public class IDFFModelImpl
                         (String) AMAdminUtils.getValue((Set) attrValues.get(
                         ATTR_REGISTRATION_NAME_IDENTIFIER_PROFILE_PROFILE)))) {
                     pDesc.getRegisterNameIdentifierProtocolProfile().add(
-                            nameRegistrationProfileList.get(i));
+                            (String) nameRegistrationProfileList.get(i));
                 }
             }
 
@@ -891,7 +883,7 @@ public class IDFFModelImpl
                         (String) AMAdminUtils.getValue((Set) attrValues.get(
                         ATTR_SINGLE_SIGN_ON_PROTOCOL_PROFILE)))) {
                     pDesc.getSingleSignOnProtocolProfile().add(
-                            federationProfileList.get(i));
+                            (String) federationProfileList.get(i));
                 }
 
             }
@@ -1417,8 +1409,6 @@ public class IDFFModelImpl
             }
             idffMetaMgr.setEntityConfig(realm, entityConfig);
         } catch (IDFFMetaException e) {
-            throw new AMConsoleException(getErrorString(e));
-        } catch (JAXBException e) {
             throw new AMConsoleException(getErrorString(e));
         }
     }

@@ -56,7 +56,7 @@ import com.sun.identity.liberty.ws.meta.jaxb.ProviderDescriptorType;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * The <code>IDFFMetaSecurityUtils</code> class provides metadata security 
@@ -246,7 +246,7 @@ public final class IDFFMetaSecurityUtils {
         List keys = desp.getKeyDescriptor();
         for (Iterator iter = keys.iterator(); iter.hasNext();) {
             KeyDescriptorElement key = (KeyDescriptorElement) iter.next();
-            if (key.getUse().equalsIgnoreCase(newKey.getUse())) {
+            if (key.getUse() != null && key.getUse().equals(newKey.getUse())) {
                 iter.remove();
             }
         }
@@ -262,7 +262,7 @@ public final class IDFFMetaSecurityUtils {
         }
         for (Iterator iter = keys.iterator(); iter.hasNext();) {
             KeyDescriptorElement key = (KeyDescriptorElement) iter.next();
-            if (key.getUse().equalsIgnoreCase(keyUse)) {
+            if (key.getUse() != null && key.getUse().value().equalsIgnoreCase(keyUse)) {
                 iter.remove();
             }
         }
@@ -271,23 +271,19 @@ public final class IDFFMetaSecurityUtils {
     private static void setExtendedAttributeValue(
         BaseConfigType config,
         String attrName, Set attrVal) throws IDFFMetaException {
-        try {
-            List attributes = config.getAttribute();
-            for(Iterator iter = attributes.iterator(); iter.hasNext();) {
-                AttributeType avp = (AttributeType)iter.next();
-                if (avp.getName().trim().equalsIgnoreCase(attrName)) {
-                     iter.remove(); 
-                }
+        List attributes = config.getAttribute();
+        for(Iterator iter = attributes.iterator(); iter.hasNext();) {
+            AttributeType avp = (AttributeType)iter.next();
+            if (avp.getName().trim().equalsIgnoreCase(attrName)) {
+                 iter.remove(); 
             }
-            if (attrVal != null) {
-                ObjectFactory factory = new ObjectFactory();
-                AttributeType atype = factory.createAttributeType();
-                atype.setName(attrName);
-                atype.getValue().addAll(attrVal);
-                config.getAttribute().add(atype);
-            }
-        } catch (JAXBException e) {
-            throw new IDFFMetaException(e);
+        }
+        if (attrVal != null) {
+            ObjectFactory factory = new ObjectFactory();
+            AttributeType atype = factory.createAttributeType();
+            atype.setName(attrName);
+            atype.getValue().addAll(attrVal);
+            config.getAttribute().add(atype);
         }
     }
 

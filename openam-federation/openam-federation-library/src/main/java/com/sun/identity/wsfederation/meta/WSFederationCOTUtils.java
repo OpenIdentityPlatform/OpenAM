@@ -29,7 +29,7 @@
 
 package com.sun.identity.wsfederation.meta;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import java.util.Iterator;
 import java.util.List;
 import com.sun.identity.shared.debug.Debug;
@@ -37,7 +37,9 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeType;
 import com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement;
+import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.ObjectFactory;
+import com.sun.identity.wsfederation.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement;
 
 /**
@@ -99,7 +101,7 @@ public class WSFederationCOTUtils {
             atype.getValue().add(name);
             // add to eConfig
             FederationConfigElement ele = 
-                objFactory.createFederationConfigElement();
+                new FederationConfigElement();
             ele.setFederationID(entityId);
             ele.setHosted(false);
             List ll =
@@ -109,11 +111,11 @@ public class WSFederationCOTUtils {
             // IdP will have UriNamedClaimTypesOffered
             if (metaManager.getUriNamedClaimTypesOffered(edes) != 
                 null) {
-                bctype = objFactory.createIDPSSOConfigElement();
+                bctype = new IDPSSOConfigElement();
                 bctype.getAttribute().add(atype);
                 ll.add(bctype);
             } else {
-                bctype = objFactory.createSPSSOConfigElement();
+                bctype = new SPSSOConfigElement();
                 bctype.getAttribute().add(atype);
                 ll.add(bctype);
             }

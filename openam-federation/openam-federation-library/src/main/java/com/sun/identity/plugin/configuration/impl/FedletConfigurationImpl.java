@@ -54,7 +54,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -117,6 +117,23 @@ public class FedletConfigurationImpl implements ConfigurationInstance {
         } 
     }
 
+    /** Sets the fedlet home directory path, allowing the service provider to inject the correct path. */
+    public static void setFedletHomeDir(String path) {
+        fedletHomeDir = path;
+    }
+
+    /** Returns the entity map, allowing the service provider to inspect and repair it when needed. */
+    @SuppressWarnings("rawtypes")
+    public static Map getEntityMap() {
+        return entityMap;
+    }
+
+    /** Sets the entity map, allowing the service provider to inject repaired metadata when needed. */
+    @SuppressWarnings("rawtypes")
+    public static void setEntityMap(Map map) {
+        entityMap = map;
+    }
+
     /**
      * Returns Configurations.
      * @param realm the name of organization at which the configuration resides.
@@ -163,7 +180,7 @@ public class FedletConfigurationImpl implements ConfigurationInstance {
      * COT is stored in a file named <filename>.cot
      *
      */
-    private void initializeMetadataAndCOT() {
+    public void initializeMetadataAndCOT() {
         try {
             // read all SAML2 metadata/COT files from fedlet home directory
             File homeDir = new File(fedletHomeDir); 

@@ -68,6 +68,8 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.assertion.AttributeElement;
+import com.sun.identity.saml2.jaxb.assertion.AttributeType;
+import com.sun.identity.saml2.jaxb.assertion.AttributeType;
 import com.sun.identity.saml2.jaxb.assertion.AttributeValueElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeAuthorityConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeQueryConfigElement;
@@ -832,7 +834,7 @@ public class AttributeQueryUtil {
         return AssertionFactory.getInstance().createEncryptedAssertion(el);
     }
 
-    private static List<Attribute> verifyDesiredAttributes(List<AttributeElement> supportedAttrs,
+    private static List<Attribute> verifyDesiredAttributes(List<AttributeType> supportedAttrs,
             List<Attribute> desiredAttrs) throws SAML2Exception {
         if (supportedAttrs == null || supportedAttrs.isEmpty()) {
             return desiredAttrs;
@@ -844,9 +846,9 @@ public class AttributeQueryUtil {
 
         for (Attribute desiredAttr : desiredAttrs) {
             boolean isAttrValid = false;
-            Iterator<AttributeElement> supportedAttrIterator = supportedAttrs.iterator();
+            Iterator<AttributeType> supportedAttrIterator = supportedAttrs.iterator();
             while (supportedAttrIterator.hasNext()) {
-                AttributeElement supportedAttr = supportedAttrIterator.next();
+                AttributeType supportedAttr = supportedAttrIterator.next();
                 if (isSameAttribute(desiredAttr, supportedAttr)) {
                     if (isValueValid(desiredAttr, supportedAttr)) {
                         isAttrValid = true;
@@ -988,7 +990,7 @@ public class AttributeQueryUtil {
         }
     }
 
-    private static boolean isSameAttribute(Attribute desired, AttributeElement supported) {
+    private static boolean isSameAttribute(Attribute desired, AttributeType supported) {
         return desired.getName().equals(supported.getName())
                 && isNameFormatMatching(desired.getNameFormat(), supported.getNameFormat());
     }
@@ -1015,7 +1017,7 @@ public class AttributeQueryUtil {
     }
 
     private static boolean isValueValid(Attribute desiredAttr,
-        AttributeElement supportedAttr) {
+        AttributeType supportedAttr) {
 
         List valuesD = desiredAttr.getAttributeValueString();
         if ((valuesD == null) || (valuesD.isEmpty())) {

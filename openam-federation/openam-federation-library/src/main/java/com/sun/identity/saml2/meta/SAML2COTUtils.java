@@ -29,7 +29,7 @@
 
 package com.sun.identity.saml2.meta;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,10 +40,18 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.jaxb.entityconfig.AffiliationConfigElement;
+
+import com.sun.identity.saml2.jaxb.entityconfig.AttributeAuthorityConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.AttributeQueryConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeType;
+import com.sun.identity.saml2.jaxb.entityconfig.AuthnAuthorityConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.ObjectFactory;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.XACMLAuthzDecisionQueryConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.XACMLPDPConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.AttributeAuthorityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.AuthnAuthorityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
@@ -125,12 +133,12 @@ public class SAML2COTUtils {
             atype.setName(SAML2Constants.COT_LIST);
             atype.getValue().add(name);
             // add to eConfig
-            EntityConfigElement ele =objFactory.createEntityConfigElement();
+            EntityConfigElement ele = new EntityConfigElement();
             ele.setEntityID(entityId);
             ele.setHosted(false);
             if (isAffiliation) {
                 // handle affiliation case
-                bctype = objFactory.createAffiliationConfigElement();
+                bctype = new AffiliationConfigElement();
                 bctype.getAttribute().add(atype);
                 ele.setAffiliationConfig(bctype);
             } else {
@@ -143,35 +151,33 @@ public class SAML2COTUtils {
                 for(Iterator iter = list.iterator(); iter.hasNext();) {
                     Object obj = iter.next();
                     if (obj instanceof SPSSODescriptorElement) {
-                        bctype = objFactory.createSPSSOConfigElement();
+                        bctype = new SPSSOConfigElement();
                         bctype.getAttribute().add(atype);
                         ll.add(bctype);
                     } else if (obj instanceof IDPSSODescriptorElement) {
-                        bctype = objFactory.createIDPSSOConfigElement();
+                        bctype = new IDPSSOConfigElement();
                         bctype.getAttribute().add(atype);
                         ll.add(bctype);
                     } else if (obj instanceof XACMLPDPDescriptorElement) {
-                        bctype = objFactory.createXACMLPDPConfigElement();
+                        bctype = new XACMLPDPConfigElement();
                         bctype.getAttribute().add(atype);
                         ll.add(bctype);
                     } else if (obj instanceof 
                         XACMLAuthzDecisionQueryDescriptorElement) 
                     {
-                        bctype =
-                        objFactory.createXACMLAuthzDecisionQueryConfigElement();
+                        bctype = new XACMLAuthzDecisionQueryConfigElement();
                         bctype.getAttribute().add(atype);
                         ll.add(bctype);
                     } else if (obj instanceof AttributeAuthorityDescriptorElement) {
-                        bctype = 
-                            objFactory.createAttributeAuthorityConfigElement();
+                        bctype = new AttributeAuthorityConfigElement();
                         bctype.getAttribute().add(atype);
                         ll.add(bctype);
                     } else if (obj instanceof  AttributeQueryDescriptorElement){
-                        bctype = objFactory.createAttributeQueryConfigElement();
+                        bctype = new AttributeQueryConfigElement();
                         bctype.getAttribute().add(atype);
                         ll.add(bctype);
                     } else if (obj instanceof AuthnAuthorityDescriptorElement) {
-                        bctype = objFactory.createAuthnAuthorityConfigElement();
+                        bctype = new AuthnAuthorityConfigElement();
                         bctype.getAttribute().add(atype);
                         ll.add(bctype);
                     }

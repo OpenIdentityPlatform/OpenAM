@@ -38,7 +38,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import com.sun.identity.saml.xmlsig.AMSignatureProvider;
 import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType;
@@ -520,13 +520,14 @@ public final class SAML2MetaSecurityUtils {
     }
 
     private static void updateKeyDescriptor(RoleDescriptorType desp, Set<KeyDescriptorType> keyDescriptors) {
-        String use = keyDescriptors.iterator().next().getUse();
+        KeyDescriptorType firstKD = keyDescriptors.iterator().next();
+        String use = firstKD.getUse() != null ? firstKD.getUse().value() : null;
         List<KeyDescriptorType> keys = desp.getKeyDescriptor();
 
         Iterator<KeyDescriptorType> iterator = keys.iterator();
         while (iterator.hasNext()) {
             final KeyDescriptorType keyDescriptor = iterator.next();
-            if (keyDescriptor.getUse().equalsIgnoreCase(use)) {
+            if (keyDescriptor.getUse() != null && keyDescriptor.getUse().value().equalsIgnoreCase(use)) {
                 iterator.remove();
             }
         }
@@ -544,7 +545,7 @@ public final class SAML2MetaSecurityUtils {
                 keyUse = "signing";
             }
             if ((key.getUse() != null) && 
-                key.getUse().equalsIgnoreCase(keyUse)) {
+                key.getUse().value().equalsIgnoreCase(keyUse)) {
                 iter.remove();
             }
         }
@@ -553,7 +554,6 @@ public final class SAML2MetaSecurityUtils {
     private static void setExtendedAttributeValue(
         BaseConfigType config,
         String attrName, Set attrVal) throws SAML2MetaException {
-        try {
             List attributes = config.getAttribute();
             for(Iterator iter = attributes.iterator(); iter.hasNext();) {
                 AttributeType avp = (AttributeType)iter.next();
@@ -568,9 +568,6 @@ public final class SAML2MetaSecurityUtils {
                 atype.getValue().addAll(attrVal);
                 config.getAttribute().add(atype);
             }
-        } catch (JAXBException e) {
-            throw new SAML2MetaException(e);
-        }
     }
 
     private static KeyDescriptorElement getKeyDescriptor(

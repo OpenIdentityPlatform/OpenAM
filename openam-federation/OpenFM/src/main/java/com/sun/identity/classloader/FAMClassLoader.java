@@ -223,6 +223,7 @@ public class FAMClassLoader {
         "com.sun.xml.security.",
         "com.sun.xml.xwss.",
         "javax.xml.bind.",
+        "jakarta.xml.bind.",
         "javax.xml.ws.",
         "javax.jws.",
         "javax.jws.soap.",
@@ -263,6 +264,7 @@ public class FAMClassLoader {
         "com.sun.xml.security.",
         "com.sun.xml.xwss.",
         "javax.xml.bind.",
+        "jakarta.xml.bind.",
         "javax.xml.ws.",
         "javax.jws.",
         "javax.jws.soap.",
@@ -289,9 +291,11 @@ public class FAMClassLoader {
      */
     public static String[] maskedResouces = new String[]{
         "META-INF/services/javax.xml.bind.JAXBContext",
+        "META-INF/services/jakarta.xml.bind.JAXBContext",
         "META-INF/services",
         "/META-INF/services",
         "javax/xml/bind/",
+        "jakarta/xml/bind/",
         "com/sun/xml/ws/",
         "com/sun/xml/wss/",
         "com/sun/xml/bind/",

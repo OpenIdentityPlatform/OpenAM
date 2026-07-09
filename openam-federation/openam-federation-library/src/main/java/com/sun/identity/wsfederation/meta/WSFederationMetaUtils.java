@@ -44,10 +44,10 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import jakarta.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -93,7 +93,7 @@ public final class WSFederationMetaUtils {
     private static final String PROP_JAXB_FORMATTED_OUTPUT =
         "jaxb.formatted.output";
     private static final String PROP_NAMESPACE_PREFIX_MAPPER =
-        "com.sun.xml.bind.namespacePrefixMapper";
+        "org.glassfish.jaxb.namespacePrefixMapper";
 
     private static NamespacePrefixMapperImpl nsPrefixMapper =
         new NamespacePrefixMapperImpl();
@@ -276,7 +276,7 @@ public final class WSFederationMetaUtils {
         for (String key : map.keySet())
         {
             AttributeElement
-                avp = objFactory.createAttributeElement();
+                avp = new AttributeElement();
             avp.setName(key);
             avp.getValue().addAll(map.get(key));
             
@@ -292,9 +292,9 @@ public final class WSFederationMetaUtils {
      */
     public static String getAttribute(BaseConfigType config, String key)
     {
-        List<AttributeElement> list = config.getAttribute();
+        List<AttributeType> list = config.getAttribute();
 
-        for (AttributeElement avp : list) {
+        for (AttributeType avp : list) {
             if (avp.getName().equals(key)) {
                 return CollectionUtils.getFirstItem(avp.getValue());
             }

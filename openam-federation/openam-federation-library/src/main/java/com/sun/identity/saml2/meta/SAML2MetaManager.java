@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -118,6 +118,11 @@ public class SAML2MetaManager {
         } catch (COTException se) {
             debug.error("SAML2MetaManager constructor:", se);
         }
+    }
+
+    /** Returns the shared ConfigurationInstance, allowing the service provider to access it directly. */
+    public static ConfigurationInstance getConfigInstance() {
+        return configInstStatic;
     }
 
     /**
@@ -1531,8 +1536,7 @@ public class SAML2MetaManager {
                 if (config == null || !config.isHosted()) {
                     continue;
                 }
-                List<BaseConfigType> configList = config.getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
-                for (BaseConfigType bConfigType : configList) {
+                for (BaseConfigType bConfigType : config.getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig()) {
                     String curMetaAlias = bConfigType.getMetaAlias();
                     if (curMetaAlias != null && !curMetaAlias.isEmpty()) {
                         metaAliases.add(curMetaAlias);

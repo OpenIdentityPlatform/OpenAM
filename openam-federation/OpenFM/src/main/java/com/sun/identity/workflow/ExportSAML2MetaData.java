@@ -35,7 +35,7 @@ import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * Export SAML2 Metadata.
