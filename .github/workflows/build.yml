@@ -17,6 +17,9 @@ on:
   push:
     branches: [ 'sustaining/15.2.x','master','issues/**','features/**' ]
   pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build-maven:
     runs-on: ${{ matrix.os }}
