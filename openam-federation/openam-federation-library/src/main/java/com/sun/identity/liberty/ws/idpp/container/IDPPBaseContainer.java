@@ -32,7 +32,7 @@ package com.sun.identity.liberty.ws.idpp.container;
 import static org.forgerock.openam.utils.Time.*;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
@@ -142,9 +142,9 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
               value = uri.getValue();
            } else if (obj instanceof DSTDate) {
               DSTDate date = (DSTDate)obj;
-              Calendar cal = date.getValue();
+              javax.xml.datatype.XMLGregorianCalendar cal = date.getValue();
               if(cal != null) {
-                 value = DateFormat.getDateInstance().format(cal.getTime());
+                 value = DateFormat.getDateInstance().format(cal.toGregorianCalendar().getTime());
               }
 
            } else if (obj instanceof DSTInteger) {
@@ -153,7 +153,7 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
 
            } else if (obj instanceof DSTMonthDay) {
               DSTMonthDay dstMon = (DSTMonthDay)obj;
-              value = dstMon.getValue();
+              value = dstMon.getValue() != null ? dstMon.getValue().toString() : null;
            }
 
            if(value != null) {
@@ -202,14 +202,9 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
            IDPPUtils.debug.message("IDPPBaseContainer:getDSTString:null vals");
            return null;
         }
-        try {
-            DSTString dstString = IDPPUtils.getIDPPFactory().createDSTString();
-            dstString.setValue(value);
-            return dstString;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("IDPPBaseContainer:getDSTString:jaxbFail",je);
-            return null;
-        }
+        DSTString dstString = IDPPUtils.getIDPPFactory().createDSTString();
+        dstString.setValue(value);
+        return dstString;
      }
 
      /**
@@ -228,7 +223,10 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
                  DateFormat.getDateInstance(DateFormat.MEDIUM).parse(value);
             Calendar cal = getCalendarInstance();
             cal.setTime(date);
-            dstDate.setValue(cal);
+            if (cal instanceof java.util.GregorianCalendar) {
+                dstDate.setValue(javax.xml.datatype.DatatypeFactory.newInstance()
+                    .newXMLGregorianCalendar((java.util.GregorianCalendar) cal));
+            }
             return dstDate;
         } catch(Exception e) {
             IDPPUtils.debug.error("IDPPBaseContainer:getDSTDate: Exception", e);
@@ -249,7 +247,8 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
         try {
             DSTMonthDay dstMonthDay = 
                  IDPPUtils.getIDPPFactory().createDSTMonthDay();
-            dstMonthDay.setValue(value);
+            dstMonthDay.setValue(
+                javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar(value));
             return dstMonthDay;
         } catch(Exception e) {
             IDPPUtils.debug.error("IDPPBaseContainer:getDSTMonthDay: " +
@@ -269,14 +268,9 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
            IDPPUtils.debug.message("IDPPBaseContainer:getDSTURI:null vals");
            return null;
         }
-        try {
-            DSTURI dstURI = IDPPUtils.getIDPPFactory().createDSTURI();
-            dstURI.setValue(value);
-            return dstURI;
-        } catch(JAXBException je) {
-            IDPPUtils.debug.error("IDPPBaseContainer:getDSTURI: Exception", je);
-            return null;
-        }
+        DSTURI dstURI = IDPPUtils.getIDPPFactory().createDSTURI();
+        dstURI.setValue(value);
+        return dstURI;
      }
 
      /**
@@ -294,9 +288,6 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
                  IDPPUtils.getIDPPFactory().createDSTInteger();
             dstInteger.setValue(new BigInteger(value));
             return dstInteger;
-        } catch(JAXBException je) {
-            IDPPUtils.debug.error("IDPPBaseContainer:getDSTInteger:Error", je);
-            return null;
         } catch(NumberFormatException nfe) {
             IDPPUtils.debug.error("IDPPBaseContainer:getDSTInteger: " +
             "Invalid number", nfe);
@@ -315,7 +306,6 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
      throws IDPPException {
         IDPPUtils.debug.message("IDPPContainers:getAnalyzedName:Init");
         AnalyzedNameType analyzedName = null;
-        try {
             analyzedName = IDPPUtils.getIDPPFactory().createAnalyzedNameType();
 
             String value = CollectionHelper.getMapAttr(
@@ -353,12 +343,6 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
                analyzedName.setMN(getDSTString(value));
             }
             return analyzedName;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("IDPPContainers:getAnalyzedName: " +
-            "JAXB failure", je);
-             throw new IDPPException(
-             IDPPUtils.bundle.getString("jaxbFailure"));
-        }
      }
 
      /**
@@ -379,15 +363,14 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
         try {
             IDPPUtils.getMarshaller().marshal(getContainerObject(userMap),doc);
             return doc;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("IDPPBaseContainer:toXMLDocument:"+
-            "JAXB exception while marshalling container .", je);
-            throw new IDPPException(
-            IDPPUtils.bundle.getString("jaxbFailure"));
         } catch(IDPPException ie) {
             IDPPUtils.debug.error("IDPPBaseContainer:toXMLDocument:" +
             "Error retrieving common name.", ie);
              throw new IDPPException(ie);
+        } catch(JAXBException je) {
+            IDPPUtils.debug.error("IDPPBaseContainer:toXMLDocument:" +
+            "JAXB marshalling error.", je);
+             throw new IDPPException(je);
         }
      }
 

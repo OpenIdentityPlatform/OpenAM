@@ -67,9 +67,9 @@ public class IDPPCommonName extends IDPPBaseContainer {
 
          IDPPUtils.debug.message("IDPPContainers:getContainerObject:Init");
          try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+             PPType ppType = new PPElement();
              CommonNameElement ce = 
-                   IDPPUtils.getIDPPFactory().createCommonNameElement();
+                   new CommonNameElement();
 
              String cn = CollectionHelper.getMapAttr(
                 userMap, getAttributeMapper().getDSAttribute(
@@ -95,11 +95,6 @@ public class IDPPCommonName extends IDPPBaseContainer {
 
              ppType.setCommonName(ce);
              return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPContainers:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
          } catch (IDPPException ie) {
               IDPPUtils.debug.error("IDPPContainers:getContainerObject:" +
               "Error while creating common name.", ie);

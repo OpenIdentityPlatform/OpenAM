@@ -28,7 +28,7 @@
  */
 package com.sun.identity.cot;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import com.sun.identity.federation.meta.IDFFCOTUtils;
 import com.sun.identity.federation.meta.IDFFMetaException;
 import com.sun.identity.federation.meta.IDFFMetaManager;

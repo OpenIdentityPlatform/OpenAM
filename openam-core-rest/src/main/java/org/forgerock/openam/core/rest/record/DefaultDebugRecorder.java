@@ -455,7 +455,7 @@ public class DefaultDebugRecorder implements DebugRecorder {
                         .separator + RecordConstants.INFO_FILE_NAME));
 
                 previousRecordDate = recordReport.getDateFromInfoReport(infoJson);
-            } catch (IOException | ParseException | JsonValueException e) {
+            } catch (IOException | IllegalArgumentException | ParseException | JsonValueException e) {
                 debug.error("Can't extract starting date from previous record. We will use the current date instead",
                         e);
                 previousRecordDate = newDate();

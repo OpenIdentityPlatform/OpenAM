@@ -295,7 +295,7 @@ public class KeyUtil {
         KeyDescriptorType noUsageKD = null;
         while (iter.hasNext()) {
             kd = (KeyDescriptorType)iter.next();
-            use = kd.getUse();
+            use = kd.getUse() != null ? kd.getUse().value() : null;
             if ((use == null) || (use.trim().length() == 0)) {
 		if (noUsageKD == null) {
                     noUsageKD = kd;
@@ -349,8 +349,9 @@ public class KeyUtil {
             return null;
         }
         X509DataElement data = (X509DataElement) ki.getContent().get(0);
-        byte[] bt = 
-            ((com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509Certificate)
+        @SuppressWarnings("unchecked")
+        byte[] bt =
+            ((jakarta.xml.bind.JAXBElement<byte[]>)
              data.getX509IssuerSerialOrX509SKIOrX509SubjectName().get(0)).
             getValue();
         CertificateFactory cf = null;

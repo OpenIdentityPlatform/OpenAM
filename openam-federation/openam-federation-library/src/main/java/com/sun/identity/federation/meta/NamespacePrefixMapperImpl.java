@@ -29,7 +29,7 @@
 
 package com.sun.identity.federation.meta;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
     

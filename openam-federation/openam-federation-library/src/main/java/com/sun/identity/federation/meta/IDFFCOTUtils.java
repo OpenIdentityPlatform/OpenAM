@@ -27,13 +27,15 @@
  */
 package com.sun.identity.federation.meta;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import com.sun.identity.cot.COTConstants;
 import com.sun.identity.federation.jaxb.entityconfig.AffiliationDescriptorConfigElement;
 import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.jaxb.entityconfig.ObjectFactory;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.liberty.ws.meta.jaxb.EntityDescriptorElement;
 import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
@@ -93,24 +95,23 @@ public class IDFFCOTUtils {
             atype.setName(COT_LIST);
             atype.getValue().add(cotName);
             // add to entityConfig
-            entityConfig = objFactory.createEntityConfigElement();
+            entityConfig = new EntityConfigElement();
             entityConfig.setEntityID(entityID);
             entityConfig.setHosted(false);
             // Decide which role EntityDescriptorElement includes
             // It could have one sp and one idp.
             if (IDFFMetaUtils.getSPDescriptor(entityDesc) != null) {
-                IDFFCOTUtils = objFactory.createSPDescriptorConfigElement();
+                IDFFCOTUtils = new SPDescriptorConfigElement();
                 IDFFCOTUtils.getAttribute().add(atype);
                 entityConfig.getSPDescriptorConfig().add(IDFFCOTUtils);
             }
             if (IDFFMetaUtils.getIDPDescriptor(entityDesc) != null) {
-                IDFFCOTUtils = objFactory.createIDPDescriptorConfigElement();
+                IDFFCOTUtils = new IDPDescriptorConfigElement();
                 IDFFCOTUtils.getAttribute().add(atype);
                 entityConfig.getIDPDescriptorConfig().add(IDFFCOTUtils);
             }
             if (entityDesc.getAffiliationDescriptor() != null) {
-                IDFFCOTUtils = 
-                    objFactory.createAffiliationDescriptorConfigElement();
+                IDFFCOTUtils = new AffiliationDescriptorConfigElement();
                 IDFFCOTUtils.getAttribute().add(atype);
                 entityConfig.setAffiliationDescriptorConfig(IDFFCOTUtils);
             }

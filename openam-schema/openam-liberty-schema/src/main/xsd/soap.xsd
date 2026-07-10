@@ -62,9 +62,9 @@
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:tns="http://schemas.xmlsoap.org/soap/envelope/"
-           xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+           xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
            targetNamespace="http://schemas.xmlsoap.org/soap/envelope/"
-           jxb:version="1.0" >
+           jxb:version="3.0" >
 
   <!-- Envelope, header and body -->
   <xs:element name="Envelope" type="tns:EnvelopeType" />

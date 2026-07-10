@@ -50,7 +50,7 @@ import com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerEndpointElemen
 import com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerNameElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.ObjectFactory;
 import java.util.Set;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
@@ -719,9 +719,6 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                 }
                 metaManager.setEntityConfig(realm,ele);
             }
-        } catch (JAXBException e) {
-            debug.warning("WSFedPropertiesModelImpl.createExtendedObject", e);
-            throw new AMConsoleException(getErrorString(e));
         } catch (WSFederationMetaException e) {
             debug.warning("WSFedPropertiesModelImpl.createExtendedObject", e);
             throw new AMConsoleException(getErrorString(e));
@@ -739,19 +736,13 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             Map values,
             BaseConfigType bconfig
             )throws AMConsoleException {
-        try {
-            ObjectFactory objFactory = new ObjectFactory();
-            for (Iterator iter=values.keySet().iterator();
-            iter.hasNext();) {
-                AttributeElement avp = objFactory.createAttributeElement();
-                String key = (String)iter.next();
-                avp.setName(key);
-                bconfig.getAttribute().add(avp);
-            }
-        } catch (JAXBException e) {
-            debug.warning
-                    ("WSFedPropertiesModelImpl.createAttributeElement", e);
-            throw new AMConsoleException(e.getMessage());
+        ObjectFactory objFactory = new ObjectFactory();
+        for (Iterator iter=values.keySet().iterator();
+        iter.hasNext();) {
+            AttributeElement avp = objFactory.createAttributeElement();
+            String key = (String)iter.next();
+            avp.setName(key);
+            bconfig.getAttribute().add(avp);
         }
         return bconfig;
     }

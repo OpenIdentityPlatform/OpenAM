@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.bind.JAXBException;
 
 import org.forgerock.openam.utils.StringUtils;
 
@@ -121,7 +120,7 @@ public class GetCircleOfTrusts
                         bConfig.getMetaAlias());
                 }
             }
-        } catch (JAXBException e) {
+        } catch (jakarta.xml.bind.JAXBException e) {
             throw new WorkflowException("invalid-extended-data-cot", null);
         }
         return realm;

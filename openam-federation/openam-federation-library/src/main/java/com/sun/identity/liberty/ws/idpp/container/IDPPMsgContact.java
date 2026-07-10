@@ -64,8 +64,7 @@ public class IDPPMsgContact extends IDPPBaseContainer {
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPMsgContact:getContainerObject:Init");
-        try {
-            PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+            PPType ppType = new PPElement();
             Set msgContacts = (Set)userMap.get(
                 getAttributeMapper().getDSAttribute(
                 IDPPConstants.MSG_CONTACT_ELEMENT).toLowerCase());
@@ -84,13 +83,6 @@ public class IDPPMsgContact extends IDPPBaseContainer {
                }
             }
             return ppType;
-
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error(
-            "IDPPMsgContact:getContainerObject: JAXB failure", je); 
-            throw new IDPPException(
-            IDPPUtils.bundle.getString("jaxbFailure"));
-        }
      }
 
      /**
@@ -100,8 +92,7 @@ public class IDPPMsgContact extends IDPPBaseContainer {
       * @return MsgContactElement. 
       * @exception JAXBException.
       */
-     private MsgContactElement parseEntry(String entry, Map userMap)
-        throws JAXBException {
+     private MsgContactElement parseEntry(String entry, Map userMap) {
 
          if(entry == null || entry.length() == 0) {
             return null;
@@ -116,7 +107,7 @@ public class IDPPMsgContact extends IDPPBaseContainer {
          }
 
          MsgContactElement mse = 
-              IDPPUtils.getIDPPFactory().createMsgContactElement();
+              new MsgContactElement();
 
          StringTokenizer st = 
              new StringTokenizer(entry, IDPPConstants.ATTRIBUTE_SEPARATOR);
@@ -157,7 +148,9 @@ public class IDPPMsgContact extends IDPPBaseContainer {
             } else if(attribute.equals("MsgMethod")) {
                mse.getMsgMethod().add(getDSTURI(value));
             } else if(attribute.equals("MsgTechnology")) {
-               mse.getMsgTechnology().add(getDSTURI(value));
+               MsgTechnologyElement mte = new MsgTechnologyElement();
+               mte.setValue(value);
+               mse.getMsgTechnology().add(mte);
             } else if(attribute.equals("MsgAccount")) {
                mse.setMsgAccount(getDSTString(value));
             } else if(attribute.equals("MsgSubAccount")) {

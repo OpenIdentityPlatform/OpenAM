@@ -55,7 +55,7 @@ import com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
@@ -250,8 +250,8 @@ public class SPSSOFederate {
             }
 
             String binding = getParameter(paramsMap, SAML2Constants.REQ_BINDING);
-            List<SingleSignOnServiceElement> ssoServiceList = idpsso.getSingleSignOnService();
-            final SingleSignOnServiceElement endPoint = getSingleSignOnServiceEndpoint(ssoServiceList, binding);
+            List<EndpointType> ssoServiceList = idpsso.getSingleSignOnService();
+            final EndpointType endPoint = getSingleSignOnServiceEndpoint(ssoServiceList, binding);
 
             if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
                 String[] data = { idpEntityID };
@@ -586,8 +586,8 @@ public class SPSSOFederate {
                                 realm, idpEntityID, SAML2Constants.IDP_ROLE,
                                 SAML2Constants.ENTITY_DESCRIPTION);
                             idpEntry.setName(description);
-                            List<SingleSignOnServiceElement> ssoServiceList = idpDesc.getSingleSignOnService();
-                            SingleSignOnServiceElement endPoint = getSingleSignOnServiceEndpoint(ssoServiceList, SAML2Constants.SOAP);
+                            List<EndpointType> ssoServiceList = idpDesc.getSingleSignOnService();
+                            EndpointType endPoint = getSingleSignOnServiceEndpoint(ssoServiceList, SAML2Constants.SOAP);
                             if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
                                 throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotfound"));
                             }
@@ -958,13 +958,13 @@ public class SPSSOFederate {
      *
      * @param ssoServiceList list of sso services
      * @param binding        binding of the sso service to get the url for
-     * @return a SingleSignOnServiceElement or null if no match found.
+     * @return a EndpointType or null if no match found.
      */
-    public static SingleSignOnServiceElement getSingleSignOnServiceEndpoint(
-            List<SingleSignOnServiceElement> ssoServiceList, String binding) {
-        SingleSignOnServiceElement preferredEndpoint = null;
+    public static EndpointType getSingleSignOnServiceEndpoint(
+            List<EndpointType> ssoServiceList, String binding) {
+        EndpointType preferredEndpoint = null;
         boolean noPreferredBinding = StringUtils.isEmpty(binding);
-        for (SingleSignOnServiceElement endpoint : ssoServiceList) {
+        for (EndpointType endpoint : ssoServiceList) {
             if (noPreferredBinding && (SAML2Constants.HTTP_REDIRECT.equals(endpoint.getBinding())
                     || SAML2Constants.HTTP_POST.equals(endpoint.getBinding()))) {
                 preferredEndpoint = endpoint;

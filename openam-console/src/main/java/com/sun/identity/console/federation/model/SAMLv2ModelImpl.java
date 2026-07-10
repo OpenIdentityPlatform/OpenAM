@@ -78,7 +78,7 @@ import com.sun.identity.saml2.jaxb.metadata.EncryptionMethodElement;
 import com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.console.federation.SAMLv2AuthContexts;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.xml.security.encryption.XMLCipher;
 import org.forgerock.openam.utils.StringUtils;
@@ -923,7 +923,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
          try {
              acsElem = objFact.createAssertionConsumerServiceElement();
              
-         } catch (JAXBException e) {
+         } catch (Exception e) {
              if (debug.warningEnabled()) {
                  debug.warning("SAMLv2ModelImpl.getAscObject:", e);
              }
@@ -1706,7 +1706,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 (Set)values.get(NAMEID_FORMAT));
         ssodescriptor.getNameIDFormat().clear();
         for (int i=0; i<listtoSave.size();i++) {
-            ssodescriptor.getNameIDFormat().add(listtoSave.get(i));
+            ssodescriptor.getNameIDFormat().add((String)listtoSave.get(i));
         }
     }
     
@@ -1724,7 +1724,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 for (int i=0; i<keyList.size(); i++) {
                     KeyDescriptorElement keyOne =
                             (KeyDescriptorElement)keyList.get(i);
-                    String type = keyOne.getUse();
+                    String type = (keyOne.getUse() != null) ? keyOne.getUse().value() : null;
                     if ((type == null) || (type.length() == 0) || 
                         type.equals("encryption")) { 
                         List encryptMethod = keyOne.getEncryptionMethod();
@@ -1738,13 +1738,16 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                                 for (Iterator itt = keySizeList.listIterator(); 
                                     itt.hasNext(); ) { 
                                     Object encrptType = (Object)itt.next();
-                                    if (encrptType.getClass().getName().
-                                        contains("KeySizeImpl")) {
-                                        EncryptionMethodType.KeySize keysizeElem =
-                                            (EncryptionMethodType.KeySize)
-                                                keySizeList.get(0);
-                                        BigInteger keysize = keysizeElem.getValue();
-                                        size = Integer.toString(keysize.intValue());
+                                    // JAXB 4.x: KeySize is unmarshaled as JAXBElement<BigInteger>
+                                    if (encrptType instanceof BigInteger) {
+                                        size = Integer.toString(((BigInteger) encrptType).intValue());
+                                    } else if (encrptType instanceof jakarta.xml.bind.JAXBElement) {
+                                        @SuppressWarnings("unchecked")
+                                        jakarta.xml.bind.JAXBElement<BigInteger> ksElem =
+                                            (jakarta.xml.bind.JAXBElement<BigInteger>) encrptType;
+                                        if (ksElem.getValue() instanceof BigInteger) {
+                                            size = Integer.toString(ksElem.getValue().intValue());
+                                        }
                                     }
                                 }
                             }           
@@ -2951,13 +2954,6 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
-        } catch (JAXBException e) {
-            debug.warning("SAMLv2ModelImpl.setStdAttributeAuthorityValues:", e);
-            String strError = getErrorString(e);
-            String[] paramsEx =
-            {realm, entityName, "SAMLv2", "AttribAuthority-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES",
-                    paramsEx);
         }
     }
     
@@ -3104,13 +3100,6 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             logEvent("FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
-        } catch (JAXBException e) {
-            debug.warning("SAMLv2ModelImpl.setStdAttributeAuthorityValues:", e);
-            String strError = getErrorString(e);
-            String[] paramsEx =
-            {realm, entityName, "SAMLv2", "AttribAuthority-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES",
-                    paramsEx);
         }
     }
     

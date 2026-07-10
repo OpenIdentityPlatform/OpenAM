@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import com.sun.identity.saml.xmlsig.AMSignatureProvider;
 import org.w3c.dom.Document;
@@ -551,7 +551,6 @@ public final class WSFederationMetaSecurityUtils {
 
     private static void setExtendedAttributeValue(BaseConfigType config,
         String attrName, Set attrVal) throws WSFederationMetaException {
-        try {
             List attributes = config.getAttribute();
             for(Iterator iter = attributes.iterator(); iter.hasNext();) {
                 AttributeType avp = (AttributeType)iter.next();
@@ -566,9 +565,6 @@ public final class WSFederationMetaSecurityUtils {
                 atype.getValue().addAll(attrVal);
                 config.getAttribute().add(atype);
             }
-        } catch (JAXBException e) {
-            throw new WSFederationMetaException(e);
-        }
     }
 
     private static TokenSigningKeyInfoElement getKeyDescriptor(String certAlias)

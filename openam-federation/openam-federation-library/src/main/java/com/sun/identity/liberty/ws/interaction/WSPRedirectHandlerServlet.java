@@ -62,9 +62,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -514,8 +514,7 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
 
             //read and save query parameters;
             InteractionResponseElement interactionResponseElement 
-                    = JAXBObjectFactory.getObjectFactory()
-                    .createInteractionResponseElement();
+                    = new InteractionResponseElement();
             List list = interactionResponseElement.getParameter();
             Enumeration parameterNames = httpRequest.getParameterNames();
             while ( parameterNames.hasMoreElements()) {
@@ -538,8 +537,7 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
                 int index = parameterName.indexOf(PARAMETER_PREFIX);
                 if (index != -1) {
                     ParameterType parameterType  
-                            = JAXBObjectFactory.getObjectFactory()
-                            .createParameterType();
+                            = new ParameterType();
                     parameterName = parameterName.substring(index
                              + PARAMETER_PREFIX.length());
                     parameterType.setName(parameterName);
@@ -582,13 +580,6 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
                 LogUtil.access(Level.INFO,LogUtil.IS_REDIRECTED_USER_AGENT_BACK,
                                objs);
             }
-        } catch (JAXBException je) {
-            debug.error(
-                    "WSPRedirectHandlerServlet.sendInteractionResponsePage():"
-                    + "catching JAXBException =", je);
-            showErrorPage(httpRequest, httpResponse, 
-                    "Error createing JAXBObject:"
-                    + je.getMessage());
         } catch (Exception e) {
             debug.error(
                     "WSPRedirectHandlerServlet.sendInteractionResponsePage():"

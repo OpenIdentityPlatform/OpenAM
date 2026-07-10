@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.bind.*;
+import jakarta.xml.bind.*;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.liberty.ws.disco.plugins.Default64ResourceIDMapper;

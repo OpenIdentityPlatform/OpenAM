@@ -154,5 +154,12 @@
             <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Jakarta XML Bind (JAXB) API -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.2</version>
+        </dependency>
     </dependencies>
 </project>

@@ -36,7 +36,7 @@ import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.util.List;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.w3c.dom.Document;
 
 /**

@@ -67,10 +67,9 @@ public class IDPPDemographics extends IDPPBaseContainer {
 
          IDPPUtils.debug.message("IDPPDemographics:getContainerObject:Init");
 
-         try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+             PPType ppType = new PPElement();
              DemographicsElement de = 
-                  IDPPUtils.getIDPPFactory().createDemographicsElement();
+                  new DemographicsElement();
 
              String displayLang = CollectionHelper.getMapAttr(userMap, 
                getAttributeMapper().getDSAttribute(
@@ -112,12 +111,6 @@ public class IDPPDemographics extends IDPPBaseContainer {
              ppType.setDemographics(de);
 
              return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPDemographics:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
-         }
      }
 
      /**

@@ -63,10 +63,9 @@ public class IDPPEmploymentIdentity extends IDPPBaseContainer {
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
          IDPPUtils.debug.message("IDPPEmploymentIdentity:getContainerObj:Init");
-         try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+             PPType ppType = new PPElement();
              EmploymentIdentityElement ei = 
-                 IDPPUtils.getIDPPFactory().createEmploymentIdentityElement();
+                 new EmploymentIdentityElement();
              String jobTitle = CollectionHelper.getMapAttr(
                 userMap, getAttributeMapper().getDSAttribute(
                     IDPPConstants.JOB_TITLE_ELEMENT).toLowerCase());
@@ -93,12 +92,6 @@ public class IDPPEmploymentIdentity extends IDPPBaseContainer {
              }
              ppType.setEmploymentIdentity(ei);
              return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPContainers:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
-         }
      }
 
      /**

@@ -75,8 +75,8 @@
     <!-- Project Encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Version Properties -->
-	<maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.source>11</maven.compiler.source>
+	<maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
     <opendj.version>5.0.4</opendj.version>
@@ -2037,6 +2037,7 @@
 			  <configuration>
                 <source>8</source>
 			  	<doclint>none</doclint>
+                <failOnError>false</failOnError>				
                 <notimestamp>true</notimestamp>
                 <excludePackageNames>
                   org.apache.click;org.openidentityplatform.openam.click;org.openidentityplatform.openam.velocity;*.taglib*;*.taglib

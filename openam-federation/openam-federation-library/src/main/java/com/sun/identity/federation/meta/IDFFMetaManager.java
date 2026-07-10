@@ -58,7 +58,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * The <code>IDFFMetaManager</code> provides methods to manage the Service and

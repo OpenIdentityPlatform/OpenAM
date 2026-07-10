@@ -57,11 +57,11 @@ import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.plugin.datastore.DataStoreProviderManager;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.shared.xml.XMLUtils;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -187,7 +187,7 @@ public class IDPPUtils {
                                                    String resourceID,
                                                    boolean includeCommonAttr)
      throws JAXBException, IDPPException {
-         QueryElement query = idppFactory.createQueryElement(); 
+         QueryElement query = new QueryElement(); 
          if(queryExpressions == null || resourceID == null
             || queryExpressions.size() == 0) {
             debug.error("IDPPUtils:createQueryElement: Either query" +
@@ -197,8 +197,8 @@ public class IDPPUtils {
          query.setResourceID(createResourceIDElement(resourceID));
          query.setId(SAMLUtils.generateID());
          for (int i =0; i < queryExpressions.size(); i++) {
-              QueryType.QueryItemType item = 
-              idppFactory.createQueryTypeQueryItemType();
+              QueryType.QueryItem item = 
+              idppFactory.createQueryTypeQueryItem();
               item.setId(SAMLUtils.generateID()); 
               item.setIncludeCommonAttributes(includeCommonAttr);
               item.setItemID(SAMLUtils.generateID());
@@ -234,7 +234,7 @@ public class IDPPUtils {
             throw new IDPPException("ResourceID is null");
          }
          ResourceIDElement resourceIDElement = 
-               idppFactory.createResourceIDElement();
+               new ResourceIDElement();
          resourceIDElement.setValue(resourceID);
          return resourceIDElement;
      }

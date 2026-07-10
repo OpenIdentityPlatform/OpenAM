@@ -29,7 +29,7 @@
 
 package com.sun.identity.liberty.ws.soapbinding;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 /**
  * This class is the implementation of the <code>NamespacePrefixMapper</code>.

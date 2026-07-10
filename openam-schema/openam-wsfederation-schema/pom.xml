@@ -33,7 +33,6 @@
     <!-- Build -->
     <build>
         <plugins>
-<!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
@@ -44,12 +43,44 @@
                             <goal>xjc</goal>
                         </goals>
                     </execution>
-               </executions>
-               <configuration>
+                </executions>
+                <configuration>
                     <extension>true</extension>
-               </configuration>
-           </plugin>
--->
+                    <noGeneratedHeaderComments>true</noGeneratedHeaderComments>
+                    <catalog>src/main/xsd/catalog.xml</catalog>
+                    <xjcSourceExcludeFilters>
+                        <filter implementation="org.codehaus.mojo.jaxb2.shared.filters.pattern.PatternFileFilter">
+                            <patterns>
+                                <pattern>catalog\.xml</pattern>
+                            </patterns>
+                        </filter>
+                    </xjcSourceExcludeFilters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>remove-xjc-sources-shadowed-by-hand-written</id>
+                        <phase>process-sources</phase>
+                        <goals><goal>run</goal></goals>
+                        <configuration>
+                            <target>
+                                <!-- These packages have hand-written replacements in src/main/java that shadow the XJC output -->
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/wsfederation/jaxb/entityconfig/ObjectFactory.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/wsfederation/jaxb/wsfederation/ObjectFactory.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/wsfederation/jaxb/wsse/ObjectFactory.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/wsfederation/jaxb/wsaddr/ObjectFactory.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/wsfederation/jaxb/wspolicy/ObjectFactory.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/wsfederation/jaxb/wsspolicy/ObjectFactory.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/wsfederation/jaxb/xmlsig/ObjectFactory.java"/>
+                                <delete quiet="true" file="${project.build.directory}/generated-sources/jaxb/com/sun/identity/wsfederation/jaxb/xmlsig/X509DataType.java"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -59,15 +90,15 @@
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
-
-		<dependency>
-			<groupId>org.glassfish.metro</groupId>
-			<artifactId>wsit-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb1-impl</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.5</version>
+        </dependency>
     </dependencies>
 </project>
-

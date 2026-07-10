@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.Collection;
 import java.util.logging.Level;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.w3c.dom.*;
 
 import com.sun.identity.shared.xml.XMLUtils;
@@ -313,21 +313,13 @@ public final class DiscoveryService implements RequestHandler {
     private com.sun.identity.liberty.ws.disco.jaxb.ModifyResponseElement update(
                 com.sun.identity.liberty.ws.disco.jaxb.ModifyType modify,
                 com.sun.identity.liberty.ws.soapbinding.Message message)
-                throws JAXBException
     {
         DiscoUtils.debug.message("in update.");
         ModifyResponseElement resp = null;
         StatusType status = null;
-        try {
-            resp =
-                DiscoUtils.getDiscoFactory().createModifyResponseElement();
-            status = DiscoUtils.getDiscoFactory().createStatusType();
-            resp.setStatus(status);
-        } catch (JAXBException je) {
-            DiscoUtils.debug.error("DiscoService.update: couldn't form "
-                + "ModifyResponse.");
-            throw je;
-        }
+        resp = new com.sun.identity.liberty.ws.disco.jaxb.ModifyResponseElement();
+        status = DiscoUtils.getDiscoFactory().createStatusType();
+        resp.setStatus(status);
 
         String providerID = DiscoServiceManager.getDiscoProviderID();
         String resourceID = null;

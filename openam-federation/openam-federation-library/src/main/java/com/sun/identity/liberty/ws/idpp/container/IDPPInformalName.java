@@ -61,10 +61,9 @@ public class IDPPInformalName extends IDPPBaseContainer {
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPInformalName:getInformalName:Init");
-        try {
-            PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+            PPType ppType = new PPElement();
             InformalNameElement in = 
-                 IDPPUtils.getIDPPFactory().createInformalNameElement();
+                 new InformalNameElement();
 
             String informalName = CollectionHelper.getMapAttr(
                 userMap, getAttributeMapper().getDSAttribute(
@@ -73,12 +72,6 @@ public class IDPPInformalName extends IDPPBaseContainer {
 
             ppType.setInformalName(in);
             return ppType;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error(
-            "IDPPInformalName:getContainerObject: JAXB failure", je); 
-            throw new IDPPException(
-            IDPPUtils.bundle.getString("jaxbFailure"));
-        }
      }
 
      /**

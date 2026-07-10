@@ -29,7 +29,7 @@
 
 package com.sun.identity.wsfederation.meta;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 /**
  * Stub implementation - need this for JAXB marshalling

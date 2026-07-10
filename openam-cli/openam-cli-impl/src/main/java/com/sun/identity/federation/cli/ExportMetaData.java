@@ -63,7 +63,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.w3c.dom.Document;
 import java.util.logging.Level;
 

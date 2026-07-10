@@ -68,10 +68,9 @@ public class IDPPExtensionContainer extends IDPPBaseContainer {
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPContainers:getContainerObject:Init");
-        try {
-            PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+            PPType ppType = new PPElement();
             ExtensionElement ee = 
-                     IDPPUtils.getIDPPFactory().createExtensionElement();
+                     new ExtensionElement();
 
             IDPPExtension extension = getExtensionContainerClass(); 
             if(extension != null) {
@@ -98,12 +97,6 @@ public class IDPPExtensionContainer extends IDPPBaseContainer {
 
             ppType.setExtension(ee);
             return ppType;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error(
-            "IDPPExtensionContainer:getContainerObject: JAXB failure", je); 
-            throw new IDPPException(
-            IDPPUtils.bundle.getString("jaxbFailure"));
-        }
      }
 
      /**
@@ -236,18 +229,12 @@ public class IDPPExtensionContainer extends IDPPBaseContainer {
      private PPISExtensionElement getISExtension(
          String attrName, String attrValue) throws IDPPException {
          IDPPUtils.debug.message("IDPPExtensionContainer.getISExtension:Init");
-         try {
              com.sun.identity.liberty.ws.idpp.plugin.jaxb.ObjectFactory fac =
              new com.sun.identity.liberty.ws.idpp.plugin.jaxb.ObjectFactory();
              PPISExtensionElement ext = fac.createPPISExtensionElement();
              ext.setName(attrName);
              ext.setValue(attrValue);
              return ext;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error("IDPPExtensionContainer.getISExtension:" +
-             "Fails in creating PP Extension element.", je);
-             throw new IDPPException(IDPPUtils.bundle.getString("jaxbFailure"));
-         }
      }
  
      /**

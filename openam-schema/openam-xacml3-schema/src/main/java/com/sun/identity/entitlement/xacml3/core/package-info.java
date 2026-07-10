@@ -31,18 +31,18 @@
 // Generated on: 2013.01.21 at 10:40:04 AM PST 
 //
 
-@javax.xml.bind.annotation.XmlSchema( namespace = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17",
+@jakarta.xml.bind.annotation.XmlSchema( namespace = "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17",
         xmlns = {
-                @javax.xml.bind.annotation.XmlNs(prefix = "xacml",
+                @jakarta.xml.bind.annotation.XmlNs(prefix = "xacml",
                         namespaceURI = "classpath:xsd/xacml-core-v3-schema-wd-17.xsd"),
-                @javax.xml.bind.annotation.XmlNs(prefix = "xacml3",
+                @jakarta.xml.bind.annotation.XmlNs(prefix = "xacml3",
                         namespaceURI = "classpath:xsd/xacml-core-v3-schema-wd-17.xsd"),
-                @javax.xml.bind.annotation.XmlNs(prefix = "xacml-context",
+                @jakarta.xml.bind.annotation.XmlNs(prefix = "xacml-context",
                         namespaceURI = "classpath:xsd/xacml-core-v3-schema-wd-17.xsd"),
-                @javax.xml.bind.annotation.XmlNs(prefix = "xacml-ctx",
+                @jakarta.xml.bind.annotation.XmlNs(prefix = "xacml-ctx",
                         namespaceURI = "classpath:xsd/xacml-core-v3-schema-wd-17.xsd")
         },
         elementFormDefault = XmlNsForm.QUALIFIED)
 package com.sun.identity.entitlement.xacml3.core;
 
-import javax.xml.bind.annotation.XmlNsForm;
+import jakarta.xml.bind.annotation.XmlNsForm;

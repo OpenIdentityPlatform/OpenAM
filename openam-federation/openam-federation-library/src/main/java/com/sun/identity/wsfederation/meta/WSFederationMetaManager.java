@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.cot.COTException;
@@ -61,7 +61,6 @@ import com.sun.identity.wsfederation.jaxb.wsfederation.UriNamedClaimTypesOffered
 import com.sun.identity.wsfederation.logging.LogUtil;
 import com.sun.identity.wsfederation.jaxb.wsse.SecurityTokenReferenceType;
 import com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType;
-import com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType.X509Certificate;
 
 /**
  * The <code>WSFederationMetaManager</code> provides methods to manage both the 
@@ -539,7 +538,7 @@ public class WSFederationMetaManager {
             return null;
         }
 
-        return (BaseConfigType)eConfig.getIDPSSOConfigOrSPSSOConfig().get(0);
+        return eConfig.getIDPSSOConfigOrSPSSOConfig().get(0).getValue();
     }
     
     /**
@@ -833,8 +832,8 @@ public class WSFederationMetaManager {
                 if (config == null || !config.isHosted()) {
                     continue;
                 }
-                List<BaseConfigType> configList = config.getIDPSSOConfigOrSPSSOConfig();
-                for (BaseConfigType bConfigType : configList) {
+                for (jakarta.xml.bind.JAXBElement<BaseConfigType> elem : config.getIDPSSOConfigOrSPSSOConfig()) {
+                    BaseConfigType bConfigType = elem.getValue();
                     String curMetaAlias = bConfigType.getMetaAlias();
                     if (curMetaAlias != null && !curMetaAlias.isEmpty()) {
                         metaAliases.add(curMetaAlias);
@@ -1370,9 +1369,12 @@ public class WSFederationMetaManager {
                             ((X509DataType)o1).
                             getX509IssuerSerialOrX509SKIOrX509SubjectName())
                         {
-                            if ( o2 instanceof X509Certificate )
+                            if ( o2 instanceof jakarta.xml.bind.JAXBElement &&
+                                "X509Certificate".equals(((jakarta.xml.bind.JAXBElement<?>)o2).getName().getLocalPart()) )
                             {
-                                return ((X509Certificate)o2).getValue();
+                                @SuppressWarnings("unchecked")
+                                jakarta.xml.bind.JAXBElement<byte[]> certElem = (jakarta.xml.bind.JAXBElement<byte[]>) o2;
+                                return certElem.getValue();
                             }
                         }
                     }

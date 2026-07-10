@@ -50,9 +50,9 @@ import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 import java.io.StringWriter;
 import java.security.cert.CertificateEncodingException;
 import java.util.Map;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import com.sun.identity.wsfederation.jaxb.wsse.SecurityTokenReferenceElement;
 import com.sun.identity.wsfederation.jaxb.xmlsig.X509DataElement;
 import com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType.X509Certificate;
@@ -287,7 +287,7 @@ public class CreateWSFedMetaDataTemplate {
             idpSSOConfig.getAttribute().add(attribute);
         }
         
-        fedConfig.getIDPSSOConfigOrSPSSOConfig().add(idpSSOConfig);
+        fedConfig.getIDPSSOConfigOrSPSSOConfig().add(objFactory.createIDPSSOConfig(idpSSOConfig));
     }
     
     private static void buildWSFedSPConfigTemplate(
@@ -349,7 +349,7 @@ public class CreateWSFedMetaDataTemplate {
             spSSOConfig.getAttribute().add(attribute);
         }
         
-        fedConfig.getIDPSSOConfigOrSPSSOConfig().add(spSSOConfig);
+        fedConfig.getIDPSSOConfigOrSPSSOConfig().add(objFactory.createSPSSOConfig(spSSOConfig));
     }
 
     private static String getHostURL() {

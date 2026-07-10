@@ -66,9 +66,9 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
 
          IDPPUtils.debug.message("IDPPLegalIdentity:getContainerObject:Init");
          try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+             PPType ppType = new PPElement();
              LegalIdentityElement lIdentity = 
-                  IDPPUtils.getIDPPFactory().createLegalIdentityElement();
+                  new LegalIdentityElement();
              String value = CollectionHelper.getMapAttr(userMap, 
              getAttributeMapper().getDSAttribute(
              IDPPConstants.LEGAL_NAME_ELEMENT).toLowerCase());
@@ -118,11 +118,6 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
              } 
              ppType.setLegalIdentity(lIdentity);
              return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPContainers:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
          } catch (IDPPException ie) {
               IDPPUtils.debug.error("IDPPContainers:getContainerObject:" +
               "Error while creating legal identity.", ie);
@@ -139,7 +134,6 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
      private AltIDType getAltID(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPLegalIdentity:getAltID:Init");
         AltIDType altID = null;
-        try {
             altID = IDPPUtils.getIDPPFactory().createAltIDType();
             String altIDType = CollectionHelper.getMapAttr(
                 userMap, getAttributeMapper().getDSAttribute(
@@ -164,11 +158,6 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
             }
 
             return null;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("IDPPContainers:getAltID: JAXB failure", je);
-            throw new IDPPException(
-            IDPPUtils.bundle.getString("jaxbFailure"));
-        }
      }
 
      /**
@@ -180,7 +169,6 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
      private VATType getVAT(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPLegalIdentity:getVATType:Init");
         VATType vType = null;
-        try {
             vType = IDPPUtils.getIDPPFactory().createVATType();
             String value = CollectionHelper.getMapAttr(
                 userMap, getAttributeMapper().getDSAttribute(
@@ -201,11 +189,6 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
                return null;
             }
             return vType;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("IDPPContainers:getVAT: JAXB failure", je);
-            throw new IDPPException(
-            IDPPUtils.bundle.getString("jaxbFailure"));
-        }
      }
 
      /**

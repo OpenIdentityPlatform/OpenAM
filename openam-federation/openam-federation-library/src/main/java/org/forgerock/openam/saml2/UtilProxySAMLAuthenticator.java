@@ -28,7 +28,7 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.common.SOAPCommunicator;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
@@ -192,8 +192,8 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
                 // In ECP profile, sp doesn't know idp.
                 if (!isFromECP) {
                     // verify Destination
-                    List<SingleSignOnServiceElement> ssoServiceList = idpSSODescriptor.getSingleSignOnService();
-                    SingleSignOnServiceElement  endPoint = SPSSOFederate.getSingleSignOnServiceEndpoint(ssoServiceList, binding);
+                    List<EndpointType> ssoServiceList = idpSSODescriptor.getSingleSignOnService();
+                    EndpointType  endPoint = SPSSOFederate.getSingleSignOnServiceEndpoint(ssoServiceList, binding);
                     if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
                         SAML2Utils.debug
                                 .error("{} authn request unable to get endpoint location for IdpEntity: {}  MetaAlias: {} ",

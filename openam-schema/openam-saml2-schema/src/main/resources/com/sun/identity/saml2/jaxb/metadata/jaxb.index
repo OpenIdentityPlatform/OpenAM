@@ -1,0 +1,7 @@
+# JAXB 4.x class index for com.sun.identity.saml2.jaxb.metadata
+# Ensures EntityDescriptorElement and EntitiesDescriptorElement are registered
+# as root elements so that FedletConfigurationImpl and SAML2MetaManager can
+# use instanceof checks against the concrete element classes successfully.
+EntityDescriptorElement
+EntitiesDescriptorElement
+EntityDescriptorType

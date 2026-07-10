@@ -1,0 +1,17 @@
+# JAXB 4.x class index for com.sun.identity.saml2.jaxb.entityconfig
+# Lists the root element class and all concrete BaseConfigType subclasses so
+# JAXB 4.x registers the full type hierarchy when building its context from
+# this package. Without this, JAXB 4.x may attempt to instantiate the abstract
+# BaseConfigType directly (InstantiationException) or fail to map XML element
+# names to the correct concrete types.
+EntityConfigElement
+EntityConfigType
+SPSSOConfigElement
+IDPSSOConfigElement
+AffiliationConfigElement
+AttributeAuthorityConfigElement
+AttributeQueryConfigElement
+AuthnAuthorityConfigElement
+PDPConfigElement
+XACMLAuthzDecisionQueryConfigElement
+XACMLPDPConfigElement

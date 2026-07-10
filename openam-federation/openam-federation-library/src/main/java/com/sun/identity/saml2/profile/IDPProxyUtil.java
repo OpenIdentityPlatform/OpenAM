@@ -88,7 +88,7 @@ import jakarta.xml.soap.SOAPException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
-import com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.protocol.IDPList;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
@@ -184,8 +184,8 @@ public class IDPProxyUtil {
         String binding;
         try {
             idpDescriptor = IDPSSOUtil.metaManager.getIDPSSODescriptor(realm, preferredIDP);
-            List<SingleSignOnServiceElement> ssoServiceList = idpDescriptor.getSingleSignOnService();
-            SingleSignOnServiceElement endpoint = getMatchingSSOEndpoint(ssoServiceList, originalBinding);
+            List<EndpointType> ssoServiceList = idpDescriptor.getSingleSignOnService();
+            EndpointType endpoint = getMatchingSSOEndpoint(ssoServiceList, originalBinding);
             if (endpoint == null) {
                 SAML2Utils.debug.error(classMethod + "Single Sign-on service is not found for the proxying IDP.");
                 throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotFoundIDPProxy"));
@@ -304,11 +304,11 @@ public class IDPProxyUtil {
         }
     }
 
-    private static SingleSignOnServiceElement getMatchingSSOEndpoint(List<SingleSignOnServiceElement> endpoints,
+    private static EndpointType getMatchingSSOEndpoint(List<EndpointType> endpoints,
             String preferredBinding) {
-        SingleSignOnServiceElement preferredEndpoint = null;
+        EndpointType preferredEndpoint = null;
         boolean isFirst = true;
-        for (SingleSignOnServiceElement endpoint : endpoints) {
+        for (EndpointType endpoint : endpoints) {
             if (isFirst) {
                 //If there is no match, we should use the first endpoint in the list
                 preferredEndpoint = endpoint;

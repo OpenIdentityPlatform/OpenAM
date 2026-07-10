@@ -78,18 +78,16 @@
 				<groupId>org.glassfish.metro</groupId>
 				<artifactId>wsit-impl</artifactId>
 			</dependency>
-        <!--         java.xml.bind (JAXB) - REMOVED JDK11+ -->
+        <!-- Jakarta XML Bind (JAXB) -->
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.2</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.5</version>
         </dependency>
     </dependencies>
 </project>
