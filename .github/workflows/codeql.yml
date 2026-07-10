@@ -79,7 +79,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-          queries: security-and-quality
+          queries: security-extended
           # Exclude test and integration-test sources. With build-mode 'none'
           # CodeQL extracts straight from source, so paths-ignore reliably
           # scopes the analysis (it is honored for compiled languages only when
