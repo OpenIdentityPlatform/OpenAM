@@ -1,0 +1,59 @@
+{
+  "result": [
+    {
+      "_id": "SAE",
+      "typeDescription": "SAE",
+      "type": "sae"
+    },
+    {
+      "_id": "Amster",
+      "typeDescription": "ForgeRock Amster",
+      "type": "amster"
+    },
+    {
+      "_id": "LDAP",
+      "typeDescription": "LDAP",
+      "type": "ldap"
+    },
+    {
+      "_id": "oath2",
+      "typeDescription": "Authenticator (OATH)",
+      "type": "authenticatoroath"
+    },
+    {
+      "_id": "WSSAuthModule",
+      "typeDescription": "WSSAuth",
+      "type": "wssauth"
+    },
+    {
+      "_id": "oidc",
+      "typeDescription": "OpenID Connect id_token bearer",
+      "type": "openidconnect"
+    },
+    {
+      "_id": "OATH",
+      "typeDescription": "OATH",
+      "type": "oath"
+    },
+    {
+      "_id": "DataStore",
+      "typeDescription": "Data Store",
+      "type": "datastore"
+    },
+    {
+      "_id": "HOTP",
+      "typeDescription": "HOTP",
+      "type": "hotp"
+    },
+    {
+      "_id": "Federation",
+      "typeDescription": "Federation",
+      "type": "federation"
+    }
+  ],
+  "resultCount": 10,
+  "pagedResultsCookie": null,
+  "totalPagedResultsPolicy": "EXACT",
+  "totalPagedResults": 10,
+  "remainingPagedResults": -1
+}

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.cts.api.tokens;
 
@@ -71,6 +71,16 @@ public class TokenIdFactory implements TokenIdGenerator {
      */
     public String fromSAMLSecondaryTokenId(String secondaryId) {
         return encoding.decodeKey(secondaryId);
+    }
+
+    /**
+     * Converts an OAuth2 token ID to the CTS storage key used by the OAuth2 token store.
+     *
+     * @param tokenId The OAuth2 token ID to convert. May not be null.
+     * @return Non null token storage key.
+     */
+    public String toOAuthTokenStoreId(String tokenId) {
+        return encoding.encodeKey(tokenId);
     }
 
     /**

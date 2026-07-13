@@ -25,7 +25,7 @@
  * $Id: PLLNotificationServlet.java,v 1.6 2008/08/19 19:08:43 veiming Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.iplanet.services.comm.client;
 
@@ -68,7 +68,7 @@ public class PLLNotificationServlet extends HttpServlet {
      * HttpServletNotification Reference to HttpServletNotification object
      * @param HttpServletResponse Reference to HttpServletResponse object
      * 
-     * @see javax.servlet.http.HttpServlet
+     * @see jakarta.servlet.http.HttpServlet
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, java.io.IOException {

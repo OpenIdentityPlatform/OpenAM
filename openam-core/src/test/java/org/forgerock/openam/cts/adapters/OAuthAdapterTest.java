@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package org.forgerock.openam.cts.adapters;
 
@@ -64,6 +65,24 @@ public class OAuthAdapterTest {
 
         // Then
         assert(result.getAttribute(field.getField()).toString().contains("badger"));
+    }
+
+    @Test
+    public void shouldStoreOAuthTokensUsingOAuthTokenStoreId() {
+        // Given
+        OAuthAdapter adapter = generateOAuthAdapter();
+        TokenIdFactory tokenIdFactory = new TokenIdFactory(new KeyConversion());
+
+        String id = "badger";
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(OAuthTokenField.ID.getOAuthField(), Arrays.asList(id));
+        JsonValue jsonValue = makeDefaultJsonValue(values);
+
+        // When
+        Token result = adapter.toToken(jsonValue);
+
+        // Then
+        assertThat(result.getTokenId()).isEqualTo(tokenIdFactory.toOAuthTokenStoreId(id));
     }
 
     @Test
@@ -161,6 +180,30 @@ public class OAuthAdapterTest {
         // Then
         assertNotNull(result);
         assert(result.asMap().get(field.getOAuthField()).toString().contains(id[0]));
+    }
+
+    @Test
+    public void shouldNotDeserialiseNonOAuthTokenType() {
+        // Given
+        String[] id = {"badger"};
+        List<String> list = new ArrayList<String>(Arrays.asList(id));
+        OAuthTokenField field = OAuthTokenField.ID;
+
+        JSONSerialisation serialisation = new JSONSerialisation(new ObjectMapper());
+        OAuthAdapter adapter = generateOAuthAdapter();
+
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(field.getOAuthField(), list);
+        String serialisedObject = serialisation.serialise(values);
+
+        Token token = new Token(id[0], TokenType.PUSH);
+        token.setBlob(serialisedObject.getBytes());
+
+        // When
+        JsonValue result = adapter.fromToken(token);
+
+        // Then
+        assertThat(result).isNull();
     }
 
     @Test (expectedExceptions = IllegalArgumentException.class)

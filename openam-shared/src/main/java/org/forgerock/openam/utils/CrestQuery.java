@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2021-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.utils;
@@ -19,7 +20,10 @@ package org.forgerock.openam.utils;
 import java.util.List;
 
 import org.forgerock.json.JsonPointer;
+import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.util.query.QueryFilter;
+
+import static com.forgerock.opendj.util.StaticUtils.byteToHex;
 
 /**
  * This class was created to handle queries made via CREST that can provide either a _queryID (String) or a
@@ -136,6 +140,31 @@ public class CrestQuery {
     public boolean isEscapeQueryId() {
         return escapeQueryId;
     }
+
+     /** The backslash character. */
+    private static final byte BACKSLASH = 0x5C;
+
+    public String getEscapedQueryId() {
+
+        final ByteString bytes = ByteString.valueOfObject(queryId);
+        final StringBuilder builder = new StringBuilder(bytes.length());
+        for (int i = 0; i < bytes.length(); i++) {
+            final byte b = bytes.byteAt(i);
+            if (((b & 0x7F) != b) // Not 7-bit clean
+                    || b <= 0x1F  // Below the printable character range
+                    || b == 0x28  // Open parenthesis
+                    || b == 0x29  // Close parenthesis
+                    || b == BACKSLASH
+                    || b == 0x7F  /* Delete character */) {
+                builder.append('\\');
+                builder.append(byteToHex(b));
+            } else {
+                builder.append((char) b);
+            }
+        }
+        return builder.toString();
+    }
+
     /**
      * This is mainly for debugging purposes so you can say "this is a rough idea of the CrestQuery object I've
      * been handed".

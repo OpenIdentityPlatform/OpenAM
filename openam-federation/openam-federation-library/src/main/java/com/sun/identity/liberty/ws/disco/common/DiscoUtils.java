@@ -24,6 +24,7 @@
  *
  * $Id: DiscoUtils.java,v 1.5 2008/06/25 05:47:12 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -437,14 +438,22 @@ public class DiscoUtils extends DiscoSDKUtils {
             }
             if (dirs.get(BEARER)) {
                 if (dirs.get(AUTHN) || dirs.get(AUTHO) || dirs.get(SESSION)) {
-                    if ((providerID != null) && (providerID.length() != 0)) {
-                        senderIdentity = new NameIdentifier(
-                                    providerID,
-                                    null,
-                                    DiscoConstants.PROVIDER_ID_FORMAT);
-                    } else {
-                        senderIdentity = new NameIdentifier(userDN);
+                    // Level 6: never derive the bearer-assertion Subject
+                    // from the lookup-time userDN. The Subject MUST be a
+                    // verified WSC ProviderID; otherwise an unauthenticated
+                    // caller can mint a signed bearer assertion bound to
+                    // an arbitrary user.
+                    if ((providerID == null) || (providerID.length() == 0)) {
+                        debug.error("DiscoUtils.generateCredential: no "
+                                + "verified WSC ProviderID; refusing to mint "
+                                + "bearer assertion bound to lookup-time "
+                                + "userDN");
+                        return null;
                     }
+                    senderIdentity = new NameIdentifier(
+                                providerID,
+                                null,
+                                DiscoConstants.PROVIDER_ID_FORMAT);
                     if (resourceID instanceof String) {
                         assertion = secuMgr.getSAMLBearerToken(
                                         senderIdentity,
@@ -464,14 +473,17 @@ public class DiscoUtils extends DiscoSDKUtils {
                     }
                 }
             } else {
-                if ((providerID != null) && (providerID.length() != 0)) {
-                    senderIdentity = new NameIdentifier(
-                                providerID,
-                                null,
-                                DiscoConstants.PROVIDER_ID_FORMAT);
-                } else {
-                    senderIdentity = new NameIdentifier(userDN);
+                // Same hardening for the non-bearer assertion path.
+                if ((providerID == null) || (providerID.length() == 0)) {
+                    debug.error("DiscoUtils.generateCredential: no verified "
+                            + "WSC ProviderID; refusing to mint authorization "
+                            + "token bound to lookup-time userDN");
+                    return null;
                 }
+                senderIdentity = new NameIdentifier(
+                            providerID,
+                            null,
+                            DiscoConstants.PROVIDER_ID_FORMAT);
                 if (providerID != null) {
                     secuMgr.setCertAlias(ProviderUtil.getProviderManager()
                         .getSigningKeyAlias(providerID));

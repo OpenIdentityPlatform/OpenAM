@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
@@ -21,9 +21,14 @@ import static org.forgerock.openam.session.SessionEventType.IDLE_TIMEOUT;
 import static org.forgerock.openam.session.SessionEventType.MAX_TIMEOUT;
 import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
+import java.security.AccessController;
 import java.text.MessageFormat;
 import java.util.Collection;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.SessionType;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.session.util.SessionUtils;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
@@ -201,7 +206,10 @@ public class LocalOperations implements SessionOperations {
     }
 
     @Override
-    public void addSessionListener(Session session, String url) throws SessionException {
+    public void addSessionListener(SSOToken clientToken, Session session, String url) throws SessionException {
+
+        checkAddSessionListenerPermission(clientToken);
+
         SessionID sessionId = session.getSessionID();
         InternalSession internalSession = resolveToken(sessionId);
         if (internalSession.getState() == INVALID) {
@@ -211,6 +219,32 @@ public class LocalOperations implements SessionOperations {
             throw new IllegalArgumentException("Session id mismatch");
         }
         internalSession.addSessionEventURL(url, sessionId);
+    }
+
+    static final String ADD_SESSION_LISTENER_SKIP_AUTH_CHECK =
+            "org.openidentityplatform.session.listener.skip-auth-check";
+    private void checkAddSessionListenerPermission(SSOToken clientToken) throws SessionException {
+
+        boolean clientTokenCheckFailed = false;
+        try {
+            if (clientToken == null) {
+                clientTokenCheckFailed = true;
+            } else if(!SessionUtils.isAdmin(AccessController.doPrivileged(AdminTokenAction.getInstance()), clientToken)) {
+                Session session = new Session(new SessionID(clientToken.getTokenID().toString()));
+                session.refresh(false);
+                SessionType type = session.getType();
+                if(session.isTimedOut() || !SessionType.APPLICATION.equals(type)) {
+                    clientTokenCheckFailed = true;
+                }
+            }
+        } catch (Exception e) {
+            throw new SessionException(e);
+        }
+
+        if(clientTokenCheckFailed
+                && !SystemProperties.getAsBoolean(ADD_SESSION_LISTENER_SKIP_AUTH_CHECK, false)) {
+            throw new IllegalArgumentException("Request should be authenticated");
+        }
     }
 
     @Override

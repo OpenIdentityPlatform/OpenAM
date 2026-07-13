@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 /* global module, require, process */
@@ -192,7 +192,7 @@ module.exports = function (grunt) {
             },
             build: {
                 singleRun: true,
-                reporters: ["progress", "notify", "mocha"]
+                reporters: ["progress"]
             },
             dev: {
             }

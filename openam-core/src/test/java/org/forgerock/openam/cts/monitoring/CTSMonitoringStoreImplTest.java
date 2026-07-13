@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.cts.monitoring;
@@ -24,7 +25,7 @@ import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
 import org.forgerock.openam.cts.monitoring.impl.connections.ConnectionStore;
 import org.forgerock.openam.cts.monitoring.impl.operations.TokenOperationsStore;
 import org.forgerock.openam.cts.monitoring.impl.reaper.ReaperMonitor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.testng.annotations.BeforeMethod;
@@ -34,7 +35,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
 
@@ -85,7 +86,7 @@ public class CTSMonitoringStoreImplTest {
         ctsOperationsMonitoringStore.addTokenOperation(token, operation, successful);
 
         //Then
-        verify(tokenOperationsStore, never()).addTokenOperation(Matchers.<TokenType>anyObject(), eq(operation), eq(successful));
+        verify(tokenOperationsStore, never()).addTokenOperation(ArgumentMatchers.<TokenType>anyObject(), eq(operation), eq(successful));
     }
 
     @Test

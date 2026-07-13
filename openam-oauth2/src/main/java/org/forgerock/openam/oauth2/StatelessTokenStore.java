@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2020-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2;
@@ -117,6 +117,7 @@ public class StatelessTokenStore implements TokenStore {
     private final CTSPersistentStore cts;
     private final TokenAdapter<StatelessTokenMetadata> tokenAdapter;
     private final OAuth2Utils utils;
+    private final OAuth2AccessTokenModifier accessTokenModifier;
 
 
     /**
@@ -133,13 +134,15 @@ public class StatelessTokenStore implements TokenStore {
      * @param cts An instance of the CTSPersistentStoreImpl
      * @param tokenAdapter An instance of the StatelessTokenCtsAdapter
      * @param utils OAuth2 utilities
+     * @param accessTokenModifier Runs the OAuth2 Access Token Modification script.
      */
     @Inject
     public StatelessTokenStore(StatefulTokenStore statefulTokenStore, JwtBuilderFactory jwtBuilder,
             OAuth2ProviderSettingsFactory providerSettingsFactory, @Named(OAuth2Constants.DEBUG_LOG_NAME) Debug logger,
             OpenIdConnectClientRegistrationStore clientRegistrationStore, RealmNormaliser realmNormaliser,
             OAuth2UrisFactory oAuth2UrisFactory, Blacklist<Blacklistable> tokenBlacklist,
-            CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter, OAuth2Utils utils) {
+            CTSPersistentStore cts, TokenAdapter<StatelessTokenMetadata> tokenAdapter, OAuth2Utils utils,
+            OAuth2AccessTokenModifier accessTokenModifier) {
         this.statefulTokenStore = statefulTokenStore;
         this.jwtBuilder = jwtBuilder;
         this.providerSettingsFactory = providerSettingsFactory;
@@ -151,6 +154,7 @@ public class StatelessTokenStore implements TokenStore {
         this.cts = cts;
         this.tokenAdapter = tokenAdapter;
         this.utils = utils;
+        this.accessTokenModifier = accessTokenModifier;
     }
 
     @Override
@@ -234,8 +238,50 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
                 .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString())
                 .claim(AUTH_TIME, authTime);
-        
-        
+
+        // Propagate authentication context (acr) and authentication modules (amr) into the
+        // stateless JWT access token, mirroring the behaviour of createRefreshToken. The values
+        // are sourced from the AuthorizationCode (authorization_code grant) or from the previous
+        // RefreshToken (refresh_token grant), so PEPs/API gateways can read acr/amr directly from
+        // the access token payload without an extra /oauth2/tokeninfo round-trip.
+        String authModules = null;
+        String acr = null;
+        if (authCode != null) {
+            authModules = authCode.getAuthModules();
+            acr = authCode.getAuthenticationContextClassReference();
+        }
+        RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
+        if (currentRefreshToken != null) {
+            authModules = currentRefreshToken.getAuthModules();
+            acr = currentRefreshToken.getAuthenticationContextClassReference();
+        }
+        if (authModules != null) {
+            claimsSetBuilder.claim(AUTH_MODULES, authModules);
+        }
+        if (acr != null) {
+            claimsSetBuilder.claim(ACR, acr);
+        }
+
+        // Run the configured OAuth2 Access Token Modification script (script context
+        // OAUTH2_ACCESS_TOKEN_MODIFICATION) and merge any returned claims into the access token.
+        Map<String, Object> accessTokenContext = new HashMap<>();
+        accessTokenContext.put(TOKEN_NAME, OAUTH_ACCESS_TOKEN);
+        accessTokenContext.put("sub", resourceOwnerId);
+        accessTokenContext.put(REALM, realm);
+        accessTokenContext.put("clientId", clientId);
+        accessTokenContext.put(SCOPE, scope);
+        accessTokenContext.put(GRANT_TYPE, grantType);
+        if (acr != null) {
+            accessTokenContext.put(ACR, acr);
+        }
+        if (authModules != null) {
+            accessTokenContext.put("amr", authModules);
+        }
+        Map<String, Object> modifiedClaims = accessTokenModifier.getModifiedClaims(request, realm, resourceOwnerId,
+                clientId, scope, accessTokenContext);
+        for (Map.Entry<String, Object> entry : modifiedClaims.entrySet()) {
+            claimsSetBuilder.claim(entry.getKey(), entry.getValue());
+        }
 
         JsonValue confirmationJwk = utils.getConfirmationKey(request);
         if (confirmationJwk != null) {
@@ -513,6 +559,29 @@ public class StatelessTokenStore implements TokenStore {
         if (!StringUtils.isBlank(validatedClaims)) {
             claimsSetBuilder.claim(CLAIMS, validatedClaims);
         }
+
+        // Run the configured OAuth2 Access Token Modification script (script context
+        // OAUTH2_ACCESS_TOKEN_MODIFICATION) and merge any returned claims into the refresh token, so
+        // that custom claims survive the refresh cycle.
+        Map<String, Object> refreshTokenContext = new HashMap<>();
+        refreshTokenContext.put(TOKEN_NAME, OAUTH_REFRESH_TOKEN);
+        refreshTokenContext.put("sub", resourceOwnerId);
+        refreshTokenContext.put(REALM, realm);
+        refreshTokenContext.put("clientId", clientId);
+        refreshTokenContext.put(SCOPE, scope);
+        refreshTokenContext.put(GRANT_TYPE, grantType);
+        if (acr != null) {
+            refreshTokenContext.put(ACR, acr);
+        }
+        if (authModules != null) {
+            refreshTokenContext.put("amr", authModules);
+        }
+        Map<String, Object> modifiedRefreshClaims = accessTokenModifier.getModifiedClaims(request, realm,
+                resourceOwnerId, clientId, scope, refreshTokenContext);
+        for (Map.Entry<String, Object> entry : modifiedRefreshClaims.entrySet()) {
+            claimsSetBuilder.claim(entry.getKey(), entry.getValue());
+        }
+
         JwsAlgorithm signingAlgorithm = getSigningAlgorithm(request);
         CompressionAlgorithm compressionAlgorithm = getCompressionAlgorithm(request);
         SignedJwt jwt = jwtBuilder.jws(getTokenSigningHandler(request, signingAlgorithm))

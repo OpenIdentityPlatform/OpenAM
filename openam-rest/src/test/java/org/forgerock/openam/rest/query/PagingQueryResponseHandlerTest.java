@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.rest.query;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.forgerock.json.resource.ResourceResponse;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -65,7 +66,7 @@ public class PagingQueryResponseHandlerTest {
     public void shouldOnlyReadUntilPageIsRead() {
         // Given
         testHandler = new PagingQueryResponseHandler(mockHandler, 2, 0);
-        given(mockHandler.handleResource(Matchers.any(ResourceResponse.class))).willReturn(true);
+        given(mockHandler.handleResource(ArgumentMatchers.any(ResourceResponse.class))).willReturn(true);
 
         // When
         boolean firstHandle = testHandler.handleResource(newResourceResponse("a", null, null));
@@ -95,7 +96,7 @@ public class PagingQueryResponseHandlerTest {
     public void shouldIgnoreExtraResources() {
         // Given
         testHandler = new PagingQueryResponseHandler(mockHandler, 1, 0);
-        given(mockHandler.handleResource(Matchers.any(ResourceResponse.class))).willReturn(true);
+        given(mockHandler.handleResource(ArgumentMatchers.any(ResourceResponse.class))).willReturn(true);
         ResourceResponse expected = newResourceResponse("expected", null, null);
 
         // When

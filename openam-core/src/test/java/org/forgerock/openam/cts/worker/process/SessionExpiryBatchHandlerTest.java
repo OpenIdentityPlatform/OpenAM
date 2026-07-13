@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.cts.worker.process;
 
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.cts.api.CTSOptions.OPTIMISTIC_CONCURRENCY_CHECK_OPTION;
 import static org.forgerock.openam.cts.api.CTSOptions.PRE_DELETE_READ_OPTION;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.ArgumentMatchers.nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -69,6 +71,8 @@ public class SessionExpiryBatchHandlerTest {
     @BeforeMethod
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        given(mockResultHandlerFactory.create(any(SessionEventType.class), any(CountDownLatch.class)))
+                .willReturn(mock(StateChangeResultHandler.class));
     }
 
     @Test
@@ -177,7 +181,7 @@ public class SessionExpiryBatchHandlerTest {
 
         // Then
         verifyNoMoreInteractions(mockSessionAdapter, mockLocalOperations);
-        verify(mockDebug).message(eq("Failed to delete token with expired timeout. {}"), any(String.class), eq(exception));
+        verify(mockDebug).message(eq("Failed to delete token with expired timeout. {}"), nullable(String.class), eq(exception));
         assertThat(countDownLatch.getCount()).as("processError decrements CountDownLatch").isEqualTo(0);
     }
 
@@ -198,7 +202,7 @@ public class SessionExpiryBatchHandlerTest {
 
         // Then
         verifyNoMoreInteractions(mockSessionAdapter, mockLocalOperations);
-        verify(mockDebug).error(eq("Failed to delete token with expired timeout. {}"), any(String.class), eq(exception));
+        verify(mockDebug).error(eq("Failed to delete token with expired timeout. {}"), nullable(String.class), eq(exception));
         assertThat(countDownLatch.getCount()).as("processError decrements CountDownLatch").isEqualTo(0);
     }
 

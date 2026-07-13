@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2018-2025 3A Systems LLC.
+ * Copyright 2018-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.oauth2;
@@ -19,7 +19,7 @@ package org.forgerock.openam.authentication.modules.oauth2;
 import org.openidentityplatform.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.forgerock.openam.authentication.modules.oauth2.service.ESIAServiceUrlProvider;
 import org.forgerock.openam.authentication.modules.oauth2.service.esia.Signer;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -53,7 +53,7 @@ public class ESIATest extends PowerMockTestCase {
 	public void syncOffsetTest() throws Exception {
 		HttpRequestContent httpRequestContent =  mock(HttpRequestContent.class);
 		Map<String, List<String>> headers = Collections.singletonMap("Date", Collections.singletonList("Mon, 11 Mar 2019 07:07:25 GMT"));
-		when(httpRequestContent.getHeadersUsingHEAD(Matchers.anyString())).thenReturn(headers);
+		when(httpRequestContent.getHeadersUsingHEAD(ArgumentMatchers.anyString())).thenReturn(headers);
 		PowerMockito.mockStatic(HttpRequestContent.class);
 		PowerMockito.when(HttpRequestContent.getInstance()).thenReturn(httpRequestContent);
 		ESIAServiceUrlProvider.getSyncOffset();

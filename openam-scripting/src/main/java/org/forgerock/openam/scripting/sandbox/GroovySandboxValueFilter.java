@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems,LLC
+ * Portions Copyrighted 2026 OSSTech Corporation
  */
 
 package org.forgerock.openam.scripting.sandbox;
@@ -31,6 +33,15 @@ import java.lang.reflect.Method;
 public final class GroovySandboxValueFilter extends GroovyValueFilter {
     private static final String ERROR_MESSAGE = "Access to Java class \"%s\" is prohibited.";
     private static final String CLOSURE_CALL_METHOD = "call";
+    /**
+     * Name of the Groovy extension method (provided by
+     * {@code org.codehaus.groovy.runtime.ProcessGroovyMethods}) that spawns an OS process when invoked on
+     * {@link CharSequence}, {@link java.util.List} or {@code String[]} receivers. The sandbox must reject this call
+     * before it is dispatched, because the process is started inside {@code invoker.call(...)} and only the
+     * already-spawned {@link Process} would otherwise be filtered on the return path (too late).
+     */
+    private static final String PROCESS_EXECUTE_METHOD = "execute";
+    private static final String INVOKE_METHOD = "invokeMethod";
 
     private final ClassShutter classShutter;
 
@@ -94,6 +105,12 @@ public final class GroovySandboxValueFilter extends GroovyValueFilter {
 
     @Override
     public Object onMethodCall(Invoker invoker, Object receiver, String method, Object... args) throws Throwable {
+        if (isProcessLaunchExtension(receiver, method, args)) {
+            // OPENAM Groovy sandbox escape: ProcessGroovyMethods#execute is a Groovy extension method that starts an
+            // OS process before any return value can be filtered. Reject it up-front regardless of receiver/argument
+            // types being on the class allow-list.
+            throw new SecurityException("Groovy process execution is prohibited.");
+        }
         if (isClosureCall(receiver, method) || isScriptOwnMethodCall(receiver, method)) {
             // OPENAM-4278: Allow calls to closures and methods defined by the script itself. Note: we must be careful
             // here *not* to allow a script to call inherited methods (e.g., Script#evaluate) as these allow bypassing
@@ -101,6 +118,37 @@ public final class GroovySandboxValueFilter extends GroovyValueFilter {
             return doCall(invoker, receiver, method, args);
         }
         return super.onMethodCall(invoker, receiver, method, args);
+    }
+
+    /**
+     * Determines whether the given method call would be dispatched to the Groovy
+     * {@code ProcessGroovyMethods#execute(...)} extension, which starts an OS process. The Groovy 2.4 process-launch
+     * surface is {@code execute()} on {@link CharSequence} (covers {@code String}/{@code GString}), {@link java.util.List}
+     * and {@code String[]} receivers.
+     *
+     * @param receiver the call target.
+     * @param method the method name being dispatched (signature is unknown at this point).
+     * @return {@code true} if this call would launch an OS process via a Groovy extension method.
+     */
+    private boolean isProcessLaunchExtension(Object receiver, String method, Object... args) {
+        if (receiver == null || method == null) {
+            return false;
+        }
+        // GroovyObject#invokeMethod always dispatches through the MOP, bypassing the AST
+        // transform; the real target method is passed as the first argument.
+        String effectiveMethod = method;
+        if (INVOKE_METHOD.equals(method)
+                && args != null && args.length >= 1 && args[0] instanceof CharSequence) {
+            effectiveMethod = args[0].toString();
+        }
+        if (!PROCESS_EXECUTE_METHOD.equals(effectiveMethod)) {
+            return false;
+        }
+        if (receiver instanceof CharSequence || receiver instanceof java.util.List) {
+            return true;
+        }
+        Class<?> receiverClass = receiver.getClass();
+        return receiverClass.isArray() && String.class.equals(receiverClass.getComponentType());
     }
 
     /**

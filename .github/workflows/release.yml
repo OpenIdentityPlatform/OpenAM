@@ -11,6 +11,9 @@ on:
         description: "Default version to use for new local working copy."
         required: true
         default: "X.Y.Z-SNAPSHOT"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   release-maven:
     runs-on: 'ubuntu-latest'
@@ -53,7 +56,7 @@ jobs:
         if: ${{ env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!='' }}
         run: mvn --batch-mode -Darguments="-Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}" -DsignTag=true -DtagNameFormat="${{ github.event.inputs.releaseVersion }}" -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} release:prepare clean release:perform --file pom.xml
       - name: Release on GitHub
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: ${{ github.event.inputs.releaseVersion }}
           tag_name: ${{ github.event.inputs.releaseVersion }}
@@ -69,7 +72,6 @@ jobs:
             target/checkout/openam-console/target/*.war
             target/checkout/openam-server/target/*.war
             target/checkout/openam-server-only/target/*.war
-            target/checkout/openam-distribution/openam-distribution-fedlet-unconfigured/target/*.war
             target/checkout/openam-distribution/openam-distribution-docker/target/Dockerfile*
       - uses: actions/checkout@v6
         continue-on-error: true

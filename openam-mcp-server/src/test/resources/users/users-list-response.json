@@ -1,0 +1,119 @@
+{
+  "result": [
+    {
+      "username": "amAdmin",
+      "realm": "dc=openam,dc=forgerock,dc=org",
+      "sunIdentityMSISDNNumber": [],
+      "mail": [],
+      "sn": [
+        "amAdmin"
+      ],
+      "givenName": [
+        "amAdmin"
+      ],
+      "universalid": [
+        "id=amAdmin,ou=user,dc=openam,dc=forgerock,dc=org"
+      ],
+      "cn": [
+        "amAdmin"
+      ],
+      "iplanet-am-user-success-url": [],
+      "telephoneNumber": [],
+      "roles": [
+        "ui-global-admin",
+        "ui-realm-admin"
+      ],
+      "iplanet-am-user-failure-url": [],
+      "inetuserstatus": [
+        "Active"
+      ],
+      "postalAddress": [],
+      "dn": [
+        "uid=amAdmin,ou=people,dc=openam,dc=forgerock,dc=org"
+      ],
+      "employeeNumber": [],
+      "iplanet-am-user-alias-list": []
+    },
+    {
+      "username": "demo",
+      "realm": "dc=openam,dc=forgerock,dc=org",
+      "uid": [
+        "demo"
+      ],
+      "createTimestamp": [
+        "20160108155628Z"
+      ],
+      "inetUserStatus": [
+        "Active"
+      ],
+      "mail": [
+        "demo.user@example.com"
+      ],
+      "sn": [
+        "demo"
+      ],
+      "cn": [
+        "demo"
+      ],
+      "objectClass": [
+        "devicePrintProfilesContainer",
+        "person",
+        "sunIdentityServerLibertyPPService",
+        "sunFederationManagerDataStore",
+        "inetorgperson",
+        "oathDeviceProfilesContainer",
+        "iPlanetPreferences",
+        "iplanet-am-auth-configuration-service",
+        "sunFMSAML2NameIdentifier",
+        "organizationalperson",
+        "inetuser",
+        "kbaInfoContainer",
+        "forgerock-am-dashboard-service",
+        "iplanet-am-managed-person",
+        "iplanet-am-user-service",
+        "sunAMAuthAccountLockout",
+        "top"
+      ],
+      "kbaInfo": [
+        {
+          "questionId": "2",
+          "answer": {
+            "$crypto": {
+              "value": {
+                "algorithm": "SHA-256",
+                "data": "VXGtsnjJMC...MQJ/goU5hkfF"
+              },
+              "type": "salted-hash"
+            }
+          }
+        },
+        {
+          "questionId": "1",
+          "answer": {
+            "$crypto": {
+              "value": {
+                "algorithm": "SHA-256",
+                "data": "cfYYzi9U...rVfFl0Tdw0iX"
+              },
+              "type": "salted-hash"
+            }
+          }
+        }
+      ],
+      "dn": [
+        "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
+      ],
+      "universalid": [
+        "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+      ],
+      "modifyTimestamp": [
+        "20160113010610Z"
+      ]
+    }
+  ],
+  "resultCount": 2,
+  "pagedResultsCookie": null,
+  "totalPagedResultsPolicy": "NONE",
+  "totalPagedResults": -1,
+  "remainingPagedResults": -1
+}

@@ -25,7 +25,7 @@
  * $Id: UserIdRepo.java,v 1.21 2009/12/23 00:22:34 goodearth Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2024-2026 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -74,10 +74,13 @@ import org.forgerock.openam.ldap.LdifUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LdapException;
+import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
+import org.forgerock.opendj.ldap.requests.AddRequest;
 import org.forgerock.opendj.ldap.requests.SimpleBindRequest;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
@@ -276,19 +279,91 @@ class UserIdRepo {
         String type
     ) throws Exception {
         try (Connection conn = getLDAPConnection(userRepo)){
+            // The user store schema/initialisation LDIFs (e.g. opendj_userinit.ldif)
+            // add entries such as "ou=people,<root suffix>" under the user store
+            // root suffix. The root suffix (base entry) itself is assumed to
+            // already exist. Create it if it is missing so OpenAM can be configured
+            // against an external directory whose base DN has not been pre-created
+            // (e.g. without the OpenDJ "--addBaseEntry" option).
+            createBaseEntry(conn, (String) userRepo.get(
+                SetupConstants.USER_STORE_ROOT_SUFFIX));
             String dbName = getDBName(userRepo, conn);
             for (String file :  writeSchemaFiles(basedir, dbName, servletCtx, strFiles, userRepo, type)) {
                 Object[] params = {file};
                 SetupProgress.reportStart("emb.loadingschema", params);
                 LdifUtils.createSchemaFromLDIF(file, conn);
                 SetupProgress.reportEnd("emb.success", null);
-
                 File f = new File(file);
                 f.delete();
             }
         }
     }
-    
+
+    /**
+     * Creates the user store root suffix (base entry) when it does not already
+     * exist. The object class of the created entry is derived from the naming
+     * attribute of the suffix (<code>dc</code>, <code>o</code> or
+     * <code>ou</code>). If the base entry is already present this is a no-op.
+     *
+     * @param conn   an open connection to the user store directory server.
+     * @param suffix the user store root suffix DN.
+     * @throws LdapException if the base entry cannot be created.
+     */
+    private void createBaseEntry(Connection conn, String suffix) throws LdapException {
+        if ((suffix == null) || (suffix.trim().length() == 0)) {
+            return;
+        }
+        DN suffixDN = DN.valueOf(suffix);
+
+        // Base entry already present - nothing to do.
+        try {
+            ConnectionEntryReader reader = conn.search(LDAPRequests.newSearchRequest(
+                suffix, SearchScope.BASE_OBJECT, "(objectclass=*)"));
+            if (reader.hasNext()) {
+                return;
+            }
+        } catch (LdapException e) {
+            if ((e.getResult() == null)
+                    || !ResultCode.NO_SUCH_OBJECT.equals(e.getResult().getResultCode())) {
+                throw e;
+            }
+            // NO_SUCH_OBJECT - the base entry is missing, fall through to create it.
+        }
+
+        String namingAttr = suffixDN.rdn().getFirstAVA().getAttributeType().getNameOrOID();
+        String rdnValue = LDAPUtils.rdnValueFromDn(suffixDN);
+
+        Object[] params = {suffix};
+        SetupProgress.reportStart("emb.creatingfamsuffix", params);
+
+        AddRequest addRequest = LDAPRequests.newAddRequest(suffixDN)
+                .addAttribute("objectClass", "top");
+        if ("dc".equalsIgnoreCase(namingAttr)) {
+            addRequest.addAttribute("objectClass", "domain").addAttribute("dc", rdnValue);
+        } else if ("o".equalsIgnoreCase(namingAttr)) {
+            addRequest.addAttribute("objectClass", "organization").addAttribute("o", rdnValue);
+        } else if ("ou".equalsIgnoreCase(namingAttr)) {
+            addRequest.addAttribute("objectClass", "organizationalUnit").addAttribute("ou", rdnValue);
+        } else {
+            // Fallback for any other naming attribute.
+            addRequest.addAttribute("objectClass", "extensibleObject").addAttribute(namingAttr, rdnValue);
+        }
+
+        try {
+            conn.add(addRequest);
+            SetupProgress.reportEnd("emb.success", null);
+        } catch (LdapException e) {
+            // Created concurrently or already present - acceptable.
+            if ((e.getResult() != null)
+                    && ResultCode.ENTRY_ALREADY_EXISTS.equals(e.getResult().getResultCode())) {
+                SetupProgress.reportEnd("emb.success", null);
+                return;
+            }
+            SetupProgress.reportEnd("emb.failed", null);
+            throw e;
+        }
+    }
+
     private List<String> writeSchemaFiles(
         String basedir, 
         String dbName,

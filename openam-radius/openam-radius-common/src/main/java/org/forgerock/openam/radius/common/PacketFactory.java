@@ -24,6 +24,7 @@
  *
  * $Id: AccessAccept.java,v 1.2 2008/06/25 05:42:00 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 /*
@@ -63,11 +64,24 @@ public final class PacketFactory {
      * @return the packet type that represents the received bytes
      */
     public static Packet toPacket(byte[] octets) {
+        // RFC 2865: minimum packet length is 20 octets (code + id + length + 16-octet authenticator).
+        // Without this guard the bounds reads below are undefined and PacketFactory may return a
+        // non-null Packet for clearly malformed datagrams.
+        if (octets == null || octets.length < 20) {
+            LOG.log(Level.WARNING, "RADIUS packet shorter than 20 octets - rejecting.");
+            return null;
+        }
         // for old byte array approach we may have a array longer than packet so trim ByteBuffer down to just
         // packet length to prevent attribute parsing below from running off the end of the packet and onto unrelated
         // octets. length is 3rd/4th octets in big endian, network byte order.
         int packetLen = octets[3] & 0xFF;
         packetLen |= ((octets[2] << 8) & 0xFF00);
+
+        if (packetLen < 20 || packetLen > octets.length) {
+            LOG.log(Level.WARNING, "RADIUS packet length field (" + packetLen
+                    + ") inconsistent with received datagram size (" + octets.length + ") - rejecting.");
+            return null;
+        }
 
         return toPacket(ByteBuffer.wrap(octets, 0, packetLen));
     }

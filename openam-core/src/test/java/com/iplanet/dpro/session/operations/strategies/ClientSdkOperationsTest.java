@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -66,10 +67,11 @@ public class ClientSdkOperationsTest {
     private SessionServerConfig mockServerConfig;
 
     @BeforeMethod
-    public void setup() throws SessionException {
+    public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         given(mockRequester.getID()).willReturn(mockRequesterId);
         given(mockSession.getID()).willReturn(mockSessionId);
+        given(mockSession.getSessionServiceURL()).willReturn(new java.net.URL("http://openam.example.com"));
         given(mockClientSdkSessionRequests.sendRequest(
                 any(URL.class),
                 any(SessionRequest.class),

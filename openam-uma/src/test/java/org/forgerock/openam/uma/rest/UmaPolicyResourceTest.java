@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -51,7 +52,7 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.Pair;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -264,7 +265,7 @@ public class UmaPolicyResourceTest {
         policyResource.queryCollection(context, request, handler);
 
         //Then
-        verify(handler, times(2)).handleResource(Matchers.<ResourceResponse>anyObject());
+        verify(handler, times(2)).handleResource(ArgumentMatchers.<ResourceResponse>anyObject());
     }
 
     @Test

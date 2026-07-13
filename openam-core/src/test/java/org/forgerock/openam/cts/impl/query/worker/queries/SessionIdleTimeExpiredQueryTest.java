@@ -12,12 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.cts.impl.query.worker.queries;
 
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 
 import java.util.Calendar;
@@ -46,7 +48,7 @@ public class SessionIdleTimeExpiredQueryTest {
     public void setup() {
         mockConnectionFactory = mock(ConnectionFactory.class);
         mockBuilder = mock(QueryBuilder.class);
-        given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
+        given(mockBuilder.withFilter(nullable(Filter.class))).willReturn(mockBuilder);
         given(mockBuilder.pageResultsBy(anyInt())).willReturn(mockBuilder);
         given(mockBuilder.returnTheseAttributes(
                 eq(CoreTokenField.TOKEN_ID),

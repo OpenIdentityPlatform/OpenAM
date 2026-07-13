@@ -25,6 +25,7 @@
  * $Id: DelegationPolicyImpl.java,v 1.12 2010/01/16 06:35:25 dillidorai Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2022-2026 3A Systems LLC.
  */
 
 package com.sun.identity.delegation.plugins;
@@ -437,7 +438,7 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
                         ctrl.setRecursive(true);
                         ctrl.setMaxResults(-1);
                         ctrl.setTimeOut(-1);
-                        CrestQuery crestQuery = new CrestQuery(pattern, null, null, false);
+                        CrestQuery crestQuery = new CrestQuery(pattern);
                         IdSearchResults idsr = idRepo.searchIdentities(
                                                 idType, crestQuery, ctrl);
                         if (idsr != null) {

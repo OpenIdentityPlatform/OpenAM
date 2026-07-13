@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2026 3A Systems, LLC
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -57,7 +57,7 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.promise.Promises;
 import org.forgerock.util.query.QueryFilter;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -157,7 +157,7 @@ public class ResourceSetResourceTest {
         given(contextHelper.getUserId(context)).willReturn("RESOURCE_OWNER_ID");
         given(request.getQueryFilter()).willReturn(queryFilter);
         given(resourceSetService.getResourceSets(eq(context), eq("REALM"),
-                Matchers.<ResourceSetWithPolicyQuery>anyObject(), eq("RESOURCE_OWNER_ID"), eq(false))).willReturn(resourceSetsPromise);
+                ArgumentMatchers.<ResourceSetWithPolicyQuery>anyObject(), eq("RESOURCE_OWNER_ID"), eq(false))).willReturn(resourceSetsPromise);
 
         //When
         Promise<QueryResponse, ResourceException> promise = resource.queryCollection(context, request, handler);

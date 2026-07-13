@@ -12,6 +12,7 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ * Portions copyright 2026 3A Systems LLC
  */
 package com.iplanet.dpro.session.operations;
 
@@ -93,11 +94,13 @@ public interface SessionOperations {
 
     /**
      * Add a session listener notification url.  The url will receive a notification when session change events occur.
-     * @param session the session to listen to.
-     * @param url the listener notification url
+     *
+     * @param clientToken SSO Token of the client adding session listener (should be admin or agent).
+     * @param session     the session to listen to.
+     * @param url         the listener notification url
      * @throws SessionException if the session could not be accessed.
      */
-    void addSessionListener(Session session, String url) throws SessionException;
+    void addSessionListener(SSOToken clientToken, Session session, String url) throws SessionException;
 
     /**
      * Check whether a session identified by {code sessionId} can be retrieved.

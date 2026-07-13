@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * 
- * Portions Copyrighted 2020 Open Identity Platform Community.
+ * Portions Copyrighted 2018-2026 3A Systems, LLC.
  */
 package com.sun.identity.shared;
 
@@ -206,6 +206,19 @@ public interface Constants {
      * Property string for cookie SameSite flag.
      */
     static final String AM_COOKIE_SAMESITE = "org.openidentityplatform.openam.cookie.samesite";
+
+    /**
+     * Property string controlling whether the SSO token id may be returned in the
+     * {@code /json/authenticate} response body when the session cookie is {@code HttpOnly}.
+     * <p>
+     * Only relevant when {@link #AM_COOKIE_HTTPONLY} is enabled. Defaults to {@code false}, meaning
+     * the token is delivered to the browser solely via the {@code Set-Cookie} header and is not
+     * echoed in the response body (so XSS on the origin cannot read a replayable token). Set to
+     * {@code true} to keep the legacy behaviour of also returning {@code tokenId} in the body for
+     * integrations that require both an {@code HttpOnly} cookie and the token in the body.
+     */
+    static final String AM_COOKIE_HTTPONLY_ALLOW_TOKEN_IN_BODY =
+            "org.openidentityplatform.openam.httponly.allowTokenInBody";
 
     /**
      * Property string for cookie encoding.

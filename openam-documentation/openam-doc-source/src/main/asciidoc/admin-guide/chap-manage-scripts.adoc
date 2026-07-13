@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -139,7 +139,7 @@ Create an OpenAM script as follows:
 script-file=/path/to/script-file
 language=JAVASCRIPT|GROOVY
 name=myScript
-context=AUTHENTICATION_SERVER_SIDE|AUTHENTICATION_CLIENT_SIDE|POLICY_CONDITION|OIDC_CLAIMS
+context=AUTHENTICATION_SERVER_SIDE|AUTHENTICATION_CLIENT_SIDE|POLICY_CONDITION|OIDC_CLAIMS|OAUTH2_ACCESS_TOKEN_MODIFICATION
 ----
 
 . Run the `ssoadm create-sub-cfg` command. The `--datafile` argument references the script configuration file you created in the previous step:

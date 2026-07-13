@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.xacml.v3;
@@ -20,7 +21,7 @@ import static com.sun.identity.entitlement.ApplicationTypeManager.URL_APPLICATIO
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.openam.xacml.v3.XACMLApplicationUtils.ApplicationTypeService;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;

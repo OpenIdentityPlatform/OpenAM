@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2018 Open Source Solution Technology Corporation
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -34,6 +34,8 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.oauth2.OAuth2Constants.EndpointType;
 import org.forgerock.util.Reject;
 
+import java.util.regex.Pattern;
+
 /**
  * Implementation of the request validator for the OAuth2 authorize endpoint.
  *
@@ -48,6 +50,7 @@ public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator 
     private final OAuth2ProviderSettingsFactory providerSettingsFactory;
     private final ResponseTypeValidator responseTypeValidator;
 
+    
     /**
      * Constructs a new AuthorizeRequestValidatorImpl instance.
      *
@@ -89,6 +92,10 @@ public class AuthorizeRequestValidatorImpl implements AuthorizeRequestValidator 
 
         if (request.getEndpointType() != EndpointType.END_USER_VERIFICATION_URI) {
             redirectUriValidator.validate(clientRegistration, request.<String>getParameter(REDIRECT_URI));
+        }
+
+        if (request.getParameter(STATE) != null) {
+            String state = request.getParameter(STATE);
         }
 
         responseTypeValidator.validate(clientRegistration, splitResponseType(request.<String>getParameter(RESPONSE_TYPE)),

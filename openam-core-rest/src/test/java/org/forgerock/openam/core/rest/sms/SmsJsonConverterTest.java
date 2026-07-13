@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -34,7 +35,7 @@ import org.forgerock.json.JsonException;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.test.assertj.AssertJJsonValueAssert;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -173,7 +174,7 @@ public class SmsJsonConverterTest {
     @Test
     public void convertFromJson() throws Exception {
         //Given
-        given(serviceSchema.validateAttributes(Matchers.<Map>anyObject())).willReturn(true);
+        given(serviceSchema.validateAttributes(ArgumentMatchers.<Map>anyObject())).willReturn(true);
 
         //When
         Map<String, Set<String>> result = converter.fromJson(jsonRepresentation);
@@ -186,7 +187,7 @@ public class SmsJsonConverterTest {
     @Test
     public void convertToJson() throws SMSException {
         //Given
-        given(serviceSchema.validateAttributes(Matchers.<Map>anyObject())).willReturn(true);
+        given(serviceSchema.validateAttributes(ArgumentMatchers.<Map>anyObject())).willReturn(true);
 
         //When
         JsonValue result = converter.toJson(mapRepresentation, true);
@@ -229,7 +230,7 @@ public class SmsJsonConverterTest {
     @Test(expectedExceptions = JsonException.class)
     public void invalidValuesToJson() throws SMSException {
         //Given
-        given(serviceSchema.validateAttributes(Matchers.<Map>anyObject())).willReturn(false);
+        given(serviceSchema.validateAttributes(ArgumentMatchers.<Map>anyObject())).willReturn(false);
 
         //When
         converter.toJson(mapRepresentation, true);
@@ -238,7 +239,7 @@ public class SmsJsonConverterTest {
     @Test(expectedExceptions = JsonException.class)
     public void invalidValuesToMap() throws Exception {
         //Given
-        given(serviceSchema.validateAttributes(Matchers.<Map>anyObject())).willReturn(false);
+        given(serviceSchema.validateAttributes(ArgumentMatchers.<Map>anyObject())).willReturn(false);
 
         //When
         converter.fromJson(jsonRepresentation);

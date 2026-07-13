@@ -22,7 +22,7 @@
   <name>OpenAM Project</name>
   <groupId>org.openidentityplatform.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>16.0.7-SNAPSHOT</version>
+  <version>16.1.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -79,7 +79,7 @@
     <maven.compiler.source>21</maven.compiler.source>
     <!-- Supress checkstyle errors on legacy com.iplanet and com.sun.identity packages -->
     <checkstyleUnitTestSuppressionsLocation>checkstyle/suppressions.xml</checkstyleUnitTestSuppressionsLocation>
-    <opendj.version>5.0.4</opendj.version>
+    <opendj.version>5.1.1</opendj.version>
     <javadoc-utils.version>1.0.0</javadoc-utils.version>
     <ant.contrib.version>1.0b3</ant.contrib.version>
     <guice.version>7.0.0</guice.version>
@@ -107,7 +107,6 @@
     <mockito.version>2.23.4</mockito.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
-    <rhino.version>1.7.14.1</rhino.version>
     <saaj-api.version>2.0.1</saaj-api.version>
     <saaj-impl.version>2.0.1</saaj-impl.version>
     <jsp-api.version>3.0.0</jsp-api.version>
@@ -137,9 +136,7 @@
     <license.version>1.0.0</license.version>
     <checkstyleFailOnError>false</checkstyleFailOnError>
     <logback.version>1.3.15</logback.version>
-    <netty.version>4.1.132.Final</netty.version>
     <netty-tcnative-boringssl.version>2.0.69.Final</netty-tcnative-boringssl.version>
-    <bouncycastle.version>1.81</bouncycastle.version>
     <javadoc.opts>-Xdoclint:none</javadoc.opts>
     <java.surefire.options>
       -Xmx1g
@@ -161,6 +158,7 @@
       --add-opens java.base/jdk.internal.math=ALL-UNNAMED
       --add-opens java.base/jdk.internal.module=ALL-UNNAMED
       --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
+      --add-opens java.base/jdk.internal.util=ALL-UNNAMED
       --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
       --add-opens java.base/sun.nio.ch=ALL-UNNAMED
       --add-opens java.base/java.util.concurrent=ALL-UNNAMED
@@ -249,6 +247,15 @@
             </plugins>
         </build>
     </profile>
+    <profile>
+      <id>jdk17.options</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <modules>
+        <module>openam-mcp-server</module>
+      </modules>
+    </profile>
   </profiles>
   <!-- OpenAM Child Modules -->
   <!-- Build order will be determined by the Maven Reactor. -->
@@ -326,6 +333,9 @@
     <!-- openam cassandra submodules -->
     <module>openam-cassandra</module>
     <module>transform-jakarta</module>
+    <!-- OpenAM Samples / Examples -->
+    <module>openam-samples/custom-authentication-module</module>
+    <module>openam-samples/policy-evaluation-plugin</module>
   </modules>
   <!-- Mailing Lists -->
   <mailingLists>
@@ -409,12 +419,6 @@
         <artifactId>opendj-core</artifactId>
         <version>${opendj.version}</version>
       </dependency>
-	  <dependency>
-		  <groupId>org.mockito</groupId>
-		  <artifactId>mockito-all</artifactId>
-		  <version>1.10.19</version>
-		  <scope>test</scope>
-		</dependency>
       <!-- OpenAM project dependencies -->
       <dependency>
         <groupId>org.openidentityplatform.openam</groupId>
@@ -900,6 +904,13 @@
         <type>jar</type>
       </dependency>
       <dependency>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam-ui-js-sdk</artifactId>
+        <version>${project.version}</version>
+        <classifier>app</classifier>
+        <type>zip</type>
+      </dependency>
+      <dependency>
         <groupId>org.openidentityplatform.commons.ui.libs</groupId>
         <artifactId>jquery.qrcode</artifactId>
         <version>0.11.0</version>
@@ -1049,12 +1060,6 @@
         <version>${commons-text.version}</version>
       </dependency>
 
-      <!-- Mozilla Rhino Javascript engine -->
-      <dependency>
-        <groupId>org.mozilla</groupId>
-        <artifactId>rhino</artifactId>
-        <version>${rhino.version}</version>
-      </dependency>
       <!-- Groovy scripting support -->
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
@@ -1155,7 +1160,7 @@
 	<dependency>
 	    <groupId>org.glassfish.jersey.bundles</groupId>
 	    <artifactId>jaxrs-ri</artifactId>
-	    <version>3.1.9</version>
+	    <version>3.1.10</version>
 	</dependency>
       <dependency>
         <groupId>org.openidentityplatform.openam.jakarta</groupId>
@@ -1252,7 +1257,7 @@
       <dependency>
         <groupId>com.sun.mail</groupId>
         <artifactId>jakarta.mail</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
       </dependency>
       <dependency>
         <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
@@ -1314,21 +1319,29 @@
 <!--         <version>${opendj.server.version}</version> -->
 <!--       </dependency> -->
       <!-- OpenDJ Server -->
-<!--       <dependency> -->
-<!--         <groupId>org.openidentityplatform.opendj</groupId> -->
-<!--         <artifactId>opendj-server-legacy</artifactId> -->
-<!--         <version>${opendj.server.legacy}</version> -->
-<!--         <exclusions> -->
-<!--           <exclusion> -->
-<!--             <groupId>org.slf4j</groupId> -->
-<!--             <artifactId>slf4j-jdk14</artifactId> -->
-<!--           </exclusion> -->
-<!--           <exclusion> -->
-<!--             <groupId>javax.servlet</groupId> -->
-<!--             <artifactId>javax.servlet-api</artifactId> -->
-<!--           </exclusion> -->
-<!--         </exclusions> -->
-<!--       </dependency> -->
+       <dependency>
+         <groupId>org.openidentityplatform.opendj</groupId>
+         <artifactId>opendj-server-legacy</artifactId>
+         <version>${opendj.version}</version>
+         <exclusions>
+           <exclusion>
+             <groupId>com.mysql</groupId>
+             <artifactId>mysql-connector-j</artifactId>
+           </exclusion>
+           <exclusion>
+             <groupId>com.oracle.database.jdbc</groupId>
+             <artifactId>ojdbc8</artifactId>
+           </exclusion>
+           <exclusion>
+             <groupId>com.microsoft.sqlserver</groupId>
+             <artifactId>mssql-jdbc</artifactId>
+           </exclusion>
+           <exclusion>
+             <groupId>org.postgresql</groupId>
+             <artifactId>postgresql</artifactId>
+           </exclusion>
+         </exclusions>
+       </dependency>
 <!--       <dependency> -->
 <!--         <groupId>org.openidentityplatform.opendj</groupId> -->
 <!--         <artifactId>opendj-server-legacy</artifactId> -->
@@ -1416,6 +1429,12 @@
         <groupId>org.restlet.jee</groupId>
         <artifactId>org.restlet.ext.freemarker</artifactId>
         <version>${restlet.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.restlet.jee</groupId>
@@ -1502,6 +1521,10 @@
           <exclusion>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -1624,12 +1647,6 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>javassist</groupId>
-        <artifactId>javassist</artifactId>
-        <version>3.12.1.GA</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>${h2database.version}</version>
@@ -1693,111 +1710,18 @@
 		<dependency>
 		    <groupId>org.apache.thrift</groupId>
 		    <artifactId>libthrift</artifactId>
-		    <version>0.14.0</version>
+		    <version>0.23.0</version>
 		</dependency>
 		<dependency>
    			<groupId>com.fasterxml.woodstox</groupId>
    			<artifactId>woodstox-core</artifactId>
             <version>6.4.0</version>
    		</dependency>
-		<dependency>
-			<groupId>org.owasp.antisamy</groupId>
-			<artifactId>antisamy</artifactId>
-			<version>1.7.5</version>
-		 </dependency>	
         <dependency>
             <groupId>com.github.jnr</groupId>
             <artifactId>jnr-posix</artifactId>
             <version>3.1.11</version>
         </dependency>
-        <dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-parent</artifactId>
-			<version>${netty.version}</version>
-			<type>pom</type>
-		</dependency>
-        <dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-common</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-resolver</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-transport</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-handler</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-epoll</artifactId>
-  			<version>${netty.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-epoll</artifactId>
-  			<version>${netty.version}</version>
-  			<classifier>linux-x86_64</classifier>
-  		</dependency>
-  		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-kqueue</artifactId>
-  			<version>${netty.version}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-kqueue</artifactId>
-  			<version>${netty.version}</version>
-  			<classifier>osx-x86_64</classifier>
-  		</dependency>
-  		<dependency>
-  			<groupId>io.netty</groupId>
-  			<artifactId>netty-transport-native-unix-common</artifactId>
-  			<version>${netty.version}</version>
-  		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-buffer</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-codec-http</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-codec-socks</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-handler-proxy</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-transport-classes-epoll</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-transport-classes-kqueue</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
         <dependency>
           <groupId>io.netty</groupId>
           <artifactId>netty-tcnative-boringssl-static</artifactId>
@@ -1805,12 +1729,6 @@
         </dependency>
     </dependencies>
   </dependencyManagement>
-  <dependencies>
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-    </dependency>
-  </dependencies>
   <!-- Build -->
   <build>
     <plugins>
@@ -2138,7 +2056,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.7.1</version>
+				<version>3.8.0</version>
 			</plugin>
 
 			<plugin>
@@ -2155,7 +2073,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.2.3</version>
+				<version>3.5.1</version>
 			</plugin>
 
 			<plugin>

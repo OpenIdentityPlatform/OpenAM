@@ -13,7 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
- * Portions copyright 2017-2025 3A Systems LLC.
+ * Portions copyright 2017-2026 3A Systems LLC.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -22,11 +22,14 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>16.0.7-SNAPSHOT</version>
+        <version>16.1.2-SNAPSHOT</version>
     </parent>
     <properties>
         <test.config.path>${basedir}/target/config</test.config.path>
         <maven.cargo.containerId>tomcat10x</maven.cargo.containerId>
+        <!-- Tomcat distribution downloaded (once, cached) by the integration tests to run each
+             OpenAM instance in its own forked JVM. Overridden for JDK17+ in the jdk17.options profile. -->
+        <cargo.tomcat.zip.url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/10.1.34/tomcat-10.1.34.zip</cargo.tomcat.zip.url>
     </properties>
 
     <!-- Component Definition -->
@@ -58,32 +61,6 @@
 					</dependency>
 				</dependencies>
                 <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <id>start</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                        <configuration>
-                            <container>
-                                <timeout>180000</timeout>
-                            </container>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stop</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                        <configuration>
-                            <container>
-                                <timeout>60000</timeout>
-                            </container>
-                        </configuration>
-                    </execution>
-                </executions>
                 <configuration>
                     <descriptor>src/assemble/merge.xml</descriptor>
                     <archive>
@@ -93,47 +70,6 @@
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                         </manifest>
                     </archive>
-                    <container>
-	                    <containerId>${maven.cargo.containerId}</containerId>
-<!--	                    <type>embedded</type>-->
-<!-- 	                    <zipUrlInstaller><url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/8.5.50/tomcat-8.5.50.zip</url></zipUrlInstaller> -->
-	                    <systemProperties>
-	                    	<file.encoding>UTF-8</file.encoding>
-							<com.sun.xml.ws.transport.http.HttpAdapter.dump>true</com.sun.xml.ws.transport.http.HttpAdapter.dump>
-							<com.iplanet.services.configpath>${test.config.path}</com.iplanet.services.configpath>
-							<com.sun.identity.configuration.directory>${test.config.path}</com.sun.identity.configuration.directory>
-							<logback.configurationFile>${basedir}/src/test/resources/logback-test.xml</logback.configurationFile>
-							<ssoadm.disabled>false</ssoadm.disabled>
-							<com.iplanet.services.debug.level>message</com.iplanet.services.debug.level>
-							<com.iplanet.services.debug.directory />
-							<com.sun.services.debug.mergeall>on</com.sun.services.debug.mergeall>
- 							<XUI.enable>false</XUI.enable>
-<!-- 							<org.forgerock.openam.slf4j.enableTraceInMessage>true</org.forgerock.openam.slf4j.enableTraceInMessage> -->
-	                    </systemProperties>
-	                </container>
-	                <deployables>
-	                    <deployable>
-	                    	<type>war</type>
-	                        <properties>
-	                            <context>openam</context>
-	                        </properties>
-	                        <pingURL>http://localhost:8207/openam</pingURL>
-	                    </deployable>
-                        <deployable>
-                            <type>war</type>
-                            <properties>
-                                <context>am</context>
-                            </properties>
-                            <pingURL>http://localhost:8207/am</pingURL>
-                        </deployable>
-	                </deployables>
-	                <configuration>
-				    	<properties>
-				        	<cargo.rmi.port>8206</cargo.rmi.port>
-				        	<cargo.servlet.port>8207</cargo.servlet.port>
-    			        	<cargo.jvmargs>${java.surefire.options} </cargo.jvmargs>
-				        </properties>
-				    </configuration>
                 </configuration>
             </plugin>
 		   <plugin>
@@ -166,13 +102,27 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>4.13.0</version>
+            <version>4.44.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
-            <version>1.20.6</version>
+            <version>2.0.5</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Cargo Java API: integration tests start/stop one OpenAM Tomcat instance per test,
+             sequentially (see CargoBaseTest). Same version as the cargo-maven3-plugin above. -->
+        <dependency>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-core-container-tomcat</artifactId>
+            <version>1.10.20</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-core-api-generic</artifactId>
+            <version>1.10.20</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -199,6 +149,14 @@
                             <skip>false</skip>
                             <systemProperties>
                                 <test.config.path>${test.config.path}</test.config.path>
+                                <!-- consumed by CargoBaseTest to boot one OpenAM instance per test -->
+                                <openam.war>${project.build.directory}/${project.build.finalName}.war</openam.war>
+                                <cargo.containerId>${maven.cargo.containerId}</cargo.containerId>
+                                <cargo.tomcat.zip.url>${cargo.tomcat.zip.url}</cargo.tomcat.zip.url>
+                                <cargo.install.dir>${project.build.directory}/cargo/installs</cargo.install.dir>
+                                <cargo.config.dir>${project.build.directory}/cargo/conf</cargo.config.dir>
+                                <cargo.logback.config>${basedir}/src/test/resources/logback-test.xml</cargo.logback.config>
+                                <cargo.surefire.options>${java.surefire.options}</cargo.surefire.options>
                             </systemProperties>
                         </configuration>
                         <executions>
@@ -271,6 +229,7 @@
             </activation>
             <properties>
                 <maven.cargo.containerId>tomcat11x</maven.cargo.containerId>
+                <cargo.tomcat.zip.url>https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/11.0.2/tomcat-11.0.2.zip</cargo.tomcat.zip.url>
             </properties>
         </profile>
     </profiles>

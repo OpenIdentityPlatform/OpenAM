@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.session;
@@ -667,8 +667,8 @@ public class SessionResourceTest {
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(content);
-        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class))).willReturn(true);
-        given(propertyWhitelist.isPropertySetSettable(any(SSOToken.class), anySetOf(String.class))).willReturn(true);
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), any(Collection.class))).willReturn(true);
+        given(propertyWhitelist.isPropertySetSettable(any(SSOToken.class), any(Collection.class))).willReturn(true);
 
         //when
         Promise<ActionResponse, ResourceException> promise = sessionResource.actionInstance(realmContext, resourceId, request);
@@ -763,7 +763,7 @@ public class SessionResourceTest {
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(content);
-        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class)))
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), any(Collection.class)))
                 .willThrow(new SSOException("Error"));
 
         //when
@@ -787,7 +787,7 @@ public class SessionResourceTest {
         given(ssoTokenManager.isValidToken(ssoToken, false)).willReturn(true);
         given(request.getAction()).willReturn(DELETE_PROPERTY_ACTION_ID);
         given(request.getContent()).willReturn(content);
-        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), anySetOf(String.class)))
+        given(propertyWhitelist.isPropertyListed(any(SSOToken.class), any(String.class), any(Collection.class)))
                 .willThrow(new DelegationException("Error"));
 
         //when

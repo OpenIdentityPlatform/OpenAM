@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2018-2026 3A Systems LLC.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -350,7 +351,7 @@ public class GenericRepoTest extends IdRepoTestBase {
 
     @Test
     public void searchReturnsMatchesForSearchAttribute() throws Exception {
-        CrestQuery crestQuery = new CrestQuery("searchTester*", null, null, false);
+        CrestQuery crestQuery = new CrestQuery("searchTester*");
         RepoSearchResults results =
                 idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.AND_MOD, null, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
@@ -380,7 +381,7 @@ public class GenericRepoTest extends IdRepoTestBase {
         Map<String, Set<String>> avPairs = new HashMap<String, Set<String>>();
         avPairs.put("objectclass", asSet("inetorgperson"));
         avPairs.put("sn", asSet("hellNo"));
-        CrestQuery crestQuery = new CrestQuery("*", null, null, false);
+        CrestQuery crestQuery = new CrestQuery("*");
         RepoSearchResults results =
                 idrepo.search(null, IdType.USER, crestQuery, 0, 0, null, true, IdRepo.AND_MOD, avPairs, true);
         assertThat(results.getErrorCode()).isEqualTo(ResultCode.SUCCESS.intValue());
@@ -400,10 +401,10 @@ public class GenericRepoTest extends IdRepoTestBase {
         avPairs.put("sn", asSet("hellNo"));
         CrestQuery crestQuery = new CrestQuery("*");
         Filter filter = idrepo.getFilter(IdType.USER, crestQuery, IdRepo.AND_MOD, avPairs);
-        assertThat(filter.toString()).isEqualTo("(&(&(sn=hellNo)(objectclass=inetorgperson))(&(uid=\\2A)(objectclass=inetorgperson)))");
+        assertThat(filter.toString()).isEqualTo("(&(&(sn=hellNo)(objectclass=inetorgperson))(&(uid=*)(objectclass=inetorgperson)))");
 
         avPairs = new HashMap<>();
-        crestQuery = new CrestQuery("*", null, null, false);
+        crestQuery = new CrestQuery("*");
         filter = idrepo.getFilter(IdType.USER, crestQuery, IdRepo.AND_MOD, avPairs);
         assertThat(filter.toString()).isEqualTo("(&(uid=*)(objectclass=inetorgperson))");
 

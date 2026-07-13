@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -24,7 +25,7 @@ import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.util.time.TimeService;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -106,7 +107,7 @@ public class SessionConditionTest {
         assertThat(decision.isSatisfied()).isTrue();
         assertThat(decision.getAdvice()).isEmpty();
         assertThat(decision.getTimeToLive()).isEqualTo(Long.MAX_VALUE);
-        verify(coreWrapper, never()).destroyToken(Matchers.<SSOToken>anyObject());
+        verify(coreWrapper, never()).destroyToken(ArgumentMatchers.<SSOToken>anyObject());
     }
 
     @Test

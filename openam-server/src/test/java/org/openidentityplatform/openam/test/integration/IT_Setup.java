@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2022-2025 3A Systems LLC.
+ * Copyright 2022-2026 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.test.integration;
@@ -29,14 +29,12 @@ import java.time.Duration;
 
 import static org.testng.Assert.assertTrue;
 
-public class IT_Setup extends BaseTest {
+public class IT_Setup extends CargoBaseTest {
 
     @Test
     public void testSetup() {
 
-
-
-        final String openamUrl = "http://openam.local:8207/openam";
+        final String openamUrl = OPENAM_URL;
 
         driver.get(openamUrl);
 

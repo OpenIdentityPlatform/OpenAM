@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -20,7 +21,7 @@ import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAs
 import static org.forgerock.openam.entitlement.rest.EntitlementTestUtils.assertQueryPromiseFailedWithCodes;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

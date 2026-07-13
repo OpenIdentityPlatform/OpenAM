@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Nomura Research Institute, Ltd
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  * Portions Copyrighted 2025 OSSTech Corporation
  */
 
@@ -1031,9 +1031,10 @@ public class IDPSSOUtil {
                 id = spEntityID;
             }
             boolean found = false;
-            for (NameIDandSPpair nameIDandSPpair : list) {
-                if (nameIDandSPpair.getSPEntityID().equals(id)) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getSPEntityID().equals(id)) {
                     found = true;
+                    list.set(i, pair);
                     break;
                 }
             }

@@ -12,11 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.upgrade.steps;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 
 import java.security.PrivilegedAction;
@@ -111,7 +113,7 @@ public class UpgradeEntitlementSubConfigsStepTest {
         resourceTypeConfiguration = mock(ResourceTypeConfiguration.class);
         applicationServiceFactory = mock(ApplicationServiceFactory.class);
         applicationService = mock(ApplicationService.class);
-        when(applicationServiceFactory.create(any(Subject.class), anyString())).thenReturn(applicationService);
+        when(applicationServiceFactory.create(nullable(Subject.class), anyString())).thenReturn(applicationService);
         upgradeStep = new SafeUpgradeEntitlementSubConfigsStep(entitlementService, resourceTypeConfiguration,
                 adminTokenAction, connectionFactory, applicationServiceFactory);
 
@@ -271,12 +273,11 @@ public class UpgradeEntitlementSubConfigsStepTest {
     }
 
     // Used to match the application as defined in the test xml.
-    private static final class ApplicationMatch extends ArgumentMatcher<Application> {
+    private static final class ApplicationMatch implements ArgumentMatcher<Application> {
 
         @Override
-        public boolean matches(Object argument) {
+        public boolean matches(Application application) {
             boolean matches = true;
-            final Application application = (Application)argument;
             matches &= "application4".equals(application.getName());
             matches &= "type1".equals(application.getApplicationType().getName());
             matches &= collectionMatch(
@@ -290,12 +291,11 @@ public class UpgradeEntitlementSubConfigsStepTest {
     }
 
     // Used to match an application type as defined in the test xml.
-    private static final class TypeMatch extends ArgumentMatcher<ApplicationType> {
+    private static final class TypeMatch implements ArgumentMatcher<ApplicationType> {
 
         @Override
-        public boolean matches(Object argument) {
+        public boolean matches(ApplicationType type) {
             boolean matches = true;
-            final ApplicationType type = (ApplicationType)argument;
             matches &= "type4".equals(type.getName());
             matches &= TYPE_ACTIONS.equals(type.getActions());
             matches &= type.getSearchIndex() instanceof DumbSearchIndex;

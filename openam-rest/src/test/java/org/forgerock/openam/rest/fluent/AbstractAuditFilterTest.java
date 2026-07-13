@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.rest.fluent;
 
@@ -104,7 +105,7 @@ public abstract class AbstractAuditFilterTest {
 
         // Then
         verify(auditor).auditAccessAttempt();
-        verify(auditor).auditAccessSuccess(any(JsonValue.class));
+        verify(auditor).auditAccessSuccess(nullable(JsonValue.class));
     }
 
     @Test(dataProvider = "auditedCrudpaqOperations")

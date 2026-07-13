@@ -15,6 +15,8 @@
  */
 /*
  * Portions copyright 2015 ForgeRock AS
+
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.radius.server;
@@ -29,12 +31,12 @@ import org.forgerock.openam.radius.server.spi.handlers.AcceptAllHandler;
 import org.forgerock.openam.radius.server.spi.handlers.RejectAllHandler;
 import org.testng.annotations.Test;
 
-import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -66,8 +68,7 @@ public class RadiusRequestHandlerTest {
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
-        String url = "forgerock.org";
-        InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
+        InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
         when(reqCtx.getSource()).thenReturn(socketAddress);
@@ -102,8 +103,7 @@ public class RadiusRequestHandlerTest {
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
-        String url = "forgerock.org";
-        InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
+        InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
         when(reqCtx.getSource()).thenReturn(socketAddress);
@@ -139,8 +139,7 @@ public class RadiusRequestHandlerTest {
         // given
         final RadiusRequestContext reqCtx = mock(RadiusRequestContext.class);
         final ClientConfig clientConfig = mock(ClientConfig.class);
-        String url = "forgerock.org";
-        InetSocketAddress socketAddress = new InetSocketAddress(Inet4Address.getByName(url), 6836);
+        InetSocketAddress socketAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), 6836);
 
         when(reqCtx.getClientConfig()).thenReturn(clientConfig);
         when(reqCtx.getSource()).thenReturn(socketAddress);

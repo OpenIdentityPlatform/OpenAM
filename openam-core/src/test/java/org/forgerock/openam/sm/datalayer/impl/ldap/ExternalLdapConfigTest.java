@@ -12,15 +12,16 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -62,13 +63,13 @@ public class ExternalLdapConfigTest extends PowerMockTestCase {
         // When
         config.update(dataLayerConfiguration);
         // Then
-        PowerMockito.verifyStatic(times(3));
+        PowerMockito.verifyStatic(SystemProperties.class, times(3));
         SystemProperties.get(anyString());
 
-        PowerMockito.verifyStatic(times(2));
+        PowerMockito.verifyStatic(SystemProperties.class, times(2));
         SystemProperties.getAsBoolean(anyString(), anyBoolean());
 
-        PowerMockito.verifyStatic();
+        PowerMockito.verifyStatic(SystemProperties.class);
         SystemProperties.getAsInt(anyString(), eq(-1));
     }
 

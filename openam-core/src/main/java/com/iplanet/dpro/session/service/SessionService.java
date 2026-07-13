@@ -25,7 +25,7 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2023-2025 3A Systems LLC
+ * Portions Copyrighted 2023-2026 3A Systems LLC
  */
 package com.iplanet.dpro.session.service;
 
@@ -246,8 +246,8 @@ public class SessionService {
      * @param url
      * @throws SessionException Session is null OR the Session is invalid
      */
-    public void addSessionListener(Session session, String url) throws SessionException {
-        sessionOperationStrategy.getOperation(session.getSessionID()).addSessionListener(session, url);
+    public void addSessionListener(SSOToken clientToken, Session session, String url) throws SessionException {
+        sessionOperationStrategy.getOperation(session.getSessionID()).addSessionListener(clientToken, session, url);
     }
 
     /**

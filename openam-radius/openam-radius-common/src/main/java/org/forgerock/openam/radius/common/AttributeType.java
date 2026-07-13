@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package org.forgerock.openam.radius.common;
 
@@ -240,7 +241,13 @@ public enum AttributeType {
      * The byte value for the 'type' field of the wire protocol indicating the field is the Login-LAT-Port field as
      * specified in section 5.43 of RFC 2865.
      */
-    LOGIN_LAT_PORT(63);
+    LOGIN_LAT_PORT(63),
+
+    /**
+     * The byte value for the 'type' field of the wire protocol indicating the field is the Message-Authenticator
+     * field as specified in section 3.2 of RFC 3579 (originally introduced by RFC 2869).
+     */
+    MESSAGE_AUTHENTICATOR(80);
 
     private static Map<Integer, AttributeType> atts;
 

@@ -12,7 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+* Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+* Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.rest;
 
@@ -23,7 +24,7 @@ import static org.forgerock.json.resource.test.assertj.AssertJActionResponseAsse
 import static org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert.assertThat;
 import static org.forgerock.json.resource.test.assertj.AssertJResourceResponseAssert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.sun.identity.entitlement.Application;

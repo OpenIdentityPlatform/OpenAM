@@ -40,7 +40,7 @@
                 serviceHierarchy="/DSAMEConfig/CORSService"
                 i18nFileName="amCORS"
                 resourceName="cors"
-                i18nKey="cors-service-description">
+                i18nKey="cors-service-description" revisionNumber="2">
             <Global>
                 <AttributeSchema name="cors-enabled"
                                  type="single"
@@ -93,6 +93,7 @@
                         <Value>Upgrade-Insecure-Requests</Value>
                         <Value>Referer</Value>
                         <Value>Cookie</Value>
+                        <Value>Accept-API-Version</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="exposed-headers"

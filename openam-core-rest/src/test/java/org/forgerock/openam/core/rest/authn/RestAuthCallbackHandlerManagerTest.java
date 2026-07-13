@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -21,7 +21,7 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthCallbackHandler;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -69,7 +69,7 @@ public class RestAuthCallbackHandlerManagerTest {
         jsonCallback2.put("KEY2", "VALUE2");
 
         given(restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(
-                    Matchers.<Class<? extends Callback>>anyObject()))
+                    ArgumentMatchers.<Class<? extends Callback>>anyObject()))
                 .willReturn(restAuthCallbackHandler1)
                 .willReturn(restAuthCallbackHandler1).willReturn(restAuthCallbackHandler2);
         given(restAuthCallbackHandler1.updateCallbackFromRequest(request, response, callback1))
@@ -106,7 +106,7 @@ public class RestAuthCallbackHandlerManagerTest {
         RestAuthCallbackHandler restAuthCallbackHandler2 = mock(RestAuthCallbackHandler.class);
 
         given(restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(
-                Matchers.<Class<? extends Callback>>anyObject())).willReturn(
+                ArgumentMatchers.<Class<? extends Callback>>anyObject())).willReturn(
                 restAuthCallbackHandler1).willReturn(restAuthCallbackHandler2);
         given(restAuthCallbackHandler1.updateCallbackFromRequest(request, response, callback1))
                 .willReturn(true);
@@ -143,7 +143,7 @@ public class RestAuthCallbackHandlerManagerTest {
         jsonCallback2.put("KEY2", "VALUE2");
 
         given(restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(
-                    Matchers.<Class<? extends Callback>>anyObject()))
+                    ArgumentMatchers.<Class<? extends Callback>>anyObject()))
                 .willReturn(restAuthCallbackHandler1).willReturn(restAuthCallbackHandler2)
                 .willReturn(restAuthCallbackHandler1).willReturn(restAuthCallbackHandler2);
         given(restAuthCallbackHandler1.updateCallbackFromRequest(request, response, callback1))
@@ -186,7 +186,7 @@ public class RestAuthCallbackHandlerManagerTest {
         given(jsonCallbacks.get(0)).willReturn(jsonCallback1);
         given(jsonCallbacks.get(1)).willReturn(jsonCallback2);
         given(restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(
-                Matchers.<Class<? extends Callback>>anyObject()))
+                ArgumentMatchers.<Class<? extends Callback>>anyObject()))
                 .willReturn(restAuthCallbackHandler1)
                 .willReturn(restAuthCallbackHandler2);
         given(restAuthCallbackHandler1.getCallbackClassName()).willReturn("CALLBACK1");
@@ -226,7 +226,7 @@ public class RestAuthCallbackHandlerManagerTest {
 
 
         given(restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(
-                Matchers.<Class<? extends Callback>>anyObject()))
+                ArgumentMatchers.<Class<? extends Callback>>anyObject()))
                 .willReturn(restAuthCallbackHandler1)
                 .willReturn(restAuthCallbackHandler2);
         given(restAuthCallbackHandler1.getCallbackClassName()).willReturn("CALLBACK1");
@@ -271,7 +271,7 @@ public class RestAuthCallbackHandlerManagerTest {
 
 
         given(restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(
-                Matchers.<Class<? extends Callback>>anyObject()))
+                ArgumentMatchers.<Class<? extends Callback>>anyObject()))
                 .willReturn(restAuthCallbackHandler1)
                 .willReturn(restAuthCallbackHandler2)
                 .willReturn(restAuthCallbackHandler3);

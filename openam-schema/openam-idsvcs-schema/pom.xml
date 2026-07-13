@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>16.0.7-SNAPSHOT</version>
+        <version>16.1.2-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -127,12 +127,6 @@
             <artifactId>javax.xml.soap-api</artifactId>
             <version>1.4.0</version>
         </dependency>
-
-        <dependency>
-            <groupId>jakarta.xml.soap</groupId>
-            <artifactId>jakarta.xml.soap-api</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.openidentityplatform.openam.jakarta</groupId>
             <artifactId>jaxrpc-impl</artifactId>

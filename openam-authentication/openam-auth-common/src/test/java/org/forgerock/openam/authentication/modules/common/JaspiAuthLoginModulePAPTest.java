@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.authentication.modules.common;
@@ -38,7 +38,7 @@ import javax.security.auth.message.module.ServerAuthModule;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -106,8 +106,8 @@ public class JaspiAuthLoginModulePAPTest {
         }
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
-        verify(jaspiAuthWrapper, never()).secureResponse(Matchers.<MessageInfo>anyObject());
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper, never()).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "authFailed");
     }
@@ -121,16 +121,16 @@ public class JaspiAuthLoginModulePAPTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
 
-        given(jaspiAuthWrapper.secureResponse(Matchers.<MessageInfo>anyObject()))
+        given(jaspiAuthWrapper.secureResponse(ArgumentMatchers.<MessageInfo>anyObject()))
                 .willReturn(AuthStatus.SEND_SUCCESS);
 
         //When
         jaspiPostAuthPlugin.onLoginSuccess(requestParamsMap, request, response, ssoToken);
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
         assertTrue(onLoginSuccessMethodCalled);
-        verify(jaspiAuthWrapper).secureResponse(Matchers.<MessageInfo>anyObject());
+        verify(jaspiAuthWrapper).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
     }
 
     @Test
@@ -143,7 +143,7 @@ public class JaspiAuthLoginModulePAPTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
 
-        given(jaspiAuthWrapper.secureResponse(Matchers.<MessageInfo>anyObject()))
+        given(jaspiAuthWrapper.secureResponse(ArgumentMatchers.<MessageInfo>anyObject()))
                 .willReturn(AuthStatus.SEND_FAILURE);
 
         //When
@@ -157,9 +157,9 @@ public class JaspiAuthLoginModulePAPTest {
         }
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
         assertTrue(onLoginSuccessMethodCalled);
-        verify(jaspiAuthWrapper).secureResponse(Matchers.<MessageInfo>anyObject());
+        verify(jaspiAuthWrapper).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "authFailed");
     }
@@ -174,7 +174,7 @@ public class JaspiAuthLoginModulePAPTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
 
-        given(jaspiAuthWrapper.secureResponse(Matchers.<MessageInfo>anyObject()))
+        given(jaspiAuthWrapper.secureResponse(ArgumentMatchers.<MessageInfo>anyObject()))
                 .willReturn(AuthStatus.SEND_CONTINUE);
 
         //When
@@ -188,9 +188,9 @@ public class JaspiAuthLoginModulePAPTest {
         }
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
         assertTrue(onLoginSuccessMethodCalled);
-        verify(jaspiAuthWrapper).secureResponse(Matchers.<MessageInfo>anyObject());
+        verify(jaspiAuthWrapper).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "authFailed");
     }
@@ -204,7 +204,7 @@ public class JaspiAuthLoginModulePAPTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
 
-        given(jaspiAuthWrapper.secureResponse(Matchers.<MessageInfo>anyObject()))
+        given(jaspiAuthWrapper.secureResponse(ArgumentMatchers.<MessageInfo>anyObject()))
                 .willReturn(AuthStatus.SUCCESS);
 
         //When
@@ -218,9 +218,9 @@ public class JaspiAuthLoginModulePAPTest {
         }
 
         //Then
-        verify(jaspiAuthWrapper).initialize(any(CallbackHandler.class), eq(config));
+        verify(jaspiAuthWrapper).initialize(ArgumentMatchers.nullable(CallbackHandler.class), eq(config));
         assertTrue(onLoginSuccessMethodCalled);
-        verify(jaspiAuthWrapper).secureResponse(Matchers.<MessageInfo>anyObject());
+        verify(jaspiAuthWrapper).secureResponse(ArgumentMatchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "authFailed");
     }

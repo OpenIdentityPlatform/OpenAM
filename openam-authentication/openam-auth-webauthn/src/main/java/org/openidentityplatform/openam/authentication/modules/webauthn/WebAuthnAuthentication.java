@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2019-2025 3A-Systems LLC. All rights reserved.
+ * Copyright 2019-2026 3A-Systems LLC. All rights reserved.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
@@ -34,15 +34,20 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.webauthn4j.authenticator.Authenticator;
+import com.webauthn4j.authenticator.AuthenticatorImpl;
 import com.webauthn4j.data.PublicKeyCredentialRequestOptions;
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData;
-import org.apache.commons.lang3.SerializationUtils;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.security.auth.login.LoginException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.ObjectInputFilter;
+import java.io.ObjectInputStream;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.HashSet;
@@ -189,17 +194,21 @@ public class WebAuthnAuthentication extends AMLoginModule {
 	public Principal getPrincipal() {
 		return new WebAuthnPrincipal(username);
 	}
+
+	private static final Set<String> ALLOWED_AUTHENTICATOR_CLASSES = Set.of(
+			AuthenticatorImpl.class.getName()
+	);
 	
 	@SuppressWarnings("unchecked")
 	protected Set<Authenticator> loadAuthenticators(AMIdentity identity) throws AuthLoginException {
 		Set<Authenticator> authenticators = new HashSet<>();
 
 		try {
-			Set<String> authenticatorsMarshalled =  identity.getAttribute(userAttribute);
+			Set<String> authenticatorsMarshalled = identity.getAttribute(userAttribute);
 			for(String authenticatorMarshalled: authenticatorsMarshalled) {
 				byte[] bytesDecoded = Base64Utils.decodeFromUrlSafeString(authenticatorMarshalled);
-				Authenticator decoded = (Authenticator)SerializationUtils.deserialize(bytesDecoded);
-				authenticators.add(decoded);
+				Authenticator authenticator = deserialize(bytesDecoded);
+				authenticators.add(authenticator);
 			}
 		} catch (SSOException | IdRepoException e) {
 			debug.error("loadAuthenticators: error getting authenticators from user : {0}", e.toString());
@@ -207,5 +216,26 @@ public class WebAuthnAuthentication extends AMLoginModule {
 		}
 		return authenticators;
 	}
-	
+
+	private Authenticator deserialize(byte[] authBytes) throws AuthLoginException {
+
+		try (ObjectInputStream ois =
+					 new ObjectInputStream(new ByteArrayInputStream(authBytes))) {
+			ois.setObjectInputFilter(filterInfo -> {
+				if(filterInfo.depth() > 1) {
+					return ObjectInputFilter.Status.ALLOWED;
+				}
+				Class<?> cls = filterInfo.serialClass();
+				if (ALLOWED_AUTHENTICATOR_CLASSES.contains(cls.getName())) {
+					return ObjectInputFilter.Status.ALLOWED;
+				}
+				return ObjectInputFilter.Status.REJECTED;
+			});
+			return (AuthenticatorImpl) ois.readObject();
+		} catch (InvalidClassException | ClassNotFoundException e) {
+			throw new AuthLoginException("Rejected non-allowlisted class: " + e.getMessage());
+		} catch (IOException e) {
+			throw new AuthLoginException("Deserialization stream error: " + e.getMessage());
+		}
+	}
 }

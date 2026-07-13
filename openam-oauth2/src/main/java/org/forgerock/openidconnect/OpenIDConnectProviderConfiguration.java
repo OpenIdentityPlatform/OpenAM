@@ -102,6 +102,7 @@ public class OpenIDConnectProviderConfiguration {
         configuration.put("claims_parameter_supported", providerSettings.getClaimsParameterSupported());
         configuration.put("token_endpoint_auth_methods_supported", providerSettings.getEndpointAuthMethodsSupported());
         configuration.put("device_authorization_endpoint", uris.getDeviceAuthorizationEndpoint());
+        configuration.put("revocation_endpoint", uris.getRevocationEndpoint());
 
         return new JsonValue(configuration);
     }

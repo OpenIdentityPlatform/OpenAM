@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems LLC.
  */
 package org.forgerock.openam.scripting.service;
 
@@ -469,6 +470,8 @@ public class ScriptConfigurationService implements ScriptingService, ServiceList
                 return serverSideAuthenticationUsageCount(script.getId());
             case OIDC_CLAIMS:
                 return oidcClaimsUsageCount(script.getId());
+            case OAUTH2_ACCESS_TOKEN_MODIFICATION:
+                return accessTokenModificationUsageCount(script.getId());
             case POLICY_CONDITION:
                 return policyConditionUsageCount(script.getId());
             default:
@@ -555,6 +558,31 @@ public class ScriptConfigurationService implements ScriptingService, ServiceList
         try {
             Set<String> sunKeyValues = getMapSetThrows(attributes, "sunKeyValue");
             if (sunKeyValues.contains("forgerock-oauth2-provider-oidc-claims-extension-script=" + uuid)) {
+                return 1;
+            }
+        } catch (ValueNotFoundException ignored) {
+        }
+
+        return 0;
+    }
+
+    /**
+     * Count how many times the script identified by the specified uuid is used as an OAuth2 Access Token
+     * Modification script.
+     *
+     * @param uuid The specified uuid.
+     * @return the count of how many times the script is used as an OAuth2 Access Token Modification script.
+     * @throws SMSException If the LDAP node could not be read.
+     * @throws SSOException If the Admin token could not be found.
+     */
+    private int accessTokenModificationUsageCount(String uuid) throws SSOException, SMSException {
+
+        SMSEntry smsEntry = new SMSEntry(getToken(), getOAuth2ProviderBaseDN());
+        Map<String, Set<String>> attributes = smsEntry.getAttributes();
+
+        try {
+            Set<String> sunKeyValues = getMapSetThrows(attributes, "sunKeyValue");
+            if (sunKeyValues.contains("forgerock-oauth2-provider-access-token-modification-script=" + uuid)) {
                 return 1;
             }
         } catch (ValueNotFoundException ignored) {

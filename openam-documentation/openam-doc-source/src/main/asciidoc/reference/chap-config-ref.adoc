@@ -2169,6 +2169,11 @@ Default: No user attributes are protected.
 [#liberty-id-ff-service-configuration]
 ==== Liberty ID-FF Service Configuration
 
+[NOTE]
+====
+The Liberty ID-WSF SOAP endpoints (`/Liberty/*` and `/WSPRedirectHandler/*`) are disabled by default. To enable them, set the advanced server property `com.sun.identity.liberty.enabled` to `true`. Two additional advanced properties (`com.sun.identity.liberty.soap.sensitiveHandlers` and `com.sun.identity.liberty.allowAnonymousWSC`) control how anonymous and null-family authentication is handled by sensitive Liberty handlers (IDPP, Discovery, AuthnSvc, Interaction). See xref:#servers-advanced-configuration["Advanced"].
+====
+
 --
 `ssoadm` service name: `sunFAMIDFFConfiguration`
 
@@ -2394,6 +2399,21 @@ Default: `OIDC Claims Script`
 
 +
 `ssoadm` attribute: `forgerock-oauth2-provider-oidc-claims-extension-script`
+
+OAuth2 Access Token Modification Script::
+The script that is run when issuing a stateless (JWT) OAuth 2.0 access token or refresh token. The script can add, modify, or remove claims in the token payload, allowing custom claims (such as `acr`, `amr`, roles, or profile attributes) to be embedded directly in the access token.
+
++
+The script has access to a mutable view of the token (`accessToken`), the granted scopes, the resource owner's identity, the user's session (if available), and selected request properties.
+
++
+This script is only run when stateless tokens are enabled. For more information on scripting, see xref:../dev-guide/chap-scripting.adoc#scripting-api-access-token-modification["OAuth2 Access Token Modification API Functionality"] in the __Developer's Guide__.
+
++
+Default: `OAuth2 Access Token Modification Script`
+
++
+`ssoadm` attribute: `forgerock-oauth2-provider-access-token-modification-script`
 
 Response Type Plugins::
 List of plugins that handle the valid `response_type` values. OAuth 2.0 clients pass response types as parameters to the OAuth 2.0 Authorization endpoint (`/oauth2/authorize`) to indicate which grant type is requested from the provider. For example, the client passes `code` when requesting an authorization code, and `token` when requesting an access token.
@@ -2679,10 +2699,19 @@ If not enabled, if an access token is requested the client must use it to access
 `ssoadm` attribute: `alwaysAddClaimsToToken`
 
 Code Verifier Parameter Required::
-If enabled, requests using the authorization code grant require a `code_challenge` attribute.
+If enabled, every request using the authorization code grant must include a `code_challenge` parameter at the authorization endpoint and a matching `code_verifier` parameter at the token endpoint (Proof Key for Code Exchange, PKCE).
 
 +
-For more information, see the Internet-Draft: link:https://tools.ietf.org/html/draft-ietf-oauth-spop-12[Proof Key for Code Exchange by OAuth Public Clients, window=\_top].
+This property is *enabled by default*.
+
++
+[NOTE]
+====
+Independently of this setting, if an authorization code was issued together with a `code_challenge`, OpenAM always requires and validates the corresponding `code_verifier` when the code is exchanged at the token endpoint, as mandated by link:https://tools.ietf.org/html/rfc7636#section-4.6[RFC 7636 §4.6, window=\_top]. Disabling this property only stops OpenAM from *forcing* all clients to use PKCE; it never relaxes verification for codes that were issued with a challenge. This prevents PKCE downgrade attacks.
+====
+
++
+For more information, see link:https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange by OAuth Public Clients, window=\_top] - __RFC 7636__.
 
 +
 `ssoadm` attribute: `forgerock-oauth2-provider-code-verifier-enforced`
@@ -3640,6 +3669,9 @@ Client-side Authentication
 
 `OIDC_CLAIMS`::
 OIDC Claims
+
+`OAUTH2_ACCESS_TOKEN_MODIFICATION`::
+OAuth2 Access Token Modification
 
 ====
 +
@@ -4777,10 +4809,19 @@ Secure Cookie::
 If yes, then OpenAM sets the cookie in secure mode such that the browser only returns the cookie if a secure protocol such as HTTPS is used.
 
 +
-Default: No
+Default: Derived from the deployment URL scheme at install time. If the server is configured over HTTPS, the secure flag is enabled (`Yes`); over plain HTTP it is left disabled (`No`) with a deploy-time warning.
 
 +
 property: `com.iplanet.am.cookie.secure`
+
+SameSite Cookie::
+Sets the `SameSite` attribute on the cookies issued by OpenAM. Valid values are `Lax`, `Strict`, and `None`.
+
++
+Default: `Lax`
+
++
+property: `org.openidentityplatform.openam.cookie.samesite`
 
 Encode Cookie Value::
 If yes, then OpenAM URL encodes cookie values.
@@ -5577,10 +5618,10 @@ Number of threads in the shared system timer pool used to schedule operations su
 Default: `3`
 
 `com.sun.identity.cookie.httponly`::
-When set to `true`, mark cookies as HTTPOnly to prevent scripts and third-party programs from accessing the cookies.
+When set to `true`, mark cookies as HttpOnly to prevent scripts and third-party programs from accessing the cookies.
 
 +
-Note that this configuration option is used only in non-XUI deployments. The XUI cannot set the HttpOnly name in a cookie.
+Both the classic UI and the XUI support HttpOnly session cookies. When HttpOnly is enabled, the XUI relies on the automatically sent cookie instead of reading the token from JavaScript, and a successful `/json/authenticate` response delivers the token only through the `Set-Cookie` header (the `tokenId` is, by default, no longer returned in the response body). See `org.openidentityplatform.openam.httponly.allowTokenInBody` to control that behaviour.
 
 +
 Default: `false`
@@ -5596,6 +5637,36 @@ Whether JSS should take priority over other providers.
 
 +
 Default: `true`
+
+`com.sun.identity.liberty.allowAnonymousWSC`::
+Controls whether the Liberty ID-WSF SOAP receiver mints a synthetic anonymous Web Service Client (WSC) session for null-family authentication mechanisms (`urn:liberty:security:2003-08:null:*`) when no client credential (TLS or message certificate) is presented.
+
++
+When `false` (the default), such requests are rejected (fail-close). Set to `true` only to restore the legacy (insecure) behaviour required by deployments that explicitly rely on anonymous WSC sessions. This setting was introduced as part of the GHSA-p462-xxwx-pqf4 hardening.
+
++
+Default: `false`
+
+`com.sun.identity.liberty.enabled`::
+Master kill-switch for the legacy Liberty ID-WSF SOAP endpoints (`/Liberty/*` served by `SOAPReceiver` and `/WSPRedirectHandler/*` served by `WSPRedirectHandlerServlet`).
+
++
+When `false` (the default), every request to these endpoints is rejected with HTTP 404. Liberty ID-WSF is a legacy protocol and most deployments do not need it. Set to `true` only if your deployment actively uses Liberty ID-WSF, IDPP, Discovery, AuthnSvc, or Interaction services.
+
++
+The property is read on every request, so the endpoint can be enabled or disabled without restarting OpenAM.
+
++
+Default: `false`
+
+`com.sun.identity.liberty.soap.sensitiveHandlers`::
+Comma-separated list of Liberty SOAP `RequestHandler` keys that MUST NOT accept the unauthenticated `urn:liberty:security:2003-08:null:null` mechanism nor the ANONYMOUS security profile, regardless of binding-level `SupportedAuthenticationMechanisms` or `SecurityProfile` configuration.
+
++
+Empty value disables the additional restriction (not recommended). This setting was introduced as part of the GHSA-p462-xxwx-pqf4 hardening.
+
++
+Default: `idpp,disco,authnsvc,interaction`
 
 `com.sun.identity.monitoring`::
 Whether monitoring is active for OpenAM.
@@ -5978,6 +6049,21 @@ Default: None (do not time out)
 
 +
 For suggested settings, see xref:../admin-guide/chap-tuning.adoc#tuning-ldap-settings-cts["Tuning LDAP CTS and Configuration Store Settings"] in the __Administration Guide__.
+
+`org.openidentityplatform.openam.httponly.allowTokenInBody`::
+Controls whether the SSO token id (`tokenId`) is returned in the `/json/authenticate` response body when the session cookie is HttpOnly.
+
++
+This property is only relevant when the session cookie is HttpOnly (`com.sun.identity.cookie.httponly=true`). By default (`false`), the token is delivered to the browser solely through the `Set-Cookie` header and is not echoed in the response body, so an XSS on the origin cannot read a replayable SSO token (including a freshly upgraded one). The XUI relies on the auto-sent cookie and does not need the token in the body.
+
++
+Set this property to `true` to keep the legacy behaviour of also returning `tokenId` in the response body, for example for non-browser or raw-REST integrations that require both the HttpOnly cookie and the token in the body.
+
++
+When the session cookie is not HttpOnly, `tokenId` is always returned in the response body, regardless of this property.
+
++
+Default: `false`
 
 `securidHelper.ports`::
 Port on which SecurID daemon listens.

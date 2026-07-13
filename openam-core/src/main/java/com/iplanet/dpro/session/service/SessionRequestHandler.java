@@ -25,7 +25,7 @@
  * $Id: SessionRequestHandler.java,v 1.9 2009/04/02 04:11:44 ericow Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.iplanet.dpro.session.service;
 
@@ -285,9 +285,9 @@ public class SessionRequestHandler implements RequestHandler {
         switch (req.getMethodID()) {
             case SessionRequest.GetValidSessions:
             case SessionRequest.GetSessionCount:
-                verifyRequestingSessionIsNotRestrictedToken(requesterSession);
-                break;
-
+                //GHSA-vvhj-w2jq-263q: prevent getting session count,
+                //as the session quota used only by internal functionality
+                throw new SessionRequestException(requesterSession.getSessionID(), SessionBundle.getString("unknownRequestMethod"));
             case SessionRequest.GetSession:
             case SessionRequest.Logout:
             case SessionRequest.AddSessionListener:
@@ -352,21 +352,16 @@ public class SessionRequestHandler implements RequestHandler {
                 break;
 
             case SessionRequest.AddSessionListener:
-                sessionService.addSessionListener(requesterSession, req.getNotificationURL());
+                sessionService.addSessionListener(this.clientToken, requesterSession, req.getNotificationURL());
                 break;
 
             case SessionRequest.SetProperty:
                 sessionService.setExternalProperty(this.clientToken, requesterSession.getSessionID(), req.getPropertyName(), req.getPropertyValue());
                 break;
 
-            case SessionRequest.GetSessionCount:
-                String uuid = req.getUUID();
-                Map sessions =  sessionQueryManager.getAllSessionsByUUID(uuid);
-                if (sessions != null) {
-                    res.setSessionsForGivenUUID(sessions);
-                }
+            //case SessionRequest.GetSessionCount: commented out due to GHSA-vvhj-w2jq-263q: prevent getting session count,
 
-                break;
+
 
             default:
                 return handleException(req, requesterSession.getSessionID(), SessionBundle.getString("unknownRequestMethod"));

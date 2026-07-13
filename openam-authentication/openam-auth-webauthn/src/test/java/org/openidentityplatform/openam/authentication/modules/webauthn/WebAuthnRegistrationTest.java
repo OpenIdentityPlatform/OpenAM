@@ -12,12 +12,13 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2024-2025 3A-Systems LLC. All rights reserved.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.openidentityplatform.openam.authentication.modules.webauthn;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
