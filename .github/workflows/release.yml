@@ -11,6 +11,9 @@ on:
         description: "Default version to use for new local working copy."
         required: true
         default: "X.Y.Z-SNAPSHOT"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   release-maven:
     runs-on: 'ubuntu-latest'

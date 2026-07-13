@@ -334,6 +334,9 @@
     <!-- openam cassandra submodules -->
     <module>openam-cassandra</module>
     <module>transform-jakarta</module>
+    <!-- OpenAM Samples / Examples -->
+    <module>openam-samples/custom-authentication-module</module>
+    <module>openam-samples/policy-evaluation-plugin</module>
   </modules>
   <!-- Mailing Lists -->
   <mailingLists>
