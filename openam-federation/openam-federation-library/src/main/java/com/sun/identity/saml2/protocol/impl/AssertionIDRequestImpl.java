@@ -24,6 +24,7 @@
  *
  * $Id: AssertionIDRequestImpl.java,v 1.2 2008/06/25 05:47:59 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -50,9 +51,8 @@ import com.sun.identity.shared.xml.XMLUtils;
  * schema.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 	
- * <p>
  * <pre>
- * &lt;element name="AssertionIDRequest" type="{urn:oasis:names:tc:SAML:2.0:protocol}AssertionIDRequestType"/>
+ * &lt;element name="AssertionIDRequest" type="{urn:oasis:names:tc:SAML:2.0:protocol}AssertionIDRequestType"/&gt;
  * </pre>
  *
  */

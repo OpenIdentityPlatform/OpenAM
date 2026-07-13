@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -57,8 +58,8 @@ import java.util.Collections;
  * of <code>Condition</code>. This lets you define the IP addresses,
  * IP address ranges and DNS name patterns for which the policy applies
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.IPv4Condition}
- * or {@link org.forgerock.openam.entitlement.conditions.environment.IPv6Condition} instead.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.environment.IPv4Condition}
+ * or {@code org.forgerock.openam.entitlement.conditions.environment.IPv6Condition} instead.
  */
 @Deprecated
 public class IPCondition implements Condition {
@@ -107,7 +108,7 @@ public class IPCondition implements Condition {
      * @see com.sun.identity.policy.Syntax
      *
      * @param property property name
-     * @return <code>Syntax<code> for the property name
+     * @return <code>Syntax</code> for the property name
      */
     public Syntax getPropertySyntax(String property) {
         return Syntax.NONE;
@@ -123,7 +124,7 @@ public class IPCondition implements Condition {
      * @param property property name
      * @param locale locale for which the property name must be customized
      * @return display name for the property name
-     * @throws PolicyException
+     * @throws PolicyException if the display name cannot be determined.
      */
     public String getDisplayName(String property, Locale locale) throws PolicyException {
         if (ipv6) {
@@ -164,7 +165,6 @@ public class IPCondition implements Condition {
      *        by IP and DNS_NAME
      * @see #START_IP
      * @see #END_IP
-     * @see #IP_RANGE
      * @see #DNS_NAME
      * @see #REQUEST_IP
      * @see #REQUEST_DNS_NAME
@@ -236,11 +236,9 @@ public class IPCondition implements Condition {
      * @see #setProperties(Map)
      * @see #START_IP
      * @see #END_IP
-     * @see #IP_RANGE
      * @see #DNS_NAME
      * @see #REQUEST_IP
      * @see #REQUEST_DNS_NAME
-     * @see com.sun.identity.policy.
      */
     public ConditionDecision getConditionDecision(SSOToken token, Map env) throws PolicyException, SSOException {
         // Determine Request IP address
@@ -257,7 +255,7 @@ public class IPCondition implements Condition {
      *
      * @param env map containing environment description. Note that the type of the value corresponding to REQUEST_IP
      * parameter differs depending upon invocation path. It will be a String when invoked by the agents, but it will be
-     * a Set<String> when invoked via the DecisionResource (GET ws/1/entitlement/entitlements).
+     * a {@code Set<String>} when invoked via the DecisionResource (GET ws/1/entitlement/entitlements).
      * @return the IP that was used
      */
     public static String getRequestIp(Map env) {

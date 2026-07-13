@@ -13,7 +13,7 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions copyright 2025 3A Systems, LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.rest;
 
@@ -235,7 +235,7 @@ public class ApplicationV1Filter implements Filter {
      * json definition for an application. It also expects that the mentioned application exists with exactly one
      * resource type - no resource types or many resource types is not acceptable, else it is impossible to determine
      * which resource type applies to the set of actions and resources being passed as part of the application json.
-     * <p/>
+     * <p>
      * Changes to the actions and/or resources will be reflected in the applications associated resource type.
      *
      * @param context

@@ -24,6 +24,7 @@
  *
  * $Id: ManageNameIDRequestImpl.java,v 1.3 2008/06/25 05:47:59 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -69,9 +70,9 @@ public class ManageNameIDRequestImpl
      * Constructor to create <code>ManageNameIDRequest</code> Object. 
      *
      * @param element Document Element of 
-     *         <code>ManageNameIDRequest<code> object.
-     * @throws SAML2Exception 
-     *         if <code>ManageNameIDRequest<code> cannot be created.
+     *         <code>ManageNameIDRequest</code> object.
+     * @throws SAML2Exception if a SAML2 error occurs
+     *         if <code>ManageNameIDRequest</code> cannot be created.
      */
     public ManageNameIDRequestImpl(Element element) throws SAML2Exception {
     	parseElement(element);
@@ -85,9 +86,9 @@ public class ManageNameIDRequestImpl
      * Constructor to create <code>ManageNameIDRequest</code> Object. 
      *
      * @param xmlString XML Representation of 
-     *        the <code>ManageNameIDRequest<code> object.
-     * @throws SAML2Exception 
-     *        if <code>ManageNameIDRequest<code> cannot be created.
+     *        the <code>ManageNameIDRequest</code> object.
+     * @throws SAML2Exception if a SAML2 error occurs
+     *        if <code>ManageNameIDRequest</code> cannot be created.
      */
     public ManageNameIDRequestImpl(String xmlString) throws SAML2Exception {
     	Document doc = XMLUtils.toDOMDocument(xmlString, SAML2SDKUtils.debug);
@@ -328,7 +329,7 @@ public class ManageNameIDRequestImpl
 
     /** Returns a String representation of this Object.
     *
-    *  @exception SAML2Exception , if it could not create String object
+    *  @exception SAML2Exception if it could not create String object
     *  @return a  String representation of this Object.
     */
     public String toXMLString()
@@ -343,7 +344,7 @@ public class ManageNameIDRequestImpl
     *          qualifier is prepended to the Element when converted
     *  @param declareNS determines whether or not the namespace is declared
     *          within the Element.
-    *  @exception SAML2Exception ,if it could not create String object.
+    *  @exception SAML2Exception if it could not create String object.
     *  @return a String , String representation of this Object.
     **/
    

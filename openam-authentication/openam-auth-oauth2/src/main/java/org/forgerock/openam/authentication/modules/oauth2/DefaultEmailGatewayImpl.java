@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -53,7 +54,6 @@ public class DefaultEmailGatewayImpl implements EmailGateway {
 
    /**
     * Sends an email  message to the mail with the code
-    * <p>
     *
     * @param from The address that sends the E-mail message
     * @param to The address that the E-mail message is sent

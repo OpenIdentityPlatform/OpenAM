@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -25,14 +26,15 @@ import java.text.MessageFormat;
 /**
  * Provides a TextArea control: &nbsp; &lt;textarea&gt;&lt;/textarea&gt;.
  *
- * <table class='htmlHeader' cellspacing='6'>
+ * <table class='htmlHeader'>
+ * <caption>Example</caption>
  * <tr>
  * <td>Text Area</td>
- * <td><textarea title='TextArea Control'>Rather lengthy text</textarea></td>
+ * <td>&lt;textarea&gt;Rather lengthy text&lt;/textarea&gt;</td>
  * </tr>
  * </table>
  *
- * <h3>TextArea Example</h3>
+ * <h2>TextArea Example</h2>
  *
  * The example below shows how to a TextArea to a Form:
  *
@@ -47,7 +49,7 @@ import java.text.MessageFormat;
  * &lt;textarea name="comments" rows="6" cols="40"/&gt;&lt;/textarea&gt; </pre>
  *
  * See also the W3C HTML reference:
- * <a class="external" target="_blank" title="W3C HTML 4.01 Specification"
+ * <a class="external" target="_blank"
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.7">TEXTAREA</a>
  */
 public class TextArea extends Field {
@@ -199,7 +201,7 @@ public class TextArea extends Field {
 
     /**
      * Create a TextArea with no name defined.
-     * <p/>
+     * <p>
      * <b>Please note</b> the control's name must be defined before it is valid.
      */
     public TextArea() {
@@ -209,7 +211,7 @@ public class TextArea extends Field {
     // ------------------------------------------------------- Public Attributes
 
     /**
-     * Return the textarea's html tag: <tt>textarea</tt>.
+     * Return the textarea's html tag: <code>textarea</code>.
      *
      * @see org.apache.click.control.AbstractControl#getTag()
      *
@@ -365,11 +367,11 @@ public class TextArea extends Field {
 
     /**
      * Validate the TextArea request submission.
-     * <p/>
+     * <p>
      * A field error message is displayed if a validation error occurs.
      * These messages are defined in the resource bundle: <blockquote>
      * <pre>org.apache.click.control.MessageProperties</pre></blockquote>
-     * <p/>
+     * <p>
      * Error message bundle key names include: <blockquote><ul>
      * <li>field-maxlength-error</li>
      * <li>field-minlength-error</li>
@@ -404,8 +406,8 @@ public class TextArea extends Field {
 
     /**
      * Return the field JavaScript client side validation function.
-     * <p/>
-     * The function name must follow the format <tt>validate_[id]</tt>, where
+     * <p>
+     * The function name must follow the format <code>validate_[id]</code>, where
      * the id is the DOM element id of the fields focusable HTML element, to
      * ensure the function has a unique name.
      *

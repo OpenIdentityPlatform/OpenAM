@@ -24,6 +24,7 @@
  *
  * $Id: DefaultAttributeMapper.java,v 1.4 2009/09/22 23:04:36 exu Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -80,7 +81,6 @@ public class DefaultAttributeMapper implements AttributeMapper {
      * SubjectConfirmationData contains TEXT node only, then the method
      * returns the concatenated string of all the TEXT nodes. Otherwise,
      * it returns null.
-     * <p>
      * @param query the <code>AttributeQuery</code> object.
      * @see com.sun.identity.saml.plugins.AttributeMapper#getSSOTokenID
      */
@@ -105,7 +105,6 @@ public class DefaultAttributeMapper implements AttributeMapper {
      * This method exams the SubjectConfirmationData of the Subject in the
      * AttributeQuery. It returns the first Assertion that contains at least
      * one AuthenticationStatement.
-     * <p>
      * @see com.sun.identity.saml.plugins.AttributeMapper#getSSOAssertion
      */
     public Assertion getSSOAssertion(AttributeQuery query) {
@@ -157,7 +156,6 @@ public class DefaultAttributeMapper implements AttributeMapper {
      * of the query. If there is no AttributeDesignator in the query,
      * attributes of services specified as userServiceNameList in
      * amSAML.properties will be returned.
-     * <p>
      *
      * @param query the <code>AttributeQuery</code> object.
      * @param sourceID the Source Identifier.

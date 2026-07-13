@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.service;
 
@@ -39,7 +40,7 @@ import org.apache.commons.io.IOUtils;
  * serve static resources contained in the web applications JARs, under the
  * resource path META-INF/resources and which are contained under the WAR file
  * web root.
- * <p/>
+ * <p>
  * This service is useful for application servers which do not allow Click to
  * automatically deploy resources to the web root directory.
  */
@@ -131,17 +132,17 @@ public class ClickResourceService implements ResourceService {
 
     /**
      * Return the list of directories that contains cacheable resources.
-     * <p/>
-     * By default only resource packaged under the "<tt>/click</tt>" directory
+     * <p>
+     * By default only resource packaged under the "<code>/click</code>" directory
      * will be processed. To serve resources from other directories you need to
      * override this method and return a list of directories to process.
-     * <p/>
+     * <p>
      * For example:
      *
      * <pre class="prettyprint">
      * public class MyResourceService extends ClickResourceService {
      *
-     *     protected List<String> getCacheableDirs() {
+     *     protected List&lt;String&gt; getCacheableDirs() {
      *         // Get default dirs which includes /click
      *         List list = super.getCacheableDirs();
      *
@@ -152,7 +153,7 @@ public class ClickResourceService implements ResourceService {
      *     }
      * } </pre>
      *
-     * You also need to add a mapping in your <tt>web.xml</tt> to forward
+     * You also need to add a mapping in your <code>web.xml</code> to forward
      * requests for these resources on to Click:
      *
      * <pre class="prettyprint">

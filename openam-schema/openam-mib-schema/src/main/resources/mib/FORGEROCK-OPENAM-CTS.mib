@@ -11,6 +11,7 @@
 --  information: "Portions copyright [year] [name of copyright owner]".
 --
 --  Copyright 2013-2016 ForgeRock AS.
+--  Portions Copyrighted 2026 3A Systems, LLC
 --
 
 --
@@ -264,7 +265,7 @@ ctsCRUDOperationsPerTokenTypeEntry     OBJECT-TYPE
     SYNTAX			CTSCRUDOperationsPerTokenTypeEntry
     MAX-ACCESS		not-accessible
     STATUS			current
-    DESCRIPTION     "Rate information for a token & operation combination"
+    DESCRIPTION     "Rate information for a token and operation combination"
     INDEX		    { tokenTableIndex, operationTableIndex }
     ::= { ctsCRUDOperationsPerTokenTypeTable 1 }
 

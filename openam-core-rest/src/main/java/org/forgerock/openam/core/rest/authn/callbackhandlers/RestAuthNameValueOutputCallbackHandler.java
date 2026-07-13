@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2018 Open Identity Community.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -28,11 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
-<<<<<<< HEAD
  * Defines methods to convert a NameValueOutputCallback to a JSON representation.
-=======
- * Defines methods to convert a TextOutputCallback to a JSON representation.
->>>>>>> upstream/master
  */
 public class RestAuthNameValueOutputCallbackHandler extends AbstractRestAuthCallbackHandler<NameValueOutputCallback>  {
 

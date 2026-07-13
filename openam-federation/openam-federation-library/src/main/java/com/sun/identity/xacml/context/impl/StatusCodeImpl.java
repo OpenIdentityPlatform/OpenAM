@@ -24,6 +24,7 @@
  *
  * $Id: StatusCodeImpl.java,v 1.3 2008/06/25 05:48:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context.impl;
@@ -47,17 +48,16 @@ import org.w3c.dom.NodeList;
  * The <code>StatusCode</code> element is a container of 
  * one or more <code>StatusCode</code>s issuded by authorization authority.
  * 
- * <p/>
  * <pre>
  *
  * Schema:
- *  &lt;xs:element name="StatusCode" type="xacml-context:StatusCodeType"/>
- *  &lt;xs:complexType name="StatusCodeType">
- *      &lt;xs:sequence>
- *          &lt;xs:element ref="xacml-context:StatusCode" minOccurs="0"/>
- *      &lt;xs:sequence>
- *      &lt;xs:attribute name="Value" type="xs:anyURI" use="required"/>
- *  &lt;xs:complexType>
+ *  &lt;xs:element name="StatusCode" type="xacml-context:StatusCodeType"/&gt;
+ *  &lt;xs:complexType name="StatusCodeType"&gt;
+ *      &lt;xs:sequence&gt;
+ *          &lt;xs:element ref="xacml-context:StatusCode" minOccurs="0"/&gt;
+ *      &lt;xs:sequence&gt;
+ *      &lt;xs:attribute name="Value" type="xs:anyURI" use="required"/&gt;
+ *  &lt;xs:complexType&gt;
  * </pre>
  */
 public class StatusCodeImpl implements StatusCode {
@@ -77,7 +77,7 @@ public class StatusCodeImpl implements StatusCode {
      * Constructs a <code>StatusCode</code> object from an XML string
      *
      * @param xml string representing a <code>StatusCode</code> object
-     * @throws SAMLException if the XML string could not be processed
+     * @throws XACMLException if the XML string could not be processed
      */
     public StatusCodeImpl(String xml) throws XACMLException {
         Document document = XMLUtils.toDOMDocument(xml, XACMLSDKUtils.debug);
@@ -100,7 +100,7 @@ public class StatusCodeImpl implements StatusCode {
      * @param element XML DOM element representing a <code>StatusCode</code> 
      * object
      *
-     * @throws SAMLException if the DOM element could not be processed
+     * @throws XACMLException if the DOM element could not be processed
      */
     public StatusCodeImpl(Element element) throws XACMLException {
         processElement(element);

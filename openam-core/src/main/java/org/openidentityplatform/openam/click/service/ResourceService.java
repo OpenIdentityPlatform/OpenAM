@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.service;
 
@@ -29,11 +30,11 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Provides a static resource service interface.
  *
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  * The default ResourceService is {@link ClickResourceService}.
- * <p/>
+ * <p>
  * However you can instruct Click to use a different implementation by adding
- * the following element to your <tt>click.xml</tt> configuration file.
+ * the following element to your <code>click.xml</code> configuration file.
  *
  * <pre class="codeConfig">
  * &lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
@@ -50,7 +51,7 @@ public interface ResourceService {
     /**
      * Initialize the ResourceService with the given application configuration
      * service instance.
-     * <p/>
+     * <p>
      * This method is invoked after the ResourceService has been constructed.
      *
      * @param servletContext the application servlet context

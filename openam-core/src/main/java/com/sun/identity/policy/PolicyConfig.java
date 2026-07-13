@@ -25,6 +25,7 @@
  * $Id: PolicyConfig.java,v 1.10 2009/01/28 05:35:01 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy;
@@ -64,11 +65,13 @@ import org.forgerock.opendj.ldap.DN;
  * following keys. This map is passed to the ResourceComparator class while
  * instantiating a ResourceComparator class.
  * The map contains the following keys:
+ * <ul>
  * <li><code>RESOURCE_COMPARATOR_CLASS</code></li>
  * <li><code>RESOURCE_COMPARATOR_WILDCARD</code></li>
  * <li><code>RESOURCE_COMPARATOR_ONE_LEVEL_WILDCARD</code></li>
  * <li><code>RESOURCE_COMPARATOR_DELIMITER</code> </li>
  * <li><code>RESOURCE_COMPARATOR_CASE_SENSITIVE</code></li>
+ * </ul>
  */
 
 public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
@@ -373,7 +376,7 @@ public class PolicyConfig implements com.sun.identity.sm.ServiceListener {
      *
      * @param serviceName name of the service
      * @param version version of the service
-     * @param groupName
+     * @param groupName the configuration grouping name that changed
      * @param orgName organization name as DN
      * @param serviceComponent the name of the service components that
      *                          changed

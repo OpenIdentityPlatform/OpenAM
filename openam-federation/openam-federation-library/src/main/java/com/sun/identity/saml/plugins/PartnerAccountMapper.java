@@ -25,6 +25,7 @@
  * $Id: PartnerAccountMapper.java,v 1.4 2008/08/19 19:11:14 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.plugins;
@@ -101,7 +102,7 @@ public interface PartnerAccountMapper {
      * @param sourceID source ID for the site from which the subject
      *        originated.
      * @return Map which contains <code>NAME</code> and <code>ORG</code> keys,
-     *         value of the <code>NAME<code> key is the user DN, value of the
+     *         value of the <code>NAME</code> key is the user DN, value of the
      *         <code>ORG</code> is the user organization  DN. Returns empty map
      *         if the mapped user could not be obtained from the subject.
      */

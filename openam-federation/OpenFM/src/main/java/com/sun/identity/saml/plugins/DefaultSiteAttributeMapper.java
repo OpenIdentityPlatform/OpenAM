@@ -24,7 +24,7 @@
  *
  * $Id: DefaultSiteAttributeMapper.java,v 1.2 2009/01/08 04:29:00 hengming Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -60,8 +60,6 @@ import com.sun.identity.sm.ServiceConfig;
  * <code>AttributeStatements</code> elements, as part of the
  * Authentication Assertion returned to the partner during the
  * SSO scenario of Browser Artifact and POST profile.
- * <p>
- *
  */
 public class DefaultSiteAttributeMapper implements ConsumerSiteAttributeMapper {
 

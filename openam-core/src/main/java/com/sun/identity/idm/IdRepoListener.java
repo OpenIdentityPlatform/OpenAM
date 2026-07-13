@@ -25,6 +25,7 @@
  * $Id: IdRepoListener.java,v 1.16 2009/01/28 05:34:59 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.idm;
 
@@ -221,7 +222,7 @@ public final class IdRepoListener {
      * 
      * @param sName service name for which attributes are being set
      * @param attrs service synamic attributes
-     * @throws com.sun.identity.idm.IdRepoException
+     * @throws com.sun.identity.idm.IdRepoException if the service attributes cannot be stored
      */
     public void setServiceAttributes(String sName, Map attrs)
             throws IdRepoException {

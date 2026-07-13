@@ -24,6 +24,7 @@
  *
  * $Id: SubjectLocality.java,v 1.2 2008/06/25 05:47:42 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -36,18 +37,17 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * The <code>SubjectLocality</code> element specifies the DNS domain name
  * and IP address for the system entity that performed the authentication.
  * It exists as part of <code>AuthenticationStatement</code> element.
- * <p>
  * <pre>
- * &lt;complexType name="SubjectLocalityType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ * &lt;complexType name="SubjectLocalityType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;attribute name="Address" 
- *       type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="DNSName"
- *       type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *       type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  *
  * 

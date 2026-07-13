@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openidconnect.restlet;
@@ -45,7 +46,7 @@ public class WebFinger extends Application {
 
     /**
      * Constructs a new WebFinger.
-     * <br/>
+     * <br>
      * Sets the default media type to {@link MediaType#APPLICATION_JSON} and sets the status service to
      * {@link OAuth2StatusService}.
      */

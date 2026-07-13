@@ -319,7 +319,7 @@ public class Session implements Blacklistable, AMSession{
      * Returns true if the session has timed out.
      * @return <code>true</code> if session timed out,
      *         <code>false</code>otherwise
-     * @exception SessionException
+     * @exception SessionException if an error occurs while determining the session state.
      */
     public boolean isTimedOut() throws SessionException {
         /**
@@ -464,7 +464,7 @@ public class Session implements Blacklistable, AMSession{
      * @param session Must be an app token
      * @param restrictedId The SSOTokenID of the restricted token
      * @return The SSOTokenID string of the master token
-     * @throws SSOException If the master token cannot be dereferenced
+     * @throws SessionException If the master token cannot be dereferenced
      */
     public String dereferenceRestrictedTokenID(Session session, String restrictedId) throws SessionException {
         String masterSID;
@@ -485,7 +485,7 @@ public class Session implements Blacklistable, AMSession{
      * restricted token, false otherwise.
      *
      * @return true if the token is restricted
-     * @throws SSOException If we are unable to determine if the session is
+     * @throws SessionException If we are unable to determine if the session is
      *              restricted
      */
     public boolean isRestricted() throws SessionException {

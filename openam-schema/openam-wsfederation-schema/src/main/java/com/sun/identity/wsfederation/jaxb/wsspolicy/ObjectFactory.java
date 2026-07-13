@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -299,7 +300,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -318,7 +319,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -337,7 +338,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -349,7 +350,7 @@ public class ObjectFactory
     /**
      * Create an instance of TripleDesElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.TripleDesElement createTripleDesElement()
@@ -361,7 +362,7 @@ public class ObjectFactory
     /**
      * Create an instance of Wss11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Wss11Element createWss11Element()
@@ -373,7 +374,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProtectionTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.ProtectionTokenElement createProtectionTokenElement()
@@ -385,7 +386,7 @@ public class ObjectFactory
     /**
      * Create an instance of HttpBasicAuthenticationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.HttpBasicAuthenticationElement createHttpBasicAuthenticationElement()
@@ -397,7 +398,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireClientCertificateElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireClientCertificateElement createRequireClientCertificateElement()
@@ -409,7 +410,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic256Rsa15Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic256Rsa15Element createBasic256Rsa15Element()
@@ -421,7 +422,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic128Rsa15Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic128Rsa15Element createBasic128Rsa15Element()
@@ -433,7 +434,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic128Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic128Element createBasic128Element()
@@ -445,7 +446,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssSamlV20Token11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssSamlV20Token11Element createWssSamlV20Token11Element()
@@ -457,7 +458,7 @@ public class ObjectFactory
     /**
      * Create an instance of XPathFilter20Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.XPathFilter20Element createXPathFilter20Element()
@@ -469,7 +470,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestSecurityTokenTemplateType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequestSecurityTokenTemplateType createRequestSecurityTokenTemplateType()
@@ -481,7 +482,7 @@ public class ObjectFactory
     /**
      * Create an instance of HashPasswordElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.HashPasswordElement createHashPasswordElement()
@@ -493,7 +494,7 @@ public class ObjectFactory
     /**
      * Create an instance of OnlySignEntireHeadersAndBodyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.OnlySignEntireHeadersAndBodyElement createOnlySignEntireHeadersAndBodyElement()
@@ -505,7 +506,7 @@ public class ObjectFactory
     /**
      * Create an instance of LayoutElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.LayoutElement createLayoutElement()
@@ -517,7 +518,7 @@ public class ObjectFactory
     /**
      * Create an instance of XPath10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.XPath10Element createXPath10Element()
@@ -529,7 +530,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssRelV10Token10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssRelV10Token10Element createWssRelV10Token10Element()
@@ -541,7 +542,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic192Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic192Element createBasic192Element()
@@ -553,7 +554,7 @@ public class ObjectFactory
     /**
      * Create an instance of SupportingTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SupportingTokensElement createSupportingTokensElement()
@@ -565,7 +566,7 @@ public class ObjectFactory
     /**
      * Create an instance of InitiatorTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.InitiatorTokenElement createInitiatorTokenElement()
@@ -577,7 +578,7 @@ public class ObjectFactory
     /**
      * Create an instance of MustSupportRefIssuerSerialElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.MustSupportRefIssuerSerialElement createMustSupportRefIssuerSerialElement()
@@ -589,7 +590,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecurityContextTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SecurityContextTokenElement createSecurityContextTokenElement()
@@ -601,7 +602,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireIssuerSerialReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireIssuerSerialReferenceElement createRequireIssuerSerialReferenceElement()
@@ -613,7 +614,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssKerberosV5ApReqToken11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssKerberosV5ApReqToken11Element createWssKerberosV5ApReqToken11Element()
@@ -625,7 +626,7 @@ public class ObjectFactory
     /**
      * Create an instance of QNameAssertionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.QNameAssertionType createQNameAssertionType()
@@ -637,7 +638,7 @@ public class ObjectFactory
     /**
      * Create an instance of STRTransform10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.STRTransform10Element createSTRTransform10Element()
@@ -649,7 +650,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireExplicitDerivedKeysElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireExplicitDerivedKeysElement createRequireExplicitDerivedKeysElement()
@@ -661,7 +662,7 @@ public class ObjectFactory
     /**
      * Create an instance of AbsXPathElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.AbsXPathElement createAbsXPathElement()
@@ -673,7 +674,7 @@ public class ObjectFactory
     /**
      * Create an instance of TripleDesRsa15Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.TripleDesRsa15Element createTripleDesRsa15Element()
@@ -685,7 +686,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptBeforeSigningElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.EncryptBeforeSigningElement createEncryptBeforeSigningElement()
@@ -697,7 +698,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.EncryptionTokenElement createEncryptionTokenElement()
@@ -709,7 +710,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireSignatureConfirmationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireSignatureConfirmationElement createRequireSignatureConfirmationElement()
@@ -721,7 +722,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignatureTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SignatureTokenElement createSignatureTokenElement()
@@ -733,7 +734,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssX509V3Token10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssX509V3Token10Element createWssX509V3Token10Element()
@@ -745,7 +746,7 @@ public class ObjectFactory
     /**
      * Create an instance of Trust10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Trust10Element createTrust10Element()
@@ -757,7 +758,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireExternalUriReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireExternalUriReferenceElement createRequireExternalUriReferenceElement()
@@ -769,7 +770,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireServerEntropyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireServerEntropyElement createRequireServerEntropyElement()
@@ -781,7 +782,7 @@ public class ObjectFactory
     /**
      * Create an instance of IssuedTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.IssuedTokenElement createIssuedTokenElement()
@@ -793,7 +794,7 @@ public class ObjectFactory
     /**
      * Create an instance of RecipientSignatureTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RecipientSignatureTokenElement createRecipientSignatureTokenElement()
@@ -805,7 +806,7 @@ public class ObjectFactory
     /**
      * Create an instance of HeaderType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.HeaderType createHeaderType()
@@ -817,7 +818,7 @@ public class ObjectFactory
     /**
      * Create an instance of InitiatorSignatureTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.InitiatorSignatureTokenElement createInitiatorSignatureTokenElement()
@@ -829,7 +830,7 @@ public class ObjectFactory
     /**
      * Create an instance of LaxTsLastElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.LaxTsLastElement createLaxTsLastElement()
@@ -841,7 +842,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignedElementsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SignedElementsElement createSignedElementsElement()
@@ -853,7 +854,7 @@ public class ObjectFactory
     /**
      * Create an instance of AsymmetricBindingElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.AsymmetricBindingElement createAsymmetricBindingElement()
@@ -865,7 +866,7 @@ public class ObjectFactory
     /**
      * Create an instance of SamlTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SamlTokenElement createSamlTokenElement()
@@ -877,7 +878,7 @@ public class ObjectFactory
     /**
      * Create an instance of EndorsingSupportingTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.EndorsingSupportingTokensElement createEndorsingSupportingTokensElement()
@@ -889,7 +890,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssX509Pkcs7Token11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssX509Pkcs7Token11Element createWssX509Pkcs7Token11Element()
@@ -901,7 +902,7 @@ public class ObjectFactory
     /**
      * Create an instance of TripleDesSha256Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.TripleDesSha256Element createTripleDesSha256Element()
@@ -913,7 +914,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireDerivedKeysElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireDerivedKeysElement createRequireDerivedKeysElement()
@@ -925,7 +926,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenAssertionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.TokenAssertionType createTokenAssertionType()
@@ -937,7 +938,7 @@ public class ObjectFactory
     /**
      * Create an instance of HttpDigestAuthenticationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.HttpDigestAuthenticationElement createHttpDigestAuthenticationElement()
@@ -949,7 +950,7 @@ public class ObjectFactory
     /**
      * Create an instance of MustSupportClientChallengeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.MustSupportClientChallengeElement createMustSupportClientChallengeElement()
@@ -961,7 +962,7 @@ public class ObjectFactory
     /**
      * Create an instance of IncludeTimestampElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.IncludeTimestampElement createIncludeTimestampElement()
@@ -973,7 +974,7 @@ public class ObjectFactory
     /**
      * Create an instance of MustSupportRefThumbprintElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.MustSupportRefThumbprintElement createMustSupportRefThumbprintElement()
@@ -985,7 +986,7 @@ public class ObjectFactory
     /**
      * Create an instance of InitiatorEncryptionTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.InitiatorEncryptionTokenElement createInitiatorEncryptionTokenElement()
@@ -997,7 +998,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignedSupportingTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SignedSupportingTokensElement createSignedSupportingTokensElement()
@@ -1009,7 +1010,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssRelV20Token11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssRelV20Token11Element createWssRelV20Token11Element()
@@ -1021,7 +1022,7 @@ public class ObjectFactory
     /**
      * Create an instance of LaxElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.LaxElement createLaxElement()
@@ -1033,7 +1034,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssX509V3Token11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssX509V3Token11Element createWssX509V3Token11Element()
@@ -1045,7 +1046,7 @@ public class ObjectFactory
     /**
      * Create an instance of MustSupportIssuedTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.MustSupportIssuedTokensElement createMustSupportIssuedTokensElement()
@@ -1057,7 +1058,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireImplicitDerivedKeysElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireImplicitDerivedKeysElement createRequireImplicitDerivedKeysElement()
@@ -1069,7 +1070,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignedEndorsingEncryptedSupportingTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SignedEndorsingEncryptedSupportingTokensElement createSignedEndorsingEncryptedSupportingTokensElement()
@@ -1081,7 +1082,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignedEncryptedSupportingTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SignedEncryptedSupportingTokensElement createSignedEncryptedSupportingTokensElement()
@@ -1093,7 +1094,7 @@ public class ObjectFactory
     /**
      * Create an instance of SePartsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SePartsType createSePartsType()
@@ -1105,7 +1106,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireClientEntropyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireClientEntropyElement createRequireClientEntropyElement()
@@ -1117,7 +1118,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptSignatureElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.EncryptSignatureElement createEncryptSignatureElement()
@@ -1129,7 +1130,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic192Rsa15Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic192Rsa15Element createBasic192Rsa15Element()
@@ -1141,7 +1142,7 @@ public class ObjectFactory
     /**
      * Create an instance of TripleDesSha256Rsa15Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.TripleDesSha256Rsa15Element createTripleDesSha256Rsa15Element()
@@ -1153,7 +1154,7 @@ public class ObjectFactory
     /**
      * Create an instance of MustSupportServerChallengeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.MustSupportServerChallengeElement createMustSupportServerChallengeElement()
@@ -1165,7 +1166,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireEmbeddedTokenReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireEmbeddedTokenReferenceElement createRequireEmbeddedTokenReferenceElement()
@@ -1177,7 +1178,7 @@ public class ObjectFactory
     /**
      * Create an instance of AlgorithmSuiteElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.AlgorithmSuiteElement createAlgorithmSuiteElement()
@@ -1189,7 +1190,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireExternalReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireExternalReferenceElement createRequireExternalReferenceElement()
@@ -1201,7 +1202,7 @@ public class ObjectFactory
     /**
      * Create an instance of RecipientEncryptionTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RecipientEncryptionTokenElement createRecipientEncryptionTokenElement()
@@ -1213,7 +1214,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssUsernameToken10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssUsernameToken10Element createWssUsernameToken10Element()
@@ -1225,7 +1226,7 @@ public class ObjectFactory
     /**
      * Create an instance of NestedPolicyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.NestedPolicyType createNestedPolicyType()
@@ -1237,7 +1238,7 @@ public class ObjectFactory
     /**
      * Create an instance of InclusiveC14NElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.InclusiveC14NElement createInclusiveC14NElement()
@@ -1249,7 +1250,7 @@ public class ObjectFactory
     /**
      * Create an instance of TransportBindingElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.TransportBindingElement createTransportBindingElement()
@@ -1261,7 +1262,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedPartsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.EncryptedPartsElement createEncryptedPartsElement()
@@ -1273,7 +1274,7 @@ public class ObjectFactory
     /**
      * Create an instance of Wss10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Wss10Element createWss10Element()
@@ -1285,7 +1286,7 @@ public class ObjectFactory
     /**
      * Create an instance of TransportTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.TransportTokenElement createTransportTokenElement()
@@ -1297,7 +1298,7 @@ public class ObjectFactory
     /**
      * Create an instance of HttpsTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.HttpsTokenElement createHttpsTokenElement()
@@ -1309,7 +1310,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecureConversationTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SecureConversationTokenType createSecureConversationTokenType()
@@ -1321,7 +1322,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic256Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic256Element createBasic256Element()
@@ -1333,7 +1334,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecureConversationTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SecureConversationTokenElement createSecureConversationTokenElement()
@@ -1345,7 +1346,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic192Sha256Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic192Sha256Element createBasic192Sha256Element()
@@ -1357,7 +1358,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssRelV20Token10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssRelV20Token10Element createWssRelV20Token10Element()
@@ -1369,7 +1370,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic192Sha256Rsa15Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic192Sha256Rsa15Element createBasic192Sha256Rsa15Element()
@@ -1381,7 +1382,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssSamlV11Token11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssSamlV11Token11Element createWssSamlV11Token11Element()
@@ -1393,7 +1394,7 @@ public class ObjectFactory
     /**
      * Create an instance of MustSupportRefExternalURIElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.MustSupportRefExternalURIElement createMustSupportRefExternalURIElement()
@@ -1405,7 +1406,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedElementsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.EncryptedElementsElement createEncryptedElementsElement()
@@ -1417,7 +1418,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssUsernameToken11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssUsernameToken11Element createWssUsernameToken11Element()
@@ -1429,7 +1430,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssX509Pkcs7Token10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssX509Pkcs7Token10Element createWssX509Pkcs7Token10Element()
@@ -1441,7 +1442,7 @@ public class ObjectFactory
     /**
      * Create an instance of SC200502SecurityContextTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SC200502SecurityContextTokenElement createSC200502SecurityContextTokenElement()
@@ -1453,7 +1454,7 @@ public class ObjectFactory
     /**
      * Create an instance of RecipientTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RecipientTokenElement createRecipientTokenElement()
@@ -1465,7 +1466,7 @@ public class ObjectFactory
     /**
      * Create an instance of SOAPNormalization10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SOAPNormalization10Element createSOAPNormalization10Element()
@@ -1477,7 +1478,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509TokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.X509TokenElement createX509TokenElement()
@@ -1489,7 +1490,7 @@ public class ObjectFactory
     /**
      * Create an instance of KerberosTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.KerberosTokenElement createKerberosTokenElement()
@@ -1501,7 +1502,7 @@ public class ObjectFactory
     /**
      * Create an instance of MustSupportRefKeyIdentifierElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.MustSupportRefKeyIdentifierElement createMustSupportRefKeyIdentifierElement()
@@ -1513,7 +1514,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic256Sha256Rsa15Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic256Sha256Rsa15Element createBasic256Sha256Rsa15Element()
@@ -1525,7 +1526,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssRelV10Token11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssRelV10Token11Element createWssRelV10Token11Element()
@@ -1537,7 +1538,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssX509PkiPathV1Token10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssX509PkiPathV1Token10Element createWssX509PkiPathV1Token10Element()
@@ -1549,7 +1550,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignedPartsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SignedPartsElement createSignedPartsElement()
@@ -1561,7 +1562,7 @@ public class ObjectFactory
     /**
      * Create an instance of MustSupportRefEncryptedKeyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.MustSupportRefEncryptedKeyElement createMustSupportRefEncryptedKeyElement()
@@ -1573,7 +1574,7 @@ public class ObjectFactory
     /**
      * Create an instance of NoPasswordElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.NoPasswordElement createNoPasswordElement()
@@ -1585,7 +1586,7 @@ public class ObjectFactory
     /**
      * Create an instance of StrictElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.StrictElement createStrictElement()
@@ -1597,7 +1598,7 @@ public class ObjectFactory
     /**
      * Create an instance of SerElementsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SerElementsType createSerElementsType()
@@ -1609,7 +1610,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssX509PkiPathV1Token11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssX509PkiPathV1Token11Element createWssX509PkiPathV1Token11Element()
@@ -1621,7 +1622,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic128Sha256Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic128Sha256Element createBasic128Sha256Element()
@@ -1633,7 +1634,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignedEndorsingSupportingTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SignedEndorsingSupportingTokensElement createSignedEndorsingSupportingTokensElement()
@@ -1645,7 +1646,7 @@ public class ObjectFactory
     /**
      * Create an instance of MustSupportRefEmbeddedTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.MustSupportRefEmbeddedTokenElement createMustSupportRefEmbeddedTokenElement()
@@ -1657,7 +1658,7 @@ public class ObjectFactory
     /**
      * Create an instance of SymmetricBindingElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SymmetricBindingElement createSymmetricBindingElement()
@@ -1669,7 +1670,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssSamlV11Token10Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssSamlV11Token10Element createWssSamlV11Token10Element()
@@ -1681,7 +1682,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProtectTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.ProtectTokensElement createProtectTokensElement()
@@ -1693,7 +1694,7 @@ public class ObjectFactory
     /**
      * Create an instance of IssuedTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.IssuedTokenType createIssuedTokenType()
@@ -1705,7 +1706,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequiredElementsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequiredElementsElement createRequiredElementsElement()
@@ -1717,7 +1718,7 @@ public class ObjectFactory
     /**
      * Create an instance of LaxTsFirstElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.LaxTsFirstElement createLaxTsFirstElement()
@@ -1729,7 +1730,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireThumbprintReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireThumbprintReferenceElement createRequireThumbprintReferenceElement()
@@ -1741,7 +1742,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmptyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.EmptyType createEmptyType()
@@ -1753,7 +1754,7 @@ public class ObjectFactory
     /**
      * Create an instance of SpnegoContextTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SpnegoContextTokenType createSpnegoContextTokenType()
@@ -1765,7 +1766,7 @@ public class ObjectFactory
     /**
      * Create an instance of BootstrapPolicyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.BootstrapPolicyElement createBootstrapPolicyElement()
@@ -1777,7 +1778,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssX509V1Token11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssX509V1Token11Element createWssX509V1Token11Element()
@@ -1789,7 +1790,7 @@ public class ObjectFactory
     /**
      * Create an instance of RelTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RelTokenElement createRelTokenElement()
@@ -1801,7 +1802,7 @@ public class ObjectFactory
     /**
      * Create an instance of UsernameTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.UsernameTokenElement createUsernameTokenElement()
@@ -1813,7 +1814,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireInternalReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireInternalReferenceElement createRequireInternalReferenceElement()
@@ -1825,7 +1826,7 @@ public class ObjectFactory
     /**
      * Create an instance of SpnegoContextTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.SpnegoContextTokenElement createSpnegoContextTokenElement()
@@ -1837,7 +1838,7 @@ public class ObjectFactory
     /**
      * Create an instance of EndorsingEncryptedSupportingTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.EndorsingEncryptedSupportingTokensElement createEndorsingEncryptedSupportingTokensElement()
@@ -1849,7 +1850,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic128Sha256Rsa15Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic128Sha256Rsa15Element createBasic128Sha256Rsa15Element()
@@ -1861,7 +1862,7 @@ public class ObjectFactory
     /**
      * Create an instance of Basic256Sha256Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.Basic256Sha256Element createBasic256Sha256Element()
@@ -1873,7 +1874,7 @@ public class ObjectFactory
     /**
      * Create an instance of WssGssKerberosV5ApReqToken11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.WssGssKerberosV5ApReqToken11Element createWssGssKerberosV5ApReqToken11Element()
@@ -1885,7 +1886,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireRequestSecurityTokenCollectionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireRequestSecurityTokenCollectionElement createRequireRequestSecurityTokenCollectionElement()
@@ -1897,7 +1898,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireKeyIdentifierReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsspolicy.RequireKeyIdentifierReferenceElement createRequireKeyIdentifierReferenceElement()

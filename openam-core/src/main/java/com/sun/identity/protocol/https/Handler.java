@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -47,8 +48,8 @@ public class Handler extends sun.net.www.protocol.https.Handler {
 	
     /**
      * Constructor
-     * @param proxy
-     * @param port
+     * @param proxy the proxy host name
+     * @param port the proxy port
      */
     public Handler (String proxy, int port) {
         super(proxy, port);

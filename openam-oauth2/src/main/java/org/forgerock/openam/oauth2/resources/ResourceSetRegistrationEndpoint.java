@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2.resources;
@@ -70,7 +70,7 @@ import org.restlet.resource.ServerResource;
 /**
  * Restlet endpoint for OAuth2 resource servers to register resource set that should be protected.
  *
- * @link https://tools.ietf.org/html/draft-hardjono-oauth-resource-reg-04
+ * @see <a href="https://tools.ietf.org/html/draft-hardjono-oauth-resource-reg-04">OAuth 2.0 Resource Set Registration</a>
  * @since 13.0.0
  */
 public class ResourceSetRegistrationEndpoint extends ServerResource {

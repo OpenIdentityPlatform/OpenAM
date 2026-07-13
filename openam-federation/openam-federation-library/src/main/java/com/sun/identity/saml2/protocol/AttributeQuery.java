@@ -25,6 +25,7 @@
  * $Id: AttributeQuery.java,v 1.2 2008/06/25 05:47:56 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -40,17 +41,16 @@ import java.util.List;
  * This class represents the AttributeQueryType complex type.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 	
- * <p>
  * <pre>
- * &lt;complexType name="AttributeQueryType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}SubjectQueryAbstractType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Attribute" minOccurs="0" maxOccurs="unbounded"/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="AttributeQueryType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}SubjectQueryAbstractType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Attribute" minOccurs="0" maxOccurs="unbounded"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

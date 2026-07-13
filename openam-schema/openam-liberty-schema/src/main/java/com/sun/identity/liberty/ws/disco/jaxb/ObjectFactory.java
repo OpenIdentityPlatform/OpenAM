@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -98,7 +99,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -117,7 +118,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -136,7 +137,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -148,7 +149,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResourceOfferingElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ResourceOfferingElement createResourceOfferingElement()
@@ -160,7 +161,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.QueryElement createQueryElement()
@@ -172,7 +173,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmptyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.EmptyType createEmptyType()
@@ -184,7 +185,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.StatusType createStatusType()
@@ -196,7 +197,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.QueryType createQueryType()
@@ -208,7 +209,7 @@ public class ObjectFactory
     /**
      * Create an instance of ModifyResponseElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ModifyResponseElement createModifyResponseElement()
@@ -220,7 +221,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ExtensionElement createExtensionElement()
@@ -232,7 +233,7 @@ public class ObjectFactory
     /**
      * Create an instance of OptionsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.OptionsType createOptionsType()
@@ -244,7 +245,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticateSessionContextElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.AuthenticateSessionContextElement createAuthenticateSessionContextElement()
@@ -256,7 +257,7 @@ public class ObjectFactory
     /**
      * Create an instance of ModifyResponseType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ModifyResponseType createModifyResponseType()
@@ -268,7 +269,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ExtensionType createExtensionType()
@@ -280,7 +281,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResourceIDType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ResourceIDType createResourceIDType()
@@ -292,7 +293,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticateRequesterElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.AuthenticateRequesterElement createAuthenticateRequesterElement()
@@ -304,7 +305,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedResourceIDType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.EncryptedResourceIDType createEncryptedResourceIDType()
@@ -316,7 +317,7 @@ public class ObjectFactory
     /**
      * Create an instance of RemoveEntryType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.RemoveEntryType createRemoveEntryType()
@@ -328,7 +329,7 @@ public class ObjectFactory
     /**
      * Create an instance of ServiceTypeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ServiceTypeElement createServiceTypeElement()
@@ -340,7 +341,7 @@ public class ObjectFactory
     /**
      * Create an instance of ServiceTypeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ServiceTypeElement createServiceTypeElement(java.lang.String value)
@@ -352,7 +353,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResourceOfferingType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ResourceOfferingType createResourceOfferingType()
@@ -364,7 +365,7 @@ public class ObjectFactory
     /**
      * Create an instance of DescriptionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.DescriptionType createDescriptionType()
@@ -376,7 +377,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedResourceIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.EncryptedResourceIDElement createEncryptedResourceIDElement()
@@ -388,7 +389,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.StatusElement createStatusElement()
@@ -400,7 +401,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptResourceIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.EncryptResourceIDElement createEncryptResourceIDElement()
@@ -412,7 +413,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryTypeRequestedServiceTypeType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.QueryType.RequestedServiceTypeType createQueryTypeRequestedServiceTypeType()
@@ -424,7 +425,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryResponseElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.QueryResponseElement createQueryResponseElement()
@@ -436,7 +437,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryResponseType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.QueryResponseType createQueryResponseType()
@@ -448,7 +449,7 @@ public class ObjectFactory
     /**
      * Create an instance of OptionsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.OptionsElement createOptionsElement()
@@ -460,7 +461,7 @@ public class ObjectFactory
     /**
      * Create an instance of ServiceInstanceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ServiceInstanceType createServiceInstanceType()
@@ -472,7 +473,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryResponseTypeCredentialsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.QueryResponseType.CredentialsType createQueryResponseTypeCredentialsType()
@@ -484,7 +485,7 @@ public class ObjectFactory
     /**
      * Create an instance of DirectiveType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.DirectiveType createDirectiveType()
@@ -496,7 +497,7 @@ public class ObjectFactory
     /**
      * Create an instance of ModifyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ModifyType createModifyType()
@@ -508,7 +509,7 @@ public class ObjectFactory
     /**
      * Create an instance of ModifyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ModifyElement createModifyElement()
@@ -520,7 +521,7 @@ public class ObjectFactory
     /**
      * Create an instance of InsertEntryType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.InsertEntryType createInsertEntryType()
@@ -532,7 +533,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthorizeRequesterElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.AuthorizeRequesterElement createAuthorizeRequesterElement()
@@ -544,7 +545,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResourceIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.disco.jaxb.ResourceIDElement createResourceIDElement()

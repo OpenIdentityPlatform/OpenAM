@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A-Systems LLC.
+ * Portions Copyrighted 2025-2026 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap;
@@ -273,7 +273,7 @@ public class SoapSTSConsumer {
      * Invokes the soap-sts Validate operation
      * @param endpointSpecification port and service qname of soap-sts instance to be invoked
      * @param toBeValidatedToken the to-be-validated SecurityToken instance returned from the Issue operation
-     * @throws SoapSTSConsumerException
+     * @throws SoapSTSConsumerException if an exception occurred when validating the token
      */
     public boolean validateToken(EndpointSpecification endpointSpecification,
                                  SecurityToken toBeValidatedToken) throws SoapSTSConsumerException {

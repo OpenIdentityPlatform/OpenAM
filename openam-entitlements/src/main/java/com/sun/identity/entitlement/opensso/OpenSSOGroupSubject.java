@@ -25,6 +25,7 @@
  * $Id: OpenSSOGroupSubject.java,v 1.2 2009/08/21 21:52:01 hengming Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -100,8 +101,7 @@ public class OpenSSOGroupSubject extends GroupSubject {
      * @param environment Environment parameters.
      * @return <code>SubjectDecision</code> of
      * <code>EntitlementSubject</code> evaluation
-     * @throws com.sun.identity.entitlement,  EntitlementException in case
-     * of any error
+     * @throws EntitlementException in case of any error
      */
     @Override
     public SubjectDecision evaluate(

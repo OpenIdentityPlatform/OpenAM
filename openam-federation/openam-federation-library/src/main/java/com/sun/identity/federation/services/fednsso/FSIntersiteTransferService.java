@@ -24,7 +24,7 @@
  *
  * $Id: FSIntersiteTransferService.java,v 1.6 2008/08/29 04:57:16 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -306,7 +306,8 @@ public class FSIntersiteTransferService extends HttpServlet {
      * Generates <code>AuthnRequest</code> and sends it to <code>IDP</code>.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException,IOException if error occurred
+     * @exception ServletException if error occurred
+     * @exception IOException if error occurred
      */
     public void doGet(
         HttpServletRequest request, 
@@ -506,7 +507,8 @@ public class FSIntersiteTransferService extends HttpServlet {
      * Generates <code>AuthnRequest</code> and sends it to <code>IDP</code>.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException,IOException if error occurred
+     * @exception ServletException if error occurred
+     * @exception IOException if error occurred
      */
     public void doPost(
         HttpServletRequest request, 

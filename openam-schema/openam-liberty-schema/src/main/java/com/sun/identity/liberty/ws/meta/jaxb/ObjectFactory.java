@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -81,7 +82,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -100,7 +101,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -119,7 +120,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -131,7 +132,7 @@ public class ObjectFactory
     /**
      * Create an instance of SPDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType createSPDescriptorType()
@@ -143,7 +144,7 @@ public class ObjectFactory
     /**
      * Create an instance of AffiliationDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.AffiliationDescriptorType createAffiliationDescriptorType()
@@ -155,7 +156,7 @@ public class ObjectFactory
     /**
      * Create an instance of OrganizationDisplayNameType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.OrganizationDisplayNameType createOrganizationDisplayNameType()
@@ -167,7 +168,7 @@ public class ObjectFactory
     /**
      * Create an instance of LocalizedURIType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.LocalizedURIType createLocalizedURIType()
@@ -179,7 +180,7 @@ public class ObjectFactory
     /**
      * Create an instance of AdditionalMetadataLocationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.AdditionalMetadataLocationType createAdditionalMetadataLocationType()
@@ -191,7 +192,7 @@ public class ObjectFactory
     /**
      * Create an instance of EntityDescriptorElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.EntityDescriptorElement createEntityDescriptorElement()
@@ -203,7 +204,7 @@ public class ObjectFactory
     /**
      * Create an instance of OrganizationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.OrganizationType createOrganizationType()
@@ -215,7 +216,7 @@ public class ObjectFactory
     /**
      * Create an instance of EntityDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.EntityDescriptorType createEntityDescriptorType()
@@ -227,7 +228,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyDescriptorElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorElement createKeyDescriptorElement()
@@ -239,7 +240,7 @@ public class ObjectFactory
     /**
      * Create an instance of OrganizationNameType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.OrganizationNameType createOrganizationNameType()
@@ -251,7 +252,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.StatusType createStatusType()
@@ -263,7 +264,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmptyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.EmptyType createEmptyType()
@@ -275,7 +276,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.ExtensionElement createExtensionElement()
@@ -287,7 +288,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorType createKeyDescriptorType()
@@ -299,7 +300,7 @@ public class ObjectFactory
     /**
      * Create an instance of EntitiesDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.EntitiesDescriptorType createEntitiesDescriptorType()
@@ -311,7 +312,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.StatusElement createStatusElement()
@@ -323,7 +324,7 @@ public class ObjectFactory
     /**
      * Create an instance of ContactType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.ContactType createContactType()
@@ -335,7 +336,7 @@ public class ObjectFactory
     /**
      * Create an instance of IDPDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType createIDPDescriptorType()
@@ -347,7 +348,7 @@ public class ObjectFactory
     /**
      * Create an instance of IDPDescriptorElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorElement createIDPDescriptorElement()
@@ -359,7 +360,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProviderDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.ProviderDescriptorType createProviderDescriptorType()
@@ -371,7 +372,7 @@ public class ObjectFactory
     /**
      * Create an instance of SPDescriptorElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorElement createSPDescriptorElement()
@@ -383,7 +384,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.ExtensionType createExtensionType()
@@ -395,7 +396,7 @@ public class ObjectFactory
     /**
      * Create an instance of SPDescriptorTypeAssertionConsumerServiceURLType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURLType createSPDescriptorTypeAssertionConsumerServiceURLType()
@@ -407,7 +408,7 @@ public class ObjectFactory
     /**
      * Create an instance of EntitiesDescriptorElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.meta.jaxb.EntitiesDescriptorElement createEntitiesDescriptorElement()

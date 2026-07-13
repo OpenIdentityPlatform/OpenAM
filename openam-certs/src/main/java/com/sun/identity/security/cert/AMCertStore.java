@@ -25,6 +25,7 @@
  * $Id: AMCertStore.java,v 1.5 2009/01/28 05:35:12 ww203982 Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.security.cert;
@@ -88,7 +89,7 @@ public class AMCertStore {
      * Class AMCertStore is special cased Certificate store for LDAP.
      * A AMCertStore instance has to have all the information for ldap.
      *
-     * @param param
+     * @param param the LDAP certificate store parameters used to configure this store
      */
     public AMCertStore(AMLDAPCertStoreParameters param) {
             storeParam = param;
@@ -193,9 +194,9 @@ public class AMCertStore {
     }
 
     /**
-     * Return matched certificate from ldap certificate store 
+     * Return matched certificate from ldap certificate store
      *
-     * @param cert
+     * @param cert the certificate to match against the store
      */
     public X509Certificate getCertificate (X509Certificate cert) {
         X509Certificate c = getCertificate();
@@ -279,7 +280,7 @@ public class AMCertStore {
     /**
      * Return value of certificate Issuer DN.
      *
-     * @param certificate
+     * @param certificate the certificate whose issuer DN is returned
      * @return The Issuer's DN as String.
      */
     public static String getIssuerDN(X509Certificate certificate) {
@@ -289,7 +290,7 @@ public class AMCertStore {
     /**
      * Return value of certificate subject DN.
      *
-     * @param certificate
+     * @param certificate the certificate whose subject DN is returned
      * @return The Subject's DN as String.
      */
     public static String getSubjectDN(X509Certificate certificate) throws IOException {
@@ -297,10 +298,10 @@ public class AMCertStore {
     }    
     
     /**
-     * Return value of certificate subject DN 
+     * Return value of certificate subject DN
      *
-     * @param attrName
-     * @param attrValue
+     * @param attrName the attribute name to match in the search filter
+     * @param attrValue the attribute value to match in the search filter
      * @return searchFilter
      */
     public static String setSearchFilter(String attrName, String attrValue) {
@@ -317,15 +318,15 @@ public class AMCertStore {
     }
 
     /**
-     * Return ldapParam object has all config params 
+     * Return ldapParam object has all config params
      *
-     * @param serverHost 
-     * @param serverPort 
-     * @param principleUser 
-     * @param principlePasswd 
-     * @param startSearchLoc 
-     * @param uriParamsCRL 
-     * @param isSSL 
+     * @param serverHost the LDAP server host name
+     * @param serverPort the LDAP server port
+     * @param principleUser the bind DN used to authenticate to the LDAP server
+     * @param principlePasswd the bind password used to authenticate to the LDAP server
+     * @param startSearchLoc the base DN at which to start the search
+     * @param uriParamsCRL the URI parameters used when retrieving CRLs
+     * @param isSSL true if the connection to the LDAP server should use SSL
      */
     public static AMLDAPCertStoreParameters setLdapStoreParam(
                   String serverHost, int serverPort,
@@ -351,9 +352,9 @@ public class AMCertStore {
     /**
      * Return Issuer Certificate if the ldap entry has one
      *
-     * @param ldapParam 
-     * @param cert 
-     * @param attrName 
+     * @param ldapParam the LDAP certificate store parameters used to connect to the store
+     * @param cert the certificate whose issuer certificate is looked up
+     * @param attrName the attribute name used to match the issuer certificate
      */
     public static X509Certificate getIssuerCertificate (
         AMLDAPCertStoreParameters ldapParam, 
@@ -370,9 +371,9 @@ public class AMCertStore {
     /**
      * Return X509 Certificate if the ldap entry has the same one
      *
-     * @param ldapParam 
-     * @param cert 
-     * @param attrName 
+     * @param ldapParam the LDAP certificate store parameters used to connect to the store
+     * @param cert the certificate to look up and compare against the store
+     * @param attrName the attribute name used to match the certificate
      */
     public static X509Certificate getRegisteredCertificate (
             AMLDAPCertStoreParameters ldapParam, 
@@ -397,11 +398,11 @@ public class AMCertStore {
     }
 
     /**
-     * Return X509 Certificate if the ldap entry has one  
+     * Return X509 Certificate if the ldap entry has one
      *
-     * @param ldapParam 
-     * @param attrName 
-     * @param attrValue 
+     * @param ldapParam the LDAP certificate store parameters used to connect to the store
+     * @param attrName the attribute name to match in the search filter
+     * @param attrValue the attribute value to match in the search filter
      */
     public static  X509Certificate getCertificate (
         AMLDAPCertStoreParameters ldapParam, 
@@ -433,9 +434,9 @@ public class AMCertStore {
     }
     
     /**
-     * Return true if it is self signed ROOT CA  
+     * Return true if it is self signed ROOT CA
      *
-     * @param cert 
+     * @param cert the certificate to test for being a self-signed root CA
      */
     public static boolean isRootCA(X509Certificate cert) {
         return CertUtils.getIssuerName(cert).equals(CertUtils.getSubjectName(cert));

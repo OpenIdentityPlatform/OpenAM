@@ -24,6 +24,7 @@
  *
  * $Id: IDPPInformalName.java,v 1.2 2008/06/25 05:47:16 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -57,7 +58,7 @@ public class IDPPInformalName extends IDPPBaseContainer {
       * Gets the Informal Name JAXB Object 
       * @param userMap user map
       * @return InformalNameElement JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPInformalName:getInformalName:Init");
@@ -107,7 +108,7 @@ public class IDPPInformalName extends IDPPBaseContainer {
       * @param select Select Excepression.
       * @param data list of new data objects.
       * @return Attribute key value pair for the given select.
-      * @throws IDPPException.
+      * @throws IDPPException .
       */
      public Map getDataMapForSelect(String select, List data) 
      throws IDPPException {

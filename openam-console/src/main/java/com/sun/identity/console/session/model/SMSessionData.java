@@ -24,6 +24,7 @@
  *
  * $Id: SMSessionData.java,v 1.2 2008/06/25 05:43:21 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.console.session.model;
@@ -109,7 +110,7 @@ public class SMSessionData implements Serializable
     /**
      * Set Organization
      *
-     * @param Organization
+     * @param organization the organization to set
      */
 	public void setOrganization(String organization) {
 		this.organization = organization;
@@ -118,7 +119,7 @@ public class SMSessionData implements Serializable
     /**
      * Set Service
      *
-     * @param Service
+     * @param service the service to set
      */
 	public void setService(String service) {
 		this.service = service;
@@ -127,7 +128,7 @@ public class SMSessionData implements Serializable
     /**
      * Set AuthType
      *
-     * @param AuthType
+     * @param authType the authentication type to set
      */
 	public void setAuthType(String authType) {
 		this.authType = authType;
@@ -136,7 +137,7 @@ public class SMSessionData implements Serializable
     /**
      * Set AuthLevel
      *
-     * @param AuthLevel
+     * @param authLevel the authentication level to set
      */
 	public void setAuthLevel(String authLevel) {
 		this.authLevel = authLevel;
@@ -145,7 +146,7 @@ public class SMSessionData implements Serializable
     /**
      * Set AMCtxId
      *
-     * @param AMCtxId
+     * @param aMCtxId the AM context ID to set
      */
 	public void setaMCtxId(String aMCtxId) {
 		this.aMCtxId = aMCtxId;

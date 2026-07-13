@@ -24,6 +24,7 @@
  *
  * $Id: SessionSubject.java,v 1.2 2008/06/25 05:47:22 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -52,7 +53,7 @@ import com.sun.identity.saml.assertion.NameIdentifier;
 public class SessionSubject extends FSSubject {
     
     /**
-     * Constructs a <code>SessionSubject<code> object from a
+     * Constructs a <code>SessionSubject</code> object from a
      * <code>NameIdentifier</code> object, <code>SubjectConfirmation</code> and
      * <code>IDPProvidedNameIdentifier</code> object.
      *

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.rest.router;
 
@@ -33,7 +33,7 @@ import org.forgerock.util.Options;
 
 /**
  * A proxy implementation of the CTSPersistentStore, which delegates all its calls to the "real" implementation.
- * <br/>
+ * <br>
  * Using this proxy instead of the "real" implementation prevents singletons in the core of OpenAM to be initialised
  * prior to OpenAM being configured. As if this happens then some functions in OpenAM will be broken and a restart will
  * be required for them to be restored.

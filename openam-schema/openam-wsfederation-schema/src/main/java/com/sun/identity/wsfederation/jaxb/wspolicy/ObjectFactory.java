@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -67,7 +68,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -86,7 +87,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -105,7 +106,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -117,7 +118,7 @@ public class ObjectFactory
     /**
      * Create an instance of PolicyAttachmentElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.PolicyAttachmentElement createPolicyAttachmentElement()
@@ -129,7 +130,7 @@ public class ObjectFactory
     /**
      * Create an instance of OperatorContentType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.OperatorContentType createOperatorContentType()
@@ -141,7 +142,7 @@ public class ObjectFactory
     /**
      * Create an instance of AllElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.AllElement createAllElement()
@@ -153,7 +154,7 @@ public class ObjectFactory
     /**
      * Create an instance of PolicyAttachmentType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.PolicyAttachmentType createPolicyAttachmentType()
@@ -165,7 +166,7 @@ public class ObjectFactory
     /**
      * Create an instance of AppliesToType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.AppliesToType createAppliesToType()
@@ -177,7 +178,7 @@ public class ObjectFactory
     /**
      * Create an instance of PolicyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.PolicyType createPolicyType()
@@ -189,7 +190,7 @@ public class ObjectFactory
     /**
      * Create an instance of AppliesToElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.AppliesToElement createAppliesToElement()
@@ -201,7 +202,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExactlyOneElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.ExactlyOneElement createExactlyOneElement()
@@ -213,7 +214,7 @@ public class ObjectFactory
     /**
      * Create an instance of PolicyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.PolicyElement createPolicyElement()
@@ -225,7 +226,7 @@ public class ObjectFactory
     /**
      * Create an instance of PolicyReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.PolicyReferenceElement createPolicyReferenceElement()
@@ -237,7 +238,7 @@ public class ObjectFactory
     /**
      * Create an instance of PolicyReferenceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wspolicy.PolicyReferenceType createPolicyReferenceType()

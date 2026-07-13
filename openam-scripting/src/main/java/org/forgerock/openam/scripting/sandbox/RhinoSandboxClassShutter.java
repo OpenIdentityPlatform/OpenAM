@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.scripting.sandbox;
@@ -55,7 +56,7 @@ public final class RhinoSandboxClassShutter implements ClassShutter {
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * This implementation first checks whether the class/package is allowed by the configured security manager
      * (if one is set). Then it checks that the class name matches at least one white-list pattern. Finally, it
      * checks that the class name does not match any of the black-list patterns. Only if all three checks pass is the

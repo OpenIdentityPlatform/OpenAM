@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -45,7 +46,6 @@ import com.iplanet.services.util.I18n;
  * 
  * <p>
  * Example:
- * <p>
  * 
  * <pre>
  * TemplateManager mgr = TemplateManager.getTemplateManager();

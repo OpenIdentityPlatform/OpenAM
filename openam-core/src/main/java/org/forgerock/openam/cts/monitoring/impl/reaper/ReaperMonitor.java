@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.cts.monitoring.impl.reaper;
@@ -29,14 +30,14 @@ public class ReaperMonitor {
     private final List<ReaperRun> reaperRuns = new ArrayList<ReaperRun>();
 
     /**
-     * {@inheritDoc}
+     * Records the timing and deletion count of a completed reaper run.
      */
     public void add(final long startTime, final long runTime, final long numberOfDeletedSessions) {
         reaperRuns.add(new ReaperRun(startTime, runTime, numberOfDeletedSessions));
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the average rate of session deletion across the recorded reaper runs.
      */
     public double getRateOfDeletion() {
 

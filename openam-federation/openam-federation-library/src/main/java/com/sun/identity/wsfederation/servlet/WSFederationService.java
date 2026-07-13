@@ -24,7 +24,7 @@
  *
  * $Id: WSFederationService.java,v 1.1 2009/12/14 23:42:49 mallas Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.wsfederation.servlet;
 
@@ -65,8 +65,7 @@ public class WSFederationService {
      * @param token the user's session.
      * @param entityID the entityID
      * @param entityRole the entity role for e.g. RP or IP
-     * @return the SAML Assertion xml string
-     * @return null if there is a failure.
+     * @return the SAML Assertion xml string, or null if there is a failure.
      */
     @GET
     @Produces("application/xml")

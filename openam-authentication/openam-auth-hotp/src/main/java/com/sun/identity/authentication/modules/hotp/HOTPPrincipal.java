@@ -27,6 +27,7 @@
  */
 /**
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.authentication.modules.hotp;
 
@@ -53,7 +54,6 @@ public class HOTPPrincipal implements Principal, java.io.Serializable {
     /**
      * Returns the HOTP username for this <code>HOTPPrincipal</code>.
      *
-     * <p>
      *
      * @return the HOTP username for this <code>HOTPPrincipal</code>
      */
@@ -64,7 +64,6 @@ public class HOTPPrincipal implements Principal, java.io.Serializable {
     /**
      * Returns a string representation of this <code>HOTPPrincipal</code>.
      *
-     * <p>
      *
      * @return a string representation of this <code>HOTPPrincipal</code>.
      */
@@ -78,7 +77,6 @@ public class HOTPPrincipal implements Principal, java.io.Serializable {
      * <code>HOTPPrincipal</code> and the two HOTPPrincipals
      * have the same username.
      *
-     * <p>
      *
      * @param o Object to be compared for equality with this
      *		<code>HOTPPrincipal</code>.
@@ -109,7 +107,6 @@ public class HOTPPrincipal implements Principal, java.io.Serializable {
     /**
      * Returns a hash code for this <code>HOTPPrincipal</code>.
      *
-     * <p>
      *
      * @return a hash code for this <code>HOTPPrincipal</code>.
      */

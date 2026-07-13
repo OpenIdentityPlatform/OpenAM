@@ -24,6 +24,7 @@
  *
  * $Id: DSTQueryResponse.java,v 1.2 2008/06/25 05:47:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -46,38 +47,38 @@ import org.w3c.dom.NodeList;
  * The following schema fragment specifies the expected content within
  * the <code>DSTQueryResponse</code> object.
  * <pre>
- * &lt;complexType name="QueryResponse">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:idpp:2003-08}Status"/>
- *         &lt;element name="Data" maxOccurs="unbounded" minOccurs="0">
- *           &lt;complexType>
- *             &lt;complexContent>
+ * &lt;complexType name="QueryResponse"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:idpp:2003-08}Status"/&gt;
+ *         &lt;element name="Data" maxOccurs="unbounded" minOccurs="0"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;complexContent&gt;
  *               &lt;restriction 
- *               base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;sequence>
- *                   &lt;any/>
- *                 &lt;/sequence>
+ *               base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                 &lt;sequence&gt;
+ *                   &lt;any/&gt;
+ *                 &lt;/sequence&gt;
  *                 &lt;attribute name="itemIDRef" 
- *                 type="{urn:liberty:idpp:2003-08}IDReferenceType" />
+ *                 type="{urn:liberty:idpp:2003-08}IDReferenceType" /&gt;
  *                 &lt;attribute name="id"
- *                 type="{http://www.w3.org/2001/XMLSchema}ID" />
- *               &lt;/restriction>
- *             &lt;/complexContent>
- *           &lt;/complexType>
- *         &lt;/element>
+ *                 type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *               &lt;/restriction&gt;
+ *             &lt;/complexContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
  *         &lt;element ref="{urn:liberty:idpp:2003-08}Extension" 
- *         maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
+ *         maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
  *       &lt;attribute name="timeStamp" 
- *       type="{http://www.w3.org/2001/XMLSchema}dateTime" />
+ *       type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
  *       &lt;attribute name="itemIDRef"
- *       type="{urn:liberty:idpp:2003-08}IDReferenceType" />
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *       type="{urn:liberty:idpp:2003-08}IDReferenceType" /&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  *
  *  
@@ -114,7 +115,7 @@ public class DSTQueryResponse {
      * Constructor
      *
      * @param element <code>DOM</code> Element 
-     * @throws DSTException
+     * @throws DSTException if a data service error occurs
      */
     public DSTQueryResponse(org.w3c.dom.Element element) throws DSTException {
         if(element == null) {

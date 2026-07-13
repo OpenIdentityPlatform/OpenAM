@@ -1,5 +1,6 @@
 /**
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -38,7 +39,7 @@ public class CoreTokenFieldTypes {
      * Validate a collection of key/value mappings.
      *
      * @param types A mapping of CoreTokenField to value. Non null, may be empty.
-     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException If one of the values was invalid for the CoreTokenField field.
+     * @throws CoreTokenException If one of the values was invalid for the CoreTokenField field.
      */
     public static void validateTypes(Map<CoreTokenField, Object> types) throws CoreTokenException {
         for (Map.Entry<CoreTokenField, Object> entry : types.entrySet()) {
@@ -51,7 +52,7 @@ public class CoreTokenFieldTypes {
      *
      * @param field The CoreTokenField to validate against.
      * @param value The value to verify. Non null.
-     * @throws org.forgerock.openam.sm.datalayer.api.LdapOperationFailedException
+     * @throws CoreTokenException If the value was invalid for the CoreTokenField field.
      */
     public static void validateType(CoreTokenField field, Object value) throws CoreTokenException {
         if (value == null) {

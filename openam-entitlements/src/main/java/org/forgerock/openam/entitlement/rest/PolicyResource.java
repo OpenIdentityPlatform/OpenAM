@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -134,7 +134,7 @@ public final class PolicyResource implements CollectionResourceProvider{
     }
 
     /**
-     * {@inheritDoc}
+     * Evaluates policies for the given action request and returns the resulting policy decisions.
      */
     @Action(operationDescription = @Operation(
                     errors = {

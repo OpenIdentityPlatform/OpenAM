@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -68,8 +69,8 @@ public class AMUserPasswordValidationPlugin extends AMUserPasswordValidation
      *            source string which should be validated
      * @param envParams
      *            parameters for which the userID validation is enforced.
-     * @throws throws
-     *             AMException when it detects specified pattern within source
+     * @throws AMException
+     *             when it detects specified pattern within source
      *             string which need to be validated OR if source string is null
      */
 

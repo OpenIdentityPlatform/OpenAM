@@ -28,7 +28,7 @@
 
 /**
  * Portions Copyrighted 2012-2014 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.authentication.UI;
 
@@ -63,7 +63,7 @@ static Debug exDebug = Debug.getInstance("amAuthExceptionViewBean");
      *
      * @param requestContext - request context
      * @param handlerName - name of handler
-     * @throws ServletException
+     * @throws ServletException if an error occurs while forwarding to the authentication exception view bean
      */
     protected void onRequestHandlerNotFound(
         RequestContext requestContext,
@@ -83,7 +83,7 @@ static Debug exDebug = Debug.getInstance("amAuthExceptionViewBean");
      * Forwards to login view bean, in case of no handler specified
      *
      * @param requestContext - request context
-     * @throws ServletException
+     * @throws ServletException if an error occurs while forwarding to the authentication exception view bean
      */
     protected void onRequestHandlerNotSpecified(RequestContext requestContext)
         throws ServletException
@@ -102,8 +102,8 @@ static Debug exDebug = Debug.getInstance("amAuthExceptionViewBean");
      *
      * @param requestContext - request context
      * @param e Exception that was not handled by the application.
-     * @throws ServletException
-     * @throws IOException
+     * @throws ServletException if an error occurs while forwarding to the authentication exception view bean
+     * @throws IOException if an I/O error occurs while forwarding to the authentication exception view bean
      */
     protected void onUncaughtException(
         RequestContext requestContext,

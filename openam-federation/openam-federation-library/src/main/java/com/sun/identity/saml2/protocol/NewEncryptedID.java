@@ -25,6 +25,7 @@
  * $Id: NewEncryptedID.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.saml2.protocol;
 
@@ -39,9 +40,8 @@ import java.util.Set;
  * Java content class for NewEncryptedID element declaration.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 	
- * <p>
  * <pre>
- * &lt;element name="NewEncryptedID" type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/>
+ * &lt;element name="NewEncryptedID" type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/&gt;
  * </pre>
  * 
  * 

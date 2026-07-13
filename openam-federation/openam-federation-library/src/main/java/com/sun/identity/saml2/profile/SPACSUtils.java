@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -151,7 +151,8 @@ public class SPACSUtils {
      * @param hostEntityId Entity ID of the hosted service provider
      * @param metaManager <code>SAML2MetaManager</code> instance.
      * @return <code>ResponseInfo</code> instance.
-     * @throws SAML2Exception,IOException if it fails in the process.
+     * @throws SAML2Exception if it fails in the process.
+     * @throws IOException if it fails in the process.
      */
     public static ResponseInfo getResponse(
                                 HttpServletRequest request,
@@ -1602,7 +1603,7 @@ public class SPACSUtils {
      *  @param sessionProvider Session provider
      *  @param attrMap the Attribute Map
      *  @param session the valid session object
-     *  @throws com.sun.identity.plugin.session.SessionException 
+     *  @throws com.sun.identity.plugin.session.SessionException if a session error occurs
      */
     public static void setAttrMapInSession(
         SessionProvider sessionProvider,

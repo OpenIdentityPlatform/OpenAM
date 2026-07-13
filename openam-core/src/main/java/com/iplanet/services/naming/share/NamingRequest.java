@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -34,8 +35,7 @@ package com.iplanet.services.naming.share;
 /**
  * This <code>NamingRequest</code> class represents a NamingRequest XML
  * document. The NamingRequest DTD is defined as the following:
- * </p>
- * 
+ *
  * <pre>
  *     &lt;?xml version=&quot;1.0&quot;&gt;
  *     &lt; !DOCTYPE NamingRequest [
@@ -47,8 +47,6 @@ package com.iplanet.services.naming.share;
  *     &lt; !ELEMENT GetNamingProfile EMPTY&gt;
  *     ]&gt;
  * </pre>
- * 
- * </p>
  */
 
 public class NamingRequest {

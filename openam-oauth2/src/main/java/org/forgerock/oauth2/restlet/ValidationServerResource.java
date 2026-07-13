@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -67,7 +67,7 @@ public class ValidationServerResource extends ServerResource {
      * Handles GET requests to the OAuth2 tokeninfo endpoint for retrieving information about the provided token.
      *
      * @return The body to be sent in the response to the user agent.
-     * @throws OAuth2RestletException
+     * @throws OAuth2RestletException if an error occurs while validating the token.
      */
     @Get
     public Representation validate() throws OAuth2RestletException {

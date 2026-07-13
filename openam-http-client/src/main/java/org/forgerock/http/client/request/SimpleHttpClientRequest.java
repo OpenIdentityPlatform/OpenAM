@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.http.client.request;
 
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A basic implementation of {@link HttpClientRequest} that a script can send over a {@link org.forgerock.http.client.HttpClient}.
+ * A basic implementation of {@link HttpClientRequest} that a script can send over a {@code org.forgerock.http.client.HttpClient}.
  *
  * @since 12.0.0
  */

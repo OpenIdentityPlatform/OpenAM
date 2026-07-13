@@ -25,6 +25,7 @@
  * $Id: AuthSPrincipal.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.rest;
@@ -62,9 +63,7 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Create an AuthSPrincipal with a username.
-     * 
-     * <p>
-     * 
+     *
      * @param name
      *            the username for this user.
      * 
@@ -81,9 +80,7 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Return the username for this <code>AuthPrincipal</code>.
-     * 
-     * <p>
-     * 
+     *
      * @return the username for this <code>AuthPrincipal</code>
      */
     public String getName() {
@@ -92,9 +89,7 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Return the AuthMethod for this <code>AuthPrincipal</code>.
-     * 
-     * <p>
-     * 
+     *
      * @return the AuthMethod for this <code>AuthPrincipal</code>
      */
     public String getAuthMethod() {
@@ -103,9 +98,7 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Return the AuthLevel for this <code>AuthPrincipal</code>.
-     * 
-     * <p>
-     * 
+     *
      * @return the AuthLevel for this <code>AuthPrincipal</code>
      */
     public String getAuthLevel() {
@@ -114,9 +107,7 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Set the AuthMethod for this <code>AuthPrincipal</code>.
-     * 
-     * <p>
-     * 
+     *
      * @param auth_method
      *            AuthMethod for this <code>AuthPrincipal</code>
      */
@@ -126,9 +117,7 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Set the AuthLevel for this <code>AuthPrincipal</code>.
-     * 
-     * <p>
-     * 
+     *
      * @param auth_level
      *            AuthLevel for this <code>AuthPrincipal</code>
      */

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.dpro.session.service.cluster;
@@ -55,7 +56,7 @@ public interface ClusterMonitor {
      *
      * @param sessionId SessionID for which the home server is to be found
      * @return server id for the server instance determined to be the current host
-     * @throws SessionException
+     * @throws SessionException if the current host server cannot be determined
      */
     String getCurrentHostServer(SessionID sessionId) throws SessionException;
 

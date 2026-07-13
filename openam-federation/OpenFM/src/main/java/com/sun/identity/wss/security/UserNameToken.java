@@ -24,6 +24,7 @@
  *
  * $Id: UserNameToken.java,v 1.8 2009/01/24 01:31:25 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.security;
@@ -315,7 +316,7 @@ public class UserNameToken implements SecurityToken {
     /**
      * Returns the XML document element for the username security token.
      * @return Element the XML Element for the username security token.
-     * @exception if the XML document conversion is failed.
+     * @exception SecurityException if the XML document conversion is failed.
      */
     public Element toDocumentElement() throws SecurityException {
         Document document = XMLUtils.toDOMDocument(toString(), debug);

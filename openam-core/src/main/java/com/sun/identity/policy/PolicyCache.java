@@ -25,6 +25,7 @@
  * $Id: PolicyCache.java,v 1.9 2010/01/10 01:19:35 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy;
@@ -334,7 +335,7 @@ public class PolicyCache implements ServiceListener {
      * 
      * @param serviceName name of the service
      * @param version version of the service
-     * @param groupName
+     * @param groupName configuration grouping name
      * @param orgName organization name as DN
      * @param serviceComponent the name of the service components that
      *                          changed

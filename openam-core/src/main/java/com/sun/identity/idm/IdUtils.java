@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.idm;
@@ -539,7 +540,7 @@ public final class IdUtils {
     /**
      * Returns an IdRepoException based on an <code>AMException</code>
      * 
-     * @param ame
+     * @param ame the <code>AMException</code> to convert
      * @return IdRepoException based on ame.
      */
     public static IdRepoException convertAMException(AMException ame) {
@@ -601,7 +602,7 @@ public final class IdUtils {
      * @param uuid uuid of the user
      * @param orgName the org user is trying to login to
      * @return user name
-     * @throws IdRepoException 
+     * @throws IdRepoException if the org name does not match the realm in the uuid
      */
     public static String getIdentityName(String uuid, String orgName)
         throws IdRepoException {

@@ -25,6 +25,7 @@
  * $Id: PluginConfig.java,v 1.5 2009/01/28 05:35:03 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.sm;
 
@@ -150,7 +151,7 @@ public class PluginConfig {
      * @param attrs
      *            the <code>Map</code> where key is the attribute name and
      *            value is the <code>Set</code> of attribute values
-     * @throws SMSException
+     * @throws SMSException if an error occurs while saving the configuration.
      */
     public void setAttributes(Map attrs) throws SMSException, SSOException {
         validatePluginConfig();
@@ -176,7 +177,7 @@ public class PluginConfig {
      *            the name of the attribute to add
      * @param values
      *            the set of values to add
-     * @throws SMSException
+     * @throws SMSException if an error occurs while saving the configuration.
      */
     public void addAttribute(String attrName, Set values) throws SMSException,
             SSOException {
@@ -206,7 +207,7 @@ public class PluginConfig {
      * 
      * @param attrName
      *            the name of the attribute to remove
-     * @throws SMSException
+     * @throws SMSException if an error occurs while saving the configuration.
      */
     public void removeAttribute(String attrName) throws SMSException,
             SSOException {
@@ -223,7 +224,7 @@ public class PluginConfig {
      *            the name of the attribute
      * @param values
      *            set of attribute values to remove from the given attribute
-     * @throws SMSException
+     * @throws SMSException if an error occurs while saving the configuration.
      */
     public void removeAttributeValues(String attrName, Set values)
             throws SMSException, SSOException {
@@ -243,7 +244,7 @@ public class PluginConfig {
      *            the old value to remove from the attribute
      * @param newValue
      *            the new value to add to the attribute
-     * @throws SMSException
+     * @throws SMSException if an error occurs while saving the configuration.
      */
     public void replaceAttributeValue(String attrName, String oldValue,
             String newValue) throws SMSException, SSOException {
@@ -278,7 +279,7 @@ public class PluginConfig {
      *            the set of old values to remove from the attribute
      * @param newValues
      *            the set of new values to add to the attribute
-     * @throws SMSException
+     * @throws SMSException if an error occurs while saving the configuration.
      */
     public void replaceAttributeValues(String attrName, Set oldValues,
             Set newValues) throws SMSException, SSOException {

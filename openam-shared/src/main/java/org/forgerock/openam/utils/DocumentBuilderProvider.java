@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.utils;
@@ -22,7 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * Abstract factory interface for supplying configured {@link javax.xml.parsers.DocumentBuilder} instances. The
  * underlying implementation may cache or pool instances for performance.
- * <p/>
+ * <p>
  * Note: usually you will want to use the {@link PerThreadDocumentBuilderProvider} wrapped around a
  * {@link SafeDocumentBuilderProvider}.
  */

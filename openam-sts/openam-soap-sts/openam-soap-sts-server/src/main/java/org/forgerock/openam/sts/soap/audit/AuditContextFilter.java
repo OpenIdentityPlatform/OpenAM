@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.soap.audit;
@@ -31,11 +33,11 @@ import java.io.IOException;
 
 /**
  * Servlet filter for initializing thread local RequestContext when request handling begins
- * and discarding it when handling completes. This is a copy of the AuditContextFilter -
- * @see {@link org.forgerock.openam.audit.context.AuditContextFilter}. The code is duplicated because the original
+ * and discarding it when handling completes. This is a copy of the
+ * {@code org.forgerock.openam.audit.context.AuditContextFilter}. The code is duplicated because the original
  * AuditContextFilter resolved some dependencies via the InjectorHolder,
- * and given the current Guice complexity, we did not want to add additional @GuiceModule instances and the ServletContextListener
- * which would populate the InjectorHolder with the bindings in the @GuiceModule instances.
+ * and given the current Guice complexity, we did not want to add additional {@code @GuiceModule} instances and the ServletContextListener
+ * which would populate the InjectorHolder with the bindings in the {@code @GuiceModule} instances.
  *
  * @since 13.0.0
  */

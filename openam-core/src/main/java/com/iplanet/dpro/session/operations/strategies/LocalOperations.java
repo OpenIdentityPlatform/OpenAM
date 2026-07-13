@@ -298,7 +298,7 @@ public class LocalOperations implements SessionOperations {
      * @param masterSessionId   master session id
      * @param restriction TokenRestriction Object
      * @return restricted token id
-     * @throws SessionException
+     * @throws SessionException if the master session cannot be located or the restricted token cannot be created
      */
     public String getRestrictedTokenId(final SessionID masterSessionId,
                                        final TokenRestriction restriction) throws SessionException {
@@ -352,8 +352,8 @@ public class LocalOperations implements SessionOperations {
      * Gets all valid Internal Sessions, depending on the value of the user's
      * preferences.
      *
-     * @param s
-     * @throws SessionException
+     * @param s the requesting session used to authorize the search
+     * @throws SessionException if the valid sessions cannot be retrieved
      */
     @Override
     public SearchResults<SessionInfo> getValidSessions(Session s, String pattern) throws SessionException {

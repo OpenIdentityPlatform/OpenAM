@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.session;
@@ -75,7 +75,6 @@ public class SessionURL {
      * be rewritten in the URL as a query string with entity escaping of
      * ampersand before appending session ID if other query parameters exists in
      * the URL.
-     * <p>
      *
      * @param res HTTP Servlet Response.
      * @param url the URL to be encoded.
@@ -91,7 +90,6 @@ public class SessionURL {
      * be rewritten in the URL as a query string with entity escaping of
      * ampersand before appending session id if other query parameters exists in
      * the URL.
-     * <p>
      *
      * @param res HTTP Servlet Response.
      * @param url  the URL to be encoded.
@@ -232,7 +230,7 @@ public class SessionURL {
      * If the encoding scheme is SLASH then the  cookie value would be
      * written in the URL as extra path info in the following format:
      * <pre>
-     * protocol://server:port/servletpath/&lt;cookieName>=&lt;cookieValue>?
+     * protocol://server:port/servletpath/&lt;cookieName&gt;=&lt;cookieValue&gt;?
      *       queryString
      * </pre>
      * <p>
@@ -245,7 +243,7 @@ public class SessionURL {
      * If the encoding scheme is SEMICOLON then the cookie value would be
      * written in the URL as extra path info in the following format:
      * <pre>
-     * protocol://server:port/path;&lt;cookieName=cookieValue>?queryString
+     * protocol://server:port/path;&lt;cookieName=cookieValue&gt;?queryString
      * </pre>
      * Note that this is not supported in the servlet specification and
      * some web containers do not support this.
@@ -254,8 +252,8 @@ public class SessionURL {
      * If the encoding scheme is QUERY then the cookie value would be
      * written in the URL in the following format:
      * <pre>
-     * protocol://server:port/path?&lt;cookieName>=&lt;cookieValue>
-     * protocol://server:port/path?queryString&&lt;cookieName>=&lt;cookieValue>
+     * protocol://server:port/path?&lt;cookieName&gt;=&lt;cookieValue&gt;
+     * protocol://server:port/path?queryString&amp;&lt;cookieName&gt;=&lt;cookieValue&gt;
      * </pre>
      * <p>
      * This is the default and OpenAM always encodes in this format
@@ -264,12 +262,11 @@ public class SessionURL {
      * if the escape is true.  Only the ampersand before appending
      * cookie parameter
      * will be entity escaped.
-     * <p>
      * @param url the url to be encoded
      * @param encodingScheme possible values are QUERY,SLASH,SEMICOLON
      * @param escape entity escaping of ampersand when appending the
      *        SSOToken ID to request query string.
-     * @param cookieName
+     * @param cookieName the name of the session cookie to encode into the URL
      * @return encoded URL with cookie value (session id) based
      *         on the encoding scheme or the url itself if there is an error.
      */

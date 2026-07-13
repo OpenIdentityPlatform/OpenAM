@@ -25,6 +25,7 @@
  * $Id: DataLayer.java,v 1.19 2009/11/20 23:52:52 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.ums;
@@ -418,7 +419,7 @@ public class DataLayer implements java.io.Serializable {
      * @param principal Authenticated Principal.
      * @param guid Distinguished name.
      * @param attrSet attribute set containing name/value pairs.
-     * @exception AccessRightsException if insufficient access>
+     * @exception AccessRightsException if insufficient access
      * @exception EntryAlreadyExistsException if the entry already exists.
      * @exception UMSException if fail to add entry.
      *
@@ -991,10 +992,8 @@ public class DataLayer implements java.io.Serializable {
      *                insufficient access
      * @exception UMSException
      *                Fail to fetch the schema.
-     * @exception LdapException
-     *                Error with LDAP connection.
      *
-     * 
+     *
      */
     public Schema getSchema(java.security.Principal principal) throws UMSException {
         ResultCode errorCode;

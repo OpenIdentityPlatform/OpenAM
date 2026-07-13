@@ -24,6 +24,7 @@
  *
  * $Id: ClientUserToken.java,v 1.5 2008/08/27 19:05:53 mrudul_uchil Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.sts;
@@ -53,8 +54,9 @@ public interface ClientUserToken extends Token {
     
     /**
      * Initializes client user token.
-     * @param obj credential object to initialize the user token     
-     * @throws com.sun.identity.wss.sts.FAMSTSException
+     * @param obj credential object to initialize the user token
+     * @throws com.sun.identity.wss.sts.FAMSTSException if the user token
+     *         cannot be initialized.
      */
     public void init(Object obj) throws FAMSTSException;
     
@@ -62,15 +64,17 @@ public interface ClientUserToken extends Token {
      * Parses the custom token element. This method is used at the 
      * receiving end (STS server side).
      * @param element the custom token element
-     * @throws com.sun.identity.wss.sts.FAMSTSException
+     * @throws com.sun.identity.wss.sts.FAMSTSException if the token element
+     *         cannot be parsed.
      */
     public void parse(Element element) throws FAMSTSException;
 
     /**
      * Returns the principal name that the client user token carries.
      * @return the principal name that the client user token carries
-     * @throws com.sun.identity.wss.sts.FAMSTSException
-     */     
+     * @throws com.sun.identity.wss.sts.FAMSTSException if the principal name
+     *         cannot be retrieved.
+     */
     public String getPrincipalName() throws FAMSTSException;
 
     /**

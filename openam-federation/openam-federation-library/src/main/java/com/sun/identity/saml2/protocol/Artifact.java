@@ -25,6 +25,7 @@
  * $Id: Artifact.java,v 1.2 2008/06/25 05:47:55 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -38,9 +39,8 @@ import com.sun.identity.saml2.protocol.impl.ArtifactImpl;
 /**
  * This class represents the <code>Artifact</code> element in
  * SAMLv2 protocol schema.
- * <p>
  * <pre>
- * &lt;element name="Artifact" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ * &lt;element name="Artifact" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  * </pre>
  *
  * 

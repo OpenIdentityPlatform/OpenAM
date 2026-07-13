@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.radius.common;
 
@@ -20,7 +22,6 @@ import java.util.Map;
 
 /**
  * The packet types in RADIUS rfc 2865 and 2866.
- * <p/>
  */
 public enum PacketType {
 

@@ -24,6 +24,7 @@
  *
  * $Id: DSTModifyResponse.java,v 1.2 2008/06/25 05:47:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -46,22 +47,22 @@ import org.w3c.dom.NodeList;
  * The following schema fragment specifies the expected content within the
  * <code>DSTModifyResponse</code> object.
  * <pre>
- * &lt;complexType name="ResponseType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:idpp:2003-08}Status"/>
+ * &lt;complexType name="ResponseType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:idpp:2003-08}Status"/&gt;
  *         &lt;element ref="{urn:liberty:idpp:2003-08}Extension"
- *         maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
+ *         maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
  *       &lt;attribute name="timeStamp"
- *       type="{http://www.w3.org/2001/XMLSchema}dateTime" />
+ *       type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
  *       &lt;attribute name="itemIDRef"
- *       type="{urn:liberty:idpp:2003-08}IDReferenceType" />
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *       type="{urn:liberty:idpp:2003-08}IDReferenceType" /&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -84,7 +85,7 @@ public class DSTModifyResponse {
     /**
      * Constructor
      * @param element <code>DOM</code> Element.
-     * @throws DSTException
+     * @throws DSTException if a data service error occurs
      */
     public DSTModifyResponse(org.w3c.dom.Element element) throws DSTException{
         if(element == null) {

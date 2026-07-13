@@ -25,6 +25,7 @@
  * $Id: CachedSubEntries.java,v 1.10 2008/07/11 01:46:21 arviranga Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.sm;
 
@@ -89,8 +90,8 @@ public class CachedSubEntries implements SMSEventListener{
      * 
      * @param t SSOToken to used for searching
      * @return sub entries for the given DN
-     * @throws com.sun.identity.sm.SMSException
-     * @throws com.iplanet.sso.SSOException
+     * @throws com.sun.identity.sm.SMSException if an error occurs accessing the data store.
+     * @throws com.iplanet.sso.SSOException if the single sign-on token is invalid.
      */
     protected Set getSubEntries(SSOToken t) throws SMSException, SSOException {
         String tokenID = t.getTokenID().toString();
@@ -129,11 +130,11 @@ public class CachedSubEntries implements SMSEventListener{
      * Return sub-entries that match the pattern.
      * Performs data store operation, the results are not cached
      * 
-     * @param token
-     * @param pattern
+     * @param token the SSOToken used for searching
+     * @param pattern the search pattern to match sub-entries against
      * @return subentries that match the pattern
-     * @throws com.sun.identity.sm.SMSException
-     * @throws com.iplanet.sso.SSOException
+     * @throws com.sun.identity.sm.SMSException if an error occurs accessing the data store.
+     * @throws com.iplanet.sso.SSOException if the single sign-on token is invalid.
      */
     public Set<String> getSubEntries(SSOToken token, String pattern)
             throws SMSException, SSOException {
@@ -148,13 +149,13 @@ public class CachedSubEntries implements SMSEventListener{
      * Returns sub-entries that belong to given SubSchema name and
      * statisfies the pattern. The results are not cached.
      * 
-     * @param token
-     * @param pattern
+     * @param token the SSOToken used for searching
+     * @param pattern the search pattern to match sub-entries against
      * @param serviceidPattern sub-schema name
      * @return subentries that belong to given SubSchema name and satisfies
      * the pattern
-     * @throws com.sun.identity.sm.SMSException
-     * @throws com.iplanet.sso.SSOException
+     * @throws com.sun.identity.sm.SMSException if an error occurs accessing the data store.
+     * @throws com.iplanet.sso.SSOException if the single sign-on token is invalid.
      */
     public Set getSchemaSubEntries(SSOToken token, String pattern,
             String serviceidPattern) throws SMSException, SSOException {
@@ -208,16 +209,16 @@ public class CachedSubEntries implements SMSEventListener{
     }
 
     /**
-     * Returns realm names that matches the given pattern. If <code>
-     * recursive<code> is set to <code>true</code>, a sub-tree search
+     * Returns realm names that matches the given pattern. If <code>recursive</code>
+     * is set to <code>true</code>, a sub-tree search
      * is performed. The results are not cached.
-     * 
-     * @param token
-     * @param pattern
-     * @param recursive
+     *
+     * @param token the SSOToken used for searching
+     * @param pattern the search pattern to match realm names against
+     * @param recursive if <code>true</code> a sub-tree search is performed
      * @return realm names that matches the given pattern
-     * @throws com.sun.identity.sm.SMSException
-     * @throws com.iplanet.sso.SSOException
+     * @throws com.sun.identity.sm.SMSException if an error occurs accessing the data store.
+     * @throws com.iplanet.sso.SSOException if the single sign-on token is invalid.
      */
     public Set searchSubOrgNames(SSOToken token, String pattern,
         boolean recursive) throws SMSException, SSOException {
@@ -236,14 +237,14 @@ public class CachedSubEntries implements SMSEventListener{
      * attribute schema. A sub-tree search is performed.
      * The results are not cached.
      * 
-     * @param token
-     * @param serviceName
-     * @param attrName
-     * @param values
+     * @param token the SSOToken used for searching
+     * @param serviceName the service name whose attribute schema is used
+     * @param attrName the attribute name to match
+     * @param values the attribute values to match
      * @return realm names that match the attributevalues pair for the given
      * service name
-     * @throws com.sun.identity.sm.SMSException
-     * @throws com.iplanet.sso.SSOException
+     * @throws com.sun.identity.sm.SMSException if an error occurs accessing the data store.
+     * @throws com.iplanet.sso.SSOException if the single sign-on token is invalid.
      */
     public Set searchOrgNames(SSOToken token, String serviceName,
             String attrName, Set values) throws SMSException, SSOException {

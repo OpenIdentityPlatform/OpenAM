@@ -25,6 +25,7 @@
  * $Id: Referral.java,v 1.2 2008/06/25 05:43:47 qcheng Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -104,9 +105,10 @@ public interface Referral {
      * Gets the valid values for this referral 
      * @param token <code>SSOToken</code>
      * @return <code>ValidValues</code> object
-     * @throws SSOException, PolicyException
+     * @throws SSOException if the single sign on token is invalid
+     * @throws PolicyException if the valid values cannot be retrieved
      */
-    ValidValues getValidValues(SSOToken token) 
+    ValidValues getValidValues(SSOToken token)
         throws SSOException, PolicyException;
 
     /**
@@ -115,7 +117,8 @@ public interface Referral {
      * @param token <code>SSOToken</code>
      * @param pattern a pattern to match against the value
      * @return <code>ValidValues</code> object
-     * @throws SSOException, PolicyException
+     * @throws SSOException if the single sign on token is invalid
+     * @throws PolicyException if the valid values cannot be retrieved
      */
     ValidValues getValidValues(SSOToken token, String pattern)
         throws SSOException, PolicyException;
@@ -145,8 +148,8 @@ public interface Referral {
      *        Each value is a set of values for the parameter.
      * @return policy decision
      *
-     * @throws PolicyException
-     * @throws SSOException
+     * @throws PolicyException if the policy decision cannot be obtained
+     * @throws SSOException if the single sign on token is invalid
      */
     PolicyDecision getPolicyDecision(SSOToken token, String resourceType,
         String resourceName, Set actionNames, Map envParameters
@@ -168,8 +171,8 @@ public interface Referral {
      * @return names of sub resources for the given resourceName.
      *         The return value also includes the resourceName.
      *
-     * @throws PolicyException
-     * @throws SSOException
+     * @throws PolicyException if the resource names cannot be retrieved
+     * @throws SSOException if the single sign on token is invalid
      *
      * @see com.sun.identity.policy.ResourceMatch#EXACT_MATCH
      * @see com.sun.identity.policy.ResourceMatch#SUB_RESOURCE_MATCH

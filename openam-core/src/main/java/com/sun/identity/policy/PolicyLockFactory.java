@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.policy;
 
@@ -19,7 +20,7 @@ import org.forgerock.openam.shared.concurrency.LockFactory;
 
 /**
  * Maintains a singleton instance to the shared lock factory.
- * <br />
+ * <br>
  * This factory is intended to be used when concurrent policy changes are not atomic. The retrieved lock
  * can be used to protect the non-atomic logic, blocking other threads until all operations are completed.
  */

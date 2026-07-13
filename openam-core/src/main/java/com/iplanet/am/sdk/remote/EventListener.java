@@ -25,6 +25,7 @@
  * $Id: EventListener.java,v 1.12 2008/06/27 20:56:23 arviranga Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk.remote;
@@ -98,7 +99,7 @@ class EventListener {
     }
 
     /**
-     * Constructor for <class>EventListener</class>. Should be instantiated
+     * Constructor for <code>EventListener</code>. Should be instantiated
      * once by <code>RemoteServicesImpl</code>
      *
      */
@@ -241,7 +242,6 @@ class EventListener {
      * Sends notifications to listeners added via <code>addListener</code>.
      * The parameter <code>nItem</code> is an XML document having a single
      * notification event, using the following DTD.
-     * <p>
      * 
      * <pre>
      *       &lt;!-- EventNotification element specifes the change notification

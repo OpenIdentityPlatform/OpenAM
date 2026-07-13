@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -121,8 +121,6 @@ public class ConditionTypesResource {
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementCondition}s to return.
      *
      * Looks up all the names of conditions registered in the system, and then returns each one to the
@@ -168,8 +166,6 @@ public class ConditionTypesResource {
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementCondition} to return.
      */
     @Read(operationDescription = @Operation(

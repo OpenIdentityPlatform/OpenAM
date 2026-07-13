@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.audit;
 
@@ -26,7 +27,7 @@ public interface AuditEventPublisher {
 
     /**
      * Tries to publish the provided AuditEvent to the specified topic of the AuditService.
-     * <p/>
+     * <p>
      * If an error occurs that prevents the AuditEvent from being published, then details regarding the error
      * are recorded in the debug logs. However, only details relating to the error are logged; the debug logs
      * are not treated as the fallback destination for audit information.

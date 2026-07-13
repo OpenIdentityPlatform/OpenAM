@@ -24,6 +24,7 @@
  *
  * $Id: BinarySecurityToken.java,v 1.5 2008/08/06 17:28:07 exu Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -50,31 +51,30 @@ import com.sun.identity.liberty.ws.soapbinding.Utils;
  * Certificate Token Profile and Liberty ID-WSF Security Mechanisms 
  * specifications.
  *  <p>The following schema fragment specifies the expected content within the BinarySecurityToken object.
- * <p>
  * <pre>
- * &lt;element name="BinarySecurityToken" type="wsse:BinarySecurityTokenType/>
- * &lt;complexType name="BinarySecurityTokenType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://schemas.xmlsoap.org/ws/2003/06/secext>EncodedString">
- *       &lt;attribute name="ValueType" type="{http://www.w3.org/2001/XMLSchema}QName" />
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
- * &lt;xsd:complexType name="EncodedString">
- *   &lt;xsd:simpleContent>
- *     &lt;xsd:extension base="wsse:AttributedString">
- *       &lt;xsd:attribute name="EncodingType" type="xsd:QName"/>
- *     &lt;/xsd:extension>
- *   &lt;/xsd:simpleContent>
- * &lt;/xsd:complexType>
- * &lt;xsd:complexType name="AttributedString">
- *   &lt;xsd:simpleContent>
- *     &lt;xsd:extension base="xsd:string">
- *       &lt;xsd:attribute ref="wsu:Id"/>
- *         &lt;xsd:anyAttribute namespace="##other" processContents="lax"/>
- *     &lt;/xsd:extension>
- *   &lt;/xsd:simpleContent>
- * &lt;/xsd:complexType>
+ * &lt;element name="BinarySecurityToken" type="wsse:BinarySecurityTokenType/&gt;
+ * &lt;complexType name="BinarySecurityTokenType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://schemas.xmlsoap.org/ws/2003/06/secext&gt;EncodedString"&gt;
+ *       &lt;attribute name="ValueType" type="{http://www.w3.org/2001/XMLSchema}QName" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
+ * &lt;xsd:complexType name="EncodedString"&gt;
+ *   &lt;xsd:simpleContent&gt;
+ *     &lt;xsd:extension base="wsse:AttributedString"&gt;
+ *       &lt;xsd:attribute name="EncodingType" type="xsd:QName"/&gt;
+ *     &lt;/xsd:extension&gt;
+ *   &lt;/xsd:simpleContent&gt;
+ * &lt;/xsd:complexType&gt;
+ * &lt;xsd:complexType name="AttributedString"&gt;
+ *   &lt;xsd:simpleContent&gt;
+ *     &lt;xsd:extension base="xsd:string"&gt;
+ *       &lt;xsd:attribute ref="wsu:Id"/&gt;
+ *         &lt;xsd:anyAttribute namespace="##other" processContents="lax"/&gt;
+ *     &lt;/xsd:extension&gt;
+ *   &lt;/xsd:simpleContent&gt;
+ * &lt;/xsd:complexType&gt;
  * </pre>
  * 
  * 

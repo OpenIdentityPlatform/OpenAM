@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,19 +13,18 @@ package com.sun.identity.liberty.ws.common.jaxb.xmlsig;
 /**
  * Java content class for TransformType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/xmldsig-core-schema.xsd line 118)
- * <p>
  * <pre>
- * &lt;complexType name="TransformType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice maxOccurs="unbounded" minOccurs="0">
- *         &lt;any/>
- *         &lt;element name="XPath" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *       &lt;/choice>
- *       &lt;attribute name="Algorithm" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="TransformType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
+ *         &lt;any/&gt;
+ *         &lt;element name="XPath" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *       &lt;/choice&gt;
+ *       &lt;attribute name="Algorithm" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */
@@ -78,9 +78,8 @@ public interface TransformType {
     /**
      * Java content class for XPath element declaration.
      * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/xmldsig-core-schema.xsd line 122)
-     * <p>
      * <pre>
-     * &lt;element name="XPath" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     * &lt;element name="XPath" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
      * </pre>
      * 
      */

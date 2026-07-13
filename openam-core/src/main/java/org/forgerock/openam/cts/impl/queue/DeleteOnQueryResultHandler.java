@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.cts.impl.queue;
 
@@ -32,7 +32,7 @@ import org.forgerock.openam.sm.datalayer.api.query.PartialToken;
  * performs an asynchronous delete operation. This can come in handy if there is a need to find tokens based on
  * secondary storage keys or other arbitrary information and the matching tokens needs to be deleted right away.
  *
- * @see TaskDispatcher#read(String, org.forgerock.openam.sm.datalayer.api.ResultHandler)
+ * @see TaskDispatcher#read(String, org.forgerock.util.Options, org.forgerock.openam.sm.datalayer.api.ResultHandler)
  * @see TaskDispatcher#query(TokenFilter, org.forgerock.openam.sm.datalayer.api.ResultHandler)
  */
 public class DeleteOnQueryResultHandler implements ResultHandler<Collection<PartialToken>, CoreTokenException> {

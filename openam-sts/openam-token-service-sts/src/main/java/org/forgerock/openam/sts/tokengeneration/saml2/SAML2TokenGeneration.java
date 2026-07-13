@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
@@ -36,7 +38,7 @@ public interface SAML2TokenGeneration {
      * @param stsInstanceState The STS-instance-specific state necessary to generate the assertion
      * @param invocationState The parameters with which the TokenGenerationService was invoked.
      * @return The String representation of the assertion
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the assertion could not be generated
      */
     String generate(SSOToken subjectToken, STSInstanceState stsInstanceState,
                     TokenGenerationServiceInvocationState invocationState) throws TokenCreationException;

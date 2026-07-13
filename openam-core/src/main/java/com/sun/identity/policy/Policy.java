@@ -25,6 +25,7 @@
  * $Id: Policy.java,v 1.9 2010/01/10 01:19:35 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy;
@@ -237,8 +238,10 @@ public class Policy implements Cloneable {
      *
      * @param policyNode XML node in W3C DOM format representing 
      * the policy object which needs to be created.
-     * @exception InvalidFormatException, InvalidNameException,
-     * NameNotFoundException, PolicyException
+     * @exception InvalidFormatException if the policy XML format is invalid
+     * @exception InvalidNameException if the policy name is invalid
+     * @exception NameNotFoundException if a referenced name is not found
+     * @exception PolicyException if the policy cannot be constructed
      */
     public Policy(PolicyManager pm, Node policyNode)
         throws InvalidFormatException, InvalidNameException,
@@ -740,7 +743,7 @@ public class Policy implements Cloneable {
      *
      *
      * @param subjectName name of the Subject as defined at the realm
-     * @param stm <code>SubjectTypeManager<code> of the realm.
+     * @param stm <code>SubjectTypeManager</code> of the realm.
      *       You have to pass the SubjectTypeManager of realm in which 
      *       you would save the policy. Trying to save the policy at 
      *       a different realm would throw PolicyException.
@@ -1221,14 +1224,11 @@ public class Policy implements Cloneable {
      * @param respProvider <code>ResponseProvider</code> object to be added to 
      *            the policy
      *
-     * @exception NameAlreadyExistsException if a ResponseProvider with the 
+     * @exception NameAlreadyExistsException if a ResponseProvider with the
      *            given name already exists
-     * @exception InvalidNameException if the <code>respProvider</code>
-     *             name is invalid
-     *
      *
      */
-    public void addResponseProvider(String name, ResponseProvider respProvider) 
+    public void addResponseProvider(String name, ResponseProvider respProvider)
             throws NameAlreadyExistsException {
         respProviders.addResponseProvider(name, respProvider);
     }

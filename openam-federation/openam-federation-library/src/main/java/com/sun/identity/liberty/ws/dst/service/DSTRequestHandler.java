@@ -24,6 +24,7 @@
  *
  * $Id: DSTRequestHandler.java,v 1.3 2008/06/25 05:47:14 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.dst.service;
@@ -135,7 +136,7 @@ public abstract class DSTRequestHandler implements RequestHandler {
      * Generates the binary security token if the security profile is X509.
      * @param msg Request Message. 
      * @return BinarySecurityToken.
-     * @exception DSTException.
+     * @exception DSTException .
      */
     private BinarySecurityToken generateBinarySecurityToken(Message msg)
     throws DSTException {

@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems, LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.sts.publish.rest;
@@ -216,7 +216,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritDoc}
      * The method is synchronized primarily as a sanity check, as excluding concurrent updates to published rest-sts instance
      * state makes the system easier to reason about.
      */
@@ -233,7 +233,7 @@ public class RestSTSInstancePublisherImpl implements RestSTSInstancePublisher {
     }
 
     /**
-     * {@InheritDoc}
+     * {@inheritDoc}
      * The method is synchronized so that two instances are not updated concurrently, as multiple configurations must be
      * completed atomically.
      */

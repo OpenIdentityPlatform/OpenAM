@@ -25,6 +25,7 @@
  * $Id: RemoteServicesImpl.java,v 1.10 2009/07/02 20:26:16 hengming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk.remote;
@@ -832,7 +833,7 @@ public class RemoteServicesImpl implements IDirectoryServices {
      * @param objectType
      *            profile type
      * @param recursive
-     *            if true, remove all sub entries & the object
+     *            if true, remove all sub entries &amp; the object
      * @param softDelete
      *            Used to let pre/post callback plugins know that this delete is
      *            either a soft delete (marked for deletion) or a purge/hard
@@ -1299,10 +1300,15 @@ public class RemoteServicesImpl implements IDirectoryServices {
      * Sets the filter for a dynamic group in the datastore.
      * 
      * @param token
+     *            the single sign-on token used to authorize the operation
      * @param entryDN
+     *            the DN of the dynamic group entry
      * @param filter
+     *            the search filter to set on the dynamic group
      * @throws AMException
+     *             if an error occurs while setting the group filter
      * @throws SSOException
+     *             if the single sign-on token is invalid or has expired
      */
     public void setGroupFilter(SSOToken token, String entryDN, String filter)
             throws AMException, SSOException {
@@ -1691,7 +1697,7 @@ public class RemoteServicesImpl implements IDirectoryServices {
      * Returns the set of attributes (both optional and required) needed for an
      * objectclass based on the LDAP schema
      * 
-     * @param objectclass
+     * @param objectclass the object class whose attributes are returned
      * @return Set of the attributes for the  object class
      */
     public Set getAttributesForSchema(String objectclass) {

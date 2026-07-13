@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click.control;
@@ -36,18 +37,18 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  * rendering of the contained fields. All Form field controls must extend this
  * abstract class.
  *
- * <h3><a name="field-processing"></a>Field Processing</h3>
+ * <h2><a id="field-processing"></a>Field Processing</h2>
  *
- * <h4><a name="post-requests"></a>Post Requests</h4>
+ * <h3><a id="post-requests"></a>Post Requests</h3>
  *
  * When processing POST requests forms typically invoke the {@link #onProcess()}
- * method on all its fields. The Field <tt>onProcess()</tt> method is used
+ * method on all its fields. The Field <code>onProcess()</code> method is used
  * to bind the fields request value, validate the submission and invoke any
- * control listener method. If the <tt>onProcess()</tt> method returns true
+ * control listener method. If the <code>onProcess()</code> method returns true
  * the form will continue processing fields, otherwise the form will abort
  * further processing.
- * <p/>
- * The body of the Field <tt>onProcess()</tt> method is detailed below.
+ * <p>
+ * The body of the Field <code>onProcess()</code> method is detailed below.
  *
  * <pre class="codeJava">
  * <span class="kw">public boolean</span> onProcess() {
@@ -62,7 +63,7 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  *     <span class="kw">return true</span>;
  * } </pre>
  *
- * The Field methods called by <tt>onProcess()</tt> include:
+ * The Field methods called by <code>onProcess()</code> include:
  *
  * <dl>
  * <dt>{@link #bindRequestValue()}</dt>
@@ -84,31 +85,31 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  * </dd>
  * </dl>
  *
- * Field subclasses generally only have to override the <tt>validate()</tt>
- * method, and possibly the <tt>bindRequestValue()</tt> method, to provide their
+ * Field subclasses generally only have to override the <code>validate()</code>
+ * method, and possibly the <code>bindRequestValue()</code> method, to provide their
  * own behaviour.
  *
- * <h4><a name="get-requests"></a>Get Requests</h4>
+ * <h3><a id="get-requests"></a>Get Requests</h3>
  *
  * When processing GET requests a Page's Form will typically perform no
  * processing and simply render itself and its Fields.
  *
- * <h3><a name="rendering"></a>Rendering</h3>
+ * <h2><a id="rendering"></a>Rendering</h2>
  *
  * Field subclasses must override the {@link #render(org.openidentityplatform.openam.click.util.HtmlStringBuffer)}
  * method to enable themselves to be rendered as HTML. With the increasing use of
  * AJAX, Fields should render themselves as valid XHTML, so that they may be parsed
- * correctly and used as the <tt>innerHtml</tt> in the DOM.
- * <p/>
+ * correctly and used as the <code>innerHtml</code> in the DOM.
+ * <p>
  * When a Form object renders a Field using autolayout, it renders the
  * Field in a table row using the Field's {@link #label} attribute, its
  * {@link #error} attribute if defined, and the Fields
  * {@link #render(org.openidentityplatform.openam.click.util.HtmlStringBuffer)} method.
- * <p/>
+ * <p>
  * To assist with rendering valid HTML Field subclasses can use the
  * {@link org.apache.click.util.HtmlStringBuffer} class.
  *
- * <h3><a name="message-resources"></a>Message Resources and Internationalization (i18n)</h3>
+ * <h2><a id="message-resources"></a>Message Resources and Internationalization (i18n)</h2>
  *
  * Fields support a hierarchy of resource bundles for displaying validation
  * error messages and display messages. These localized messages can be accessed
@@ -132,12 +133,12 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  * <li>{@link #setErrorMessage(String, Object)}</li>
  * </ul>
  *
- * <a name="message-resolve-order" href="#"></a>
+ * <a id="message-resolve-order" href="#"></a>
  * The order in which localized messages resolve are:
  * <dl>
  * <dt style="font-weight:bold">Page scope messages</dt>
  * <dd>Message lookups are first resolved to the Pages message bundle if it
- * exists. For example a <tt>Login</tt> page may define the message properties:
+ * exists. For example a <code>Login</code> page may define the message properties:
  *
  * <pre class="codeConfig">
  * /com/mycorp/page/Login.properties </pre>
@@ -159,7 +160,7 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  *
  * <dt style="font-weight:bold">Control scope messages</dt>
  * <dd>Next message lookups are resolved to the Control message bundle if it
- * exists. For example a <tt>CustomTextField</tt> control may define the
+ * exists. For example a <code>CustomTextField</code> control may define the
  * message properties:
  *
  * <pre class="codeConfig">
@@ -176,7 +177,7 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  *
  * You can modify these properties by copying this file into your applications
  * root class path and editing these properties.
- * <p/>
+ * <p>
  * Note when customizing the message properties you must include all the
  * properties, not just the ones you want to override.
  * </dd>
@@ -236,7 +237,7 @@ public abstract class Field extends AbstractControl implements Stateful {
     protected boolean trim = true;
 
     /**
-     * The validate Field value <tt>onProcess()</tt> invocation flag.
+     * The validate Field value <code>onProcess()</code> invocation flag.
      */
     protected Boolean validate;
 
@@ -281,7 +282,7 @@ public abstract class Field extends AbstractControl implements Stateful {
      * @param parent the parent of the Control
      * @throws IllegalStateException if {@link #name} is not defined
      * @throws IllegalArgumentException if the given parent instance is
-     * referencing <tt>this</tt> object: <tt>if (parent == this)</tt>
+     * referencing <code>this</code> object: <code>if (parent == this)</code>
      */
     @Override
     public void setParent(Object parent) {
@@ -333,18 +334,18 @@ public abstract class Field extends AbstractControl implements Stateful {
     /**
      * Set the Field disabled flag. Disabled fields are not processed nor
      * validated and their action event is not fired.
-     * <p/>
+     * <p>
      * <b>Important Note</b>: an HTML form POST does not submit disabled fields
      * values. Similarly disabled Click fields do not get processed or validated.
-     * However, JavaScript is often used to <tt>enable</tt> fields prior to
+     * However, JavaScript is often used to <code>enable</code> fields prior to
      * submission. Click is smart enough to recognize when a field was enabled
      * this way by checking if the field has an incoming request parameter.
      * If a field is disabled but has an incoming request parameter, Click will
-     * <tt>"enable"</tt> the field and process it.
-     * <p/>
+     * <code>"enable"</code> the field and process it.
+     * <p>
      * <b>Caveat</b>: Unfortunately the above behavior does not apply to
      * {@link Checkbox} and {@link Radio} buttons. An HTML form POST for a
-     * <tt>disabled</tt> checkbox/radio is the same as for an <tt>unchecked</tt>
+     * <code>disabled</code> checkbox/radio is the same as for an <code>unchecked</code>
      * checkbox/radio. In neither case is a value submitted to the server and
      * Click cannot make the distinction whether the checkbox/radio is disabled
      * or unchecked.
@@ -423,9 +424,9 @@ public abstract class Field extends AbstractControl implements Stateful {
     }
 
     /**
-     * Set the Field's the parent <tt>Form</tt>.
+     * Set the Field's the parent <code>Form</code>.
      *
-     * @param form Field's parent <tt>Form</tt>
+     * @param form Field's parent <code>Form</code>
      */
     public void setForm(Form form) {
         this.form = form;
@@ -433,17 +434,17 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Return the field help text.
-     * <p/>
+     * <p>
      * If the help value is null, this method will attempt to find a
      * localized help message in the parent messages using the key:
      * <blockquote>
-     * <tt>getName() + ".help"</tt>
+     * <code>getName() + ".help"</code>
      * </blockquote>
      * If not found then the message will be looked up in the
-     * <tt>/click-control.properties</tt> file using the same key.
-     * <p/>
-     * For example given a <tt>CustomerPage</tt> with the properties file
-     * <tt>CustomerPage.properties</tt>:
+     * <code>/click-control.properties</code> file using the same key.
+     * <p>
+     * For example given a <code>CustomerPage</code> with the properties file
+     * <code>CustomerPage.properties</code>:
      *
      * <pre class="codeConfig">
      * <span class="st">name</span>.label=<span class="red">Customer Name</span>
@@ -501,8 +502,8 @@ public abstract class Field extends AbstractControl implements Stateful {
     }
 
     /**
-     * Return the Form and Field id appended: &nbsp; "<tt>form-field</tt>"
-     * <p/>
+     * Return the Form and Field id appended: &nbsp; "<code>form-field</code>"
+     * <p>
      * Use the field the "id" attribute value if defined, or the name otherwise.
      *
      * @see org.apache.click.Control#getId()
@@ -548,19 +549,19 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Return the field display label.
-     * <p/>
+     * <p>
      * If the label value is null, this method will attempt to find a
      * localized label message in the parent messages using the key:
      * <blockquote>
-     * <tt>getName() + ".label"</tt>
+     * <code>getName() + ".label"</code>
      * </blockquote>
      * If not found then the message will be looked up in the
-     * <tt>/click-control.properties</tt> file using the same key.
+     * <code>/click-control.properties</code> file using the same key.
      * If a value is still not found, the Field name will be converted
      * into a label using the method: {@link ClickUtils#toLabel(String)}
-     * <p/>
-     * For example given a <tt>CustomerPage</tt> with the properties file
-     * <tt>CustomerPage.properties</tt>:
+     * <p>
+     * For example given a <code>CustomerPage</code> with the properties file
+     * <code>CustomerPage.properties</code>:
      *
      * <pre class="codeConfig">
      * <span class="st">name</span>.label=<span class="red">Customer Name</span>
@@ -580,7 +581,7 @@ public abstract class Field extends AbstractControl implements Stateful {
      *
      * When a label value is not set, or defined in any properties files, then
      * its value will be created from the Fields name.
-     * <p/>
+     * <p>
      * For example given the TextField code:
      *
      * <pre class="codeJava">
@@ -625,11 +626,10 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Set the field label "style" attribute value.
-     * <p/>
+     * <p>
      * <b>Please note</b>: the label is rendered by the containing Form
      * or container, not the field itself. It is up to the parent Form
      * (or container) on how to apply the label style.
-     * <p/>
      * <pre class="prettyprint">
      * nameField.setLabelStyle("color: green; font-weight: bold");</pre>
      *
@@ -652,7 +652,7 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Set the field label "class" attribute value.
-     * <p/>
+     * <p>
      * <b>Please note</b>: the label is rendered by the containing Form
      * or container, not the field itself. It is up to the parent Form
      * (or container) on how to apply the label style class.
@@ -676,7 +676,6 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Set the field's parent "style" attribute hint.
-     * <p/>
      * <pre class="prettyprint">
      * nameField.setParentStyleHint("margin-bottom; 10px");</pre>
      *
@@ -705,7 +704,7 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Set the field's parent "class" attribute hint.
-     * <p/>
+     * <p>
      * <b>Please note:</b>The parent style class provides a hint to Forms
      * (or other containers) which CSS class to render, but it is up to the
      * Form (or container) implementation how the style class will be applied.
@@ -821,7 +820,7 @@ public abstract class Field extends AbstractControl implements Stateful {
     /**
      * Set the field CSS horizontal "text-align" style.
      *
-     * @param align the CSS "text-align" value: <tt>["left", "right", "center"]</tt>
+     * @param align the CSS "text-align" value: <code>["left", "right", "center"]</code>
      */
     public void setTextAlign(String align) {
         setStyle("text-align", align);
@@ -830,18 +829,18 @@ public abstract class Field extends AbstractControl implements Stateful {
     /**
      * Return the 'title' attribute, or null if not defined. The title
      * attribute acts like tooltip message over the Field.
-     * <p/>
+     * <p>
      * If the title value is null, this method will attempt to find a
      * localized title message in the parent messages using the key:
      * <blockquote>
-     * <tt>getName() + ".title"</tt>
+     * <code>getName() + ".title"</code>
      * </blockquote>
      * If not found then the message will be looked up in the
-     * <tt>/click-control.properties</tt> file using the same key. If still
+     * <code>/click-control.properties</code> file using the same key. If still
      * not found the title will be left as null and will not be rendered.
-     * <p/>
-     * For example given a <tt>CustomerPage</tt> with the properties file
-     * <tt>CustomerPage.properties</tt>:
+     * <p>
+     * For example given a <code>CustomerPage</code> with the properties file
+     * <code>CustomerPage.properties</code>:
      *
      * <pre class="codeConfig">
      * <span class="st">name</span>.label=<span class="red">Customer Name</span>
@@ -879,7 +878,7 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Return true if the Field request value should be trimmed, false otherwise.
-     * The default value is <tt>"true"</tt>.
+     * The default value is <code>"true"</code>.
      *
      * @return true if the Field request value should be trimmed, false otherwise
      */
@@ -900,12 +899,12 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Return true if the Field should validate itself when being processed.
-     * <p/>
+     * <p>
      * If the validate attribute for the Field is not explicitly set, this
      * method will return the validation status of its parent Form, see
      * {@link Form#getValidate()}. If the Field validate attribute is not set
      * and the parent Form is not set this method will return true.
-     * <p/>
+     * <p>
      * This method is called by the {@link #onProcess()} method to determine
      * whether the the Field {@link #validate()} method should be invoked.
      *
@@ -934,8 +933,8 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Return the field JavaScript client side validation function.
-     * <p/>
-     * The function name must follow the format <tt>validate_[id]</tt>, where
+     * <p>
+     * The function name must follow the format <code>validate_[id]</code>, where
      * the id is the DOM element id of the fields focusable HTML element, to
      * ensure the function has a unique name.
      *
@@ -979,10 +978,10 @@ public abstract class Field extends AbstractControl implements Stateful {
      * Return the object representation of the Field value. This method will
      * return a string value, or null if the string value is null or is zero
      * length.
-     * <p/>
+     * <p>
      * Specialized object field subclasses should override this method to
-     * return a non string object. For examples a <tt>DoubleField</tt> would
-     * return a <tt>Double</tt> value instead.
+     * return a non string object. For examples a <code>DoubleField</code> would
+     * return a <code>Double</code> value instead.
      *
      * @return the object representation of the Field value
      */
@@ -1027,10 +1026,10 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * This method binds the submitted request value to the Field's value.
-     * <p/>
+     * <p>
      * <b>Please note:</b> while it is possible to explicitly bind the field
      * value by invoking this method directly, it is recommended to use the
-     * "<tt>bind</tt>" utility methods in {@link org.apache.click.util.ClickUtils}
+     * "<code>bind</code>" utility methods in {@link org.apache.click.util.ClickUtils}
      * instead. See {@link org.apache.click.util.ClickUtils#bind(org.apache.click.control.Field)}
      * for more details.
      */
@@ -1070,13 +1069,13 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * This method processes the page request returning true to continue
-     * processing or false otherwise. The Field <tt>onProcess()</tt> method is
-     * typically invoked by the Form <tt>onProcess()</tt> method when
+     * processing or false otherwise. The Field <code>onProcess()</code> method is
+     * typically invoked by the Form <code>onProcess()</code> method when
      * processing POST request.
-     * <p/>
+     * <p>
      * This method will bind the Field request parameter value to the field,
      * validate the submission and invoke its callback listener if defined.
-     * <p/>
+     * <p>
      * Below is a typical onProcess implementation:
      *
      * <pre class="codeJava">
@@ -1128,7 +1127,7 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Restore the Field state from the session for the given request context.
-     * <p/>
+     * <p>
      * This method delegates to {@link #setState(java.lang.Object)} to set the
      * field restored state.
      *
@@ -1143,7 +1142,7 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Save the Field state to the session for the given request context.
-     * <p/>
+     * <p>
      * * This method delegates to {@link #getState()} to retrieve the field state
      * to save.
      *
@@ -1157,10 +1156,10 @@ public abstract class Field extends AbstractControl implements Stateful {
     }
 
     /**
-     * The validate method is invoked by <tt>onProcess()</tt> to validate
+     * The validate method is invoked by <code>onProcess()</code> to validate
      * the request submission. Field subclasses should override this method
      * to implement request validation logic.
-     * <p/>
+     * <p>
      * If the field determines that the submission is invalid it should set the
      * {@link #error} property with the error message.
      */
@@ -1171,7 +1170,7 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Return a normalized label for display in error messages.
-     * <p/>
+     * <p>
      * The error label is a normalized version of {@link #getLabel()}.
      *
      * @return a normalized label for error message display
@@ -1187,23 +1186,23 @@ public abstract class Field extends AbstractControl implements Stateful {
      * Set the error with the a label formatted message specified by the given
      * message bundle key. The message will be formatted with the field label
      * using {@link #getErrorLabel()}.
-     * <p/>
+     * <p>
      * setErrorMessage will attempt to find a localized error message as
      * described <a href="#message-resolve-order">here</a>, using the following
      * lookup strategy:
      * <ul>
      *   <li>
      *     an error message is looked up for a specific Field instance by
-     *     prefixing the <tt>key</tt> with the Field's name:
+     *     prefixing the <code>key</code> with the Field's name:
      *     <blockquote>
-     *       <tt>getMessage(getName() + "." + key);</tt>
+     *       <code>getMessage(getName() + "." + key);</code>
      *     </blockquote>
      *   </li>
      *   <li>
      *     if no message is found for a specific Field instance, an error
-     *     message is looked up for the Field class based on the <tt>key</tt>:
+     *     message is looked up for the Field class based on the <code>key</code>:
      *     <blockquote>
-     *       <tt>getMessage(key);</tt>
+     *       <code>getMessage(key);</code>
      *     </blockquote>
      *   </li>
      * </ul>
@@ -1223,7 +1222,7 @@ public abstract class Field extends AbstractControl implements Stateful {
      * Set the error with the a label and value formatted message specified by
      * the given message bundle key. The message will be formatted with the
      * field label {0} using {@link #getErrorLabel()} and the given value {1}.
-     * <p/>
+     * <p>
      * <b>Also see</b> {@link #setErrorMessage(java.lang.String)} on how to
      * specify error messages for specific Field instances.
      *
@@ -1258,7 +1257,7 @@ public abstract class Field extends AbstractControl implements Stateful {
 
     /**
      * Render the Field tag and common attributes including {@link #getName() name},
-     * {@link #getId() id}, <tt>class</tt> and <tt>style</tt>.
+     * {@link #getId() id}, <code>class</code> and <code>style</code>.
      *
      * @see org.openidentityplatform.openam.click.control.AbstractControl#renderTagBegin(java.lang.String, HtmlStringBuffer)
      *

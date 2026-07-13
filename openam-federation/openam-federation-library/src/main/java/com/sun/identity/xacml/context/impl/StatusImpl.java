@@ -24,6 +24,7 @@
  *
  * $Id: StatusImpl.java,v 1.3 2008/06/25 05:48:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context.impl;
@@ -52,17 +53,17 @@ import org.w3c.dom.NodeList;
  * The <code>Status</code> element is a container of 
  * one or more <code>Status</code>s issuded by authorization authority.
  * 
- * <p/>
  * <pre>
  *
  * Schema:
- * &lt;xs:complexType name="StatusType">
- *     &lt;xs:sequence>
- *         &lt;xs:element ref="xacml-context:StatusCode"/>
- *         &lt;xs:element ref="xacml-context:StatusMessage" minOccurs="0"/>
- *         &lt;xs:element ref="xacml-context:StatusDetail" minOccurs="0"/>
- *     &lt;xs:sequence>
- * &lt;xs:complexType>
+ * &lt;xs:complexType name="StatusType"&gt;
+ *     &lt;xs:sequence&gt;
+ *         &lt;xs:element ref="xacml-context:StatusCode"/&gt;
+ *         &lt;xs:element ref="xacml-context:StatusMessage" minOccurs="0"/&gt;
+ *         &lt;xs:element ref="xacml-context:StatusDetail" minOccurs="0"/&gt;
+ *     &lt;xs:sequence&gt;
+ * &lt;xs:complexType&gt;
+ * </pre>
  */
 public class StatusImpl implements Status {
 
@@ -81,7 +82,7 @@ public class StatusImpl implements Status {
      * Constructs a <code>Status</code> object from an XML string
      *
      * @param xml string representing a <code>Status</code> object
-     * @throws SAMLException if the XML string could not be processed
+     * @throws XACMLException if the XML string could not be processed
      */
     public StatusImpl(String xml) throws XACMLException {
         Document document = XMLUtils.toDOMDocument(xml, XACMLSDKUtils.debug);
@@ -104,7 +105,7 @@ public class StatusImpl implements Status {
      * @param element XML DOM element representing a <code>Status</code> 
      * object
      *
-     * @throws SAMLException if the DOM element could not be processed
+     * @throws XACMLException if the DOM element could not be processed
      */
     public StatusImpl(Element element) throws XACMLException {
         processElement(element);

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.core.rest.record;
 
@@ -29,7 +30,7 @@ public class RecordException extends Exception {
     /**
      * Record Exception constructor with a message
      *
-     * @param message
+     * @param message the detail message
      */
     public RecordException(String message) {
         super(message);
@@ -38,8 +39,8 @@ public class RecordException extends Exception {
     /**
      * Record exception constructor with a message and an exception
      *
-     * @param message
-     * @param cause
+     * @param message the detail message
+     * @param cause the cause of this exception
      */
     public RecordException(String message, Throwable cause) {
         super(message, cause);
@@ -48,7 +49,7 @@ public class RecordException extends Exception {
     /**
      * Record exception constructor with an exception
      *
-     * @param cause
+     * @param cause the cause of this exception
      */
     public RecordException(Throwable cause) {
         super(cause);

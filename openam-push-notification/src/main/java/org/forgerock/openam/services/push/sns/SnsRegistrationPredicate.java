@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions Copyrighted 2026 3A Systems, LLC.
 */
 package org.forgerock.openam.services.push.sns;
 
@@ -32,7 +33,7 @@ import org.forgerock.openam.services.push.sns.utils.SnsPushResponseUpdater;
  * Acts to register (via communication with SNS) the device that is currently talking to the server
  * from the mobile app.
  *
- * {@see org.forgerock.openam.authentication.modules.push.registration.AuthenticatorPushRegistration} for
+ * {@code org.forgerock.openam.authentication.modules.push.registration.AuthenticatorPushRegistration} for
  * information on the format which the perform() method alters the data to fit.
  *
  * This predicate does NOT have a listener attached to its config reading subsystem, therefore it will

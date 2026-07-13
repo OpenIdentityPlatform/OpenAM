@@ -25,6 +25,7 @@
  * $Id: ReferralPrivilege.java,v 1.7 2010/01/08 23:59:31 veiming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entitlement;
@@ -252,7 +253,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
     /**
      * Sets description.
      *
-     * @param description
+     * @param description the description to set.
      */
     public void setDescription(String description) {
         this.description = description;

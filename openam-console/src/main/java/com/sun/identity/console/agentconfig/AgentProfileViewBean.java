@@ -24,7 +24,7 @@
  *
  * $Id: AgentProfileViewBean.java,v 1.14 2009/11/10 23:20:15 asyhuang Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  *
  */
 
@@ -510,7 +510,6 @@ public abstract class AgentProfileViewBean
      * Handles reset button click.
      *
      * @param event Request Invocation Event.
-     * @throws ModelControlException if cannot access to framework model.
      */
     public void handleButton2Request(RequestInvocationEvent event) {
         forwardTo();
@@ -520,7 +519,6 @@ public abstract class AgentProfileViewBean
      * Handles back to main page button click.
      *
      * @param event Request Invocation Event.
-     * @throws ModelControlException if cannot access to framework model.
      */
     public void handleButton3Request(RequestInvocationEvent event) {
         AgentsViewBean vb = (AgentsViewBean)getViewBean(AgentsViewBean.class);

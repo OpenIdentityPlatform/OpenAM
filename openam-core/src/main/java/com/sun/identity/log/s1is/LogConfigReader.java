@@ -27,6 +27,7 @@
  * Portions Copyrighted 2010-2014 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
  * Portions Copyrighted 2013 Cybernetica AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.log.s1is;
@@ -56,10 +57,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * <tt>LogConfigReader</TT> is used to load the configuration from the
+ * <code>LogConfigReader</code> is used to load the configuration from the
  * Directory Server and store the configuration as Properties of
- * <tt>LogManager</tt>. <p>
- * <tt>LogConfigReader</TT> is very Speicific to DSAME. <p>
+ * <code>LogManager</code>. <p>
+ * <code>LogConfigReader</code> is very Speicific to DSAME. <p>
  * java.util.logging.config.class System property should point to this class,
  * since LogManager uses this property instantiates this class to load
  * the configuration.
@@ -98,7 +99,7 @@ public class LogConfigReader implements ServiceListener{
      * HOSTNAME, DATA, LEVEL, LOGINID \r\n
      * <p> The input stream hence constructed is converted into a
      * ByteArrayInputStream and is loaded into LogManager.
-     * @throws IOException
+     * @throws IOException if the logging configuration cannot be read
      */
     public LogConfigReader() throws IOException {
         debug = Debug.getInstance("amLog");

@@ -24,6 +24,7 @@
  *
  * $Id: StatusMessageImpl.java,v 1.3 2008/06/25 05:48:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context.impl;
@@ -43,11 +44,10 @@ import org.w3c.dom.Node;
  * The <code>StatusMessage</code> element is a container of 
  * one or more <code>StatusMessage</code>s issuded by authorization authority.
  * 
- * <p/>
  * <pre>
  *
  * Schema:
- *  &lt;xs:element name="StatusMessage" type="xs:string"/>
+ *  &lt;xs:element name="StatusMessage" type="xs:string"/&gt;
  * </pre>
  */
 public class StatusMessageImpl implements StatusMessage {
@@ -65,7 +65,7 @@ public class StatusMessageImpl implements StatusMessage {
      * Constructs a <code>StatusMessage</code> object from an XML string
      *
      * @param xml string representing a <code>StatusMessage</code> object
-     * @throws SAMLException if the XML string could not be processed
+     * @throws XACMLException if the XML string could not be processed
      */
     public StatusMessageImpl(String xml) throws XACMLException {
         Document document = XMLUtils.toDOMDocument(xml, XACMLSDKUtils.debug);
@@ -87,7 +87,7 @@ public class StatusMessageImpl implements StatusMessage {
      * @param element XML DOM element representing a <code>StatusMessage</code> 
      * object
      *
-     * @throws SAMLException if the DOM element could not be processed
+     * @throws XACMLException if the DOM element could not be processed
      */
     public StatusMessageImpl(Element element) throws XACMLException {
         processElement(element);

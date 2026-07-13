@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.audit.context;
@@ -19,7 +20,7 @@ package org.forgerock.openam.audit.context;
 import java.util.concurrent.ExecutorService;
 
 /**
- * An ExecutorService that <ul>may</ul> be re-configured after construction.
+ * An ExecutorService that may be re-configured after construction.
  *
  * This interface is a work-around for the fact that ThreadPoolExecutor does not implement an interface for
  * its configuration methods. As such, in order to re-configure a ThreadPoolExecutor after its construction

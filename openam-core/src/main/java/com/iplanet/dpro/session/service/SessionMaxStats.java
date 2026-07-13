@@ -25,7 +25,7 @@
  * $Id: SessionMaxStats.java,v 1.4 2008/06/25 05:41:31 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.iplanet.dpro.session.service;
 
@@ -55,8 +55,8 @@ public class SessionMaxStats implements StatsListener {
    /**
     * Creates a new SessionMaxStats
     * @param sessionAccessManager session accessManagement
-    * @param sessionNotificationSender
-    * @param stats
+    * @param sessionNotificationSender the sender used to dispatch session notifications
+    * @param stats the statistics holder used to record session metrics
     */
    @Inject
    public SessionMaxStats(

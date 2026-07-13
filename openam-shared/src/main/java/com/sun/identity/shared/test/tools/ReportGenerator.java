@@ -24,6 +24,7 @@
  *
  * $Id: ReportGenerator.java,v 1.2 2008/06/25 05:53:06 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.shared.test.tools;
@@ -54,7 +55,7 @@ public class ReportGenerator {
     /**
      * Creates an instance of <code>ReportGenerator</code> object.
      *
-     * @param dataDir Directory where code>testNG</code> result XML resides.
+     * @param dataDir Directory where <code>testNG</code> result XML resides.
      * @param templateDir Directory where HTML templates reside.
      * @param outputDir Directory to place the HTML reports.
      */

@@ -24,6 +24,7 @@
  *
  * $Id: DefaultAttributeMapper.java,v 1.4 2008/06/25 05:47:50 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /**
@@ -77,7 +78,7 @@ public class DefaultAttributeMapper {
      * @return a map of local attributes configuration map.
      *        This map will have a key as the SAML attribute name and the value
      *        is the local attribute. 
-     * @exception <code>SAML2Exception</code> if any failured.
+     * @exception SAML2Exception if any failured.
      */
     public Map<String, String> getConfigAttributeMap(String realm, String hostEntityID,
         String role) throws SAML2Exception {

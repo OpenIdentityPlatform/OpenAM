@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -76,7 +77,7 @@ import org.forgerock.openam.utils.ValidateIPaddress;
  * resource such as IP address, DNS host name, location, etc.
  * For the first drop, we are only supporting IP address.
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.ResourceEnvIPCondition instead}.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.environment.ResourceEnvIPCondition} instead.
  */
 @Deprecated
 public class ResourceEnvIPCondition implements Condition {
@@ -118,7 +119,7 @@ public class ResourceEnvIPCondition implements Condition {
       *
       * @param property String property name
       *
-      * @return <code>Syntax<code> for the property name
+      * @return <code>Syntax</code> for the property name
       */
      public Syntax getPropertySyntax(String property)
      {

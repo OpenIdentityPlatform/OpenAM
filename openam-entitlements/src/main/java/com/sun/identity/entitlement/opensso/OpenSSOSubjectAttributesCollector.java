@@ -25,6 +25,7 @@
  * $Id: OpenSSOSubjectAttributesCollector.java,v 1.3 2009/09/24 22:38:21 hengming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -254,7 +255,7 @@ public class OpenSSOSubjectAttributesCollector
 
     /**
      * Returns the attribute values of the given user represented by
-     * <class>Subject</class> object.
+     * a {@code Subject} object.
      *
      * @param subject identity of the user.
      * @param attrNames requested attribute names.

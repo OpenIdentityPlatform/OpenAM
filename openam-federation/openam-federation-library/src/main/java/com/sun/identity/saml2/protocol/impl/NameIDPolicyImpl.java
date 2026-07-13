@@ -25,6 +25,7 @@
  * $Id: NameIDPolicyImpl.java,v 1.5 2008/08/31 05:49:48 bina Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -66,7 +67,7 @@ public class NameIDPolicyImpl implements NameIDPolicy {
      * Constructor creates <code>NameIDPolicy</code> object.
      *
      * @param element Document Element of <code>NameIDPolicy</code> Object.
-     * @throws SAML2Exception if <code>NameIDPolicy<code> cannot be created.
+     * @throws SAML2Exception if <code>NameIDPolicy</code> cannot be created.
      */
     public NameIDPolicyImpl(Element element) throws SAML2Exception {
 	parseElement(element);
@@ -77,7 +78,7 @@ public class NameIDPolicyImpl implements NameIDPolicy {
      *
      * @param xmlString XML String Representation of <code>NameIDPolicy</code>
      *	      object.
-     * @throws SAML2Exception if <code>NameIDPolicy<code> cannot be created.
+     * @throws SAML2Exception if <code>NameIDPolicy</code> cannot be created.
      */
 
     public NameIDPolicyImpl(String xmlString) throws SAML2Exception {
@@ -117,7 +118,7 @@ public class NameIDPolicyImpl implements NameIDPolicy {
     }
     
     /** 
-     * Returns the value of the <code>SPNameQualifier<code> attribute.
+     * Returns the value of the <code>SPNameQualifier</code> attribute.
      *
      * @return the value of <code>SPNameQualifier</code> attribute.
      */

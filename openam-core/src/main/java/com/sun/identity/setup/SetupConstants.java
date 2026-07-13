@@ -196,7 +196,7 @@ public interface SetupConstants {
     static final String UM_LDAPv3ForOpenDS = "LDAPv3ForOpenDS";
 
     /**
-     * User Management datastore option - AD with Host & Port.
+     * User Management datastore option - AD with Host &amp; Port.
      */
     static final String UM_LDAPv3ForAD = "LDAPv3ForAD";
 

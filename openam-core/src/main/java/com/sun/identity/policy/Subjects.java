@@ -25,6 +25,7 @@
  * $Id: Subjects.java,v 1.4 2008/06/25 05:43:45 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.policy;
 
@@ -74,9 +75,9 @@ public class Subjects {
      * @throws InvalidFormatException if the node passed in does not
      * conform to expected format
      * 
-     * @throws InvalidNameException 
-     * @throws NameNotFoundException 
-     *         
+     * @throws InvalidNameException if a subject name in the node is invalid
+     * @throws NameNotFoundException if a referenced subject type cannot be found
+     *
      * @throws PolicyException if can not construct <code>Subjects</code>
      */
     protected Subjects(PolicyManager pm, Node usersNode)
@@ -209,7 +210,7 @@ public class Subjects {
 
     /**
      * Sets the name for this instance of the
-     * <code>Subjects<code> which contains a collection
+     * <code>Subjects</code> which contains a collection
      * of users respresented as <code>Subject</code>.
      *
      * @param name for the collection of subjects
@@ -221,7 +222,7 @@ public class Subjects {
 
     /**
      * Sets the description for this instance of the
-     * <code>Subjects<code> which contains a collection
+     * <code>Subjects</code> which contains a collection
      * of users respresented as <code>Subject</code>.
      *
      * @param description description for the collection subjects

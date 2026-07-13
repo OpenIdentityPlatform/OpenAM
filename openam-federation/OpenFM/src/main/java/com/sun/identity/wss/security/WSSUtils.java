@@ -25,7 +25,7 @@
  * $Id: WSSUtils.java,v 1.23 2010/01/23 00:20:26 mrudul_uchil Exp $
  *
  *  Portions Copyrighted 2012-2014 ForgeRock AS
- *  Portions Copyrighted 2025 3A Systems LLC.
+ *  Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.wss.security;
@@ -779,7 +779,7 @@ public class WSSUtils {
     }
     
     /**
-     * Returns the SAML Attribute Map<QName, List<String>>. The attribute map
+     * Returns the SAML Attribute {@code Map<QName, List<String>>}. The attribute map
      * is generated from the given SSOToken first and if not found, then it
      * will try to find from the repository.
      * @param subjectName the principal to be used for retrieving the user

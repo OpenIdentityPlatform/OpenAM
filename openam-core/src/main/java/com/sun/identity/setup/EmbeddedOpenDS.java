@@ -25,7 +25,7 @@
  * $Id: EmbeddedOpenDS.java,v 1.27 2010/01/15 01:22:39 goodearth Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2017-2025 3A Systems, LLC.
+ * Portions Copyrighted 2017-2026 3A Systems, LLC.
  */
 
 package com.sun.identity.setup;
@@ -286,9 +286,9 @@ public class EmbeddedOpenDS {
 
     /**
      * Helper Method to Copy from one Byte Channel to another.
-     * @param from
-     * @param to
-     * @throws IOException
+     * @param from the source byte channel to read from
+     * @param to the destination byte channel to write to
+     * @throws IOException if an I/O error occurs while copying
      */
     protected static void channelCopy(ReadableByteChannel from, WritableByteChannel to)
             throws IOException {
@@ -817,10 +817,10 @@ public class EmbeddedOpenDS {
     /**
      * Get replication port
      *
-     * @param username
-     * @param password
-     * @param hostname
-     * @param port
+     * @param username the directory administrator user name
+     * @param password the directory administrator password
+     * @param hostname the host name of the directory server
+     * @param port the administration port of the directory server
      * @return port number if replication is setup, null if not or on error.
      */
     public static String getReplicationPort(

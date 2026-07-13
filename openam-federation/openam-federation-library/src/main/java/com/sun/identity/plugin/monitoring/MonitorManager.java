@@ -24,6 +24,7 @@
  *
  * $Id: MonitorManager.java,v 1.1 2009/06/19 02:48:04 bigfatrat Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.plugin.monitoring;
@@ -68,7 +69,6 @@ public final class MonitorManager {
      * Returns an instance of the <code>FedMonAgent</code> object.
      *
      * @return instance of <code>Logger</code> object.
-     * @exception LogException if there is an error.
      */
     public static FedMonAgent getAgent() {
         if (agentProvider != null) {

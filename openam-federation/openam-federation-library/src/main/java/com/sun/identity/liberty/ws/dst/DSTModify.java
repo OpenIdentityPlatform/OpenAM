@@ -24,6 +24,7 @@
  *
  * $Id: DSTModify.java,v 1.2 2008/06/25 05:47:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -46,48 +47,48 @@ import com.sun.identity.shared.xml.XMLUtils;
  * the <code>DSTModify</code> object.
  * 
  * <pre>
- * &lt;complexType name="ModifyType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;group ref="{urn:liberty:idpp:2003-08}ResourceIDGroup"/>
- *         &lt;element name="Modification" maxOccurs="unbounded">
- *           &lt;complexType>
- *             &lt;complexContent>
+ * &lt;complexType name="ModifyType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;group ref="{urn:liberty:idpp:2003-08}ResourceIDGroup"/&gt;
+ *         &lt;element name="Modification" maxOccurs="unbounded"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;complexContent&gt;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}
- *                anyType">
- *                 &lt;sequence>
+ *                anyType"&gt;
+ *                 &lt;sequence&gt;
  *                   &lt;element name="Select"
- *                   type="{urn:liberty:idpp:2003-08}SelectType"/>
- *                   &lt;element name="NewData" minOccurs="0">
- *                     &lt;complexType>
- *                       &lt;complexContent>
+ *                   type="{urn:liberty:idpp:2003-08}SelectType"/&gt;
+ *                   &lt;element name="NewData" minOccurs="0"&gt;
+ *                     &lt;complexType&gt;
+ *                       &lt;complexContent&gt;
  *                         &lt;restriction 
- *                         base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                           &lt;sequence>
- *                           &lt;any/>
- *                           &lt;/sequence>
- *                         &lt;/restriction>
- *                       &lt;/complexContent>
- *                     &lt;/complexType>
- *                   &lt;/element>
- *                 &lt;/sequence>
+ *                         base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                           &lt;sequence&gt;
+ *                           &lt;any/&gt;
+ *                           &lt;/sequence&gt;
+ *                         &lt;/restriction&gt;
+ *                       &lt;/complexContent&gt;
+ *                     &lt;/complexType&gt;
+ *                   &lt;/element&gt;
+ *                 &lt;/sequence&gt;
  *                 &lt;attribute name="overrideAllowed"
- *                 type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *                 type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *                 &lt;attribute name="id"
- *                 type="{http://www.w3.org/2001/XMLSchema}ID" />
- *               &lt;/restriction>
- *             &lt;/complexContent>
- *           &lt;/complexType>
- *         &lt;/element>
+ *                 type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *               &lt;/restriction&gt;
+ *             &lt;/complexContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
  *         &lt;element ref="{urn:liberty:idpp:2003-08}Extension"
- *         maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *       &lt;attribute name="itemID" type="{urn:liberty:idpp:2003-08}IDType" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *         maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *       &lt;attribute name="itemID" type="{urn:liberty:idpp:2003-08}IDType" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -158,7 +159,7 @@ public class DSTModify {
     /**
      * Constructor
      * @param element <code>DOM</code> Element.
-     * @exception DSTException
+     * @exception DSTException if a data service error occurs
      */
     public DSTModify(org.w3c.dom.Element element) throws DSTException{
         if(element == null) {

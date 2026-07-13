@@ -220,7 +220,7 @@ public class LibSecurityTokenProvider implements SecurityTokenProvider {
     /**
      * Gets X509 certificate from key store based on the certAlias
      *
-     * @return the <code>X509Certificate<code> in the keystore.
+     * @return the <code>X509Certificate</code> in the keystore.
      * @throws SecurityTokenException if there is an error retrieving
      *         the certificate.
      */

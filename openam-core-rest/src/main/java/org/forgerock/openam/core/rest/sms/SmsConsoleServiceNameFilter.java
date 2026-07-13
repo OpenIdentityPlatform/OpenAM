@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -50,7 +50,7 @@ import org.forgerock.openam.utils.StringUtils;
  * situations where the service's schema simply does not allow it to be rendered (by having blank
  * i18n fields).
  *
- * The 'map' function helps to a set of internal names to a map of resourcenames -> displayable names.
+ * The 'map' function helps to a set of internal names to a map of resourcenames -&gt; displayable names.
  * Any service where its internal name is equal to its displayable name is not included in the returned map.
  *
  */
@@ -82,7 +82,8 @@ public class SmsConsoleServiceNameFilter {
      * Filters (mutates) the provided service set to remove services which should not be displayed to the console.
      *
      * @param services The set of service identities to filter.
-     * @throws AMConfigurationException If there was an issue loading internal handlers and managers used to filter.
+     * @throws SSOException if there is a problem with the caller's single sign-on token while filtering.
+     * @throws SMSException if there was an issue loading internal handlers and managers used to filter.
      */
     public void filter(Set<String> services) throws SSOException, SMSException {
         filterByAuthServices(services);

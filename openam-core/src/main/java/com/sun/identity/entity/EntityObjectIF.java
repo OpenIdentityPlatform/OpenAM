@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -142,7 +143,7 @@ public interface EntityObjectIF extends Remote {
      *            <code>DAI</code> service.
      * @param entityLocation
      *            Location of the entity creation.eg.www.abc.com
-     * @param entityFilter
+     * @param entityFilter filter used to constrain the entity search
      * @return Set of Entity Names.
      * @throws EntityException if there is an internal error in the AM Store.
      * @throws SSOException if the sign on is no longer valid.

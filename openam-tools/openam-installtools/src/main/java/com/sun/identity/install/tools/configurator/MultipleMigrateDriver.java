@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -56,7 +57,7 @@ public class MultipleMigrateDriver extends MigrateDriver {
     
     /**
      * start migrate product instances.
-     * @param migrateLog
+     * @param migrateLog the installer log used to record migration progress
      */
     public void migrate(InstallLogger migrateLog) throws InstallException {
         migrate(null, INT_OPERATION_TYPE_REGULAR, migrateLog);
@@ -66,9 +67,9 @@ public class MultipleMigrateDriver extends MigrateDriver {
      * start migrate product instances. keep this method's signature for 
      * future expansion.
      *
-     * @param fileName
-     * @param operationType
-     * @param migrateLog
+     * @param fileName the file name of the instances to migrate (reserved for future use)
+     * @param operationType the type of migration operation to perform
+     * @param migrateLog the installer log used to record migration progress
      */
     public void migrate(String fileName, int operationType,
             InstallLogger migrateLog) throws InstallException {

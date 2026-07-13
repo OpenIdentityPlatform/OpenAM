@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click.ajax;
@@ -28,16 +29,16 @@ import org.openidentityplatform.openam.click.Control;
 /**
  * AjaxBehavior extends the basic Behavior functionality to allow Controls to
  * handle and process incoming Ajax requests.
- * <p/>
+ * <p>
  * To handle an Ajax request, AjaxBehavior exposes the listener method:
  * {@link #onAction(org.openidentityplatform.openam.click.Control) onAction}.
- * The <tt>onAction</tt> method returns an ActionResult that is rendered back
+ * The <code>onAction</code> method returns an ActionResult that is rendered back
  * to the browser.
- * <p/>
- * Before Click invokes the <tt>onAction</tt> method it checks whether the request
+ * <p>
+ * Before Click invokes the <code>onAction</code> method it checks whether the request
  * is targeted at the AjaxBehavior by invoking the method
  * {@link #isAjaxTarget(org.openidentityplatform.openam.click.Context) Behavior.isAjaxTarget()}.
- * Click will only invoke <tt>onAction</tt> if <tt>isAjaxTarget</tt> returns true.
+ * Click will only invoke <code>onAction</code> if <code>isAjaxTarget</code> returns true.
  */
 public interface AjaxBehavior extends Behavior {
 
@@ -64,15 +65,15 @@ public interface AjaxBehavior extends Behavior {
 
     /**
      * Return true if the behavior is the request target, false otherwise.
-     * <p/>
+     * <p>
      * This method is queried by Click to determine if the behavior's
      * {@link #onAction(org.openidentityplatform.openam.click.Control)} method should be called in
      * response to a request.
-     * <p/>
+     * <p>
      * By exposing this method through the Behavior interface it provides
      * implementers with fine grained control over whether the Behavior's
      * {@link #onAction(org.openidentityplatform.openam.click.Control)} method should be invoked or not.
-     * <p/>
+     * <p>
      * Below is an example implementation:
      *
      * <pre class="prettyprint">

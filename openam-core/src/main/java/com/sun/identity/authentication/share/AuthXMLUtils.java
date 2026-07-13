@@ -25,7 +25,7 @@
  * $Id: AuthXMLUtils.java,v 1.10 2009/06/19 20:39:09 qcheng Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.share;
@@ -1764,7 +1764,7 @@ public class AuthXMLUtils {
      * Deserializes Subject.
      *
      * @param subjectSerialized Serialized Subject.
-     * @throws Exception
+     * @throws Exception if the serialized subject cannot be decoded and deserialized.
      */
     public static Subject getDeSerializedSubject(String subjectSerialized)
         throws Exception {

@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -23,7 +24,7 @@ import org.openidentityplatform.openam.click.Context;
 /**
  * Provides a decorator interface for delegating object rendering.
  *
- * <h3>Decorator Example</h3>
+ * <h2>Decorator Example</h2>
  *
  * The following example illustrates how to render a email hyperlink in a
  * email table column.

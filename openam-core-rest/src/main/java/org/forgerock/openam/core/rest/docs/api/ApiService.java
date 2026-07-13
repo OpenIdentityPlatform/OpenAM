@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.core.rest.docs.api;
 
@@ -63,8 +63,9 @@ public class ApiService {
     private static final String OPERATION_DELIMITER = "#";
 
     /**
+     * Constructs a new {@code ApiService}.
      *
-     * @param describableHandler
+     * @param describableHandler the handler used to describe and dispatch REST API requests
      */
     @Inject
     public ApiService( @Named("RestHandler") DescribableHandler describableHandler) {
@@ -72,11 +73,12 @@ public class ApiService {
     }
 
     /**
+     * Handles a request for the HTML representation of the OpenAM REST API.
      *
-     * @param request
-     * @return
-     * @throws URISyntaxException
-     * @throws MalformedHeaderException
+     * @param request the incoming API request
+     * @return the HTTP response containing the HTML representation of the REST API
+     * @throws URISyntaxException if a request URI cannot be parsed
+     * @throws MalformedHeaderException if a request header cannot be parsed
      */
     @Get
     public Response handle(@Contextual Request request) throws URISyntaxException, MalformedHeaderException {

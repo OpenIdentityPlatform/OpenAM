@@ -24,6 +24,7 @@
  *
  * $Id: IdRepoSampleUtils.java,v 1.5 2008/08/07 22:08:20 goodearth Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -52,7 +53,6 @@ import com.sun.identity.idm.IdType;
  * This class 
  *
  *
- * @author 
  */
 public class IdRepoSampleUtils {
 

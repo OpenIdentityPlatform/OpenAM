@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -157,7 +158,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -176,7 +177,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -195,7 +196,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -207,7 +208,7 @@ public class ObjectFactory
     /**
      * Create an instance of RealmElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RealmElement createRealmElement()
@@ -219,7 +220,7 @@ public class ObjectFactory
     /**
      * Create an instance of RealmElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RealmElement createRealmElement(java.lang.String value)
@@ -231,7 +232,7 @@ public class ObjectFactory
     /**
      * Create an instance of IssuerNamesOfferedType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.IssuerNamesOfferedType createIssuerNamesOfferedType()
@@ -243,7 +244,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestProofTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RequestProofTokenType createRequestProofTokenType()
@@ -255,7 +256,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProofTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.ProofTokenElement createProofTokenElement()
@@ -267,7 +268,7 @@ public class ObjectFactory
     /**
      * Create an instance of DisplayNameType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.DisplayNameType createDisplayNameType()
@@ -279,7 +280,7 @@ public class ObjectFactory
     /**
      * Create an instance of AssertionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.AssertionType createAssertionType()
@@ -291,7 +292,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignOutElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.SignOutElement createSignOutElement()
@@ -303,7 +304,7 @@ public class ObjectFactory
     /**
      * Create an instance of UriNamedClaimTypesOfferedType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.UriNamedClaimTypesOfferedType createUriNamedClaimTypesOfferedType()
@@ -315,7 +316,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenTypesOfferedElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.TokenTypesOfferedElement createTokenTypesOfferedElement()
@@ -327,7 +328,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireSharedCookiesElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RequireSharedCookiesElement createRequireSharedCookiesElement()
@@ -339,7 +340,7 @@ public class ObjectFactory
     /**
      * Create an instance of SingleSignOutSubscriptionEndpointElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.SingleSignOutSubscriptionEndpointElement createSingleSignOutSubscriptionEndpointElement()
@@ -351,7 +352,7 @@ public class ObjectFactory
     /**
      * Create an instance of SingleSignOutNotificationEndpointElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.SingleSignOutNotificationEndpointElement createSingleSignOutNotificationEndpointElement()
@@ -363,7 +364,7 @@ public class ObjectFactory
     /**
      * Create an instance of FederationMetadataHandlerElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataHandlerElement createFederationMetadataHandlerElement()
@@ -375,7 +376,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenTypesOfferedType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.TokenTypesOfferedType createTokenTypesOfferedType()
@@ -387,7 +388,7 @@ public class ObjectFactory
     /**
      * Create an instance of IssuerNamesOfferedElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.IssuerNamesOfferedElement createIssuerNamesOfferedElement()
@@ -399,7 +400,7 @@ public class ObjectFactory
     /**
      * Create an instance of PseudonymType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.PseudonymType createPseudonymType()
@@ -411,7 +412,7 @@ public class ObjectFactory
     /**
      * Create an instance of IssuesSpecificPolicyFaultElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.IssuesSpecificPolicyFaultElement createIssuesSpecificPolicyFaultElement()
@@ -423,7 +424,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeExtensibleURI
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.AttributeExtensibleURI createAttributeExtensibleURI()
@@ -435,7 +436,7 @@ public class ObjectFactory
     /**
      * Create an instance of FreshnessElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FreshnessElement createFreshnessElement()
@@ -447,7 +448,7 @@ public class ObjectFactory
     /**
      * Create an instance of RelativeToType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RelativeToType createRelativeToType()
@@ -459,7 +460,7 @@ public class ObjectFactory
     /**
      * Create an instance of AdditionalContextProcessedElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.AdditionalContextProcessedElement createAdditionalContextProcessedElement()
@@ -471,7 +472,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecurityTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.SecurityTokenElement createSecurityTokenElement()
@@ -483,7 +484,7 @@ public class ObjectFactory
     /**
      * Create an instance of IssuerNameType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.IssuerNameType createIssuerNameType()
@@ -495,7 +496,7 @@ public class ObjectFactory
     /**
      * Create an instance of FilterPseudonymsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FilterPseudonymsType createFilterPseudonymsType()
@@ -507,7 +508,7 @@ public class ObjectFactory
     /**
      * Create an instance of AutomaticPseudonymsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.AutomaticPseudonymsElement createAutomaticPseudonymsElement()
@@ -519,7 +520,7 @@ public class ObjectFactory
     /**
      * Create an instance of AutomaticPseudonymsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.AutomaticPseudonymsElement createAutomaticPseudonymsElement(boolean value)
@@ -531,7 +532,7 @@ public class ObjectFactory
     /**
      * Create an instance of WebBindingElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.WebBindingElement createWebBindingElement()
@@ -543,7 +544,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenKeyTransferKeyInfoElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.TokenKeyTransferKeyInfoElement createTokenKeyTransferKeyInfoElement()
@@ -555,7 +556,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceDigestType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.ReferenceDigestType createReferenceDigestType()
@@ -567,7 +568,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireBearerTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RequireBearerTokensElement createRequireBearerTokensElement()
@@ -579,7 +580,7 @@ public class ObjectFactory
     /**
      * Create an instance of FederationMetadataType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataType createFederationMetadataType()
@@ -591,7 +592,7 @@ public class ObjectFactory
     /**
      * Create an instance of PsuedonymServiceEndpointElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.PsuedonymServiceEndpointElement createPsuedonymServiceEndpointElement()
@@ -603,7 +604,7 @@ public class ObjectFactory
     /**
      * Create an instance of ClientPseudonymElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.ClientPseudonymElement createClientPseudonymElement()
@@ -615,7 +616,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenIssuerNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerNameElement createTokenIssuerNameElement()
@@ -627,7 +628,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireSignedTokensElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RequireSignedTokensElement createRequireSignedTokensElement()
@@ -639,7 +640,7 @@ public class ObjectFactory
     /**
      * Create an instance of FederationIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FederationIDElement createFederationIDElement()
@@ -651,7 +652,7 @@ public class ObjectFactory
     /**
      * Create an instance of FederationMetadataHandlerType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataHandlerType createFederationMetadataHandlerType()
@@ -663,7 +664,7 @@ public class ObjectFactory
     /**
      * Create an instance of PseudonymBasisType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.PseudonymBasisType createPseudonymBasisType()
@@ -675,7 +676,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.TokenType createTokenType()
@@ -687,7 +688,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.ReferenceTokenElement createReferenceTokenElement()
@@ -699,7 +700,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequiresGenericClaimDialectElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RequiresGenericClaimDialectElement createRequiresGenericClaimDialectElement()
@@ -711,7 +712,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeExtensibleString
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.AttributeExtensibleString createAttributeExtensibleString()
@@ -723,7 +724,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenSigningKeyInfoElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.TokenSigningKeyInfoElement createTokenSigningKeyInfoElement()
@@ -735,7 +736,7 @@ public class ObjectFactory
     /**
      * Create an instance of Freshness
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.Freshness createFreshness()
@@ -747,7 +748,7 @@ public class ObjectFactory
     /**
      * Create an instance of ClaimType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.ClaimType createClaimType()
@@ -759,7 +760,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignOutType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.SignOutType createSignOutType()
@@ -771,7 +772,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecurityTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.SecurityTokenType createSecurityTokenType()
@@ -783,7 +784,7 @@ public class ObjectFactory
     /**
      * Create an instance of FilterPseudonymsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FilterPseudonymsElement createFilterPseudonymsElement()
@@ -795,7 +796,7 @@ public class ObjectFactory
     /**
      * Create an instance of PseudonymBasisElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.PseudonymBasisElement createPseudonymBasisElement()
@@ -807,7 +808,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeServiceEndpointElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.AttributeServiceEndpointElement createAttributeServiceEndpointElement()
@@ -819,7 +820,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenKeyInfoType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.TokenKeyInfoType createTokenKeyInfoType()
@@ -831,7 +832,7 @@ public class ObjectFactory
     /**
      * Create an instance of DescriptionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.DescriptionType createDescriptionType()
@@ -843,7 +844,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenIssuerEndpointElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerEndpointElement createTokenIssuerEndpointElement()
@@ -855,7 +856,7 @@ public class ObjectFactory
     /**
      * Create an instance of UriNamedClaimTypesOfferedElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.UriNamedClaimTypesOfferedElement createUriNamedClaimTypesOfferedElement()
@@ -867,7 +868,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestPseudonymType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RequestPseudonymType createRequestPseudonymType()
@@ -879,7 +880,7 @@ public class ObjectFactory
     /**
      * Create an instance of FederationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FederationType createFederationType()
@@ -891,7 +892,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestPseudonymElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RequestPseudonymElement createRequestPseudonymElement()
@@ -903,7 +904,7 @@ public class ObjectFactory
     /**
      * Create an instance of ClientPseudonymType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.ClientPseudonymType createClientPseudonymType()
@@ -915,7 +916,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequireReferenceTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RequireReferenceTokenElement createRequireReferenceTokenElement()
@@ -927,7 +928,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestProofTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RequestProofTokenElement createRequestProofTokenElement()
@@ -939,7 +940,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticationTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.AuthenticationTokenElement createAuthenticationTokenElement()
@@ -951,7 +952,7 @@ public class ObjectFactory
     /**
      * Create an instance of FederationMetadataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataElement createFederationMetadataElement()
@@ -963,7 +964,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceToken11Element
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.ReferenceToken11Element createReferenceToken11Element()
@@ -975,7 +976,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.ReferenceTokenType createReferenceTokenType()
@@ -987,7 +988,7 @@ public class ObjectFactory
     /**
      * Create an instance of FederationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement createFederationElement()
@@ -999,7 +1000,7 @@ public class ObjectFactory
     /**
      * Create an instance of PseudonymElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.PseudonymElement createPseudonymElement()
@@ -1011,7 +1012,7 @@ public class ObjectFactory
     /**
      * Create an instance of RelativeToElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.RelativeToElement createRelativeToElement()
@@ -1023,7 +1024,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignOutBasisType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.SignOutBasisType createSignOutBasisType()
@@ -1035,7 +1036,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProofTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsfederation.ProofTokenType createProofTokenType()

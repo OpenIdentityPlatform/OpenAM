@@ -28,7 +28,7 @@
 
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.console.agentconfig.model;
 
@@ -884,8 +884,6 @@ public class AgentsModelImpl
      * Returns map of secure token service configurations.
      *
      * @return map of secure token service configurations.
-     * @throws AMConsoleException if secure token service configurations cannot
-     *         be returned.
      */
     public Map getSTSConfigurations() {
         try {
@@ -917,7 +915,6 @@ public class AgentsModelImpl
      * Returns map of discovery configurations.
      *
      * @return map of discovery configurations.
-     * @throws AMConsoleException if discovery configurations cannot be returned.
      */
     public Map getDiscoveryConfigurations() {
         try {

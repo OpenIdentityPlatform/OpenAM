@@ -89,8 +89,8 @@ import com.sun.identity.shared.debug.Debug;
  *     "messageId" : "..." // unique identifier for this message
  * }
  *
- * {@see SnsHttpDelegate}.
- * {@see PushNotificationService}.
+ * @see SnsHttpDelegate
+ * @see PushNotificationService
  */
 @RequestHandler(@Handler(mvccSupported = false,
         title = SNS_MESSAGE_RESOURCE + TITLE, description = SNS_MESSAGE_RESOURCE + DESCRIPTION))

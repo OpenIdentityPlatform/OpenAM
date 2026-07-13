@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,25 +13,24 @@ package com.sun.identity.liberty.ws.meta.jaxb;
 /**
  * Java content class for affiliationDescriptorType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-metadata.xsd line 222)
- * <p>
  * <pre>
- * &lt;complexType name="affiliationDescriptorType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="AffiliateMember" type="{urn:liberty:metadata:2003-08}entityIDType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:metadata:2003-08}Extension" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:metadata:2003-08}KeyDescriptor" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}Signature" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="affiliationID" use="required" type="{urn:liberty:metadata:2003-08}entityIDType" />
- *       &lt;attribute name="affiliationOwnerID" use="required" type="{urn:liberty:metadata:2003-08}entityIDType" />
- *       &lt;attribute name="cacheDuration" type="{http://www.w3.org/2001/XMLSchema}duration" />
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *       &lt;attribute name="validUntil" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="affiliationDescriptorType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="AffiliateMember" type="{urn:liberty:metadata:2003-08}entityIDType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:metadata:2003-08}Extension" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:metadata:2003-08}KeyDescriptor" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}Signature" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="affiliationID" use="required" type="{urn:liberty:metadata:2003-08}entityIDType" /&gt;
+ *       &lt;attribute name="affiliationOwnerID" use="required" type="{urn:liberty:metadata:2003-08}entityIDType" /&gt;
+ *       &lt;attribute name="cacheDuration" type="{http://www.w3.org/2001/XMLSchema}duration" /&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *       &lt;attribute name="validUntil" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

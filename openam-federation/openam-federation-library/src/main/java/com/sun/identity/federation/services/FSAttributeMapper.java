@@ -24,6 +24,7 @@
  *
  * $Id: FSAttributeMapper.java,v 1.3 2008/06/25 05:46:52 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -41,7 +42,6 @@ import java.util.Map;
  * Identity provider to local attributes so that the assertion consumer
  * service will populate these attributes to the application via the
  * single sign-on token.
- * </p>
  * @deprecated This SPI is deprecated.
  * @see com.sun.identity.federation.services.FSRealmAttributeMapper
  * 

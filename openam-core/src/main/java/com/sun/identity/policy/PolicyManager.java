@@ -25,6 +25,7 @@
  * $Id: PolicyManager.java,v 1.19 2010/01/25 23:48:15 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy;
@@ -227,8 +228,8 @@ public final class PolicyManager {
      * The names of the organization, sub organization or the
      * container object could be either "/" separated (as per SMS)
      * or could be the complete DN of the object.
-     * For example: <code>/isp/coke<code>, <code>/isp/pepsi/tacobell<code>,
-     * etc., or <code>"ou=tacobell, o=pepsi, o=isp"<code>,
+     * For example: <code>/isp/coke</code>, <code>/isp/pepsi/tacobell</code>,
+     * etc., or <code>"ou=tacobell, o=pepsi, o=isp"</code>,
      * <code>"o=coke, o=isp"</code>, etc.
      * The constructor also requires a single sign on token.
      * which will be used to perform all data store

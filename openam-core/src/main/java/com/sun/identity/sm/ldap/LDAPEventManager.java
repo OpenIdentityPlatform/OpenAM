@@ -25,6 +25,7 @@
  * $Id: LDAPEventManager.java,v 1.8 2009/01/28 05:35:04 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.sm.ldap;
@@ -46,8 +47,8 @@ import org.forgerock.opendj.ldap.LdapException;
 import org.forgerock.opendj.ldap.SearchScope;
 
 /**
- * This class registers itself as a listener to <class>
- * com.iplanet.services.ldap.event.EventService</class> which sets up
+ * This class registers itself as a listener to <code>
+ * com.iplanet.services.ldap.event.EventService</code> which sets up
  * persistant search connections with the event service for any
  * changes to SMS object classes
  */

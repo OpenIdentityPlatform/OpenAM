@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 package com.sun.identity.wsfederation.jaxb.entityconfig.impl.runtime;
@@ -160,7 +161,7 @@ public class GrammarInfoImpl implements GrammarInfo
     }
     
     /**
-     * @see com.sun.tools.xjc.runtime.GrammarInfo#castToXMLSerializable(java.lang.Object)
+     * @see GrammarInfo#castToXMLSerializable(java.lang.Object)
      */
     public XMLSerializable castToXMLSerializable(Object o) {
         if( o instanceof XMLSerializable ) {
@@ -171,7 +172,7 @@ public class GrammarInfoImpl implements GrammarInfo
     }
     
     /**
-     * @see com.sun.tools.xjc.runtime.GrammarInfo#castToValidatableObject(java.lang.Object)
+     * @see GrammarInfo#castToValidatableObject(java.lang.Object)
      */
     public ValidatableObject castToValidatableObject(Object o) {
         if( o instanceof ValidatableObject ) {

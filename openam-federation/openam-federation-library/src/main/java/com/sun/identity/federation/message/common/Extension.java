@@ -24,7 +24,7 @@
  *
  * $Id: Extension.java,v 1.2 2008/06/25 05:46:46 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message.common;
@@ -284,7 +284,7 @@ public class Extension {
      * @param prefix the string that is prepended to the key of query
      *     string.
      * @param minorVersion the <code>MinorVersion</code>.
-     * @return <code><Extension/code> object.
+     * @return <code>Extension</code> object.
      * @throws FSMsgException if there is an error creating
      *     <code>Extension</code> object.
      */

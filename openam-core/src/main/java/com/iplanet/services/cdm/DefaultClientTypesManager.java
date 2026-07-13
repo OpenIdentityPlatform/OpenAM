@@ -25,6 +25,7 @@
  * $Id: DefaultClientTypesManager.java,v 1.4 2008/09/04 16:16:34 dillidorai Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.iplanet.services.cdm;
 
@@ -240,7 +241,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
     }
 
     /**
-     * Get internal sso token, use admin DN & password
+     * Get internal sso token, use admin DN &amp; password
      */
     private static SSOToken getInternalToken() throws SSOException {
         return ((SSOToken) AccessController.doPrivileged(AdminTokenAction
@@ -451,7 +452,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
     }
 
     /**
-     * Add to the userAgentMap, clientTypeMap & ProfilesMap.
+     * Add to the userAgentMap, clientTypeMap &amp; ProfilesMap.
      * 
      * @return the created Client Object
      */
@@ -497,9 +498,9 @@ public class DefaultClientTypesManager implements ClientTypesManager,
     }
 
     /**
-     * Adds the client to its appropriate baseProfileMap & styleMap. Ex:
-     * Nokia7110, with Nokia style & WML for its baseProfile, will go into
-     * wmlProfilesMap under Nokia styles. (Used only for displaying Styles &
+     * Adds the client to its appropriate baseProfileMap &amp; styleMap. Ex:
+     * Nokia7110, with Nokia style &amp; WML for its baseProfile, will go into
+     * wmlProfilesMap under Nokia styles. (Used only for displaying Styles &amp;
      * Clients under Base in the console plug-in).
      * 
      * Currently Aligo only supports 1 level of Style. Only the baseProfiles
@@ -610,7 +611,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
     }
 
     /**
-     * Create Client Object & add to all our indexes. Called only by addClient &
+     * Create Client Object &amp; add to all our indexes. Called only by addClient &amp;
      * on clientChanged notification.
      */
     protected Client addToIndexes(String ct, Map cMap) {
@@ -914,10 +915,10 @@ public class DefaultClientTypesManager implements ClientTypesManager,
 
     /**
      * AMClientDataListener method for client change notification
-     * 
-     * @param clientType
-     * @param dbType
-     * @param opType
+     *
+     * @param clientType the client type that changed
+     * @param dbType the database type of the change
+     * @param opType the operation type of the change
      */
     public void clientChanged(String clientType, int dbType, int opType) {
         if (debug.messageEnabled()) {
@@ -975,7 +976,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
              * if the client has been flagged updated then remove flag else
              * force the client data to be reloaded for the next request for
              * this client type. We don't need to relaod the UA and clienttype
-             * maps because the two minimal properties - clientType & UA cannot
+             * maps because the two minimal properties - clientType &amp; UA cannot
              * be modified.
              */
             synchronized (updatedClients) {
@@ -1034,7 +1035,7 @@ public class DefaultClientTypesManager implements ClientTypesManager,
      * @param style
      *            A valid style name
      * 
-     * @return A Map of all clientTypes belonging to baseProfile & style
+     * @return A Map of all clientTypes belonging to baseProfile &amp; style
      */
     public Map getClients(String baseProfileName, String style) {
         Map cMap = null;
@@ -1069,10 +1070,10 @@ public class DefaultClientTypesManager implements ClientTypesManager,
 
     /**
      * 
-     * @param token
-     * @param props
+     * @param token the single sign-on token authorizing the operation
+     * @param props the client properties to modify
      * @return 0 if everything went fine
-     * @throws AMClientCapException
+     * @throws AMClientCapException if the client capability data cannot be modified
      */
     public int modifyClientExternal(SSOToken token, Map props)
             throws AMClientCapException {
@@ -1111,10 +1112,10 @@ public class DefaultClientTypesManager implements ClientTypesManager,
 
     /**
      * 
-     * @param token
-     * @param clientType
+     * @param token the single sign-on token authorizing the operation
+     * @param clientType the client type to remove
      * @return 0 if everything went fine
-     * @throws AMClientCapException
+     * @throws AMClientCapException if the client capability data cannot be removed
      */
     public int removeClientExternal(SSOToken token, String clientType)
             throws AMClientCapException {
@@ -1157,8 +1158,8 @@ public class DefaultClientTypesManager implements ClientTypesManager,
 
     /**
      * Sets the styles and parent ids tree set for a client
-     * 
-     * @param clientData
+     *
+     * @param clientData the client data map for which to set parent styles and ids
      */
     protected void setParentStyles(Map clientData) {
         if (clientData == null) {

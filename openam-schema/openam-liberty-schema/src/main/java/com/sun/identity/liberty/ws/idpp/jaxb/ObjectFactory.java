@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -239,7 +240,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -258,7 +259,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -277,7 +278,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -289,7 +290,7 @@ public class ObjectFactory
     /**
      * Create an instance of GreetMeSoundElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.GreetMeSoundElement createGreetMeSoundElement()
@@ -301,7 +302,7 @@ public class ObjectFactory
     /**
      * Create an instance of IDValueElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.IDValueElement createIDValueElement()
@@ -313,7 +314,7 @@ public class ObjectFactory
     /**
      * Create an instance of FNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.FNElement createFNElement()
@@ -325,7 +326,7 @@ public class ObjectFactory
     /**
      * Create an instance of VATElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.VATElement createVATElement()
@@ -337,7 +338,7 @@ public class ObjectFactory
     /**
      * Create an instance of CElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.CElement createCElement()
@@ -349,7 +350,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryResponseTypeDataType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.QueryResponseType.DataType createQueryResponseTypeDataType()
@@ -361,7 +362,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResponseType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.ResponseType createResponseType()
@@ -373,7 +374,7 @@ public class ObjectFactory
     /**
      * Create an instance of LInformalNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LInformalNameElement createLInformalNameElement()
@@ -385,7 +386,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmploymentIdentityElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.EmploymentIdentityElement createEmploymentIdentityElement()
@@ -397,7 +398,7 @@ public class ObjectFactory
     /**
      * Create an instance of MsgTechnologyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MsgTechnologyType createMsgTechnologyType()
@@ -409,7 +410,7 @@ public class ObjectFactory
     /**
      * Create an instance of DSTDate
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DSTDate createDSTDate()
@@ -421,7 +422,7 @@ public class ObjectFactory
     /**
      * Create an instance of AddressCardElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AddressCardElement createAddressCardElement()
@@ -433,7 +434,7 @@ public class ObjectFactory
     /**
      * Create an instance of AltCNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AltCNElement createAltCNElement()
@@ -445,7 +446,7 @@ public class ObjectFactory
     /**
      * Create an instance of LOElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LOElement createLOElement()
@@ -457,7 +458,7 @@ public class ObjectFactory
     /**
      * Create an instance of MsgProviderElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MsgProviderElement createMsgProviderElement()
@@ -469,7 +470,7 @@ public class ObjectFactory
     /**
      * Create an instance of LEmergencyContactElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LEmergencyContactElement createLEmergencyContactElement()
@@ -481,7 +482,7 @@ public class ObjectFactory
     /**
      * Create an instance of DOBElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DOBElement createDOBElement()
@@ -493,7 +494,7 @@ public class ObjectFactory
     /**
      * Create an instance of DSTURI
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DSTURI createDSTURI()
@@ -505,7 +506,7 @@ public class ObjectFactory
     /**
      * Create an instance of LSNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LSNElement createLSNElement()
@@ -517,7 +518,7 @@ public class ObjectFactory
     /**
      * Create an instance of PostalAddressElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.PostalAddressElement createPostalAddressElement()
@@ -529,7 +530,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyInfoType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.KeyInfoType createKeyInfoType()
@@ -541,7 +542,7 @@ public class ObjectFactory
     /**
      * Create an instance of LJobTitleElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LJobTitleElement createLJobTitleElement()
@@ -553,7 +554,7 @@ public class ObjectFactory
     /**
      * Create an instance of DisplayLanguageElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DisplayLanguageElement createDisplayLanguageElement()
@@ -565,7 +566,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.StatusElement createStatusElement()
@@ -577,7 +578,7 @@ public class ObjectFactory
     /**
      * Create an instance of ModifyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.ModifyType createModifyType()
@@ -589,7 +590,7 @@ public class ObjectFactory
     /**
      * Create an instance of CNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.CNElement createCNElement()
@@ -601,7 +602,7 @@ public class ObjectFactory
     /**
      * Create an instance of LPostalAddressElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LPostalAddressElement createLPostalAddressElement()
@@ -613,7 +614,7 @@ public class ObjectFactory
     /**
      * Create an instance of AltIDType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AltIDType createAltIDType()
@@ -625,7 +626,7 @@ public class ObjectFactory
     /**
      * Create an instance of MsgMethodElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MsgMethodElement createMsgMethodElement()
@@ -637,7 +638,7 @@ public class ObjectFactory
     /**
      * Create an instance of DemographicsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DemographicsElement createDemographicsElement()
@@ -649,7 +650,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignKeyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.SignKeyElement createSignKeyElement()
@@ -661,7 +662,7 @@ public class ObjectFactory
     /**
      * Create an instance of MsgContactType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MsgContactType createMsgContactType()
@@ -673,7 +674,7 @@ public class ObjectFactory
     /**
      * Create an instance of AddressType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AddressType createAddressType()
@@ -685,7 +686,7 @@ public class ObjectFactory
     /**
      * Create an instance of ModifyTypeModificationTypeNewDataType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.ModifyType.ModificationType.NewDataType createModifyTypeModificationTypeNewDataType()
@@ -697,7 +698,7 @@ public class ObjectFactory
     /**
      * Create an instance of ModifyTypeModificationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.ModifyType.ModificationType createModifyTypeModificationType()
@@ -709,7 +710,7 @@ public class ObjectFactory
     /**
      * Create an instance of FacadeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.FacadeElement createFacadeElement()
@@ -721,7 +722,7 @@ public class ObjectFactory
     /**
      * Create an instance of LNickElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LNickElement createLNickElement()
@@ -733,7 +734,7 @@ public class ObjectFactory
     /**
      * Create an instance of PPElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.PPElement createPPElement()
@@ -745,7 +746,7 @@ public class ObjectFactory
     /**
      * Create an instance of AltIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AltIDElement createAltIDElement()
@@ -757,7 +758,7 @@ public class ObjectFactory
     /**
      * Create an instance of LegalNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LegalNameElement createLegalNameElement()
@@ -769,7 +770,7 @@ public class ObjectFactory
     /**
      * Create an instance of JobTitleElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.JobTitleElement createJobTitleElement()
@@ -781,7 +782,7 @@ public class ObjectFactory
     /**
      * Create an instance of InformalNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.InformalNameElement createInformalNameElement()
@@ -793,7 +794,7 @@ public class ObjectFactory
     /**
      * Create an instance of PPType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.PPType createPPType()
@@ -805,7 +806,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.QueryType createQueryType()
@@ -817,7 +818,7 @@ public class ObjectFactory
     /**
      * Create an instance of LanguageElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LanguageElement createLanguageElement()
@@ -829,7 +830,7 @@ public class ObjectFactory
     /**
      * Create an instance of PersonalTitleElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.PersonalTitleElement createPersonalTitleElement()
@@ -841,7 +842,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmergencyContactElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.EmergencyContactElement createEmergencyContactElement()
@@ -853,7 +854,7 @@ public class ObjectFactory
     /**
      * Create an instance of GenderElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.GenderElement createGenderElement()
@@ -865,7 +866,7 @@ public class ObjectFactory
     /**
      * Create an instance of ModifyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.ModifyElement createModifyElement()
@@ -877,7 +878,7 @@ public class ObjectFactory
     /**
      * Create an instance of LFNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LFNElement createLFNElement()
@@ -889,7 +890,7 @@ public class ObjectFactory
     /**
      * Create an instance of ModifyResponseElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.ModifyResponseElement createModifyResponseElement()
@@ -901,7 +902,7 @@ public class ObjectFactory
     /**
      * Create an instance of AddressElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AddressElement createAddressElement()
@@ -913,7 +914,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.ExtensionType createExtensionType()
@@ -925,7 +926,7 @@ public class ObjectFactory
     /**
      * Create an instance of MsgAccountElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MsgAccountElement createMsgAccountElement()
@@ -937,7 +938,7 @@ public class ObjectFactory
     /**
      * Create an instance of CommonNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.CommonNameElement createCommonNameElement()
@@ -949,7 +950,7 @@ public class ObjectFactory
     /**
      * Create an instance of LElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LElement createLElement()
@@ -961,7 +962,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryResponseType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.QueryResponseType createQueryResponseType()
@@ -973,7 +974,7 @@ public class ObjectFactory
     /**
      * Create an instance of TimeZoneElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.TimeZoneElement createTimeZoneElement()
@@ -985,7 +986,7 @@ public class ObjectFactory
     /**
      * Create an instance of DSTMonthDay
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DSTMonthDay createDSTMonthDay()
@@ -997,7 +998,7 @@ public class ObjectFactory
     /**
      * Create an instance of LLegalNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LLegalNameElement createLLegalNameElement()
@@ -1009,7 +1010,7 @@ public class ObjectFactory
     /**
      * Create an instance of LCommentElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LCommentElement createLCommentElement()
@@ -1021,7 +1022,7 @@ public class ObjectFactory
     /**
      * Create an instance of NamePronouncedElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.NamePronouncedElement createNamePronouncedElement()
@@ -1033,7 +1034,7 @@ public class ObjectFactory
     /**
      * Create an instance of PostalCodeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.PostalCodeElement createPostalCodeElement()
@@ -1045,7 +1046,7 @@ public class ObjectFactory
     /**
      * Create an instance of LPersonalTitleElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LPersonalTitleElement createLPersonalTitleElement()
@@ -1057,7 +1058,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.ExtensionElement createExtensionElement()
@@ -1069,7 +1070,7 @@ public class ObjectFactory
     /**
      * Create an instance of IDTypeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.IDTypeElement createIDTypeElement()
@@ -1081,7 +1082,7 @@ public class ObjectFactory
     /**
      * Create an instance of NickElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.NickElement createNickElement()
@@ -1093,7 +1094,7 @@ public class ObjectFactory
     /**
      * Create an instance of AddrTypeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AddrTypeElement createAddrTypeElement()
@@ -1105,7 +1106,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmptyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.EmptyType createEmptyType()
@@ -1117,7 +1118,7 @@ public class ObjectFactory
     /**
      * Create an instance of OElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.OElement createOElement()
@@ -1129,7 +1130,7 @@ public class ObjectFactory
     /**
      * Create an instance of LLElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LLElement createLLElement()
@@ -1141,7 +1142,7 @@ public class ObjectFactory
     /**
      * Create an instance of BirthdayElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.BirthdayElement createBirthdayElement()
@@ -1153,7 +1154,7 @@ public class ObjectFactory
     /**
      * Create an instance of AnalyzedNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AnalyzedNameElement createAnalyzedNameElement()
@@ -1165,7 +1166,7 @@ public class ObjectFactory
     /**
      * Create an instance of LAltCNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LAltCNElement createLAltCNElement()
@@ -1177,7 +1178,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptKeyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.EncryptKeyElement createEncryptKeyElement()
@@ -1189,7 +1190,7 @@ public class ObjectFactory
     /**
      * Create an instance of LStElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LStElement createLStElement()
@@ -1201,7 +1202,7 @@ public class ObjectFactory
     /**
      * Create an instance of GreetSoundElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.GreetSoundElement createGreetSoundElement()
@@ -1213,7 +1214,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryResponseElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.QueryResponseElement createQueryResponseElement()
@@ -1225,7 +1226,7 @@ public class ObjectFactory
     /**
      * Create an instance of LegalIdentityType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LegalIdentityType createLegalIdentityType()
@@ -1237,7 +1238,7 @@ public class ObjectFactory
     /**
      * Create an instance of MugShotElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MugShotElement createMugShotElement()
@@ -1249,7 +1250,7 @@ public class ObjectFactory
     /**
      * Create an instance of FacadeType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.FacadeType createFacadeType()
@@ -1261,7 +1262,7 @@ public class ObjectFactory
     /**
      * Create an instance of MaritalStatusElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MaritalStatusElement createMaritalStatusElement()
@@ -1273,7 +1274,7 @@ public class ObjectFactory
     /**
      * Create an instance of CommonNameType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.CommonNameType createCommonNameType()
@@ -1285,7 +1286,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResourceIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.ResourceIDElement createResourceIDElement()
@@ -1297,7 +1298,7 @@ public class ObjectFactory
     /**
      * Create an instance of StElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.StElement createStElement()
@@ -1309,7 +1310,7 @@ public class ObjectFactory
     /**
      * Create an instance of LMNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LMNElement createLMNElement()
@@ -1321,7 +1322,7 @@ public class ObjectFactory
     /**
      * Create an instance of MsgContactElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MsgContactElement createMsgContactElement()
@@ -1333,7 +1334,7 @@ public class ObjectFactory
     /**
      * Create an instance of MsgTechnologyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MsgTechnologyElement createMsgTechnologyElement()
@@ -1345,7 +1346,7 @@ public class ObjectFactory
     /**
      * Create an instance of AltLOElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AltLOElement createAltLOElement()
@@ -1357,7 +1358,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryTypeQueryItemType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.QueryType.QueryItemType createQueryTypeQueryItemType()
@@ -1369,7 +1370,7 @@ public class ObjectFactory
     /**
      * Create an instance of DSTInteger
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DSTInteger createDSTInteger()
@@ -1381,7 +1382,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.StatusType createStatusType()
@@ -1393,7 +1394,7 @@ public class ObjectFactory
     /**
      * Create an instance of AltOElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AltOElement createAltOElement()
@@ -1405,7 +1406,7 @@ public class ObjectFactory
     /**
      * Create an instance of MNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MNElement createMNElement()
@@ -1417,7 +1418,7 @@ public class ObjectFactory
     /**
      * Create an instance of DSTLocalizedString
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DSTLocalizedString createDSTLocalizedString()
@@ -1429,7 +1430,7 @@ public class ObjectFactory
     /**
      * Create an instance of VATType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.VATType createVATType()
@@ -1441,7 +1442,7 @@ public class ObjectFactory
     /**
      * Create an instance of MsgTypeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MsgTypeElement createMsgTypeElement()
@@ -1453,7 +1454,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmploymentIdentityType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.EmploymentIdentityType createEmploymentIdentityType()
@@ -1465,7 +1466,7 @@ public class ObjectFactory
     /**
      * Create an instance of WebSiteElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.WebSiteElement createWebSiteElement()
@@ -1477,7 +1478,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedResourceIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.EncryptedResourceIDElement createEncryptedResourceIDElement()
@@ -1489,7 +1490,7 @@ public class ObjectFactory
     /**
      * Create an instance of DSTString
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DSTString createDSTString()
@@ -1501,7 +1502,7 @@ public class ObjectFactory
     /**
      * Create an instance of AgeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AgeElement createAgeElement()
@@ -1513,7 +1514,7 @@ public class ObjectFactory
     /**
      * Create an instance of DemographicsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.DemographicsType createDemographicsType()
@@ -1525,7 +1526,7 @@ public class ObjectFactory
     /**
      * Create an instance of AddressCardType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AddressCardType createAddressCardType()
@@ -1537,7 +1538,7 @@ public class ObjectFactory
     /**
      * Create an instance of LegalIdentityElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LegalIdentityElement createLegalIdentityElement()
@@ -1549,7 +1550,7 @@ public class ObjectFactory
     /**
      * Create an instance of LCNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.LCNElement createLCNElement()
@@ -1561,7 +1562,7 @@ public class ObjectFactory
     /**
      * Create an instance of AnalyzedNameType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.AnalyzedNameType createAnalyzedNameType()
@@ -1573,7 +1574,7 @@ public class ObjectFactory
     /**
      * Create an instance of SNElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.SNElement createSNElement()
@@ -1585,7 +1586,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.QueryElement createQueryElement()
@@ -1597,7 +1598,7 @@ public class ObjectFactory
     /**
      * Create an instance of MsgSubaccountElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.idpp.jaxb.MsgSubaccountElement createMsgSubaccountElement()

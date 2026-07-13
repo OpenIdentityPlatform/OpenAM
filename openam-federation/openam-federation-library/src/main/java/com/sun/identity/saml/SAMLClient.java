@@ -25,7 +25,7 @@
  * $Id: SAMLClient.java,v 1.6 2008/08/19 19:11:11 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml; 
@@ -357,7 +357,7 @@ public class SAMLClient {
      * wrapped around the request object. 
      * @param req A SAML request object 
      * @return a SOAPMessage 
-     * @exception SAMLException
+     * @exception SAMLException if a SAML error occurs
      */
     private static String createSOAPMessage(Request req)
                                throws SAMLException {
@@ -593,7 +593,7 @@ public class SAMLClient {
      * @param samlresponse A SAML Response object
      * @param alist a List  
      * @return a List object representing a list of Assertion
-     * @exception SAMLException
+     * @exception SAMLException if a SAML error occurs
      */
     private static List getAssertionList(Response samlresponse, List alist) 
                                          throws SAMLException {

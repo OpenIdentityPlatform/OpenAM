@@ -13,7 +13,7 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.core.rest.record;
 
@@ -113,7 +113,7 @@ public class DefaultDebugRecorder implements DebugRecorder {
     /**
      * Start recording an issue
      *
-     * @param jsonProperties
+     * @param jsonProperties the JSON properties describing the recording to start
      * @throws RecordException throw a RecordException if the issueID doesn't exist
      */
     public synchronized void startRecording(JsonValue jsonProperties) throws RecordException {

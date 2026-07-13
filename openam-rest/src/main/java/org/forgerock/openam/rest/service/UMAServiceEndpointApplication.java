@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.rest.service;
@@ -28,7 +29,7 @@ import org.restlet.routing.Router;
 public class UMAServiceEndpointApplication extends ServiceEndpointApplication {
 
     /**
-     * {@inheritDoc}
+     * Constructs a new UMAServiceEndpointApplication.
      * Sets the default media type as "application/json".
      */
     public UMAServiceEndpointApplication() {

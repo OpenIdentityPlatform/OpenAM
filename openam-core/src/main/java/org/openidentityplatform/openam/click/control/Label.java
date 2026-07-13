@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -25,7 +26,7 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  * processing, and is used primarily to add descriptive labels or horizontal
  * rules to auto rendered forms.
  *
- * <h3>Label Example</h3>
+ * <h2>Label Example</h2>
  *
  * A Label example:
  *
@@ -47,11 +48,11 @@ public class Label extends Field {
 
     /**
      * Create a Label display control.
-     * <p/>
+     * <p>
      * Note the Label control will attempt to find a localized label message
      * in the parent messages, and if not found then in the field messages
-     * using the key name of <tt>getName() + ".label"</tt>.
-     * <p/>
+     * using the key name of <code>getName() + ".label"</code>.
+     * <p>
      * If a value cannot be found in the parent or control messages then the
      * Field name will be converted into a label using the
      * {@link org.apache.click.util.ClickUtils#toLabel(String)} method.
@@ -74,7 +75,7 @@ public class Label extends Field {
 
     /**
      * Create a Label with no label/name defined.
-     * <p/>
+     * <p>
      * <b>Please note</b> the control's name must be defined before it is valid.
      */
     public Label() {

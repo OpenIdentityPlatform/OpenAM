@@ -25,6 +25,7 @@
  * $Id: WSSSignatureProvider.java,v 1.13 2009/11/16 21:53:00 mallas Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.xmlsig;
@@ -807,12 +808,13 @@ public class WSSSignatureProvider extends AMSignatureProvider {
     
     /**
      * Sign with Kerberos Token
-     * @param doc
-     * @param key
-     * @param algorithm
-     * @param ids
+     * @param doc the document to be signed.
+     * @param key the key to sign with.
+     * @param algorithm the signature algorithm to use.
+     * @param ids the list of element ids to be signed.
      * @return Kerberos Security Token signature
-     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException
+     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException if the message
+     *         cannot be signed.
      */
     public org.w3c.dom.Element signWithKerberosToken(
             org.w3c.dom.Document doc,
@@ -936,7 +938,8 @@ public class WSSSignatureProvider extends AMSignatureProvider {
      * @param document the document to be validated
      * @param key the secret key to be used for validating signature
      * @return true if verification is successful.
-     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException
+     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException if the
+     *         signature cannot be verified.
      */
     public boolean verifyWSSSignature(org.w3c.dom.Document document,
                          java.security.Key key)
@@ -953,7 +956,8 @@ public class WSSSignatureProvider extends AMSignatureProvider {
      * @param encryptAlias the certificate alias that may be used to decrypt
      *        the symmetric key that is part of <code>KeyInfo</code>
      * @return true if verification is successful.
-     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException
+     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException if the
+     *         signature cannot be verified.
      */
     public boolean verifyWSSSignature(Document doc, java.security.Key key,
           String certAlias, String encryptAlias) throws XMLSignatureException {

@@ -24,6 +24,7 @@
  *
  * $Id: SecurityAssertion.java,v 1.3 2009/10/01 18:42:07 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.security;
@@ -299,8 +300,6 @@ public class SecurityAssertion extends Assertion {
      * @return A string containing the valid XML for this element.
      * By default name space name is prepended to the element name
      * example <code>&lt;saml:Assertion&gt;</code>.
-     *
-     * @return the String representation of this element.
      */
     public java.lang.String toString() {
         // call toString() with includeNS true by default and declareNS false
@@ -312,7 +311,7 @@ public class SecurityAssertion extends Assertion {
      * element.
      *
      * @param includeNS if true prepends all elements by their Namespace
-     *        name example <code>&lt;saml:Assertion&gt</code>;
+     *        name example <code>&lt;saml:Assertion&gt;</code>
      * @param declareNS if true includes the namespace within the generated
      *        XML.
      * @return A string containing the valid XML for this element.

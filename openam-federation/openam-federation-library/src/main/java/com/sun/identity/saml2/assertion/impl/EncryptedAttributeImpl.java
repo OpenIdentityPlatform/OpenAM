@@ -25,6 +25,7 @@
  * $Id: EncryptedAttributeImpl.java,v 1.2 2008/06/25 05:47:43 qcheng Exp $
  *
  * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.saml2.assertion.impl;
 
@@ -47,10 +48,9 @@ import com.sun.identity.saml2.xmlenc.EncManager;
  *
  * The <code>EncryptedAttribute</code> element represents a SAML attribute
  * in encrypted fashion. It's of type <code>EncryptedElementType</code>.
- * <p>
  * <pre>
  * &lt;element name="EncryptedAttribute"
- * type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/>
+ * type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/&gt;
  * </pre>
  */
 public class EncryptedAttributeImpl implements EncryptedAttribute {

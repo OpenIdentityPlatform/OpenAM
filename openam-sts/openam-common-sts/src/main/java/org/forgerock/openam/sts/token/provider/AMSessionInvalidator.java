@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS. All rights reserved.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.token.provider;
@@ -28,7 +30,7 @@ public interface AMSessionInvalidator {
     /**
      *
      * @param sessionIds the to-be-invalidated session ids. Can be empty. Will not be null.
-     * @throws TokenCreationException
+     * @throws TokenCreationException if one or more of the OpenAM sessions could not be invalidated
      */
     void invalidateAMSessions(Set<String> sessionIds) throws TokenCreationException;
 }

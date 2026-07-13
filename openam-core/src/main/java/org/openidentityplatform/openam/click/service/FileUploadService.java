@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.service;
 
@@ -37,9 +38,9 @@ public interface FileUploadService {
 
     /**
      * Initialize the FileUploadService with the given application servlet context.
-     * <p/>
+     * <p>
      * This method is invoked after the FileUploadService has been constructed.
-     * <p/>
+     * <p>
      * Note you can access {@link ConfigService} by invoking
      * {@link org.openidentityplatform.openam.click.util.ClickUtils#getConfigService(jakarta.servlet.ServletContext)}
      *

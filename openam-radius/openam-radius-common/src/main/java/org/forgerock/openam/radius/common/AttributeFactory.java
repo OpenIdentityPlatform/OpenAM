@@ -96,7 +96,7 @@ public final class AttributeFactory {
      *            the raw octets received in a radius packet on the wire for the attribute including leading attribute
      *            type code octet and length octet.
      * @return the corresponding subclass of the {@link org.forgerock.openam.radius.common.Attribute} class or an
-     *         instance of the {@link com.sun.identity.authentication.modules.radius.client.UnknownAttribute} class if
+     *         instance of the {@code com.sun.identity.authentication.modules.radius.client.UnknownAttribute} class if
      *         the field type is unrecognized and hence not supported.
      */
     public static Attribute createAttribute(byte[] data) {

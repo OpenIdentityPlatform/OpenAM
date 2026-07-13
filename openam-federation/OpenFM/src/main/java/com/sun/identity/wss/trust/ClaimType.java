@@ -24,6 +24,7 @@
  *
  * $Id: ClaimType.java,v 1.1 2009/10/13 23:19:49 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.trust;
@@ -55,7 +56,8 @@ public class ClaimType {
     /**
      * Constructor
      * @param element the claimtype element
-     * @throws com.sun.identity.wss.trust.WSTException
+     * @throws com.sun.identity.wss.trust.WSTException if the claim type element
+     *         cannot be parsed.
      */
     public ClaimType(Element element) throws WSTException {
         if(element == null) {

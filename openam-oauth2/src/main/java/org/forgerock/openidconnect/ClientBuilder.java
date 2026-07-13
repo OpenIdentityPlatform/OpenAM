@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openidconnect;
@@ -190,7 +191,7 @@ public class ClientBuilder {
     /**
      *
      * @param contacts The contact information for the clients
-     * @return
+     * @return this ClientBuilder instance.
      */
     public ClientBuilder setContacts(List<String> contacts) {
         this.contacts = contacts;

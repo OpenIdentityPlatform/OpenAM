@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.console.realm;
 
@@ -174,7 +175,6 @@ public abstract class RMRealmViewBeanBase
      * Handles parentage path request.
      *
      * @param event Request Invocation Event.
-     * @throws ModelControlException if table model cannot be restored.
      */
     public void handleParentagepathHrefRequest(RequestInvocationEvent event) {
         String path = (String)getDisplayFieldValue(PARENTAGE_PATH_HREF);

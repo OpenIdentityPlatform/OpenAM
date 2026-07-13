@@ -25,6 +25,7 @@
  * $Id: AuthnContextImpl.java,v 1.3 2008/06/25 05:47:43 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.saml2.assertion.impl;
 
@@ -53,36 +54,35 @@ import com.sun.identity.saml2.common.SAML2SDKUtils;
  * authentication event. The element can contain an authentication context
  * class reference, an authentication declaration or declaration reference,
  * or both. Its type is <code>AuthnContextType</code>.
- * <p>
  * <pre>
- * &lt;complexType name="AuthnContextType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;choice>
- *           &lt;sequence>
+ * &lt;complexType name="AuthnContextType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice&gt;
+ *           &lt;sequence&gt;
  *             &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *             AuthnContextClassRef"/>
- *             &lt;choice minOccurs="0">
+ *             AuthnContextClassRef"/&gt;
+ *             &lt;choice minOccurs="0"&gt;
  *               &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *               AuthnContextDecl"/>
+ *               AuthnContextDecl"/&gt;
  *               &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *               AuthnContextDeclRef"/>
- *             &lt;/choice>
- *           &lt;/sequence>
- *           &lt;choice>
+ *               AuthnContextDeclRef"/&gt;
+ *             &lt;/choice&gt;
+ *           &lt;/sequence&gt;
+ *           &lt;choice&gt;
  *             &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *             AuthnContextDecl"/>
+ *             AuthnContextDecl"/&gt;
  *             &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *             AuthnContextDeclRef"/>
- *           &lt;/choice>
- *         &lt;/choice>
+ *             AuthnContextDeclRef"/&gt;
+ *           &lt;/choice&gt;
+ *         &lt;/choice&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *         AuthenticatingAuthority" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *         AuthenticatingAuthority" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  */
 public class AuthnContextImpl implements AuthnContext {
@@ -340,7 +340,7 @@ public class AuthnContextImpl implements AuthnContext {
      * Sets the value of the <code>AuthnContextClassRef</code> property.
      *
      * @param value new <code>AuthenticationContextClassRef</code>.
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *                if the object is immutable.
      */
     public void setAuthnContextClassRef(java.lang.String value)
@@ -368,7 +368,7 @@ public class AuthnContextImpl implements AuthnContext {
      *
      * @param value A String representation of authentication context
      *                declaration reference.
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *                if the object is immutable.
      */
     public void setAuthnContextDeclRef(java.lang.String value)
@@ -395,7 +395,7 @@ public class AuthnContextImpl implements AuthnContext {
      *
      * @param value An XML String representing authentication context
      *                declaration.
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *                if the object is immutable.
      */
     public void setAuthnContextDecl(java.lang.String value)
@@ -436,7 +436,7 @@ public class AuthnContextImpl implements AuthnContext {
      *
      * @return A string containing the valid XML for this element.
      *         By default name space name is prepended to the element name.
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *          if the object does not conform to the schema.
      */
     public java.lang.String toXMLString()
@@ -453,7 +453,7 @@ public class AuthnContextImpl implements AuthnContext {
      * @param declareNS Determines whether or not the namespace is declared
      *                within the Element.
      * @return A string containing the valid XML for this element
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *          if the object does not conform to the schema.
      */
     public java.lang.String toXMLString(boolean includeNS, boolean declareNS)

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions Copyrighted 2024-2025 3A Systems LLC
+ * Portions Copyrighted 2024-2026 3A Systems LLC
  */
 
 package org.forgerock.openam.authentication.service;
@@ -55,7 +55,8 @@ public class AuthSessionFactory {
      *
      * @param domain      Authentication Domain
      * @return Non null Authentication SSO Token
-     * @throws Exception If there was any unexpected error which prevented the token from being generated.
+     * @throws SSOException If there was any unexpected error which prevented the token from being generated.
+     * @throws SessionException If the authentication session could not be created.
      */
     public SSOToken getAuthenticationSession(String domain) throws SSOException, SessionException {
             if (authSession == null) {

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -44,7 +45,7 @@ public class ResourceSearchIndexes {
      *
      * @param hostIndexes Set of host indexes.
      * @param pathIndexes Set of path indexes.
-     * @param parentPathIndexes 
+     * @param parentPathIndexes Set of parent path indexes.
      */
     public ResourceSearchIndexes(
         Set<String> hostIndexes,

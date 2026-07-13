@@ -24,6 +24,7 @@
  *
  * $Id: IDPListImpl.java,v 1.2 2008/06/25 05:47:59 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -70,7 +71,7 @@ public class IDPListImpl implements IDPList {
      * Constructor to create the <code>IDPList</code> Object.
      *
      * @param element Document Element of <code>IDPList</code> Object.
-     * @throws SAML2Exception if <code>IDPList<code> cannot be created.
+     * @throws SAML2Exception if <code>IDPList</code> cannot be created.
      */
     
     public IDPListImpl(Element element) throws SAML2Exception {
@@ -82,7 +83,7 @@ public class IDPListImpl implements IDPList {
      *
      * @param xmlString the XML String Representation of 
      *        <code>IDPList</code> Object.
-     * @throws SAML2Exception if <code>IDPList<code> cannot be created.
+     * @throws SAML2Exception if <code>IDPList</code> cannot be created.
      */
     
     public IDPListImpl(String xmlString) throws SAML2Exception {
@@ -132,7 +133,7 @@ public class IDPListImpl implements IDPList {
     }
     
     /**
-     * Sets the <code>GetComplete<code> Object.
+     * Sets the <code>GetComplete</code> Object.
      *
      * @param getComplete the new <code>GetComplete</code> object.
      * @throws SAML2Exception if the object is immutable.

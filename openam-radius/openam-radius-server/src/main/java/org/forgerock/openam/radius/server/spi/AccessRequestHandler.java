@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.radius.server.spi;
 
@@ -27,9 +28,9 @@ import org.forgerock.openam.radius.server.RadiusResponse;
  * definition of clients in the admin console and declaration on a per-client basis of the handler class to be use for
  * traffic from that client. There are several sample implementations such as the
  * {@link org.forgerock.openam.radius.server.spi.handlers.AcceptAllHandler} which always responds with an
- * {@link com.sun.identity.authentication.modules.radius.client.AccessAccept} packet granting access to everyone and the
+ * {@link org.forgerock.openam.radius.common.AccessAccept} packet granting access to everyone and the
  * {@link org.forgerock.openam.radius.server.spi.handlers.RejectAllHandler} that does just the opposite returning an
- * {@link com.sun.identity.authentication.modules.radius.client.AccessReject} packet allowing no access for anyone. The
+ * {@link org.forgerock.openam.radius.common.AccessReject} packet allowing no access for anyone. The
  * {@link org.forgerock.openam.radius.server.spi.handlers.OpenAMAuthHandler} uses an OpenAM realm and chain to allow
  * users to authenticate via authentication modules that are cognizant of non-http clients. Created by markboyd on
  * 11/21/14.

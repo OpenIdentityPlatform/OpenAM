@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,21 +13,20 @@ package com.sun.identity.liberty.ws.interaction.jaxb;
 /**
  * Java content class for InquiryElementType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-interact-svc.xsd line 135)
- * <p>
  * <pre>
- * &lt;complexType name="InquiryElementType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:is:2003-08}Help" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:is:2003-08}Hint" minOccurs="0"/>
- *         &lt;element name="Label" type="{http://www.w3.org/2001/XMLSchema}normalizedString" minOccurs="0"/>
- *         &lt;element name="Value" type="{http://www.w3.org/2001/XMLSchema}normalizedString" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="InquiryElementType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:is:2003-08}Help" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:is:2003-08}Hint" minOccurs="0"/&gt;
+ *         &lt;element name="Label" type="{http://www.w3.org/2001/XMLSchema}normalizedString" minOccurs="0"/&gt;
+ *         &lt;element name="Value" type="{http://www.w3.org/2001/XMLSchema}normalizedString" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

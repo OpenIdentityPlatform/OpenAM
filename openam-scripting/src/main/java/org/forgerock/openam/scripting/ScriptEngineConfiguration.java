@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.scripting;
@@ -57,7 +58,7 @@ public final class ScriptEngineConfiguration {
     /**
      * Constructs a script configuration with the given parameters.
      *
-     * @param scriptExecutionTimeout the maximum length of time to allow a script to run, in seconds. Must be >= 0.
+     * @param scriptExecutionTimeout the maximum length of time to allow a script to run, in seconds. Must be {@code >= 0}.
      * @param classWhiteList a list of patterns of allowed java classes that can be loaded or accessed by the script.
      *                       May not be null. May be empty to deny access to all Java classes (i.e., pure script only).
      * @param classBlackList a list of patterns of disallowed java classes that cannot be loaded or accessed by the
@@ -277,7 +278,7 @@ public final class ScriptEngineConfiguration {
          * Sets the maximum amount of time (in seconds) to allow a script to execute before interrupting it. Use
          * {@link #NO_TIMEOUT} for no timeout.
          *
-         * @param timeout the script execution timeout. Must be >= 0.
+         * @param timeout the script execution timeout. Must be {@code >= 0}.
          * @param unit the time units of the timeout.
          * @return this.
          */
@@ -339,7 +340,7 @@ public final class ScriptEngineConfiguration {
          * {@link org.forgerock.openam.scripting.ThreadPoolScriptEvaluator}). This is the number of threads that will
          * be created to service requests before new requests are queued.
          *
-         * @param coreSize the number of threads to keep in the thread pool. Must be >= 1.
+         * @param coreSize the number of threads to keep in the thread pool. Must be {@code >= 1}.
          * @return this.
          */
         public Builder withThreadPoolCoreSize(final int coreSize) {

@@ -25,7 +25,7 @@
  * $Id: CachedDirectoryServicesImpl.java,v 1.5 2009/11/20 23:52:51 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC
+ * Portions Copyrighted 2023-2026 3A Systems LLC
  */
 
 package com.iplanet.am.sdk.ldap;
@@ -981,7 +981,7 @@ public class CachedDirectoryServicesImpl extends DirectoryServicesImpl
      * @param objectType
      *            profile type
      * @param recursive
-     *            if true, remove all sub entries & the object
+     *            if true, remove all sub entries &amp; the object
      * @param softDelete
      *            Used to let pre/post callback plugins know that this delete is
      *            either a soft delete (marked for deletion) or a purge/hard

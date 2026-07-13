@@ -25,6 +25,7 @@
  * $Id: ConfigManagerUMS.java,v 1.6 2009/01/28 05:34:50 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.ums;
@@ -69,7 +70,6 @@ import org.forgerock.opendj.ldap.SearchScope;
  * Configuration Manager is responsible for getting configuration parameters for
  * UMS. ConfigManager is implemented as a singleton and the configurations can
  * be accessed as follows:
- * <p>
  * 
  * <pre>
  *  ConfigManager cm = ConfigManager.getConfigManager(); 
@@ -87,8 +87,7 @@ import org.forgerock.opendj.ldap.SearchScope;
  * speeds up the retrieval in caching the configurations at start up time once
  * as a singleton and share it among the ums package. ConfigManager uses the
  * default PROXY as AuthPrincipal for this instance of the server.
- * 
- * </p>
+ *
  */
 public class ConfigManagerUMS implements java.io.Serializable {
 
@@ -657,7 +656,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      *        applies.
      * @return Collection of attrSets pertaining to the structure
      *         templates in the DIT.
-     * @throws ConfigManagerException.
+     * @throws ConfigManagerException if the entity information cannot be retrieved
      */
     public Set getEntity(Guid guid, String name) throws ConfigManagerException {
         Set ret = (Set) getConfigData(guid, name, ENTITY,
@@ -680,7 +679,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      *        <code>ConfigManager</code> to begin searching for DIT
      *        information (for structural entities).
      * @param templateName Template name.
-     * @param lookup
+     * @param lookup the lookup scope used when searching for the template
      * @return <code>AttrSet</code> value pertaining to the structural template
      *         in the DIT. Usage:
      *         <pre>
@@ -692,7 +691,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      *         matching <code>BasicUserSearch</code> and returns the first one
      *         matched. If found in cache, it returns that. Else it looks it up
      *         in the Directory through SMS (traverses the tree if need be).
-     * @throws ConfigManagerException.
+     * @throws ConfigManagerException if the search template cannot be retrieved
      */
     public AttrSet getSearchTemplate(Guid guid, String templateName, int lookup)
             throws ConfigManagerException {
@@ -711,7 +710,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      *        <code>ConfigManager</code> to begin searching for DIT information
      *        (for structural entities).
      * @param templateName Template name.
-     * @param lookup
+     * @param lookup the lookup scope used when searching for the template
      * @return <code>AttrSet</code> value pertaining to the structural template
      *         in the DIT.  Usage:
      *         <pre>
@@ -723,7 +722,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      *         matching <code>BasicUser</code> and returns the first one
      *         matched. If found in cache, it returns that. Else it looks it
      *         up in the Directory through SMS (traverses the tree if need be)
-     * @throws ConfigManagerException.
+     * @throws ConfigManagerException if the creation template cannot be retrieved
      */
     public AttrSet getCreationTemplate(
         Guid guid,
@@ -747,7 +746,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      * 
      * @param guid Organization DN.
      * @param className Name of <code>javaclass</code> Attribute to be matched.
-     * @param lookup
+     * @param lookup the lookup scope used when searching for the template
      * @return Attribute key-value pair of Creation templates.  Usage:
      *         <pre>
      *         AttrSet a = CM.getCreationTemplateForClass(
@@ -795,7 +794,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      * 
      * @param guid Organization to look under.
      * @return Set of template name.
-     * @throws ConfigManagerException.
+     * @throws ConfigManagerException if the search template names cannot be retrieved
      */
     public Set getSearchTemplateNames(Guid guid) throws ConfigManagerException {
         return getConfigTemplateNames(guid, SEARCH, TemplateManager.SCOPE_ORG);
@@ -811,8 +810,8 @@ public class ConfigManagerUMS implements java.io.Serializable {
      * exist under any other organization except the root.
      * 
      * @return an array of Objectclass/Javaclass pairs.
-     * @exception ConfigManagerException.
-     * 
+     * @exception ConfigManagerException if the class resolver cannot be retrieved
+     *
      * Usage: String[][] a = CM.getClassResolver() Looks up the attributes at
      * the top level /ObjectResolver/templates/iDA Caches it first.
      */
@@ -831,7 +830,7 @@ public class ConfigManagerUMS implements java.io.Serializable {
      * @param guid the GUID it is looking under.
      * @param templateName Name of the template.
      * @param attrSet attribute-values pair to be replaced.
-     * @exception ConfigManagerException.
+     * @exception ConfigManagerException if the creation template cannot be replaced
      */
     public void replaceCreationTemplate(Guid guid, String templateName,
             AttrSet attrSet) throws ConfigManagerException {

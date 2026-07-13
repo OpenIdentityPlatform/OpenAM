@@ -98,7 +98,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     /**
      * Constructs user code verification resource for OAuth2 Device Flow
      * @param router The base router
-     * @param exceptionHandler
+     * @param exceptionHandler An instance of the ExceptionHandler.
      * @param oAuth2Utils An OAuth2Utils instance.
      * @param csrfProtection An instance of the CsrfProtection.
      */

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.cts.monitoring.impl.persistence;
 
@@ -47,7 +47,7 @@ public class CtsPersistenceOperationsDelegate {
      *
      * @param tokenType The type of token for which we are gathering results
      * @return Zero or positive integer of the number of tokens in the store.
-     * @throws CoreTokenException
+     * @throws CoreTokenException if there are issues talking with the CTS
      */
     public int countTokenEntries(TokenType tokenType) throws CoreTokenException {
 
@@ -76,7 +76,7 @@ public class CtsPersistenceOperationsDelegate {
      *
      * @param tokenType The type of token for which we are gathering results
      * @return A collection of longs, each of which represents the duration of a token inside the CTS
-     * @throws CoreTokenException
+     * @throws CoreTokenException if there are issues talking with the CTS
      */
     public Collection<Long> listDurationOfTokens(TokenType tokenType) throws CoreTokenException {
 

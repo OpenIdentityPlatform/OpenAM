@@ -24,6 +24,7 @@
  *
  * $Id: CollectionUtils.java,v 1.2 2008/06/25 05:53:05 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.shared.test;
@@ -42,9 +43,9 @@ public class CollectionUtils {
     }
 
     /**
-     * Returns set of string. This is a convenient method for adding a set of 
-     * string into a map. In this project, we usually have the 
-     * <code>Map&lt;String, Set&lt;String&gt;&gt; and many times, we just 
+     * Returns set of string. This is a convenient method for adding a set of
+     * string into a map. In this project, we usually have the
+     * <code>Map&lt;String, Set&lt;String&gt;&gt;</code> and many times, we just
      * want to add a string to the map.
      *
      * @param key Key to the entry in the map.

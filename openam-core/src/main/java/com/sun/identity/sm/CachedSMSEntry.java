@@ -25,6 +25,7 @@
  * $Id: CachedSMSEntry.java,v 1.16 2009/10/08 20:33:54 hengming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.sm;
@@ -197,7 +198,7 @@ public class CachedSMSEntry implements SMSEventListener {
     }
     
     /**
-     * Updates the attributes from the provided <class>SMSEntry</class>
+     * Updates the attributes from the provided <code>SMSEntry</code>
      * and marks the entry as non-dirty.
      * @param e object that contains the updated values for the attributes
      * @throws com.sun.identity.sm.SMSException

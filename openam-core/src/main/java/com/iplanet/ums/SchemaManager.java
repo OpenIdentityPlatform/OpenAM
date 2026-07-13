@@ -25,6 +25,7 @@
  * $Id: SchemaManager.java,v 1.4 2009/01/28 05:34:50 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.ums;
@@ -48,7 +49,6 @@ import org.forgerock.opendj.ldap.schema.Schema;
  * Examples:
  * <p>
  * To add/delete schema definitions
- * <p>
  * 
  * <pre>
  * // Gets the schema manager associated with the login Context

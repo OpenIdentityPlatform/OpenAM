@@ -25,7 +25,7 @@
  * $Id: AMLoginModule.java,v 1.22 2009/11/21 01:11:56 222713 Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.spi;
@@ -1321,9 +1321,8 @@ public abstract class AMLoginModule implements LoginModule {
     
     /**
      * Resets the current state in the authentication process
-     * @param state
      */
-    
+
     public void resetCurrentState() {
     	this.currentState = ISAuthConstants.LOGIN_START;
     }
@@ -1802,7 +1801,7 @@ public abstract class AMLoginModule implements LoginModule {
      * module to decide in which domain the user profile should be created.
      *
      * @param orgDN The organization DN.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the user organization cannot be set
      */
     public void setOrg(String orgDN) throws AuthLoginException {
 /* TODO
@@ -2432,8 +2431,8 @@ public abstract class AMLoginModule implements LoginModule {
      * @param userName name of user to be created.
      * @param userAttributes Map of default attributes.
      * @param userRoles Set of default roles.
-     * @throws IdRepoException
-     * @throws SSOException
+     * @throws IdRepoException if the identity cannot be created in the repository
+     * @throws SSOException if the single sign on token is invalid or expired
      */
     public void createIdentity(
         String userName,

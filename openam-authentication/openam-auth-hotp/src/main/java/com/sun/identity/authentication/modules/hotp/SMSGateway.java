@@ -25,6 +25,7 @@
  * $Id: SMSGateway.java,v 1.2 2009/06/03 20:46:51 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.authentication.modules.hotp;
 
@@ -48,7 +49,6 @@ public interface SMSGateway {
 
     /**
      * Sends a SMS message to the phone with the code
-     * <p>
      *
      * @param from The address that sends the SMS message
      * @param to The address that the SMS message is sent
@@ -64,7 +64,6 @@ public interface SMSGateway {
 
     /**
      * Sends an email  message to the mail with the code
-     * <p>
      *
      * @param from The address that sends the E-mail message
      * @param to The address that the E-mail message is sent 

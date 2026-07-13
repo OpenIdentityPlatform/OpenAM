@@ -24,6 +24,7 @@
  *
  * $Id: PPInteractionHelper.java,v 1.2 2008/06/25 05:47:14 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -45,8 +46,8 @@ import com.sun.identity.liberty.ws.idpp.common.*;
  * Personal Profile Service for creating questions for Interaction for value 
  * and interaction for consent.
  * The question key will always be of the following form in a properties file.
- * Question: <PPAttribute>_Value_Question for interact for value
- * Question: <PPAttribute>_Consent_Question for interfact for consent
+ * Question: {@code <PPAttribute>_Value_Question} for interact for value
+ * Question: {@code <PPAttribute>_Consent_Question} for interfact for consent
  * For e.g. CN_Value_Question or CN_Consent_Question.
  * There will be a default question key for Consent if there's not one for the
  * rquested attribute., but it's not true for interact for the value.

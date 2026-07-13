@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.utils;
@@ -33,8 +34,6 @@ import org.slf4j.LoggerFactory;
  * Use the methods on this class where you would have otherwise used {@code System.currentTimeMillis()},
  * {@code new Date()}, {@code Calendar.getInstance()} or the various constructors and {@code now} methods
  * in {@code org.joda.time.DateTime}.
- * <p>
- *
  */
 @SuppressWarnings({"PMD.AvoidCalenderGetInstance"})
 public enum Time implements DateTimeUtils.MillisProvider {

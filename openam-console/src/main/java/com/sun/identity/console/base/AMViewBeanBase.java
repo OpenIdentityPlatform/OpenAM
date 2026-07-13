@@ -25,7 +25,7 @@
  * $Id: AMViewBeanBase.java,v 1.15 2009/10/19 18:17:33 asyhuang Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.console.base;
 
@@ -651,7 +651,7 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
     /**
      * Set location DN
      *
-     * @param dn
+     * @param dn the location distinguished name to set
      */
     public void setCurrentLocation(String dn) {
         if (dn != null) {

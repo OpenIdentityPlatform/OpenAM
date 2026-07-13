@@ -25,6 +25,7 @@
  * $Id: AMStoreConnection.java,v 1.13 2009/01/28 05:34:47 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk;
@@ -598,7 +599,7 @@ public final class AMStoreConnection implements AMConstants {
      *            returned. A "/" separated string is assumed to represent an
      *            existing organization DN in the DIT. For example:
      *            <code>/iplanet/sun</code> is converted to a DN
-     *            <code>(o=iplanet,o=sun,&lt;base DN>)</code> and the validity
+     *            <code>(o=iplanet,o=sun,&lt;base DN&gt;)</code> and the validity
      *            of this DN is checked and returned. Any other string is
      *            assumed to be either a domain or an associated domain or the
      *            organization name. The search filter is created accordingly.
@@ -1387,6 +1388,7 @@ public final class AMStoreConnection implements AMConstants {
      *             if there is an error in deleting the user, or if the user
      *             <code>callbacks</code> thrown an exception
      * @throws SSOException
+     *             if the single sign-on token is invalid or has expired
      */
     public void purgeUser(String uid, String domainName, int graceperiod)
             throws AMException, SSOException {
@@ -1439,6 +1441,7 @@ public final class AMStoreConnection implements AMConstants {
      *             if there is an error in deleting the user, or if the user
      *             <code>callbacks</code> thrown an exception
      * @throws SSOException
+     *             if the single sign-on token is invalid or has expired
      */
     public void purgeResource(String rid, String domainName, int graceperiod)
             throws AMException, SSOException {
@@ -1492,6 +1495,7 @@ public final class AMStoreConnection implements AMConstants {
      *             if there is an error in deleting the group, or if the
      *             <code>callbacks</code> thrown an exception
      * @throws SSOException
+     *             if the single sign-on token is invalid or has expired
      */
     public void purgeGroup(String gid, String domainName, int graceperiod)
             throws AMException, SSOException {

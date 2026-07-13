@@ -25,6 +25,7 @@
  * $Id: Attribute.java,v 1.2 2008/06/25 05:47:40 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.assertion;
@@ -41,24 +42,23 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * The <code>Attribute</code> element identifies an attribute by name and
  * optionally includes its value(s). It has the <code>AttributeType</code>
  * complex type.
- * <p>
  * <pre>
- * &lt;complexType name="AttributeType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
+ * &lt;complexType name="AttributeType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *         AttributeValue" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
+ *         AttributeValue" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
  *       &lt;attribute name="FriendlyName"
- *       type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="Name" use="required"
- *       type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="NameFormat"
- *       type="{http://www.w3.org/2001/XMLSchema}anyURI" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *       type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  *  
  */

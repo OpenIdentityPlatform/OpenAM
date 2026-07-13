@@ -24,6 +24,7 @@
  *
  * $Id: IDPPCommonName.java,v 1.2 2008/06/25 05:47:15 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -61,7 +62,7 @@ public class IDPPCommonName extends IDPPBaseContainer {
       * Gets the common name jaxb element 
       * @param userMap user map
       * @return CommonNameElement JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
 
@@ -167,7 +168,7 @@ public class IDPPCommonName extends IDPPBaseContainer {
       * @param select Select expression.
       * @param data list of new data objects.
       * @return Attribute key value pair for the given select.
-      * @throws IDPPException.
+      * @throws IDPPException .
       */
      public Map getDataMapForSelect(String select, List data) 
      throws IDPPException {
@@ -284,7 +285,7 @@ public class IDPPCommonName extends IDPPBaseContainer {
       * @param dataObject list of data objects
       * @param map map to be filled in
       * @return Map map to be returned
-      * @exception IDPPException
+      * @exception IDPPException if an error occurs
       */
      private Map getAltCNMap(List dataObject, Map map) throws IDPPException {
         IDPPUtils.debug.message("IDPPCommonName:getAltCNMap:Init");

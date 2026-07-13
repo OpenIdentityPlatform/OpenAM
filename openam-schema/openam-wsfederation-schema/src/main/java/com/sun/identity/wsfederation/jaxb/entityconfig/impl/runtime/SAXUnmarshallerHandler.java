@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 package com.sun.identity.wsfederation.jaxb.entityconfig.impl.runtime;
@@ -17,7 +18,7 @@ import org.xml.sax.SAXException;
  * both the SAX events and error events.
  * 
  * <p>
- * This interface refines {@link ContentHandler} as follows:
+ * This interface refines {@link org.xml.sax.ContentHandler} as follows:
  * <ol>
  *  <li>element names and attribute names must be {@link String#intern()}ed.
  *  <li>namespace prefix and uris must be {@link String#intern()}ed.

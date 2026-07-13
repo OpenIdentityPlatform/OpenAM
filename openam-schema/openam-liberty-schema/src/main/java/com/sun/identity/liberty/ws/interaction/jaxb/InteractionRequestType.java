@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,23 +13,22 @@ package com.sun.identity.liberty.ws.interaction.jaxb;
 /**
  * Java content class for InteractionRequestType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-interact-svc.xsd line 75)
- * <p>
  * <pre>
- * &lt;complexType name="InteractionRequestType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;group ref="{urn:liberty:is:2003-08}ResourceIDGroup" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:is:2003-08}Inquiry" maxOccurs="unbounded"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}KeyInfo" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *       &lt;attribute name="language" type="{http://www.w3.org/2001/XMLSchema}NMTOKENS" />
- *       &lt;attribute name="maxInteractTime" type="{http://www.w3.org/2001/XMLSchema}integer" />
- *       &lt;attribute name="signed" type="{http://www.w3.org/2001/XMLSchema}token" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="InteractionRequestType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;group ref="{urn:liberty:is:2003-08}ResourceIDGroup" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:is:2003-08}Inquiry" maxOccurs="unbounded"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}KeyInfo" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *       &lt;attribute name="language" type="{http://www.w3.org/2001/XMLSchema}NMTOKENS" /&gt;
+ *       &lt;attribute name="maxInteractTime" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
+ *       &lt;attribute name="signed" type="{http://www.w3.org/2001/XMLSchema}token" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

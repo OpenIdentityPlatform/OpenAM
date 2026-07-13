@@ -25,6 +25,7 @@
  * $Id: PrivilegeUtils.java,v 1.4 2010/01/07 00:19:11 veiming Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -84,7 +85,7 @@ import java.util.Set;
  * Class with utility methods to map from
  * <code>com.sun.identity.entity.Privilege</code>
  * to
- * </code>com.sun.identity.policy.Policy</code>
+ * <code>com.sun.identity.policy.Policy</code>
  */
 public class PrivilegeUtils {
 

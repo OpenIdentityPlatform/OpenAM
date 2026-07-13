@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -13,20 +14,19 @@ package com.sun.identity.liberty.ws.common.jaxb.ps;
  * A type that may be used for status codes.
  * Java content class for StatusType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-iff-utility.xsd line 57)
- * <p>
  * <pre>
- * &lt;complexType name="StatusType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:iff:2003-08}Status" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="code" use="required" type="{http://www.w3.org/2001/XMLSchema}QName" />
- *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="ref" type="{http://www.w3.org/2001/XMLSchema}NCName" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="StatusType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:iff:2003-08}Status" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="code" use="required" type="{http://www.w3.org/2001/XMLSchema}QName" /&gt;
+ *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="ref" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

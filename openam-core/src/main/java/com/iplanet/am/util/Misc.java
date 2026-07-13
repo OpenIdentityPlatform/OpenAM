@@ -25,6 +25,7 @@
  * $Id: Misc.java,v 1.6 2009/01/28 05:34:48 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.util;
@@ -120,7 +121,7 @@ public class Misc {
      *             when fails to parse the defaultValue argument as a signed
      *             decimal integer for return
      * @deprecated As of OpenSSO version 8.0
-     * {@link com.sun.identity.shared.datastruct.CollectionHelper#getIntMapAttr(Map, String, String, Debug)}
+     * {@link com.sun.identity.shared.datastruct.CollectionHelper#getIntMapAttr(Map, String, int, Debug)}
      */
     public static int getIntMapAttr(Map m, String name, String defaultValue,
             Debug debug) throws NumberFormatException {

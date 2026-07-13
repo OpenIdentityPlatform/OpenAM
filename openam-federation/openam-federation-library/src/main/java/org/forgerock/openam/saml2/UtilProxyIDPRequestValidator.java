@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.saml2;
 
@@ -52,7 +52,7 @@ public class UtilProxyIDPRequestValidator implements IDPRequestValidator {
      * @param reqBinding the request binding for the new UtilProxyIDPRequestValidator
      * @param isFromECP whether the validator will be validating a request from an ecp
      * @param debug the debuger to use for debug logging
-     * @param saml2MetaManager
+     * @param saml2MetaManager the SAML2 metadata manager used to look up entity configuration
      */
     public UtilProxyIDPRequestValidator(String reqBinding, boolean isFromECP, Debug debug,
                                         SAML2MetaManager saml2MetaManager) {

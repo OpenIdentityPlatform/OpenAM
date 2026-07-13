@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.core;
@@ -20,7 +21,7 @@ import com.sun.identity.sm.DNMapper;
 
 /**
  * Wrapper class to remove coupling to DNMapper static methods.
- * <p/>
+ * <p>
  * Until DNMapper is refactored, this class can be used to assist with DI.
  */
 public class DNWrapper {

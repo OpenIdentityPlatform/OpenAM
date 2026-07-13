@@ -129,6 +129,11 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<!--
+					This is a standalone Java 17 module (records, var). Its sources cannot be
+					processed by the Javadoc tool on the JDK 11 baseline used to build and publish
+					the API docs, so Javadoc is skipped for this module.
+				-->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>

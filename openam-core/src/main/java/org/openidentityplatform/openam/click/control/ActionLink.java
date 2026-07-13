@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -27,19 +28,20 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Provides a Action Link control: &nbsp; &lt;a href=""&gt;&lt;/a&gt;.
  *
- * <table class='htmlHeader' cellspacing='6'>
+ * <table class='htmlHeader'>
+ * <caption>Example</caption>
  * <tr><td>
- * <a href='' title='ActionLink Control'>Action Link</a>
+ * <a href='#'>Action Link</a>
  * </td></tr>
  * </table>
  *
  * This control can render the "href" URL attribute using
  * {@link #getHref()}, or the entire ActionLink anchor tag using
  * {@link #toString()}.
- * <p/>
+ * <p>
  * ActionLink support invoking control listeners.
  *
- * <h3>ActionLink Example</h3>
+ * <h2>ActionLink Example</h2>
  *
  * An example of using ActionLink to call a logout method is illustrated below:
  *
@@ -70,7 +72,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * ActionLink can also support a value parameter which is accessible
  * using {@link #getValue()}.
- * <p/>
+ * <p>
  * For example a products table could include rows
  * of products, each with a get product details ActionLink and add product
  * ActionLink. The ActionLinks include the product's id as a parameter to
@@ -135,7 +137,7 @@ import org.apache.commons.lang.StringUtils;
  * } </pre>
  *
  * See also the W3C HTML reference:
- * <a class="external" target="_blank" title="W3C HTML 4.01 Specification"
+ * <a class="external" target="_blank"
  *    href="http://www.w3.org/TR/html401/struct/links.html#h-12.2">A Links</a>
  *
  * @see org.apache.click.control.AbstractLink
@@ -147,10 +149,10 @@ public class ActionLink extends AbstractLink {
 
     private static final long serialVersionUID = 1L;
 
-    /** The action link parameter name: &nbsp; <tt>actionLink</tt>. */
+    /** The action link parameter name: &nbsp; <code>actionLink</code>. */
     public static final String ACTION_LINK = "actionLink";
 
-    /** The value parameter name: &nbsp; <tt>value</tt>. */
+    /** The value parameter name: &nbsp; <code>value</code>. */
     public static final String VALUE = "value";
 
     // Instance Variables -----------------------------------------------------
@@ -162,7 +164,7 @@ public class ActionLink extends AbstractLink {
 
     /**
      * Create an ActionLink for the given name.
-     * <p/>
+     * <p>
      * Please note the name 'actionLink' is reserved as a control request
      * parameter name and cannot be used as the name of the control.
      *
@@ -175,7 +177,7 @@ public class ActionLink extends AbstractLink {
 
     /**
      * Create an ActionLink for the given name and label.
-     * <p/>
+     * <p>
      * Please note the name 'actionLink' is reserved as a control request
      * parameter name and cannot be used as the name of the control.
      *
@@ -210,7 +212,7 @@ public class ActionLink extends AbstractLink {
     /**
      * Create an ActionLink for the given name, listener object and listener
      * method.
-     * <p/>
+     * <p>
      * Please note the name 'actionLink' is reserved as a control request
      * parameter name and cannot be used as the name of the control.
      *
@@ -234,7 +236,7 @@ public class ActionLink extends AbstractLink {
     /**
      * Create an ActionLink for the given name, label, listener object and
      * listener method.
-     * <p/>
+     * <p>
      * Please note the name 'actionLink' is reserved as a control request
      * parameter name and cannot be used as the name of the control.
      *
@@ -280,7 +282,7 @@ public class ActionLink extends AbstractLink {
     /**
      * Return the ActionLink anchor &lt;a&gt; tag href attribute for the
      * given value. This method will encode the URL with the session ID
-     * if required using <tt>HttpServletResponse.encodeURL()</tt>.
+     * if required using <code>HttpServletResponse.encodeURL()</code>.
      *
      * @param value the ActionLink value parameter
      * @return the ActionLink HTML href attribute
@@ -348,7 +350,7 @@ public class ActionLink extends AbstractLink {
     /**
      * Set the name of the Control. Each control name must be unique in the
      * containing Page model or the containing Form.
-     * <p/>
+     * <p>
      * Please note the name 'actionLink' is reserved as a control request
      * parameter name and cannot be used as the name of the control.
      *
@@ -375,7 +377,7 @@ public class ActionLink extends AbstractLink {
      * @param parent the parent of the Control
      * @throws IllegalStateException if {@link #name} is not defined
      * @throws IllegalArgumentException if the given parent instance is
-     * referencing <tt>this</tt> object: <tt>if (parent == this)</tt>
+     * referencing <code>this</code> object: <code>if (parent == this)</code>
      */
     @Override
     public void setParent(Object parent) {
@@ -400,10 +402,10 @@ public class ActionLink extends AbstractLink {
     }
 
     /**
-     * Returns the action link <tt>Double</tt> value if the action link was
+     * Returns the action link <code>Double</code> value if the action link was
      * processed and has a value, or null otherwise.
      *
-     * @return the action link <tt>Double</tt> value if the action link was processed
+     * @return the action link <code>Double</code> value if the action link was processed
      *
      * @throws NumberFormatException if the value cannot be parsed into a Double
      */
@@ -417,10 +419,10 @@ public class ActionLink extends AbstractLink {
     }
 
     /**
-     * Returns the ActionLink <tt>Integer</tt> value if the ActionLink was
+     * Returns the ActionLink <code>Integer</code> value if the ActionLink was
      * processed and has a value, or null otherwise.
      *
-     * @return the ActionLink <tt>Integer</tt> value if the action link was processed
+     * @return the ActionLink <code>Integer</code> value if the action link was processed
      *
      * @throws NumberFormatException if the value cannot be parsed into an Integer
      */
@@ -434,10 +436,10 @@ public class ActionLink extends AbstractLink {
     }
 
     /**
-     * Returns the ActionLink <tt>Long</tt> value if the ActionLink was
+     * Returns the ActionLink <code>Long</code> value if the ActionLink was
      * processed and has a value, or null otherwise.
      *
-     * @return the ActionLink <tt>Long</tt> value if the action link was processed
+     * @return the ActionLink <code>Long</code> value if the action link was processed
      *
      * @throws NumberFormatException if the value cannot be parsed into a Long
      */

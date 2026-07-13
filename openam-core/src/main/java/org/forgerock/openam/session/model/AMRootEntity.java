@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -154,7 +155,7 @@ public abstract class AMRootEntity implements Serializable {
 
     /**
      * Base64 Encoded Data.
-     * @return
+     * @return the Base64 encoded data
      */
     public String getData() {
         return data;

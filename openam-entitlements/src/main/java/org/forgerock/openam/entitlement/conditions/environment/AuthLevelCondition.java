@@ -14,6 +14,7 @@
  * Copyright 2006 Sun Microsystems Inc.
  *
  * Portions Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.entitlement.conditions.environment;
@@ -146,8 +147,9 @@ public class AuthLevelCondition extends EntitlementConditionAdaptor {
      * <p>Will also set an advice if the requested auth level is less than the configured auth level of the minimum
      * required auth level.</p>
      *
-     * @param maxRequestAuthLevel {@inheritDoc}
-     * @param advices {@inheritDoc}
+     * @param maxRequestAuthLevel the maximum authentication level presented by the request
+     * @param advices the advice map, updated with the required authentication level when the condition is not
+     * satisfied
      * @return {@code true} if the get {@code maxRequestAuthLevel} is greater than or equal to the configured auth
      * level.
      */

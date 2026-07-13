@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,23 +13,22 @@ package com.sun.identity.liberty.ws.common.jaxb.protocol;
 /**
  * Java content class for RequestType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/cs-sstc-schema-protocol-01.xsd line 58)
- * <p>
  * <pre>
- * &lt;complexType name="RequestType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:SAML:1.0:protocol}RequestAbstractType">
- *       &lt;choice>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}Query"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}SubjectQuery"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}AuthenticationQuery"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}AttributeQuery"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}AuthorizationDecisionQuery"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:assertion}AssertionIDReference" maxOccurs="unbounded"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}AssertionArtifact" maxOccurs="unbounded"/>
- *       &lt;/choice>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="RequestType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:oasis:names:tc:SAML:1.0:protocol}RequestAbstractType"&gt;
+ *       &lt;choice&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}Query"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}SubjectQuery"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}AuthenticationQuery"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}AttributeQuery"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}AuthorizationDecisionQuery"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:assertion}AssertionIDReference" maxOccurs="unbounded"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:1.0:protocol}AssertionArtifact" maxOccurs="unbounded"/&gt;
+ *       &lt;/choice&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

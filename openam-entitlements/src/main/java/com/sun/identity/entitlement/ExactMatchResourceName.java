@@ -24,6 +24,7 @@
  *
  * $Id: ExactMatchResourceName.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.entitlement;
 
@@ -65,7 +66,7 @@ public class ExactMatchResourceName
      * 
      * @param o1 a url query parameter to be compared  
      * @param o2 a url query parameter to be compared  
-     * @return -1 if o1 < o2; 0 if o1 = o2; 1 if o1 > o2
+     * @return {@code -1} if o1 &lt; o2; {@code 0} if o1 = o2; {@code 1} if o1 &gt; o2
      */
     public int compare(Object o1, Object o2) {
         String s1 = (String) o1;

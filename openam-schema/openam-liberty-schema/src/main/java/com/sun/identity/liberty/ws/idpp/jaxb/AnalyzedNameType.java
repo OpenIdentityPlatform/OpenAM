@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,27 +13,26 @@ package com.sun.identity.liberty.ws.idpp.jaxb;
 /**
  * Java content class for AnalyzedNameType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-id-sis-pp.xsd line 70)
- * <p>
  * <pre>
- * &lt;complexType name="AnalyzedNameType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}PersonalTitle" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LPersonalTitle" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}FN" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LFN" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}SN" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LSN" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MN" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LMN" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Extension" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attGroup ref="{urn:liberty:id-sis-pp:2003-08}commonAttributes"/>
- *       &lt;attribute name="nameScheme" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="AnalyzedNameType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}PersonalTitle" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LPersonalTitle" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}FN" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LFN" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}SN" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LSN" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MN" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LMN" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Extension" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attGroup ref="{urn:liberty:id-sis-pp:2003-08}commonAttributes"/&gt;
+ *       &lt;attribute name="nameScheme" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

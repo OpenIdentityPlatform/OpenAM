@@ -24,6 +24,7 @@
  *
  * $Id: NameIDMappingResponseImpl.java,v 1.2 2008/06/25 05:48:00 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.protocol.impl;
@@ -63,9 +64,9 @@ public class NameIDMappingResponseImpl extends StatusResponseImpl
     /**
      * Constructor to create <code>ManageNameIDResponse</code> Object. 
      *
-     * @param element Document Element of <code>ManageNameIDRequest<code>
+     * @param element Document Element of <code>ManageNameIDRequest</code>
      *     object.
-     * @throws SAML2Exception if <code>ManageNameIDRequest<code> cannot be
+     * @throws SAML2Exception if <code>ManageNameIDRequest</code> cannot be
      *     created.
      */
     public NameIDMappingResponseImpl(Element element) throws SAML2Exception {
@@ -80,8 +81,8 @@ public class NameIDMappingResponseImpl extends StatusResponseImpl
      * Constructor to create <code>ManageNameIDResponse</code> Object. 
      *
      * @param xmlString XML representation of the
-     *     <code>ManageNameIDRequest<code> object.
-     * @throws SAML2Exception if <code>ManageNameIDRequest<code> cannot be
+     *     <code>ManageNameIDRequest</code> object.
+     * @throws SAML2Exception if <code>ManageNameIDRequest</code> cannot be
      *     created.
      */
     public NameIDMappingResponseImpl(String xmlString) throws SAML2Exception {

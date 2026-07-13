@@ -24,7 +24,7 @@
  *
  * $Id: RPSigninResponse.java,v 1.8 2009/12/14 23:42:48 mallas Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -321,7 +321,7 @@ public class RPSigninResponse extends WSFederationAction {
      *  @param sessionProvider Session provider
      *  @param attrMap the Attribute Map
      *  @param session the valid session object
-     *  @throws com.sun.identity.plugin.session.SessionException 
+     *  @throws com.sun.identity.plugin.session.SessionException if a session error occurs
      */
     public static void setAttrMapInSession(
         SessionProvider sessionProvider,

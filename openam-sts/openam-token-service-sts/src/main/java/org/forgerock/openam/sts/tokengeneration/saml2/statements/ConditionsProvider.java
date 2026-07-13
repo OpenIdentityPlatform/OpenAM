@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS. All rights reserved.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -37,7 +39,7 @@ public interface ConditionsProvider {
      * @param issueInstant The instant at which the enclosing assertion was issued
      * @param saml2SubjectConfirmation The subject confirmation specification
      * @return The generated Conditions instance.
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the Conditions instance could not be generated
      */
     Conditions get(SAML2Config saml2Config, Date issueInstant,
                    SAML2SubjectConfirmation saml2SubjectConfirmation) throws TokenCreationException;

@@ -24,6 +24,7 @@
  *
  * $Id: EvidenceBase.java,v 1.2 2008/06/25 05:47:32 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.assertion;
@@ -119,7 +120,7 @@ public abstract class EvidenceBase  {
     }    
     
     /**
-     * Constructs a new <code>Evidence></code> element containing a
+     * Constructs a new <code>Evidence</code> element containing a
      * set of <code>Assertion</code> objects.
      *
      * @param evidenceContent A set of <code>Assertion</code> and

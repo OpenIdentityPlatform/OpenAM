@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -40,7 +42,7 @@ public interface SubjectProvider {
      * @param assertionIssueInstant The issue instant assertion
      * @param proofTokenState The instance containing the proof token necessary for HoK assertions.
      * @return The to-be-included Subject instance
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the Subject instance could not be generated
      */
     Subject get(String subjectId, String audienceId, SAML2Config saml2Config,
                 SAML2SubjectConfirmation subjectConfirmation, Date assertionIssueInstant,

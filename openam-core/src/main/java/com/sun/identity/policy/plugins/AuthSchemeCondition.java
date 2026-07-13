@@ -25,6 +25,7 @@
  * $Id: AuthSchemeCondition.java,v 1.6 2009/05/05 18:29:01 mrudul_uchil Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -58,7 +59,7 @@ import java.util.Collections;
  * of <code>Condition</code> that lets you define authentication module
  * instances for which a <code>Policy</code> applies.
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.AuthSchemeCondition} instead.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.environment.AuthSchemeCondition} instead.
  */
 @Deprecated
 public class AuthSchemeCondition implements Condition {
@@ -82,7 +83,7 @@ public class AuthSchemeCondition implements Condition {
     public static final String FORCE_AUTH_ADVICE = "ForceAuth";
 
     /** 
-     * Constant for representing <code>true</value> for ForceAuth
+     * Constant for representing <code>true</code> for ForceAuth
      */
     public static final String TRUE = "true";
 
@@ -127,7 +128,7 @@ public class AuthSchemeCondition implements Condition {
      *
      * @param property property name
      *
-     * @return <code>Syntax<code> for the property name
+     * @return <code>Syntax</code> for the property name
      */
     public Syntax getPropertySyntax(String property) {
         return Syntax.NONE;
@@ -143,7 +144,7 @@ public class AuthSchemeCondition implements Condition {
      * @param property property name
      * @param locale locale for which the property name must be customized
      * @return display name for the property name
-     * @throws PolicyException
+     * @throws PolicyException if the display name cannot be retrieved
      */
     public String getDisplayName(String property, Locale locale)
        throws PolicyException {
@@ -215,7 +216,7 @@ public class AuthSchemeCondition implements Condition {
      *        <code>AuthSchemeCondition</code> looks for value of key
      *        <code>REQUEST_AUTH_SCHEHMES</code> in the map.  The value should
      *        be a String. If the <code>env</code> parameter is null or does not
-     *       define the value for <code.REQUEST_AUTH_SCHEMES</code>, value for
+     *       define the value for <code>REQUEST_AUTH_SCHEMES</code>, value for
      *        <code>REQUEST_AUTH_SCHEMES</code> is computed using
      *        <code>AuthMethod</code> obtained from single sign on token of
      *        the user.

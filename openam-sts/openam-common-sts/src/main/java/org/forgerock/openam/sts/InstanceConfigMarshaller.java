@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts;
@@ -24,12 +26,12 @@ import java.util.Set;
 
 /**
  * Interface to represent the concerns of marshalling to RestSTSInstanceConfig and SoapSTSInstanceConfig instances to/from either
- * the Map<String, Set<String>> SMS representation or the json representation. Simply wraps the static methods in the
+ * the {@code Map<String, Set<String>>} SMS representation or the json representation. Simply wraps the static methods in the
  * RestSTSInstanceConfig and SoapSTSInstanceConfig classes, so that they can be easily mocked.
  */
 public interface InstanceConfigMarshaller<T extends STSInstanceConfig> {
     /**
-     * Called to marshal an STSInstanceConfig subclass instance to the Map<String, Set<String>> required for SMS persistence.
+     * Called to marshal an STSInstanceConfig subclass instance to the {@code Map<String, Set<String>>} required for SMS persistence.
      * @param instance the to-be-marshaled instance
      * @return the SMS-persistence-ready representation of STSInstanceConfig state.
      * @throws STSPublishException if an exception occurs during the marshalling
@@ -47,10 +49,10 @@ public interface InstanceConfigMarshaller<T extends STSInstanceConfig> {
     /**
      * Marshal STSInstanceConfig subclass instance from the SMS representation, wrapped in json. The ViewBean classes
      * which allow AdminConsole users to configure Soap and Rest STS instances ultimately call the sts publish service
-     * to publish the Rest or Soap STS instance. The invocation payload is the SMS Map<String, Set<String>> representation
+     * to publish the Rest or Soap STS instance. The invocation payload is the SMS {@code Map<String, Set<String>>} representation
      * native to the ViewBean context, wrapped in a JsonValue, so that it may be posted to CREST. This method defines the
      * contract to marshal this representation back to a STSInstanceConfig subclass.
-     * @param jsonMapAttributes the Map<String, Set<String>> native to the ViewBean context and to SMS persistence, wrapped
+     * @param jsonMapAttributes the {@code Map<String, Set<String>>} native to the ViewBean context and to SMS persistence, wrapped
      *                          in a JsonValue
      * @return a STSInstanceConfig subclass
      * @throws STSPublishException if an exception occurs during the marshalling

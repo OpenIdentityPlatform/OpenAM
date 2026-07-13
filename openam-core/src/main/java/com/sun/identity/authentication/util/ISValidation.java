@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -84,9 +85,9 @@ public class ISValidation {
     /**
      * Returns the index within this string of the first occurrence of the
      * specified substring, starting at the specified index.  The integer
-     * returned is the smallest value <tt>k</tt> for which:
+     * returned is the smallest value <code>k</code> for which:
      * <blockquote><pre>
-     *     k >= Math.min(fromIndex, str.length()) &&
+     *     k >= Math.min(fromIndex, str.length()) &amp;&amp;
      *                   this.toString().startsWith(str, k)
      * </pre></blockquot>
      * If no such value of <i>k</i> exists, then -1 is returned.

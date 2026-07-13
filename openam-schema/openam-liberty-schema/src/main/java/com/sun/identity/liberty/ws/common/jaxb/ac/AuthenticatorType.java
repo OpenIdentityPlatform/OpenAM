@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,27 +13,26 @@ package com.sun.identity.liberty.ws.common.jaxb.ac;
 /**
  * Java content class for AuthenticatorType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-authentication-context.xsd line 569)
- * <p>
  * <pre>
- * &lt;complexType name="AuthenticatorType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice>
- *         &lt;element ref="{urn:liberty:ac:2003-08}PreviousSession"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}ResumeSession"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}DigSig"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}Password"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}ZeroKnowledge"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}SharedSecretChallengeResponse"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}SharedSecretDynamicPlaintext"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}IPAddress"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}AsymmetricDecryption"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}AsymmetricKeyAgreement"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}Extension" maxOccurs="unbounded"/>
- *       &lt;/choice>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="AuthenticatorType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}PreviousSession"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}ResumeSession"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}DigSig"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}Password"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}ZeroKnowledge"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}SharedSecretChallengeResponse"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}SharedSecretDynamicPlaintext"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}IPAddress"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}AsymmetricDecryption"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}AsymmetricKeyAgreement"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}Extension" maxOccurs="unbounded"/&gt;
+ *       &lt;/choice&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

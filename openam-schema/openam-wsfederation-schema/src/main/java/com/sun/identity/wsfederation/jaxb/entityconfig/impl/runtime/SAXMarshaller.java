@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 package com.sun.identity.wsfederation.jaxb.entityconfig.impl.runtime;
@@ -263,7 +264,7 @@ public class SAXMarshaller implements XMLSerializer
      * c.endElement();
      * </pre>
      * 
-     * will generate <code>&lt;foo>abc def&lt;bar/>ghi&lt;/foo></code>.
+     * will generate <code>&lt;foo&gt;abc def&lt;bar/&gt;ghi&lt;/foo&gt;</code>.
      */
     public void text( String text, String fieldName ) throws SAXException {
         // If the assertion fails, it must be a bug of xjc.

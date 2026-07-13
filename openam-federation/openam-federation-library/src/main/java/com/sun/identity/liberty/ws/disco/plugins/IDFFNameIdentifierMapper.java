@@ -24,6 +24,7 @@
  *
  * $Id: IDFFNameIdentifierMapper.java,v 1.3 2008/06/25 05:47:12 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -47,7 +48,6 @@ import java.util.List;
 /**
  * The class <code>IDFFNameIdentifierMapper</code> is an implementation
  * of <code>NameIdentifierMapper</code> for Liberty ID-FF providers.
- * <p>
  *
  */
 public class IDFFNameIdentifierMapper implements NameIdentifierMapper {
