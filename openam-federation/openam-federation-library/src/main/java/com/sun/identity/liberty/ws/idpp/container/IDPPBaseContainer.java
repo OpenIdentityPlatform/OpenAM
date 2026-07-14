@@ -126,11 +126,14 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
               Iterator iter = list.iterator();
               while(iter.hasNext()) {
                  Object ob = iter.next();
+                 if(ob instanceof JAXBElement) {
+                    ob = ((JAXBElement<?>)ob).getValue();
+                 }
                  if(ob instanceof DSTString) {
                     DSTString str = (DSTString)ob;
                     String val = str.getValue();
                     values.add(val);
-                 } else if(obj instanceof DSTURI) {
+                 } else if(ob instanceof DSTURI) {
                     DSTURI uri = (DSTURI)ob;
                     String val = uri.getValue();
                     values.add(val);
@@ -148,9 +151,11 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
               value = uri.getValue();
            } else if (obj instanceof DSTDate) {
               DSTDate date = (DSTDate)obj;
-              Calendar cal = date.getValue().toGregorianCalendar();
-              if(cal != null) {
-                 value = DateFormat.getDateInstance().format(cal.getTime());
+              if(date.getValue() != null) {
+                 Calendar cal = date.getValue().toGregorianCalendar();
+                 if(cal != null) {
+                    value = DateFormat.getDateInstance().format(cal.getTime());
+                 }
               }
 
            } else if (obj instanceof DSTInteger) {
@@ -159,7 +164,9 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
 
            } else if (obj instanceof DSTMonthDay) {
               DSTMonthDay dstMon = (DSTMonthDay)obj;
-              value = dstMon.getValue().toXMLFormat();
+              if(dstMon.getValue() != null) {
+                 value = dstMon.getValue().toXMLFormat();
+              }
            }
 
            if(value != null) {

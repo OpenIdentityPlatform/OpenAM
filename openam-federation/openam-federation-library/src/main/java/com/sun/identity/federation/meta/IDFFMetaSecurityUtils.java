@@ -155,7 +155,7 @@ public final class IDFFMetaSecurityUtils {
         IDFFMetaManager metaManager = FSUtils.getIDFFMetaManager();
         EntityConfigElement config = 
             metaManager.getEntityConfig(realm, entityID);
-        if (!config.getValue().isHosted()) {
+        if (!Boolean.TRUE.equals(config.getValue().isHosted())) {
             String[] args = {entityID, realm};
             throw new IDFFMetaException("entityNotHosted", args);
         }

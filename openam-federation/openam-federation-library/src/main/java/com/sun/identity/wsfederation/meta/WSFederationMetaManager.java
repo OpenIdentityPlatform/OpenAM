@@ -833,7 +833,7 @@ public class WSFederationMetaManager {
             }
             for (String entityId : entityIds) {
                 FederationConfigElement config = getEntityConfig(realm, entityId);
-                if (config == null || !config.getValue().isHosted()) {
+                if (config == null || !Boolean.TRUE.equals(config.getValue().isHosted())) {
                     continue;
                 }
                 List<JAXBElement<BaseConfigType>> configList = config.getValue().getIDPSSOConfigOrSPSSOConfig();
@@ -896,7 +896,7 @@ public class WSFederationMetaManager {
                     String federationId = (String)iter.next();
                     FederationConfigElement config =
                                     getEntityConfig(realm, federationId);
-                    if (config != null && config.getValue().isHosted()) {
+                    if (config != null && Boolean.TRUE.equals(config.getValue().isHosted())) {
                         hostedEntityIds.add(federationId);
                     }
                 }
@@ -982,7 +982,7 @@ public class WSFederationMetaManager {
                     String federationId = (String)iter.next();
                     FederationConfigElement config =
                                     getEntityConfig(realm, federationId);
-                    if (config == null || !config.getValue().isHosted()) {
+                    if (config == null || !Boolean.TRUE.equals(config.getValue().isHosted())) {
                         remoteEntityIds.add(federationId);
                     }
                 }

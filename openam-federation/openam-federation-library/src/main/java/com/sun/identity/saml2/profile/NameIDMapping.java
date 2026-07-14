@@ -203,8 +203,9 @@ public class NameIDMapping {
 
             signNIMRequest(nimRequest, realm, spEntityID, true);
 
-            BaseConfigType config = metaManager.getIDPSSOConfig(realm,
-                idpEntityID).getValue();
+            IDPSSOConfigElement configElem = metaManager.getIDPSSOConfig(realm,
+                idpEntityID);
+            BaseConfigType config = (configElem == null) ? null : configElem.getValue();
 
             nimURL = SAML2SDKUtils.fillInBasicAuthInfo(config, nimURL);
 

@@ -834,7 +834,7 @@ public class IDFFMetaManager {
                     String entityID = (String) entityIterator.next();
                     EntityConfigElement entityConfig =
                             getEntityConfig(realm, entityID);
-                    if (entityConfig != null && entityConfig.getValue().isHosted()) {
+                    if (entityConfig != null && Boolean.TRUE.equals(entityConfig.getValue().isHosted())) {
                         hostedEntityList.add(entityID);
                     }
                 }
@@ -869,7 +869,7 @@ public class IDFFMetaManager {
                     String entityID = (String) entityIterator.next();
                     EntityConfigElement entityConfig =
                             getEntityConfig(realm, entityID);
-                    if (entityConfig != null && !entityConfig.getValue().isHosted()) {
+                    if (entityConfig != null && !Boolean.TRUE.equals(entityConfig.getValue().isHosted())) {
                         remoteEntityList.add(entityID);
                     }
                 }

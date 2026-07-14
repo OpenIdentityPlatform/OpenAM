@@ -73,8 +73,8 @@ import java.util.Date;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 
-import org.glassfish.jaxb.core.v2.model.core.ID;
 import org.w3c.dom.Document;
 
 //Interaction imports
@@ -136,18 +136,20 @@ public class PPRequestHandler extends DSTRequestHandler {
             if(request instanceof QueryElement) {
                QueryElement query = (QueryElement)request;
                Document doc = IDPPUtils.getDocumentBuilder().newDocument();
-               IDPPUtils.getMarshaller().setProperty(
+               Marshaller marshaller = IDPPUtils.getMarshaller();
+               marshaller.setProperty(
                          "org.glassfish.jaxb.namespacePrefixMapper",
                          new NamespacePrefixMapperImpl());
-               IDPPUtils.getMarshaller().marshal(query, doc);
+               marshaller.marshal(query, doc);
                return processQueryRequest(query, providerID, requestMsg, doc);
              } else if (request instanceof ModifyElement) {
                ModifyElement modify = (ModifyElement)request;
                Document doc = IDPPUtils.getDocumentBuilder().newDocument();
-               IDPPUtils.getMarshaller().setProperty(
+               Marshaller marshaller = IDPPUtils.getMarshaller();
+               marshaller.setProperty(
                          "org.glassfish.jaxb.namespacePrefixMapper",
                          new NamespacePrefixMapperImpl());
-               IDPPUtils.getMarshaller().marshal(modify, doc);
+               marshaller.marshal(modify, doc);
                return processModifyRequest(modify, providerID, requestMsg, doc);
              } else {
                IDPPUtils.debug.error("PPRequestHandler:processRequest:invalid" +

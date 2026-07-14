@@ -222,8 +222,10 @@ public class IDFFSingleLogoutHandler implements SingleLogoutHandler {
             if (currentSessionProvider != null) {
                 ProviderDescriptorType hostedProviderDesc =
                     metaManager.getIDPDescriptor(realm, idpEntityId);
-                BaseConfigType hostedConfig = 
-                    metaManager.getIDPDescriptorConfig(realm, idpEntityId).getValue();
+                IDPDescriptorConfigElement hostedConfigElt =
+                    metaManager.getIDPDescriptorConfig(realm, idpEntityId);
+                BaseConfigType hostedConfig =
+                    (hostedConfigElt == null) ? null : hostedConfigElt.getValue();
                 FSSingleLogoutHandler handlerObj = new FSSingleLogoutHandler();
                 handlerObj.setHostedDescriptor(hostedProviderDesc);
                 handlerObj.setHostedDescriptorConfig(hostedConfig);

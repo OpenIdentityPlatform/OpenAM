@@ -83,7 +83,7 @@ public class SLOLocationTest {
         com.sun.identity.saml2.jaxb.metadata.ObjectFactory of
                 = new com.sun.identity.saml2.jaxb.metadata.ObjectFactory();
 
-        SingleLogoutServiceElement ret = of.createSingleLogoutServiceElement(of.createAttributeServiceType());
+        SingleLogoutServiceElement ret = of.createSingleLogoutServiceElement(of.createEndpointType());
         ret.getValue().setBinding(binding);
         ret.getValue().setLocation(location);
         return ret;

@@ -72,6 +72,7 @@ import com.sun.identity.saml2.jaxb.metadata.AssertionIDRequestServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.AuthnAuthorityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.RoleDescriptorType;
+import jakarta.xml.bind.JAXBElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
@@ -402,14 +403,14 @@ public class AssertionIDRequestUtil {
         RoleDescriptorType roled = null;
         try {
             if (SAML2Constants.IDP_ROLE.equals(role)) {
-                roled = metaManager.getIDPSSODescriptor(realm,
-                    samlAuthorityEntityID).getValue();
+                roled = unwrap(metaManager.getIDPSSODescriptor(realm,
+                    samlAuthorityEntityID));
             } else if (SAML2Constants.AUTHN_AUTH_ROLE.equals(role)) {
-                roled = metaManager.getAuthnAuthorityDescriptor(realm,
-                    samlAuthorityEntityID).getValue();
+                roled = unwrap(metaManager.getAuthnAuthorityDescriptor(realm,
+                    samlAuthorityEntityID));
             } else if (SAML2Constants.ATTR_AUTH_ROLE.equals(role)) {
-                roled = metaManager.getAttributeAuthorityDescriptor(realm,
-                    samlAuthorityEntityID).getValue();
+                roled = unwrap(metaManager.getAttributeAuthorityDescriptor(realm,
+                    samlAuthorityEntityID));
             }
         } catch (SAML2MetaException sme) {
             SAML2Utils.debug.error("AssertionIDRequestUtil." +
@@ -644,6 +645,16 @@ public class AssertionIDRequestUtil {
         if (signingKey != null) {
             response.sign(signingKey, signingCert);
         }
+    }
+
+    /**
+     * Returns the value contained in the given JAXB element, or {@code null}
+     * if the element itself is {@code null}. The metadata lookups return
+     * {@code null} when the requested role descriptor is absent, so this
+     * guards against a {@code NullPointerException} on {@code getValue()}.
+     */
+    private static <T> T unwrap(JAXBElement<? extends T> element) {
+        return (element == null) ? null : element.getValue();
     }
 
     private static String fillInBasicAuthInfo(String location, String realm,

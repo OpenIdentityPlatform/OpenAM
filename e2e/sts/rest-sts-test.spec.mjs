@@ -33,20 +33,15 @@ const __dirname = resolve(__filename, "..");
 // Get admin token
 async function getAuthToken(request, username, password) {
   const resp = await request.post(`${BASE_URL}/json/authenticate`, {
-    headers: { 
+    headers: {
       "Content-Type": "application/json",
       "X-OpenAM-Username": username,
       "X-OpenAM-Password": password,
-      "Content-Type": "application/json",
       "Accept-API-Version": "resource=2.0, protocol=1.0",
     }
   });
   const json = await resp.json();
   return json.tokenId;
-}
-
-async function setupSts(request) {
-  
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────

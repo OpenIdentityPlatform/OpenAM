@@ -46,6 +46,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.workflow.WorkflowException;
 import java.util.List;
 import java.util.Map;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.w3c.dom.Document;
@@ -138,14 +139,14 @@ public class ImportEntityModelImpl extends AMModelBase
             if (extendedMetaData != null) {
                 configElt = getEntityConfigElement();
 
-                if (configElt != null && configElt.getValue().isHosted()) {
-                    List config = 
+                if (configElt != null && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
+                    List<JAXBElement<BaseConfigType>> config =
                        configElt.getValue().getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
                     if (!config.isEmpty()) {
-                        BaseConfigType bConfig = (BaseConfigType)
-                            config.iterator().next();
-                        
-                        // get the realm from the extended meta and use 
+                        BaseConfigType bConfig =
+                            config.iterator().next().getValue();
+
+                        // get the realm from the extended meta and use
                         // for import
                         realm = SAML2MetaUtils.getRealmByMetaAlias(
                             bConfig.getMetaAlias());                     
@@ -236,7 +237,7 @@ public class ImportEntityModelImpl extends AMModelBase
             if (extendedMetaData != null) {
                 configElt = getIDFFEntityConfigElement();
                 
-                if ((configElt != null) && configElt.getValue().isHosted()) {
+                if ((configElt != null) && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
                     IDPDescriptorConfigElement idpConfig = 
                         IDFFMetaUtils.getIDPDescriptorConfig(configElt);
                     if (idpConfig != null) {
@@ -310,12 +311,11 @@ public class ImportEntityModelImpl extends AMModelBase
                  * see note at the end of this class for how we decide
                  * the realm value
                  */
-                if (configElt != null && configElt.getValue().isHosted()) {
-                    List config = configElt.getValue().getIDPSSOConfigOrSPSSOConfig();
+                if (configElt != null && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
+                    List<JAXBElement<com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType>> config = configElt.getValue().getIDPSSOConfigOrSPSSOConfig();
                     if (!config.isEmpty()) {
-                        com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType bConfig = 
-                            (com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType)
-                            config.iterator().next();
+                        com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType bConfig =
+                            config.iterator().next().getValue();
                         realm = WSFederationMetaUtils.getRealmByMetaAlias(
                             bConfig.getMetaAlias());
                     }

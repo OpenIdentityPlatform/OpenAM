@@ -189,7 +189,7 @@ public class ImportMetaData extends AuthenticatedCommand {
                  * see note at the end of this class for how we decide
                  * the realm value
                  */
-                if (configElt != null && configElt.getValue().isHosted()) {
+                if (configElt != null && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
                     List<BaseConfigType> config = configElt.getValue().
                        getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig()
                             .stream().map(JAXBElement::getValue).collect(Collectors.toList());
@@ -261,7 +261,7 @@ public class ImportMetaData extends AuthenticatedCommand {
                  * see note at the end of this class for how we decide
                  * the realm value
                  */
-                if ((configElt != null) && configElt.getValue().isHosted()) {
+                if ((configElt != null) && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
                     IDPDescriptorConfigElement idpConfig =
                         IDFFMetaUtils.getIDPDescriptorConfig(configElt);
                     if (idpConfig != null) {
@@ -321,7 +321,7 @@ public class ImportMetaData extends AuthenticatedCommand {
                  * see note at the end of this class for how we decide
                  * the realm value
                  */
-                if (configElt != null && configElt.getValue().isHosted()) {
+                if (configElt != null && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
                     List<com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType> config =
                             configElt.getValue().getIDPSSOConfigOrSPSSOConfig()
                                     .stream().map(JAXBElement::getValue).collect(Collectors.toList());

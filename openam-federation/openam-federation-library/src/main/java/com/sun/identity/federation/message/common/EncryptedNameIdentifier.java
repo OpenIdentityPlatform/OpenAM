@@ -33,6 +33,8 @@ import com.sun.identity.federation.common.FSException;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.key.EncInfo;
 import com.sun.identity.federation.key.KeyUtil;
 import com.sun.identity.federation.meta.IDFFMetaException;
@@ -222,11 +224,13 @@ public class EncryptedNameIdentifier {
         
         BaseConfigType providerConfig = null;
         try {
-            providerConfig = FSUtils.getIDFFMetaManager().
-                getSPDescriptorConfig(realm, providerID).getValue();
+            SPDescriptorConfigElement spConfigElem = FSUtils.getIDFFMetaManager().
+                getSPDescriptorConfig(realm, providerID);
+            providerConfig = (spConfigElem == null) ? null : spConfigElem.getValue();
             if (providerConfig == null) {
-                providerConfig = FSUtils.getIDFFMetaManager().
-                    getIDPDescriptorConfig(realm, providerID).getValue();
+                IDPDescriptorConfigElement idpConfigElem = FSUtils.getIDFFMetaManager().
+                    getIDPDescriptorConfig(realm, providerID);
+                providerConfig = (idpConfigElem == null) ? null : idpConfigElem.getValue();
             }
         } catch (Exception ae) {
             FSUtils.debug.error("EncryptedNameIdentifier.getDecryptedName" +

@@ -493,8 +493,10 @@ public class IDFFModelImpl
             manager = getIDFFMetaManager();
             String metaAlias = null;
 
-            BaseConfigType idpConfig =
-                    manager.getIDPDescriptorConfig(realm, entityName).getValue();
+            IDPDescriptorConfigElement idpConfigElement =
+                    manager.getIDPDescriptorConfig(realm, entityName);
+            BaseConfigType idpConfig = (idpConfigElement != null)
+                    ? idpConfigElement.getValue() : null;
             if (idpConfig != null) {
                 map = IDFFMetaUtils.getAttributes(idpConfig);
                 metaAlias = idpConfig.getMetaAlias();
@@ -561,8 +563,10 @@ public class IDFFModelImpl
             manager = getIDFFMetaManager();
             String metaAlias = null;
 
-            BaseConfigType spConfig =
-                    manager.getSPDescriptorConfig(realm, entityName).getValue();
+            SPDescriptorConfigElement spConfigElement =
+                    manager.getSPDescriptorConfig(realm, entityName);
+            BaseConfigType spConfig = (spConfigElement != null)
+                    ? spConfigElement.getValue() : null;
             if (spConfig != null) {
                 map = IDFFMetaUtils.getAttributes(spConfig);
                 metaAlias = spConfig.getMetaAlias();
@@ -1243,8 +1247,10 @@ public class IDFFModelImpl
             IDFFMetaManager manager = getIDFFMetaManager();
             Map map = new HashMap();
 
-            BaseConfigType idpConfig =
-                    manager.getIDPDescriptorConfig(realm, entityName).getValue();
+            IDPDescriptorConfigElement idpConfigElement =
+                    manager.getIDPDescriptorConfig(realm, entityName);
+            BaseConfigType idpConfig = (idpConfigElement != null)
+                    ? idpConfigElement.getValue() : null;
             if (idpConfig != null) {
                 map = IDFFMetaUtils.getAttributes(idpConfig);
             } else {
@@ -1302,8 +1308,10 @@ public class IDFFModelImpl
             IDFFMetaManager manager = getIDFFMetaManager();
             Map map = new HashMap();
 
-            BaseConfigType spConfig =
-                    manager.getSPDescriptorConfig(realm, entityName).getValue();
+            SPDescriptorConfigElement spConfigElement =
+                    manager.getSPDescriptorConfig(realm, entityName);
+            BaseConfigType spConfig = (spConfigElement != null)
+                    ? spConfigElement.getValue() : null;
             if (spConfig != null) {
                 map = IDFFMetaUtils.getAttributes(spConfig);
             } else {
@@ -1364,7 +1372,7 @@ public class IDFFModelImpl
             // It could have one sp and one idp.
             if ((role.equals(IFSConstants.SP)) &&
                     (IDFFMetaUtils.getSPDescriptor(entityDesc) != null)) {
-                baseCfgType = new BaseConfigType() {};
+                baseCfgType = objFactory.createBaseConfigType();
 
                 for (Iterator<String> iter = extendedMetaMap.keySet().iterator();
                      iter.hasNext();) {
@@ -1386,7 +1394,7 @@ public class IDFFModelImpl
                 entityConfig.getValue().getSPDescriptorConfig().add(objFactory.createSPDescriptorConfigElement(baseCfgType));
             } else if ((role.equals(IFSConstants.IDP)) &&
                     (IDFFMetaUtils.getIDPDescriptor(entityDesc) != null)) {
-                baseCfgType = new BaseConfigType() {};
+                baseCfgType = objFactory.createBaseConfigType();
 
                 for (Iterator iter = extendedMetaMap.keySet().iterator();
                         iter.hasNext();) {
@@ -1490,10 +1498,12 @@ public class IDFFModelImpl
                 values.put(ATTR_AFFILIATE_OWNER_ID,
                         returnEmptySetIfValueIsNull(aDesc.getAffiliationOwnerID()));                               
 
-                BaseConfigType affiliationConfig =
+                com.sun.identity.federation.jaxb.entityconfig.AffiliationDescriptorConfigElement affiliationConfigElement =
                         idffManager.getAffiliationDescriptorConfig(
-                        realm, 
-                        entityName).getValue();
+                        realm,
+                        entityName);
+                BaseConfigType affiliationConfig = (affiliationConfigElement != null)
+                        ? affiliationConfigElement.getValue() : null;
 
                 if (affiliationConfig != null) {
                     Map map = IDFFMetaUtils.getAttributes(affiliationConfig);                                       

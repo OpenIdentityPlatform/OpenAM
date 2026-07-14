@@ -987,7 +987,7 @@ public class AttributeQueryUtil {
     }
 
     private static boolean isSameAttribute(Attribute desired, AttributeElement supported) {
-        return desired.getName().equals(supported.getName())
+        return desired.getName().equals(supported.getValue().getName())
                 && isNameFormatMatching(desired.getNameFormat(), supported.getValue().getNameFormat());
     }
 
@@ -1191,7 +1191,7 @@ public class AttributeQueryUtil {
         return ((attrQueryProfile.equals(
             SAML2Constants.DEFAULT_ATTR_QUERY_PROFILE)) ||
             (SAML2Constants.X509_SUBJECT_ATTR_QUERY_PROFILE.equals(
-            attrQueryProfile) && attrService.getValue().isSupportsX509Query()));
+            attrQueryProfile) && Boolean.TRUE.equals(attrService.getValue().isSupportsX509Query())));
     }
 
     /** 
@@ -1255,6 +1255,9 @@ public class AttributeQueryUtil {
             AttributeAuthorityConfigElement config =
                 metaManager.getAttributeAuthorityConfig(realm,
                 attrAuthorityEntityID);
+            if (config == null) {
+                return null;
+            }
             Map<String, List<String>> attrs = SAML2MetaUtils.getAttributes(config.getValue());
             String value = null;
             List<String> values = attrs.get(attrName);

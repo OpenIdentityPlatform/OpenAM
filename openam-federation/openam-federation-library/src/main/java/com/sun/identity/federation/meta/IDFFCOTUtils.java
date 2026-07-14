@@ -29,8 +29,10 @@
  */
 package com.sun.identity.federation.meta;
 
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import com.sun.identity.cot.COTConstants;
+import com.sun.identity.federation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement;
@@ -115,7 +117,7 @@ public class IDFFCOTUtils {
             }
             if (entityDesc.getValue().getAffiliationDescriptor() != null) {
                 IDFFCOTUtils =
-                        new BaseConfigType() {};;
+                        new BaseConfigType() {};
                 IDFFCOTUtils.getAttribute().add(objFactory.createAttributeElement(atype));
                 entityConfig.getValue().setAffiliationDescriptorConfig(
                         objFactory.createAffiliationDescriptorConfigElement(IDFFCOTUtils));
@@ -223,10 +225,10 @@ public class IDFFCOTUtils {
             throws IDFFMetaException,JAXBException {
         boolean foundCOT = false;
         for (Iterator iter = configList.iterator(); iter.hasNext();) {
-            BaseConfigType bConfig = (BaseConfigType)iter.next();
+            BaseConfigType bConfig = getBaseConfig(iter.next());
             List list = bConfig.getAttribute();
             for (Iterator iter2 = list.iterator(); iter2.hasNext();) {
-                AttributeType avp = (AttributeType)iter2.next();
+                AttributeType avp = ((AttributeElement)iter2.next()).getValue();
                 if (avp.getName().trim().equalsIgnoreCase(COT_LIST)) {
                     foundCOT = true;
                     List avpl = avp.getValue();
@@ -242,7 +244,7 @@ public class IDFFCOTUtils {
                 AttributeType atype = objFactory.createAttributeType();
                 atype.setName(COT_LIST);
                 atype.getValue().add(cotName);
-                list.add(atype);
+                list.add(objFactory.createAttributeElement(atype));
                 idffMetaMgr.setEntityConfig(realm, entityConfig);
             }
         }
@@ -260,10 +262,10 @@ public class IDFFCOTUtils {
             IDFFMetaManager idffMetaMgr)
             throws IDFFMetaException {
         for (Iterator iter = configList.iterator(); iter.hasNext();) {
-            BaseConfigType bConfig = (BaseConfigType)iter.next();
+            BaseConfigType bConfig = getBaseConfig(iter.next());
             List list = bConfig.getAttribute();
             for (Iterator iter2 = list.iterator(); iter2.hasNext();) {
-                AttributeType avp = (AttributeType)iter2.next();
+                AttributeType avp = ((AttributeElement)iter2.next()).getValue();
                 if (avp.getName().trim().equalsIgnoreCase(COT_LIST)) {
                     List avpl = avp.getValue();
                     if (avpl != null && !avpl.isEmpty() &&
@@ -275,5 +277,18 @@ public class IDFFCOTUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Unwraps a descriptor config list entry to its {@link BaseConfigType}.
+     * The SP/IDP descriptor config lists hold {@code JAXBElement} wrappers
+     * (e.g. {@code SPDescriptorConfigElement}), while the affiliation config
+     * is passed in unwrapped, so both shapes are handled here.
+     */
+    private static BaseConfigType getBaseConfig(Object item) {
+        if (item instanceof JAXBElement) {
+            return (BaseConfigType) ((JAXBElement) item).getValue();
+        }
+        return (BaseConfigType) item;
     }
 }

@@ -206,7 +206,7 @@ public class CreateWSFedMetaDataTemplate {
             objFactory.createSingleSignOutNotificationEndpointElement(new EndpointReferenceType());
         AttributedURIType ssneUri = addrObjFactory.createAttributedURIType();
         ssneUri.setValue(url + "/WSFederationServlet" + maStr);
-        ssne.getValue().setAddress(auri);
+        ssne.getValue().setAddress(ssneUri);
         fed.getValue().getAny().add(ssne);
     }
         
@@ -275,7 +275,7 @@ public class CreateWSFedMetaDataTemplate {
         };
 
         com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement 
-            idpSSOConfig = objFactory.createIDPSSOConfigElement(new BaseConfigType() {});
+            idpSSOConfig = objFactory.createIDPSSOConfigElement(objFactory.createBaseConfigType());
 
         idpSSOConfig.getValue().setMetaAlias(idpAlias);
 
@@ -337,7 +337,7 @@ public class CreateWSFedMetaDataTemplate {
         };
 
         com.sun.identity.wsfederation.jaxb.entityconfig.SPSSOConfigElement 
-            spSSOConfig = objFactory.createSPSSOConfigElement(new BaseConfigType() {});
+            spSSOConfig = objFactory.createSPSSOConfigElement(objFactory.createBaseConfigType());
 
         spSSOConfig.getValue().setMetaAlias(spAlias);
 

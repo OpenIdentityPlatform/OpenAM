@@ -374,7 +374,8 @@ public class SPSSOFederate {
         StringBuilder redirectURL =
                 new StringBuilder().append(ssoURL).append(ssoURL.contains("?") ? "&" : "?");
         // sign the query string
-        if (idpsso.getValue().isWantAuthnRequestsSigned() || spsso.getValue().isAuthnRequestsSigned()) {
+        if (Boolean.TRUE.equals(idpsso.getValue().isWantAuthnRequestsSigned())
+                || Boolean.TRUE.equals(spsso.getValue().isAuthnRequestsSigned())) {
             String certAlias = getParameter(spConfigAttrsMap, SAML2Constants.SIGNING_CERT_ALIAS);
             String signedQueryStr = signQueryString(queryString.toString(), certAlias);
             redirectURL.append(signedQueryStr);
@@ -445,7 +446,8 @@ public class SPSSOFederate {
                                             Map spConfigAttrsMap, AuthnRequest authnRequest)
             throws SAML2Exception {
 
-        if (idpsso.getValue().isWantAuthnRequestsSigned() || spsso.getValue().isAuthnRequestsSigned()) {
+        if (Boolean.TRUE.equals(idpsso.getValue().isWantAuthnRequestsSigned())
+                || Boolean.TRUE.equals(spsso.getValue().isAuthnRequestsSigned())) {
             String certAlias = getParameter(spConfigAttrsMap, SAML2Constants.SIGNING_CERT_ALIAS);
             signAuthnRequest(certAlias, authnRequest);
         }
@@ -997,7 +999,7 @@ public class SPSSOFederate {
             while (ac.hasNext()) {
                 AssertionConsumerServiceElement ace =
                     (AssertionConsumerServiceElement) ac.next();
-                if ((ace != null && ace.getValue().isIsDefault()) &&
+                if ((ace != null && Boolean.TRUE.equals(ace.getValue().isIsDefault())) &&
                   (responseBinding == null || responseBinding.length() ==0 )) {
                     acsURL = ace.getValue().getLocation();
                     responseBinding = ace.getValue().getBinding();

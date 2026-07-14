@@ -143,8 +143,12 @@
                             <include>joda-time:joda-time</include>
                             <include>org.slf4j:slf4j-api</include>
                             <include>external:jdmkrt</include>
-                            <include>jakarta.xml.bind:jaxb-api</include>
+                            <include>jakarta.xml.bind:jakarta.xml.bind-api</include>
                             <include>org.glassfish.jaxb:jaxb-runtime</include>
+                            <include>org.glassfish.jaxb:jaxb-core</include>
+                            <include>com.sun.istack:istack-commons-runtime</include>
+                            <include>org.glassfish.jaxb:txw2</include>
+                            <include>jakarta.activation:jakarta.activation-api</include>
                         </includes>
                     </artifactSet>
                     <filters>

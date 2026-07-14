@@ -184,7 +184,7 @@ public class GetIDPSPPairingInCOT
             for (Iterator i = entities.iterator(); i.hasNext();) {
                 String entityId = (String) i.next();
                 EntityConfigElement elm = mgr.getEntityConfig(realm, entityId);
-                if (elm.getValue().isHosted() == hosted) {
+                if (Boolean.TRUE.equals(elm.getValue().isHosted()) == hosted) {
                     EntityDescriptorElement desc = mgr.getEntityDescriptor(
                         realm, entityId);
                     

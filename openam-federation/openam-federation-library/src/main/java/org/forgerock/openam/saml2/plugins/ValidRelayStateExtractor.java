@@ -18,6 +18,8 @@ package org.forgerock.openam.saml2.plugins;
 
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
@@ -43,9 +45,11 @@ public class ValidRelayStateExtractor implements ValidDomainExtractor<ValidRelay
             final SAML2MetaManager metaManager = new SAML2MetaManager();
 
             if (SAML2Constants.SP_ROLE.equalsIgnoreCase(entityInfo.role)) {
-                config = metaManager.getSPSSOConfig(entityInfo.realm, entityInfo.entityID).getValue();
+                SPSSOConfigElement configElem = metaManager.getSPSSOConfig(entityInfo.realm, entityInfo.entityID);
+                config = (configElem == null) ? null : configElem.getValue();
             } else {
-                config = metaManager.getIDPSSOConfig(entityInfo.realm, entityInfo.entityID).getValue();
+                IDPSSOConfigElement configElem = metaManager.getIDPSSOConfig(entityInfo.realm, entityInfo.entityID);
+                config = (configElem == null) ? null : configElem.getValue();
             }
 
             if (config == null) {

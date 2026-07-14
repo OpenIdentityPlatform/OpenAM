@@ -162,7 +162,7 @@ public class SAMLv2SPServicesViewBean extends SAMLv2Base {
             AssertionConsumerServiceElement acsElem =
                 (AssertionConsumerServiceElement) assertionConServices.get(i);
             tblAssertionConsumerModel.setValue(
-                    TBL_DATA_DEFAULT, String.valueOf(acsElem.getValue().isIsDefault()));
+                    TBL_DATA_DEFAULT, String.valueOf(Boolean.TRUE.equals(acsElem.getValue().isIsDefault())));
             tblAssertionConsumerModel.setValue(TBL_DATA_TYPE, (
                     (acsElem.getValue().getBinding()).substring(37)));
             tblAssertionConsumerModel.setValue(TBL_DATA_LABEL, (

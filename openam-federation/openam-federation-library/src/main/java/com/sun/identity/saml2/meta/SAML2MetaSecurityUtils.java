@@ -70,6 +70,7 @@ import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml.xmlsig.XMLSignatureException;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 
+import com.sun.identity.saml2.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeType;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement; 
@@ -182,7 +183,7 @@ public final class SAML2MetaSecurityUtils {
             //if there is no EntityConfig, this is considered as a remote entity
             isHosted = false;
         } else {
-            isHosted = cfgElem.getValue().isHosted();
+            isHosted = Boolean.TRUE.equals(cfgElem.getValue().isHosted());
         }
 
         String signingCert = getRealmSetting(METADATA_SIGNING_KEY, realm);
@@ -472,7 +473,7 @@ public final class SAML2MetaSecurityUtils {
         SAML2MetaManager metaManager = new SAML2MetaManager();
         EntityConfigElement config = 
             metaManager.getEntityConfig(realm, entityID);
-        if (!config.getValue().isHosted()) {
+        if (!Boolean.TRUE.equals(config.getValue().isHosted())) {
             String[] args = {entityID, realm};
             throw new SAML2MetaException("entityNotHosted", args);
         }
@@ -480,15 +481,19 @@ public final class SAML2MetaSecurityUtils {
         BaseConfigType baseConfig;
         RoleDescriptorType descriptor;
         if (isIDP) {
-            baseConfig = SAML2MetaUtils.getIDPSSOConfig(config).getValue();
-            descriptor = SAML2MetaUtils.getIDPSSODescriptor(desp).getValue();
+            IDPSSOConfigElement baseConfigElem = SAML2MetaUtils.getIDPSSOConfig(config);
+            IDPSSODescriptorElement descriptorElem = SAML2MetaUtils.getIDPSSODescriptor(desp);
+            baseConfig = (baseConfigElem == null) ? null : baseConfigElem.getValue();
+            descriptor = (descriptorElem == null) ? null : descriptorElem.getValue();
             if (baseConfig == null || descriptor == null) {
                 String[] args = {entityID, realm};
                 throw new SAML2MetaException("entityNotIDP", args);
             }
         } else {
-            baseConfig = SAML2MetaUtils.getSPSSOConfig(config).getValue();
-            descriptor = SAML2MetaUtils.getSPSSODescriptor(desp).getValue();
+            SPSSOConfigElement baseConfigElem = SAML2MetaUtils.getSPSSOConfig(config);
+            SPSSODescriptorElement descriptorElem = SAML2MetaUtils.getSPSSODescriptor(desp);
+            baseConfig = (baseConfigElem == null) ? null : baseConfigElem.getValue();
+            descriptor = (descriptorElem == null) ? null : descriptorElem.getValue();
             if (baseConfig == null || descriptor == null) {
                 String[] args = {entityID, realm};
                 throw new SAML2MetaException("entityNotSP", args);
@@ -562,7 +567,7 @@ public final class SAML2MetaSecurityUtils {
         String attrName, Set attrVal) throws SAML2MetaException {
         List attributes = config.getAttribute();
         for(Iterator iter = attributes.iterator(); iter.hasNext();) {
-            AttributeType avp = (AttributeType)iter.next();
+            AttributeType avp = ((AttributeElement)iter.next()).getValue();
             if (avp.getName().trim().equalsIgnoreCase(attrName)) {
                  iter.remove();
             }

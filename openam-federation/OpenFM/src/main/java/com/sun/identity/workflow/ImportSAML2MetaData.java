@@ -74,7 +74,7 @@ public class ImportSAML2MetaData {
                 Object obj = SAML2MetaUtils.convertStringToJAXB(extended);
                 configElt = (obj instanceof EntityConfigElement) ?
                     (EntityConfigElement)obj : null;
-                if (configElt != null && configElt.getValue().isHosted()) {
+                if (configElt != null && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
                     List<JAXBElement<BaseConfigType>> config =
                     configElt.getValue().getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
                     if (!config.isEmpty()) {

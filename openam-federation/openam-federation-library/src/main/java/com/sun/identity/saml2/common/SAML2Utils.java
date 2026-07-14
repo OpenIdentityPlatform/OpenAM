@@ -492,7 +492,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             throw new SAML2Exception(SAML2Utils.bundle.getString("missingAssertion"));
         }
 
-        boolean wantAssertionsSigned = spDesc.getValue().isWantAssertionsSigned();
+        boolean wantAssertionsSigned = Boolean.TRUE.equals(spDesc.getValue().isWantAssertionsSigned());
         if (debug.messageEnabled()) {
             debug.message(method + "wantAssertionsSigned is :" + wantAssertionsSigned);
         }
@@ -553,7 +553,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 if (verificationCerts == null) {
                     idp = saml2MetaManager.getIDPSSODescriptor(
                             orgName, idpEntityId);
-                    verificationCerts = KeyUtil.getVerificationCerts(idp.getValue(), idpEntityId, SAML2Constants.IDP_ROLE);
+                    verificationCerts = KeyUtil.getVerificationCerts(unwrap(idp), idpEntityId, SAML2Constants.IDP_ROLE);
                 }
                 if (CollectionUtils.isEmpty(verificationCerts) || !assertion.isSignatureValid(verificationCerts)) {
                     debug.error(method +
@@ -2191,21 +2191,21 @@ public class SAML2Utils extends SAML2SDKUtils {
         try {
             BaseConfigType config = null;
             if (entityRole.equalsIgnoreCase(SAML2Constants.SP_ROLE)) {
-                config = saml2MetaManager.getSPSSOConfig(realm, hostEntityId).getValue();
+                config = unwrap(saml2MetaManager.getSPSSOConfig(realm, hostEntityId));
             } else if (entityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
-                config = saml2MetaManager.getIDPSSOConfig(realm, hostEntityId).getValue();
+                config = unwrap(saml2MetaManager.getIDPSSOConfig(realm, hostEntityId));
             } else if (entityRole.equalsIgnoreCase(
                     SAML2Constants.ATTR_AUTH_ROLE)) {
-                config = saml2MetaManager.getAttributeAuthorityConfig(realm,
-                        hostEntityId).getValue();
+                config = unwrap(saml2MetaManager.getAttributeAuthorityConfig(realm,
+                        hostEntityId));
             } else if (entityRole.equalsIgnoreCase(
                     SAML2Constants.AUTHN_AUTH_ROLE)) {
-                config = saml2MetaManager.getAuthnAuthorityConfig(realm,
-                        hostEntityId).getValue();
+                config = unwrap(saml2MetaManager.getAuthnAuthorityConfig(realm,
+                        hostEntityId));
             } else if (entityRole.equalsIgnoreCase(
                     SAML2Constants.ATTR_QUERY_ROLE)) {
-                config = saml2MetaManager.getAttributeQueryConfig(realm,
-                        hostEntityId).getValue();
+                config = unwrap(saml2MetaManager.getAttributeQueryConfig(realm,
+                        hostEntityId));
             }
 
             if (config == null) {
@@ -2220,6 +2220,16 @@ public class SAML2Utils extends SAML2SDKUtils {
             debug.message("get SSOConfig failed:", e);
         }
         return null;
+    }
+
+    /**
+     * Returns the value contained in the given JAXB element, or {@code null}
+     * if the element itself is {@code null}. The metadata/config lookups
+     * return {@code null} when the requested role or config is absent, so
+     * this guards against a {@code NullPointerException} on {@code getValue()}.
+     */
+    private static <T> T unwrap(JAXBElement<? extends T> element) {
+        return (element == null) ? null : element.getValue();
     }
 
     /**
@@ -3554,9 +3564,9 @@ public class SAML2Utils extends SAML2SDKUtils {
         try {
             BaseConfigType config = null;
             if (role.equals(SAML2Constants.SP_ROLE)) {
-                config = saml2MetaManager.getSPSSOConfig(realm, hostEntityID).getValue();
+                config = unwrap(saml2MetaManager.getSPSSOConfig(realm, hostEntityID));
             } else if (role.equals(SAML2Constants.IDP_ROLE)) {
-                config = saml2MetaManager.getIDPSSOConfig(realm, hostEntityID).getValue();
+                config = unwrap(saml2MetaManager.getIDPSSOConfig(realm, hostEntityID));
             }
 
 

@@ -221,7 +221,7 @@ public class TaskModelImpl
                 String entityId = (String) i.next();
                 EntityConfigElement elm = mgr.getEntityConfig(realm, entityId);
                 // elm could be null due to OPENAM-269
-                if (elm != null && elm.getValue().isHosted() == hosted) {
+                if (elm != null && Boolean.TRUE.equals(elm.getValue().isHosted()) == hosted) {
                     EntityDescriptorElement desc = mgr.getEntityDescriptor(
                             realm, entityId);
 

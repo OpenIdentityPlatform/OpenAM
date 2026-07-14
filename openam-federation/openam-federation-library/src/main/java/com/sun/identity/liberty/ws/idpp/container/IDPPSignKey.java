@@ -87,7 +87,7 @@ public class IDPPSignKey extends IDPPBaseContainer {
          x509DataType.
          getX509IssuerSerialOrX509SKIOrX509SubjectName().add(cert);
 
-         signKey.getContent().add(x509DataType);
+         signKey.getContent().add(of.createX509DataElement(x509DataType));
          SignKeyElement signKeyElement = IDPPUtils.getIDPPFactory().createSignKeyElement(signKey);
          ppType.setSignKey(signKeyElement);
          return ppType;

@@ -158,8 +158,8 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
             SAML2Utils.debug.error(classMethod, sme);
         }
 
-        if (idpSSODescriptor.getValue().isWantAuthnRequestsSigned()
-                || (spSSODescriptor != null && spSSODescriptor.getValue().isAuthnRequestsSigned())) {
+        if (Boolean.TRUE.equals(idpSSODescriptor.getValue().isWantAuthnRequestsSigned())
+                || (spSSODescriptor != null && Boolean.TRUE.equals(spSSODescriptor.getValue().isAuthnRequestsSigned()))) {
             // need to verify the query string containing authnRequest
             if (StringUtils.isBlank(data.getSpEntityID())) {
                 throw new ClientFaultException(data.getIdpAdapter(), INVALID_SAML_REQUEST);

@@ -38,6 +38,7 @@
 package com.sun.identity.federation.meta;
 
 import com.sun.identity.federation.common.IFSConstants;
+import com.sun.identity.federation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement;
@@ -298,7 +299,7 @@ public class IDFFMetaUtils {
         Map attrMap = new HashMap();
         List list = config.getAttribute();
         for(Iterator iter = list.iterator(); iter.hasNext();) {
-            AttributeType avp = (AttributeType)iter.next();
+            AttributeType avp = ((AttributeElement)iter.next()).getValue();
             attrMap.put(avp.getName(), avp.getValue());
         }
 

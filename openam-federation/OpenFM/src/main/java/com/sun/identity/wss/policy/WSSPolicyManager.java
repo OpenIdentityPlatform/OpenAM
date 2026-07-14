@@ -117,7 +117,7 @@ public class WSSPolicyManager {
         try {
             PolicyElement policyElement = wsPolicyFactory.createPolicyElement();           
             ExactlyOneElement exactlyOneElement = 
-                    wsPolicyFactory.createExactlyOneElement(wsPolicyFactory.createPolicyElement());
+                    wsPolicyFactory.createExactlyOneElement(wsPolicyFactory.createOperatorContentType());
             //TODO - Need to add a config in the WSP config and then create the
             // issued token policy.
             boolean useIssuedTokenPolicy = false;
@@ -128,7 +128,7 @@ public class WSSPolicyManager {
             }
             for (Iterator iter = securityMech.iterator(); iter.hasNext();) {
                 String secMech = (String)iter.next();
-                AllElement allElement = wsPolicyFactory.createAllElement(wsPolicyFactory.createPolicyElement());
+                AllElement allElement = wsPolicyFactory.createAllElement(wsPolicyFactory.createOperatorContentType());
                 if(SecurityMechanism.WSS_NULL_KERBEROS_TOKEN_URI.equals(
                         secMech)) {
                    SymmetricBindingElement sbe =
@@ -246,8 +246,8 @@ public class WSSPolicyManager {
         try {
             PolicyElement policyElement = wsPolicyFactory.createPolicyElement();           
             ExactlyOneElement exactlyOneElement = 
-                    wsPolicyFactory.createExactlyOneElement(wsPolicyFactory.createPolicyElement());
-            AllElement allElement = wsPolicyFactory.createAllElement(wsPolicyFactory.createPolicyElement());
+                    wsPolicyFactory.createExactlyOneElement(wsPolicyFactory.createOperatorContentType());
+            AllElement allElement = wsPolicyFactory.createAllElement(wsPolicyFactory.createOperatorContentType());
             
             policyElement.getPolicyOrAllOrExactlyOne().add(exactlyOneElement);
             
@@ -299,8 +299,8 @@ public class WSSPolicyManager {
         try {
             PolicyElement policyElement = wsPolicyFactory.createPolicyElement();           
             ExactlyOneElement exactlyOneElement = 
-                    wsPolicyFactory.createExactlyOneElement(wsPolicyFactory.createPolicyElement());
-            AllElement allElement = wsPolicyFactory.createAllElement(wsPolicyFactory.createPolicyElement());
+                    wsPolicyFactory.createExactlyOneElement(wsPolicyFactory.createOperatorContentType());
+            AllElement allElement = wsPolicyFactory.createAllElement(wsPolicyFactory.createOperatorContentType());
             
             policyElement.getPolicyOrAllOrExactlyOne().add(exactlyOneElement);
            

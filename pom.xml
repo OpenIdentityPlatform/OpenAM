@@ -97,7 +97,6 @@
     <!--         <esapiport.version>2013-12-04</esapiport.version> -->
     <geoip.version>2.0.0</geoip.version>
     <jaxb.version>2.2.11</jaxb.version>
-    <jaxb1.version>2.2.5-1</jaxb1.version>
     <jaxrpc-api.version>1.1</jaxrpc-api.version>
     <!--         <jaxrpc-impl.version>1.1.3_01-20160905</jaxrpc-impl.version> -->
     <jaxrpc-impl.version>1.1.3_01</jaxrpc-impl.version>

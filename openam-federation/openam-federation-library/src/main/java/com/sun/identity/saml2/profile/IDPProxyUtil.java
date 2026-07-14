@@ -219,8 +219,8 @@ public class IDPProxyUtil {
         IDPCache.proxySPAuthnReqCache.put(requestID, authnRequest);
 
 
-        boolean signingNeeded = idpDescriptor.getValue().isWantAuthnRequestsSigned()
-                || localDescriptor.getValue().isAuthnRequestsSigned();
+        boolean signingNeeded = Boolean.TRUE.equals(idpDescriptor.getValue().isWantAuthnRequestsSigned())
+                || Boolean.TRUE.equals(localDescriptor.getValue().isAuthnRequestsSigned());
 
         // check if relayState is present and get the unique
         // id which will be appended to the SSO URL before

@@ -1237,7 +1237,7 @@ public class SAML2MetaManager {
                     String entityId = (String)iter.next();
                     EntityConfigElement config =
                                     getEntityConfig(realm, entityId);
-                    if (config != null && config.getValue().isHosted()) {
+                    if (config != null && Boolean.TRUE.equals(config.getValue().isHosted())) {
                         hostedEntityIds.add(entityId);
                     }
                 }
@@ -1408,7 +1408,7 @@ public class SAML2MetaManager {
                     String entityId = (String)iter.next();
                     EntityConfigElement config =
                                     getEntityConfig(realm, entityId);
-                    if (config == null || !config.getValue().isHosted()) {
+                    if (config == null || !Boolean.TRUE.equals(config.getValue().isHosted())) {
                         remoteEntityIds.add(entityId);
                     }
                 }
@@ -1492,7 +1492,7 @@ public class SAML2MetaManager {
             for (Iterator iter = entityIds.iterator(); iter.hasNext();) {
                 String entityId = (String)iter.next();
                 EntityConfigElement config = getEntityConfig(realm, entityId);
-                if ((config == null) || !config.getValue().isHosted()) {
+                if ((config == null) || !Boolean.TRUE.equals(config.getValue().isHosted())) {
                     continue;
                 }
                 List<JAXBElement<BaseConfigType>> list =
@@ -1530,7 +1530,7 @@ public class SAML2MetaManager {
             }
             for (String entityId : entityIds) {
                 EntityConfigElement config = getEntityConfig(realm, entityId);
-                if (config == null || !config.getValue().isHosted()) {
+                if (config == null || !Boolean.TRUE.equals(config.getValue().isHosted())) {
                     continue;
                 }
                 List<JAXBElement<BaseConfigType>> configList = config.getValue().getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();

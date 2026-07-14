@@ -113,11 +113,11 @@ public class WSFederationCOTUtils {
             // IdP will have UriNamedClaimTypesOffered
             if (metaManager.getUriNamedClaimTypesOffered(edes) != 
                 null) {
-                bctype = objFactory.createIDPSSOConfigElement(new BaseConfigType() {});
+                bctype = objFactory.createIDPSSOConfigElement(objFactory.createBaseConfigType());
                 bctype.getValue().getAttribute().add(objFactory.createAttributeElement(atype));
                 ll.add(bctype);
             } else {
-                bctype = objFactory.createSPSSOConfigElement(new BaseConfigType() {});
+                bctype = objFactory.createSPSSOConfigElement(objFactory.createBaseConfigType());
                 bctype.getValue().getAttribute().add(objFactory.createAttributeElement(atype));
                 ll.add(bctype);
             }

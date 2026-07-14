@@ -57,6 +57,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
@@ -212,32 +213,32 @@ public class SMDiscoEntryData implements Serializable {
                 if (dName.equals(DiscoConstants.AUTHN_DIRECTIVE)) {
                     AuthenticateRequesterElement authenticateRequester =
                         discoFac.createAuthenticateRequesterElement(discoFac.createDirectiveType());
-                    createDirectiveEntry(de, authenticateRequester.getValue(), idRefs,
+                    createDirectiveEntry(de, authenticateRequester, idRefs,
                         descriptionTypeList);
                 } else if (dName.equals(DiscoConstants.ENCRYPT_DIRECTIVE)) {
                     EncryptResourceIDElement encryptResourceId =
                         discoFac.createEncryptResourceIDElement(discoFac.createDirectiveType());
-                    createDirectiveEntry(de, encryptResourceId.getValue(), idRefs,
+                    createDirectiveEntry(de, encryptResourceId, idRefs,
                         descriptionTypeList);
                 } else if (dName.equals(DiscoConstants.SESSION_DIRECTIVE)) {
                     AuthenticateSessionContextElement authSessionCntx =
                         discoFac.createAuthenticateSessionContextElement(discoFac.createDirectiveType());
-                    createDirectiveEntry(de, authSessionCntx.getValue(), idRefs,
+                    createDirectiveEntry(de, authSessionCntx, idRefs,
                         descriptionTypeList);
                 } else if (dName.equals(DiscoConstants.AUTHZ_DIRECTIVE)) {
                     AuthorizeRequesterElement authorizeRequester =
                         discoFac.createAuthorizeRequesterElement(discoFac.createDirectiveType());
-                    createDirectiveEntry(de, authorizeRequester.getValue(), idRefs,
+                    createDirectiveEntry(de, authorizeRequester, idRefs,
                         descriptionTypeList);
                 } else if (dName.equals(DiscoConstants.BEARER_DIRECTIVE)) {
                     GenerateBearerTokenElement bearer =
                         disco11Fac.createGenerateBearerTokenElement(discoFac.createDirectiveType());
-                    createDirectiveEntry(de, bearer.getValue(), idRefs,
+                    createDirectiveEntry(de, bearer, idRefs,
                         descriptionTypeList);
                 } else if (dName.equals(DiscoConstants.LOGOUT_DIRECTIVE)) {
                     SendSingleLogOutElement logout =
                         disco11Fac.createSendSingleLogOutElement(discoFac.createDirectiveType());
-                    createDirectiveEntry(de, logout.getValue(), idRefs,
+                    createDirectiveEntry(de, logout, idRefs,
                         descriptionTypeList);
                 }
 	    }
@@ -246,10 +247,11 @@ public class SMDiscoEntryData implements Serializable {
 
     private void createDirectiveEntry(
         DiscoEntryElement de,
-        DirectiveType dType,
+        JAXBElement<DirectiveType> directiveElement,
         List idRefs,
         List descriptionTypeList
     ) throws AMConsoleException {
+        DirectiveType dType = directiveElement.getValue();
         if (idRefs != null && !idRefs.isEmpty()) {
 	    for (Iterator iter = idRefs.iterator(); iter.hasNext(); ) {
                 String idRef = (String)iter.next();
@@ -264,7 +266,7 @@ public class SMDiscoEntryData implements Serializable {
             }
         }
 
-        de.getValue().getAny().add(dType);
+        de.getValue().getAny().add(directiveElement);
     }
 
     private DescriptionType getDescriptionType(String id, List list) {

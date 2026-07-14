@@ -86,7 +86,7 @@ public class IDPPEncryptKey extends IDPPBaseContainer {
 
             x509DataType.
                 getX509IssuerSerialOrX509SKIOrX509SubjectName().add(cert);
-            encryptKey.getValue().getContent().add(x509DataType);
+            encryptKey.getValue().getContent().add(of.createX509DataElement(x509DataType));
          }
 
          ppType.setEncryptKey(encryptKey);

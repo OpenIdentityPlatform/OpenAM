@@ -74,6 +74,8 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.AffiliationDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.ManageNameIDServiceElement;
@@ -289,9 +291,11 @@ public class DoManageNameID {
 
                 BaseConfigType config = null;
                 if (hostEntityRole.equalsIgnoreCase(SAML2Constants.SP_ROLE)) {
-                    config = metaManager.getIDPSSOConfig(realm, remoteEntityID).getValue();
+                    IDPSSOConfigElement configElem = metaManager.getIDPSSOConfig(realm, remoteEntityID);
+                    config = (configElem == null) ? null : configElem.getValue();
                 } else {
-                    config = metaManager.getSPSSOConfig(realm, remoteEntityID).getValue();
+                    SPSSOConfigElement configElem = metaManager.getSPSSOConfig(realm, remoteEntityID);
+                    config = (configElem == null) ? null : configElem.getValue();
                 }
                 mniURL = SAML2Utils.fillInBasicAuthInfo(config, mniURL);
                 if (!doMNIBySOAP(mniRequest, mniURL, metaAlias, hostEntityRole,

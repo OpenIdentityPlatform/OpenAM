@@ -38,6 +38,8 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.wsfederation.common.WSFederationException;
 import com.sun.identity.wsfederation.common.WSFederationUtils;
 import com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.wsfederation.jaxb.entityconfig.SPSSOConfigElement;
+import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 
@@ -96,11 +98,17 @@ public class DefaultAttributeMapper {
         try {
             BaseConfigType config = null;
             if(role.equals(SP)) {
-               config = WSFederationUtils.getMetaManager().getSPSSOConfig(
-                   realm, hostEntityID).getValue();
+               SPSSOConfigElement configElt = WSFederationUtils.getMetaManager().getSPSSOConfig(
+                   realm, hostEntityID);
+               if(configElt != null) {
+                  config = configElt.getValue();
+               }
             } else {
-               config = WSFederationUtils.getMetaManager().getIDPSSOConfig(
-                   realm, hostEntityID).getValue();
+               IDPSSOConfigElement configElt = WSFederationUtils.getMetaManager().getIDPSSOConfig(
+                   realm, hostEntityID);
+               if(configElt != null) {
+                  config = configElt.getValue();
+               }
             }
 
             if(config == null) {

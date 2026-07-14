@@ -234,7 +234,7 @@ public final class WSFederationMetaUtils {
         Map<String,List<String>> attrMap = new HashMap<String,List<String>>();
         List list = config.getAttribute();
         for(Iterator iter = list.iterator(); iter.hasNext();) {
-            AttributeType avp = (AttributeType)iter.next();
+            AttributeType avp = ((AttributeElement)iter.next()).getValue();
             attrMap.put(avp.getName(), avp.getValue());
         }
 
@@ -295,7 +295,7 @@ public final class WSFederationMetaUtils {
         List<AttributeElement> list = config.getAttribute();
 
         for (AttributeElement avp : list) {
-            if (avp.getName().equals(key)) {
+            if (avp.getValue().getName().equals(key)) {
                 return CollectionUtils.getFirstItem(avp.getValue().getValue());
             }
         }

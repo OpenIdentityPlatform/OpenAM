@@ -91,8 +91,8 @@ public class ConfigureGoogleApps
                     samlManager.getEntityConfig(realm, entityId);
             IDPSSOConfigElement idpssoConfig =
                     samlManager.getIDPSSOConfig(realm, entityId);
-            List attrList = idpssoConfig.getValue().getAttribute();
             if (idpssoConfig != null) {
+                List attrList = idpssoConfig.getValue().getAttribute();
                 for (Iterator it = attrList.iterator(); it.hasNext();) {
                     AttributeElement avpnew = (AttributeElement) it.next();
                     String name = avpnew.getValue().getName();

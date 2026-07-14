@@ -28,6 +28,8 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.common.WSFederationUtils;
 import com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.wsfederation.jaxb.entityconfig.SPSSOConfigElement;
+import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 
@@ -46,9 +48,13 @@ public class ValidWReplyExtractor implements ValidDomainExtractor<ValidWReplyExt
 
 
             if (SAML2Constants.SP_ROLE.equalsIgnoreCase(entityInfo.role)) {
-                config = WSFederationUtils.getMetaManager().getSPSSOConfig(entityInfo.realm, entityInfo.entityID).getValue();
+                SPSSOConfigElement configElt =
+                        WSFederationUtils.getMetaManager().getSPSSOConfig(entityInfo.realm, entityInfo.entityID);
+                config = (configElt == null) ? null : configElt.getValue();
             } else {
-                config = WSFederationUtils.getMetaManager().getIDPSSOConfig(entityInfo.realm, entityInfo.entityID).getValue();
+                IDPSSOConfigElement configElt =
+                        WSFederationUtils.getMetaManager().getIDPSSOConfig(entityInfo.realm, entityInfo.entityID);
+                config = (configElt == null) ? null : configElt.getValue();
             }
 
             if (config == null) {

@@ -32,6 +32,7 @@ package com.sun.identity.multiprotocol;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.message.FSLogoutResponse;
 import com.sun.identity.federation.message.common.FSMsgException;
 import com.sun.identity.federation.meta.IDFFMetaException;
@@ -688,8 +689,10 @@ public class SingleLogoutManager {
                     Element elem = XMLUtils.toDOMDocument(logoutResponseXML,
                         SingleLogoutManager.debug).getDocumentElement();
                     FSLogoutResponse responseLogout = new FSLogoutResponse(elem);
+                    IDPDescriptorConfigElement hostedConfigElt =
+                        metaManager.getIDPDescriptorConfig(realm, idpEntityID);
                     BaseConfigType hostedConfig =
-                        metaManager.getIDPDescriptorConfig(realm, idpEntityID).getValue();
+                        (hostedConfigElt == null) ? null : hostedConfigElt.getValue();
                     logoutDoneURL = FSServiceUtils.getLogoutDonePageURL(request,
                         hostedConfig, null);
                     Status status = responseLogout.getStatus();

@@ -392,7 +392,7 @@ public class SPACSUtils {
             IDPSSOConfigElement config = null;
             config = sm.getIDPSSOConfig(orgName, idpEntityID);
             location = SAML2Utils.fillInBasicAuthInfo(
-                config.getValue(), location);
+                config == null ? null : config.getValue(), location);
             resMsg = con.call(msg, location);
         } catch (SAML2Exception s2e) {
             SAML2Utils.debug.error("SPACSUtils.getResponseFromArtifact: "
@@ -508,7 +508,7 @@ public class SPACSUtils {
             location = ars.getValue().getLocation();
             //String binding = ars.getBinding();
             index = ars.getValue().getIndex();
-            isDefault = ars.getValue().isIsDefault();
+            isDefault = Boolean.TRUE.equals(ars.getValue().isIsDefault());
             if (index == endpointIndex) {
                 break;
             }

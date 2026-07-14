@@ -418,7 +418,7 @@ public class QueryHandlerServlet extends HttpServlet {
                     pepEntityID);
             
             EncInfo encInfo = null;
-            boolean wantAssertionSigned=pepDescriptor.getValue().isWantAssertionsSigned();
+            boolean wantAssertionSigned=Boolean.TRUE.equals(pepDescriptor.getValue().isWantAssertionsSigned());
             
             if (debug.messageEnabled()) {
                 debug.message(classMethod +

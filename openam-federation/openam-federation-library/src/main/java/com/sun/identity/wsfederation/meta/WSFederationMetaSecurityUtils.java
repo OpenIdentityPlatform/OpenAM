@@ -468,7 +468,7 @@ public final class WSFederationMetaSecurityUtils {
         WSFederationMetaManager metaManager = new WSFederationMetaManager();
         FederationConfigElement config =
             metaManager.getEntityConfig(realm, entityID);
-        if (!config.getValue().isHosted()) {
+        if (!Boolean.TRUE.equals(config.getValue().isHosted())) {
             String[] args = {entityID, realm};
             throw new WSFederationMetaException("entityNotHosted", args);
         }

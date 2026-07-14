@@ -496,7 +496,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 
                 // retrieve WantAuthnRequestsSigned
                 map.put(WANT_AUTHN_REQ_SIGNED,returnEmptySetIfValueIsNull(
-                        idpssoDescriptor.getValue().isWantAuthnRequestsSigned()));
+                        Boolean.TRUE.equals(idpssoDescriptor.getValue().isWantAuthnRequestsSigned())));
                 
                 //retrieve ArtifactResolutionService
                 map.put(ART_RES_LOCATION, Collections.EMPTY_SET);
@@ -513,7 +513,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                             returnEmptySetIfValueIsNull(Integer.toString(
                             key.getValue().getIndex())));
                     map.put(ART_RES_ISDEFAULT,
-                            returnEmptySetIfValueIsNull(key.getValue().isIsDefault()));
+                            returnEmptySetIfValueIsNull(Boolean.TRUE.equals(key.getValue().isIsDefault())));
                 }
                 //retrieve SingleLogoutService
                 map.put(SINGLE_LOGOUT_HTTP_LOCATION, Collections.EMPTY_SET);
@@ -768,10 +768,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 // retrieve WantAuthnRequestsSigned
                 map.put(IS_AUTHN_REQ_SIGNED,
                         returnEmptySetIfValueIsNull(
-                        spssoDescriptor.getValue().isAuthnRequestsSigned()));
+                        Boolean.TRUE.equals(spssoDescriptor.getValue().isAuthnRequestsSigned())));
                 map.put(WANT_ASSERTIONS_SIGNED,
                         returnEmptySetIfValueIsNull(
-                        spssoDescriptor.getValue().isWantAssertionsSigned()));
+                        Boolean.TRUE.equals(spssoDescriptor.getValue().isWantAssertionsSigned())));
                 
                 //retrieve SingleLogoutService
                 map.put(SP_SINGLE_LOGOUT_HTTP_LOCATION, Collections.EMPTY_SET);
@@ -1731,8 +1731,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                                 for (Iterator itt = keySizeList.listIterator(); 
                                     itt.hasNext(); ) { 
                                     Object encrptType = (Object)itt.next();
-                                    if (encrptType.getClass().getName().
-                                        contains("KeySizeImpl")) {
+                                    if (encrptType instanceof EncryptionMethodType.KeySize) {
                                         EncryptionMethodType.KeySize keysizeElem =
                                             (EncryptionMethodType.KeySize)
                                                 keySizeList.get(0);
@@ -1804,8 +1803,8 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     realm, entityName);
 
         if (isDualRole(entityDescriptor)) {
-            baseConfigIDP = new BaseConfigType() {};
-            baseConfigSP = new BaseConfigType() {};
+            baseConfigIDP = objFactory.createBaseConfigType();
+            baseConfigSP = objFactory.createBaseConfigType();
             baseConfigIDP = addAttributeType(extendedMetaIdpMap, baseConfigIDP);
             baseConfigSP = addAttributeType(extendedMetaSpMap, baseConfigSP);
             configList.add(objFactory.createIDPSSOConfigElement(baseConfigIDP));
@@ -1813,41 +1812,41 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         }else if (role.equals(EntityModel.IDENTITY_PROVIDER) ||
                 (idpssoDesc != null)) 
         {
-            baseConfigIDP = new BaseConfigType() {};
+            baseConfigIDP = objFactory.createBaseConfigType();
             baseConfigIDP = addAttributeType(extendedMetaIdpMap, baseConfigIDP);
             configList.add(objFactory.createIDPSSOConfigElement(baseConfigIDP));
         } else if (role.equals(EntityModel.SERVICE_PROVIDER) || 
                 (spssoDesc  != null)) 
         {
-            baseConfigSP = new BaseConfigType() {};
+            baseConfigSP = objFactory.createBaseConfigType();
             baseConfigSP = addAttributeType(extendedMetaSpMap, baseConfigSP);
             configList.add(objFactory.createSPSSOConfigElement(baseConfigSP));
         }
         if (role.equals(EntityModel.SAML_ATTRAUTHORITY) || 
                 (attrauthDescriptor != null))
         {
-            baseConfigAuth = new BaseConfigType() {};
+            baseConfigAuth = objFactory.createBaseConfigType();
             baseConfigAuth = addAttributeType(extAttrAuthMap, baseConfigAuth);
             configList.add(objFactory.createAttributeAuthorityConfigElement(baseConfigAuth));
         }
         if (role.equals(EntityModel.SAML_AUTHNAUTHORITY) ||
                 (authnauthDescriptor != null)) 
         {
-            baseConfigAuth = new BaseConfigType() {};
+            baseConfigAuth = objFactory.createBaseConfigType();
             baseConfigAuth = addAttributeType(extAuthnAuthMap, baseConfigAuth);
             configList.add(objFactory.createAuthnAuthorityConfigElement(baseConfigAuth));
         }
         if (role.equals(EntityModel.SAML_ATTRQUERY) || 
                 (attrQueryDescriptor != null))
         {
-            baseConfigAuth = new BaseConfigType() {};
+            baseConfigAuth = objFactory.createBaseConfigType();
             baseConfigAuth = addAttributeType(extattrQueryMap, baseConfigAuth);
             configList.add(objFactory.createAttributeQueryConfigElement(baseConfigAuth));
         }
         if (role.equals(EntityModel.POLICY_DECISION_POINT_DESCRIPTOR) ||
                 (xacmlPDPDescriptor != null)) 
         {
-            baseConfigAuth = new BaseConfigType() {};
+            baseConfigAuth = objFactory.createBaseConfigType();
 
             baseConfigAuth = addAttributeType(xacmlPDPExtendedMeta, baseConfigAuth);
             configList.add(objFactory.createXACMLPDPConfigElement(baseConfigAuth));
@@ -1855,7 +1854,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         if (role.equals(EntityModel.POLICY_ENFORCEMENT_POINT_DESCRIPTOR) ||
                 (xacmlAuthzDescriptor != null)) 
         {
-            baseConfigAuth = new BaseConfigType() {};
+            baseConfigAuth = objFactory.createBaseConfigType();
 
             baseConfigAuth = addAttributeType(
                     xacmlPEPExtendedMeta, baseConfigAuth);
@@ -1927,7 +1926,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 data.put(ATTR_TXT_PROTOCOL_SUPPORT_ENUM,
                         returnEmptySetIfValueIsNull(
                         xacmlAuthzDescriptor.getValue().getProtocolSupportEnumeration()));
-                if (xacmlAuthzDescriptor.getValue().isWantAssertionsSigned()) {
+                if (Boolean.TRUE.equals(xacmlAuthzDescriptor.getValue().isWantAssertionsSigned())) {
                     data.put(ATTR_WANT_ASSERTION_SIGNED, "true");
                 } else {
                     data.put(ATTR_WANT_ASSERTION_SIGNED, "false");
@@ -2032,7 +2031,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 metaAlias = xacmlAuthzConfigElement.getValue().getMetaAlias();
                 int size = configList.size();
                 for (int i=0; i< size; i++) {
-                    AttributeType atype = (AttributeType) configList.get(i);
+                    AttributeType atype = ((AttributeElement) configList.get(i)).getValue();
                     String name = atype.getName();
                     java.util.List value = atype.getValue();
                     data.put(atype.getName(),
@@ -2093,7 +2092,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 metaAlias = xacmlPDPConfigElement.getValue().getMetaAlias();
                 int size = configList.size();
                 for (int i=0; i< size; i++) {
-                    AttributeType atype = (AttributeType) configList.get(i);
+                    AttributeType atype = ((AttributeElement) configList.get(i)).getValue();
                     String name = atype.getName();
                     java.util.List value = atype.getValue();
                     data.put(atype.getName(),
@@ -2317,8 +2316,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             SAML2MetaManager  saml2MetaManager = getSAML2MetaManager();
             Map map = new HashMap();
             
-            BaseConfigType  idpConfig=
-                    saml2MetaManager.getIDPSSOConfig(realm, entityName).getValue();
+            IDPSSOConfigElement idpConfigElement =
+                    saml2MetaManager.getIDPSSOConfig(realm, entityName);
+            BaseConfigType  idpConfig = (idpConfigElement != null)
+                    ? idpConfigElement.getValue() : null;
             if (idpConfig != null){
                 map = SAML2MetaUtils.getAttributes(idpConfig) ;
             } else {
@@ -2376,8 +2377,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             SAML2MetaManager  saml2MetaManager = getSAML2MetaManager();
             Map map = new HashMap();
             
-            BaseConfigType  spConfig=
-                    saml2MetaManager.getSPSSOConfig(realm, entityName).getValue();
+            SPSSOConfigElement spConfigElement =
+                    saml2MetaManager.getSPSSOConfig(realm, entityName);
+            BaseConfigType  spConfig = (spConfigElement != null)
+                    ? spConfigElement.getValue() : null;
             if (spConfig != null){
                 map = SAML2MetaUtils.getAttributes(spConfig) ;
             } else {
@@ -2553,10 +2556,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     AttributeServiceElement key =
                             (AttributeServiceElement)artServiceList.get(i);
                     if ((key.getValue().getLocation() != null) &&
-                            (key.getValue().isSupportsX509Query()))
+                            (Boolean.TRUE.equals(key.getValue().isSupportsX509Query())))
                     {
                         map.put(SUPPORTS_X509, returnEmptySetIfValueIsNull(
-                            key.getValue().isSupportsX509Query()));
+                            Boolean.TRUE.equals(key.getValue().isSupportsX509Query())));
                     map.put(ATTR_SEFVICE_LOCATION,
                             returnEmptySetIfValueIsNull(key.getValue().getLocation()));
                     

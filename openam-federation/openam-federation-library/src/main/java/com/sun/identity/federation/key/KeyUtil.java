@@ -297,7 +297,7 @@ public class KeyUtil {
         KeyDescriptorElement noUsageKD = null;
         while (iter.hasNext()) {
             kd = iter.next();
-            use = kd.getValue().getUse().value();
+            use = (kd.getValue().getUse() == null) ? null : kd.getValue().getUse().value();
             if ((use == null) || (use.trim().length() == 0)) {
 		if (noUsageKD == null) {
                     noUsageKD = kd;
@@ -313,7 +313,7 @@ public class KeyUtil {
         if (kd != null) {
             return kd.getValue();
         } else {
-            return noUsageKD.getValue();
+            return (noUsageKD == null) ? null : noUsageKD.getValue();
         }
     }
 

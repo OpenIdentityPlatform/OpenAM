@@ -39,6 +39,8 @@ import java.util.Map;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.key.EncInfo;
 import com.sun.identity.federation.key.KeyUtil;
 import com.sun.identity.federation.meta.IDFFMetaException;
@@ -125,10 +127,13 @@ public class IDFFProviderManager implements ProviderManager {
             return false;
         }
 
-        BaseConfigType baseConfig =
-            IDFFMetaUtils.getSPDescriptorConfig(entityConfig).getValue();
+        SPDescriptorConfigElement spEl =
+            IDFFMetaUtils.getSPDescriptorConfig(entityConfig);
+        BaseConfigType baseConfig = (spEl == null) ? null : spEl.getValue();
         if (baseConfig == null) {
-            baseConfig = IDFFMetaUtils.getIDPDescriptorConfig(entityConfig).getValue();
+            IDPDescriptorConfigElement idpEl =
+                IDFFMetaUtils.getIDPDescriptorConfig(entityConfig);
+            baseConfig = (idpEl == null) ? null : idpEl.getValue();
             if (baseConfig == null) {
                 return false;
             }
@@ -185,11 +190,13 @@ public class IDFFProviderManager implements ProviderManager {
     public PrivateKey getDecryptionKey(String providerID) {
         BaseConfigType providerConfig = null;
         try {
-            providerConfig = idffMetaManager.getSPDescriptorConfig(
-                ROOT_REALM, providerID).getValue();
+            SPDescriptorConfigElement spEl = idffMetaManager.getSPDescriptorConfig(
+                ROOT_REALM, providerID);
+            providerConfig = (spEl == null) ? null : spEl.getValue();
             if (providerConfig == null) {
-                providerConfig = idffMetaManager.
-                    getIDPDescriptorConfig(ROOT_REALM, providerID).getValue();
+                IDPDescriptorConfigElement idpEl = idffMetaManager.
+                    getIDPDescriptorConfig(ROOT_REALM, providerID);
+                providerConfig = (idpEl == null) ? null : idpEl.getValue();
             }
         } catch (IDFFMetaException imex) {
             ProviderUtil.debug.error("IDFFProviderManager.getDecryptionKey",
@@ -211,11 +218,13 @@ public class IDFFProviderManager implements ProviderManager {
     public String getSigningKeyAlias(String providerID) {
         BaseConfigType config = null;
         try {
-            config = idffMetaManager.getSPDescriptorConfig(
-                ROOT_REALM, providerID).getValue();
+            SPDescriptorConfigElement spEl = idffMetaManager.getSPDescriptorConfig(
+                ROOT_REALM, providerID);
+            config = (spEl == null) ? null : spEl.getValue();
             if (config == null) {
-                config = idffMetaManager.getIDPDescriptorConfig(
-                    ROOT_REALM, providerID).getValue();
+                IDPDescriptorConfigElement idpEl = idffMetaManager.getIDPDescriptorConfig(
+                    ROOT_REALM, providerID);
+                config = (idpEl == null) ? null : idpEl.getValue();
             }
         } catch(IDFFMetaException imex) {
             ProviderUtil.debug.error(

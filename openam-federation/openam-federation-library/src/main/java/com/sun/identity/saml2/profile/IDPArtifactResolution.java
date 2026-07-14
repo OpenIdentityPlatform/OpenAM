@@ -469,7 +469,7 @@ public class IDPArtifactResolution {
         }
         
         // check if need to sign the assertion
-        boolean signAssertion = spSSODescriptor.getValue().isWantAssertionsSigned();
+        boolean signAssertion = Boolean.TRUE.equals(spSSODescriptor.getValue().isWantAssertionsSigned());
         if (signAssertion) {
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(classMethod +

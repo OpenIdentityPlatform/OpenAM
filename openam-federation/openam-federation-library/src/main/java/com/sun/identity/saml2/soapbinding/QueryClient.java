@@ -808,7 +808,7 @@ public class QueryClient {
                 getPolicyEnforcementPointDescriptor(realm,
                 pepEntityID);
         
-        return pepDescriptor.getValue().isWantAssertionsSigned();
+        return Boolean.TRUE.equals(pepDescriptor.getValue().isWantAssertionsSigned());
     }
 
 

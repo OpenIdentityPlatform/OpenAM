@@ -39,6 +39,7 @@ import com.sun.identity.liberty.ws.util.ProviderManager;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import jakarta.xml.bind.JAXBElement;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SSODescriptorType;
 import com.sun.identity.saml2.key.EncInfo;
@@ -94,9 +95,9 @@ public class SAML2ProviderManager implements ProviderManager {
     public boolean isNameIDEncryptionEnabled(String providerID) {
         BaseConfigType config = null;
         try {
-            config = metaManager.getSPSSOConfig("/", providerID).getValue();
+            config = unwrap(metaManager.getSPSSOConfig("/", providerID));
             if (config == null) {
-                config = metaManager.getIDPSSOConfig("/", providerID).getValue();
+                config = unwrap(metaManager.getIDPSSOConfig("/", providerID));
             }
         } catch (SAML2MetaException smex) {
             SAML2Utils.debug.error(
@@ -165,9 +166,9 @@ public class SAML2ProviderManager implements ProviderManager {
     public PrivateKey getDecryptionKey(String providerID) {
         BaseConfigType providerConfig = null;
         try {
-            providerConfig = metaManager.getSPSSOConfig("/", providerID).getValue();
+            providerConfig = unwrap(metaManager.getSPSSOConfig("/", providerID));
             if (providerConfig == null) {
-                providerConfig = metaManager.getIDPSSOConfig("/", providerID).getValue();
+                providerConfig = unwrap(metaManager.getIDPSSOConfig("/", providerID));
             }
         } catch (SAML2MetaException smex) {
             SAML2Utils.debug.error("SAML2ProviderManager.getDecryptionKey",
@@ -189,9 +190,9 @@ public class SAML2ProviderManager implements ProviderManager {
     public String getSigningKeyAlias(String providerID) {
         BaseConfigType config = null;
         try {
-            config = metaManager.getSPSSOConfig("/", providerID).getValue();
+            config = unwrap(metaManager.getSPSSOConfig("/", providerID));
             if (config == null) {
-                config = metaManager.getIDPSSOConfig("/", providerID).getValue();
+                config = unwrap(metaManager.getIDPSSOConfig("/", providerID));
             }
         } catch (SAML2MetaException smex) {
             SAML2Utils.debug.error(
@@ -214,9 +215,9 @@ public class SAML2ProviderManager implements ProviderManager {
     private EncInfo getEncInfo(String providerID) {
         SSODescriptorType ssod = null;
         try {
-            ssod = metaManager.getSPSSODescriptor("/", providerID).getValue();
+            ssod = unwrap(metaManager.getSPSSODescriptor("/", providerID));
             if (ssod == null) {
-                ssod = metaManager.getIDPSSODescriptor("/", providerID).getValue();
+                ssod = unwrap(metaManager.getIDPSSODescriptor("/", providerID));
             }
         } catch (SAML2MetaException smex) {
             SAML2Utils.debug.error(
@@ -232,5 +233,15 @@ public class SAML2ProviderManager implements ProviderManager {
         }
 
         return KeyUtil.getEncInfo(ssod, providerID, SAML2Constants.SP_ROLE);
+    }
+
+    /**
+     * Returns the value contained in the given JAXB element, or {@code null}
+     * if the element itself is {@code null}. Guards the SP-role lookups whose
+     * getter returns {@code null} for an IDP-only entity so the IDP fallback
+     * can run instead of throwing a {@code NullPointerException}.
+     */
+    private static <T> T unwrap(JAXBElement<? extends T> element) {
+        return (element == null) ? null : element.getValue();
     }
 }

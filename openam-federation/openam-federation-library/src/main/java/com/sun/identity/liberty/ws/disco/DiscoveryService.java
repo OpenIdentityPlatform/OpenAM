@@ -218,7 +218,8 @@ public final class DiscoveryService implements RequestHandler {
         String resourceID = null;
         ResourceIDType resID = query.getResourceID();
         if (resID == null) {
-            resourceID = getResourceID(query.getEncryptedResourceID().getValue(),
+            resourceID = getResourceID(query.getEncryptedResourceID() == null
+                                        ? null : query.getEncryptedResourceID().getValue(),
                                         providerID);
         } else {
             resourceID = resID.getValue();
@@ -360,7 +361,8 @@ public final class DiscoveryService implements RequestHandler {
         String resourceID = null;
         ResourceIDType resID = modify.getResourceID();
         if (resID == null) {
-            resourceID = getResourceID(modify.getEncryptedResourceID().getValue(),
+            resourceID = getResourceID(modify.getEncryptedResourceID() == null
+                                        ? null : modify.getEncryptedResourceID().getValue(),
                                         providerID);
         } else {
             resourceID = resID.getValue();

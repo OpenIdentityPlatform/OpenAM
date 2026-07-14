@@ -706,19 +706,19 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                     //for dual role create both idp and sp config objects
                     BaseConfigType bctype_idp = null;
                     BaseConfigType bctype_sp = null;
-                    bctype_idp = new BaseConfigType() {};
+                    bctype_idp = objFactory.createBaseConfigType();
                     bctype_idp = createAttributeElement(keys, bctype_idp);
-                    bctype_sp = new BaseConfigType() {};
+                    bctype_sp = objFactory.createBaseConfigType();
                     bctype_sp = createAttributeElement(keys, bctype_sp);
                     ll.add(objFactory.createIDPSSOConfigElement(bctype_idp));
                     ll.add(objFactory.createSPSSOConfigElement(bctype_sp));
                 } else if (role.equals(IDENTITY_PROVIDER)) {
-                    bctype =  new BaseConfigType() {};
+                    bctype =  objFactory.createBaseConfigType();
                     //bctype.getAttribute().add(atype);
                     bctype = createAttributeElement(keys, bctype);
                     ll.add(objFactory.createIDPSSOConfigElement(bctype));
                 } else if (role.equals(SERVICE_PROVIDER)) {
-                    bctype =  new BaseConfigType() {};
+                    bctype =  objFactory.createBaseConfigType();
                     bctype = createAttributeElement(keys, bctype);
                     ll.add(objFactory.createSPSSOConfigElement(bctype));
                 }

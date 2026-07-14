@@ -49,6 +49,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
@@ -156,8 +157,10 @@ public class IDPSessionListener
                         String spEntityID = pair.getSPEntityID();
                         NameID nameID = pair.getNameID();
 
+                        IDPSSOConfigElement idpConfigElem =
+                               sm.getIDPSSOConfig(realm, idpEntityID);
                         BaseConfigType idpConfig =
-                               sm.getIDPSSOConfig(realm, idpEntityID).getValue();
+                               (idpConfigElem == null) ? null : idpConfigElem.getValue();
 
                         if (idpConfig != null) {
                             List idpSessionSyncList =

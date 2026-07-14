@@ -102,8 +102,9 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
                 lIdentity.setMaritalStatus(IDPPUtils.getIDPPFactory().createMaritalStatusElement(mStatus));
              }
 
-             AltIDElement altID = IDPPUtils.getIDPPFactory().createAltIDElement(getAltID(userMap));
-             if(altID != null) {
+             AltIDType altIDValue = getAltID(userMap);
+             if(altIDValue != null) {
+                AltIDElement altID = IDPPUtils.getIDPPFactory().createAltIDElement(altIDValue);
                 List<AltIDElement> list = new ArrayList<>();
                 list.add(altID);
                 lIdentity.getAltID().addAll(list);
@@ -487,9 +488,11 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
            for(int i= 0; i < size; i++) {
                Object dataElement = dataObject.get(i);
                if(dataElement instanceof AltIDElement) {
-                  AltIDType altID = (AltIDType)dataElement;
-                  altIDType = altID.getIDType(); 
-                  altIDValue = altID.getIDValue().getValue();
+                  AltIDType altID = ((AltIDElement)dataElement).getValue();
+                  altIDType = altID.getIDType();
+                  if(altID.getIDValue() != null) {
+                     altIDValue = altID.getIDValue().getValue();
+                  }
                } else {
                   throw new IDPPException(
                   IDPPUtils.bundle.getString("invalid Element"));
@@ -515,7 +518,9 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
            if(obj instanceof VATType) {
               VATType vType = (VATType)obj;
               idType = vType.getIDType();
-              idValue = vType.getIDValue().getValue();
+              if(vType.getIDValue() != null) {
+                 idValue = vType.getIDValue().getValue();
+              }
            } else {
               throw new IDPPException(
               IDPPUtils.bundle.getString("invalid Element"));
