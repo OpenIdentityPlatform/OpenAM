@@ -218,8 +218,7 @@ public final class DiscoveryService implements RequestHandler {
         String resourceID = null;
         ResourceIDType resID = query.getResourceID();
         if (resID == null) {
-            resourceID = getResourceID(query.getEncryptedResourceID() == null
-                                        ? null : query.getEncryptedResourceID().getValue(),
+            resourceID = getResourceID(query.getEncryptedResourceID(),
                                         providerID);
         } else {
             resourceID = resID.getValue();
@@ -361,8 +360,7 @@ public final class DiscoveryService implements RequestHandler {
         String resourceID = null;
         ResourceIDType resID = modify.getResourceID();
         if (resID == null) {
-            resourceID = getResourceID(modify.getEncryptedResourceID() == null
-                                        ? null : modify.getEncryptedResourceID().getValue(),
+            resourceID = getResourceID(modify.getEncryptedResourceID(),
                                         providerID);
         } else {
             resourceID = resID.getValue();
@@ -528,7 +526,7 @@ public final class DiscoveryService implements RequestHandler {
         return true;
     }
 
-    private String getResourceID(EncryptedResourceIDType encryptResID,
+    private String getResourceID(EncryptedResourceIDElement encryptResID,
                                 String providerID)
     {
         if ((encryptResID == null) || (providerID == null)) {

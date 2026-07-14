@@ -127,8 +127,8 @@ public class FSIDPFinderService extends HttpServlet {
         IDFFMetaManager metaManager = FSUtils.getIDFFMetaManager();
         try {
             if (metaManager != null ) {
-                hostConfig = metaManager.getIDPDescriptorConfig(
-                    realm, entityID).getValue();
+                hostConfig = IDFFMetaUtils.unwrap(metaManager.getIDPDescriptorConfig(
+                    realm, entityID));
                 if (hostConfig != null) {
                     hostMetaAlias = hostConfig.getMetaAlias();
                 }

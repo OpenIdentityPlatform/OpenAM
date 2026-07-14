@@ -1776,9 +1776,9 @@ public class FSSingleLogoutHandler {
                 // check to see if original SP is idp proxy enabled
                 if (metaManager != null) {
                     try {
-                        BaseConfigType sourceSPConfig = 
-                            metaManager.getSPDescriptorConfig(
-                                realm, sourceEntityId).getValue();
+                        BaseConfigType sourceSPConfig =
+                            IDFFMetaUtils.unwrap(metaManager.getSPDescriptorConfig(
+                                realm, sourceEntityId));
                         String enabledString = 
                             IDFFMetaUtils.getFirstAttributeValueFromConfig(
                                 sourceSPConfig, IFSConstants.ENABLE_IDP_PROXY);

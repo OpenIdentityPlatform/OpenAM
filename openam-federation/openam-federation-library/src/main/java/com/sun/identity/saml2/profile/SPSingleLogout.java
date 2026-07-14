@@ -480,7 +480,7 @@ public class SPSingleLogout {
             request,
             response,
             paramsMap,
-            idpConfig.getValue());
+            (idpConfig == null) ? null : idpConfig.getValue());
 
         String requestIDStr = requestID.toString();
         if (debug.messageEnabled()) {

@@ -1753,9 +1753,11 @@ public class SAML2MetaManager {
                                                  trustedEntityId);
                 }
             } else if (role.equals(SAML2Constants.PEP_ROLE)) {
-                 XACMLAuthzDecisionQueryConfigElement pepConfig = 
+                 XACMLAuthzDecisionQueryConfigElement pepConfig =
                                 getPolicyEnforcementPointConfig(realm,entityId);
-                 result = isSameCircleOfTrust(pepConfig.getValue(),realm,trustedEntityId);
+                 if (pepConfig != null) {
+                     result = isSameCircleOfTrust(pepConfig.getValue(),realm,trustedEntityId);
+                 }
             }
         }
         return result;

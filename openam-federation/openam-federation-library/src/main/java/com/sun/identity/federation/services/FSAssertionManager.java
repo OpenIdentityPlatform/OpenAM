@@ -187,8 +187,8 @@ public final class FSAssertionManager {
         assertionTimeout = IFSConstants.ASSERTION_TIMEOUT_DEFAULT * 1000;
         artifactTimeout = IFSConstants.ARTIFACT_TIMEOUT_DEFAULT * 1000;
         try {
-            BaseConfigType idpConfig = FSUtils.getIDFFMetaManager().
-                getIDPDescriptorConfig(realm, hostEntityId).getValue();
+            BaseConfigType idpConfig = IDFFMetaUtils.unwrap(FSUtils.getIDFFMetaManager().
+                getIDPDescriptorConfig(realm, hostEntityId));
             attributes = IDFFMetaUtils.getAttributes(idpConfig);
             try {
                 cleanupInterval = Integer.parseInt(

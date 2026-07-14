@@ -498,8 +498,8 @@ public class FSLoginHelper {
                 while (it.hasNext()) {
                     provider = (String) it.next();
                     providerDesc = metaManager.getIDPDescriptor(realm,provider);
-                    providerConfig = 
-                        metaManager.getIDPDescriptorConfig(realm, provider).getValue();
+                    providerConfig =
+                        IDFFMetaUtils.unwrap(metaManager.getIDPDescriptorConfig(realm, provider));
                     if (providerDesc == null || providerConfig == null) {
                         continue;
                     } 

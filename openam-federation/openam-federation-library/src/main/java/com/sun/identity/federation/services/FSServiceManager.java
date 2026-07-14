@@ -243,7 +243,7 @@ public class FSServiceManager {
             SPDescriptorType spDescriptor = 
                 metaManager.getSPDescriptor(realm, spEntityId);
             BaseConfigType spConfig =
-                metaManager.getSPDescriptorConfig(realm, spEntityId).getValue();
+                IDFFMetaUtils.unwrap(metaManager.getSPDescriptorConfig(realm, spEntityId));
             String relayState = authnRequest.getRelayState();
             
             if (FSUtils.debug.messageEnabled()) {
@@ -379,7 +379,7 @@ public class FSServiceManager {
                 response, 
                 authnRequest,
                 metaManager.getSPDescriptor(realm, spEntityId),
-                metaManager.getSPDescriptorConfig(realm, spEntityId).getValue(),
+                IDFFMetaUtils.unwrap(metaManager.getSPDescriptorConfig(realm, spEntityId)),
                 spEntityId,
                 authnRequest.getRelayState());
         } catch(IDFFMetaException ex){

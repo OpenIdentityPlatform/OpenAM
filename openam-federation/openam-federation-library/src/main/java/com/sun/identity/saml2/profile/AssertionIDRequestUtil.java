@@ -663,14 +663,14 @@ public class AssertionIDRequestUtil {
         BaseConfigType config = null;
         try {
             if (role.equals(SAML2Constants.IDP_ROLE)) {
-                config = metaManager.getIDPSSOConfig(realm,
-                    samlAuthorityEntityID).getValue();
+                config = unwrap(metaManager.getIDPSSOConfig(realm,
+                    samlAuthorityEntityID));
             } else if (role.equals(SAML2Constants.AUTHN_AUTH_ROLE)) {
-                config = metaManager.getAuthnAuthorityConfig(realm,
-                    samlAuthorityEntityID).getValue();
+                config = unwrap(metaManager.getAuthnAuthorityConfig(realm,
+                    samlAuthorityEntityID));
             } else if (role.equals(SAML2Constants.ATTR_AUTH_ROLE)) {
-                config = metaManager.getAttributeAuthorityConfig(realm,
-                    samlAuthorityEntityID).getValue();
+                config = unwrap(metaManager.getAttributeAuthorityConfig(realm,
+                    samlAuthorityEntityID));
             }
         } catch (SAML2MetaException sme) {
             if (SAML2Utils.debug.messageEnabled()) {

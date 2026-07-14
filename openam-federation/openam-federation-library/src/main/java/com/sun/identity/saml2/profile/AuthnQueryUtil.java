@@ -451,7 +451,8 @@ public class AuthnQueryUtil {
 
         AuthnAuthorityConfigElement config =
             metaManager.getAuthnAuthorityConfig(realm, authnAuthorityEntityID);
-        authnServiceURL = SAML2Utils.fillInBasicAuthInfo(config.getValue(),
+        authnServiceURL = SAML2Utils.fillInBasicAuthInfo(
+            (config == null) ? null : config.getValue(),
             authnServiceURL);
         
         SOAPMessage resMsg = null;

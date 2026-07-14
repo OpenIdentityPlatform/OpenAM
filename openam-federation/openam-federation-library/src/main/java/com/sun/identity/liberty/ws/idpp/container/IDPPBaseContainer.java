@@ -142,6 +142,9 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
               map.put(attrKey, values);
               return map;
            }
+           if(obj instanceof JAXBElement) {
+              obj = ((JAXBElement<?>)obj).getValue();
+           }
            String value = null;
            if(obj instanceof DSTString) {
               DSTString str = (DSTString)obj;

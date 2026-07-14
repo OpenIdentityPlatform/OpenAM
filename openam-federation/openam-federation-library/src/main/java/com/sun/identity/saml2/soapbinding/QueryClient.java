@@ -190,7 +190,7 @@ public class QueryClient {
                         
                    endPoint =
                                 SAML2SDKUtils.fillInBasicAuthInfo(
-                                pepConfig.getValue(),endPoint);
+                                (pepConfig == null) ? null : pepConfig.getValue(),endPoint);
                         String[] urls = { endPoint };
                         SOAPClient soapClient = new SOAPClient(urls);
                         if (debug.messageEnabled()) {

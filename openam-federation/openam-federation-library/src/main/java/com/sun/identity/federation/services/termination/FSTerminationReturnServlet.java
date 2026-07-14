@@ -139,12 +139,12 @@ public class FSTerminationReturnServlet extends HttpServlet {
             String realm = IDFFMetaUtils.getRealmByMetaAlias(providerAlias);
             if (hostedRole != null && 
                 hostedRole.equalsIgnoreCase(IFSConstants.IDP)) {
-                hostedConfig = metaManager.getIDPDescriptorConfig(
-                    realm, hostedEntityId).getValue();
+                hostedConfig = IDFFMetaUtils.unwrap(metaManager.getIDPDescriptorConfig(
+                    realm, hostedEntityId));
             } else if (hostedRole != null &&
                 hostedRole.equalsIgnoreCase(IFSConstants.SP)) {
-                hostedConfig = metaManager.getSPDescriptorConfig(
-                    realm, hostedEntityId).getValue();
+                hostedConfig = IDFFMetaUtils.unwrap(metaManager.getSPDescriptorConfig(
+                    realm, hostedEntityId));
             }
             if (hostedRole == null || hostedConfig == null) {
                 throw new IDFFMetaException((String) null);

@@ -306,7 +306,8 @@ public class IDPSingleLogout {
                 StringBuffer requestID = null;
                 try {
                     requestID = LogoutUtil.doLogout(metaAlias, spEntityID, extensionsList, logoutEndpoint.getValue(), relayState,
-                        idpSessionIndex, pair.getNameID(), request, response, paramsMap, spConfig.getValue());
+                        idpSessionIndex, pair.getNameID(), request, response, paramsMap,
+                        (spConfig == null) ? null : spConfig.getValue());
                 } catch (SAML2Exception ex) {
                     if (logoutEndpoint.getValue().getBinding().equals(SAML2Constants.SOAP)) {
                         debug.error(
@@ -904,7 +905,8 @@ public class IDPSingleLogout {
                     continue;
                 }
                 StringBuffer requestID = LogoutUtil.doLogout(metaAlias, spEntityID, extensionsList, logoutEndpoint.getValue(),
-                        relayState, idpSessionIndex, pair.getNameID(), request, response, paramsMap, spConfig.getValue());
+                        relayState, idpSessionIndex, pair.getNameID(), request, response, paramsMap,
+                        (spConfig == null) ? null : spConfig.getValue());
                 String bindingUsed = logoutEndpoint.getValue().getBinding();
                 if (bindingUsed.equals(SAML2Constants.HTTP_REDIRECT) || bindingUsed.equals(SAML2Constants.HTTP_POST)) {
                     String requestIDStr = requestID.toString();
@@ -1198,7 +1200,8 @@ public class IDPSingleLogout {
                     }
                     try {
                         requestID = LogoutUtil.doLogout(metaAlias, spEntityID, null, logoutEndpoint.getValue(), relayState,
-                                sessionIndex, pair.getNameID(), request, response, paramsMap, spConfig.getValue());
+                                sessionIndex, pair.getNameID(), request, response, paramsMap,
+                                (spConfig == null) ? null : spConfig.getValue());
                     } catch (SAML2Exception ex) {
                         if (logoutEndpoint.getValue().getBinding().equals(SAML2Constants.SOAP)) {
                             debug.error(

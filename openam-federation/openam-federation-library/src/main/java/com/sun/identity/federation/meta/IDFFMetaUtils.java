@@ -60,6 +60,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
@@ -468,6 +469,19 @@ public class IDFFMetaUtils {
     }
 
     /**
+     * Null-safely unwraps a {@link JAXBElement}, returning {@code null} when the element itself is
+     * {@code null}. Restores the pre-JAXB3 semantics where a nullable config element was passed
+     * straight through to null-tolerant consumers instead of throwing an NPE.
+     *
+     * @param element the (possibly {@code null}) JAXB element
+     * @param <T> the wrapped value type
+     * @return the unwrapped value, or {@code null} if {@code element} is {@code null}
+     */
+    public static <T> T unwrap(JAXBElement<? extends T> element) {
+        return (element == null) ? null : element.getValue();
+    }
+
+    /**
      * Obtains provider's extended meta.
      * @param realm the realm in which the provider resides
      * @param providerId provider's entity ID
@@ -484,11 +498,11 @@ public class IDFFMetaUtils {
         if (metaManager != null && providerRole != null) {
             try {
                 if (providerRole.equalsIgnoreCase(IFSConstants.IDP)) {
-                    providerConfig = metaManager.getIDPDescriptorConfig(
-                        realm, providerId).getValue();
+                    providerConfig = unwrap(metaManager.getIDPDescriptorConfig(
+                        realm, providerId));
                 } else if (providerRole.equalsIgnoreCase(IFSConstants.SP)) {
-                    providerConfig = metaManager.getSPDescriptorConfig(
-                        realm, providerId).getValue();
+                    providerConfig = unwrap(metaManager.getSPDescriptorConfig(
+                        realm, providerId));
                 }
             } catch (IDFFMetaException ie) {
                 debug.error(

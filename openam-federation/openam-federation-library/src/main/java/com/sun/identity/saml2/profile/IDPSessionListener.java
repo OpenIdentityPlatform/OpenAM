@@ -317,6 +317,6 @@ public class IDPSessionListener
         SPSSOConfigElement spConfig = sm.getSPSSOConfig(realm, spEntityID);
 
         LogoutUtil.doLogout(metaAlias, spEntityID, slosList, null, binding, null, sessionIndex, nameID, null, null,
-                paramsMap, spConfig.getValue());
+                paramsMap, (spConfig == null) ? null : spConfig.getValue());
     }
 }

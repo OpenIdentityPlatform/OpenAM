@@ -50,6 +50,19 @@ public enum Time implements DateTimeUtils.MillisProvider {
 
     private final TimeService timeService;
 
+    /**
+     * Shared {@link DatatypeFactory}. Instantiating a factory is comparatively expensive and the
+     * instance is safe for concurrent {@code newXMLGregorianCalendar} calls, so it is cached once.
+     */
+    private static final DatatypeFactory DATATYPE_FACTORY;
+    static {
+        try {
+            DATATYPE_FACTORY = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
     Time() {
         Iterator<TimeService> services = ServiceLoader.load(TimeService.class).iterator();
         if (services.hasNext()) {
@@ -164,15 +177,13 @@ public enum Time implements DateTimeUtils.MillisProvider {
         gCalendar.setTime(calendar.getTime());
         gCalendar.setTimeZone(calendar.getTimeZone());
 
-        return DatatypeFactory.newInstance()
-                .newXMLGregorianCalendar(gCalendar);
+        return DATATYPE_FACTORY.newXMLGregorianCalendar(gCalendar);
     }
 
     public static XMLGregorianCalendar getXMLGregorianCalendarInstance(Date date) throws DatatypeConfigurationException {
         GregorianCalendar gCalendar = new GregorianCalendar();
         gCalendar.setTime(date);
 
-        return DatatypeFactory.newInstance()
-                .newXMLGregorianCalendar(gCalendar);
+        return DATATYPE_FACTORY.newXMLGregorianCalendar(gCalendar);
     }
 }

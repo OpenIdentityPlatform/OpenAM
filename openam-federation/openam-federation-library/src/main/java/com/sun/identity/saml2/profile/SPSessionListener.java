@@ -145,7 +145,7 @@ public class SPSessionListener implements SessionListener {
                                 SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
 
                     BaseConfigType spConfig =
-                                        sm.getSPSSOConfig(realm, spEntityID).getValue();
+                                        SAML2MetaUtils.unwrap(sm.getSPSSOConfig(realm, spEntityID));
                     if (spConfig != null) {
                         List spSessionSyncList =
                             (List) SAML2MetaUtils.getAttributes(spConfig).

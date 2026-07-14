@@ -130,6 +130,19 @@ public final class SAML2MetaUtils {
     }
 
     /**
+     * Null-safely unwraps a {@link JAXBElement}, returning {@code null} when the element itself is
+     * {@code null}. Restores the pre-JAXB3 semantics where a nullable config/metadata element was
+     * passed straight through to null-tolerant consumers instead of throwing an NPE.
+     *
+     * @param element the (possibly {@code null}) JAXB element
+     * @param <T> the wrapped value type
+     * @return the unwrapped value, or {@code null} if {@code element} is {@code null}
+     */
+    public static <T> T unwrap(JAXBElement<? extends T> element) {
+        return (element == null) ? null : element.getValue();
+    }
+
+    /**
      * Converts a <code>String</code> object to a JAXB object.
      * @param str a <code>String</code> object
      * @return a JAXB object converted from the <code>String</code> object.
