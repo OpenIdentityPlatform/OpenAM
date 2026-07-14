@@ -31,6 +31,7 @@
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
@@ -206,6 +207,9 @@ public class IDPPEmploymentIdentity extends IDPPBaseContainer {
         DSTString jobTitle = null, org = null;
         List altO = null;
         if(obj != null) {
+           if(obj instanceof JAXBElement) {
+              obj = ((JAXBElement<?>)obj).getValue();
+           }
            if(obj instanceof EmploymentIdentityType) {
               EmploymentIdentityType eiType = (EmploymentIdentityType)obj;
               jobTitle = jaxbValue(eiType.getJobTitle());

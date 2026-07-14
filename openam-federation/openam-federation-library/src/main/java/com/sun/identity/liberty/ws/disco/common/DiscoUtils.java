@@ -117,7 +117,7 @@ public class DiscoUtils extends DiscoSDKUtils {
                 }
                 if (!authorizer.isAuthorized(message.getToken(),
                         DiscoConstants.ACTION_LOOKUP,
-                        entry.getResourceOffering(),
+                        entry.getResourceOffering().getValue(),
                         env))
                 {
                     DiscoUtils.debug.error("DiscoveryService.checkPolicyAndHan"

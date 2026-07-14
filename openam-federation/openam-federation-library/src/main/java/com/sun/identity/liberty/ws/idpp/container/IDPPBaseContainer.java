@@ -388,7 +388,11 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
         }
         Document doc = IDPPUtils.getDocumentBuilder().newDocument();
         try {
-            IDPPUtils.getMarshaller().marshal(getContainerObject(userMap),doc);
+            Object containerObject = getContainerObject(userMap);
+            if (containerObject instanceof PPType) {
+                containerObject = IDPPUtils.getIDPPFactory().createPP((PPType) containerObject);
+            }
+            IDPPUtils.getMarshaller().marshal(containerObject, doc);
             return doc;
         } catch (JAXBException je) {
             IDPPUtils.debug.error("IDPPBaseContainer:toXMLDocument:"+

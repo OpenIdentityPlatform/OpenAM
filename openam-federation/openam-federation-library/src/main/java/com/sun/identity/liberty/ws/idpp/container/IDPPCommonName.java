@@ -31,6 +31,7 @@
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
@@ -261,6 +262,9 @@ public class IDPPCommonName extends IDPPBaseContainer {
         DSTString cn = null;
         List altCNs = null;
         if(obj != null) {
+           if(obj instanceof JAXBElement) {
+              obj = ((JAXBElement<?>)obj).getValue();
+           }
            if(obj instanceof CommonNameType) {
               CommonNameType cnType = (CommonNameType)obj;
               analyzedName = cnType.getAnalyzedName();

@@ -31,6 +31,7 @@
 package com.sun.identity.federation.meta;
 
 import com.sun.identity.federation.common.FSUtils;
+import com.sun.identity.federation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement;
@@ -274,7 +275,7 @@ public final class IDFFMetaSecurityUtils {
         String attrName, Set attrVal) throws IDFFMetaException {
         List attributes = config.getAttribute();
         for(Iterator iter = attributes.iterator(); iter.hasNext();) {
-            AttributeType avp = (AttributeType)iter.next();
+            AttributeType avp = ((AttributeElement)iter.next()).getValue();
             if (avp.getName().trim().equalsIgnoreCase(attrName)) {
                  iter.remove();
             }

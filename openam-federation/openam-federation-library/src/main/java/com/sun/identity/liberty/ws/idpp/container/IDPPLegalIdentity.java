@@ -31,6 +31,7 @@
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
@@ -359,7 +360,7 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
 
                       String idTypeKey = null;
                       String idValueKey = null;
-                      DSTString idValue = (DSTString)dataElement;
+                      DSTString idValue = ((IDValueElement)dataElement).getValue();
                     
                       if(select.indexOf("AltID") != -1) {
                          idTypeKey = getAttributeMapper().getDSAttribute(
@@ -448,6 +449,9 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
         DSTDate dob = null;
         DSTString lName = null;
         if(obj != null) {
+           if(obj instanceof JAXBElement) {
+              obj = ((JAXBElement<?>)obj).getValue();
+           }
            if(obj instanceof LegalIdentityType) {
               LegalIdentityType lType = (LegalIdentityType)obj;
               analyzedName = lType.getAnalyzedName();
@@ -515,6 +519,9 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
         DSTURI idType = null;
         DSTString idValue = null;
         if(obj != null) {
+           if(obj instanceof JAXBElement) {
+              obj = ((JAXBElement<?>)obj).getValue();
+           }
            if(obj instanceof VATType) {
               VATType vType = (VATType)obj;
               idType = vType.getIDType();

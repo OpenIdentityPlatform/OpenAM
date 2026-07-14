@@ -489,8 +489,8 @@ public final class DiscoveryService implements RequestHandler {
                 }
                 if (!authorizer.isAuthorized(message.getToken(),
                                 DiscoConstants.ACTION_UPDATE,
-                                ((InsertEntryType) entryMap.get(entryID)).
-                                                        getResourceOffering(),
+                                ((DiscoEntryElement) entryMap.get(entryID)).getValue()
+                                                        .getResourceOffering().getValue(),
                                 env))
                 {
                     DiscoUtils.debug.error("DiscoveryService.isUpdateAllowed: "
@@ -513,7 +513,7 @@ public final class DiscoveryService implements RequestHandler {
                 }
                 if (!authorizer.isAuthorized(message.getToken(),
                         DiscoConstants.ACTION_UPDATE,
-                        ((InsertEntryType) j.next()).getResourceOffering(),
+                        ((InsertEntryType) j.next()).getResourceOffering().getValue(),
                         env))
                 {
                     DiscoUtils.debug.error("DiscoveryService.isUpdateAllowed: "

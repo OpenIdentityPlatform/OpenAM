@@ -31,6 +31,7 @@
 
 package com.sun.identity.liberty.ws.idpp;
 
+import jakarta.xml.bind.JAXBElement;
 import com.sun.identity.liberty.ws.idpp.jaxb.ResponseType;
 import com.sun.identity.liberty.ws.interaction.jaxb.InquiryElementType;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -202,6 +203,9 @@ public class PPRequestHandler extends DSTRequestHandler {
         Object resObj = query.getValue().getResourceID();
         if(resObj == null) {
             resObj = query.getValue().getEncryptedResourceID();
+        }
+        if(resObj instanceof JAXBElement) {
+            resObj = ((JAXBElement<?>)resObj).getValue();
         }
         QueryResponseElement response = getQueryResponse(query);
         String resourceID = getResourceID(resObj, providerID, 
@@ -480,6 +484,9 @@ public class PPRequestHandler extends DSTRequestHandler {
         Object resObj = modify.getValue().getResourceID();
         if(resObj == null) {
             resObj = modify.getValue().getEncryptedResourceID();
+        }
+        if(resObj instanceof JAXBElement) {
+            resObj = ((JAXBElement<?>)resObj).getValue();
         }
         String resourceID = getResourceID(resObj, providerID, 
                   IDPPConstants.XMLNS_IDPP);
