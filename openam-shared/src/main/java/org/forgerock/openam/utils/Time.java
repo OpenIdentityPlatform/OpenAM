@@ -51,15 +51,20 @@ public enum Time implements DateTimeUtils.MillisProvider {
     private final TimeService timeService;
 
     /**
-     * Shared {@link DatatypeFactory}. Instantiating a factory is comparatively expensive and the
-     * instance is safe for concurrent {@code newXMLGregorianCalendar} calls, so it is cached once.
+     * Lazy holder for the shared {@link DatatypeFactory}. Creating a factory is comparatively
+     * expensive and the instance is safe for concurrent {@code newXMLGregorianCalendar} calls, so
+     * it is created once. Deferring creation until the first {@code getXMLGregorianCalendarInstance}
+     * call keeps it off the {@code Time} class-initialization path (which nearly every code path
+     * touches), avoiding surprises from the JAXP factory lookup at class-load time.
      */
-    private static final DatatypeFactory DATATYPE_FACTORY;
-    static {
-        try {
-            DATATYPE_FACTORY = DatatypeFactory.newInstance();
-        } catch (DatatypeConfigurationException e) {
-            throw new ExceptionInInitializerError(e);
+    private static final class DatatypeFactoryHolder {
+        static final DatatypeFactory INSTANCE;
+        static {
+            try {
+                INSTANCE = DatatypeFactory.newInstance();
+            } catch (DatatypeConfigurationException e) {
+                throw new ExceptionInInitializerError(e);
+            }
         }
     }
 
@@ -177,13 +182,13 @@ public enum Time implements DateTimeUtils.MillisProvider {
         gCalendar.setTime(calendar.getTime());
         gCalendar.setTimeZone(calendar.getTimeZone());
 
-        return DATATYPE_FACTORY.newXMLGregorianCalendar(gCalendar);
+        return DatatypeFactoryHolder.INSTANCE.newXMLGregorianCalendar(gCalendar);
     }
 
     public static XMLGregorianCalendar getXMLGregorianCalendarInstance(Date date) throws DatatypeConfigurationException {
         GregorianCalendar gCalendar = new GregorianCalendar();
         gCalendar.setTime(date);
 
-        return DATATYPE_FACTORY.newXMLGregorianCalendar(gCalendar);
+        return DatatypeFactoryHolder.INSTANCE.newXMLGregorianCalendar(gCalendar);
     }
 }
