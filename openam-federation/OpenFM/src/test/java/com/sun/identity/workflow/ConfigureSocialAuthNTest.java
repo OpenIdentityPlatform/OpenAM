@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.workflow;
@@ -164,7 +165,9 @@ public class ConfigureSocialAuthNTest {
         assertEquals(getMapAttr(attrs, AUTH_MODULE_CLIENT_ID), "fred");
         assertEquals(getMapAttr(attrs, AUTH_MODULE_CLIENT_SECRET), "freddy");
         assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_TYPE), "client_secret");
-        assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_VALUE), "freddy");
+        // OPENAM-5851: under the client_secret crypto type the validation config value is
+        // ignored in favour of the client secret itself, so the wizard leaves it unset.
+        assertNull(getMapAttr(attrs, AUTH_MODULE_CRYPTO_VALUE));
         assertEquals(getMapAttr(attrs, AUTH_MODULE_PROXY_URL), "http://example.com");
     }
 
@@ -184,7 +187,7 @@ public class ConfigureSocialAuthNTest {
         assertEquals(getMapAttr(attrs, AUTH_MODULE_CLIENT_ID), "fred");
         assertEquals(getMapAttr(attrs, AUTH_MODULE_CLIENT_SECRET), "freddy");
         assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_TYPE), "client_secret");
-        assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_VALUE), "freddy");
+        assertNull(getMapAttr(attrs, AUTH_MODULE_CRYPTO_VALUE));
         assertEquals(getMapAttr(attrs, AUTH_MODULE_PROXY_URL), "http://example.com");
         assertEquals(getMapAttr(attrs, AUTH_MODULE_AUTH_URL), "http://local.example.com/auth");
         assertEquals(getMapAttr(attrs, AUTH_MODULE_TOKEN_URL), "http://local.example.com/token");
@@ -211,7 +214,7 @@ public class ConfigureSocialAuthNTest {
 
         // Then
         assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_TYPE), "client_secret");
-        assertEquals(getMapAttr(attrs, AUTH_MODULE_CRYPTO_VALUE), "freddy");
+        assertNull(getMapAttr(attrs, AUTH_MODULE_CRYPTO_VALUE));
     }
 
     @Test
