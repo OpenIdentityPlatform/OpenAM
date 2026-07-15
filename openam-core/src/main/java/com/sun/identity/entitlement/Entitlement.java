@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -63,7 +64,7 @@ import org.json.JSONObject;
  * Or do a sub tree search like this.
  * <pre>
  *     Evaluator evaluator = new Evaluator(adminToken);
- *     List&lt;Entitlement> entitlements = evaluator.getEntitlements(
+ *     List&lt;Entitlement&gt; entitlements = evaluator.getEntitlements(
  *         subject, "http://www.sun.com", Collections.EMPTY_MAP, true);
  *     for (Entitlement e : entitlements) {
  *         String resource = e.getResourceNames();

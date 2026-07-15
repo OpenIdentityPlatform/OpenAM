@@ -25,6 +25,7 @@
  * $Id: AuthnRequest.java,v 1.2 2008/06/25 05:47:56 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -213,7 +214,7 @@ public interface AuthnRequest extends RequestAbstract {
      * Returns the value of the <code>AssertionConsumerServiceIndex</code> 
      * attribute.
      *
-     * @return value of the <code>AssertionConsumerServiceIndex<code> 
+     * @return value of the <code>AssertionConsumerServiceIndex</code> 
      *         attribute.
      * @see #setAssertionConsumerServiceIndex(Integer)
      */
@@ -236,7 +237,7 @@ public interface AuthnRequest extends RequestAbstract {
      * Returns the value of the <code>AttributeConsumingServiceIndex</code>
      * attribute.
      *
-     * @return value of the <code>AttributeConsumingServiceIndex<code> 
+     * @return value of the <code>AttributeConsumingServiceIndex</code> 
      *         attribute.
      * @see #setAttributeConsumingServiceIndex(Integer)
      */

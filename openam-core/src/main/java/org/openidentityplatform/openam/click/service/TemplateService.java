@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click.service;
@@ -33,11 +34,11 @@ import org.apache.click.service.VelocityTemplateService;
 /**
  * Provides a templating service interface.
  *
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  * The default TemplateService is {@link VelocityTemplateService}.
- * <p/>
+ * <p>
  * However you can instruct Click to use a different implementation by adding
- * the following element to your <tt>click.xml</tt> configuration file.
+ * the following element to your <code>click.xml</code> configuration file.
  *
  * <pre class="codeConfig">
  * &lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
@@ -54,9 +55,9 @@ public interface TemplateService {
     /**
      * Initialize the TemplateService with the given application configuration
      * service instance.
-     * <p/>
+     * <p>
      * This method is invoked after the TemplateService has been constructed.
-     * <p/>
+     * <p>
      * Note you can access {@link ConfigService} by invoking
      * {@link org.openidentityplatform.openam.click.util.ClickUtils#getConfigService(jakarta.servlet.ServletContext)}
      *

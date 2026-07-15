@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -85,7 +86,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -104,7 +105,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -123,7 +124,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -135,7 +136,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceListTypeKeyReference
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.ReferenceListType.KeyReference createReferenceListTypeKeyReference()
@@ -147,7 +148,7 @@ public class ObjectFactory
     /**
      * Create an instance of CipherReferenceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.CipherReferenceType createCipherReferenceType()
@@ -159,7 +160,7 @@ public class ObjectFactory
     /**
      * Create an instance of CipherDataType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.CipherDataType createCipherDataType()
@@ -171,7 +172,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceListTypeDataReference
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.ReferenceListType.DataReference createReferenceListTypeDataReference()
@@ -183,7 +184,7 @@ public class ObjectFactory
     /**
      * Create an instance of AgreementMethodTypeKANonce
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodType.KANonce createAgreementMethodTypeKANonce()
@@ -195,7 +196,7 @@ public class ObjectFactory
     /**
      * Create an instance of AgreementMethodTypeKANonce
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodType.KANonce createAgreementMethodTypeKANonce(byte[] value)
@@ -207,7 +208,7 @@ public class ObjectFactory
     /**
      * Create an instance of CipherDataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.CipherDataElement createCipherDataElement()
@@ -219,7 +220,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptedType createEncryptedType()
@@ -231,7 +232,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionMethodTypeKeySize
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType.KeySize createEncryptionMethodTypeKeySize()
@@ -243,7 +244,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionMethodTypeKeySize
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType.KeySize createEncryptionMethodTypeKeySize(java.math.BigInteger value)
@@ -255,7 +256,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceListType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.ReferenceListType createReferenceListType()
@@ -267,7 +268,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.ReferenceType createReferenceType()
@@ -279,7 +280,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionPropertiesElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptionPropertiesElement createEncryptionPropertiesElement()
@@ -291,7 +292,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionMethodType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType createEncryptionMethodType()
@@ -303,7 +304,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedKeyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptedKeyElement createEncryptedKeyElement()
@@ -315,7 +316,7 @@ public class ObjectFactory
     /**
      * Create an instance of CipherReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.CipherReferenceElement createCipherReferenceElement()
@@ -327,7 +328,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedKeyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptedKeyType createEncryptedKeyType()
@@ -339,7 +340,7 @@ public class ObjectFactory
     /**
      * Create an instance of TransformsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.TransformsType createTransformsType()
@@ -351,7 +352,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedDataType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptedDataType createEncryptedDataType()
@@ -363,7 +364,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceListElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.ReferenceListElement createReferenceListElement()
@@ -375,7 +376,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionMethodTypeOAEPparams
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType.OAEPparams createEncryptionMethodTypeOAEPparams()
@@ -387,7 +388,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionMethodTypeOAEPparams
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType.OAEPparams createEncryptionMethodTypeOAEPparams(byte[] value)
@@ -399,7 +400,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionPropertyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptionPropertyType createEncryptionPropertyType()
@@ -411,7 +412,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedDataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptedDataElement createEncryptedDataElement()
@@ -423,7 +424,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionPropertiesType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptionPropertiesType createEncryptionPropertiesType()
@@ -435,7 +436,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptionPropertyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.EncryptionPropertyElement createEncryptionPropertyElement()
@@ -447,7 +448,7 @@ public class ObjectFactory
     /**
      * Create an instance of AgreementMethodElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodElement createAgreementMethodElement()
@@ -459,7 +460,7 @@ public class ObjectFactory
     /**
      * Create an instance of AgreementMethodTypeRecipientKeyInfo
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodType.RecipientKeyInfo createAgreementMethodTypeRecipientKeyInfo()
@@ -471,7 +472,7 @@ public class ObjectFactory
     /**
      * Create an instance of AgreementMethodTypeOriginatorKeyInfo
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodType.OriginatorKeyInfo createAgreementMethodTypeOriginatorKeyInfo()
@@ -483,7 +484,7 @@ public class ObjectFactory
     /**
      * Create an instance of AgreementMethodType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodType createAgreementMethodType()

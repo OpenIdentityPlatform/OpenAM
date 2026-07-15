@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.token.validator.url;
@@ -35,7 +37,7 @@ public interface AuthenticationUrlProvider {
      * Returns the String representing the URL against which the authentication invocation will be made.
      * @param tokenTypeId The to-be-validated Token.
      * @return The URL targeted by the authentication request - e.g. with the appropriate
-     * ?realm=phill&authIndexType=service&authIndexValue=[SERVICE_NAME] elements appended onto the httpBasePath.
+     * {@code ?realm=phill&authIndexType=service&authIndexValue=[SERVICE_NAME]} elements appended onto the httpBasePath.
      */
     URL authenticationUrl(TokenTypeId tokenTypeId) throws TokenValidationException;
 }

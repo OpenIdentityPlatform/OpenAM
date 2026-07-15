@@ -5,6 +5,7 @@
 
 --
 -- Portions Copyrighted 2011-2016 ForgeRock AS
+-- Portions Copyrighted 2026 3A Systems, LLC
 --
 
 SUN-OPENSSO-SERVER-MIB DEFINITIONS ::= BEGIN
@@ -117,7 +118,7 @@ ssoServerServerTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-            "Server topology : all servers known to this server & their state"
+            "Server topology : all servers known to this server and their state"
     ::= { ssoServerTopology 1 } 
 
 ssoServerServerEntry  OBJECT-TYPE

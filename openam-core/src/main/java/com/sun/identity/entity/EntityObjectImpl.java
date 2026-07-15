@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -171,7 +172,7 @@ public class EntityObjectImpl implements EntityObjectIF {
      * @return Set of Entity objects.
      * @throws EntityException if there is an internal error in the AM Store.
      * @throws SSOException if the sign on is no longer valid.
-     * @throws RemoteException
+     * @throws RemoteException if a remote communication error occurs.
      */
     public Map getEntity(
             String ssoToken,
@@ -194,11 +195,11 @@ public class EntityObjectImpl implements EntityObjectIF {
      *        in the <code>DAI</code> service.
      * @param entityLocation Location of the entity creation. example
      *        <code>www.abc.com</code>.
-     * @param entityFilter
+     * @param entityFilter the filter used to narrow the returned entity names.
      * @return Set of Entity Names.
      * @throws EntityException if there is an internal error in the AM Store.
      * @throws SSOException if the sign on is no longer valid.
-     * @throws RemoteException
+     * @throws RemoteException if a remote communication error occurs.
      */
     public Set getEntityNames(
             String ssoToken,
@@ -225,7 +226,7 @@ public class EntityObjectImpl implements EntityObjectIF {
      *        <code>www.abc.com</code>.
      * @throws EntityException if there is an internal error in the AM Store.
      * @throws SSOException if the sign on is no longer valid.
-     * @throws RemoteException
+     * @throws RemoteException if a remote communication error occurs.
      */
     public void modifyEntity(
             String ssoToken,

@@ -61,8 +61,8 @@ public abstract class Token implements IXMLUtilsConstants {
 
     /**
      * Returns the string representation of the token
-     * 
-     * @return
+     *
+     * @return the string representation of the token
      */
     protected String getTokenString() {
         return tokenString;

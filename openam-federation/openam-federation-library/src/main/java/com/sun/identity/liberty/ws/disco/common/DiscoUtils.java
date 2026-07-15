@@ -86,10 +86,10 @@ public class DiscoUtils extends DiscoSDKUtils {
      * @param token token of this soap session.
      * @return Map of following key value pairs:
      *  <pre>
-     *  Key: <code>OFFERINGS</code>
-     *  Value: List of <code>ResourceOffering</code>s
-     *  Key: <code>CREDENTIALS</code>
-     *  Value: List of credentials (<code>Assertion</code>s)
+     *  Key: &lt;code&gt;OFFERINGS&lt;/code&gt;
+     *  Value: List of &lt;code&gt;ResourceOffering&lt;/code&gt;s
+     *  Key: &lt;code&gt;CREDENTIALS&lt;/code&gt;
+     *  Value: List of credentials (&lt;code&gt;Assertion&lt;/code&gt;s)
      *  </pre>
      */
     public static Map checkPolicyAndHandleDirectives(

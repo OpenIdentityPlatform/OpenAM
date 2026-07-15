@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sm.datalayer.api;
@@ -22,7 +23,7 @@ import org.forgerock.util.promise.Promise;
 
 /**
  * Creates connections of type T either asynchronously or synchronously.
- * @param <T>
+ * @param <T> the type of connection produced by this factory
  */
 public interface ConnectionFactory<T> extends Closeable {
 

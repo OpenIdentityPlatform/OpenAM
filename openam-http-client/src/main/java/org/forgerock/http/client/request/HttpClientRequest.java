@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.http.client.request;
 
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Models the request that a script can send over a {@link org.forgerock.http.client.HttpClient}. Is designed to be a basic HTTP/1.1
+ * Models the request that a script can send over a {@code org.forgerock.http.client.HttpClient}. Is designed to be a basic HTTP/1.1
  * request. See http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5
  *
  * NB: 'HttpClientRequest' used rather than 'Request' to avoid clashes with {@link org.restlet.Request}.
@@ -69,7 +70,7 @@ public interface HttpClientRequest {
     /**
      * Set the message entity.
      *
-     * @param entity
+     * @param entity the message entity/body to set on the request.
      */
     public void setEntity(String entity);
 

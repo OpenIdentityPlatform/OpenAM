@@ -24,6 +24,7 @@
  *
  * $Id: DefaultAttributeMapper.java,v 1.4 2009/10/28 23:58:59 exu Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -76,7 +77,7 @@ public class DefaultAttributeMapper {
      * @return a map of local attributes configuration map.
      *        This map will have a key as the SAML attribute name and the value
      *        is the local attribute. 
-     * @exception <code>WSFederationException</code> if any failured.
+     * @exception WSFederationException if any failured.
      */
     public Map getConfigAttributeMap(
          String realm, String hostEntityID) throws WSFederationException {

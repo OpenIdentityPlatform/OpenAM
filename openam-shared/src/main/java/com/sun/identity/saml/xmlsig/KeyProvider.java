@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.xmlsig;
@@ -41,10 +42,7 @@ import javax.crypto.SecretKey;
 /**
  * The class <code>KeyProvider</code> is an interface
  * that is implemented to retrieve X509Certificates and Private Keys from
- * user data store.  
- * <p>
- *
- * 
+ * user data store.
  */
 
 public interface KeyProvider {

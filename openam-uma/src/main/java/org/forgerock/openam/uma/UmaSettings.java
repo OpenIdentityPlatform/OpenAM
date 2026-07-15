@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.uma;
@@ -69,8 +70,8 @@ public interface UmaSettings {
 
     /**
      * <p>Gets the config file to be used to store Uma audit</p>
-     * @return
-     * @throws ServerException
+     * @return the name of the config file used to store UMA audit records
+     * @throws ServerException if there is a problem reading the configuration
      */
     String getAuditLogConfig() throws ServerException, SMSException, SSOException;
 

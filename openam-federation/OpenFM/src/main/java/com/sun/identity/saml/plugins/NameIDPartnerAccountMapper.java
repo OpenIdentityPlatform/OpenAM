@@ -25,6 +25,7 @@
  * $Id: NameIDPartnerAccountMapper.java,v 1.5 2010/01/09 19:41:52 qcheng Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.plugins;
@@ -44,7 +45,6 @@ import java.util.Map;
  * the value is DN, the RND value will be returned. If value is email
  * address, the email id (without @domain) will be returned. Otherwise,
  * whole Name ID value will be returned.
- * <p>
  */
 public class NameIDPartnerAccountMapper extends DefaultPartnerAccountMapper {
 

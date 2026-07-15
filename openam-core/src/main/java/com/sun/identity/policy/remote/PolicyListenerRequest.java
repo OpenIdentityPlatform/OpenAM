@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -49,9 +50,8 @@ import org.w3c.dom.Node;
  * This <code>PolicyListenerRequest</code> class represents an 
  * AddPolicyListener XML document. The AddPolicyListener DTD is 
  * defined as the following:
- * <p>
- * <pre>
- *    <!-- AddPolicyListener element adds a policy listener to the 
+ * <pre>{@code
+ *    <!-- AddPolicyListener element adds a policy listener to the
  *         service to receive the policy notification.
  *         The attribute serviceName specifies the service name.
  *         The attribute notificationURL provides the notification
@@ -63,8 +63,8 @@ import org.w3c.dom.Node;
  *        serviceName        NMTOKEN    #REQUIRED
  *        notificationURL    CDATA      #REQUIRED
  *    >
+ * }
  * </pre>
- * <p>
  */
 
 public class PolicyListenerRequest implements PolicyListener {

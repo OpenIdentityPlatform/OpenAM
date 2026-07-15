@@ -24,7 +24,7 @@
  *
  * $Id: FSProcessLogoutServlet.java,v 1.7 2008/12/19 06:50:47 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -635,7 +635,8 @@ public class FSProcessLogoutServlet extends HttpServlet {
      * @param remoteEntity Id the remote provider's entity id
      * @return <code>true</code> if the signature is valid; <code>false</code>
      *  otherwise.
-     * @exception SAMLException, FSException if an error occurred during the
+     * @exception SAMLException if an error occurred during the
+     * @exception FSException if an error occurred during the
      *  process
      */
     private boolean verifyLogoutSignature(

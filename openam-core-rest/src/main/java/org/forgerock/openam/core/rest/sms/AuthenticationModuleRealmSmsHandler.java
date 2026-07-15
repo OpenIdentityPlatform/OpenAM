@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -87,8 +87,6 @@ public class AuthenticationModuleRealmSmsHandler {
 
     /**
      * Returns the list of configured authentication module instances for the current realm.
-     *
-     * {@inheritDoc}
      */
     @Query(operationDescription = @Operation(description = REALM_AUTH_MODULES + "query.description"),
             type = QueryType.FILTER, queryableFields = "_id")

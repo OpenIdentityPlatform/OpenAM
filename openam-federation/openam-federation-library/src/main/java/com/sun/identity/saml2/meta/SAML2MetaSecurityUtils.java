@@ -25,6 +25,7 @@
  * $Id: SAML2MetaSecurityUtils.java,v 1.6 2009/06/08 23:43:18 madan_ranganath Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.meta;
@@ -142,19 +143,21 @@ public final class SAML2MetaSecurityUtils {
     /**
      * Signs the entity descriptor root element by the following rules:
      * <ul>
-     *  <li>Hosted Entity</li>
-     *  <ul>
-     *   <li>If there is a signature already on the EntityDescriptor, removes it, then signs the EntityDescriptor.
-     *   </li>
-     *   <li>Simply signs the EntityDescriptor otherwise.</li>
-     *  </ul>
-     *  <li>Remote Entity</li>
-     *  <ul>
-     *   <li>If there is a signature already on the EntityDescriptor, then does not change it, but returns the
-     *       Document with the original signature.
-     *   </li>
-     *   <li>Simply signs the EntityDescriptor otherwise</li>
-     *  </ul>
+     *  <li>Hosted Entity
+     *   <ul>
+     *    <li>If there is a signature already on the EntityDescriptor, removes it, then signs the EntityDescriptor.
+     *    </li>
+     *    <li>Simply signs the EntityDescriptor otherwise.</li>
+     *   </ul>
+     *  </li>
+     *  <li>Remote Entity
+     *   <ul>
+     *    <li>If there is a signature already on the EntityDescriptor, then does not change it, but returns the
+     *        Document with the original signature.
+     *    </li>
+     *    <li>Simply signs the EntityDescriptor otherwise</li>
+     *   </ul>
+     *  </li>
      * </ul>
      * If there is no extended metadata for the entity, the entity is considered as remote.
      *
@@ -370,16 +373,18 @@ public final class SAML2MetaSecurityUtils {
     /** 
      * Restores Base64 encoded format.
      * JAXB will change
-     *      <ds:X509Data>
-     *          <ds:X509Certificate>
+     * <pre>
+     *      &lt;ds:X509Data&gt;
+     *          &lt;ds:X509Certificate&gt;
      *  .........
      *  .........
-     *          </ds:X509Certificate>
-     *      </ds:X509Data>
+     *          &lt;/ds:X509Certificate&gt;
+     *      &lt;/ds:X509Data&gt;
      *  to
-     *      <ds:X509Data>
-     *          <ds:X509Certificate>..................</ds:X509Certificate>
-     *      </ds:X509Data>
+     *      &lt;ds:X509Data&gt;
+     *          &lt;ds:X509Certificate&gt;..................&lt;/ds:X509Certificate&gt;
+     *      &lt;/ds:X509Data&gt;
+     * </pre>
      *
      *  This method will restore the format.
      *  @param xmlstr The xml string containing element 'X509Certificate'.

@@ -25,6 +25,7 @@
  * $Id: PolicyResponse.java,v 1.8 2008/12/04 00:38:52 dillidorai Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.remote;
@@ -41,8 +42,7 @@ import org.w3c.dom.Node;
 /**
  * This <code>PolicyResponse</code> represents a PolicyResponse
  * XML document. The PolicyResponse DTD is defined as the following:
- * <p>
- * <pre>
+ * <pre>{@code
  *   <!-- PolicyResponse element is used by the server to return a
  *    response to the client.
  *    If the client request is a policy evaluation request, then the
@@ -65,8 +65,7 @@ import org.w3c.dom.Node;
  *   <!ATTLIST    PolicyResponse
  *       requestId      CDATA        #REQUIRED
  *   >
- * </pre>
- * <p>
+ * }</pre>
  */
 public class PolicyResponse {
     /**

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -38,8 +39,7 @@ import java.util.Hashtable;
 /**
  * This <code>NamingResponse</code> class represents a NamingResponse XML
  * document. The NamingResponse DTD is defined as the following:
- * </p>
- * 
+ *
  * <pre>
  *     &lt;?xml version=&quot;1.0&quot;&gt;
  *     &lt; !DOCTYPE NamingResponse [
@@ -55,8 +55,6 @@ import java.util.Hashtable;
  *     &lt; !ELEMENT Exception (#PCDATA)&gt;
  *     ]&gt;
  * </pre>
- * 
- * </p>
  */
 
 public class NamingResponse {

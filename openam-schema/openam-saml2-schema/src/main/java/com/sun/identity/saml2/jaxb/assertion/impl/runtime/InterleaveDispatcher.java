@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
@@ -20,12 +21,11 @@ import com.sun.xml.bind.unmarshaller.Tracer;
 
 /**
  * Splits the unmarshalling events to bracnhes to support
- * XML Schema's &lt;all> and RELAX NG's &lt;interleave>
+ * XML Schema's &lt;all&gt; and RELAX NG's &lt;interleave&gt;
  * 
  * <p>
  * This class will be extended by the generated code.
  * 
- * @optionalRuntime
  * 
  * @author
  *     Kohsuke Kawaguchi (kohsuke.kawaguchi@sun.com)

@@ -25,6 +25,7 @@
  * $Id: RequestAbstractImpl.java,v 1.5 2008/06/25 05:48:00 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.saml2.protocol.impl;
 
@@ -290,7 +291,6 @@ public abstract class RequestAbstractImpl implements RequestAbstract {
      * Sets the value of the <code>Consent</code> attribute.
      *
      * @return the value of <code>Consent</code> attribute.
-     * @throws SAML2Exception if the object is immutable.
      * @see #setConsent(String)
      */
     public String getConsent() {

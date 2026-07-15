@@ -25,6 +25,7 @@
  * $Id: PeopleContainer.java,v 1.4 2009/01/28 05:34:50 ww203982 Exp $
  *
  * Portions Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.ums;
@@ -101,7 +102,7 @@ public class PeopleContainer extends PersistentObject {
      * 
      * @param user
      *            User object to be added to the container
-     * @exception AccessRightsEsception
+     * @exception AccessRightsException
      *                if an access rights exception occurs
      * @exception EntryAlreadyExistsException
      *                if the entry already exists
@@ -119,7 +120,7 @@ public class PeopleContainer extends PersistentObject {
      * 
      * @param pc
      *            People Container object to be added to the container
-     * @exception AccessRightsEsception
+     * @exception AccessRightsException
      *                if an access rights exception occurs
      * @exception EntryAlreadyExistsException
      *                if the entry already exists
@@ -138,7 +139,7 @@ public class PeopleContainer extends PersistentObject {
      * 
      * @param user
      *            User object to be removed to the container
-     * @exception AccessRightsEsception
+     * @exception AccessRightsException
      *                if an access rights exception occurs
      * @exception UMSException
      *                fails to remove the object 
@@ -154,7 +155,7 @@ public class PeopleContainer extends PersistentObject {
      * 
      * @param pc
      *            People Container object to be removed to the container
-     * @exception AccessRightsEsception
+     * @exception AccessRightsException
      *                if an access rights exception occurs
      * @exception EntryNotFoundException
      *                if the entry is not found

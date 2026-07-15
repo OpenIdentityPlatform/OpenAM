@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.util;
 
@@ -40,7 +41,7 @@ import java.util.Map;
 /**
  * Provides a utility object for rendering a Page's HEAD elements and
  * control HEAD elements.
- * <p/>
+ * <p>
  * PageImports automatically makes the HEAD elements available to Velocity
  * templates and JSP pages through the following variables:
  * <ul>
@@ -52,7 +53,7 @@ import java.util.Map;
  * By splitting JavaScript elements from other HEAD elements allows you to place
  * JavaScript elements at the bottom of the Page which allows the HTML content
  * to be rendered faster.
- * <p/>
+ * <p>
  * To use the HEAD elements simply reference them in your page template. For
  * example:
  *
@@ -332,7 +333,7 @@ public class PageImports {
      * Process the HEAD elements of the given list of Controls. You can retrieve
      * the processed HEAD elements through {@link #getHeadElements} and
      * {@link #getJsElements()}.
-     * <p/>
+     * <p>
      * This method delegates to {@link #processControl(Control)}
      * to add the given Control's HEAD elements to the Page imports.
      *
@@ -351,7 +352,7 @@ public class PageImports {
      * process Containers and all child controls. You can retrieve
      * the processed HEAD elements through {@link #getHeadElements} and
      * {@link #getJsElements()}.
-     * <p/>
+     * <p>
      * This method delegates to {@link #processHeadElements(List)}
      * to add the HEAD elements to the Page imports.
      *
@@ -513,9 +514,9 @@ public class PageImports {
 
     /**
      * Process the given list of HEAD elements.
-     * <p/>
+     * <p>
      * This method invokes {@link #add(Element)} for
-     * every <tt>Element</tt> entry in the specified list.
+     * every <code>Element</code> entry in the specified list.
      *
      * @param elements the list of HEAD elements to process
      */

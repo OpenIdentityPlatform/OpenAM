@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2.rest;
@@ -139,7 +139,7 @@ public class OAuth2UserApplications {
      *
      * @param context The request context.
      * @param queryHandler The query handler.
-     * @param request Unused but necessary for used of the {@link @Query} annotation.
+     * @param request Unused but necessary for used of the {@code @Query} annotation.
      * @return A promise of a query response.
      */
     @Query(operationDescription = @Operation(description = OAUTH2_USER_APPLICATIONS + QUERY_DESCRIPTION,

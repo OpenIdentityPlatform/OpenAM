@@ -25,6 +25,7 @@
  * $Id: SMSException.java,v 1.7 2009/01/28 05:35:03 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.sm;
 
@@ -450,7 +451,6 @@ public class SMSException extends Exception implements L10NMessage {
     /**
      * If root LDAP cause is an LDAP exception with one of the following error
      * codes then this status is set.
-     * <p>
      * 
      * <PRE>
      * 

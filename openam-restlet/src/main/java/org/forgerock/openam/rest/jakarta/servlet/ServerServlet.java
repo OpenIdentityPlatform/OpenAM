@@ -20,6 +20,8 @@
  * https://restlet.talend.com/
  *
  * Restlet is a registered trademark of QlikTech International AB.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.rest.jakarta.servlet;
@@ -67,6 +69,7 @@ import org.restlet.routing.VirtualHost;
  * Please note that you can also combine the two first of them whereas the last
  * one is a full alternative. They are described below by order of priority:
  * <table>
+ * <caption>Servlet deployment configuration modes</caption>
  * <tr>
  * <th>Mode</th>
  * <th>Description</th>
@@ -1093,7 +1096,7 @@ public class ServerServlet extends HttpServlet {
      * @param className
      *            The class name to lookup.
      * @return The class object.
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException if no class with the given name can be found.
      */
     protected Class<?> loadClass(String className)
             throws ClassNotFoundException {

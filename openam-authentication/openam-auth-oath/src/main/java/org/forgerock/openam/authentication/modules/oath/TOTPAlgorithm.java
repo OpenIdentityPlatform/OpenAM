@@ -9,7 +9,7 @@
  (http://trustee.ietf.org/license-info).
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.oath;
@@ -68,7 +68,7 @@ public class TOTPAlgorithm {
      * @param time         a value that reflects a time
      * @param returnDigits number of digits to return
      * @return a numeric String in base 10 that includes
-     *         {@link truncationDigits} digits
+     *         {@code truncationDigits} digits
      */
 
     public static String generateTOTP(byte[] key,
@@ -86,7 +86,7 @@ public class TOTPAlgorithm {
      * @param time         a value that reflects a time
      * @param returnDigits number of digits to return
      * @return a numeric String in base 10 that includes
-     *         {@link truncationDigits} digits
+     *         {@code truncationDigits} digits
      */
 
     public static String generateTOTP256(byte[] key,
@@ -103,7 +103,7 @@ public class TOTPAlgorithm {
      * @param time         a value that reflects a time
      * @param returnDigits number of digits to return
      * @return a numeric String in base 10 that includes
-     *         {@link truncationDigits} digits
+     *         {@code truncationDigits} digits
      */
 
     public static String generateTOTP512(byte[] key,
@@ -122,7 +122,7 @@ public class TOTPAlgorithm {
      * @param returnDigits number of digits to return
      * @param crypto       the crypto function to use
      * @return a numeric String in base 10 that includes
-     *         {@link truncationDigits} digits
+     *         {@code truncationDigits} digits
      */
 
     public static String generateTOTP(byte[] key,

@@ -25,6 +25,7 @@
  * $Id: StaticGroup.java,v 1.4 2009/01/28 05:34:51 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.ums;
@@ -203,9 +204,8 @@ public class StaticGroup extends PersistentObject implements
      * Gets the members of the group.
      * 
      * @return SearchResults for members of the group
-     * @exception Not
-     *                thrown by this class
-     * 
+     * @exception UMSException
+     *                if an error occurs while retrieving the member identifiers
      */
     public SearchResults getMemberIDs() throws UMSException {
         return getMembers(LEVEL_DIRECT);
@@ -223,10 +223,8 @@ public class StaticGroup extends PersistentObject implements
      * @param level
      *            Nesting level
      * @return SearchResults for members of the group
-     * @exception Not
-     *                thrown by this class
-     * 
-     * 
+     * @exception UMSException
+     *                if an error occurs while retrieving the members
      */
     public SearchResults getMembers(int level) throws UMSException {
         Attr attr = getAttribute(MEMBER_ATTR_NAME);
@@ -282,9 +280,8 @@ public class StaticGroup extends PersistentObject implements
      * Gets the member count.
      * 
      * @return Number of members of the group
-     * @exception Not
-     *                thrown by this class
-     * 
+     * @exception UMSException
+     *                if an error occurs while counting the members
      */
     public int getMemberCount() throws UMSException {
         return getMemberCount(LEVEL_DIRECT);
@@ -296,9 +293,8 @@ public class StaticGroup extends PersistentObject implements
      * @param level
      *            Nesting level
      * @return Number of members of the group
-     * @exception Not
-     *                thrown by this class
-     * 
+     * @exception UMSException
+     *                if an error occurs while counting the members
      */
     public int getMemberCount(int level) throws UMSException {
 
@@ -329,9 +325,8 @@ public class StaticGroup extends PersistentObject implements
      * @param index
      *            Zero-based index into the group container
      * @return The unique identifier for a member
-     * @exception Not
-     *                thrown by this class
-     * 
+     * @exception UMSException
+     *                if an error occurs while retrieving the member
      */
     public Guid getMemberIDAt(int index) throws UMSException {
         Attr attr = getAttribute(MEMBER_ATTR_NAME);
@@ -347,9 +342,8 @@ public class StaticGroup extends PersistentObject implements
      * @param level
      *            Nesting level
      * @return The unique identifier for a member
-     * @exception Not
-     *                thrown by this class
-     * 
+     * @exception UMSException
+     *                if an error occurs while retrieving the member
      */
     public Guid getMemberIDAt(int index, int level) throws UMSException {
         SearchResults allMembers = getMembers(level);
@@ -421,9 +415,9 @@ public class StaticGroup extends PersistentObject implements
      * 
      * @param guid
      *            Identity of member to be checked for membership
-     * @return <code>true if it is a member
-     * @exception   Not thrown by this class
-     * 
+     * @return <code>true</code> if it is a member
+     * @exception UMSException
+     *                if an error occurs while checking membership
      */
     public boolean hasMember(Guid guid) throws UMSException {
         return isMemberAtLevel(guid.getDn(), LEVEL_DIRECT);
@@ -457,9 +451,8 @@ public class StaticGroup extends PersistentObject implements
      * @param level
      *            Nesting level
      * @return <code>true</code> if it is a member
-     * @exception Not
-     *                thrown by this class
-     * 
+     * @exception UMSException
+     *                if an error occurs while checking membership
      */
     public boolean hasMember(Guid guid, int level) throws UMSException {
 

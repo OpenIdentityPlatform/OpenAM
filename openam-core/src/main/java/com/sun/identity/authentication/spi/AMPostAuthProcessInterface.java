@@ -25,7 +25,7 @@
  * $Id: AMPostAuthProcessInterface.java,v 1.5 2009/01/16 23:31:34 higapa Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.spi;
@@ -137,7 +137,7 @@ public interface AMPostAuthProcessInterface {
     /**
      * Post processing on failed authentication.
      *
-     * @param requestParamsMap map containing <code>HttpServletRequest<code>
+     * @param requestParamsMap map containing <code>HttpServletRequest</code>
      *        parameters.
      * @param request <code>HttpServletRequest</code> object.
      * @param response <code>HttpServletResponse</code> object.
@@ -155,7 +155,7 @@ public interface AMPostAuthProcessInterface {
      * @param request <code>HttpServletRequest</code> object.
      * @param response <code>HttpServletResponse</code> object.
      * @param ssoToken authenticated user's single sign on token.
-     * @throws AuthenticationException
+     * @throws AuthenticationException if an error occurs during logout post processing
      */
     public void onLogout(
         HttpServletRequest request,

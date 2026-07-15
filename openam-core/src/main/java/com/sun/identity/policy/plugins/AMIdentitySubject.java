@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -71,7 +72,7 @@ import java.security.AccessController;
  * membership in a set of <code>AMIdentity</code> objects using the underlying
  * Identity repository service.
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.subject.IdentitySubject} instead.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.subject.IdentitySubject} instead.
  */
 @Deprecated
 public class AMIdentitySubject implements Subject {
@@ -90,8 +91,8 @@ public class AMIdentitySubject implements Subject {
      * Initialize the AMIdentitySubject object by using the configuration
      * information passed by the Policy Framework.
      * <p>
-     * This implementation  not need anything out of the <code>configParams 
-     * I/code> so does no operation.
+     * This implementation  not need anything out of the <code>configParams
+     * </code> so does no operation.
      *
      * @param configParams configuration parameters as a <code>Map</code>.
      *
@@ -114,10 +115,6 @@ public class AMIdentitySubject implements Subject {
      * It returns <code>Syntax.MULTIPLE_CHOICE</code>.
      *
      * @exception SSOException if <code>SSOToken</code> is not valid
-     * @exception <code>PolicyException</code> if unable to get the list of 
-     * valid names.
-     *
-     * @return <code>Syntax</code> of the values for the <code>Subject</code>
      */
     public Syntax getValueSyntax(SSOToken token) throws SSOException {
         return (Syntax.MULTIPLE_CHOICE);
@@ -193,7 +190,7 @@ public class AMIdentitySubject implements Subject {
      * Returns the values that was set using the
      * method <code>setValues</code>.
      *
-     * @return <code>Set</code of values that have been set for the user 
+     * @return <code>Set</code> of values that have been set for the user
      * collection
      */
     public Set getValues() {

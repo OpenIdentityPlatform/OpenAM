@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.scripting;
@@ -29,7 +30,7 @@ public interface ScriptEvaluator {
     /**
      * Evaluates the given script object using an appropriate script engine for the language of the script. Any
      * bindings associated with the script will be passed to the engine when the script is evaluated.
-     * <p/>
+     * <p>
      * There are three scope levels at which variables can be set:
      * <ol>
      *     <li><em>Global</em> variables are set using the {@link #bindVariableInGlobalScope(String, Object)} method,

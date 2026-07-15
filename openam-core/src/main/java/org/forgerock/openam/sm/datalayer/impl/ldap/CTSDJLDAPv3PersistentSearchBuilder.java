@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions Copyrighted 2026 3A Systems, LLC
 */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
@@ -37,7 +38,7 @@ public class CTSDJLDAPv3PersistentSearchBuilder {
     /**
      * Generates a new builder.
      *
-     * @param connectionFactory 
+     * @param connectionFactory the connection factory used to create LDAP connections for the persistent search
      */
     public CTSDJLDAPv3PersistentSearchBuilder(ConnectionFactory connectionFactory) {
         Reject.ifNull(connectionFactory);

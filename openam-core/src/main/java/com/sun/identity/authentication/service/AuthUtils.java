@@ -25,7 +25,7 @@
  * $Id: AuthUtils.java,v 1.33 2009/12/15 16:39:47 qcheng Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.authentication.service;
 
@@ -1209,8 +1209,8 @@ public class AuthUtils extends AuthClientUtils {
 
     /**
      * Get the module service name in either
-     * iplanet-am-auth format<module.toLowerCase()>Service(old) or
-     * sunAMAuth<module>Service format(new).
+     * iplanet-am-auth format{@code <module.toLowerCase()>}Service(old) or
+     * sunAMAuth{@code <module>}Service format(new).
      */
     public static String getModuleServiceName(String moduleName) {
         String serviceName = (String) moduleService.get(moduleName);

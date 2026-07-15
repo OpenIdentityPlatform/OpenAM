@@ -20,6 +20,7 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted 2012 ForgeRock AS"
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.authentication.modules.oath;
@@ -45,8 +46,6 @@ public class OATHPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Returns the HOTP username for this <code>HOTPPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return the HOTP username for this <code>HOTPPrincipal</code>
      */
@@ -56,8 +55,6 @@ public class OATHPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Returns a string representation of this <code>HOTPPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return a string representation of this <code>HOTPPrincipal</code>.
      */
@@ -70,8 +67,6 @@ public class OATHPrincipal implements Principal, java.io.Serializable {
      * for equality.  Returns true if the given object is also a
      * <code>HOTPPrincipal</code> and the two HOTPPrincipals
      * have the same username.
-     * <p/>
-     * <p/>
      *
      * @param o Object to be compared for equality with this
      *          <code>HOTPPrincipal</code>.
@@ -100,8 +95,6 @@ public class OATHPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Returns a hash code for this <code>HOTPPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return a hash code for this <code>HOTPPrincipal</code>.
      */

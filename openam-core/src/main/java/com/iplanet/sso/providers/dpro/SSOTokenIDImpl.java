@@ -25,6 +25,7 @@
  * $Id: SSOTokenIDImpl.java,v 1.2 2008/06/25 05:41:43 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.sso.providers.dpro;
@@ -73,7 +74,7 @@ public class SSOTokenIDImpl implements SSOTokenID {
      * and only if the argument is not null and the random string and server
      * name are the same in both objects.
      * 
-     * @param an
+     * @param object
      *            Object - the object to compare this SessionID against.
      * @return true if the SessionID are equal; false otherwise.
      */

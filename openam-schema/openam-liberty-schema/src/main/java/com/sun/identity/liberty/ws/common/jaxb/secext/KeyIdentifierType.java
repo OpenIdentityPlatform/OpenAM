@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -13,15 +14,14 @@ package com.sun.identity.liberty.ws.common.jaxb.secext;
  * A security token key identifier
  * Java content class for KeyIdentifierType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/secext.xsd line 87)
- * <p>
  * <pre>
- * &lt;complexType name="KeyIdentifierType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://schemas.xmlsoap.org/ws/2003/06/secext>EncodedString">
- *       &lt;attribute name="ValueType" type="{http://www.w3.org/2001/XMLSchema}QName" />
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="KeyIdentifierType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://schemas.xmlsoap.org/ws/2003/06/secext&gt;EncodedString"&gt;
+ *       &lt;attribute name="ValueType" type="{http://www.w3.org/2001/XMLSchema}QName" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

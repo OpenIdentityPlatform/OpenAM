@@ -24,6 +24,7 @@
  *
  * $Id: Decision.java,v 1.2 2008/06/25 05:48:11 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -34,17 +35,17 @@ import com.sun.identity.xacml.common.XACMLException;
  * The <code>Decision</code> element is a container of 
  * one or more <code>Decision</code>s issued by policy decision point
  * 
- * <p/>
+ * <p>
  * Schema:
  * <pre>
- * <xs:simpleType name="DecisionType">
- *     <xs:restriction base="xs:string">
- *         <xs:enumeration value="Permit"/>
- *         <xs:enumeration value="Deny"/>
- *         <xs:enumeration value="Indeterminate"/>
- *         <xs:enumeration value="NotApplicable"/>
- *     </xs:restriction>
- * </xs:simpleType>
+ * &lt;xs:simpleType name="DecisionType"&gt;
+ *     &lt;xs:restriction base="xs:string"&gt;
+ *         &lt;xs:enumeration value="Permit"/&gt;
+ *         &lt;xs:enumeration value="Deny"/&gt;
+ *         &lt;xs:enumeration value="Indeterminate"/&gt;
+ *         &lt;xs:enumeration value="NotApplicable"/&gt;
+ *     &lt;/xs:restriction&gt;
+ * &lt;/xs:simpleType&gt;
  * </pre>
  * 
  */

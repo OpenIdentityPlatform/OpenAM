@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.monitoring;
@@ -60,7 +60,7 @@ class EvaluationMonitoringStore {
     /**
      * Increments the cumulative count of evaluations and recalculates the rate.
      *
-     * <br/>
+     * <br>
      * Only synchronizes the count increment, NOT the whole method.
      */
     public void increment() {

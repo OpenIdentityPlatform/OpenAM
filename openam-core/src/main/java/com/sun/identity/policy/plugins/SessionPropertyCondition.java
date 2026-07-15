@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -58,7 +59,7 @@ import com.iplanet.sso.SSOToken;
  * This condition checks whether session properties contain at least 
  * one value of the each property listed in the <code>Condition</code>
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.SessionPropertyCondition} instead.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.environment.SessionPropertyCondition} instead.
  */
 @Deprecated
 public class SessionPropertyCondition implements Condition {
@@ -99,7 +100,7 @@ public class SessionPropertyCondition implements Condition {
       *
       * @param property <code>String</code> representing property name
       *
-      * @return <code>Syntax<code> for the property name
+      * @return <code>Syntax</code> for the property name
       */
      public Syntax getPropertySyntax(String property)
      {

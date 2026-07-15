@@ -24,6 +24,7 @@
  *
  * $Id: STSConfig.java,v 1.10 2009/11/16 21:52:58 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /*
@@ -104,7 +105,7 @@ public abstract class STSConfig extends TrustAuthorityConfig {
     
     /**
      * Sets the keytype
-     * @param keyType
+     * @param keyType the key type to set, for example symmetric or asymmetric.
      */
     public void setKeyType(String keyType) {
         this.keyType = keyType;

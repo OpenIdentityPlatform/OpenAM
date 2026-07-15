@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -35,8 +36,7 @@ package com.iplanet.dpro.session.share;
  * This <code>SessionNotification</code> class represents a
  * <code>SessionNotification</code> XML document. The
  * <code>SessionNotification</code> DTD is defined as the following:
- * </p>
- * 
+ *
  * <pre>
  *     &lt;?xml version=&quot;1.0&quot;&gt;
  *     &lt; !DOCTYPE SessionNotification [
@@ -61,8 +61,7 @@ package com.iplanet.dpro.session.share;
  *     &lt; !ELEMENT Time (#PCDATA)&gt;
  *     ]&gt;
  * </pre>
- * 
- * </p>
+ *
  */
 public class SessionNotification {
 

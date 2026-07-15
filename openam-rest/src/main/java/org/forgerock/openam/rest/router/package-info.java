@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock Inc.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 /**
  * This package contains classes for the routing of REST requests for OpenAM.
- * <br/>
+ * <br>
  * Each REST request is parsed for the presence of a realm in the URI before being routed to the requested
  * endpoint.
  */

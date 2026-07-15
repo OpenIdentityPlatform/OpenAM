@@ -12,7 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
-* Portions copyright 2025 3A Systems LLC.
+* Portions copyright 2025-2026 3A Systems LLC.
 */
 package org.forgerock.openam.utils;
 
@@ -74,7 +74,7 @@ public class RecoveryCodeGenerator {
      * source of random characters.
      *
      * @param alphabet The alpha to use from which to pick characters. Must not be null.
-     * @param length The size of the produced codes. Must be > 0.
+     * @param length The size of the produced codes. Must be &gt; 0.
      *
      * @return a randomly generated code.
      */
@@ -100,7 +100,7 @@ public class RecoveryCodeGenerator {
      * @param alphabet The alpha to use from which to pick characters. Must not be null.
      * @param groups The groupings of characters. For example, {@code {4, 4}} will produce two sets
      *               of four characters with a {@code delimiter} between them. Must not be null. Must have at least
-     *               one entry. Entries must be > 0.
+     *               one entry. Entries must be &gt; 0.
      * @param delimiter The character to use between each of the groups.
      *
      * @return a randomly generated, delimited code.
@@ -134,7 +134,7 @@ public class RecoveryCodeGenerator {
      * @param alphabet The alpha to use from which to pick characters. Must not be null.
      * @param groups The groupings of characters. For example, {@code {4, 4}} will produce two sets
      *               of four characters with a {@code delimiter} between them. Must not be null. Must have at least
-     *               one entry. Entries must be > 0.
+     *               one entry. Entries must be &gt; 0.
      * @param delimiter The character to use between each of the groups. Must not be null.
      * @param specifics A map used to specify characters to use at a given location.
      *
@@ -158,7 +158,7 @@ public class RecoveryCodeGenerator {
     /**
      * Generate a set of codes using the provided alphabet of the default length.
      *
-     * @param numCodes The number of codes to generate. Must be > 0.
+     * @param numCodes The number of codes to generate. Must be &gt; 0.
      * @param alphabet The alphabet to use from which to select characters. Must not be null.
      * @param allowDuplicates Whether to allow duplicates in the result set.
      *
@@ -173,9 +173,9 @@ public class RecoveryCodeGenerator {
     /**
      * Generate a set of codes using the provided alphabet of the provided length.
      *
-     * @param numCodes Number of recovery codes to generate. Must be > 0.
+     * @param numCodes Number of recovery codes to generate. Must be &gt; 0.
      * @param alphabet The alphabet to use from which to select characters. Must not be null.
-     * @param length The length of produced codes. Must be > 0.
+     * @param length The length of produced codes. Must be &gt; 0.
      * @param allowDuplicates Whether or not to allow duplicates in the result set.
      *
      * @throws CodeException if duplicate codes were produced, disallowed and the number of retries was exceeded.
@@ -214,11 +214,11 @@ public class RecoveryCodeGenerator {
      * source of random characters. The generated codes will have random characters for the
      * size of each of the supplied {@code groups}, with a {@code delimiter} between them.
      *
-     * @param numCodes Number of recovery codes to generate. Must be > 0.
+     * @param numCodes Number of recovery codes to generate. Must be &gt; 0.
      * @param alphabet The alphabet to use from which to select numbers. Must not be null.
      * @param groups The groupings of lengths of characters. For example, {@code {4, 4}} will produce two set
      *               of four characters with a {@code delimiter} between them. Must not be null. Must have at least
-     *               one entry. Entries must be > 0.
+     *               one entry. Entries must be &gt; 0.
      * @param delimiter The character to use between each of the groups.
      * @param allowDuplicates Whether or not to allow duplicates in the result set.
      *
@@ -261,11 +261,11 @@ public class RecoveryCodeGenerator {
      * The provided specifics map can then be used to replace individual character indexes with a
      * specific character.
      *
-     * @param numCodes The number of codes to generate. Must be > 0.
+     * @param numCodes The number of codes to generate. Must be &gt; 0.
      * @param alphabet The alphabet to use from which to pick characters. Must not be null.
      * @param groups The groupings of lengths of characters. For example, {@code {4, 4}} will produce two sets
      *               of four characters with a {@code delimiter} between them. Must not be null. Must have at least
-     *               one entry. Entries must be > 0.
+     *               one entry. Entries must be &gt; 0.
      * @param delimiter The character to use between each of the groups.
      * @param specifics A map used to specify characters to use at a given location.
      * @param allowDuplicates Whether to allow duplicate codes.

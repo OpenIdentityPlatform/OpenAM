@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS. All rights reserved.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2;
@@ -35,7 +37,7 @@ public interface StatementProvider {
      * @param saml2Config The SAML2Config corresponding to the STS instance consuming the TokenGenerationService
      * @return The ConditionsProvider instance which will be invoked to obtain the Conditions included in the generated SAML2
      * assertion
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the configured ConditionsProvider could not be instantiated
      */
     ConditionsProvider getConditionsProvider(SAML2Config saml2Config) throws TokenCreationException;
 
@@ -44,7 +46,7 @@ public interface StatementProvider {
      * @param saml2Config The SAML2Config corresponding to the STS instance consuming the TokenGenerationService
      * @return The SubjectProvider instance which will be invoked to obtain the Subject included in the generated SAML2
      * assertion
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the configured SubjectProvider could not be instantiated
      */
     SubjectProvider getSubjectProvider(SAML2Config saml2Config) throws TokenCreationException;
 
@@ -53,7 +55,7 @@ public interface StatementProvider {
      * @param saml2Config The SAML2Config corresponding to the STS instance consuming the TokenGenerationService
      * @return The AuthenticationStatementsProvider instance which will be invoked to obtain the AuthenticationStatements included in the generated SAML2
      * assertion
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the configured AuthenticationStatementsProvider could not be instantiated
      */
     AuthenticationStatementsProvider getAuthenticationStatementsProvider(SAML2Config saml2Config) throws TokenCreationException;
 
@@ -62,7 +64,7 @@ public interface StatementProvider {
      * @param saml2Config The SAML2Config corresponding to the STS instance consuming the TokenGenerationService
      * @return The AttributeStatementsProvider instance which will be invoked to obtain the AttributeStatements included in the generated SAML2
      * assertion
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the configured AttributeStatementsProvider could not be instantiated
      */
     AttributeStatementsProvider getAttributeStatementsProvider(SAML2Config saml2Config) throws TokenCreationException;
 
@@ -71,7 +73,7 @@ public interface StatementProvider {
      * @param saml2Config The SAML2Config corresponding to the STS instance consuming the TokenGenerationService
      * @return The AuthzDecisionStatementsProvider instance which will be invoked to obtain the AuthzDecisionStatements included in the generated SAML2
      * assertion
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the configured AuthzDecisionStatementsProvider could not be instantiated
      */
     AuthzDecisionStatementsProvider getAuthzDecisionStatementsProvider(SAML2Config saml2Config) throws TokenCreationException;
 
@@ -80,7 +82,7 @@ public interface StatementProvider {
      * @param saml2Config The SAML2Config corresponding to the STS instance consuming the TokenGenerationService
      * @return The AttributeMapper instance which will be invoked to obtain the Attributes included in the generated SAML2
      * assertion
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the configured AttributeMapper could not be instantiated
      */
     AttributeMapper getAttributeMapper(SAML2Config saml2Config) throws TokenCreationException;
 

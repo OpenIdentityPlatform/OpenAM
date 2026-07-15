@@ -24,6 +24,7 @@
  *
  * $Id: FSAccountManager.java,v 1.5 2008/06/25 05:46:39 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.accountmgmt;
@@ -47,7 +48,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 /**
- * This class is used for storing & retrieving user account's federation
+ * This class is used for storing &amp; retrieving user account's federation
  * specific information.
  */
 public class FSAccountManager {
@@ -313,9 +314,9 @@ public class FSAccountManager {
      * @param userID user id
      * @param fedInfo  Account federation info as FSAccountFedInfo object.
      * @param fedInfoKey Account Fed Info Key which contains NameSpace
-     * & opaque handle sent/received.
+     * &amp; opaque handle sent/received.
      * @param oldFedInfoKey Account Fed Info Key which contains NameSpace
-     * & opaque handle sent/received, which will be removed.
+     * &amp; opaque handle sent/received, which will be removed.
      * @throws FSAccountMgmtException if illegal argument passed.
      */
     public void writeAccountFedInfo(
@@ -332,7 +333,7 @@ public class FSAccountManager {
      * Removes Account's federation Info Key in data store.
      * @param userID user id
      * @param fedInfoKey Account Fed Info Key which contains NameSpace
-     * & opaque handle sent/received, which will be removed.
+     * &amp; opaque handle sent/received, which will be removed.
      * @throws FSAccountMgmtException if illegal argument passed.
      */
     public void removeAccountFedInfoKey(
@@ -391,10 +392,10 @@ public class FSAccountManager {
      * in fedInfo object.
      * @param userID user id
      * @param fedInfoKey Account Fed Info Key which contains NameSpace
-     * & opaque handle sent/received.
+     * &amp; opaque handle sent/received.
      * @param providerID Remote ProviderID value.
      * @throws FSAccountMgmtException - If Account fed info is not found for 
-     * given user & given ProviderID.
+     * given user &amp; given ProviderID.
      */
     public void removeAccountFedInfo(
         String userID, 
@@ -678,7 +679,7 @@ public class FSAccountManager {
      * @return true/false if Account's federation Status is Active / Inactive
      *  for given providerID.
      * @throws FSAccountMgmtException - If Account fed info is not found for 
-     *  given user & given ProviderID.
+     *  given user &amp; given ProviderID.
      */
     public boolean isFederationActive(
         String userID, 
@@ -791,10 +792,10 @@ public class FSAccountManager {
     }
     
     /**
-     * Searches user with given combination of ProviderID & Opaque handle
+     * Searches user with given combination of ProviderID &amp; Opaque handle
      * in Default Organization.
      * @param fedInfoKey Account Fed Info Key which contains NameSpace
-     * & opaque handle sent/received.
+     * &amp; opaque handle sent/received.
      * @param env - Extra parameters that can be used for user mapping.
      * @throws FSAccountMgmtException - If Unable to get Organization
      * @return User DN if user found with given combination else returns null.
@@ -809,10 +810,10 @@ public class FSAccountManager {
     }
 
     /**
-     * Searches user with given combination of ProviderID & Opaque handle
+     * Searches user with given combination of ProviderID &amp; Opaque handle
      * in given Organization.
      * @param fedInfoKey Account Fed Info Key which contains NameSpace
-     * & opaque handle sent/received.
+     * &amp; opaque handle sent/received.
      * @param orgDN organization DN.
      * @param env Extra parameters that can be used for user mapping.
      * @throws FSAccountMgmtException - If Unable to get Organization.

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -50,7 +51,7 @@ abstract public class BaseInteraction {
     /**
      * Method that needs to be implemented by the sub-classes to return 
      * the ResponseOption's and return the appropriate BaseOptions. * viz., 
-     * SingleLineOptions & MutliLineOptions. 
+     * SingleLineOptions &amp; MutliLineOptions.
      *   
      * @param state IStateAccess
      * 

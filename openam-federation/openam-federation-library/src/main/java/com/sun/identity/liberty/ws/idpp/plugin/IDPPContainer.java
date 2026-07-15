@@ -24,6 +24,7 @@
  *
  * $Id: IDPPContainer.java,v 1.2 2008/06/25 05:47:17 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.plugin;
@@ -49,7 +50,7 @@ public interface IDPPContainer {
       * Converts all the supported container values into an XML document.
       * @param userMap user data map
       * @return Document XML representation of container.
-      * @exception IDPPException. 
+      * @exception IDPPException .
       */
      public Document toXMLDocument(Map userMap) throws IDPPException;
 
@@ -71,7 +72,7 @@ public interface IDPPContainer {
       * @param select select expression.
       * @param data list of new data objects.
       * @return Map Attribute value pair for the given select and data.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Map getDataMapForSelect(String select, List data)
      throws IDPPException;

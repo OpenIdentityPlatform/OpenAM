@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.cts.monitoring.impl.operations;
@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * An internal data structure for the CTSOperationsMonitoringStore to store monitoring information about operations of
  * tokens.
- * <br/>
+ * <br>
  * The token operation monitoring information is split per token type and both a cumulative count and rate is calculated
  * and maintained.
  *
@@ -69,7 +69,7 @@ public class TokenOperationsStore {
 
     /**
      * Adds a Token operation into the monitoring store.
-     * <br/>
+     * <br>
      * The operation is mapped to the type of the token. The operations per configurable period and cumulative count
      * will be updated for the token type and operation.
      *
@@ -93,7 +93,7 @@ public class TokenOperationsStore {
 
     /**
      * Adds a Token operation into the monitoring store.
-     * <br/>
+     * <br>
      * The operation is not mapped to a particular token type, this is for operations such as delete and list as
      * the type of token cannot be determined.
      * The operations per configurable period and cumulative count will be updated for the operation.
@@ -113,7 +113,7 @@ public class TokenOperationsStore {
 
     /**
      * Gets the average rate of operations made in a given period.
-     * <br/>
+     * <br>
      * Will return the number of the specified operation made on the specified type token in a given
      * (configurable) period.
      *
@@ -130,7 +130,7 @@ public class TokenOperationsStore {
 
     /**
      * Gets the minimum rate of operations made in a given period.
-     * <br/>
+     * <br>
      * Will return the number of the specified operation made on the specified type token in a given
      * (configurable) period.
      *
@@ -147,7 +147,7 @@ public class TokenOperationsStore {
 
     /**
      * Gets the maximum rate of operations made in a given period.
-     * <br/>
+     * <br>
      * Will return the number of the specified operation made on the specified type token in a given
      * (configurable) period.
      *
@@ -164,7 +164,7 @@ public class TokenOperationsStore {
 
     /**
      * Gets the average rate of operations made in a given period.
-     * <br/>
+     * <br>
      * Returns the overall rate of calls to the given operation for all token types.
      *
      * @param operation The operation to now the average rate for.
@@ -186,7 +186,7 @@ public class TokenOperationsStore {
 
     /**
      * Gets the minimum rate of operations made in a given period.
-     * <br/>
+     * <br>
      * Will return the number of the specified operation made on tokens, which the type cannot be determined,
      * i.e. Delete and List operations.
      *
@@ -209,7 +209,7 @@ public class TokenOperationsStore {
 
     /**
      * Gets the maximum rate of operations made in a given period.
-     * <br/>
+     * <br>
      * Will return the number of the specified operation made on tokens, which the type cannot be determined,
      * i.e. Delete and List operations.
      *
@@ -232,7 +232,7 @@ public class TokenOperationsStore {
 
     /**
      * Gets the cumulative count of operations made since server start up.
-     * <br/>
+     * <br>
      * Will return the total number of the specified operation made on the specified type of token since the server
      * stared.
      *
@@ -249,7 +249,7 @@ public class TokenOperationsStore {
 
     /**
      * Gets the cumulative count of operations made since server start up.
-     * <br/>
+     * <br>
      * Will return the total number of the specified operation made on tokens, which the type cannot be determined,
      * i.e. Delete and List operations.
      *

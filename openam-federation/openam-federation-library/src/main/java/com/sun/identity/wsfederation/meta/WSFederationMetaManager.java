@@ -25,6 +25,7 @@
  * $Id: WSFederationMetaManager.java,v 1.8 2009/10/28 23:58:59 exu Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -818,7 +819,7 @@ public class WSFederationMetaManager {
      *
      * @param realm The given realm.
      * @return all the hosted entity metaAliases for a realm or an empty arrayList if not found.
-     * @throws WSFederationMetaException  if unable to retrieve the entity ids.
+     * @throws WSFederationMetaException if unable to retrieve the entity ids.
      */
     public List<String> getAllHostedMetaAliasesByRealm(String realm) throws WSFederationMetaException {
 

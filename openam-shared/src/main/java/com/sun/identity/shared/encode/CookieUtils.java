@@ -433,9 +433,9 @@ public class CookieUtils {
 
     /**
      * Add cookie to HttpServletResponse as custom header
-     * 
-     * @param response
-     * @param cookie 
+     *
+     * @param response the HttpServletResponse to add the cookie header to
+     * @param cookie the cookie to add to the response
      */
     public static void addCookieToResponse(HttpServletResponse response, Cookie cookie) {
         if (response==null || cookie == null) {

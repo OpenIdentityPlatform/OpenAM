@@ -24,6 +24,7 @@
  *
  * $Id: PAOSRequest.java,v 1.3 2008/06/25 05:47:20 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -214,7 +215,7 @@ public class PAOSRequest {
      *  @param declareNS determines whether or not the namespace is declared
      *      within the Element.
      *  @return a String representation of this Object.
-     *  @exception PAOSException ,if it could not create String object.
+     *  @exception PAOSException if it could not create String object.
      */
     public String toXMLString(boolean includeNSPrefix,boolean declareNS)
         throws PAOSException {

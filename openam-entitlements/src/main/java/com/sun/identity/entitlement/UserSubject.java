@@ -25,6 +25,7 @@
  * $Id: UserSubject.java,v 1.1 2009/08/19 05:40:34 veiming Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement;
@@ -79,8 +80,7 @@ public class UserSubject extends EntitlementSubjectImpl {
      * @param environment Environment parameters.
      * @return <code>SubjectDecision</code> of
      * <code>EntitlementSubject</code> evaluation
-     * @throws com.sun.identity.entitlement,  EntitlementException in case
-     * of any error
+     * @throws EntitlementException in case of any error
      */
     public SubjectDecision evaluate(
         String realm,

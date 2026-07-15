@@ -24,6 +24,7 @@
  *
  * $Id: FSRealmAttributeMapper.java,v 1.2 2008/06/25 05:46:55 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -41,7 +42,6 @@ import java.util.Map;
  * Identity provider to local attributes so that the assertion consumer
  * service will populate these attributes to the application via the
  * single sign-on token.
- * </p>
  * 
  * @deprecated since 12.0.0
  */

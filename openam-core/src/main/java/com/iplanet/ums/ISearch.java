@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -40,7 +41,6 @@ package com.iplanet.ums;
  * Examples:
  * <p>
  * To modify a user's telphone number
- * <p>
  * 
  * <pre>
  *       SearchResults searchResults = 
@@ -55,7 +55,6 @@ package com.iplanet.ums;
  * 
  * <p>
  * To read data using VLV
- * <p>
  * 
  * <pre>
  *       SearchControl searchControl = new SearchControl();
@@ -141,7 +140,7 @@ public interface ISearch {
      *            search filter
      * @param searchControl
      *            search control, use default setting if searchControl == null
-     * @exception com.iplanet.ums.UMSException
+     * @exception com.iplanet.ums.UMSException if the search operation cannot be performed.
      * @return An search result class for reading IDs.
      * @exception InvalidSearchFilterException
      *                if search filter is invalid.
@@ -161,8 +160,8 @@ public interface ISearch {
      * @param searchControl Search control, use default setting if
      *        searchControl is <code>null</code>.
      * @return An search result class for reading entries.
-     * @exception InvalidSearchFilterException
-     * @exception UMSException
+     * @exception InvalidSearchFilterException if the search filter is invalid.
+     * @exception UMSException if no result matches.
      */
     public SearchResults search(
         String filter,
@@ -179,7 +178,7 @@ public interface ISearch {
      *            search template
      * @param searchControl
      *            search control, use default setting if searchControl == null
-     * @exception com.iplanet.ums.UMSException
+     * @exception com.iplanet.ums.UMSException if the search operation cannot be performed.
      */
     public SearchResults search(SearchTemplate template,
             SearchControl searchControl) throws UMSException;

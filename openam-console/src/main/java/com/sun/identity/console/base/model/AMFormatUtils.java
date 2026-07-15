@@ -25,6 +25,7 @@
  * $Id: AMFormatUtils.java,v 1.5 2009/01/28 05:34:56 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.console.base.model;
@@ -131,7 +132,7 @@ public class AMFormatUtils
     /**
      * Gets relative distinguished name
      *
-     * @param model
+     * @param model the model used to resolve localized strings
      * @param dn - distinguished name
      * @return name of relative distinguished name
      */

@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.soap.bootstrap;
@@ -39,8 +41,7 @@ public interface SoapSTSAccessTokenProvider {
     public void invalidateAccessToken(String accessToken);
 
     /**
-     * Retrieves soap-sts agent token with retry. 
-     * @param accessToken the accessToken returned fom getAccessToken.
+     * Retrieves soap-sts agent token with retry.
      * @return the SSOToken identifier corresponding to the authN of this soap-sts deployment. Won't return null.
      * @throws org.forgerock.json.resource.ResourceException if authentication failed for any reason.
      */

@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -23,10 +24,11 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
 /**
  * Provides the default Table Paginator.
  *
- * <table class='htmlHeader' cellspacing='10'>
+ * <table class='htmlHeader'>
+ * <caption>Example</caption>
  * <tr>
  * <td>
- * <img align='middle' hspace='2'src='default-paginator.png' title='Table'/>
+ * <img src='default-paginator.png' alt='Table paginator'>
  * </td>
  * </tr>
  * </table>
@@ -198,7 +200,7 @@ public class TablePaginator implements Renderable {
 
     /**
      * Returns the HTML representation of this paginator.
-     * <p/>
+     * <p>
      * This method delegates the rendering to the method
      * {@link #render(HtmlStringBuffer)}.
      *

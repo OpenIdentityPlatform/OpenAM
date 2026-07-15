@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -94,13 +94,13 @@ public class ExceptionHandler {
 
     /**
      * Handles a OAuth2RestletException that is thrown when processing a OAuth2 authorization request.
-     * <br/>
+     * <br>
      * If the OAuth2RestletException has a status of {@link Status#REDIRECTION_TEMPORARY} the user agent will be
      * redirected to the redirect uri set on the exception.
-     * <br/>
+     * <br>
      * If the OAuth2RestletException does not have a redirect status but still has a redirect uri set, the user
      * agent will be redrected to the redirect uri with the exception message in the redirect uri.
-     * <br/>
+     * <br>
      * In all other cases the OAuth2 error page will be presented.
      *
      * @param exception The OAuth2RestletException.
@@ -139,9 +139,9 @@ public class ExceptionHandler {
 
     /**
      * Handles general OAuth2 exceptions from Restlet endpoints.
-     * <br/>
+     * <br>
      * If the throwable is not a OAuth2RestletException then it will be wrapped as a ServerException.
-     * <br/>
+     * <br>
      * If the throwable is a OAuth2RestletException then it will be set on the response as a Json representation.
      *
      * @param throwable The throwable.

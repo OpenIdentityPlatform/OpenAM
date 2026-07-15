@@ -24,6 +24,7 @@
  *
  * $Id: ByteArrayLexOrder.java,v 1.2 2008/06/25 05:52:43 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.security.util;
@@ -45,11 +46,10 @@ public class ByteArrayLexOrder implements Comparator {
      *            first byte array to compare.
      * @param obj2
      *            second byte array to compare.
-     * @return negative number if obj1 < obj2, 0 if obj1 == obj2, positive
-     *         number if obj1 > obj2.
-     * 
-     * @exception <code>ClassCastException</code> if either argument is not a
-     *                byte array.
+     * @return a negative number if {@code obj1 < obj2}, 0 if
+     *         {@code obj1 == obj2}, a positive number if {@code obj1 > obj2}.
+     *
+     * @exception ClassCastException if either argument is not a byte array.
      */
     public final int compare(Object obj1, Object obj2) {
 

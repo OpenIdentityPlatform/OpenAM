@@ -24,6 +24,7 @@
  *
  * $Id: Authorizer.java,v 1.2 2008/06/25 05:47:18 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.interfaces;
@@ -97,7 +98,7 @@ public interface Authorizer {
      *          <code>com.sun.identity.liberty.ws.soapbinding.Message</code>.
      * @return <code>AuthorizationDecision</code> object contains authorization 
      *             decision information for the given resource.
-     * @exception Exception
+     * @exception Exception if an error occurs while making the authorization decision.
      */
     public Object getAuthorizationDecision(
                   Object credential,

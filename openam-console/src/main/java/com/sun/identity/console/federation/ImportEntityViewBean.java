@@ -24,7 +24,7 @@
  *
  * $Id: ImportEntityViewBean.java,v 1.7 2009/08/21 20:09:23 veiming Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  *
  */
 
@@ -193,7 +193,7 @@ public class ImportEntityViewBean
      * required.
      *
      * @param event Request invocation event
-     * @throws ModelControlException
+     * @throws ModelControlException if the framework model cannot be accessed.
      */
     public void handleButton1Request(RequestInvocationEvent event)
         throws ModelControlException

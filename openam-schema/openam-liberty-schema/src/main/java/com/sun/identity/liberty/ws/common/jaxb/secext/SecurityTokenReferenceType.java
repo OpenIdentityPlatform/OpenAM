@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -13,19 +14,18 @@ package com.sun.identity.liberty.ws.common.jaxb.secext;
  * This type is used reference a security token.
  * Java content class for SecurityTokenReferenceType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/secext.xsd line 126)
- * <p>
  * <pre>
- * &lt;complexType name="SecurityTokenReferenceType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice maxOccurs="unbounded" minOccurs="0">
- *         &lt;any/>
- *       &lt;/choice>
- *       &lt;attribute ref="{http://schemas.xmlsoap.org/ws/2003/06/secext}Usage"/>
- *       &lt;attribute ref="{http://schemas.xmlsoap.org/ws/2003/06/utility}Id"/>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="SecurityTokenReferenceType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
+ *         &lt;any/&gt;
+ *       &lt;/choice&gt;
+ *       &lt;attribute ref="{http://schemas.xmlsoap.org/ws/2003/06/secext}Usage"/&gt;
+ *       &lt;attribute ref="{http://schemas.xmlsoap.org/ws/2003/06/utility}Id"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

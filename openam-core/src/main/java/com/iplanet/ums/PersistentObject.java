@@ -25,6 +25,7 @@
  * $Id: PersistentObject.java,v 1.8 2009/07/02 20:27:01 hengming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.ums;
@@ -124,13 +125,12 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
     /**
      * Constructor for in memory object to be added to the system. You can make
      * the object persistent two ways:
-     * <P>
+     * <p>
      * 
      * 1) call add on parent object (recommended)
-     * <P>
+     * <p>
      * 2) call save(...) method after all attributes for in memory object are
      * set up properly.
-     * <P>
      * 
      * @param template
      *            Object creation template. The template holds all the default
@@ -158,13 +158,12 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
     /**
      * Constructor for in memory object to be added to the system. You can make
      * the object persistent two ways:
-     * <P>
+     * <p>
      * 
      * 1) call add on parent object (recommended)
-     * <P>
+     * <p>
      * 2) call save(...) method after all attributes for in memory object are
      * set up properly.
-     * <P>
      * 
      * @param template
      *            Object creation template. The template holds all the default
@@ -318,10 +317,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
 
     /**
      * Set an attribute value for the entity.
-     * <P>
+     * <p>
      * IMPORTANT: To make the changes persistent, you need to call the save
      * method to save the changes.
-     * <P>
      * 
      * @param attr
      *            Attribute and value
@@ -349,10 +347,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
 
     /**
      * Sets an attribute value with a given locale for the entity.
-     * <P>
+     * <p>
      * IMPORTANT: To make the changes persistent, you need to call the save
      * method to save the changes.
-     * <P>
      * 
      * @param attr
      *            Attribute and value
@@ -384,8 +381,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * @param attrName password attribute name
      * @param oldPassword old password
      * @param newPassword new password
-     * @throws AMException if an error occurs when changing user password
-     * @throws SSOException If user's single sign on token is invalid.
+     * @throws UMSException if an error occurs when changing the user password.
      */
     public void changePassword(String entryDN, String attrName,
         String oldPassword, String newPassword) throws UMSException {
@@ -396,10 +392,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
 
     /**
      * Removes attribute value for the entity.
-     * <P>
+     * <p>
      * IMPORTANT: To make the changes persistent, you need to call the save
      * method to save the changes.
-     * <P>
      * 
      * @param attr
      *            Attribute to be removed
@@ -444,10 +439,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
 
     /**
      * Modifies attribute values for the entity.
-     * <P>
+     * <p>
      * IMPORTANT: To make the changes persistent, you need to call the save
      * method to save the changes.
-     * <P>
      * 
      * @param modSet
      *            Set of modification of attributes
@@ -493,10 +487,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
 
     /**
      * Modifies the values of a single attribute for the entity.
-     * <P>
+     * <p>
      * IMPORTANT: To make the changes persistent, you need to call the save
      * method to save the changes.
-     * <P>
      * 
      * @param attr
      *            Attribute value to be modified
@@ -521,10 +514,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
 
     /**
      * Modify a single attribute for the entity.
-     * <P>
+     * <p>
      * IMPORTANT: To make the changes persistent, you need to call the save
      * method to save the changes.
-     * <P>
      * 
      * @param attrName
      *            Attribute name of the attribute to be modified
@@ -611,7 +603,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * Save the modification(s) to the object. Save the changes made so far for
      * the persistent object. In other words, make the changes persistent for
      * the object.
-     * <P>
+     * <p>
      * This save method takes no parameter. You use this save method when the
      * object is already instantiated. For example,
      * 
@@ -622,7 +614,6 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * user.save();
      * </pre>
      * 
-     * <P>
      * 
      * @throws AccessRightsException
      *             if an access rights exception occurs.
@@ -670,7 +661,6 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * ldap) component in an object. Subclasses may choose to override this
      * function. For instance, User takes either "uid" or "cn" for its
      * identification
-     * <P>
      * 
      * @return Attribute name for identification
      *
@@ -871,7 +861,7 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * child ID is a descendant (something being contained) in "this" object
      * 
      * @param childGuid Unique entry identification for the child to be removed.
-     * @throws AccessRights if an access rights exception occurs.
+     * @throws AccessRightsException if an access rights exception occurs.
      * @throws EntryNotFoundException if the entry is not found.
      * @throws UMSException if failure to remove the entry from the persistent
      *         store. Possible causes include AccessRights violation,
@@ -898,10 +888,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * at hand from the persistent storage but keeps its internal data so that
      * the ums client can save it to somewhere else or make reference to its
      * internal data
-     * <P>
      * 
-     * @throws AccessRights
-     *             Exception if an access rights exception occurs.
+     * @throws AccessRightsException
+     *             if an access rights exception occurs.
      * @throws EntryNotFoundException
      *             if the entry is not found
      * @throws UMSException
@@ -975,7 +964,6 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
     /**
      * Gets the immediate children, subject to search filter constraints. Only
      * the IDs and object classes of each child are returned.
-     * <P>
      * 
      * @param filter
      *            Search filter
@@ -1044,10 +1032,9 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * Gets all immediate children under current node based on search criteria
      * specified in template, and returns attributes specified there. Search
      * behavior is controlled by searchControl.
-     * <P>
+     * <p>
      * 
      * Returning attributes are determined by the search template
-     * <P>
      * 
      * @param template
      *            Search template
@@ -1136,7 +1123,6 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
      * Gets the attributes specified in the template for all objects at the
      * current level and below which match the search filter in the template.
      * Search behavior is controlled by searchControl.
-     * <P>
      * 
      * @param template
      *            Search template
@@ -1275,9 +1261,8 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
 
     /**
      * Maps a dn to guid
-     * <P>
+     * <p>
      * TODO: Not yet implemented
-     * <P>
      */
     static String dnToGuid(String dn) {
         // TODO: Need to fill in base 64 encoding <P>
@@ -1287,9 +1272,8 @@ public class PersistentObject implements ISearch, Serializable, IUMSConstants {
 
     /**
      * Maps a guid to dn
-     * <P>
+     * <p>
      * TODO: Not yet implemented
-     * <P>
      */
     static String guidToDN(String guid) {
         // TODO: Need to fill in base 64 encoding <P>

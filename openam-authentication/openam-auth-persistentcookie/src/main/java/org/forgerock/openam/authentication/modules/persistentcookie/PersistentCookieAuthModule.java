@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2018-2025 3A Systems, LLC.
+ * Portions Copyrighted 2018-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
@@ -168,7 +168,7 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
      * @param callbacks {@inheritDoc}
      * @param state {@inheritDoc}
      * @return {@inheritDoc}
-     * @throws LoginException {@inheritDoc}
+     * @throws LoginException if the persistent cookie cannot be validated or the login state is incorrect
      */
     @Override
     public int process(Callback[] callbacks, int state) throws LoginException {
@@ -219,7 +219,7 @@ public class PersistentCookieAuthModule extends JaspiAuthLoginModule {
      * @param clientSubject {@inheritDoc}
      * @param callbacks {@inheritDoc}
      * @return {@inheritDoc}
-     * @throws LoginException {@inheritDoc}
+     * @throws LoginException if the JWT session cookie is invalid
      */
     @Override
     protected boolean process(MessageInfo messageInfo, Subject clientSubject, Callback[] callbacks)

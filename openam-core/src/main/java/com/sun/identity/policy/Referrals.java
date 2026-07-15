@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -75,8 +76,8 @@ public class Referrals implements Cloneable {
      * @throws InvalidFormatException if the node passed in does not
      * conform to expected format
      * 
-     * @throws InvalidNameException  if the name specified in the 
-     * </code>Node</code> for <code>Referrals</code> is invalid
+     * @throws InvalidNameException  if the name specified in the
+     * <code>Node</code> for <code>Referrals</code> is invalid
      *
      * @throws NameNotFoundException need to add the situations that would
      * cause this
@@ -193,7 +194,7 @@ public class Referrals implements Cloneable {
 
     /**
      * Sets the name for this instance of the
-     * <code>Referrals<code> which contains a collection
+     * <code>Referrals</code> which contains a collection
      * of referrals respresented as <code>Referral</code>.
      *
      * @param name for the collection of referrals
@@ -205,7 +206,7 @@ public class Referrals implements Cloneable {
 
     /**
      * Sets the description for this instance of the
-     * <code>Referrals<code> which contains a collection
+     * <code>Referrals</code> which contains a collection
      * of referrals respresented as <code>Referral</code>.
      *
      * @param description description for the collection referrals

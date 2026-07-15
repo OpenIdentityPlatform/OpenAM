@@ -24,6 +24,7 @@
  *
  * $Id: BigInt.java,v 1.2 2008/06/25 05:52:43 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.security.util;
@@ -39,7 +40,7 @@ import java.math.BigInteger;
  * <P>
  * <em><b>NOTE:</b>  This class may eventually disappear, to
  * be supplanted by big-endian byte arrays which hold both signed
- * and unsigned arbitrary-precision integers.
+ * and unsigned arbitrary-precision integers.</em>
  */
 public final class BigInt {
 

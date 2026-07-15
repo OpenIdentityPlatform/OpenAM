@@ -24,6 +24,7 @@
  *
  * $Id: NameIdentifierMapper.java,v 1.2 2008/06/25 05:47:12 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -37,7 +38,6 @@ import java.util.List;
  * The class <code>NameIdentifierMapper</code> is an interface that is 
  * used to map user's <code>NameIdentifier</code> from one provider 
  * to another.
- * <p>
  * 
  *
  */

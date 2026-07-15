@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.oauth2.core;
 
@@ -186,7 +187,7 @@ public interface OAuth2ProviderSettings {
     /**
      * Provided as an extension point to allow the OAuth2 provider to return additional data from an access token
      * request.
-     * <br/>
+     * <br>
      * Any additional data to be returned should be added to the access token by invoking,
      * AccessToken#addExtraData(String, String).
      *
@@ -454,7 +455,7 @@ public interface OAuth2ProviderSettings {
      * Whether or not to enforce the Code Verifier Parameter.
      *
      * @return Whether the Code Verifier option has been configured.
-     * @see <a href="https://tools.ietf.org/html/draft-ietf-oauth-spop-12"</a>
+     * @see <a href="https://tools.ietf.org/html/draft-ietf-oauth-spop-12">OAuth 2.0 PKCE (draft-ietf-oauth-spop-12)</a>
      */
     boolean isCodeVerifierRequired() throws ServerException;
 

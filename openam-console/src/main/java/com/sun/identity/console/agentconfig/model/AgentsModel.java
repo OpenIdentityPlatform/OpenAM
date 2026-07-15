@@ -24,6 +24,7 @@
  *
  * $Id: AgentsModel.java,v 1.12 2008/12/13 07:16:09 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.console.agentconfig.model;
@@ -273,8 +274,6 @@ public interface AgentsModel
      * Returns map of secure token service configurations.
      *
      * @return map of secure token service configurations.
-     * @throws AMConsoleException if sercure token service configurations cannot 
-     *         be returned.
      */
     Map getSTSConfigurations();
     
@@ -282,7 +281,6 @@ public interface AgentsModel
      * Returns set of discovery configurations.
      *
      * @return set of discovery configurations.
-     * @throws AMConsoleException if discovery configurations cannot be returned.
      */
     Map getDiscoveryConfigurations();
     

@@ -24,6 +24,7 @@
  *
  * $Id: IDPAuthenticationMethodMapper.java,v 1.3 2008/06/25 05:48:07 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -34,7 +35,7 @@ import com.sun.identity.wsfederation.common.WSFederationException;
 /**
  * 
  * The interface <code>IDPAuthenticationMethodMapper</code> creates an
- * <code>IDPAuthenticationTypeInfo<code> based on the RequestAuthnContext from
+ * <code>IDPAuthenticationTypeInfo</code> based on the RequestAuthnContext from
  * the AuthnRequest sent by a Service Provider and the AuthnContext
  * configuration at the IDP entity config.
  * The implementation of this class will be used by the IDP to find out

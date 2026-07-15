@@ -25,6 +25,7 @@
  * $Id: IdRepoJAXRPCObjectImpl.java,v 1.13 2010/01/06 01:58:27 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.idm.server;
@@ -81,7 +82,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Provides service side implementation of IdRepo for JAX-RPC interface
- * <class>DirectoryManagerIF</class>. Does not provide implementation for
+ * <code>DirectoryManagerIF</code>. Does not provide implementation for
  * deprecated AMSDK interfaces.
  * Remote clients using openssoclientsdk.jar would be calling these
  * methods using SOAP.

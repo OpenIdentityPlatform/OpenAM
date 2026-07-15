@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,24 +13,23 @@ package com.sun.identity.liberty.ws.common.jaxb.xmlsig;
 /**
  * Java content class for X509DataType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/xmldsig-core-schema.xsd line 186)
- * <p>
  * <pre>
- * &lt;complexType name="X509DataType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence maxOccurs="unbounded">
- *         &lt;choice>
- *           &lt;element name="X509IssuerSerial" type="{http://www.w3.org/2000/09/xmldsig#}X509IssuerSerialType"/>
- *           &lt;element name="X509SKI" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
- *           &lt;element name="X509SubjectName" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *           &lt;element name="X509Certificate" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
- *           &lt;element name="X509CRL" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
- *           &lt;any/>
- *         &lt;/choice>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="X509DataType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence maxOccurs="unbounded"&gt;
+ *         &lt;choice&gt;
+ *           &lt;element name="X509IssuerSerial" type="{http://www.w3.org/2000/09/xmldsig#}X509IssuerSerialType"/&gt;
+ *           &lt;element name="X509SKI" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
+ *           &lt;element name="X509SubjectName" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *           &lt;element name="X509Certificate" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
+ *           &lt;element name="X509CRL" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
+ *           &lt;any/&gt;
+ *         &lt;/choice&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */
@@ -68,9 +68,8 @@ public interface X509DataType {
     /**
      * Java content class for X509CRL element declaration.
      * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/xmldsig-core-schema.xsd line 193)
-     * <p>
      * <pre>
-     * &lt;element name="X509CRL" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+     * &lt;element name="X509CRL" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
      * </pre>
      * 
      */
@@ -103,9 +102,8 @@ public interface X509DataType {
     /**
      * Java content class for X509Certificate element declaration.
      * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/xmldsig-core-schema.xsd line 192)
-     * <p>
      * <pre>
-     * &lt;element name="X509Certificate" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+     * &lt;element name="X509Certificate" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
      * </pre>
      * 
      */
@@ -138,9 +136,8 @@ public interface X509DataType {
     /**
      * Java content class for X509IssuerSerial element declaration.
      * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/xmldsig-core-schema.xsd line 189)
-     * <p>
      * <pre>
-     * &lt;element name="X509IssuerSerial" type="{http://www.w3.org/2000/09/xmldsig#}X509IssuerSerialType"/>
+     * &lt;element name="X509IssuerSerial" type="{http://www.w3.org/2000/09/xmldsig#}X509IssuerSerialType"/&gt;
      * </pre>
      * 
      */
@@ -155,9 +152,8 @@ public interface X509DataType {
     /**
      * Java content class for X509SKI element declaration.
      * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/xmldsig-core-schema.xsd line 190)
-     * <p>
      * <pre>
-     * &lt;element name="X509SKI" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+     * &lt;element name="X509SKI" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
      * </pre>
      * 
      */
@@ -190,9 +186,8 @@ public interface X509DataType {
     /**
      * Java content class for X509SubjectName element declaration.
      * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/xmldsig-core-schema.xsd line 191)
-     * <p>
      * <pre>
-     * &lt;element name="X509SubjectName" type="{http://www.w3.org/2001/XMLSchema}string"/>
+     * &lt;element name="X509SubjectName" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
      * </pre>
      * 
      */

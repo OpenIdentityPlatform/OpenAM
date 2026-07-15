@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click;
 
@@ -22,28 +23,28 @@ package org.openidentityplatform.openam.click;
  * Behaviors provide a mechanism for changing how Controls behave at runtime.
  * Behaviors are added to a Control and provides interceptor methods to decorate
  * and enhance the source Control.
- * <p/>
+ * <p>
  * Behaviors provide interceptor methods for specific Control life cycle events.
  * These interceptor methods can be implemented to further process and decorate
  * the control or its children.
- * <p/>
+ * <p>
  * The following interceptor methods are defined:
  *
  * <ul>
  * <li>preResponse - occurs before the control markup is written to the response</li>
- * <li>preRenderHeadElements - occurs after <tt>preResponse</tt> but before the control
+ * <li>preRenderHeadElements - occurs after <code>preResponse</code> but before the control
  * {@link Control#getHeadElements() HEAD elements} are written to the response</li>
  * <li>preDestroy - occurs before the Control {@link Control#onDestroy() onDestroy}
  * event handler.</li>
  * </ul>
  *
- * These interceptor methods allow the Behavior to <tt>decorate</tt> a control,
+ * These interceptor methods allow the Behavior to <code>decorate</code> a control,
  * for example:
  *
  * <ul>
  * <li>add or remove Control HEAD elements such as JavaScript and CSS dependencies
  * and setup scripts</li>
- * <li>add or remove Control attributes such as <tt>"class"</tt>, <tt>"style"</tt> etc.</li>
+ * <li>add or remove Control attributes such as <code>"class"</code>, <code>"style"</code> etc.</li>
  * </ul>
  */
 public interface Behavior {

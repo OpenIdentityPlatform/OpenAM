@@ -1,3 +1,7 @@
+/*
+ * Portions Copyrighted 2026 3A Systems, LLC.
+ */
+
 package com.sun.identity.authentication.modules.jdbc;
 
 import java.security.MessageDigest;
@@ -20,8 +24,8 @@ public class MD5Transform implements JDBCPasswordSyntaxTransform  {
      *
      * @param input Password before transform
      * @return MD5 Password after transform in this case the same thing.
-     * @throws AuthLoginException
-     */  
+     * @throws AuthLoginException if the input password is {@code null}
+     */
     public String transform(String input) throws AuthLoginException {
         if (input == null) {
             throw new AuthLoginException(

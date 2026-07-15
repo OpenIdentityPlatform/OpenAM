@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,21 +13,20 @@ package com.sun.identity.liberty.ws.disco.jaxb;
 /**
  * Java content class for ResourceOfferingType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-disco-svc.xsd line 110)
- * <p>
  * <pre>
- * &lt;complexType name="ResourceOfferingType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;group ref="{urn:liberty:disco:2003-08}ResourceIDGroup"/>
- *         &lt;element name="ServiceInstance" type="{urn:liberty:disco:2003-08}ServiceInstanceType"/>
- *         &lt;element ref="{urn:liberty:disco:2003-08}Options" minOccurs="0"/>
- *         &lt;element name="Abstract" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="entryID" type="{urn:liberty:disco:2003-08}IDType" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="ResourceOfferingType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;group ref="{urn:liberty:disco:2003-08}ResourceIDGroup"/&gt;
+ *         &lt;element name="ServiceInstance" type="{urn:liberty:disco:2003-08}ServiceInstanceType"/&gt;
+ *         &lt;element ref="{urn:liberty:disco:2003-08}Options" minOccurs="0"/&gt;
+ *         &lt;element name="Abstract" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="entryID" type="{urn:liberty:disco:2003-08}IDType" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -128,7 +129,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -147,7 +148,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -166,7 +167,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -178,7 +179,7 @@ public class ObjectFactory
     /**
      * Create an instance of DigestMethodElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.DigestMethodElement createDigestMethodElement()
@@ -190,7 +191,7 @@ public class ObjectFactory
     /**
      * Create an instance of RetrievalMethodElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.RetrievalMethodElement createRetrievalMethodElement()
@@ -202,7 +203,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataTypeX509SubjectName
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509SubjectName createX509DataTypeX509SubjectName()
@@ -214,7 +215,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataTypeX509SubjectName
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509SubjectName createX509DataTypeX509SubjectName(java.lang.String value)
@@ -226,7 +227,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.ReferenceType createReferenceType()
@@ -238,7 +239,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignatureType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureType createSignatureType()
@@ -250,7 +251,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyInfoElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.KeyInfoElement createKeyInfoElement()
@@ -262,7 +263,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType createX509DataType()
@@ -274,7 +275,7 @@ public class ObjectFactory
     /**
      * Create an instance of DSAKeyValueType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.DSAKeyValueType createDSAKeyValueType()
@@ -286,7 +287,7 @@ public class ObjectFactory
     /**
      * Create an instance of TransformElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.TransformElement createTransformElement()
@@ -298,7 +299,7 @@ public class ObjectFactory
     /**
      * Create an instance of TransformsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.TransformsElement createTransformsElement()
@@ -310,7 +311,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignaturePropertyElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignaturePropertyElement createSignaturePropertyElement()
@@ -322,7 +323,7 @@ public class ObjectFactory
     /**
      * Create an instance of DSAKeyValueElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.DSAKeyValueElement createDSAKeyValueElement()
@@ -334,7 +335,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyInfoType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.KeyInfoType createKeyInfoType()
@@ -346,7 +347,7 @@ public class ObjectFactory
     /**
      * Create an instance of SPKIDataTypeSPKISexp
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SPKIDataType.SPKISexp createSPKIDataTypeSPKISexp()
@@ -358,7 +359,7 @@ public class ObjectFactory
     /**
      * Create an instance of SPKIDataTypeSPKISexp
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SPKIDataType.SPKISexp createSPKIDataTypeSPKISexp(byte[] value)
@@ -370,7 +371,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignatureMethodElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureMethodElement createSignatureMethodElement()
@@ -382,7 +383,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignaturePropertyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignaturePropertyType createSignaturePropertyType()
@@ -394,7 +395,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignatureValueElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureValueElement createSignatureValueElement()
@@ -406,7 +407,7 @@ public class ObjectFactory
     /**
      * Create an instance of ObjectElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.ObjectElement createObjectElement()
@@ -418,7 +419,7 @@ public class ObjectFactory
     /**
      * Create an instance of ManifestType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.ManifestType createManifestType()
@@ -430,7 +431,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignatureMethodType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureMethodType createSignatureMethodType()
@@ -442,7 +443,7 @@ public class ObjectFactory
     /**
      * Create an instance of RSAKeyValueElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.RSAKeyValueElement createRSAKeyValueElement()
@@ -454,7 +455,7 @@ public class ObjectFactory
     /**
      * Create an instance of SPKIDataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SPKIDataElement createSPKIDataElement()
@@ -466,7 +467,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataTypeX509SKI
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509SKI createX509DataTypeX509SKI()
@@ -478,7 +479,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataTypeX509SKI
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509SKI createX509DataTypeX509SKI(byte[] value)
@@ -490,7 +491,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataElement createX509DataElement()
@@ -502,7 +503,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignatureValueType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureValueType createSignatureValueType()
@@ -514,7 +515,7 @@ public class ObjectFactory
     /**
      * Create an instance of CanonicalizationMethodElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.CanonicalizationMethodElement createCanonicalizationMethodElement()
@@ -526,7 +527,7 @@ public class ObjectFactory
     /**
      * Create an instance of DigestValueElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.DigestValueElement createDigestValueElement()
@@ -538,7 +539,7 @@ public class ObjectFactory
     /**
      * Create an instance of DigestValueElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.DigestValueElement createDigestValueElement(byte[] value)
@@ -550,7 +551,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataTypeX509Certificate
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509Certificate createX509DataTypeX509Certificate()
@@ -562,7 +563,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataTypeX509Certificate
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509Certificate createX509DataTypeX509Certificate(byte[] value)
@@ -574,7 +575,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignedInfoType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignedInfoType createSignedInfoType()
@@ -586,7 +587,7 @@ public class ObjectFactory
     /**
      * Create an instance of TransformsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.TransformsType createTransformsType()
@@ -598,7 +599,7 @@ public class ObjectFactory
     /**
      * Create an instance of ObjectType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.ObjectType createObjectType()
@@ -610,7 +611,7 @@ public class ObjectFactory
     /**
      * Create an instance of PGPDataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.PGPDataElement createPGPDataElement()
@@ -622,7 +623,7 @@ public class ObjectFactory
     /**
      * Create an instance of DigestMethodType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.DigestMethodType createDigestMethodType()
@@ -634,7 +635,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509IssuerSerialType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509IssuerSerialType createX509IssuerSerialType()
@@ -646,7 +647,7 @@ public class ObjectFactory
     /**
      * Create an instance of RetrievalMethodType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.RetrievalMethodType createRetrievalMethodType()
@@ -658,7 +659,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyValueType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.KeyValueType createKeyValueType()
@@ -670,7 +671,7 @@ public class ObjectFactory
     /**
      * Create an instance of TransformType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.TransformType createTransformType()
@@ -682,7 +683,7 @@ public class ObjectFactory
     /**
      * Create an instance of PGPDataType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.PGPDataType createPGPDataType()
@@ -694,7 +695,7 @@ public class ObjectFactory
     /**
      * Create an instance of SPKIDataType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SPKIDataType createSPKIDataType()
@@ -706,7 +707,7 @@ public class ObjectFactory
     /**
      * Create an instance of CanonicalizationMethodType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.CanonicalizationMethodType createCanonicalizationMethodType()
@@ -718,7 +719,7 @@ public class ObjectFactory
     /**
      * Create an instance of TransformTypeXPath
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.TransformType.XPath createTransformTypeXPath()
@@ -730,7 +731,7 @@ public class ObjectFactory
     /**
      * Create an instance of TransformTypeXPath
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.TransformType.XPath createTransformTypeXPath(java.lang.String value)
@@ -742,7 +743,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.KeyNameElement createKeyNameElement()
@@ -754,7 +755,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.KeyNameElement createKeyNameElement(java.lang.String value)
@@ -766,7 +767,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataTypeX509IssuerSerial
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509IssuerSerial createX509DataTypeX509IssuerSerial()
@@ -778,7 +779,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignedInfoElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignedInfoElement createSignedInfoElement()
@@ -790,7 +791,7 @@ public class ObjectFactory
     /**
      * Create an instance of ManifestElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.ManifestElement createManifestElement()
@@ -802,7 +803,7 @@ public class ObjectFactory
     /**
      * Create an instance of MgmtDataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.MgmtDataElement createMgmtDataElement()
@@ -814,7 +815,7 @@ public class ObjectFactory
     /**
      * Create an instance of MgmtDataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.MgmtDataElement createMgmtDataElement(java.lang.String value)
@@ -826,7 +827,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignaturePropertiesElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignaturePropertiesElement createSignaturePropertiesElement()
@@ -838,7 +839,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyValueElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.KeyValueElement createKeyValueElement()
@@ -850,7 +851,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignatureMethodTypeHMACOutputLength
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureMethodType.HMACOutputLength createSignatureMethodTypeHMACOutputLength()
@@ -862,7 +863,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignatureMethodTypeHMACOutputLength
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureMethodType.HMACOutputLength createSignatureMethodTypeHMACOutputLength(java.math.BigInteger value)
@@ -874,7 +875,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignaturePropertiesType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignaturePropertiesType createSignaturePropertiesType()
@@ -886,7 +887,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataTypeX509CRL
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509CRL createX509DataTypeX509CRL()
@@ -898,7 +899,7 @@ public class ObjectFactory
     /**
      * Create an instance of X509DataTypeX509CRL
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509CRL createX509DataTypeX509CRL(byte[] value)
@@ -910,7 +911,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.ReferenceElement createReferenceElement()
@@ -922,7 +923,7 @@ public class ObjectFactory
     /**
      * Create an instance of SignatureElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.SignatureElement createSignatureElement()
@@ -934,7 +935,7 @@ public class ObjectFactory
     /**
      * Create an instance of RSAKeyValueType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.xmlsig.RSAKeyValueType createRSAKeyValueType()

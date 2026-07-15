@@ -24,6 +24,7 @@
  *
  * $Id: WSSPolicyManager.java,v 1.2 2009/12/19 00:09:41 asyhuang Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.wss.policy;
 
@@ -238,9 +239,10 @@ public class WSSPolicyManager {
      * 
      * @return the XML String representation for the web service provider
      *         input policy. 
-     * @throws com.sun.identity.wss.policy.WSSPolicyException
+     * @throws com.sun.identity.wss.policy.WSSPolicyException if the input
+     *         policy cannot be generated.
      */
-    public String getInputPolicy(ProviderConfig providerConfig) 
+    public String getInputPolicy(ProviderConfig providerConfig)
             throws WSSPolicyException {
         
         try {
@@ -292,7 +294,8 @@ public class WSSPolicyManager {
      *        provider.
      * @return the XML String representation of ws-security policy for the
      *         web service provider.
-     * @throws com.sun.identity.wss.policy.WSSPolicyException 
+     * @throws com.sun.identity.wss.policy.WSSPolicyException if the output
+     *         policy cannot be generated.
      */
     public String getOutputPolicy(ProviderConfig providerConfig)
             throws WSSPolicyException {
@@ -330,7 +333,7 @@ public class WSSPolicyManager {
      * Returns the STS end point policy
      * @return the XML String representation of ws-security policy for the
      * STS service.
-     * @throws WSSPolicyException
+     * @throws WSSPolicyException if the STS policy cannot be generated.
      */
     public String getSTSPolicy()
             throws WSSPolicyException {
@@ -342,7 +345,8 @@ public class WSSPolicyManager {
      * Returns the input policy for the STS service
      * @return the XML String representation of ws-security policy for the
      *         STS service.
-     * @throws com.sun.identity.wss.policy.WSSPolicyException
+     * @throws com.sun.identity.wss.policy.WSSPolicyException if the STS input
+     *         policy cannot be generated.
      */
     public String getSTSInputPolicy() throws WSSPolicyException {
         return getInputPolicy(getSTSConfig());
@@ -353,7 +357,8 @@ public class WSSPolicyManager {
      * Returns the output policy for the STS service
      * @return the XML String representation of ws-security policy for the
      *         STS service.
-     * @throws com.sun.identity.wss.policy.WSSPolicyException
+     * @throws com.sun.identity.wss.policy.WSSPolicyException if the STS output
+     *         policy cannot be generated.
      */
 
     public String getSTSOutputPolicy() throws WSSPolicyException {

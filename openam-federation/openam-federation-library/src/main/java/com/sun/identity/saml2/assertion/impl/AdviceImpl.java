@@ -24,6 +24,7 @@
  *
  * $Id: AdviceImpl.java,v 1.4 2008/06/25 05:47:42 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -81,7 +82,7 @@ public class AdviceImpl implements Advice {
      *
      * @param xml A <code>java.lang.String</code> representing
      *        a <code>Advice</code> object
-     * @exception SAMLException if it could not process the XML string
+     * @exception SAML2Exception if it could not process the XML string
      */
     public AdviceImpl(String xml) throws SAML2Exception {
         Document document = XMLUtils.toDOMDocument(xml, SAML2SDKUtils.debug);
@@ -103,7 +104,7 @@ public class AdviceImpl implements Advice {
      *
      * @param element A <code>org.w3c.dom.Element</code> representing
      *        DOM tree for <code>Advice</code> object
-     * @exception SAMLException if it could not process the Element
+     * @exception SAML2Exception if it could not process the Element
      */
     public AdviceImpl(Element element) throws SAML2Exception {
         processElement(element);

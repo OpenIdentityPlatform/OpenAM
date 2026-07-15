@@ -24,6 +24,7 @@
  *
  * $Id: DSTQueryItem.java,v 1.2 2008/06/25 05:47:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.dst;
@@ -42,26 +43,26 @@ import org.w3c.dom.Element;
  * The following schema fragment specifies the expected content within the
  * <code>DSTQueryItem</code> object.
  * <pre>
- * &lt;element name="QueryItem" maxOccurs="unbounded">
- *   &lt;complexType>
- *     &lt;complexContent>
- *       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *         &lt;sequence>
+ * &lt;element name="QueryItem" maxOccurs="unbounded"&gt;
+ *   &lt;complexType&gt;
+ *     &lt;complexContent&gt;
+ *       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *         &lt;sequence&gt;
  *           &lt;element name="Select"
- *           type="{urn:liberty:id-sis-pp:2003-08}SelectType"/>
- *         &lt;/sequence>
+ *           type="{urn:liberty:id-sis-pp:2003-08}SelectType"/&gt;
+ *         &lt;/sequence&gt;
  *         &lt;attribute name="itemID"
- *         type="{urn:liberty:id-sis-pp:2003-08}IDType" />
+ *         type="{urn:liberty:id-sis-pp:2003-08}IDType" /&gt;
  *         &lt;attribute name="changedSince"
- *         type="{http://www.w3.org/2001/XMLSchema}dateTime" />
+ *         type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
  *         &lt;attribute name="includeCommonAttributes" 
- *         type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *         type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *         &lt;attribute name="id" 
- *         type="{http://www.w3.org/2001/XMLSchema}ID" />
- *       &lt;/restriction>
- *     &lt;/complexContent>
- *   &lt;/complexType>
- * &lt;/element>
+ *         type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *       &lt;/restriction&gt;
+ *     &lt;/complexContent&gt;
+ *   &lt;/complexType&gt;
+ * &lt;/element&gt;
  * </pre>
  *
  * 
@@ -109,7 +110,7 @@ public class DSTQueryItem {
     /**
      * Constructor
      * @param element <code>DOM</code> Element 
-     * @throws DSTException
+     * @throws DSTException if a data service error occurs
      */
     public DSTQueryItem(org.w3c.dom.Element element) throws DSTException{
         if(element == null) {

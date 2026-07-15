@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.rest.wrappers;
 
@@ -31,7 +32,7 @@ import java.util.Set;
  * Wrapper for the conversion of ResourceType to and from JSON.
  *
  * Taking an instance of an {@link org.forgerock.openam.entitlement.ResourceType} this class exposes the necessary
- * parts of that class to the Jackson {@link org.codehaus.jackson.map.ObjectMapper} via annotations.
+ * parts of that class to the Jackson {@code org.codehaus.jackson.map.ObjectMapper} via annotations.
  */
 public class JsonResourceType {
 

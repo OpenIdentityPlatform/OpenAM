@@ -25,6 +25,7 @@
  * $Id: AuthContext.java,v 1.10 2009/01/28 05:34:52 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.internal;
@@ -173,7 +174,7 @@ public final class AuthContext extends Object {
      * <code>getRequirements()</code> and <code>submitRequirements()</code>
      * to pass the credentials needed for authentication by the plugin modules.
      *
-     * @throws LoginException
+     * @throws LoginException if the authentication process fails
      *
      * 
      */
@@ -192,7 +193,7 @@ public final class AuthContext extends Object {
      *            name of the user to be authenticated
      * @param password
      *            password for the user
-     * @throws LoginException
+     * @throws LoginException if the authentication process fails
      *
      * 
      */
@@ -224,7 +225,7 @@ public final class AuthContext extends Object {
      *            name of the user to be authenticated
      * @param password
      *            password for the user
-     * @throws LoginException
+     * @throws LoginException if the authentication process fails
      *
      * 
      */
@@ -434,7 +435,7 @@ public final class AuthContext extends Object {
      * would then query for the user name and related information.
      *
      * @param orgName organization name.
-     * @throws LoginException
+     * @throws LoginException if the authentication process fails
      *
      * 
      */
@@ -517,7 +518,7 @@ public final class AuthContext extends Object {
      * Method to start the login process. This method will
      * read the plug-ins configured for the application and initialize them.
      *
-     * @throws LoginException
+     * @throws LoginException if the login process cannot be started
      *
      * 
      */
@@ -647,7 +648,7 @@ public final class AuthContext extends Object {
     /**
      * Logs the user out.
      *
-     * @throws LoginException
+     * @throws LoginException if an error occurs while logging out
      *
      * 
      */
@@ -773,7 +774,7 @@ public final class AuthContext extends Object {
      * token can be used as the authenticated token.
      *
      * @return single-sign-on token.
-     * @throws InvalidAuthContextException
+     * @throws InvalidAuthContextException if the authentication context is invalid or authentication has not completed
      *
      * 
      */

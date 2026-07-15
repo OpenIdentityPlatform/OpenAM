@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -69,7 +70,7 @@ public interface IComplianceServices {
     /**
      * Returns the search filter to be used for searching deleted objects. For
      * example, for searching deleted users, the search filter is
-     * <code> (&(objectclass=inetOrgPerson)(inetUserStatus=deleted)) </code>.
+     * <code> (&amp;(objectclass=inetOrgPerson)(inetUserStatus=deleted)) </code>.
      * The search filters are configured in the Admin Console service
      * 
      * @param objectType

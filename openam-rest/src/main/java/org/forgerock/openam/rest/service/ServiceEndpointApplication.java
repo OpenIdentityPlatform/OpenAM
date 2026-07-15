@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.rest.service;
@@ -40,7 +41,7 @@ public abstract class ServiceEndpointApplication extends Application {
 
     /**
      * Constructs a new ServiceEndpointApplication.
-     * <br/>
+     * <br>
      * Sets the StatusService to {@link RestStatusService}.
      */
     protected ServiceEndpointApplication(StatusService statusService) {

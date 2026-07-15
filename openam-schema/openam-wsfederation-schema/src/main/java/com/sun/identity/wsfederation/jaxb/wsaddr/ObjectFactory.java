@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -86,7 +87,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -105,7 +106,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -124,7 +125,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -136,7 +137,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProblemActionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.ProblemActionType createProblemActionType()
@@ -148,7 +149,7 @@ public class ObjectFactory
     /**
      * Create an instance of MessageIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.MessageIDElement createMessageIDElement()
@@ -160,7 +161,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReplyToElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.ReplyToElement createReplyToElement()
@@ -172,7 +173,7 @@ public class ObjectFactory
     /**
      * Create an instance of MetadataType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.MetadataType createMetadataType()
@@ -184,7 +185,7 @@ public class ObjectFactory
     /**
      * Create an instance of RelatesToElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.RelatesToElement createRelatesToElement()
@@ -196,7 +197,7 @@ public class ObjectFactory
     /**
      * Create an instance of MetadataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.MetadataElement createMetadataElement()
@@ -208,7 +209,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceParametersType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.ReferenceParametersType createReferenceParametersType()
@@ -220,7 +221,7 @@ public class ObjectFactory
     /**
      * Create an instance of FromElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.FromElement createFromElement()
@@ -232,7 +233,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceParametersElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.ReferenceParametersElement createReferenceParametersElement()
@@ -244,7 +245,7 @@ public class ObjectFactory
     /**
      * Create an instance of RetryAfterElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.RetryAfterElement createRetryAfterElement()
@@ -256,7 +257,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProblemIRIElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.ProblemIRIElement createProblemIRIElement()
@@ -268,7 +269,7 @@ public class ObjectFactory
     /**
      * Create an instance of EndpointReferenceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.EndpointReferenceType createEndpointReferenceType()
@@ -280,7 +281,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributedQNameType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.AttributedQNameType createAttributedQNameType()
@@ -292,7 +293,7 @@ public class ObjectFactory
     /**
      * Create an instance of RelatesToType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.RelatesToType createRelatesToType()
@@ -304,7 +305,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributedURIType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.AttributedURIType createAttributedURIType()
@@ -316,7 +317,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProblemActionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.ProblemActionElement createProblemActionElement()
@@ -328,7 +329,7 @@ public class ObjectFactory
     /**
      * Create an instance of FaultToElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.FaultToElement createFaultToElement()
@@ -340,7 +341,7 @@ public class ObjectFactory
     /**
      * Create an instance of ToElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.ToElement createToElement()
@@ -352,7 +353,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributedUnsignedLongType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.AttributedUnsignedLongType createAttributedUnsignedLongType()
@@ -364,7 +365,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProblemHeaderQNameElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.ProblemHeaderQNameElement createProblemHeaderQNameElement()
@@ -376,7 +377,7 @@ public class ObjectFactory
     /**
      * Create an instance of EndpointReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.EndpointReferenceElement createEndpointReferenceElement()
@@ -388,7 +389,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.wsfederation.jaxb.wsaddr.ActionElement createActionElement()

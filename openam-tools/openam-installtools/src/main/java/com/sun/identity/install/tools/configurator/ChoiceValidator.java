@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -48,9 +49,9 @@ public class ChoiceValidator extends ValidatorBase {
      * Method isChoiceValid
      *
      *
-     * @param choice
-     * @param props
-     * @param IStateAccess
+     * @param choice the choice value entered by the user to validate
+     * @param props the map of configured valid choice values
+     * @param state the installer state access
      *
      * @return ValidationResult
      *

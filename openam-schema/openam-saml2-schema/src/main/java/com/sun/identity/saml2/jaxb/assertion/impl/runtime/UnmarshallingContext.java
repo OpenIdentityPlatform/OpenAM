@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
@@ -25,7 +26,7 @@ import com.sun.xml.bind.unmarshaller.Tracer;
  *
  * <p>
  * Errors detected by the AbstractUnmarshallingEventHandlerImpl-derived classes should
- * be either thrown as {@link UnrepotedException} or reported through
+ * be either thrown as {@code UnrepotedException} or reported through
  * the handleEvent method of this interface.
  *
  * @author

@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2022 Open Identity Platform Community
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.console.base.model;
@@ -309,7 +309,7 @@ public class AMModelBase
     /**
      * Returns the attribute name that is used for the main user display
      * on user entries. This attribute is defined in the administration
-     * service in <code>Search Return Attribute/code>. The FIRST entry in
+     * service in <code>Search Return Attribute</code>. The FIRST entry in
      * this attribute is the value returned. If the attribute contains the
      * following values <code>cn uid</code>, then <code>cn</code> will be
      * the return value.

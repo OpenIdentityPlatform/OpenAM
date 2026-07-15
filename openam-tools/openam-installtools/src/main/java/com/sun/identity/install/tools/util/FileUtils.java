@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.install.tools.util;
 
@@ -115,9 +116,9 @@ public class FileUtils {
     /**
      * Method copyJarFile to destination directory
      *
-     * @param srcDir
-     * @param destDir
-     * @param filename
+     * @param srcDir the source directory containing the jar file
+     * @param destDir the destination directory to copy the jar file to
+     * @param filename the name of the jar file to copy
      *
      */
     public static void copyJarFile(String srcDir, String destDir,
@@ -174,8 +175,8 @@ public class FileUtils {
     /**
      * Method copyDirContents
      *
-     * @param srcDir
-     * @param destDir
+     * @param srcDir the source directory whose contents are copied
+     * @param destDir the destination directory to copy contents into
      *
      */
     public static void copyDirContents(File srcDir, File destDir)
@@ -360,9 +361,9 @@ public class FileUtils {
      * Method replaceBackWithForward
      *
      *
-     * @param str
+     * @param str the string in which back slashes are replaced
      *
-     * @return
+     * @return the string with all back slashes replaced by forward slashes
      *
      */
     public static String replaceBackWithForward(String str) {
@@ -400,10 +401,10 @@ public class FileUtils {
      * Method getLineByNumber
      *
      *
-     * @param filePath
-     * @param lineNum
+     * @param filePath the path of the file to read
+     * @param lineNum the 1-based line number to retrieve
      *
-     * @return
+     * @return the contents of the specified line, or null if it cannot be read
      *
      */
     public static String getLineByNumber(String filePath, int lineNum) {
@@ -437,13 +438,13 @@ public class FileUtils {
      * Method matchPattern
      *
      *
-     * @param line
-     * @param pattern
-     * @param matchBegin
-     * @param matchEnd
-     * @param ignoreCase
+     * @param line the line of text to test
+     * @param pattern the pattern to match within the line
+     * @param matchBegin whether the pattern must match at the beginning of the line
+     * @param matchEnd whether the pattern must match at the end of the line
+     * @param ignoreCase whether the match should be case-insensitive
      *
-     * @return
+     * @return true if the line matches the pattern according to the given options
      *
      */
     public static boolean matchPattern(String line, String pattern,
@@ -494,14 +495,14 @@ public class FileUtils {
      * Method getLineWithPattern
      *
      *
-     * @param filePath
-     * @param pattern
-     * @param matchBegin
-     * @param matchEnd
-     * @param ignoreCase
-     * @param beginAtLine
+     * @param filePath the path of the file to search
+     * @param pattern the pattern to search for
+     * @param matchBegin whether the pattern must match at the beginning of a line
+     * @param matchEnd whether the pattern must match at the end of a line
+     * @param ignoreCase whether the match should be case-insensitive
+     * @param beginAtLine the line number at which to start searching
      *
-     * @return
+     * @return the first line that matches the pattern, or null if none is found
      *
      */
     public static String getLineWithPattern(String filePath, String pattern,
@@ -555,14 +556,14 @@ public class FileUtils {
      * Method getFirstOccurence
      *
      *
-     * @param filePath
-     * @param pattern
-     * @param matchBegin
-     * @param matchEnd
-     * @param ignoreCase
-     * @param beginAtLine
+     * @param filePath the path of the file to search
+     * @param pattern the pattern to search for
+     * @param matchBegin whether the pattern must match at the beginning of a line
+     * @param matchEnd whether the pattern must match at the end of a line
+     * @param ignoreCase whether the match should be case-insensitive
+     * @param beginAtLine the line number at which to start searching
      *
-     * @return
+     * @return the line number of the first match, or -1 if none is found
      *
      */
     public static int getFirstOccurence(String filePath, String pattern,
@@ -615,13 +616,13 @@ public class FileUtils {
      * Method getFirstOccurence
      *
      *
-     * @param filePath
-     * @param pattern
-     * @param matchBegin
-     * @param matchEnd
-     * @param ignoreCase
+     * @param filePath the path of the file to search
+     * @param pattern the pattern to search for
+     * @param matchBegin whether the pattern must match at the beginning of a line
+     * @param matchEnd whether the pattern must match at the end of a line
+     * @param ignoreCase whether the match should be case-insensitive
      *
-     * @return
+     * @return the line number of the first match, or -1 if none is found
      *
      */
     public static int getFirstOccurence(String filePath, String pattern,
@@ -634,13 +635,13 @@ public class FileUtils {
      * Method getLastOccurence
      *
      *
-     * @param filePath
-     * @param pattern
-     * @param matchBegin
-     * @param matchEnd
-     * @param ignoreCase
+     * @param filePath the path of the file to search
+     * @param pattern the pattern to search for
+     * @param matchBegin whether the pattern must match at the beginning of a line
+     * @param matchEnd whether the pattern must match at the end of a line
+     * @param ignoreCase whether the match should be case-insensitive
      *
-     * @return
+     * @return the line number of the last match, or -1 if none is found
      *
      */
     public static int getLastOccurence(String filePath, String pattern,
@@ -920,11 +921,10 @@ public class FileUtils {
      * Method declaration
      *
      *
-     * @param fileName
+     * @param fileName the path of the file whose lines are counted
      *
-     * @return
+     * @return the total number of lines in the file
      *
-     * @see
      */
     public static int getTotalLineNums(String fileName) {
         int lineNum = 0;
@@ -952,11 +952,11 @@ public class FileUtils {
      * Method insertLineByNumber
      *
      *
-     * @param filePath
-     * @param lineNum
-     * @param line
+     * @param filePath the path of the file to modify
+     * @param lineNum the 1-based line number at which to insert
+     * @param line the line of text to insert
      *
-     * @return
+     * @return true if the line was inserted successfully
      *
      */
     public static boolean insertLineByNumber(String filePath, int lineNum,
@@ -1007,6 +1007,7 @@ public class FileUtils {
      *
      *
      * @param filePath
+     *            the path of the file to modify
      * @param lineNum
      *            begining line number
      * @param numLines
@@ -1035,10 +1036,13 @@ public class FileUtils {
      *
      *
      * @param filePath
+     *            the path of the file to modify
      * @param lineNum
+     *            the beginning line number (1-based)
      * @param numLines
+     *            the number of lines to remove
      *
-     * @return
+     * @return the last removed line, or {@code null} if the removal failed
      *
      */
     public static String removeLinesByNumber(String filePath, int lineNum,
@@ -1089,8 +1093,8 @@ public class FileUtils {
     /**
      * Appends the given set of lines to the specified file.
      *
-     * @param filePath
-     * @param linesToAppend
+     * @param filePath the path of the file to append to
+     * @param linesToAppend the lines to append to the file
      * @return true for success, false otherwise
      */
     public static boolean appendLinesToFile(String filePath,
@@ -1101,8 +1105,8 @@ public class FileUtils {
     /**
      * Appends the given set of lines to the specified file.
      *
-     * @param filePath
-     * @param linesToAppend
+     * @param filePath the path of the file to append to
+     * @param linesToAppend the lines to append to the file
      * @param create should the file be created if it does not exist
      * @return true for success, false otherwise
      */

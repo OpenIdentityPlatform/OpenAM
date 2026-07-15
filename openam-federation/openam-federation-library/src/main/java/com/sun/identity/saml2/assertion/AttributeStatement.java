@@ -25,6 +25,7 @@
  * $Id: AttributeStatement.java,v 1.2 2008/06/25 05:47:40 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.assertion;
@@ -40,20 +41,19 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * The <code>AttributeStatement</code> element describes a statement by
  * the SAML authority asserting that the assertion subject is associated with
  * the specified attributes. It is of type <code>AttributeStatementType</code>.
- * <p>
  * <pre>
- * &lt;complexType name="AttributeStatementType">
- *   &lt;complexContent>
+ * &lt;complexType name="AttributeStatementType"&gt;
+ *   &lt;complexContent&gt;
  *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:assertion}
- *     StatementAbstractType">
- *       &lt;choice maxOccurs="unbounded">
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Attribute"/>
+ *     StatementAbstractType"&gt;
+ *       &lt;choice maxOccurs="unbounded"&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Attribute"/&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *         EncryptedAttribute"/>
- *       &lt;/choice>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *         EncryptedAttribute"/&gt;
+ *       &lt;/choice&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

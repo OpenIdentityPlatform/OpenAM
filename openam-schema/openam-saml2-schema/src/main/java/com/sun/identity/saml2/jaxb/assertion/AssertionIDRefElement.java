@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -12,9 +13,8 @@ package com.sun.identity.saml2.jaxb.assertion;
 /**
  * Java content class for AssertionIDRef element declaration.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/saml2/saml-schema-assertion-2.0.xsd line 84)
- * <p>
  * <pre>
- * &lt;element name="AssertionIDRef" type="{http://www.w3.org/2001/XMLSchema}NCName"/>
+ * &lt;element name="AssertionIDRef" type="{http://www.w3.org/2001/XMLSchema}NCName"/&gt;
  * </pre>
  * 
  */

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -36,7 +37,6 @@ import com.iplanet.services.ldap.AttrSet;
  * purpose of defining guidelines in a search. It defines the search filter and
  * attributes to be returned in a search query. Reusability and flexibility are
  * serving goals in SearchTemplate.
- * <P>
  * 
  * @see Template
  * @see CreationTemplate
@@ -95,7 +95,7 @@ public class SearchTemplate extends Template {
     /**
      * Sets the filter expression used to search for objects of this type, for
      * example, "objectclass=inetorgperson" or
-     * "(&(objectclass=inetorgperson)(ou=accounting))"
+     * "(&amp;(objectclass=inetorgperson)(ou=accounting))"
      * 
      * @param filter
      *            A UMS search expression (LDAP syntax)

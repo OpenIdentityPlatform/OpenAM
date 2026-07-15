@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -75,7 +76,7 @@ public class Base64 {
      * Returns an array of decoded bytes which were encoded in the passed byte
      * array.
      * 
-     * @param data
+     * @param encdata
      *            the array of base64-encoded characters
      * @return byte[] the decoded data array
      */

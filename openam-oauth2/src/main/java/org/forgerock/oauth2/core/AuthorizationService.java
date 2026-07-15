@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -101,12 +101,12 @@ public class AuthorizationService {
      * Handles an initial authorization request from a OAuth2 client, validates the request is valid and contains
      * the required parameters, checks the resource owner has authenticated and given their consent for the client to
      * be authorized before issuing an AuthorizationToken.
-     * <br/>
+     * <br>
      * If the resource owner is not authenticated, then the user-agent is redirected to a login page for the
      * resource owner to authenticate. And if the resource owner has not given their consent (or have not requested
      * it to be saved from a previous authorization request) the user-agent is redirected to the user consent page.
      * The user-agent is then redirected back to the OAuth2 authorize endpoint.
-     * <br/>
+     * <br>
      * An AuthorizationToken is only ever issued by this method if the resource owner has previously given their
      * consent. In the case where the user-agent is redirected to the user consent page, when the user-agent is
      * redirected back to OAuth2 authorize endpoint the #authorize(OAuth2Request, boolean, boolean) method on this class
@@ -248,7 +248,7 @@ public class AuthorizationService {
      * Handles an authorization request from a OAuth2 client, validates the request is valid and contains the required
      * parameters, checks the resource owner has authenticated and given their consent for the client to be authorized
      * before issuing an AuthorizationToken.
-     * <br/>
+     * <br>
      * If the resource owner is not authenticated, then the user-agent is redirected to a login page for the
      * resource owner to authenticate.
      *

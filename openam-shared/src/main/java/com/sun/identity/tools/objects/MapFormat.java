@@ -37,6 +37,8 @@
  * However, if you add GPL Version 2 code and therefore, elected the GPL
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.tools.objects;
 
@@ -157,7 +159,7 @@ public class MapFormat extends Format {
     }
      */
     /** Returns the value for given key. Subclass may define its own beahvior of
-     * this method. For example, if key is not defined, subclass can return <not defined>
+     * this method. For example, if key is not defined, subclass can return {@code <not defined>}
      * string.
      *
      * @param key Key.

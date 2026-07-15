@@ -25,6 +25,7 @@
  * $Id: LogoutRequest.java,v 1.2 2008/06/25 05:47:56 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -43,26 +44,26 @@ import com.sun.identity.saml2.protocol.impl.LogoutResponseImpl;
  * message to indicate that a session has been terminated.
  *
  * <pre>
- * &lt;element name="LogoutRequest" type="{urn:oasis:names:tc:SAML:2.0:protocol}LogoutRequestType"/>
+ * &lt;element name="LogoutRequest" type="{urn:oasis:names:tc:SAML:2.0:protocol}LogoutRequestType"/&gt;
  * </pre>
  *
  * <pre>
- * &lt;complexType name="LogoutRequestType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}RequestAbstractType">
- *       &lt;sequence>
- *         &lt;choice>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}BaseID"/>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}NameID"/>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedID"/>
- *         &lt;/choice>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}SessionIndex" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="NotOnOrAfter" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
- *       &lt;attribute name="Reason" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="LogoutRequestType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}RequestAbstractType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}BaseID"/&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}NameID"/&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedID"/&gt;
+ *         &lt;/choice&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}SessionIndex" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="NotOnOrAfter" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
+ *       &lt;attribute name="Reason" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  *
  * 

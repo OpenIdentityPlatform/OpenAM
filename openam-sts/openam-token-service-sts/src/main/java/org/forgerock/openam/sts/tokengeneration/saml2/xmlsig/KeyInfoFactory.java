@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS. All rights reserved.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.xmlsig;
@@ -32,8 +34,8 @@ public interface KeyInfoFactory {
      * @param recipientCert The cert, passed in the invocation to the TokenGenerationService, for which KeyInfo will
      *                      be generated for inclusion in the SubjectConfirmationData for HoK assertions.
      * @return The KeyInfo Element
-     * @throws ParserConfigurationException
-     * @throws XMLSecurityException
+     * @throws ParserConfigurationException if a document builder to hold the KeyInfo element could not be created
+     * @throws XMLSecurityException if the KeyInfo element could not be generated from the certificate
      */
     public Element generatePublicKeyInfo(X509Certificate recipientCert) throws ParserConfigurationException, XMLSecurityException;
 }

@@ -25,6 +25,7 @@
  * $Id: AuthnContext.java,v 1.2 2008/06/25 05:47:40 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -41,36 +42,35 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * authentication event. The element can contain an authentication context
  * class reference, an authentication declaration or declaration reference,
  * or both. Its type is <code>AuthnContextType</code>.
- * <p>
  * <pre>
- * &lt;complexType name="AuthnContextType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;choice>
- *           &lt;sequence>
+ * &lt;complexType name="AuthnContextType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice&gt;
+ *           &lt;sequence&gt;
  *             &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *             AuthnContextClassRef"/>
- *             &lt;choice minOccurs="0">
+ *             AuthnContextClassRef"/&gt;
+ *             &lt;choice minOccurs="0"&gt;
  *               &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *               AuthnContextDecl"/>
+ *               AuthnContextDecl"/&gt;
  *               &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *               AuthnContextDeclRef"/>
- *             &lt;/choice>
- *           &lt;/sequence>
- *           &lt;choice>
+ *               AuthnContextDeclRef"/&gt;
+ *             &lt;/choice&gt;
+ *           &lt;/sequence&gt;
+ *           &lt;choice&gt;
  *             &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *             AuthnContextDecl"/>
+ *             AuthnContextDecl"/&gt;
  *             &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *             AuthnContextDeclRef"/>
- *           &lt;/choice>
- *         &lt;/choice>
+ *             AuthnContextDeclRef"/&gt;
+ *           &lt;/choice&gt;
+ *         &lt;/choice&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *         AuthenticatingAuthority" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *         AuthenticatingAuthority" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

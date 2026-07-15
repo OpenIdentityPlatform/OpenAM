@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -161,6 +162,7 @@ public interface AMTemplate extends AMObject {
      *         <ul>
      *         <li> DYNAMIC_TEMPLATE
      *         <li> ORGANIZATION_TEMPLATE
+     *         </ul>
      */
     public int getType();
 

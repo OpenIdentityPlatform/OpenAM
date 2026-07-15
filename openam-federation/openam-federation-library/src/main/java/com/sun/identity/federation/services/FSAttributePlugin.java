@@ -24,6 +24,7 @@
  *
  * $Id: FSAttributePlugin.java,v 1.3 2008/06/25 05:46:52 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -37,7 +38,6 @@ import java.util.List;
  * AttributeStatements into the <code>Assertion</code> by the Identity Provider
  * during the Single Sign-on process. The implementation of this plugin
  * must return list of SAML <code>AttributeStatement</code>s.
- * </p>
  * 
  * @deprecated This SPI is deprecated.
  * @see com.sun.identity.federation.services.FSRealmAttributePlugin
@@ -50,7 +50,7 @@ public interface FSAttributePlugin {
      * @param remoteProviderID Remote ProviderID.
      * @param subject <code>FSSubject</code> to use in the statements
      * @param token session object
-     * @return List A list of SAML <code>AttributeStatement<code>s.
+     * @return List A list of SAML <code>AttributeStatement</code>s.
      * @deprecated This method is deprecated.
      * @see com.sun.identity.federation.services.FSRealmAttributePlugin
      */

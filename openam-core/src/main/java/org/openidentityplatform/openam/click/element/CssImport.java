@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.element;
 
@@ -26,9 +27,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import java.util.Map;
 
 /**
- * Provides a Css HEAD element for importing <tt>external</tt> Cascading
+ * Provides a Css HEAD element for importing <code>external</code> Cascading
  * Stylesheet files using the &lt;link&gt; tag.
- * <p/>
+ * <p>
  * Example usage:
  * <pre class="prettyprint">
  * public class MyPage extends Page {
@@ -47,8 +48,8 @@ import java.util.Map;
  *     }
  * } </pre>
  *
- * The <tt>cssImport</tt> instance will be rendered as follows (assuming the
- * context path is <tt>myApp</tt>):
+ * The <code>cssImport</code> instance will be rendered as follows (assuming the
+ * context path is <code>myApp</code>):
  * <pre class="prettyprint">
  * &lt;link type="text/css" rel="stylesheet" href="/myApp/css/style.css"/&gt; </pre>
  */
@@ -60,7 +61,7 @@ public class CssImport extends ResourceElement {
 
     /**
      * Constructs a new Css import element.
-     * <p/>
+     * <p>
      * The CssImport {@link #setVersionIndicator(String) version indicator}
      * will automatically be set to the
      * {@link ClickUtils#getApplicationResourceVersionIndicator() application version indicator}.
@@ -70,16 +71,16 @@ public class CssImport extends ResourceElement {
     }
 
     /**
-     * Construct a new Css import element with the specified <tt>href</tt>
+     * Construct a new Css import element with the specified <code>href</code>
      * attribute.
-     * <p/>
+     * <p>
      * The CssImport {@link #setVersionIndicator(String) version indicator}
      * will automatically be set to the
      * {@link ClickUtils#getApplicationResourceVersionIndicator() application version indicator}.
-     * <p/>
-     * <b>Please note</b> if the given <tt>href</tt> begins with a
-     * <tt class="wr">"/"</tt> character the href will be prefixed with the web
-     * application <tt>context path</tt>.
+     * <p>
+     * <b>Please note</b> if the given <code>href</code> begins with a
+     * <code class="wr">"/"</code> character the href will be prefixed with the web
+     * application <code>context path</code>.
      *
      * @param href the Css import href attribute
      */
@@ -88,17 +89,17 @@ public class CssImport extends ResourceElement {
     }
 
     /**
-     * Construct a new Css import element with the specified <tt>href</tt>
+     * Construct a new Css import element with the specified <code>href</code>
      * attribute.
-     * <p/>
+     * <p>
      * If useApplicationVersionIndicator is true the
      * CssImport {@link #setVersionIndicator(String) version indicator}
      * will automatically be set to the
      * {@link ClickUtils#getApplicationResourceVersionIndicator() application version indicator}.
-     * <p/>
-     * <b>Please note</b> if the given <tt>href</tt> begins with a
-     * <tt class="wr">"/"</tt> character the href will be prefixed with the web
-     * application <tt>context path</tt>.
+     * <p>
+     * <b>Please note</b> if the given <code>href</code> begins with a
+     * <code class="wr">"/"</code> character the href will be prefixed with the web
+     * application <code>context path</code>.
      *
      * @param href the Css import href attribute
      * @param useApplicationVersionIndicator indicates whether the version
@@ -112,12 +113,12 @@ public class CssImport extends ResourceElement {
     }
 
     /**
-     * Construct a new Css import element with the specified <tt>href</tt>
+     * Construct a new Css import element with the specified <code>href</code>
      * attribute and version indicator.
-     * <p/>
-     * <b>Please note</b> if the given <tt>href</tt> begins with a
-     * <tt class="wr">"/"</tt> character the href will be prefixed with the web
-     * application <tt>context path</tt>.
+     * <p>
+     * <b>Please note</b> if the given <code>href</code> begins with a
+     * <code class="wr">"/"</code> character the href will be prefixed with the web
+     * application <code>context path</code>.
      *
      * @param href the Css import href attribute
      * @param versionIndicator the version indicator to add to the href path
@@ -143,12 +144,12 @@ public class CssImport extends ResourceElement {
 
     /**
      * This method always return true because Css import must be unique based on
-     * its <tt>href</tt> attribute. In other words the Page HEAD should only
-     * contain a single CSS import for the specific <tt>href</tt>.
+     * its <code>href</code> attribute. In other words the Page HEAD should only
+     * contain a single CSS import for the specific <code>href</code>.
      *
      * @see ResourceElement#isUnique()
      *
-     * @return true because Css import must unique based on its <tt>href</tt>
+     * @return true because Css import must unique based on its <code>href</code>
      * attribute
      */
     @Override
@@ -157,12 +158,12 @@ public class CssImport extends ResourceElement {
     }
 
     /**
-     * Sets the <tt>href</tt> attribute. If the given href argument is
-     * <tt>null</tt>, the <tt>href</tt> attribute will be removed.
-     * <p/>
-     * If the given <tt>href</tt> begins with a <tt class="wr">"/"</tt> character
-     * the href will be prefixed with the web applications <tt>context path</tt>.
-     * Note if the given href is already prefixed with the <tt>context path</tt>,
+     * Sets the <code>href</code> attribute. If the given href argument is
+     * <code>null</code>, the <code>href</code> attribute will be removed.
+     * <p>
+     * If the given <code>href</code> begins with a <code class="wr">"/"</code> character
+     * the href will be prefixed with the web applications <code>context path</code>.
+     * Note if the given href is already prefixed with the <code>context path</code>,
      * Click won't add it a second time.
      *
      * @param href the new href attribute
@@ -189,7 +190,7 @@ public class CssImport extends ResourceElement {
     }
 
     /**
-     * Return the <tt>href</tt> attribute.
+     * Return the <code>href</code> attribute.
      *
      * @return the href attribute
      */

@@ -24,6 +24,7 @@
  *
  * $Id: FSAuthnRequestEnvelope.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.message;
@@ -180,7 +181,7 @@ public class FSAuthnRequestEnvelope {
      * based on the Liberty Request schema.
      *
      * @return XML String representing the request.
-     * @throws <code>FSMsgException</code> if there is an error.
+     * @throws FSMsgException if there is an error.
      */
     
     public String toXMLString() throws FSMsgException {
@@ -212,7 +213,7 @@ public class FSAuthnRequestEnvelope {
      * @param includeHeader Determines whether the output include the xml
      *        declaration header.
      * @return A string containing the valid XML for this element.
-     * @throws <code>FSMsgException</code> if there is an error.
+     * @throws FSMsgException if there is an error.
      */
     public String toXMLString(boolean includeNS,
             boolean declareNS,
@@ -433,7 +434,7 @@ public class FSAuthnRequestEnvelope {
      * request String.
      *
      * @param encodedReq the encoded string.
-     * @throws <code>FSMsgException</code> if there is an error
+     * @throws FSMsgException if there is an error
      *         creating <code>FSAuthnRequestEnvelope</code> object.
      */
     

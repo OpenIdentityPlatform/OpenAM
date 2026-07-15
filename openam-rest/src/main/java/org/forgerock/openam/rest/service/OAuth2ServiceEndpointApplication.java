@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.rest.service;
@@ -28,7 +29,7 @@ import org.restlet.routing.Router;
 public class OAuth2ServiceEndpointApplication extends ServiceEndpointApplication {
 
     /**
-     * {@inheritDoc}
+     * Constructs a new OAuth2ServiceEndpointApplication.
      * Sets the default media type as "application/json".
      */
     public OAuth2ServiceEndpointApplication() {
@@ -37,8 +38,8 @@ public class OAuth2ServiceEndpointApplication extends ServiceEndpointApplication
     }
 
     /**
-     * Returns the XACML router.
-     * @return
+     * Returns the OAuth2 router.
+     * @return the OAuth2 router
      */
     protected Router getRouter() {
         return InjectorHolder.getInstance(Key.get(Router.class, Names.named("OAuth2Router")));

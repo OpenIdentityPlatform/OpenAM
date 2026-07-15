@@ -67,7 +67,6 @@ import com.sun.identity.shared.debug.Debug;
  * Time generally increases as we move from the top of the diagram to the bottom. However, the while and for loops
  * violate that aspect. Vertical bars imply where processing or user input is currently proceeding. Periods imply an
  * idle or waiting system.
- * <p/>
  *
  * <pre>
  *
@@ -75,16 +74,16 @@ import com.sun.identity.shared.debug.Debug;
  *      |                                      .
  *      | AccessRequest                        .
  *      | [username + password]                .
- *      + -----------------------------------> +
+ *      + -----------------------------------&gt; +
  *      .                                      | ac = new AuthContext(realm)
  *      .                                      | ac.login(VIA_CHAIN, chain)
  *      .                                      |
  *      .   at a minimum the auth chain used   | ac.hasMoreRequirements()
  *      .   must have a first module that      | callback[] cbs = ac.getRequirements(true)
- *      .   accepts username and password -->  | find nameCallback and inject username
+ *      .   accepts username and password --&gt;  | find nameCallback and inject username
  *      .                                      | find passwordCallback and inject password
  *      . AccessReject                         |
- *      + <----------------------------------- + if unable to find name/password callbacks or inject values
+ *      + &lt;----------------------------------- + if unable to find name/password callbacks or inject values
  *      .                                      |
  *      .                                      +-- while ac.hasMoreRequirements()
  *      .                                      .    | callback[] cbs = ac.getRequirements(true)
@@ -94,11 +93,11 @@ import com.sun.identity.shared.debug.Debug;
  * callback
  *      . AccessChallenge                      .    .   |
  *      . [message + state(n)]                 .    .   |
- *      + <---------------------------------------------+
+ *      + &lt;---------------------------------------------+
  *      |                                      .    .   .
  *      | AccessRequest                        .    .   .
  *      | [username + answer + state(n)]       .    .   .
- *      + --------------------------------------------->+
+ *      + ---------------------------------------------&gt;+
  *      .                                      .    .   | inject value into cbs(n)
  *      .                                      .    +---+
  *      .                                      .    |
@@ -106,27 +105,26 @@ import com.sun.identity.shared.debug.Debug;
  *      .                                      +----+
  *      .                                      |
  *      . AccessAccept                         | s = ac.getStatus()
- *      + <----------------------------------- + if s == SUCCESS
+ *      + &lt;----------------------------------- + if s == SUCCESS
  *      .                                      |
  *      . AccessReject                         |
- *      + <----------------------------------- + all else
+ *      + &lt;----------------------------------- + all else
  *      |                                      .
  *      |                                      .
  * </pre>
- * <p/>
+ * <p>
  * Of special note to authentication module implementors is what modules are allowed in the chain used by a radius
  * client. If an authentication module uses {@link jakarta.servlet.http.HttpServletRequest} or
  * {@link jakarta.servlet.http.HttpServletResponse} they generally won't work for radius clients without modification. For
  * non-http clients the {@link jakarta.servlet.http.HttpServletRequest} and {@link jakarta.servlet.http.HttpServletResponse}
  * objects will be null typically leading to a {@link java.lang.NullPointerException}. Looking for a value of null is
  * how such modules can tell if they are dealing with a non-http client and adjust their behavior accordingly.
- * <p/>
+ * <p>
  * This may include having different sets of callbacks for http clients than for radius clients. For example, a module
  * may support a checkbox causing a cookie to be set in the user's browser to remember that module's use for a period of
  * time and not require that the user leverage its unique authentication mechanism until that cookie has expired. Such a
  * feature won't work for radius clients since they have no such persistent client-side mechanism. Hence for non-http
  * clients a different callback set would most likely be needed that didn't include that checkbox and its label.
- * <p/>
  */
 public class OpenAMAuthHandler implements AccessRequestHandler {
 
@@ -218,7 +216,6 @@ public class OpenAMAuthHandler implements AccessRequestHandler {
      *            - provides methods that the handler can use to obtain information about the context in which the
      *            request was made, for example the name and IP address of the client from which the request was
      *            received.
-     * @return
      * @throws RadiusProcessingException
      *             - when the response can not be sent.
      */

@@ -25,6 +25,7 @@
  * $Id: SubConfigMeta.java,v 1.2 2008/06/25 05:42:50 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.console.base.model;
@@ -128,8 +129,6 @@ public class SubConfigMeta {
 
     /**
      * Returns sub service schema.
-     *
-     * @throws SMSException if sub schema cannot be determined.
      */
     public ServiceSchema getServiceSchema() {
         return corrSchema;

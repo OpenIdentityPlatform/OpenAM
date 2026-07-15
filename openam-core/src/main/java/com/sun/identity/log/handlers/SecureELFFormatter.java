@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -84,7 +85,7 @@ public class SecureELFFormatter extends Formatter {
     /**
       * Format the given record as per ELF and return a formatted string. <p>
       *
-      * For ELF Specifications refer <LI> www.w3.org/TR/WD-logfile.html</LI>
+      * For ELF Specifications refer to www.w3.org/TR/WD-logfile.html
       * @param logRecord The logRecord to be formatted
       * @return The string formed by formatting the logRecord
       */
@@ -186,8 +187,8 @@ public class SecureELFFormatter extends Formatter {
      * specifies the ELF version used followed by a #Fields line which specifies
      * all the fields that are being logged.
      * <p>
-     * <tt> SecureELFFormatter </tt> uses this method to return back the header
-     * containing these two lines. <tt> FileHandler </TT> checks if the header
+     * <code> SecureELFFormatter </code> uses this method to return back the header
+     * containing these two lines. <code> FileHandler </code> checks if the header
      * is already written, if not uses this method to get the header and puts it
      * at the beginning of the file.
      * @param handler The target handler (can be null)

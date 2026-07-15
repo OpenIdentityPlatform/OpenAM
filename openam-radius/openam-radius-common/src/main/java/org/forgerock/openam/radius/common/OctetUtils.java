@@ -12,6 +12,8 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.radius.common;
 
@@ -32,78 +34,78 @@ import java.nio.charset.StandardCharsets;
  * defined in the {@link org.forgerock.openam.radius.common.Attribute} class:
  *
  * <pre>
- * {@link com.sun.identity.authentication.modules.radius.client.CallbackIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallbackNumberAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CHAPChallengeAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FilterIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FramedAppleTalkZoneAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FramedRouteAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.LoginLATGroupAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.LoginLATNodeAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.LoginLATPortAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.LoginLATServiceAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.NASClassAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.NASIdentifierAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.ProxyStateAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallbackIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallbackNumberAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CHAPChallengeAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FilterIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedAppleTalkZoneAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedRouteAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.LoginLATGroupAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.LoginLATNodeAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.LoginLATPortAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.LoginLATServiceAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.NASClassAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.NASIdentifierAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.ProxyStateAttribute}
  * {@link org.forgerock.openam.radius.common.ReplyMessageAttribute}
  * {@link org.forgerock.openam.radius.common.StateAttribute}
  * {@link org.forgerock.openam.radius.common.UserNameAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CallerStationIdAttribute}
  * </pre>
  *
  * The following attributes contain a four byte integer value:
  *
  * <pre>
- * {@link com.sun.identity.authentication.modules.radius.client.FramedAppleTalkLinkAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FramedAppleTalkNetworkAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FramedCompressionAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FramedMTUAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FramedProtocolAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FramedRoutingAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.IdleTimeoutAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.LoginIPHostAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.LoginServiceAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.LoginTCPPortAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.NASPortAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.NASPortTypeAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.PortLimitAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.ServiceTypeAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.SessionTimeoutAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.TerminationActionAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedAppleTalkLinkAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedAppleTalkNetworkAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedCompressionAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedMTUAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedProtocolAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedRoutingAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.IdleTimeoutAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.LoginIPHostAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.LoginServiceAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.LoginTCPPortAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.NASPortAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.NASPortTypeAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.PortLimitAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.ServiceTypeAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.SessionTimeoutAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.TerminationActionAttribute}
  * </pre>
  *
  * The following classes contain a four byte array value:
  *
  * <pre>
- * {@link com.sun.identity.authentication.modules.radius.client.FramedIPAddressAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FramedIPNetmaskAttribute}
- * {@link com.sun.identity.authentication.modules.radius.client.FramedIPXNetworkAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedIPAddressAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedIPNetmaskAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.FramedIPXNetworkAttribute}
  * </pre>
  *
  * The following classes have unique models described and hence have their own unique code that can't be
  * shared among other attribute classes:
  * <pre>
- * {@link com.sun.identity.authentication.modules.radius.client.CHAPPasswordAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.CHAPPasswordAttribute}
  *  - class contains a single byte integer value followed by 16 bytes of text characters.
  *
  * {@link org.forgerock.openam.radius.common.UserPasswordAttribute}
  *  - has an encrypted string of characters.
 
- * {@link com.sun.identity.authentication.modules.radius.client.NASIPAddressAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.NASIPAddressAttribute}
  *  - has a four octets on the wire but uses an {@link java.net.InetAddress} object internally.
  *
- * {@link com.sun.identity.authentication.modules.radius.client.VendorSpecificAttribute}
+ * {@code com.sun.identity.authentication.modules.radius.client.VendorSpecificAttribute}
  *  - has a four byte integer followed by the remaining space containing textual characters.
  * </pre>
  *

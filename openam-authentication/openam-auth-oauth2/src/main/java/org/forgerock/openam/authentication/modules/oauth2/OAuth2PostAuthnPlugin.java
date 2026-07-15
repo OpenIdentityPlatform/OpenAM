@@ -20,7 +20,7 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.oauth2;
@@ -55,7 +55,7 @@ public class OAuth2PostAuthnPlugin implements AMPostAuthProcessInterface {
      * @param request HttpServletRequest object
      * @param response HttpServletResponse object
      * @param ssoToken  authenticated user's ssoToken
-     * @exception Authentication Exception when there is an error
+     * @exception AuthenticationException when there is an error
      */
     public void onLoginSuccess(Map requestParamsMap,
             HttpServletRequest request,

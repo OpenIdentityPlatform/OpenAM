@@ -24,7 +24,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.common;
 
@@ -1104,7 +1104,7 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @param hostEntityID   hosted <code>EntityID</code>.
      * @param remoteEntityID remote <code>EntityID</code>.
      * @param hostEntityRole the role of hosted entity.
-     * @throws <code>SAML2Exception</code> if any failure.
+     * @throws SAML2Exception if any failure.
      */
     public static Map getNameIDKeyMap(final NameID nameID,
                                       final String hostEntityID,
@@ -2564,7 +2564,7 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @param reqIssuer  <code>Issuer</code> of Request.
      * @param requestId  request ID
      * @return true if issuer is valid.
-     * @throws SAML2Exception
+     * @throws SAML2Exception if a SAML2 error occurs
      */
     public static boolean verifyRequestIssuer(String realm, String hostEntity,
                                               Issuer reqIssuer, String requestId)
@@ -2596,7 +2596,7 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @param resIssuer  <code>Issuer</code> of Response.
      * @param requestId  request ID for the response.
      * @return true if issuer is valid.
-     * @throws SAML2Exception
+     * @throws SAML2Exception if a SAML2 error occurs
      */
     public static boolean verifyResponseIssuer(String realm, String hostEntity,
                                                Issuer resIssuer, String requestId)
@@ -3532,7 +3532,7 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @return a map of local attributes configuration map.
      * This map will have a key as the SAML attribute name and the value
      * is the local attribute.
-     * @throws <code>SAML2Exception</code> if any failured.
+     * @throws SAML2Exception if any failured.
      */
     public static Map getConfigAttributeMap(String realm, String hostEntityID,
                                             String role) throws SAML2Exception {
@@ -4472,7 +4472,7 @@ public class SAML2Utils extends SAML2SDKUtils {
     /**
      * Checks if the provided <code>String</code> is URLEncoded. Our logic is
      * simple. If the string has % or + character we treat as URL encoded
-     * <p/>
+     * <p>
      * TODO : Copied from AuthClientUtils, refactor
      *
      * @param s the <code>String</code> we want to check
@@ -4492,7 +4492,7 @@ public class SAML2Utils extends SAML2SDKUtils {
     /**
      * Creates a Cookie with the <code>cookieName</code>,
      * <code>cookieValue</code> for the cookie domains specified.
-     * <p/>
+     * <p>
      * TODO: Copied from AuthClientUtils Refactor
      *
      * @param cookieName   is the name of the cookie

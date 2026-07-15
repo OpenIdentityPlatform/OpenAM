@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -92,7 +93,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -111,7 +112,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -130,7 +131,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -142,7 +143,7 @@ public class ObjectFactory
     /**
      * Create an instance of InteractionRequestType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.InteractionRequestType createInteractionRequestType()
@@ -154,7 +155,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncryptedResourceIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.EncryptedResourceIDElement createEncryptedResourceIDElement()
@@ -166,7 +167,7 @@ public class ObjectFactory
     /**
      * Create an instance of InquiryTypeConfirm
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.InquiryType.Confirm createInquiryTypeConfirm()
@@ -178,7 +179,7 @@ public class ObjectFactory
     /**
      * Create an instance of HintElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.HintElement createHintElement()
@@ -190,7 +191,7 @@ public class ObjectFactory
     /**
      * Create an instance of HintElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.HintElement createHintElement(java.lang.String value)
@@ -202,7 +203,7 @@ public class ObjectFactory
     /**
      * Create an instance of SelectType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.SelectType createSelectType()
@@ -214,7 +215,7 @@ public class ObjectFactory
     /**
      * Create an instance of InquiryElementType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.InquiryElementType createInquiryElementType()
@@ -226,7 +227,7 @@ public class ObjectFactory
     /**
      * Create an instance of InquiryElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.InquiryElement createInquiryElement()
@@ -238,7 +239,7 @@ public class ObjectFactory
     /**
      * Create an instance of ParameterType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.ParameterType createParameterType()
@@ -250,7 +251,7 @@ public class ObjectFactory
     /**
      * Create an instance of InquiryType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.InquiryType createInquiryType()
@@ -262,7 +263,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.ExtensionElement createExtensionElement()
@@ -274,7 +275,7 @@ public class ObjectFactory
     /**
      * Create an instance of SelectTypeItemType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.SelectType.ItemType createSelectTypeItemType()
@@ -286,7 +287,7 @@ public class ObjectFactory
     /**
      * Create an instance of TextType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.TextType createTextType()
@@ -298,7 +299,7 @@ public class ObjectFactory
     /**
      * Create an instance of InteractionResponseElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.InteractionResponseElement createInteractionResponseElement()
@@ -310,7 +311,7 @@ public class ObjectFactory
     /**
      * Create an instance of HelpElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.HelpElement createHelpElement()
@@ -322,7 +323,7 @@ public class ObjectFactory
     /**
      * Create an instance of TextElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.TextElement createTextElement()
@@ -334,7 +335,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.StatusElement createStatusElement()
@@ -346,7 +347,7 @@ public class ObjectFactory
     /**
      * Create an instance of InteractionStatementType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.InteractionStatementType createInteractionStatementType()
@@ -358,7 +359,7 @@ public class ObjectFactory
     /**
      * Create an instance of InteractionRequestElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.InteractionRequestElement createInteractionRequestElement()
@@ -370,7 +371,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResourceIDElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.ResourceIDElement createResourceIDElement()
@@ -382,7 +383,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.ExtensionType createExtensionType()
@@ -394,7 +395,7 @@ public class ObjectFactory
     /**
      * Create an instance of UserInteractionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.UserInteractionElement createUserInteractionElement()
@@ -406,7 +407,7 @@ public class ObjectFactory
     /**
      * Create an instance of UserInteractionHeaderType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.UserInteractionHeaderType createUserInteractionHeaderType()
@@ -418,7 +419,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmptyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.EmptyType createEmptyType()
@@ -430,7 +431,7 @@ public class ObjectFactory
     /**
      * Create an instance of InteractionResponseType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.InteractionResponseType createInteractionResponseType()
@@ -442,7 +443,7 @@ public class ObjectFactory
     /**
      * Create an instance of RedirectRequestElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.RedirectRequestElement createRedirectRequestElement()
@@ -454,7 +455,7 @@ public class ObjectFactory
     /**
      * Create an instance of RedirectRequestType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.RedirectRequestType createRedirectRequestType()
@@ -466,7 +467,7 @@ public class ObjectFactory
     /**
      * Create an instance of HelpType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.HelpType createHelpType()
@@ -478,7 +479,7 @@ public class ObjectFactory
     /**
      * Create an instance of SelectElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.SelectElement createSelectElement()
@@ -490,7 +491,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.interaction.jaxb.StatusType createStatusType()

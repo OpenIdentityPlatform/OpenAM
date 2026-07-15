@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -67,7 +68,7 @@ public class SubOrgReferral extends OrgReferral {
      * Gets the valid values for this referral 
      * @param token SSOToken
      * @return <code>ValidValues</code> object
-     * @exception SSOException if <code>SSOToken></code> is not valid
+     * @exception SSOException if <code>SSOToken</code> is not valid
      * @exception PolicyException if unable to get the list of valid
      * names.
      */
@@ -81,7 +82,7 @@ public class SubOrgReferral extends OrgReferral {
      * @param token SSOToken
      * @param pattern a pattern to match against the value
      * @return <code>ValidValues</code> object
-     * @exception SSOException if <code>SSOToken></code> is not valid
+     * @exception SSOException if <code>SSOToken</code> is not valid
      * @exception PolicyException if unable to get the list of valid
      * names.
      */

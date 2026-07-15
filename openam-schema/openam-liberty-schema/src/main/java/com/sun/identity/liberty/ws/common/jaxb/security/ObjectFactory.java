@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -73,7 +74,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -92,7 +93,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -111,7 +112,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -123,7 +124,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProxySubjectElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.ProxySubjectElement createProxySubjectElement()
@@ -135,7 +136,7 @@ public class ObjectFactory
     /**
      * Create an instance of ValidityRestrictionConditionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.ValidityRestrictionConditionType createValidityRestrictionConditionType()
@@ -147,7 +148,7 @@ public class ObjectFactory
     /**
      * Create an instance of SessionContextStatementType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.SessionContextStatementType createSessionContextStatementType()
@@ -159,7 +160,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProxyTransitedStatementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.ProxyTransitedStatementElement createProxyTransitedStatementElement()
@@ -171,7 +172,7 @@ public class ObjectFactory
     /**
      * Create an instance of SessionContextStatementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.SessionContextStatementElement createSessionContextStatementElement()
@@ -183,7 +184,7 @@ public class ObjectFactory
     /**
      * Create an instance of MessageAuthenticationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.MessageAuthenticationElement createMessageAuthenticationElement()
@@ -195,7 +196,7 @@ public class ObjectFactory
     /**
      * Create an instance of MessageAuthenticationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.MessageAuthenticationElement createMessageAuthenticationElement(javax.xml.namespace.QName value)
@@ -207,7 +208,7 @@ public class ObjectFactory
     /**
      * Create an instance of SessionContextType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.SessionContextType createSessionContextType()
@@ -219,7 +220,7 @@ public class ObjectFactory
     /**
      * Create an instance of ValidityRestrictionConditionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.ValidityRestrictionConditionElement createValidityRestrictionConditionElement()
@@ -231,7 +232,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequesterAuthorizationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.RequesterAuthorizationElement createRequesterAuthorizationElement()
@@ -243,7 +244,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequesterAuthorizationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.RequesterAuthorizationElement createRequesterAuthorizationElement(javax.xml.namespace.QName value)
@@ -255,7 +256,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProxyInfoConfirmationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.ProxyInfoConfirmationType createProxyInfoConfirmationType()
@@ -267,7 +268,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResourceAccessStatementType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.ResourceAccessStatementType createResourceAccessStatementType()
@@ -279,7 +280,7 @@ public class ObjectFactory
     /**
      * Create an instance of SessionContextElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.SessionContextElement createSessionContextElement()
@@ -291,7 +292,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResourceAccessStatementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.ResourceAccessStatementElement createResourceAccessStatementElement()
@@ -303,7 +304,7 @@ public class ObjectFactory
     /**
      * Create an instance of ProxyInfoConfirmationDataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.security.ProxyInfoConfirmationDataElement createProxyInfoConfirmationDataElement()

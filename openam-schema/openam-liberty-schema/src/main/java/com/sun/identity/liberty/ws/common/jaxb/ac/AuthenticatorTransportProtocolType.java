@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,24 +13,23 @@ package com.sun.identity.liberty.ws.common.jaxb.ac;
 /**
  * Java content class for AuthenticatorTransportProtocolType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-authentication-context.xsd line 514)
- * <p>
  * <pre>
- * &lt;complexType name="AuthenticatorTransportProtocolType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice>
- *         &lt;element ref="{urn:liberty:ac:2003-08}HTTP"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}SSL"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}MobileNetworkNoEncryption"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}MobileNetworkRadioEncryption"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}MobileNetworkEndToEndEncryption"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}WTLS"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}IPSec"/>
- *         &lt;element ref="{urn:liberty:ac:2003-08}Extension" maxOccurs="unbounded"/>
- *       &lt;/choice>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="AuthenticatorTransportProtocolType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}HTTP"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}SSL"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}MobileNetworkNoEncryption"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}MobileNetworkRadioEncryption"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}MobileNetworkEndToEndEncryption"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}WTLS"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}IPSec"/&gt;
+ *         &lt;element ref="{urn:liberty:ac:2003-08}Extension" maxOccurs="unbounded"/&gt;
+ *       &lt;/choice&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

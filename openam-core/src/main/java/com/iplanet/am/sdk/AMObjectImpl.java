@@ -25,6 +25,7 @@
  * $Id: AMObjectImpl.java,v 1.14 2009/11/20 23:52:51 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk;
@@ -111,7 +112,7 @@ class AMObjectImpl implements AMObject {
     /**
      * Hash table used to keep track of elements that need to be removed from
      * objImplListeners table when a SSOToken is no longer valid. The key is
-     * SSOTokenId & the value is a Set of DN's.
+     * SSOTokenId &amp; the value is a Set of DN's.
      */
     protected static Hashtable profileNameTable = new Hashtable();
 
@@ -1622,7 +1623,6 @@ class AMObjectImpl implements AMObject {
      * UnRegister a previously registered event listener. If the
      * <code>listener</code> was not registered, the method simply returns
      * without doing anything.
-     * <p>
      * 
      * @param listener
      *            listener object that will be removed or unregistered.
@@ -2046,7 +2046,7 @@ class AMObjectImpl implements AMObject {
 
     /**
      * Notifies ACI Change. This method will be called by the
-     * <code>AMIdRepoListener to send
+     * <code>AMIdRepoListener</code> to send
      * notifications to all interested AMObjectImp's whenever an ACI
      * change occurs.
      *
@@ -2106,7 +2106,6 @@ class AMObjectImpl implements AMObject {
     /**
      * This method will be called EntryEventListener to send notifications to
      * all interested AMObjectImp's whenever an Entry Event occurs.
-     * <p>
      * 
      * @param dn
      *            the object that is modified
@@ -2208,7 +2207,6 @@ class AMObjectImpl implements AMObject {
      * This method removes the entry corresponding to SSOTokenID supplied.
      * 
      * @return Set of DN's for the given SSOTokenID or null if not present
-     *         <p>
      * 
      * @param ssoToken -
      *            a SSOToken
@@ -3348,7 +3346,6 @@ class AMObjectImpl implements AMObject {
     /**
      * Sends event notifications to all the listeners that correspond to a DN
      * whose suffix which ends with affectedDN in the objImpListeners.
-     * <p>
      * 
      * @param affectedDN -
      *            String which has been stripped to reflect the subtree of DN's

@@ -25,6 +25,7 @@
  * $Id: SAMLConstants.java,v 1.17 2009/06/12 22:21:39 mallas Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.common;
@@ -72,7 +73,7 @@ public final class SAMLConstants
     public static final String RIGHT_ANGLE              = ">";
 
     /**
-     * String to identify "/>".
+     * String to identify {@code "/>"}.
      */
     public static final String END_ELEMENT              = "/>";
 
@@ -233,7 +234,7 @@ public final class SAMLConstants
                 "urn:oasis:names:tc:SAML:1.0:ghpp";
 
     /**
-     * String used in the <code>ActionNamespace<code> attribute to refer to
+     * String used in the <code>ActionNamespace</code> attribute to refer to
      * common sets of actions to perform on resources. 
      *
      * Title: UNIX File Permissions
@@ -243,12 +244,15 @@ public final class SAMLConstants
      * digit numeric code: extended user group world 
      * Where the extended access permission has the value  
      * <ul>
-     * <li><code>+2 if sgid is set</code>
-     * <li><code>+4 if suid is set</code>
-     * The user group and world access permissions have the value 
-     * <li><code>+1 if execute permission is granted</code>
-     * <li><code>+2 if write permission is granted</code>
-     * <li><code>+4 if read permission is granted</code>
+     * <li><code>+2 if sgid is set</code></li>
+     * <li><code>+4 if suid is set</code></li>
+     * </ul>
+     * The user group and world access permissions have the value
+     * <ul>
+     * <li><code>+1 if execute permission is granted</code></li>
+     * <li><code>+2 if write permission is granted</code></li>
+     * <li><code>+4 if read permission is granted</code></li>
+     * </ul>
      * For example 0754 denotes the UNIX file access permission: user read,
      * write and execute, group read and execute and world read. 
      *
@@ -1422,7 +1426,7 @@ public final class SAMLConstants
     public static final String TAG_KEYNAME = "KeyName";
 
     /**
-     * Tag name for <code>KeyValue<code>.
+     * Tag name for <code>KeyValue</code>.
      */
     public static final String TAG_KEYVALUE = "KeyValue";
 

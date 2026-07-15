@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click;
@@ -64,7 +65,7 @@ import org.apache.commons.lang.Validate;
  * This method registers the Control's action listener with the
  * ActionEventDispatcher. The ClickServlet will subsequently invoke the registered
  * {@link ActionListener#onAction(Control)} method after all the Page controls
- * <tt>onProcess()</tt> method have been invoked.
+ * <code>onProcess()</code> method have been invoked.
  */
 public class ActionEventDispatcher {
 
@@ -149,7 +150,7 @@ public class ActionEventDispatcher {
     /**
      * Returns true if an ActionEventDispatcher instance is available on the
      * current thread, false otherwise.
-     * <p/>
+     * <p>
      * Unlike {@link #getThreadLocalDispatcher()} this method can safely be used
      * and will not throw an exception if an ActionEventDispatcher is not
      * available on the current thread.
@@ -216,7 +217,7 @@ public class ActionEventDispatcher {
     /**
      * Fire the actions for the given listener list and event source list which
      * return true if the page should continue processing.
-     * <p/>
+     * <p>
      * This method can be overridden if you need to customize the way events
      * are fired.
      *
@@ -246,7 +247,7 @@ public class ActionEventDispatcher {
     /**
      * Fire the action for the given listener and event source which
      * return true if the page should continue processing.
-     * <p/>
+     * <p>
      * This method can be overridden if you need to customize the way events
      * are fired.
      *
@@ -264,7 +265,7 @@ public class ActionEventDispatcher {
     /**
      * Fire the AjaxBehaviors for the given control set and return true if the page
      * should continue processing, false otherwise.
-     * <p/>
+     * <p>
      * This method can be overridden if you need to customize the way
      * AjaxBehaviors are fired.
      *
@@ -298,7 +299,7 @@ public class ActionEventDispatcher {
      * page should continue processing, false otherwise. AjaxBehaviors will
      * only fire if their {@link org.openidentityplatform.openam.click.ajax.AjaxBehavior#isAjaxTarget(Context) isAjaxTarget()}
      * method returns true.
-     * <p/>
+     * <p>
      * This method can be overridden if you need to customize the way
      * AjaxBehaviors are fired.
      *

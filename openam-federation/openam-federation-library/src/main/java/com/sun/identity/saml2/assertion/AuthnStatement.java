@@ -25,6 +25,7 @@
  * $Id: AuthnStatement.java,v 1.2 2008/06/25 05:47:40 qcheng Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.assertion;
@@ -39,27 +40,26 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * SAML authority asserting that the assertion subject was authenticated
  * by a particular means at a particular time. It is of type 
  * <code>AuthnStatementType</code>.
- * <p>
  * <pre>
- * &lt;complexType name="AuthnStatementType">
- *   &lt;complexContent>
+ * &lt;complexType name="AuthnStatementType"&gt;
+ *   &lt;complexContent&gt;
  *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:assertion}
- *     StatementAbstractType">
- *       &lt;sequence>
+ *     StatementAbstractType"&gt;
+ *       &lt;sequence&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *         SubjectLocality" minOccurs="0"/>
+ *         SubjectLocality" minOccurs="0"/&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *         AuthnContext"/>
- *       &lt;/sequence>
+ *         AuthnContext"/&gt;
+ *       &lt;/sequence&gt;
  *       &lt;attribute name="AuthnInstant" use="required"
- *       type="{http://www.w3.org/2001/XMLSchema}dateTime" />
+ *       type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
  *       &lt;attribute name="SessionIndex"
- *       type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="SessionNotOnOrAfter"
- *       type="{http://www.w3.org/2001/XMLSchema}dateTime" />
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *       type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

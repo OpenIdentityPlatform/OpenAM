@@ -25,7 +25,7 @@
  * $Id: ISLocaleContext.java,v 1.14 2008/08/19 19:09:00 veiming Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.common;
@@ -223,7 +223,7 @@ public class ISLocaleContext {
      *        <code>AUTH_LOCALE</code>, <code>ACCEPT_LOCALE</code>,
      *        <code>USER_PREFERRED_LOCALE</code>, <code>URL_LOCALE</code>.
      * @param loc Locale value in string example <code>en</code>,
-     *        <code>ja_JP</ocde>. Warning: This method overrides priority
+     *        <code>ja_JP</code>. Warning: This method overrides priority
      *        lookup mechanism.
      * 
      */
@@ -257,7 +257,6 @@ public class ISLocaleContext {
      * Returns the locale based on the Http Context supplied.
      *
      * @param context The {@link HttpContext} of the request
-     * @return The locale determined by the request
      */
     public void setLocale(HttpContext context) {
         final String superLocale = context.getParameterAsString("locale");

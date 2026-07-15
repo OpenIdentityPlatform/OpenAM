@@ -25,6 +25,7 @@
  * $Id: G11NSettings.java,v 1.8 2008/08/27 22:05:40 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.iplanet.services.cdm;
 
@@ -147,7 +148,7 @@ public class G11NSettings implements ServiceListener, ICDMConstants,
     }
 
     /**
-     * @param mimeCharset
+     * @param mimeCharset the MIME charset name whose alias table is requested
      * @return a Map which can provide equivalent charset names. Currently,
      *        OpenAM uses only Java name; however an application can be
      *        configured to have different names for platform level mapping etc.
@@ -157,7 +158,7 @@ public class G11NSettings implements ServiceListener, ICDMConstants,
     }
 
     /**
-     * @param mimeCharset
+     * @param mimeCharset the MIME charset name to map to its Java charset name
      * @return charset name used in Java. If there is no such mapping, same
      *         mimecharset is returned
      */

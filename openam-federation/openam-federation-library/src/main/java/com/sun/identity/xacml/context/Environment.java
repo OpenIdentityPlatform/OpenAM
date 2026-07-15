@@ -24,6 +24,7 @@
  *
  * $Id: Environment.java,v 1.2 2008/06/25 05:48:11 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -39,15 +40,14 @@ import java.util.List;
  * environment. These are the environment attributes which are NOT 
  * associated with any of <code>Subject</code>, <code>Resource</code>
  * or <code>Action</code> of the request.
- * <p>
  * <pre>
- * &lt;xs:element name="Environment" type="xacml-context:EnvironmentType"/>
- * &lt;xs:complexType name="EnvironmentType">
- *    &lt;xs:sequence>
+ * &lt;xs:element name="Environment" type="xacml-context:EnvironmentType"/&gt;
+ * &lt;xs:complexType name="EnvironmentType"&gt;
+ *    &lt;xs:sequence&gt;
  *       &lt;xs:element ref="xacml-context:Attribute" minOccurs="0"
- *       maxOccurs="unbounded"/>
- *    &lt;xs:sequence>
- * &lt;xs:complexType>
+ *       maxOccurs="unbounded"/&gt;
+ *    &lt;xs:sequence&gt;
+ * &lt;xs:complexType&gt;
  * </pre>
  *
  */

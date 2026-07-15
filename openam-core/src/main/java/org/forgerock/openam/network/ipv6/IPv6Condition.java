@@ -2,6 +2,7 @@
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 2013-2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -100,7 +101,7 @@ public class IPv6Condition implements Condition {
      * @see com.sun.identity.policy.Syntax
      *
      * @param property property name
-     * @return <code>Syntax<code> for the property name
+     * @return <code>Syntax</code> for the property name
      */
     public Syntax getPropertySyntax(String property) {
         return Syntax.NONE;
@@ -116,7 +117,7 @@ public class IPv6Condition implements Condition {
      * @param property property name
      * @param locale locale for which the property name must be customized
      * @return display name for the property name
-     * @throws com.sun.identity.policy.PolicyException
+     * @throws com.sun.identity.policy.PolicyException if the display name cannot be retrieved
      */
     public String getDisplayName(String property, Locale locale)
             throws PolicyException {

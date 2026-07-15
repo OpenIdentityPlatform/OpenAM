@@ -25,6 +25,7 @@
  * $Id: UMSException.java,v 1.5 2009/01/28 05:34:51 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.ums;
@@ -141,7 +142,7 @@ import org.forgerock.opendj.ldap.LdapException;
  * ....... ....... } catch (UMSException ux) {
  * 
  * if (ux.getRootCause() instanceof LDAPException) { PrintWriter pw = new
- * PrintWriter(<some file stream>); ux.log(pw); } else {
+ * PrintWriter(&lt;some file stream&gt;); ux.log(pw); } else {
  * System.out.println(ux.getMessage()); }
  *  }
  * 
@@ -297,9 +298,9 @@ public class UMSException extends java.lang.Exception {
     }
 
     /**
-     * Prints this exception's stack trace to <tt>System.err</tt>. If this
+     * Prints this exception's stack trace to <code>System.err</code>. If this
      * exception has a root exception; the stack trace of the root exception is
-     * printed to <tt>System.err</tt> instead.
+     * printed to <code>System.err</code> instead.
      * 
      */
     public void printStackTrace() {

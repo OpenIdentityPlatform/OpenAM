@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.cts.monitoring.impl.operations;
@@ -66,7 +67,7 @@ class OperationMonitor {
     /**
      * Increments the cumulative count for an operation and recalculates the rate at which the operation
      * has been made.
-     * <br/>
+     * <br>
      * Only synchronizes the count increment, NOT the whole method.
      */
     void increment() {

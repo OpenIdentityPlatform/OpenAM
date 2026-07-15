@@ -24,7 +24,7 @@
  *
  * $Id: FSSOAPService.java,v 1.4 2008/11/10 22:56:58 veiming Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services;
@@ -135,7 +135,8 @@ public class FSSOAPService {
      * @param msg the <code>SOAPMessage</code> to be sent
      * @param soapEndPoint the SOAPEndpoint URL of remote provider
      * @return SOAPMessage response message from remote provider
-     * @exception IOException, SOAPException if error occurrs
+     * @exception IOException if error occurrs
+     * @exception SOAPException if error occurrs
      */
     public SOAPMessage sendMessage(
         SOAPMessage msg,
@@ -430,7 +431,8 @@ public class FSSOAPService {
      * @param needAuthn determines forced authn
      * @return <code>SOAPMessage</code> corresponding to liberty 
      *  request/response message
-     * @exception IOException, SOAPException if error occurrs
+     * @exception IOException if error occurrs
+     * @exception SOAPException if error occurrs
      */
     public SOAPMessage doSyncCall(
         HttpServletResponse response,

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.shared.debug.file;
 
@@ -30,7 +31,7 @@ public interface DebugConfiguration {
     /**
      * Get the debug suffix configuration
      * Suffix is an empty string or contains a date format if the
-     * rotation interval is enable (rotation interval > 0)
+     * rotation interval is enable ({@code rotation interval > 0})
      *
      * @return suffix
      */
@@ -38,9 +39,9 @@ public interface DebugConfiguration {
 
     /**
      * get rotation interval in minute
-     * Rotation interval can't be <= 0
+     * Rotation interval can't be {@code <= 0}
      *
-     * @return the number of minutes before rotating a file. If <= 0, the rotation is disable.
+     * @return the number of minutes before rotating a file. If {@code <= 0}, the rotation is disable.
      */
     public int getRotationInterval();
 
@@ -48,7 +49,7 @@ public interface DebugConfiguration {
     /**
      * get size rotation in byte
      *
-     * @return the maximum file size in byte. If <= 0, the rotation is disable.
+     * @return the maximum file size in byte. If {@code <= 0}, the rotation is disable.
      */
     public long getRotationFileSizeInByte();
 

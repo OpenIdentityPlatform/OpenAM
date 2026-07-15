@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.core.realms;
@@ -24,7 +25,7 @@ package org.forgerock.openam.core.realms;
  *     Realms realms = ...;
  *     Realm realm = realms.lookup("/realm/A");
  *     boolean active = realms.isActive(realm);
- * </pre></p>
+ * </pre>
  *
  * @since 14.0.0
  */

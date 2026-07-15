@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.core.rest.record;
 
@@ -26,8 +27,7 @@ public interface DebugRecorder {
      * Start recording
      *
      * @param jsonProperties record json properties
-     * @return the current recording, created from the jsonProperties
-     * @throws RecordException if y
+     * @throws RecordException if an error occurs while starting the recording
      */
     void startRecording(JsonValue jsonProperties) throws RecordException;
 
@@ -35,7 +35,6 @@ public interface DebugRecorder {
      * Get the current record if exist
      *
      * @return the current record or null if we are not recording
-     * @throws RecordException
      */
     Record getCurrentRecord();
 
@@ -43,7 +42,7 @@ public interface DebugRecorder {
      * Stop recording
      *
      * @return the stopped record or null if we are not recording
-     * @throws RecordException
+     * @throws RecordException if an error occurs while stopping the recording
      */
     Record stopRecording() throws RecordException;
 

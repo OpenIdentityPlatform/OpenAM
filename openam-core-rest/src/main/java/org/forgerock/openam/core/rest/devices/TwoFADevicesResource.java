@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
+* Portions Copyrighted 2026 3A Systems, LLC
 */
 package org.forgerock.openam.core.rest.devices;
 
@@ -34,7 +35,7 @@ import org.forgerock.util.annotations.VisibleForTesting;
  * A TwoFADevice must have the ability to skip the module, if desired by the user and
  * the configuration of that server allows it.
  *
- * @param <T>
+ * @param <T> the type of {@code UserDevicesDao} used to access the user's devices
  */
 public abstract class TwoFADevicesResource<T extends UserDevicesDao> extends UserDevicesResource<T> {
 

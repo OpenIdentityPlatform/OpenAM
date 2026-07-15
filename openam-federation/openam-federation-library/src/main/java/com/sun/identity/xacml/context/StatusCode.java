@@ -24,6 +24,7 @@
  *
  * $Id: StatusCode.java,v 1.2 2008/06/25 05:48:12 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -35,17 +36,16 @@ import com.sun.identity.xacml.common.XACMLException;
  * The <code>StatusCode</code> element is a container of 
  * one or more <code>StatusCode</code>s issuded by authorization authority.
  * 
- * <p/>
  * <pre>
  *
  * Schema:
- *  &lt;xs:element name="StatusCode" type="xacml-context:StatusCodeType"/>
- *  &lt;xs:complexType name="StatusCodeType">
- *      &lt;xs:sequence>
- *          &lt;xs:element ref="xacml-context:StatusCode" minOccurs="0"/>
- *      &lt;xs:sequence>
- *      &lt;xs:attribute name="Value" type="xs:anyURI" use="required"/>
- *  &lt;xs:complexType>
+ *  &lt;xs:element name="StatusCode" type="xacml-context:StatusCodeType"/&gt;
+ *  &lt;xs:complexType name="StatusCodeType"&gt;
+ *      &lt;xs:sequence&gt;
+ *          &lt;xs:element ref="xacml-context:StatusCode" minOccurs="0"/&gt;
+ *      &lt;xs:sequence&gt;
+ *      &lt;xs:attribute name="Value" type="xs:anyURI" use="required"/&gt;
+ *  &lt;xs:complexType&gt;
  * </pre>
  */
 public interface StatusCode {

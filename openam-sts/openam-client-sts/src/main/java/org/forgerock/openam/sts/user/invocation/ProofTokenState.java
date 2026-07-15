@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.user.invocation;
@@ -77,7 +78,7 @@ public class ProofTokenState {
         /**
          * Builds the {@code ProofTokenState}
          * @return the {@code ProofTokenState}
-         * @throws TokenMarshalException
+         * @throws TokenMarshalException if the {@code X509Certificate} has not been set on the builder
          */
         public ProofTokenState build() throws TokenMarshalException {
             return new ProofTokenState(this);
@@ -136,7 +137,7 @@ public class ProofTokenState {
      *
      * @param jsonValue the {@code JsonValue} representation to construct the {@code ProofTokenState} from.
      * @return a {@code ProofTokenState}
-     * @throws TokenMarshalException
+     * @throws TokenMarshalException if the certificate cannot be marshalled from its base64-encoded {@code JsonValue} representation
      */
     public static ProofTokenState fromJson(JsonValue jsonValue) throws TokenMarshalException {
         final String certString = jsonValue.get(BASE_64_ENCODED_CERTIFICATE).asString();
@@ -156,7 +157,7 @@ public class ProofTokenState {
     /**
      * Gets the {@code JsonValue} representation of the {@code ProofTokenState}
      * @return the {@code JsonValue} of the {@code ProofTokenState}
-     * @throws IllegalStateException
+     * @throws IllegalStateException if the base64 representation of the certificate cannot be obtained
      */
     public JsonValue toJson() throws IllegalStateException {
         try {

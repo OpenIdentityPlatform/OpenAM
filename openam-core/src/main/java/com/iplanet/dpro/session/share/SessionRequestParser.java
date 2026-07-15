@@ -25,6 +25,7 @@
  * $Id: SessionRequestParser.java,v 1.3 2008/06/25 05:41:31 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.dpro.session.share;
@@ -196,7 +197,7 @@ class SessionRequestParser {
     }
 
     /**
-     * parse property name & value
+     * parse property name &amp; value
      */
     private void parsePropertyAttributes(Element property) {
         if (property == null) {

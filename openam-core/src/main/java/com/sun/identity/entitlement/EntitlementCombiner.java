@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -73,7 +74,7 @@ public abstract class EntitlementCombiner {
      * @param normalisedResourceName The normalised resource name.
      * @param requestedResourceName The requested resource name.
      * @param actions Action names to be evaluated.
-     * @param isRecursive <code>true<</code> for subtree evaluation.
+     * @param isRecursive <code>true</code> for subtree evaluation.
      */
     public void init(String realm, String applicationName, String normalisedResourceName, String requestedResourceName,
                      Set<String> actions, boolean isRecursive) throws EntitlementException {
@@ -87,7 +88,7 @@ public abstract class EntitlementCombiner {
      * @param normalisedResourceName The normalised resource name.
      * @param requestedResourceName The requested resource name.
      * @param actions Action names to be evaluated.
-     * @param isRecursive <code>true<</code> for subtree evaluation.
+     * @param isRecursive <code>true</code> for subtree evaluation.
      * @param application The defining application.
      */
     public void init(String normalisedResourceName, String requestedResourceName, Set<String> actions,

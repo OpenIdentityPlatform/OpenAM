@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.shared.debug.file;
 
@@ -23,17 +24,13 @@ import java.io.IOException;
  * The implementation of this interface as well as the
  * <code>com.sun.identity.shared.debug.file.DebugFileProvider</code> interface together
  * provide the necessary functionality to replace or enhance the Debug File service.
- * <p/>
  * Because of specific features that are only related to the log file and not the debugger,
  * the debugger and the log file management can't be manage in a same class.
  * For example, two debugger could write on the same log file with the merge mapping.
  * They could have a different debug level but should have the same log rotation.
  * This interface manages the log rotation, and the debugger the log level.
- * <p/>
- * <p/>
  * Even if this interface was dedicated to debugger, it could be used for managing a
  * different kind of log file (example : access, statistics, etc.).
- * <p/>
  * Every features that are related to the file should be implemented by classes that
  * implement this interface.
  * </p>
@@ -47,7 +44,7 @@ public interface DebugFile {
      * @param msg    Message to be recorded.
      * @param th     the optional <code>java.lang.Throwable</code> which if
      *               present will be used to record the stack trace.
-     * @throws IOException
+     * @throws IOException if an error occurs while writing the message to the file.
      */
     public void writeIt(String prefix, String msg, Throwable th) throws IOException;
 

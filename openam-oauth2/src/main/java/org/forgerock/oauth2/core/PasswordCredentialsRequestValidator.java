@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -23,7 +24,7 @@ import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 
 /**
  * Request validator for the OAuth2 password credentials grant.
- * <br/>
+ * <br>
  * Request validators validate that the specified OAuth2 request is valid be checking that the request contains all of
  * the required parameters.
  *

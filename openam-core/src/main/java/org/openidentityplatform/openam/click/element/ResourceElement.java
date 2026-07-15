@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.element;
 
@@ -28,28 +29,28 @@ import org.apache.commons.lang.StringUtils;
  * Provides a base class for rendering HEAD resources of an HTML page, for
  * example JavaScript (&lt;script&gt;) and Cascading Stylesheets
  * (&lt;link&gt;/&lt;style&gt;).
- * <p/>
+ * <p>
  * Subclasses should override {@link #getTag()} to return a specific HTML tag.
- * <p/>
+ * <p>
  * Below are some example Resource elements:
  * <ul>
- * <li>{@link JsImport}, for importing <tt>external</tt> JavaScript using the
+ * <li>{@link JsImport}, for importing <code>external</code> JavaScript using the
  * &lt;script&gt; element.</li>
- * <li>{@link JsScript}, for including <tt>inline</tt> JavaScript using the
+ * <li>{@link JsScript}, for including <code>inline</code> JavaScript using the
  * &lt;script&gt; element.</li>
- * <li>{@link org.apache.click.element.CssImport}, for importing <tt>external</tt> Cascading Stylesheets
+ * <li>{@link org.apache.click.element.CssImport}, for importing <code>external</code> Cascading Stylesheets
  * using the &lt;link&gt; element.</li>
- * <li>{@link CssStyle}, for including <tt>inline</tt> Cascading Stylesheets
+ * <li>{@link CssStyle}, for including <code>inline</code> Cascading Stylesheets
  * using the &lt;style&gt; element.</li>
  * </ul>
  *
- * <a name="remove-duplicates"></a>
- * <h3>Remove duplicates</h3>
+ * <a id="remove-duplicates"></a>
+ * <h2>Remove duplicates</h2>
  * Click will ensure that duplicate Resource elements are removed by checking
  * the {@link #isUnique()} property. Thus if the same Resource is imported
  * multiple times by the Page or different Controls, only one Resource will be
- * rendered, if {@link #isUnique()} returns <tt>true</tt>.
- * <p/>
+ * rendered, if {@link #isUnique()} returns <code>true</code>.
+ * <p>
  * The rules for defining a unique Resource is as follows:
  * <ul>
  * <li>{@link JsImport} and {@link org.apache.click.element.CssImport} is unique based on the
@@ -101,8 +102,8 @@ import org.apache.commons.lang.StringUtils;
  *     }
  * } </pre>
  *
- * <a name="versioning"></a>
- * <h3>Automatic Resource versioning</h3>
+ * <a id="versioning"></a>
+ * <h2>Automatic Resource versioning</h2>
  *
  * ResourceElement provides the ability to automatically version elements
  * according to Yahoo Performance Rule: <a target="_blank" href="http://developer.yahoo.com/performance/rules.html#expires">Add an Expires or a Cache-Control Header</a>.
@@ -111,15 +112,15 @@ import org.apache.commons.lang.StringUtils;
  * suggests <em>versioning</em> the resources so that each new release of the
  * web application renders resources with different paths, forcing the browser
  * to download the new resources.
- * <p/>
+ * <p>
  * For detailed information on versioning JavaScript, Css and image resources
  * see the <a href="../../../../extras-api/org/apache/click/extras/filter/PerformanceFilter.html">PerformanceFilter</a>.
- * <p/>
+ * <p>
  * To enable versioning of JavaScript, Css and image resources the following
  * conditions must be met:
  * <ul>
  * <li>the {@link org.apache.click.util.ClickUtils#ENABLE_RESOURCE_VERSION}
- * request attribute must be set to <tt>true</tt></li>
+ * request attribute must be set to <code>true</code></li>
  * <li>the application mode must be either "production" or "profile"</li>
  * <li>the {@link org.apache.click.util.ClickUtils#setApplicationVersion(String)
  * application version} must be set</li>
@@ -127,19 +128,19 @@ import org.apache.commons.lang.StringUtils;
  * <b>Please note:</b> <a href="../../../../extras-api/org/apache/click/extras/filter/PerformanceFilter.html">PerformanceFilter</a>
  * handles the above steps for you.
  *
- * <a name="conditional-comment"></a>
- * <h3>Conditional comment support for Internet Explorer</h3>
+ * <a id="conditional-comment"></a>
+ * <h2>Conditional comment support for Internet Explorer</h2>
  *
  * Sometimes it is necessary to provide additional JavaScript and Css for
  * Internet Explorer because it deviates quite often from the standards.
- * <p/>
+ * <p>
  * Conditional comments allows you to wrap the resource in a special comment
  * which only IE understands, meaning other browsers won't process the resource.
- * <p/>
+ * <p>
  * You can read more about conditional comments
  * <a target="_blank" href="http://msdn.microsoft.com/en-us/library/ms537512(VS.85).aspx#syntax">here</a>
  * and <a target="_blank" href="http://www.quirksmode.org/css/condcom.html">here</a>
- * <p/>
+ * <p>
  * It has to be said that IE7 and up has much better support for Css, thus
  * conditional comments are mostly used for IE6 and below.
  * <pre class="prettyprint">
@@ -178,31 +179,31 @@ public class ResourceElement extends Element {
 
     /**
      * A predefined conditional comment to test if browser is IE. Value:
-     * <tt>[if IE]</tt>.
+     * <code>[if IE]</code>.
      */
     public static final String IF_IE = "[if IE]";
 
     /**
      * A predefined conditional comment to test if browser is less than IE7.
-     * Value: <tt>[if lt IE 7]</tt>.
+     * Value: <code>[if lt IE 7]</code>.
      */
     public static final String IF_LESS_THAN_IE7 = "[if lt IE 7]";
 
     /**
      * A predefined conditional comment to test if browser is IE7. Value:
-     * <tt>[if IE 7]</tt>.
+     * <code>[if IE 7]</code>.
      */
     public static final String IF_IE7 = "[if IE 7]";
 
     /**
      * A predefined conditional comment to test if browser is less than
-     * or equal to IE7. Value: <tt>[if lte IE 7]</tt>.
+     * or equal to IE7. Value: <code>[if lte IE 7]</code>.
      */
     public static final String IF_LESS_THAN_OR_EQUAL_TO_IE7 = "[if lte IE 7]";
 
         /**
      * A predefined conditional comment to test if browser is less than IE9.
-     * Value: <tt>[if lt IE 9]</tt>.
+     * Value: <code>[if lt IE 9]</code>.
      */
     public static final String IF_LESS_THAN_IE9 = "[if lt IE 9]";
 
@@ -215,22 +216,22 @@ public class ResourceElement extends Element {
 
     /**
      * Indicates whether the {@link #getId() ID} attribute should be rendered
-     * or not, default value is <tt>true</tt>.
+     * or not, default value is <code>true</code>.
      */
     private boolean renderId = true;
 
     /**
-     * The <tt>version indicator</tt> to append to the Resource element.
+     * The <code>version indicator</code> to append to the Resource element.
      */
     private String versionIndicator;
 
     // ------------------------------------------------------ Public properties
 
     /**
-     * Return the <tt>version indicator</tt> to be appended to the resource
+     * Return the <code>version indicator</code> to be appended to the resource
      * path.
      *
-     * @return the <tt>version indicator</tt> to be appended to the resource
+     * @return the <code>version indicator</code> to be appended to the resource
      * path.
      */
     public String getVersionIndicator() {
@@ -238,7 +239,7 @@ public class ResourceElement extends Element {
     }
 
     /**
-     * Set the <tt>version indicator</tt> to be appended to the resource path.
+     * Set the <code>version indicator</code> to be appended to the resource path.
      *
      * @param versionIndicator the version indicator to be appended to the
      * resource path
@@ -249,7 +250,7 @@ public class ResourceElement extends Element {
 
     /**
      * Returns whether or not the Resource unique. This method returns
-     * <tt>true</tt> if the {@link #getId() ID} attribute is defined,
+     * <code>true</code> if the {@link #getId() ID} attribute is defined,
      * false otherwise.
      *
      * @return true if the Resource should be unique, false otherwise.
@@ -279,7 +280,7 @@ public class ResourceElement extends Element {
 
     /**
      * Set the element render {@link #getId() ID} attribute status.
-     * <p/>
+     * <p>
      * If renderId is false the element {@link #getId() ID} attribute will not
      * be rendered.
      *
@@ -290,7 +291,7 @@ public class ResourceElement extends Element {
     }
 
     /**
-     * Return Internal Explorer's <tt>conditional comment</tt> to wrap the
+     * Return Internal Explorer's <code>conditional comment</code> to wrap the
      * Resource with.
      *
      * @return Internal Explorer's conditional comment to wrap the Resource with.
@@ -314,7 +315,7 @@ public class ResourceElement extends Element {
     /**
      * Render the HTML representation of the Resource element to the specified
      * buffer.
-     * <p/>
+     * <p>
      * If {@link #getTag()} returns null, this method will return an empty
      * string.
      *

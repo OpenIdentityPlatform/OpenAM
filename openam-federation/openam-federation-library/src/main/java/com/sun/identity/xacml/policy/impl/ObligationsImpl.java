@@ -24,6 +24,7 @@
  *
  * $Id: ObligationsImpl.java,v 1.3 2008/11/10 22:57:06 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.policy.impl;
@@ -99,7 +100,7 @@ public class ObligationsImpl implements Obligations {
      * @param element XML DOM element representing a
      *        <code>ObligationsImpl</code>  object.
      *
-     * @throws SAMLException if the DOM element could not be processed
+     * @throws XACMLException if the DOM element could not be processed
      */
     public ObligationsImpl(Element element) throws XACMLException {
         processElement(element);

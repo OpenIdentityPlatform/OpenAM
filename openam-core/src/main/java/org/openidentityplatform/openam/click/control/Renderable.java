@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -24,7 +25,7 @@ import java.io.Serializable;
 
 /**
  * Provides an interface for rendering output to an efficient string buffer.
- * <p/>
+ * <p>
  * Implementations of this interface will normally render HTML markup.
  */
 public interface Renderable extends Serializable {

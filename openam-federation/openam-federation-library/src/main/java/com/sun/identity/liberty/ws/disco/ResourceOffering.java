@@ -24,6 +24,7 @@
  *
  * $Id: ResourceOffering.java,v 1.2 2008/06/25 05:47:11 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -44,50 +45,49 @@ import com.sun.identity.shared.xml.XMLUtils;
  * instance that provides access to that resource.
  * <p>The following schema fragment specifies the expected content within the
  * <code>ResourceOffering</code> object.
- * <p>
  * <pre>
- * &lt;complexType name="ResourceOfferingType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;group ref="{urn:liberty:disco:2003-08}ResourceIDGroup"/>
- *         &lt;element name="ServiceInstance" type="{urn:liberty:disco:2003-08}ServiceInstanceType"/>
- *         &lt;element ref="{urn:liberty:disco:2003-08}Options" minOccurs="0"/>
- *         &lt;element name="Abstract" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="entryID" type="{urn:liberty:disco:2003-08}IDType" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="ResourceOfferingType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;group ref="{urn:liberty:disco:2003-08}ResourceIDGroup"/&gt;
+ *         &lt;element name="ServiceInstance" type="{urn:liberty:disco:2003-08}ServiceInstanceType"/&gt;
+ *         &lt;element ref="{urn:liberty:disco:2003-08}Options" minOccurs="0"/&gt;
+ *         &lt;element name="Abstract" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="entryID" type="{urn:liberty:disco:2003-08}IDType" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * An example of the <code>ResourceOffering</code> is :
  * <pre>
- * &lt;ResourceOffering xmlns="urn:liberty:disco:2003-08">
- *     &lt;ResourceID>http://profile-provider.com/profiles/l4m0B82k15csaUxs&lt;/ResourceID>
- *     &lt;ServiceInstance xmlns="urn:liberty:disco:2003-08">
- *         &lt;ServiceType>urn:liberty:idpp:2003-08&lt;/ServiceType>
- *         &lt;ProviderID>http://profile-provider.com/&lt;/ProviderID>
- *         &lt;Description>
- *             &lt;SecurityMechID>urn:liberty:disco:2003-08:anonymous&lt;/SecurityMechID>
- *             &lt;SecurityMechID>urn:liberty:security:2003-08:x509&lt;/SecurityMechID>
- *             &lt;SecurityMechID>urn:liberty:security:2003-08:saml&lt;/SecurityMechID>
- *             &lt;Endpoint>https://soap.profile-provider.com/soap/&lt;/Endpoint>
- *         &lt;/Description>
- *         &lt;Description>
- *             &lt;SecurityMechID>urn:ietf:rfc:2246&lt;/SecurityMechID>
- *             &lt;Endpoint>https://soap-auth.profile-provider.com/soap/&lt;/Endpoint>
- *         &lt;/Description>
- *      &lt;/ServiceInstance>
- *      &lt;Options>
- *          &lt;Option>urn:liberty:idpp&lt;/Option>
- *          &lt;Option>urn:liberty:idpp:cn&lt;/Option>
- *          &lt;Option>urn:liberty:idpp:can&lt;/Option>
- *          &lt;Option>urn:liberty:idpp:can:cn&lt;/Option>
- *      &lt;/Options>
- *      &lt;Abstract>
+ * &lt;ResourceOffering xmlns="urn:liberty:disco:2003-08"&gt;
+ *     &lt;ResourceID&gt;http://profile-provider.com/profiles/l4m0B82k15csaUxs&lt;/ResourceID&gt;
+ *     &lt;ServiceInstance xmlns="urn:liberty:disco:2003-08"&gt;
+ *         &lt;ServiceType&gt;urn:liberty:idpp:2003-08&lt;/ServiceType&gt;
+ *         &lt;ProviderID&gt;http://profile-provider.com/&lt;/ProviderID&gt;
+ *         &lt;Description&gt;
+ *             &lt;SecurityMechID&gt;urn:liberty:disco:2003-08:anonymous&lt;/SecurityMechID&gt;
+ *             &lt;SecurityMechID&gt;urn:liberty:security:2003-08:x509&lt;/SecurityMechID&gt;
+ *             &lt;SecurityMechID&gt;urn:liberty:security:2003-08:saml&lt;/SecurityMechID&gt;
+ *             &lt;Endpoint&gt;https://soap.profile-provider.com/soap/&lt;/Endpoint&gt;
+ *         &lt;/Description&gt;
+ *         &lt;Description&gt;
+ *             &lt;SecurityMechID&gt;urn:ietf:rfc:2246&lt;/SecurityMechID&gt;
+ *             &lt;Endpoint&gt;https://soap-auth.profile-provider.com/soap/&lt;/Endpoint&gt;
+ *         &lt;/Description&gt;
+ *      &lt;/ServiceInstance&gt;
+ *      &lt;Options&gt;
+ *          &lt;Option&gt;urn:liberty:idpp&lt;/Option&gt;
+ *          &lt;Option&gt;urn:liberty:idpp:cn&lt;/Option&gt;
+ *          &lt;Option&gt;urn:liberty:idpp:can&lt;/Option&gt;
+ *          &lt;Option&gt;urn:liberty:idpp:can:cn&lt;/Option&gt;
+ *      &lt;/Options&gt;
+ *      &lt;Abstract&gt;
  *          This is a personal profile containing common name information. 
- *      &lt;/Abstract>
- * &lt;/ResourceOffering>
+ *      &lt;/Abstract&gt;
+ * &lt;/ResourceOffering&gt;
  * </pre>
  * 
  * 

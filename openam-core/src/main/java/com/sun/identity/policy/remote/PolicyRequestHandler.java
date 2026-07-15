@@ -25,7 +25,7 @@
  * $Id: PolicyRequestHandler.java,v 1.8 2008/12/04 00:38:52 dillidorai Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.policy.remote;
@@ -705,13 +705,13 @@ public class PolicyRequestHandler implements RequestHandler {
 
     /**
      * Provides an instance of a policy evaluator.
-     * <p/>
+     * <p>
      * It is understood that serviceName == serviceTypeName == applicationTypeName.
-     * <p/>
+     * <p>
      * First attempts to provide an evaluator based on a configured realm and application for the subject making
      * the request. If the realm and application are present, then the application's type is retrieved and passed
      * through as the serviceTypeName to the evaluator along with the realm and application name.
-     * <p/>
+     * <p>
      * If the application name does not exist then the logic falls back to the old behaviour whereby the
      * applicationName is set to the serviceTypeName. This legacy behaviour assumes that an application exists with a
      * name that maps to the passed serviceTypeName.

@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -28,24 +29,25 @@ import java.text.MessageFormat;
 /**
  * Provides a File Field control: &nbsp; &lt;input type='file'&gt;.
  *
- * <table class='htmlHeader' cellspacing='6'>
+ * <table class='htmlHeader'>
+ * <caption>Example</caption>
  * <tr>
  * <td>File Field</td>
- * <td><input type='file' value='' title='FileField Control'/></td>
+ * <td>&lt;input type='file' value=''/&gt;</td>
  * </tr>
  * </table>
  *
  * The FileField control uses the Jakarta Commons
  * <a href="http://jakarta.apache.org/commons/fileupload/">FileUpload</a>
  * library to provide file processing functionality.
- * <p/>
+ * <p>
  * You can control the {@link org.apache.click.service.CommonsFileUploadService#sizeMax maximum request size}
  * and {@link org.apache.click.service.CommonsFileUploadService#fileSizeMax maximum file size}
  * by configuring {@link org.apache.click.service.CommonsFileUploadService}.
- * <p/>
- * Note Browsers enforce the JavaScript <tt>value</tt> property as readonly
+ * <p>
+ * Note Browsers enforce the JavaScript <code>value</code> property as readonly
  * to prevent script based stealing of users files.
- * <p/>
+ * <p>
  * You can make the file field invisible by setting the CSS display attribute, for
  * example:
  *
@@ -56,7 +58,7 @@ import java.text.MessageFormat;
  *    &lt;input type="button" value="show value" onclick="alert(fileName)"&gt;
  * &lt;/form&gt; </pre>
  *
- * <p/>
+ * <p>
  * Please also see the references:
  * <ul>
  * <li><a target="blank" href="http://commons.apache.org/fileupload/using.html">Apache Commons - Using FileUpload</a></li>
@@ -160,7 +162,7 @@ public class FileField extends Field {
 
     /**
      * Create an FileField with no name defined.
-     * <p/>
+     * <p>
      * <b>Please note</b> the control's name must be defined before it is valid.
      */
     public FileField() {
@@ -170,7 +172,7 @@ public class FileField extends Field {
     // ------------------------------------------------------ Public Attributes
 
     /**
-     * Return the FileField's html tag: <tt>input</tt>.
+     * Return the FileField's html tag: <code>input</code>.
      *
      * @see org.apache.click.control.AbstractControl#getTag()
      *
@@ -185,7 +187,7 @@ public class FileField extends Field {
      * Return the <a href="http://jakarta.apache.org/commons/fileupload/apidocs/org/apache/commons/fileupload/FileItem.html">FileItem</a>
      * after processing the request, or null otherwise.
      *
-     * @return the <tt>FileItem</tt> after processing a request
+     * @return the <code>FileItem</code> after processing a request
      */
     public FileItem getFileItem() {
         return fileItem;
@@ -210,9 +212,9 @@ public class FileField extends Field {
     }
 
     /**
-     * Return the input type: '<tt>file</tt>'.
+     * Return the input type: '<code>file</code>'.
      *
-     * @return the input type: '<tt>file</tt>'
+     * @return the input type: '<code>file</code>'
      */
     public String getType() {
         return "file";
@@ -330,7 +332,7 @@ public class FileField extends Field {
 
     /**
      * Validate the FileField request submission.
-     * <p/>
+     * <p>
      * A field error message is displayed if a validation error occurs.
      * These messages are defined in the resource bundle:
      * <blockquote>

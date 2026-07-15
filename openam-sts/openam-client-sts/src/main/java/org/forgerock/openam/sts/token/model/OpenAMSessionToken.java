@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS. All rights reserved.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.token.model;
@@ -20,7 +21,7 @@ import org.forgerock.util.Reject;
 
 /**
  * This class represents an OpenAM session token, built around the OpenAM session id. It will be used as the token type
- * for TokenAuthenticationRequestDispatcher<T> and AuthenticationHandler<T> implementations.
+ * for {@code TokenAuthenticationRequestDispatcher<T>} and {@code AuthenticationHandler<T>} implementations.
  */
 public class OpenAMSessionToken {
     private final String sessionId;

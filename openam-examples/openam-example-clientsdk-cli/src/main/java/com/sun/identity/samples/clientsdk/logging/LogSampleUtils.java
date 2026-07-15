@@ -24,6 +24,7 @@
  *
  * $Id: LogSampleUtils.java,v 1.3 2008/07/29 20:34:57 bigfatrat Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.samples.clientsdk.logging;
@@ -48,7 +49,6 @@ import com.sun.identity.log.LogRecord;
  * This class 
  *
  *
- * @author 
  */
 public class LogSampleUtils {
 

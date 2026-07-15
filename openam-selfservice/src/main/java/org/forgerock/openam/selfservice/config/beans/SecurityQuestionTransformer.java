@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.selfservice.config.beans;
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
 
 /**
  * Security question transformer.
- * <p/>
+ * <p>
  * Expected string format is <pre>id|locale|question</pre>.
  *
  * @since 13.0.0

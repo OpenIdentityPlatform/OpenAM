@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -12,25 +13,24 @@ package com.sun.identity.saml2.jaxb.xmlsig;
 /**
  * Java content class for KeyInfoType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/saml2/xmldsig-core-schema.xsd line 147)
- * <p>
  * <pre>
- * &lt;complexType name="KeyInfoType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice maxOccurs="unbounded">
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}KeyName"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}KeyValue"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}RetrievalMethod"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}X509Data"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}PGPData"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}SPKIData"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}MgmtData"/>
- *         &lt;any/>
- *       &lt;/choice>
- *       &lt;attribute name="Id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="KeyInfoType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice maxOccurs="unbounded"&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}KeyName"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}KeyValue"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}RetrievalMethod"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}X509Data"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}PGPData"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}SPKIData"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}MgmtData"/&gt;
+ *         &lt;any/&gt;
+ *       &lt;/choice&gt;
+ *       &lt;attribute name="Id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

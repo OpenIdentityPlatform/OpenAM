@@ -24,6 +24,7 @@
  *
  * $Id: ModifyResponse.java,v 1.2 2008/06/25 05:47:10 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -46,23 +47,22 @@ import com.sun.identity.liberty.ws.disco.common.DiscoUtils;
  * modify request.
  * <p>The following schema fragment specifies the expected content within the
  * <code>ModifyResponse</code> object.
- * <p>
  * <pre>
- * &lt;complexType name="ModifyResponseType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:disco:2003-08}Status"/>
- *       &lt;/sequence>
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *       &lt;attribute name="newEntryIDs">
- *         &lt;simpleType>
- *           &lt;list itemType="{urn:liberty:disco:2003-08}IDReferenceType" />
- *         &lt;/simpleType>
- *       &lt;/attribute>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="ModifyResponseType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:disco:2003-08}Status"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *       &lt;attribute name="newEntryIDs"&gt;
+ *         &lt;simpleType&gt;
+ *           &lt;list itemType="{urn:liberty:disco:2003-08}IDReferenceType" /&gt;
+ *         &lt;/simpleType&gt;
+ *       &lt;/attribute&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

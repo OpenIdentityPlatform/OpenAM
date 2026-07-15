@@ -28,7 +28,7 @@
 
 /**
  * Portions copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.iplanet.sso.providers.dpro;
 
@@ -86,8 +86,8 @@ public final class SSOProviderImpl implements SSOProvider {
     /**
      * Constructs a instance of <code>SSOProviderImpl</code>
      *
-     * @throws SSOException
-     * 
+     * @throws SSOException if the provider cannot be initialized
+     *
      */
     public SSOProviderImpl() throws SSOException {
         this(SessionCache.getInstance());
@@ -229,7 +229,7 @@ public final class SSOProviderImpl implements SSOProvider {
      * @param tokenId single sign on token ID.
      * @return single sign on token.
      * @throws SSOException                  if the single sign on token cannot be created.
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException if this operation is not supported
      * @deprecated Use #createSSOToken(String, String)
      */
     public SSOToken createSSOToken(String tokenId)

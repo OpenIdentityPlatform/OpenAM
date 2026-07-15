@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.sm.datalayer.providers;
 
@@ -51,13 +51,13 @@ import com.sun.identity.shared.debug.Debug;
 /**
  * Responsible for generating ConnectionFactory instances. The instances generated are tailored to
  * the {@link ConnectionType} required by the caller.
- * <p/>
+ * <p>
  * This factory provider is aware of two main use cases for the service management layer (also known
  * as Data Layer).
- * <p/>
+ * <p>
  * Default - Uses the service management configuration for connections. This will connect to the
  * defined LDAP server, whether that is embedded or external.
- * <p/>
+ * <p>
  * External - Uses CTS Configuration for CTS connections which are pointed towards an external
  * LDAP server. Uses service management configuration for {@link StoreMode#DEFAULT} connections.
  */

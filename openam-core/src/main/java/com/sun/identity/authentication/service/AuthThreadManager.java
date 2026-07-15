@@ -25,6 +25,7 @@
  * $Id: AuthThreadManager.java,v 1.4 2008/06/25 05:42:04 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -121,7 +122,7 @@ public class AuthThreadManager extends Thread   {
     }
 
     /**
-     * Stores the thread as key and the time out value &
+     * Stores the thread as key and the time out value &amp;
      * last callback sent in a Hashtable 
      * @param currentThread will be stored
      * @param pageTimeOut configured timeout value

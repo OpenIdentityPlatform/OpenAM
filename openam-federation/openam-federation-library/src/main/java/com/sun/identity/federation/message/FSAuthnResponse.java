@@ -25,6 +25,7 @@
  * $Id: FSAuthnResponse.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -100,7 +101,7 @@ public class FSAuthnResponse extends Response {
     * Creates <code>FSAuthnResponse</code> object from XML Schema.
     *
     * @param xml the XML Schema for this object.
-    * @throws <code>SAMLException</code> on error.
+    * @throws SAMLException on error.
     * @throws FSMsgException on error.
     */
     public static FSAuthnResponse parseAuthnResponseXML(

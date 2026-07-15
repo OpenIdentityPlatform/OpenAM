@@ -25,6 +25,7 @@
  * $Id: DSAMERole.java,v 1.4 2009/01/28 05:35:01 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.plugins;
@@ -149,11 +150,7 @@ public class DSAMERole implements Subject {
      * @param token the <code>SSOToken</code> that will be used
      * to determine the syntax
      *
-     * @return set of of valid names for the user collection.
-     *
      * @exception SSOException if SSO token is not valid
-     * @exception PolicyException if unable to get the list of valid
-     * names.
      *
      * @return syntax of the values for the <code>Subject</code>
      */

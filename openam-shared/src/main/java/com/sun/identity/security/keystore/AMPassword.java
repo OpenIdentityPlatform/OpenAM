@@ -24,6 +24,7 @@
  *
  * $Id: AMPassword.java,v 1.2 2008/06/25 05:52:58 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -107,8 +108,7 @@ public class AMPassword extends AMCallbackHandler implements  Cloneable,
      *        be wiped with zeroes.
      * @return A copy of the charArray, converted from Unicode to UTF8. It
      *         is the responsibility of the caller to clear the output byte
-     *         array; *	<code>wipeBytes</code> is ideal for this purpose.
-     * @see org.mozilla.jss.util.Password#wipeBytes
+     *         array; <code>wipeBytes</code> is ideal for this purpose.
      */
     public static byte[] charToByte(char[] charArray) {
 	byte bytearray[] = null;

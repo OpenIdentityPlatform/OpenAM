@@ -24,6 +24,7 @@
  *
  * $Id: NewIDImpl.java,v 1.2 2008/06/25 05:48:00 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -56,7 +57,7 @@ public class NewIDImpl implements NewID {
      * Constructor to create the <code>NewID</code> Object.
      *
      * @param element Document Element of <code>NewID</code> Object.
-     * @throws SAML2Exception if <code>NewID<code> cannot be created.
+     * @throws SAML2Exception if <code>NewID</code> cannot be created.
      */
 
     public NewIDImpl(Element element) throws SAML2Exception {
@@ -66,8 +67,8 @@ public class NewIDImpl implements NewID {
     /**
      * Constructor to create the <code>NewID</code> Object.
      *
-     * @param value of the <code>NewID<code>.
-     * @throws SAML2Exception if <code>NewID<code> cannot be created.
+     * @param value of the <code>NewID</code>.
+     * @throws SAML2Exception if <code>NewID</code> cannot be created.
      */
     public NewIDImpl(String value) throws SAML2Exception {
         newID = value;	

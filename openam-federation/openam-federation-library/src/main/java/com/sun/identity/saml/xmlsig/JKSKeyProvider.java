@@ -24,6 +24,7 @@
  *
  * $Id: JKSKeyProvider.java,v 1.4 2008/06/25 05:47:38 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /*
@@ -49,7 +50,6 @@ import java.security.cert.CertificateException;
  * The class <code>JKSKeyProvider</code> is a class
  * that is implemented to retrieve X509Certificates and Private Keys from
  * user data store.  
- * <p>
  */
 public class JKSKeyProvider implements KeyProvider {
 

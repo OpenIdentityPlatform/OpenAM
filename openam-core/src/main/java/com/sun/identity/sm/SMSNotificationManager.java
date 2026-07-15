@@ -25,6 +25,7 @@
  * $Id: SMSNotificationManager.java,v 1.14 2009/11/10 21:49:44 hengming Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.sm;
 
@@ -53,7 +54,7 @@ import java.util.StringTokenizer;
  * 
  * Classes that will register for notifications are:
  * 1) SMSEventListnerManager -- to send notifications to internal objects
- *      Framework classes i.e., Cached* & *Impls that maintain read only caches
+ *      Framework classes i.e., Cached* &amp; *Impls that maintain read only caches
  * 2) SMSJAXRPCObjectImpl -- to send notifications to remote clients
  * 3) SMSLdapObjectImpl -- to clear its internal cache
  * Of the above (2) and (3) would happen only on the Server only.

@@ -25,7 +25,7 @@
  * $Id: FSNameRegistrationRequest.java,v 1.4 2008/06/25 05:46:44 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message;
@@ -202,7 +202,7 @@ public class FSNameRegistrationRequest extends AbstractRequest {
     }
     
     /**
-     * Constructor creates <code>FSNameRegistrationRequest</code>> object
+     * Constructor creates <code>FSNameRegistrationRequest</code> object
      * from a Document Element.
      *
      * @param root the Document Element.
@@ -504,7 +504,7 @@ public class FSNameRegistrationRequest extends AbstractRequest {
      * Returns the value of <code>ProviderID</code> attribute.
      *
      * @return the value of <code>ProviderID</code> attribute.
-     * @see #setProviderId(String).
+     * @see #setProviderId(String)
      */
     public String getProviderId() {
         return this.providerId;

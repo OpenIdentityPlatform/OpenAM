@@ -24,6 +24,7 @@
  *
  * $Id: JDBCPasswordSyntaxTransform.java,v 1.3 2008/06/25 05:41:57 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 
@@ -43,7 +44,7 @@ public interface JDBCPasswordSyntaxTransform {
      *
      * @param input Password before transform
      * @return Password after transform - in this case the same thing.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the password cannot be transformed
      */
     String transform(String input)
         throws AuthLoginException;

@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 package com.sun.identity.wsfederation.jaxb.entityconfig.impl.runtime;
@@ -10,7 +11,7 @@ package com.sun.identity.wsfederation.jaxb.entityconfig.impl.runtime;
 import javax.xml.namespace.NamespaceContext;
 
 /**
- * Maintains namespace&lt;->prefix bindings.
+ * Maintains namespace&lt;-&gt;prefix bindings.
  * 
  * <p>
  * This interface extends {@link NamespaceContext} and provides

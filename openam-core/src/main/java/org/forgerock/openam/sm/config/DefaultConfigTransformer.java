@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.sm.config;
@@ -24,7 +24,7 @@ import java.util.Set;
 
 /**
  * Provides the default transformations if a specific transformation class is not defined.
- * <p/>
+ * <p>
  * Default transformations handles common primitive types and set and list. In the case
  * of set and list, the expectation is that the parameter type is a set or list of strings;
  * anything other will need a custom transformation.

@@ -24,6 +24,7 @@
  *
  * $Id: IDPProvidedNameIdentifier.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.message.common;
@@ -51,8 +52,8 @@ public class IDPProvidedNameIdentifier extends NameIdentifier {
      * Constructor creates <code>IDPProvidedNameIdentifier</code> object.
      *
      * @param name the Identity Provider name.
-     * @param nameQualifier 
-     * @param format
+     * @param nameQualifier the security or administrative domain that qualifies the name.
+     * @param format the format of the name identifier.
      * @throws SAMLException on error.
      */
     public IDPProvidedNameIdentifier(String name,String nameQualifier,
@@ -109,8 +110,8 @@ public class IDPProvidedNameIdentifier extends NameIdentifier {
     /**
      * Constructor creates <code> IDPProvidedNameIdentifier</code> object.
      *
-     * @param securityDomain
-     * @param name
+     * @param securityDomain the security domain of the name identifier.
+     * @param name the name identifier value.
      * @throws FSMsgException on error.
      */
     public IDPProvidedNameIdentifier(

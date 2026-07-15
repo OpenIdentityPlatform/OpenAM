@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -62,7 +63,7 @@ import java.util.Collections;
  * <code>env</code> map, <code>AuthLevel</code> is looked up from single sign on
  * token.
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.LEAuthLevelCondition} instead.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.environment.LEAuthLevelCondition} instead.
  */
 @Deprecated
 public class LEAuthLevelCondition implements Condition {
@@ -101,7 +102,7 @@ public class LEAuthLevelCondition implements Condition {
      *
      * @param property property name
      *
-     * @return <code>Syntax<code> for the property name
+     * @return <code>Syntax</code> for the property name
      */
     public Syntax getPropertySyntax(String property) {
         return Syntax.NONE;
@@ -117,7 +118,7 @@ public class LEAuthLevelCondition implements Condition {
      * @param property property name
      * @param locale locale for which the property name must be customized
      * @return display name for the property name
-     * @throws PolicyException
+     * @throws PolicyException if the display name cannot be determined
      */
     public String getDisplayName(String property, Locale locale)
        throws PolicyException {

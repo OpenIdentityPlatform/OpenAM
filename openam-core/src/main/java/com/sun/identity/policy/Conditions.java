@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -188,7 +189,7 @@ public class Conditions {
 
     /**
      * Sets the name for this instance of the
-     * <code>Conditions<code> which contains a collection
+     * <code>Conditions</code> which contains a collection
      * of conditions respresented as <code>Condition</code>.
      *
      * @param name for the collection of conditions

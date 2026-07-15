@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.authentication.modules.oidc;
@@ -64,7 +65,7 @@ public class JwtHandler {
      *
      * @param jwtValue The encoded JWT string.
      * @return The validated JWT claims.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the JWT fails validation
      */
     public JwtClaimsSet validateJwt(String jwtValue) throws AuthLoginException {
         final SignedJwt signedJwt = getSignedJwt(jwtValue);
@@ -140,7 +141,7 @@ public class JwtHandler {
 
     /**
      * Indicates whether the JWT token is issued by configured issuer, with parameterized substitution from the claims set.
-     * Example: <tt>https://login.microsoftonline.com/{tid}/v2.0</tt> shall have <tt>{tid}</tt> replaced with the iss claim's value.
+     * Example: <code>https://login.microsoftonline.com/{tid}/v2.0</code> shall have <code>{tid}</code> replaced with the iss claim's value.
      *
      * @param jwtClaimSet The JWT claims.
      * @return Whether the JWT token is issued by the configured issuer.
@@ -167,7 +168,7 @@ public class JwtHandler {
      *
      * @param jwtValue The encoded JWT string.
      * @return The reconstructed JWT object.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the JWT cannot be reconstructed from the encoded value
      */
     private SignedJwt getSignedJwt(String jwtValue) throws AuthLoginException {
         final SignedJwt signedJwt;
@@ -190,7 +191,7 @@ public class JwtHandler {
      * @param audienceName The audience name to check that the token is intended for.
      * @param jwtClaims The parsed JWT claims.
      * @return true if the token is intended for the specified audience, false if it is not.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the token audience cannot be evaluated
      */
     public static boolean isIntendedForAudience(String audienceName, JwtClaimsSet jwtClaims) throws AuthLoginException {
         List<String> jwtAudiences = jwtClaims.getAudience();
@@ -205,7 +206,7 @@ public class JwtHandler {
      * @param jwtClaims The parsed JWT claims.
      * @return true if the token's authorized party is in the list of accepted authorized parties, false if it is not,
      * or the token does not contain an authorized party entry.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the authorized party cannot be evaluated
      */
     public static boolean isFromValidAuthorizedParty(Set<String> acceptedAuthorizedParties, JwtClaimsSet jwtClaims)
             throws AuthLoginException {
@@ -225,7 +226,7 @@ public class JwtHandler {
      * @param jwtClaims The parsed JWT claims.
      * @return true if the token contains an authorized party claim and that claim is not an empty string, otherwise
      * false.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the token's claims cannot be read
      */
     private static boolean jwtHasAudienceClaim(JwtClaimsSet jwtClaims) throws AuthLoginException {
         List<String> audienceClaim = jwtClaims.getAudience();
@@ -239,7 +240,7 @@ public class JwtHandler {
      * @param jwtClaims The parsed JWT claims.
      * @return true if the token contains an authorized party claim and that claim is not an empty string, otherwise
      * false.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the token's claims cannot be read
      */
     public static boolean jwtHasAuthorizedPartyClaim(JwtClaimsSet jwtClaims) throws AuthLoginException {
         String authorizedPartyClaim = (String) jwtClaims.getClaim(AUTHORIZED_PARTY_CLAIM_KEY);
@@ -252,7 +253,7 @@ public class JwtHandler {
      *
      * @param jwtValue The encoded JWT string.
      * @return The set of claims contained within the token.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the JWT cannot be parsed
      */
     public JwtClaimsSet getJwtClaims(String jwtValue) throws AuthLoginException {
         SignedJwt signedJwt = getSignedJwt(jwtValue);

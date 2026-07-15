@@ -24,7 +24,7 @@
  *
  * $Id: FSSSOAndFedService.java,v 1.8 2009/06/19 02:45:50 bigfatrat Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -109,7 +109,8 @@ public class FSSSOAndFedService  extends HttpServlet {
      * Processes single sign on request.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException, IOException if an error occurred
+     * @exception ServletException if an error occurred
+     * @exception IOException if an error occurred
      */
     public void doGet(
         HttpServletRequest request, 
@@ -269,7 +270,8 @@ public class FSSSOAndFedService  extends HttpServlet {
      * Processes single sign on POST request.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException, IOException if an error occurred
+     * @exception ServletException if an error occurred
+     * @exception IOException if an error occurred
      */
     public void doPost(
         HttpServletRequest request, 

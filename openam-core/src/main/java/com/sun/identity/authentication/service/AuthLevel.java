@@ -25,6 +25,7 @@
  * $Id: AuthLevel.java,v 1.3 2008/06/25 05:42:04 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.service;
@@ -184,7 +185,7 @@ public class AuthLevel {
      * generates choice callback.
      *
      * @return choice callback.
-     * @throws AuthException
+     * @throws AuthException if the choice callback cannot be created
      */
     public Callback[] createChoiceCallback() throws AuthException {
         debug.message("In createChoiceCallback");

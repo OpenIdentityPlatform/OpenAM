@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.notifications.websocket;
@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
  *     }
  * </pre>
  * <p>
- * When the <tt>id</tt> is present in the request, it shall be echoed back with any response messages.
+ * When the <code>id</code> is present in the request, it shall be echoed back with any response messages.
  *
  * @since 14.0.0
  */

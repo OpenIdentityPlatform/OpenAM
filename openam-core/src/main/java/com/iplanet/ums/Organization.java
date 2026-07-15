@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -184,7 +185,7 @@ public class Organization extends PersistentObject {
 
     /**
      * Get roles associated with the organization
-     * <P>
+     * <p>
      * TODO: Not yet implemented
      * 
      * @return guid identifying roles object under the organization
@@ -196,7 +197,7 @@ public class Organization extends PersistentObject {
 
     /**
      * Get groups of which the organization is a member.
-     * <P>
+     * <p>
      * TODO: Not yet implemented
      * 
      * @return guids identifying groups that the organization is a member of
@@ -245,13 +246,12 @@ public class Organization extends PersistentObject {
      * @param filter
      *            filter representation of the rule. Accepts filter string with
      *            the following format:
-     *            <P>
-     * 
+     *
      * <PRE>
      * 
-     * &ltfilter&gt ::= &ltand&gt | &ltitem&gt &ltand&gt ::= '(' '&'
-     *            &ltitemlist&gt ')' &ltitemlist&gt ::= &ltitem&gt | &ltitem&gt
-     *            &ltitemlist&gt &ltitem&gt ::= '(' &ltattr&gt '=' &ltvalue&gt
+     * &lt;filter&gt; ::= &lt;and&gt; | &lt;item&gt; &lt;and&gt; ::= '(' '&amp;'
+     *            &lt;itemlist&gt; ')' &lt;itemlist&gt; ::= &lt;item&gt; | &lt;item&gt;
+     *            &lt;itemlist&gt; &lt;item&gt; ::= '(' &lt;attr&gt; '=' &lt;value&gt;
      *            ')'
      * 
      * </PRE>

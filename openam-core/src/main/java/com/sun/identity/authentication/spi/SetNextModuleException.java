@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.spi;
 
 /**
- * This exception throws form Authentication Module and process by {@link com.sun.identity.authentication.jaas.LoginContext#invoke()}
+ * This exception throws form Authentication Module and process by {@link com.sun.identity.authentication.jaas.LoginContext}
  *   if there's a need to go back in authentcation chain on 
  * @author maximthomas
  *

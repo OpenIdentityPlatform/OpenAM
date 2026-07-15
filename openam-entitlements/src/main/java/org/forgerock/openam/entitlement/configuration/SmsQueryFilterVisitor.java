@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.configuration;
 
@@ -24,7 +25,7 @@ import java.util.List;
 
 /**
  * Query filter visitor that understands attributes associated with the SMS layer.
- * <p/>
+ * <p>
  * Due to the current way attributes are stored in LDAP via the SMS layer,
  * only supported operator is equality. All logical operators are supported.
  *

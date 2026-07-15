@@ -25,6 +25,7 @@
  * $Id: IDPPAuthorizer.java,v 1.6 2008/08/19 19:12:22 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.plugin;
@@ -105,7 +106,8 @@ public class IDPPAuthorizer implements Authorizer {
      *             decision information for the given data.
      *             For Personal Profile service, this object would be the 
      *             String authZ decision value.
-     * @exception Exception
+     * @exception Exception if an error occurs while making the authorization
+     *             decision.
      */
 
     public Object getAuthorizationDecision(

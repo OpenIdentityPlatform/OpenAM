@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -125,10 +126,9 @@ public class SOAPClient {
     
     /**
      * Constructor for applications that would like to dynamically set the SOAP
-     * endponts using <code>
+     * endponts using
      * <code>setUrls(String[] urls)</code> before
-     * invoking either <code>send()</code> or <code>
-     * call()</code>.
+     * invoking either <code>send()</code> or <code>call()</code>.
      */
     public SOAPClient() throws IOException {
         // do nothing

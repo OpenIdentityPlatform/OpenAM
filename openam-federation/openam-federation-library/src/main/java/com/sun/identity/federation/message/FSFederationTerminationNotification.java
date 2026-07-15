@@ -25,7 +25,7 @@
  * $Id: FSFederationTerminationNotification.java,v 1.3 2008/06/25 05:46:44 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message;
@@ -94,7 +94,7 @@ public class FSFederationTerminationNotification extends AbstractRequest {
     }
     
     /**
-     * Creates <code>FSFederationTerminationNotification<object> from
+     * Creates <code>FSFederationTerminationNotification</code> from
      * a Document Element.
      *
      * @param root the Document Element.
@@ -544,7 +544,7 @@ public class FSFederationTerminationNotification extends AbstractRequest {
      * Returns the value of <code>ProviderID</code> attribute.
      *
      * @return the value of <code>ProviderID</code> attribute.
-     * @see #setProviderId(String).
+     * @see #setProviderId(String)
      */
     public String getProviderId() {
         return providerId;

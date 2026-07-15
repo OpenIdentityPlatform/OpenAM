@@ -28,7 +28,7 @@
 
 /**
  * Portions Copyrighted 2013 ForgeRock, Inc.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.idpdiscovery;
 
@@ -49,8 +49,7 @@ import com.sun.identity.shared.locale.Locale;
 
 /**
  * Implements utility methods for handling Cookie.
- * <p>
- */ 
+ */
 
 public class CookieUtils {
     static boolean secureCookie =
@@ -405,9 +404,9 @@ public class CookieUtils {
 
     /**
      * Add cookie to HttpServletResponse as custom header
-     * 
-     * @param response
-     * @param cookie
+     *
+     * @param response the HTTP servlet response to add the cookie to
+     * @param cookie the cookie to add to the response
      */
     public static void addCookieToResponse(HttpServletResponse response,
             Cookie cookie) {

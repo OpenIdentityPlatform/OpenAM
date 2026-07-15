@@ -25,13 +25,12 @@
  * $Id: package-info.java,v 1.2 2008/06/25 05:43:47 qcheng Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
 /**
  * Deprecated interfaces for writing custom Policy plugins for Conditions,
  * Subjects, Referrals, ResponseProviders and Resources.
- * 
- * @deprecated since 12.0.0
  */
 package com.sun.identity.policy.interfaces;

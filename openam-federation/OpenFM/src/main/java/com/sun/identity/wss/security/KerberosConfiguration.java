@@ -24,6 +24,7 @@
  *
  * $Id: KerberosConfiguration.java,v 1.2 2008/06/25 05:50:07 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.security;
@@ -34,7 +35,7 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.AppConfigurationEntry;
 
 /**
- * This class <code>KerberosConfiguration<code> represents Kerberos 
+ * This class <code>KerberosConfiguration</code> represents Kerberos 
  * Configuration for web service clients and web service providers.
  */
 public class KerberosConfiguration extends Configuration  {
@@ -54,7 +55,7 @@ public class KerberosConfiguration extends Configuration  {
     /**
      * Constructor
      *
-     * @param config
+     * @param config the base configuration to delegate to.
      */
     public KerberosConfiguration (Configuration config) {
         this.config = config;
@@ -63,7 +64,7 @@ public class KerberosConfiguration extends Configuration  {
     /**
      * Sets principal name.
      *
-     * @param principalName
+     * @param principalName the service principal name to set.
      */
     public void setPrincipalName(String principalName) {
         servicePrincipal = principalName;
@@ -72,7 +73,7 @@ public class KerberosConfiguration extends Configuration  {
     /**
      * Sets key tab file.
      *
-     * @param keytabFile
+     * @param keytabFile the keytab file to use.
      */
     public void setKeyTab(String keytabFile) {
         keytab = keytabFile;
@@ -80,7 +81,7 @@ public class KerberosConfiguration extends Configuration  {
 
     /**
      * Sets a boolean value to refresh the configuration.
-     * @param refresh
+     * @param refresh whether the configuration should be refreshed.
      */
     public void setRefreshConfig(String refresh) {
         refreshConf = refresh;

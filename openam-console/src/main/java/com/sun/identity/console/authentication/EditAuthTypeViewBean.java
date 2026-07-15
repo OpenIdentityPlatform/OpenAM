@@ -29,7 +29,7 @@
 /*
  * Portions Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.console.authentication;
@@ -95,7 +95,7 @@ public class EditAuthTypeViewBean extends AMServiceProfileViewBeanBase {
      * This will populate the property sheet with attribute values for display. If this is called after
      * a dynamic request the values that was present on the UI (which might not have been persisted) will be used.
      * @param event The display event.
-     * @throws ModelControlException
+     * @throws ModelControlException if the framework model cannot be accessed.
      */
     public void beginDisplay(DisplayEvent event) throws ModelControlException {
         super.beginDisplay(event);

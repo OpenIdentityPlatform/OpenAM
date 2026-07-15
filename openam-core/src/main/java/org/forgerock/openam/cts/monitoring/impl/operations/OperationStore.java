@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.cts.monitoring.impl.operations;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 /**
  * A data structure that stores the cumulative count and rate for CTS operations.
- * <p/>
+ * <p>
  * Thread-safe: All access to internal data structures are internally synchronised.
  *
  * @since 12.0.0
@@ -55,7 +56,7 @@ class OperationStore {
 
     /**
      * Adds a Token operation into the monitoring store.
-     * <br/>
+     * <br>
      * The operations per configurable period and cumulative count will be updated for the operation.
      *
      * @param operation The operation performed.

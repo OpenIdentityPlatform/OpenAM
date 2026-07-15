@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click;
 
@@ -43,14 +44,14 @@ import org.apache.commons.fileupload.FileUploadException;
 class ClickRequestWrapper extends HttpServletRequestWrapper {
 
     /**
-     * The <tt>FileItem</tt> objects for <tt>"multipart"</tt> POST requests.
+     * The <code>FileItem</code> objects for <code>"multipart"</code> POST requests.
      */
     private final Map<String, FileItem[]> fileItemMap;
 
     /** The request is a multi-part file upload POST request. */
     private final boolean isMultipartRequest;
 
-    /** The map of <tt>"multipart"</tt> request parameter values. */
+    /** The map of <code>"multipart"</code> request parameter values. */
     private final Map<String, String[]> multipartParameterMap;
 
     /** The wrapped servlet request. */
@@ -133,11 +134,11 @@ class ClickRequestWrapper extends HttpServletRequestWrapper {
     // Public Methods ---------------------------------------------------------
 
     /**
-     * Returns a map of <tt>FileItem arrays</tt> keyed on request parameter
+     * Returns a map of <code>FileItem arrays</code> keyed on request parameter
      * name for "multipart" POST requests (file uploads). Thus each map entry
-     * will consist of one or more <tt>FileItem</tt> objects.
+     * will consist of one or more <code>FileItem</code> objects.
      *
-     * @return map of <tt>FileItem arrays</tt> keyed on request parameter name
+     * @return map of <code>FileItem arrays</code> keyed on request parameter name
      * for "multipart" POST requests
      */
     public Map<String, FileItem[]> getFileItemMap() {
@@ -223,9 +224,9 @@ class ClickRequestWrapper extends HttpServletRequestWrapper {
     // Package Private Methods ------------------------------------------------
 
     /**
-     * Return the map of <tt>"multipart"</tt> request parameter map.
+     * Return the map of <code>"multipart"</code> request parameter map.
      *
-     * @return the <tt>"multipart"</tt> request parameter map
+     * @return the <code>"multipart"</code> request parameter map
      */
     @SuppressWarnings("unchecked")
     Map getMultipartParameterMap() {

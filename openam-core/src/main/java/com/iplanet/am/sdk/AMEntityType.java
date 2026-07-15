@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -42,7 +43,6 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * This class defines a supported managed object type by <code> AM SDK </code>
  * It defines the name, type, service name of the object. A set of the supported
  * types can be obtained by using the class <code>AMStoreConnection</code>:
- * <p>
  * 
  * <PRE>
  * 

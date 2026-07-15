@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click;
@@ -63,12 +64,12 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Provides the Click application HttpServlet.
- * <p/>
- * Generally developers will simply configure the <tt>ClickServlet</tt> and
+ * <p>
+ * Generally developers will simply configure the <code>ClickServlet</code> and
  * will not use it directly in their code. For a Click web application to
- * function the <tt>ClickServlet</tt> must be configured in the web
- * application's <tt>/WEB-INF/web.xml</tt> file. A simple web application which
- * maps all <tt>*.htm</tt> requests to a ClickServlet is provided below.
+ * function the <code>ClickServlet</code> must be configured in the web
+ * application's <code>/WEB-INF/web.xml</code> file. A simple web application which
+ * maps all <code>*.htm</code> requests to a ClickServlet is provided below.
  *
  * <pre class="codeConfig">
  * &lt;web-app&gt;
@@ -83,8 +84,8 @@ import org.apache.commons.lang.StringUtils;
  *    &lt;/servlet-mapping&gt;
  * &lt;/web-app&gt; </pre>
  *
- * By default the <tt>ClickServlet</tt> will attempt to load an application
- * configuration file using the path: &nbsp; <tt>/WEB-INF/click.xml</tt>
+ * By default the <code>ClickServlet</code> will attempt to load an application
+ * configuration file using the path: &nbsp; <code>/WEB-INF/click.xml</code>
  *
  * <h4>Servlet Mapping</h4>
  * By convention all Click page templates should have a .htm extension, and
@@ -93,13 +94,13 @@ import org.apache.commons.lang.StringUtils;
  * and they will not be processed as Click pages.
  *
  * <h4>Load On Startup</h4>
- * Note you should always set <tt>load-on-startup</tt> element to be 0 so the
+ * Note you should always set <code>load-on-startup</code> element to be 0 so the
  * servlet is initialized when the server is started. This will prevent any
  * delay for the first client which uses the application.
- * <p/>
- * The <tt>ClickServlet</tt> performs as much work as possible at startup to
+ * <p>
+ * The <code>ClickServlet</code> performs as much work as possible at startup to
  * improve performance later on. The Click start up and caching strategy is
- * configured with the Click application mode in the "<tt>click.xml</tt>" file.
+ * configured with the Click application mode in the "<code>click.xml</code>" file.
  * See the User Guide for information on how to configure the application mode.
  *
  * <h4>ConfigService</h4>
@@ -115,20 +116,20 @@ public class ClickServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The <tt>mock page reference</tt> request attribute: key: &nbsp;
-     * <tt>mock_page_reference</tt>.
-     * <p/>
+     * The <code>mock page reference</code> request attribute: key: &nbsp;
+     * <code>mock_page_reference</code>.
+     * <p>
      * This attribute stores the each Page instance as a request attribute.
-     * <p/>
-     * <b>Note:</b> a page is <tt>only</tt> stored as a request attribute
+     * <p>
+     * <b>Note:</b> a page is <code>only</code> stored as a request attribute
      * if the {@link #MOCK_MODE_ENABLED} attribute is set.
      */
     static final String MOCK_PAGE_REFERENCE = "mock_page_reference";
 
     /**
-     * The <tt>mock mode</tt> request attribute: key: &nbsp;
-     * <tt>mock_mode_enabled</tt>.
-     * <p/>
+     * The <code>mock mode</code> request attribute: key: &nbsp;
+     * <code>mock_mode_enabled</code>.
+     * <p>
      * If this attribute is set (the value does not matter) certain features
      * will be enabled which is needed for running Click in a mock environment.
      */
@@ -136,23 +137,23 @@ public class ClickServlet extends HttpServlet {
 
     /**
      * The click application configuration service classname init parameter name:
-     * &nbsp; "<tt>config-service-class</tt>".
+     * &nbsp; "<code>config-service-class</code>".
      */
     protected final static String CONFIG_SERVICE_CLASS = "config-service-class";
 
     /**
      * The custom TypeConverter classname as an init parameter name:
-     * &nbps; "<tt>type-converter-class</tt>".
+     * &nbps; "<code>type-converter-class</code>".
      */
     protected final static String TYPE_CONVERTER_CLASS = "type-converter-class";
 
     /**
-     * The forwarded request marker attribute: &nbsp; "<tt>click-forward</tt>".
+     * The forwarded request marker attribute: &nbsp; "<code>click-forward</code>".
      */
     protected final static String CLICK_FORWARD = "click-forward";
 
     /**
-     * The Page to forward to request attribute: &nbsp; "<tt>click-page</tt>".
+     * The Page to forward to request attribute: &nbsp; "<code>click-page</code>".
      */
     protected final static String FORWARD_PAGE = "forward-page";
 
@@ -297,10 +298,10 @@ public class ClickServlet extends HttpServlet {
     /**
      * Handle the given servlet request and render the results to the
      * servlet response.
-     * <p/>
+     * <p>
      * If an exception occurs within this method the exception will be delegated
      * to:
-     * <p/>
+     * <p>
      * {@link #handleException(HttpServletRequest, HttpServletResponse, boolean, Throwable, Class)}
      *
      * @param request the servlet request to process
@@ -428,7 +429,7 @@ public class ClickServlet extends HttpServlet {
     /**
      * Provides the application exception handler. The application exception
      * will be delegated to the configured error page. The default error page is
-     * {@link ErrorPage} and the page template is "click/error.htm" <p/>
+     * {@link ErrorPage} and the page template is "click/error.htm" <p>
      * Applications which wish to provide their own customized error handling
      * must subclass ErrorPage and specify their page in the
      * "/WEB-INF/click.xml" application configuration file. For example:
@@ -535,7 +536,7 @@ public class ClickServlet extends HttpServlet {
     /**
      * Process the given page invoking its "on" event callback methods
      * and directing the response.
-     * <p/>
+     * <p>
      * This method does not invoke the "onDestroy()" callback method.
      *
      * @see #processPageEvents(Page, Context)
@@ -561,7 +562,7 @@ public class ClickServlet extends HttpServlet {
     /**
      * Process the given page events, invoking the "on" event callback methods
      * and directing the response.
-     * <p/>
+     * <p>
      * This method does not invoke the "onDestroy()" callback method.
      *
      * @param page the Page which events to process
@@ -914,11 +915,11 @@ public class ClickServlet extends HttpServlet {
 
     /**
      * Render the Velocity template defined by the page's path.
-     * <p/>
+     * <p>
      * This method creates a Velocity Context using the Page's model Map and
      * then merges the template with the Context writing the result to the
      * HTTP servlet response.
-     * <p/>
+     * <p>
      * This method was adapted from org.apache.velocity.servlet.VelocityServlet.
      *
      * @param page the page template to merge
@@ -1112,8 +1113,8 @@ public class ClickServlet extends HttpServlet {
     }
 
     /**
-     * Process the given pages controls <tt>onDestroy</tt> methods, reset the pages
-     * navigation state and process the pages <tt>onDestroy</tt> method.
+     * Process the given pages controls <code>onDestroy</code> methods, reset the pages
+     * navigation state and process the pages <code>onDestroy</code> method.
      *
      * @param page the page to process
      * @param startTime the start time to log if greater than 0 and not in
@@ -1203,22 +1204,22 @@ public class ClickServlet extends HttpServlet {
      * Initialize a new page instance using
      * {@link #newPageInstance(String, Class, HttpServletRequest)} method and
      * setting format, headers and the forward if a JSP.
-     * <p/>
+     * <p>
      * This method will also automatically register any public Page controls
      * in the page's model. When the page is created any public visible
      * page Control variables will be automatically added to the page using
      * the method {@link Page#addControl(Control)} method. If the controls name
      * is not defined it is set to the member variables name before it is added
      * to the page.
-     * <p/>
+     * <p>
      * This feature saves you from having to manually add the controls yourself.
      * If you don't want the controls automatically added, simply declare them
      * as non public variables.
-     * <p/>
+     * <p>
      * An example auto control registration is provided below. In this example
      * the Table control is automatically added to the model using the name
-     * <tt>"table"</tt>, and the ActionLink controls are added using the names
-     * <tt>"editDetailsLink"</tt> and <tt>"viewDetailsLink"</tt>.
+     * <code>"table"</code>, and the ActionLink controls are added using the names
+     * <code>"editDetailsLink"</code> and <code>"viewDetailsLink"</code>.
      *
      * <pre class="codeJava">
      * <span class="kw">public class</span> OrderDetailsPage <span class="kw">extends</span> Page {
@@ -1318,8 +1319,8 @@ public class ClickServlet extends HttpServlet {
      * Process the page binding any request parameters to any public Page
      * fields with the same name which are "primitive" types. These types
      * include string, numbers and booleans.
-     * <p/>
-     * Type conversion is performed using the <tt>TypeConverter</tt>
+     * <p>
+     * Type conversion is performed using the <code>TypeConverter</code>
      * returned by the {@link #getTypeConverter()} method.
      *
      * @param page the page whose fields are to be processed
@@ -1373,7 +1374,7 @@ public class ClickServlet extends HttpServlet {
 
     /**
      * Return a new Page instance for the given page path, class and request.
-     * <p/>
+     * <p>
      * The default implementation of this method simply creates new page
      * instances:
      * <pre class="codeJava">
@@ -1385,10 +1386,10 @@ public class ClickServlet extends HttpServlet {
      *
      * This method is designed to be overridden by applications providing their
      * own page creation patterns.
-     * <p/>
+     * <p>
      * A typical example of this would be with Inversion of Control (IoC)
      * frameworks such as Spring or HiveMind. For example a Spring application
-     * could override this method and use a <tt>ApplicationContext</tt> to instantiate
+     * could override this method and use a <code>ApplicationContext</code> to instantiate
      * new Page objects:
      * <pre class="codeJava">
      * <span class="kw">protected</span> Page newPageInstance(String path, Class pageClass,
@@ -1421,7 +1422,7 @@ public class ClickServlet extends HttpServlet {
     /**
      * Provides an extension point for ClickServlet sub classes to activate
      * stateful page which may have been deserialized.
-     * <p/>
+     * <p>
      * This method does nothing and is designed for extension.
      *
      * @param page the page instance to activate
@@ -1431,7 +1432,7 @@ public class ClickServlet extends HttpServlet {
 
     /**
      * Return a new VelocityContext for the given pages model and Context.
-     * <p/>
+     * <p>
      * The following values automatically added to the VelocityContext:
      * <ul>
      * <li>any public Page fields using the fields name</li>
@@ -1610,13 +1611,13 @@ public class ClickServlet extends HttpServlet {
     }
 
     /**
-     * Return the request parameters OGNL <tt>TypeConverter</tt>. This method
+     * Return the request parameters OGNL <code>TypeConverter</code>. This method
      * performs a lazy load of the TypeConverter object, using the classname
-     * defined in the Servlet init parameter <tt>type-converter-class</tt>,
+     * defined in the Servlet init parameter <code>type-converter-class</code>,
      * if this parameter is not defined this method will return a
      * {@link RequestTypeConverter} instance.
      *
-     * @return the request parameters OGNL <tt>TypeConverter</tt>
+     * @return the request parameters OGNL <code>TypeConverter</code>
      * @throws RuntimeException if the TypeConverter instance could not be created
      */
     @SuppressWarnings("unchecked")
@@ -1643,10 +1644,10 @@ public class ClickServlet extends HttpServlet {
     /**
      * Creates and returns a new Context instance for this path, class and
      * request.
-     * <p/>
+     * <p>
      * The default implementation of this method simply creates a new Context
      * instance.
-     * <p/>
+     * <p>
      * Subclasses can override this method to provide a custom Context.
      *
      * @param request the page request
@@ -1686,13 +1687,13 @@ public class ClickServlet extends HttpServlet {
 
     /**
      * Creates and returns a new ErrorPage instance.
-     * <p/>
-     * This method creates the custom page as specified in <tt>click.xml</tt>,
+     * <p>
+     * This method creates the custom page as specified in <code>click.xml</code>,
      * otherwise the default ErrorPage instance.
-     * <p/>
+     * <p>
      * Subclasses can override this method to provide custom ErrorPages tailored
      * for specific exceptions.
-     * <p/>
+     * <p>
      * <b>Note</b> you can safely use {@link Context} in this
      * method.
      *
@@ -1719,7 +1720,7 @@ public class ClickServlet extends HttpServlet {
 
     /**
      * Return a new Page instance for the given path. The path must start with
-     * a <tt>"/"</tt>.
+     * a <code>"/"</code>.
      *
      * @param path the path which maps to a Page class
      * @param request the Page request
@@ -1927,15 +1928,15 @@ public class ClickServlet extends HttpServlet {
 
     /**
      * Provides an Ajax exception handler. Exceptions are wrapped inside a
-     * <tt>div</tt> element and streamed back to the browser. The response status
+     * <code>div</code> element and streamed back to the browser. The response status
      * is set to an {@link jakarta.servlet.http.HttpServletResponse#SC_INTERNAL_SERVER_ERROR HTTP 500 error}
      * which allows the JavaScript that initiated the Ajax request to handle
      * the error as appropriate.
-     * <p/>
-     * If Click is running in <tt>development</tt> modes the exception stackTrace
-     * will be rendered, in <tt>production</tt> modes an error message is
+     * <p>
+     * If Click is running in <code>development</code> modes the exception stackTrace
+     * will be rendered, in <code>production</code> modes an error message is
      * rendered.
-     * <p/>
+     * <p>
      * Below is an example error response:
      *
      * <pre class="prettyprint">
@@ -1989,10 +1990,10 @@ public class ClickServlet extends HttpServlet {
     // ------------------------------------------------ Package Private Methods
 
     /**
-     * Return the OGNL <tt>MemberAccess</tt>. This method performs a lazy load
+     * Return the OGNL <code>MemberAccess</code>. This method performs a lazy load
      * of the MemberAccess object, using a {@link DefaultMemberAccess} instance.
      *
-     * @return the OGNL <tt>MemberAccess</tt>
+     * @return the OGNL <code>MemberAccess</code>
      */
     MemberAccess getMemberAccess() {
         if (memberAccess == null) {
@@ -2023,10 +2024,10 @@ public class ClickServlet extends HttpServlet {
     }
 
     /**
-     * Initialize the Click application <tt>ConfigService</tt> instance and bind
+     * Initialize the Click application <code>ConfigService</code> instance and bind
      * it as a ServletContext attribute using the key
-     * "<tt>org.apache.click.service.ConfigService</tt>".
-     * <p/>
+     * "<code>org.apache.click.service.ConfigService</code>".
+     * <p>
      * This method will use the configuration service class specified by the
      * {@link #CONFIG_SERVICE_CLASS} parameter, otherwise it will create a
      * {@link org.apache.click.service.XmlConfigService} instance.

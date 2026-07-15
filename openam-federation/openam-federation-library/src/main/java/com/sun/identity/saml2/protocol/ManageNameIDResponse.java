@@ -25,6 +25,7 @@
  * $Id: ManageNameIDResponse.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -37,9 +38,8 @@ import com.sun.identity.saml2.protocol.impl.ManageNameIDResponseImpl;
  * This class represents the ManageNameIDResponse element declaration.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 
- * <p>
  * <pre>
- * &lt;element name="ManageNameIDResponse" type="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType"/>
+ * &lt;element name="ManageNameIDResponse" type="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType"/&gt;
  * </pre>
  * 
  * 

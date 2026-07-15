@@ -24,6 +24,7 @@
  *
  * $Id: StatusDetailImpl.java,v 1.3 2008/06/25 05:48:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context.impl;
@@ -44,17 +45,17 @@ import org.w3c.dom.Element;
  * The <code>StatusCode</code> element is a container of 
  * one or more <code>Status</code>s issuded by authorization authority.
  * 
- * <p/>
+ * <p>
  *  Schema:
  * <pre>
- *  &lt;xs:element name="StatusDetail" type="xacml-context:StatusDetailType"/>
- *  &lt;xs:complexType name="StatusDetailType">
- *      &lt;xs:sequence>
+ *  &lt;xs:element name="StatusDetail" type="xacml-context:StatusDetailType"/&gt;
+ *  &lt;xs:complexType name="StatusDetailType"&gt;
+ *      &lt;xs:sequence&gt;
  *      &lt;xs:any namespace="##any" processContents="lax" 
- *          minOccurs="0" maxOccurs="unbounded"/>
- *      &lt;xs:sequence>
- *  &lt;xs:complexType>
- * >/pre>
+ *          minOccurs="0" maxOccurs="unbounded"/&gt;
+ *      &lt;xs:sequence&gt;
+ *  &lt;xs:complexType&gt;
+ * </pre>
  */
 public class StatusDetailImpl implements StatusDetail {
 
@@ -75,7 +76,7 @@ public class StatusDetailImpl implements StatusDetail {
      * Constructs a <code>StatusDetail</code> object from an XML string
      *
      * @param xml string representing a <code>StatusDetail</code> object
-     * @throws SAMLException if the XML string could not be processed
+     * @throws XACMLException if the XML string could not be processed
      */
     public StatusDetailImpl(String xml) throws XACMLException {
         Document document = XMLUtils.toDOMDocument(xml, XACMLSDKUtils.debug);
@@ -98,7 +99,7 @@ public class StatusDetailImpl implements StatusDetail {
      * @param element XML DOM element representing a <code>StatusDetail</code> 
      * object
      *
-     * @throws SAMLException if the DOM element could not be processed
+     * @throws XACMLException if the DOM element could not be processed
      */
     public StatusDetailImpl(Element element) throws XACMLException {
         processElement(element);

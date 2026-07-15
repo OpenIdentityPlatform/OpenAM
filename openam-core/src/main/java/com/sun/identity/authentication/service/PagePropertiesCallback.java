@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -60,13 +61,13 @@ public class PagePropertiesCallback implements Callback {
     /**
      * Creates <code>PagePropertiesCallback</code> object.
      *
-     * @param name
-     * @param header
-     * @param image
-     * @param timeOut
-     * @param templateName
-     * @param error
-     * @param page_state
+     * @param name the module name
+     * @param header the header text to display
+     * @param image the image to display
+     * @param timeOut the page timeout in seconds
+     * @param templateName the name of the page template
+     * @param error true if the page represents an error
+     * @param page_state the page state identifier
      */
     public PagePropertiesCallback(
         String name,

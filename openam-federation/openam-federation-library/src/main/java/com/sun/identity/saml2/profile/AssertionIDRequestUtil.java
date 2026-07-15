@@ -25,7 +25,7 @@
  * $Id: AssertionIDRequestUtil.java,v 1.8 2009/06/12 22:21:40 mallas Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -141,7 +141,7 @@ public class AssertionIDRequestUtil {
      * returns <code>Assertion</code> coming from the Assertion ID Request
      * Service.
      *
-     * @param assertionID the asssertionID</code> object
+     * @param assertionID the asssertionID object
      * @param samlAuthorityEntityID entity ID of SAML authority
      * @param role SAML authority role, for example,
      * <code>SAML2Constants.ATTR_AUTH_ROLE</code>, 

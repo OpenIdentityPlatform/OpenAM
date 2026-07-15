@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
 */
 package org.forgerock.openam.session;
 
@@ -90,7 +90,7 @@ public class SessionPollerPool {
     /**
      * Checks if Polling is enabled and initializes the threadpool if it's not already configured.
      *
-     * @return <code> true if polling is enabled , <code>false<code> otherwise.
+     * @return <code>true</code> if polling is enabled, <code>false</code> otherwise.
      */
     public boolean isPollingEnabled(){
         // This is only a transitional solution before the complete

@@ -24,6 +24,7 @@
  *
  * $Id: IDPAuthnContextMapper.java,v 1.6 2008/06/25 05:47:51 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -37,7 +38,7 @@ import com.sun.identity.saml2.protocol.AuthnRequest;
 
 /** 
  * The interface <code>IDPAuthnContextMapper</code> creates an
- * <code>IDPAuthnContextInfo<code> based on the RequestAuthnContext from
+ * <code>IDPAuthnContextInfo</code> based on the RequestAuthnContext from
  * the AuthnRequest sent by a Service Provider and the AuthnContext
  * configuration at the IDP entity config.
  * The implementation of this class will be used by the IDP to find out

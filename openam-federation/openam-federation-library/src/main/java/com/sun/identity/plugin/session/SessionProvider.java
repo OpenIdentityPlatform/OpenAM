@@ -25,7 +25,7 @@
  * $Id: SessionProvider.java,v 1.7 2008/06/25 05:47:28 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.plugin.session;
@@ -278,7 +278,7 @@ public interface SessionProvider {
      * Returns the time left for this session in seconds.
      * @param session Session object.
      * @return The time left for this session.
-     * @exception A SessionException is thrown if the session reached its maximum
+     * @exception SessionException if the session reached its maximum
      * session time, or the session was destroyed, or there was an error during
      * communication with session service.
      */

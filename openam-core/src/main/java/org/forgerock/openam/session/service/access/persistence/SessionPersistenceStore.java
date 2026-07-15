@@ -13,7 +13,7 @@
  *
  * Copyright 2016 ForgeRock AS.
  * Portions Copyrighted 2022 Open Identity Platform Community
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.session.service.access.persistence;
@@ -300,7 +300,7 @@ public class SessionPersistenceStore {
 
     /**
      * Returns the expiration information of all sessions belonging to a user
-     * (uuid). The returned value will be a Map (sid->expiration_time).
+     * (uuid). The returned value will be a {@code Map (sid->expiration_time)}.
      *
      * @param uuid
      *            User's universal unique ID.

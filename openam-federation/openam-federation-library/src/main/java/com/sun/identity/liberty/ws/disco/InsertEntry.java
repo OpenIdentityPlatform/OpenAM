@@ -24,6 +24,7 @@
  *
  * $Id: InsertEntry.java,v 1.2 2008/06/25 05:47:10 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -43,19 +44,18 @@ import com.sun.identity.liberty.ws.disco.common.DiscoUtils;
  * Modify request.
  * <p>The following schema fragment specifies the expected content within the
  * <code>InsertEntry</code> object.
- * <p>
  * <pre>
- * &lt;xs:element name="InsertEntry" type="InsertEntryType">
- * &lt;complexType name="InsertEntryType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:disco:2003-08}ResourceOffering"/>
- *         &lt;any/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;xs:element name="InsertEntry" type="InsertEntryType"&gt;
+ * &lt;complexType name="InsertEntryType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:disco:2003-08}ResourceOffering"/&gt;
+ *         &lt;any/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

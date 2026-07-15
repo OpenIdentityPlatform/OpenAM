@@ -24,6 +24,7 @@
  *
  * $Id: IdRepoSampleGetSpecialIds.java,v 1.2 2008/06/25 05:41:14 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -44,7 +45,6 @@ import com.sun.identity.idm.IdRepoException;
  * This class 
  *
  *
- * @author 
  */
 public class IdRepoSampleGetSpecialIds {
 

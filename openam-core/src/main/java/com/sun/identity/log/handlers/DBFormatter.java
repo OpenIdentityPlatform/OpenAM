@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -46,7 +47,7 @@ import com.sun.identity.log.spi.Debug;
  * Database Logging.
  * <p>
  * Typically this Formatter will be associated with a DBHandler (a handler meant
- * to handle Database logging). <tt> DBFormatter </TT> takes a LogRecord and
+ * to handle Database logging). <code> DBFormatter </code> takes a LogRecord and
  * converts it to a Formatted string which DBHandler can understand.
  *
  */

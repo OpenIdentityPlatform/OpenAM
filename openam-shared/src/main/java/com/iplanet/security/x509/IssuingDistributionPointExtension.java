@@ -24,6 +24,7 @@
  *
  * $Id: IssuingDistributionPointExtension.java,v 1.2 2008/06/25 05:52:46 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.security.x509;
@@ -426,7 +427,7 @@ public class IssuingDistributionPointExtension extends Extension {
      * Write the extension to the DerOutputStream.
      *
      * @param out the DerOutputStream to write the extension to.
-     * @exception IOException on encoding errors.
+     * @exception RuntimeException if an encoding error occurs.
      */
     public void encode(DerOutputStream out)  {
     	try {

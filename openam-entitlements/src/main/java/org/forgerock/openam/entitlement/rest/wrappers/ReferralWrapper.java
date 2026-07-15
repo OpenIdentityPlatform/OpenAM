@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.entitlement.rest.wrappers;
@@ -29,7 +30,7 @@ import org.forgerock.openam.utils.JsonValueBuilder;
 
 /**
  * Wrapper for the jsonification of {@link ReferralPrivilege} objects, for
- * interaction via the REST endpoint {@link org.forgerock.openam.forgerockrest.entitlements.ReferralsResource}.
+ * interaction via the REST endpoint {@code org.forgerock.openam.forgerockrest.entitlements.ReferralsResource}.
  */
 public class ReferralWrapper implements Comparable<ReferralWrapper> {
 

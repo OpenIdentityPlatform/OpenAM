@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -31,10 +32,10 @@ import java.util.Map;
 /**
  * Provides a default implementation of the {@link org.openidentityplatform.openam.click.control.Container} interface
  * to make it easier for developers to create their own containers.
- * <p/>
+ * <p>
  * Subclasses can override {@link #getTag()} to return a specific HTML element.
- * <p/>
- * The following example shows how to create an HTML <tt>div</tt> element:
+ * <p>
+ * The following example shows how to create an HTML <code>div</code> element:
  *
  * <pre class="prettyprint">
  * public class Div extends AbstractContainer {
@@ -80,13 +81,14 @@ public abstract class AbstractContainer extends AbstractControl implements
     // Public Methods ---------------------------------------------------------
 
     /**
-     * @see org.openidentityplatform.openam.click.control.Container#add(Control).
-     * <p/>
+     * Adds the given control to the container and returns it.
+     * <p>
      * <b>Please note</b>: if the container contains a control with the same name
      * as the given control, that control will be
      * {@link #replace(Control, Control) replaced}
      * by the given control. If a control has no name defined it cannot be replaced.
      *
+     * @see org.openidentityplatform.openam.click.control.Container#add(Control)
      * @param control the control to add to the container
      * @return the control that was added to the container
      * @throws IllegalArgumentException if the control is null
@@ -98,12 +100,12 @@ public abstract class AbstractContainer extends AbstractControl implements
     /**
      * Add the control to the container at the specified index, and return the
      * added instance.
-     * <p/>
+     * <p>
      * <b>Please note</b>: if the container contains a control with the same name
      * as the given control, that control will be
      * {@link #replace(Control, Control) replaced}
      * by the given control. If a control has no name defined it cannot be replaced.
-     * <p/>
+     * <p>
      * <b>Also note</b> if the specified control already has a parent assigned,
      * it will automatically be removed from that parent and inserted into this
      * container.
@@ -118,7 +120,7 @@ public abstract class AbstractContainer extends AbstractControl implements
      * and container is the same instance
      *
      * @throws IndexOutOfBoundsException if index is out of range
-     * <tt>(index &lt; 0 || index &gt; getControls().size())</tt>
+     * <code>(index &lt; 0 || index &gt; getControls().size())</code>
      */
     public Control insert(Control control, int index) {
         // Check if panel already contains the control
@@ -146,7 +148,7 @@ public abstract class AbstractContainer extends AbstractControl implements
     }
 
     /**
-     * @seeorg.openidentityplatform.openam.click.control.Container#remove(Control).
+     * @see org.openidentityplatform.openam.click.control.Container#remove(Control)
      *
      * @param control the control to remove from the container
      * @return true if the control was removed from the container
@@ -181,7 +183,7 @@ public abstract class AbstractContainer extends AbstractControl implements
     }
 
     /**
-     * @see org.apache.click.control.Container#getControls().
+     * @see org.apache.click.control.Container#getControls()
      *
      * @return the sequential list of controls held by the container
      */
@@ -227,7 +229,7 @@ public abstract class AbstractContainer extends AbstractControl implements
     /**
      * Return the map of controls where each map's key / value pair will consist
      * of the control name and instance.
-     * <p/>
+     * <p>
      * Controls added to the container that did not specify a {@link #name},
      * will not be included in the returned map.
      *
@@ -241,7 +243,7 @@ public abstract class AbstractContainer extends AbstractControl implements
     }
 
     /**
-     * @see org.openidentityplatform.openam.click.control.AbstractControl#getControlSizeEst().
+     * @see org.openidentityplatform.openam.click.control.AbstractControl#getControlSizeEst()
      *
      * @return the estimated rendered control size in characters
      */
@@ -261,7 +263,7 @@ public abstract class AbstractContainer extends AbstractControl implements
     }
 
     /**
-     * @see Control#onProcess().
+     * @see Control#onProcess()
      *
      * @return true to continue Page event processing or false otherwise
      */
@@ -319,10 +321,9 @@ public abstract class AbstractContainer extends AbstractControl implements
     /**
      * Render the HTML representation of the container and all its child
      * controls to the specified buffer.
-     * <p/>
+     * <p>
      * If {@link #getTag()} returns null, this method will render only its
      * child controls.
-     * <p/>
      * @see org.openidentityplatform.openam.click.control.AbstractControl#render(HtmlStringBuffer)
      *
      * @param buffer the specified buffer to render the control's output to
@@ -349,7 +350,7 @@ public abstract class AbstractContainer extends AbstractControl implements
 
     /**
      * Returns the HTML representation of this control.
-     * <p/>
+     * <p>
      * This method delegates the rendering to the method
      * {@link #render(HtmlStringBuffer)}. The size of buffer
      * is determined by {@link #getControlSizeEst()}.
@@ -368,7 +369,7 @@ public abstract class AbstractContainer extends AbstractControl implements
     // Protected Methods ------------------------------------------------------
 
     /**
-     * @see AbstractControl#renderTagEnd(String, HtmlStringBuffer).
+     * @see AbstractControl#renderTagEnd(String, HtmlStringBuffer)
      *
      * @param tagName the name of the tag to close
      * @param buffer the buffer to append the output to

@@ -24,6 +24,7 @@
  *
  * $Id: SecurityTokenManagerImpl.java,v 1.3 2008/06/25 05:47:21 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -139,7 +140,7 @@ public class SecurityTokenManagerImpl implements SecurityTokenManagerIF {
      *        Assertion (for <code>AuthorizeRequester</code> directive). If
      *        false, a <code>SessionContextStatement</code> will be included i
      *        the Assertion (for <code>AuthenticationSessionContext</code>
-     *        directive). In the case when both <code>AuthorizeRequester</code
+     *        directive). In the case when both <code>AuthorizeRequester</code>
      *        and <code>AuthenticationSessionContext</code> directive need to be
      *        handled, use "true" as parameter here since the
      *        <code>SessionContext</code> will always be included in the

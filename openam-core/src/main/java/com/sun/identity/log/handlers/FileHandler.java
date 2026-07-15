@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
- * Portions Copyrighted 2020-2025 3A Systems, LLC.
+ * Portions Copyrighted 2020-2026 3A Systems, LLC.
  */
 
 package com.sun.identity.log.handlers;
@@ -70,10 +70,10 @@ import java.io.FileNotFoundException;
 import java.util.Calendar;
 
 /**
- * This <tt> FileHandler </tt> is very much similar to the
- * <t> java.util.logging.FileHandler </tt>. <p> The <TT> FileHandler </TT>
+ * This <code> FileHandler </code> is very much similar to the
+ * <code> java.util.logging.FileHandler </code>. <p> The <code> FileHandler </code>
  * can either write to a specified file, or it can write to a rotating set
- * of files. <P>
+ * of files. <p>
  * For a rotating set of files, as each file reaches the limit
  * (<i> LogConstants.MAX_FILE_SIZE</I>), it is closed, rotated out, and a
  * new file opened. Successively older files and named by adding "-1", "-2",
@@ -200,15 +200,15 @@ public class FileHandler extends java.util.logging.Handler {
     }
 
     /**
-     * Set (or change) the character encoding used by this <tt>Handler</tt>.
-     * The encoding should be set before any <tt>LogRecords</tt> are written
-     * to the <tt>Handler</tt>.
+     * Set (or change) the character encoding used by this <code>Handler</code>.
+     * The encoding should be set before any <code>LogRecords</code> are written
+     * to the <code>Handler</code>.
      *
      * @param encoding  The name of a supported character encoding.
      *        May be null, to indicate the default platform encoding.
      * @exception  SecurityException  if a security manager exists and if
      *             the caller does not have
-     *             <tt>LoggingPermission("control")</tt>.
+     *             <code>LoggingPermission("control")</code>.
      * @exception UnsupportedEncodingException if the named encoding is
      *           not supported.
      */

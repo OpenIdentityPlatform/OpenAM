@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems, LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 package com.sun.identity.shared.datastruct;
 
@@ -87,7 +87,7 @@ public class CollectionHelper {
      * Return String from a map of strings to set of strings.
      * 
      * @param map Map of string of set of string.
-     * @param name Key of the map entry.
+     * @param key Key of the map entry.
      * @return the String value from a map of strings to set of strings.
      * @throws ValueNotFoundException if no value is found for the key.
      */

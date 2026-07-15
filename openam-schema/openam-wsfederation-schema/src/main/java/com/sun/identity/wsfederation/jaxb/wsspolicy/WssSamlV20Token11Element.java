@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -14,9 +15,8 @@ package com.sun.identity.wsfederation.jaxb.wsspolicy;
  * 
  * Java content class for WssSamlV20Token11 element declaration.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/wsfederation/ws-securitypolicy-1.2.xsd line 453)
- * <p>
  * <pre>
- * &lt;element name="WssSamlV20Token11" type="{http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200512}QNameAssertionType"/>
+ * &lt;element name="WssSamlV20Token11" type="{http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200512}QNameAssertionType"/&gt;
  * </pre>
  * 
  */

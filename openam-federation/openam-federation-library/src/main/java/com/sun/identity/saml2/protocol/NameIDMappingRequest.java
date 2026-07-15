@@ -25,6 +25,7 @@
  * $Id: NameIDMappingRequest.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.protocol;
@@ -39,25 +40,24 @@ import com.sun.identity.saml2.protocol.impl.NameIDMappingRequestImpl;
  * This class represents the ManageNameIDRequestType complex type.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 	
- * <p>
  * <pre>
- * &lt;complexType name="ManageNameIDRequestType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}RequestAbstractType">
- *       &lt;sequence>
- *         &lt;choice>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}NameID"/>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedID"/>
- *         &lt;/choice>
- *         &lt;choice>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}NewID"/>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}NewEncryptedID"/>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}Terminate"/>
- *         &lt;/choice>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="ManageNameIDRequestType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}RequestAbstractType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}NameID"/&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedID"/&gt;
+ *         &lt;/choice&gt;
+ *         &lt;choice&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}NewID"/&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}NewEncryptedID"/&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}Terminate"/&gt;
+ *         &lt;/choice&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

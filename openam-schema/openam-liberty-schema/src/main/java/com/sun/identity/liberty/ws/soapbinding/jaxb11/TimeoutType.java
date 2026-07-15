@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,18 +13,17 @@ package com.sun.identity.liberty.ws.soapbinding.jaxb11;
 /**
  * Java content class for TimeoutType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/liberty-idwsf-soap-binding-v1.1.xsd line 103)
- * <p>
  * <pre>
- * &lt;complexType name="TimeoutType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *       &lt;attribute name="maxProcessingTime" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" />
- *       &lt;attribute ref="{http://schemas.xmlsoap.org/soap/envelope/}actor"/>
- *       &lt;attribute ref="{http://schemas.xmlsoap.org/soap/envelope/}mustUnderstand"/>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="TimeoutType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *       &lt;attribute name="maxProcessingTime" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
+ *       &lt;attribute ref="{http://schemas.xmlsoap.org/soap/envelope/}actor"/&gt;
+ *       &lt;attribute ref="{http://schemas.xmlsoap.org/soap/envelope/}mustUnderstand"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

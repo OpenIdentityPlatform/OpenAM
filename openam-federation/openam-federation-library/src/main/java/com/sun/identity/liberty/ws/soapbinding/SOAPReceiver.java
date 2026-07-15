@@ -24,6 +24,7 @@
  *
  * $Id: SOAPReceiver.java,v 1.3 2008/06/25 05:47:23 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /*
@@ -74,7 +75,7 @@ import java.util.Set;
  * binding SM schema and store in a static HashMap. Each 
  * <code>RequestHandler</code> is associated with a unique key. When a web
  * service client uses <code>Client</code> to send request, the SOAP URL must
- * be in the format of 'this_servlet_URL>/key'. The <code>SOAPReceiver</code>
+ * be in the format of {@code 'this_servlet_URL>/key'}. The <code>SOAPReceiver</code>
  * will parse the SOAP URL to get the key and use it to find corresponding
  * <code>RequestHandler</code>. After it is done processing, it will invoke
  * <code>RequestHandler.processRequest</code> to let web service to do further

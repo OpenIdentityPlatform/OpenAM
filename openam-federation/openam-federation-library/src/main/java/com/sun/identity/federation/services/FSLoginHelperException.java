@@ -24,6 +24,7 @@
  *
  * $Id: FSLoginHelperException.java,v 1.2 2008/06/25 05:46:55 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -31,7 +32,7 @@ package com.sun.identity.federation.services;
 import com.sun.identity.federation.common.FSException;
 
 /**
- * This class handles all preLogin & postLogin exceptions.
+ * This class handles all preLogin &amp; postLogin exceptions.
  *
  * @see com.sun.identity.federation.common.FSException
  */
