@@ -24,7 +24,7 @@
  *
  * $Id: FSRegistrationRequestServlet.java,v 1.4 2008/06/25 05:47:03 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.registration;
@@ -408,7 +408,8 @@ public class FSRegistrationRequestServlet extends HttpServlet {
      * @return <code>true</code> if the signature is verified;
      *  <code>false</code>
      *  otherwise
-     * @exception SAMLException, FSException if an error occurred during
+     * @exception SAMLException if an error occurred during
+     * @exception FSException if an error occurred during
      *  the process
      */
     private boolean verifyRegistrationSignature(

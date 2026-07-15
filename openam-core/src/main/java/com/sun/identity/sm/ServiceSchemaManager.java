@@ -25,6 +25,7 @@
  * $Id: ServiceSchemaManager.java,v 1.12 2009/07/25 05:11:55 qcheng Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.sm;
 
@@ -65,8 +66,8 @@ public class ServiceSchemaManager {
     
     /**
      * Constructor for service's schema manager to manage the attributes and
-     * sub configurations. Assumes service version number to be <class>1.0
-     * </class>.
+     * sub configurations. Assumes service version number to be <code>1.0
+     * </code>.
      *
      * @throws SMSException
      *             if an error occurred while trying to perform the operation

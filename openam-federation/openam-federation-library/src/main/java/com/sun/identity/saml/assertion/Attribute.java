@@ -24,6 +24,7 @@
  *
  * $Id: Attribute.java,v 1.4 2008/09/03 22:28:40 weisun2 Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -247,7 +248,7 @@ public class Attribute extends AttributeDesignator {
      *
      * @return A list of DOM Element representing the
      * <code>AttributeValue</code> block.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public  List getAttributeValue()  throws SAMLException {
         return _attributeValue; 
@@ -257,7 +258,7 @@ public class Attribute extends AttributeDesignator {
      * Adds <code>AttributeValue</code> to the Attribute.
      *
      * @param value A String representing <code>AttributeValue</code>. 
-     * @exception SAMLException 
+     * @exception SAMLException if a SAML error occurs
      */
     public void addAttributeValue(String value) throws SAMLException {
         if (value == null || value.length() == 0) {
@@ -302,7 +303,7 @@ public class Attribute extends AttributeDesignator {
      *
      * @param element An Element object representing
      *        <code>AttributeValue</code>.
-     * @exception SAMLException 
+     * @exception SAMLException if a SAML error occurs
      */
     public void addAttributeValue(Element element) throws SAMLException {
         if (element == null) {

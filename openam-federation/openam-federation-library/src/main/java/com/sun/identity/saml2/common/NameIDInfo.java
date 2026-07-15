@@ -24,6 +24,7 @@
  *
  * $Id: NameIDInfo.java,v 1.3 2008/06/25 05:47:45 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -40,24 +41,26 @@ import com.sun.identity.saml2.assertion.AssertionFactory;
  * This multiple-valued attribute is used to store all information 
  * related to the name identifier, such as IDP, SP entity id, role, etc.
  * Value format for this attribute:
- *  <hosted_entity_id>|<remote_entity_id>|<idp_nameid>|<idp_nameid_qualifier>|
- *  <idp_nameid_format>|<sp_nameid>|<sp_nameid_qualifier>|<hosted_entity_role>|
- * <is_affiliation>
+ * <pre>
+ *  &lt;hosted_entity_id&gt;|&lt;remote_entity_id&gt;|&lt;idp_nameid&gt;|&lt;idp_nameid_qualifier&gt;|
+ *  &lt;idp_nameid_format&gt;|&lt;sp_nameid&gt;|&lt;sp_nameid_qualifier&gt;|&lt;hosted_entity_role&gt;|
+ * &lt;is_affiliation&gt;
  *       where:
- *       <hosted_entity_id>    : entity id for this hosted entity
- *       <remote_entity_id>    : entity id for the remote entity
- *       <idp_nameid>          : name identifier for the IDP
- *       <idp_nameid_qualifier>: nameid qualifier for the IDP
- *       <idp_nameid_format>   : nameid format for the IDP
- *       <sp_nameid>           : name identifier for the SP/Affiliation
- *       <sp_nameid_qualifier> : nameid qualifier for the SP/Affiliation
- *       <hosted_entity_role>  : value of SPRole, IDPRole or DualRole.
- *       <is_affiliation>      : true for affiliation, false otherwise 
+ *       &lt;hosted_entity_id&gt;    : entity id for this hosted entity
+ *       &lt;remote_entity_id&gt;    : entity id for the remote entity
+ *       &lt;idp_nameid&gt;          : name identifier for the IDP
+ *       &lt;idp_nameid_qualifier&gt;: nameid qualifier for the IDP
+ *       &lt;idp_nameid_format&gt;   : nameid format for the IDP
+ *       &lt;sp_nameid&gt;           : name identifier for the SP/Affiliation
+ *       &lt;sp_nameid_qualifier&gt; : nameid qualifier for the SP/Affiliation
+ *       &lt;hosted_entity_role&gt;  : value of SPRole, IDPRole or DualRole.
+ *       &lt;is_affiliation&gt;      : true for affiliation, false otherwise
  *       for example:
  *       http://www.sp.com|http://www.idp.com|
  *       vPQyHXLnSWLAVh2BoI3gdUrhanC1|http://www.idp.com|
  *       urn:oasis:names:tc:SAML:2.0:nameid-format:persistent|
  *       g6lD46kMqDGSsFPawoFrw4iNf86C|http://www.sp.com|SPRole|false
+ * </pre>
  */
 public class NameIDInfo {
 

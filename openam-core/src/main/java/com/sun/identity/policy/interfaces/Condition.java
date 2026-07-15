@@ -25,6 +25,7 @@
  * $Id: Condition.java,v 1.7 2009/06/19 22:54:46 mrudul_uchil Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.interfaces;
@@ -616,7 +617,7 @@ public interface Condition extends Cloneable {
      *
      * @param property property name
      *
-     * @return <code>Syntax<code> for the property name
+     * @return <code>Syntax</code> for the property name
      */
     public Syntax getPropertySyntax(String property);
 
@@ -631,7 +632,7 @@ public interface Condition extends Cloneable {
      * @param property property name
      * @param locale locale for which the property name must be customized
      * @return display name for the property name.
-     * @throws PolicyException
+     * @throws PolicyException if the display name cannot be determined.
      */
     public String getDisplayName(String property, Locale locale)
         throws PolicyException;
@@ -685,7 +686,7 @@ public interface Condition extends Cloneable {
      *
      * @param token single-sign-on <code>SSOToken</code> of the user
      *
-     * @param env request specific environment <code>Map,/code> of key/value 
+     * @param env request specific environment <code>Map</code> of key/value
      *        pairs For example this would contain IP address of remote
      *        client for an <code>IPCondition</code>.
      *

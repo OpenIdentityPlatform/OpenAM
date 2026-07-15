@@ -25,6 +25,7 @@
  * $Id: IDebugProvider.java,v 1.1 2009/08/19 05:40:34 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entitlement.interfaces;
@@ -37,7 +38,6 @@ import com.sun.identity.shared.debug.IDebug;
  * <code>com.sun.identity.entitlement.interface.IDebug</code> interface
  * together provide the necessary functionality to replace or enhance the
  * Debug service.
- * </p>
  */
 public interface IDebugProvider {
     /**

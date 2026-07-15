@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -37,7 +38,6 @@ import org.w3c.dom.Node;
  * This <code>RemoveListenerRequest</code> class represents an 
  * RemovePolicyListener XML document. The RemovePolicyListener DTD is 
  * defined as the following:
- * <p>
  * <pre>
  *    <!-- RemovePolicyListener element removes a policy listener 
  *          from the service.
@@ -47,13 +47,12 @@ import org.w3c.dom.Node;
  *          be removed.
  *     -->
  *
- *      <!ELEMENT    RemovePolicyListener    EMPTY >
- *     <!ATTLIST    RemovePolicyListener
+ *      &lt;!ELEMENT    RemovePolicyListener    EMPTY &gt;
+ *     &lt;!ATTLIST    RemovePolicyListener
  *         serviceName        NMTOKEN    #REQUIRED
  *         notificationURL    CDATA      #REQUIRED
- *     >
+ *     &gt;
  * </pre>
- * <p>
  */
 public class RemoveListenerRequest {
 

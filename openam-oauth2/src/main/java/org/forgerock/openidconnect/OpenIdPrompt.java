@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openidconnect;
@@ -44,7 +45,7 @@ public class OpenIdPrompt {
 
     /**
      * Constructs a new OpenIdPrompt instance from the given prompt String.
-     * <br/>
+     * <br>
      * Parses the prompt string (converted to lowercase) by splitting on the ' ' character.
      *
      * @param prompt The prompt.

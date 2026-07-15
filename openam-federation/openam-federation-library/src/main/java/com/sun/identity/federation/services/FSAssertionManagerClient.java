@@ -25,6 +25,7 @@
  * $Id: FSAssertionManagerClient.java,v 1.8 2008/08/19 19:11:06 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -91,7 +92,7 @@ public final class FSAssertionManagerClient {
      * Returns an instance of <code>AssertionManagerClient</code>.
      *
      * @param metaAlias hosted provider's meta alias.
-     * @throws FSException
+     * @throws FSException if a federation error occurs
      */
     public FSAssertionManagerClient(String metaAlias) throws FSException
     {
@@ -141,7 +142,7 @@ public final class FSAssertionManagerClient {
      * @param metaAlias hosted provider's meta alias.
      * @param url the <code>FSAssertionManager</code> service URL that
      *  will be used to create, get and delete <code>Assertion</code>s
-     * @throws FSException
+     * @throws FSException if a federation error occurs
      */
     public FSAssertionManagerClient(String metaAlias, String url)
         throws FSException {

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -113,12 +114,12 @@ public class Membership extends AMLoginModule {
      * Return STATE_SUCCEED if the login is successful, return STATE_FAILED
      * if the LoginModule should be ignored.
      *
-     * @param callbacks an array of <code>Callback</cdoe> for this Login state
+     * @param callbacks an array of <code>Callback</code> for this Login state
      * @param state order of state. State order starts with 1.
      * @return int order of next state. Return STATE_SUCCEED if authentication
      *         is successful, return STATE_FAILED if the
      *         LoginModule should be ignored.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if an error occurs while processing the callbacks
      */
     public int process(Callback[] callbacks, int state)
     throws AuthLoginException {

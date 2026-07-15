@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -101,8 +102,6 @@ public class SMSFlatFileTreeNode {
      *
      * @param child Child node.
      * @return <code>true</code> if child is added to the tree.
-     * @throws SMSException if the dn of the child is not prefix with
-     *         this node.
      */
     public boolean addChild(SMSFlatFileTreeNode child) {
         boolean added = false;

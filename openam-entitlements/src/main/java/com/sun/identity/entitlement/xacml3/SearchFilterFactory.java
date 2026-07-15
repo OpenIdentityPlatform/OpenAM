@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -46,8 +47,8 @@ public class SearchFilterFactory {
      *
      * Where operator can be one of the following:
      * Equals - =
-     * Less Than - <
-     * Greater Than - >
+     * Less Than - &lt;
+     * Greater Than - &gt;
      *
      * @param filter Non null String representing a search filter.
      * @return Non null parsed SearchFilter.

@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -120,7 +121,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -139,7 +140,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -158,7 +159,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -170,7 +171,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AttributeElement createAttributeElement()
@@ -182,7 +183,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.ActionType createActionType()
@@ -194,7 +195,7 @@ public class ObjectFactory
     /**
      * Create an instance of ConfirmationMethodElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.ConfirmationMethodElement createConfirmationMethodElement()
@@ -206,7 +207,7 @@ public class ObjectFactory
     /**
      * Create an instance of ConfirmationMethodElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.ConfirmationMethodElement createConfirmationMethodElement(java.lang.String value)
@@ -218,7 +219,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatementAbstractType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.StatementAbstractType createStatementAbstractType()
@@ -230,7 +231,7 @@ public class ObjectFactory
     /**
      * Create an instance of ConditionsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.ConditionsType createConditionsType()
@@ -242,7 +243,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeDesignatorElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AttributeDesignatorElement createAttributeDesignatorElement()
@@ -254,7 +255,7 @@ public class ObjectFactory
     /**
      * Create an instance of AdviceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AdviceElement createAdviceElement()
@@ -266,7 +267,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectConfirmationDataElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.SubjectConfirmationDataElement createSubjectConfirmationDataElement()
@@ -278,7 +279,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeStatementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AttributeStatementElement createAttributeStatementElement()
@@ -290,7 +291,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectConfirmationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.SubjectConfirmationElement createSubjectConfirmationElement()
@@ -302,7 +303,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthorizationDecisionStatementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AuthorizationDecisionStatementElement createAuthorizationDecisionStatementElement()
@@ -314,7 +315,7 @@ public class ObjectFactory
     /**
      * Create an instance of DoNotCacheConditionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.DoNotCacheConditionElement createDoNotCacheConditionElement()
@@ -326,7 +327,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectConfirmationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.SubjectConfirmationType createSubjectConfirmationType()
@@ -338,7 +339,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectLocalityType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.SubjectLocalityType createSubjectLocalityType()
@@ -350,7 +351,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthorityBindingElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AuthorityBindingElement createAuthorityBindingElement()
@@ -362,7 +363,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectLocalityElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.SubjectLocalityElement createSubjectLocalityElement()
@@ -374,7 +375,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticationStatementType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AuthenticationStatementType createAuthenticationStatementType()
@@ -386,7 +387,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeDesignatorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AttributeDesignatorType createAttributeDesignatorType()
@@ -398,7 +399,7 @@ public class ObjectFactory
     /**
      * Create an instance of AudienceRestrictionConditionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AudienceRestrictionConditionType createAudienceRestrictionConditionType()
@@ -410,7 +411,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.SubjectType createSubjectType()
@@ -422,7 +423,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.SubjectElement createSubjectElement()
@@ -434,7 +435,7 @@ public class ObjectFactory
     /**
      * Create an instance of EvidenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.EvidenceElement createEvidenceElement()
@@ -446,7 +447,7 @@ public class ObjectFactory
     /**
      * Create an instance of ConditionAbstractType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.ConditionAbstractType createConditionAbstractType()
@@ -458,7 +459,7 @@ public class ObjectFactory
     /**
      * Create an instance of NameIdentifierElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.NameIdentifierElement createNameIdentifierElement()
@@ -470,7 +471,7 @@ public class ObjectFactory
     /**
      * Create an instance of NameIdentifierType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.NameIdentifierType createNameIdentifierType()
@@ -482,7 +483,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthorizationDecisionStatementType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AuthorizationDecisionStatementType createAuthorizationDecisionStatementType()
@@ -494,7 +495,7 @@ public class ObjectFactory
     /**
      * Create an instance of EvidenceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.EvidenceType createEvidenceType()
@@ -506,7 +507,7 @@ public class ObjectFactory
     /**
      * Create an instance of DoNotCacheConditionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.DoNotCacheConditionType createDoNotCacheConditionType()
@@ -518,7 +519,7 @@ public class ObjectFactory
     /**
      * Create an instance of ConditionsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.ConditionsElement createConditionsElement()
@@ -530,7 +531,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeValueElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AttributeValueElement createAttributeValueElement()
@@ -542,7 +543,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeStatementType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AttributeStatementType createAttributeStatementType()
@@ -554,7 +555,7 @@ public class ObjectFactory
     /**
      * Create an instance of AudienceRestrictionConditionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AudienceRestrictionConditionElement createAudienceRestrictionConditionElement()
@@ -566,7 +567,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectStatementAbstractType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.SubjectStatementAbstractType createSubjectStatementAbstractType()
@@ -578,7 +579,7 @@ public class ObjectFactory
     /**
      * Create an instance of AudienceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AudienceElement createAudienceElement()
@@ -590,7 +591,7 @@ public class ObjectFactory
     /**
      * Create an instance of AudienceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AudienceElement createAudienceElement(java.lang.String value)
@@ -602,7 +603,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthorityBindingType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AuthorityBindingType createAuthorityBindingType()
@@ -614,7 +615,7 @@ public class ObjectFactory
     /**
      * Create an instance of AssertionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AssertionElement createAssertionElement()
@@ -626,7 +627,7 @@ public class ObjectFactory
     /**
      * Create an instance of AdviceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AdviceType createAdviceType()
@@ -638,7 +639,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectStatementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.SubjectStatementElement createSubjectStatementElement()
@@ -650,7 +651,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AttributeType createAttributeType()
@@ -662,7 +663,7 @@ public class ObjectFactory
     /**
      * Create an instance of AssertionIDReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AssertionIDReferenceElement createAssertionIDReferenceElement()
@@ -674,7 +675,7 @@ public class ObjectFactory
     /**
      * Create an instance of AssertionIDReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AssertionIDReferenceElement createAssertionIDReferenceElement(java.lang.String value)
@@ -686,7 +687,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticationStatementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AuthenticationStatementElement createAuthenticationStatementElement()
@@ -698,7 +699,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.ActionElement createActionElement()
@@ -710,7 +711,7 @@ public class ObjectFactory
     /**
      * Create an instance of AssertionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.AssertionType createAssertionType()
@@ -722,7 +723,7 @@ public class ObjectFactory
     /**
      * Create an instance of ConditionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.ConditionElement createConditionElement()
@@ -734,7 +735,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.assertion.StatementElement createStatementElement()

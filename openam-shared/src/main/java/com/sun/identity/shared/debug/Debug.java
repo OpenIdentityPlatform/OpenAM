@@ -25,6 +25,7 @@
  * $Id: Debug.java,v 1.6 2009/08/19 05:41:17 veiming Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  */
 
@@ -80,23 +81,17 @@ import com.sun.identity.shared.debug.impl.DebugProviderImpl;
  * 'com.sun.identity.util.debug.provider' may be used to plugin a non-default
  * implementation of the debug service where necessary.
  * </p>
- * <p/>
  * <blockquote>
- * <p/>
  * <pre>
  *  com.iplanet.services.debug.level
  *  com.iplanet.services.debug.directory
  *  com.sun.identity.util.debug.provider
  * </pre>
- * <p/>
  * </blockquote>
- * <p/>
  * If there is an error reading or loading the properties, Debug service will
  * redirect all debug information to <code>System.out</code>
- * <p/>
  * If these properties are changed, the server must be restarted for the changes
  * to take effect.
- * <p/>
  * <p>
  * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt application
  * performance when abused. Particularly, note that Java evaluates the arguments
@@ -298,7 +293,6 @@ public class Debug {
 
     /**
      * Checks if message debugging is enabled.
-     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -318,7 +312,6 @@ public class Debug {
 
     /**
      * Checks if warning debugging is enabled.
-     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -338,7 +331,6 @@ public class Debug {
 
     /**
      * Checks if error debugging is enabled.
-     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -375,7 +367,6 @@ public class Debug {
     /**
      * Prints messages only when the debug state is either Debug.MESSAGE or
      * Debug.ON.
-     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -402,20 +393,17 @@ public class Debug {
      * debugging is enabled, the message along with a time stamp and thread info
      * will be printed on <code>System.out</code>.
      * </p>
-     * <p/>
      * <p>
      * This method creates the debug file if does not exist; otherwise it starts
      * appending to the existing debug file. When invoked for the first time on
      * this object, the method writes a line delimiter of '*'s.
      * </p>
-     * <p/>
      * <p>
      * Note that the debug file will remain open until <code>destroy()</code>
      * is invoked. To conserve file resources, you should invoke
      * <code>destroy()</code> explicitly rather than wait for the garbage
      * collector to clean up.
      * </p>
-     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -472,7 +460,6 @@ public class Debug {
     /**
      * Prints warning messages only when debug level is greater than
      * Debug.ERROR.
-     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -498,7 +485,6 @@ public class Debug {
     /**
      * Prints warning messages only when debug level is greater than
      * Debug.ERROR.
-     * <p/>
      * <p>
      * <b>NOTE:</b> Debugging is an IO intensive operation and may hurt
      * application performance when abused. Particularly, note that Java
@@ -508,19 +494,16 @@ public class Debug {
      * <code>warning()</code> methods to avoid unnecessary argument evaluation
      * and to maximize application performance.
      * </p>
-     * <p/>
      * <p>
      * If the debug file is not accessible and debugging is enabled, the message
      * along with a time stamp and thread info will be printed on
      * <code>System.out</code>.
      * </p>
-     * <p/>
      * <p>
      * This method creates the debug file if does not exist; otherwise it starts
      * appending to the existing debug file. When invoked for the first time on
      * this object, the method writes a line delimiter of '*'s.
      * </p>
-     * <p/>
      * <p>
      * Note that the debug file will remain open until <code>destroy()</code>
      * is invoked. To conserve file resources, you should invoke
@@ -588,14 +571,11 @@ public class Debug {
      * the debug file is not accessible and debugging is enabled, the message
      * along with a time stamp and thread info will be printed on
      * <code>System.out</code>.
-     * </p>
-     * <p/>
      * <p>
      * This method creates the debug file if does not exist; otherwise it starts
      * appending to the existing debug file. When invoked for the first time on
      * this object, the method writes a line delimiter of '*'s.
      * </p>
-     * <p/>
      * <p>
      * Note that the debug file will remain open until <code>destroy()</code>
      * is invoked. To conserve file resources, you should invoke
@@ -695,7 +675,6 @@ public class Debug {
      * <code>destroy()</code> is invoked. To conserve file resources, you
      * should invoke <code>destroy()</code> explicitly rather than wait for
      * the garbage collector to clean up.
-     * <p/>
      * <p>
      * If this object is accessed after <code>destroy()</code> has been
      * invoked, the results are undefined.

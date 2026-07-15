@@ -25,6 +25,7 @@
  * $Id: AMSDKEventListener.java,v 1.6 2008/08/19 19:08:51 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.config;
@@ -66,7 +67,7 @@ public class AMSDKEventListener implements AMEventListener {
     /**
      * Implements <code>com.iplanet.am.sdk.AMEventListener</code>.
      *
-     * @param event
+     * @param event the identity repository event that was fired
      * @see com.iplanet.am.sdk.AMEventListener#objectChanged
      */
     public void objectChanged(AMEvent event) {

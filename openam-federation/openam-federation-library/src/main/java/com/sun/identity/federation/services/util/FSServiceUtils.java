@@ -25,7 +25,7 @@
  * $Id: FSServiceUtils.java,v 1.11 2008/11/10 22:56:59 veiming Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.util;
@@ -386,7 +386,8 @@ public class FSServiceUtils {
      * Outputs the DOM representation given as root as XML string.
      * @param root The <code>DOM</code> representation to be outputted
      * @return string representation of <code>DOM</code> node.
-     * @exception TransformerException, TransformerConfigurationException,
+     * @exception TransformerException if an error occurs
+     * @exception TransformerConfigurationException if an error occurs
      *  FileNotFoundException
      */
     public static String printDocument (Node root) throws TransformerException, TransformerConfigurationException,

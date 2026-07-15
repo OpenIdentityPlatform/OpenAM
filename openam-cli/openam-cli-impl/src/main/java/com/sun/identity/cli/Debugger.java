@@ -25,6 +25,7 @@
  * $Id: Debugger.java,v 1.2 2008/06/25 05:42:08 qcheng Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.cli;
@@ -190,7 +191,7 @@ public class Debugger {
      * Prints error messages only if debug state is greater than
      * Debug.OFF. If the debug file is not accessible and debugging is enabled,
      * the message along with a time stamp and thread info will be printed on
-     * <code>System.out</code>.</p>
+     * <code>System.out</code>.
      *
      * <p>This method creates the debug file if does not exist; otherwise it
      * starts appending to the existing debug file. When invoked for the first

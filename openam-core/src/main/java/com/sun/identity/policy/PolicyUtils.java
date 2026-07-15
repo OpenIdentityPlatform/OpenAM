@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.policy;
 
@@ -952,6 +953,7 @@ public class PolicyUtils {
      * to the following DTD. The input string may not be validated against the 
      * dtd for performance reasons.  
 
+     * <pre>{@code
          <!-- This DTD defines the Advices that could be included in
         ActionDecision nested in PolicyDecision. Agents would post this
         Advices to authentication service URL
@@ -982,7 +984,7 @@ public class PolicyUtils {
              client could use to influence the policy decision
         -->
         <!ELEMENT    Advices   ( AttributeValuePair+ ) >
-
+     * }</pre>
      *
      * @return the map of policy advices parsed from the passed in advicesXML
      *         If the passed in advicesXML is null, null would be returned
@@ -1125,7 +1127,7 @@ public class PolicyUtils {
     }
 
     /** 
-     * Returns deep copy of a <code>Map</Map>
+     * Returns deep copy of a <code>Map</code>
      * The passed in <code>Map</code> should have <code>String</code> 
      * object as keys and <code>Set</code> of <code>String</code> 
      * objects as values 

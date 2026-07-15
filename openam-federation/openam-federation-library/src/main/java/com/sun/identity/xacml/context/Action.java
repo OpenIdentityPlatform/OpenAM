@@ -24,6 +24,7 @@
  *
  * $Id: Action.java,v 1.2 2008/06/25 05:48:10 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -37,15 +38,14 @@ import java.util.List;
  * action requested in the <code>Request</code> context by listing a 
  * sequence of <code>Attribute</code> elements associated with the
  * action.
- * <p>
  * <pre>
- * &lt;xs:element name="Action" type="xacml-context:ActionType"/>
- * &lt;xs:complexType name="ActionType">
- *    &lt;xs:sequence>
+ * &lt;xs:element name="Action" type="xacml-context:ActionType"/&gt;
+ * &lt;xs:complexType name="ActionType"&gt;
+ *    &lt;xs:sequence&gt;
  *       &lt;xs:element ref="xacml-context:Attribute" minOccurs="0"
- *       maxOccurs="unbounded"/>
- *    &lt;xs:sequence>
- * &lt;xs:complexType>
+ *       maxOccurs="unbounded"/&gt;
+ *    &lt;xs:sequence&gt;
+ * &lt;xs:complexType&gt;
  * </pre>
  *
  */

@@ -25,6 +25,7 @@
  * $Id: SubjectAttributesCollector.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entitlement;
@@ -64,7 +65,7 @@ public interface SubjectAttributesCollector {
 
     /**
      * Returns the attribute values of the given user represented by
-     * <class>Subject</class> object.
+     * <code>Subject</code> object.
      *
      * @param subject identity of the user
      * @param attrNames requested attribute names
@@ -96,7 +97,7 @@ public interface SubjectAttributesCollector {
 
     /**
      * Returns the attribute values of the given user represented by
-     * <class>Subject</class> object.
+     * <code>Subject</code> object.
      *
      * @param subject identity of the user.
      * @param attrNames requested attribute names.

@@ -25,6 +25,7 @@
  * $Id: AMAuthConfigUtils.java,v 1.5 2008/06/25 05:41:51 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.authentication.config;
 
@@ -248,9 +249,9 @@ public class AMAuthConfigUtils {
      * the <code>configName</code> for <code>getAppConfigurationEntry()</code>.
      * function in <code>AMConfiguration</code>.
      *
-     * @param organizationDN  DN for the login organization. 
-     * @param clientType
-     * @return Corresponding authentication configuration name. 
+     * @param organizationDN  DN for the login organization.
+     * @param clientType the client type for which the configuration name is generated
+     * @return Corresponding authentication configuration name.
      */
     public static String getAuthConfigName(
         String organizationDN, 
@@ -521,12 +522,12 @@ public class AMAuthConfigUtils {
      * <p>
      * Here is a sample XML string for an authentication configuration
      * <pre>
-     * &lt;AttributeValuePair> <br>
-     * &lt;Value>com.sun.identity.authentication.modules.LDAP required 
-     *    debug=true&lt;/Value><br>
-     * &lt;Value>com.sun.identity.authentication.modules.RADIUS
-     *    optional&lt;/Value> 
-     * &lt;/AttributeValuePair>
+     * &lt;AttributeValuePair&gt; <br>
+     * &lt;Value&gt;com.sun.identity.authentication.modules.LDAP required
+     *    debug=true&lt;/Value&gt;<br>
+     * &lt;Value&gt;com.sun.identity.authentication.modules.RADIUS
+     *    optional&lt;/Value&gt;
+     * &lt;/AttributeValuePair&gt;
      * </pre>
      * This means user need to pass a required LDAP Login module, then an 
      * optional RADIUS Login module. 

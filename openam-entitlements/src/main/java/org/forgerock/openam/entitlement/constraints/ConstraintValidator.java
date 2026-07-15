@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.constraints;
 
@@ -19,7 +20,7 @@ import java.util.Set;
 
 /**
  * Current validates resources and actions against the constraints within a resource type.
- * <p/>
+ * <p>
  * This implementation is currently very specific but will become more general purpose, not only concerning itself
  * with resource constraints but also subject and environment constraints.
  *

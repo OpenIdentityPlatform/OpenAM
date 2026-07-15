@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.shared.security.crypto;
@@ -25,18 +26,14 @@ public enum KeyStoreType {
     /**
      * The Sun proprietary Java Key Store format. May not be supported on non-Oracle JREs.
      *
-     * @see <a
-     * href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#
-     * KeystoreImplementation">Keystore Implementation</a>
+     * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#KeystoreImplementation">Keystore Implementation</a>
      */
     JKS,
     /**
      * Alternative Sun proprietary Key Store format. Provides stronger cryptographic protections than {@link #JKS}
      * format. May not be supported on all platforms.
      *
-     * @see <a
-     * href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#
-     * KeystoreImplementation">Keystore Implementation</a>
+     * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/crypto/CryptoSpec.html#KeystoreImplementation">Keystore Implementation</a>
      */
     JCEKS,
     /**

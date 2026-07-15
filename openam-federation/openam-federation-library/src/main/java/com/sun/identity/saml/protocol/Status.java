@@ -24,6 +24,7 @@
  *
  * $Id: Status.java,v 1.2 2008/06/25 05:47:37 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -155,7 +156,7 @@ public class Status {
      * @param detail A DOM tree element that is the <code>StatusDetail</code>
      *        of the response. It could be null when there is no 
      *        <code>StatusDetail</code>.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public Status(StatusCode code, String message, Element detail) 
 						throws SAMLException {
@@ -179,7 +180,7 @@ public class Status {
     /**
      * Constructs a Status object from a <code>StatusCode</code>.
      * @param code <code>StatusCode</code>.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public Status(StatusCode code) throws SAMLException {
 	if (code == null) {

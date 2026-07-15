@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click;
@@ -32,22 +33,22 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
 /**
  * Provides the interface for Page controls. Controls are also referred to
  * as components or widgets.
- * <p/>
+ * <p>
  * When a Page request event is processed Controls may perform server side event
  * processing through their {@link #onProcess()} method. Controls are generally
- * rendered in a Page by calling their <tt>toString()</tt> method.
- * <p/>
+ * rendered in a Page by calling their <code>toString()</code> method.
+ * <p>
  * The Control execution sequence is illustrated below:
- * <p/>
+ * <p>
  * <img src="control-post-sequence-diagram.png"/>
  *
  * <h4>HTML HEAD Elements</h4>
  *
  * Control HTML HEAD elements can be included in the Page by overriding the
  * {@link #getHeadElements()} method.
- * <p/>
+ * <p>
  * Below is an example of a custom TextField control specifying that the
- * <tt>custom.js</tt> file should be included in the HTML HEADer:
+ * <code>custom.js</code> file should be included in the HTML HEADer:
  *
  * <pre class="prettyprint">
  * public class CustomField extends TextField {
@@ -66,31 +67,31 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  *     ..
  * } </pre>
  *
- * <a name="on-deploy"></a>
+ * <a id="on-deploy"></a>
  * <h4>Deploying Resources</h4>
  *
- * The Click framework uses the Velocity Tools <tt>WebappResourceLoader</tt> for loading templates.
- * This avoids issues associate with using the Velocity <tt>ClasspathResourceLoader</tt> and
- * <tt>FileResourceLoader</tt> on J2EE application servers.
+ * The Click framework uses the Velocity Tools <code>WebappResourceLoader</code> for loading templates.
+ * This avoids issues associate with using the Velocity <code>ClasspathResourceLoader</code> and
+ * <code>FileResourceLoader</code> on J2EE application servers.
  * To make preconfigured resources (templates, JavaScript, stylesheets, etc.)
  * available to web applications Click automatically deploys configured classpath
- * resources to the <tt class="blue">/click</tt> directory at startup
+ * resources to the <code class="blue">/click</code> directory at startup
  * (existing files will not be overwritten).
- * <p/>
+ * <p>
  * Click supports two ways of deploying pre-configured resources. The recommended
  * deployment strategy (which also the simplest) relies on packaging resources
- * into a special folder of the JAR, called <tt>'META-INF/resources'</tt>. At
+ * into a special folder of the JAR, called <code>'META-INF/resources'</code>. At
  * startup time Click will scan this folder for resources and deploy them to the
  * web application. This deployment strategy is the same approach taken by the
  * Servlet 3.0 specification. Please see the section
  * <a href="../../../../user-guide/html/ch05s03.html#deploying-custom-resources">Deploying Custom Resources</a>
  * for more details.
- * <p/>
+ * <p>
  * An alternative approach to deploying static resources on startup is provided
  * by the Control interface through the {@link #onDeploy(ServletContext)} method.
- * <p/>
- * Continuing our example, the <tt>CustomField</tt> control deploys its
- * <tt>custom.js</tt> file to the <tt>/click</tt> directory:
+ * <p>
+ * Continuing our example, the <code>CustomField</code> control deploys its
+ * <code>custom.js</code> file to the <code>/click</code> directory:
  *
  * <pre class="codeJava">
  * <span class="kw">public class</span> CustomField <span class="kw">extends</span> TextField {
@@ -102,8 +103,8 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  *     }
  * } </pre>
  *
- * Controls using the <tt>onDeploy()</tt> method must be registered in the
- * application <tt>WEB-INF/click.xml</tt> for them to be invoked.
+ * Controls using the <code>onDeploy()</code> method must be registered in the
+ * application <code>WEB-INF/click.xml</code> for them to be invoked.
  * For example:
  *
  * <pre class="codeConfig">
@@ -118,9 +119,9 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  * When the Click application starts up it will deploy any control elements
  * defined in the following files in sequential order:
  * <ul>
- *  <li><tt>/click-controls.xml</tt>
- *  <li><tt>/extras-controls.xml</tt>
- *  <li><tt>WEB-INF/click.xml</tt>
+ *  <li><code>/click-controls.xml</code>
+ *  <li><code>/extras-controls.xml</code>
+ *  <li><code>WEB-INF/click.xml</code>
  * </ul>
  *
  * <b>Please note</b> {@link org.apache.click.control.AbstractControl} provides
@@ -132,7 +133,7 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
 public interface Control extends Serializable {
 
     /**
-     * The global control messages bundle name: &nbsp; <tt>click-control</tt>.
+     * The global control messages bundle name: &nbsp; <code>click-control</code>.
      */
     public static final String CONTROL_MESSAGES = "click-control";
 
@@ -154,13 +155,13 @@ public interface Control extends Serializable {
      * {@link org.apache.click.element.JsScript JsScript},
      * {@link org.apache.click.element.CssImport CssImport} and
      * {@link org.apache.click.element.CssStyle CssStyle}.
-     * <p/>
+     * <p>
      * Controls can contribute their own list of HEAD elements by implementing
      * this method.
-     * <p/>
+     * <p>
      * The recommended approach when implementing this method is to use
-     * <tt>lazy loading</tt> to ensure the HEAD elements are only added
-     * <tt>once</tt> and when <tt>needed</tt>. For example:
+     * <code>lazy loading</code> to ensure the HEAD elements are only added
+     * <code>once</code> and when <code>needed</code>. For example:
      *
      * <pre class="prettyprint">
      * public MyControl extends AbstractControl {
@@ -202,13 +203,13 @@ public interface Control extends Serializable {
      * One can also add HEAD elements from event handler methods such as
      * {@link #onInit()}, {@link #onProcess()}, {@link #onRender()}
      * etc.
-     * <p/>
+     * <p>
      * The order in which JS and CSS files are included will be preserved in the
      * page.
-     * <p/>
+     * <p>
      * <b>Note:</b> this method must never return null. If no HEAD elements
      * are available this method must return an empty {@link java.util.List}.
-     * <p/>
+     * <p>
      * <b>Also note:</b> a common problem when overriding getHeadElements in
      * subclasses is forgetting to call <em>super.getHeadElements</em>. Consider
      * carefully whether you should call <em>super.getHeadElements</em> or not.
@@ -228,13 +229,13 @@ public interface Control extends Serializable {
 
     /**
      * Set the controls event listener.
-     * <p/>
+     * <p>
      * The method signature of the listener is:<ul>
      * <li>must have a valid Java method name</li>
      * <li>takes no arguments</li>
      * <li>returns a boolean value</li>
      * </ul>
-     * <p/>
+     * <p>
      * An example event listener method would be:
      *
      * <pre class="codeJava">
@@ -253,9 +254,9 @@ public interface Control extends Serializable {
     public void setListener(Object listener, String method);
 
     /**
-     * Return the localized messages <tt>Map</tt> of the Control.
+     * Return the localized messages <code>Map</code> of the Control.
      *
-     * @return the localized messages <tt>Map</tt> of the Control
+     * @return the localized messages <code>Map</code> of the Control
      */
     public Map<String, String> getMessages();
 
@@ -270,7 +271,7 @@ public interface Control extends Serializable {
     /**
      * Set the name of the Control. Each control name must be unique in the
      * containing Page model or the parent container.
-     * <p/>
+     * <p>
      * <b>Please note:</b> changing the name of a Control after it has been
      * added to its parent container is undefined. Thus it is  best <b>not</b>
      * to change the name of a Control once its been set.
@@ -298,7 +299,7 @@ public interface Control extends Serializable {
      * The on deploy event handler, which provides classes the
      * opportunity to deploy static resources when the Click application is
      * initialized.
-     * <p/>
+     * <p>
      * For example:
      * <pre class="codeJava">
      * <span class="kw">public void</span> onDeploy(ServletContext servletContext) <span class="kw">throws</span> IOException {
@@ -308,7 +309,7 @@ public interface Control extends Serializable {
      * <b>Please note:</b> a common problem when overriding onDeploy in
      * subclasses is forgetting to call <em>super.onDeploy</em>. Consider
      * carefully whether you should call <em>super.onDeploy</em> or not.
-     * <p/>
+     * <p>
      * Click also supports an alternative deployment strategy which relies on
      * packaging resource (stylesheets, JavaScript, images etc.) following a
      * specific convention. See the section
@@ -322,11 +323,11 @@ public interface Control extends Serializable {
     /**
      * The on initialize event handler. Each control will be initialized
      * before its {@link #onProcess()} method is called.
-     * <p/>
+     * <p>
      * {@link org.apache.click.control.Container} implementations should recursively
      * invoke the onInit method on each of their child controls ensuring that
      * all controls receive this event.
-     * <p/>
+     * <p>
      * <b>Please note:</b> a common problem when overriding onInit in
      * subclasses is forgetting to call <em>super.onInit()</em>. Consider
      * carefully whether you should call <em>super.onInit()</em> or not,
@@ -338,20 +339,20 @@ public interface Control extends Serializable {
     /**
      * The on process event handler. Each control will be processed when the
      * Page is requested.
-     * <p/>
+     * <p>
      * ClickServlet will process all Page controls in the order they were added
      * to the Page.
-     * <p/>
+     * <p>
      * {@link org.apache.click.control.Container} implementations should recursively
      * invoke the onProcess method on each of their child controls ensuring that
      * all controls receive this event. However when a control onProcess method
      * return false, no other controls onProcess method should be invoked.
-     * <p/>
+     * <p>
      * When a control is processed it should return true if the Page should
      * continue event processing, or false if no other controls should be
      * processed and the {@link org.apache.click.Page#onGet()} or {@link Page#onPost()} methods
      * should not be invoked.
-     * <p/>
+     * <p>
      * <b>Please note:</b> a common problem when overriding onProcess in
      * subclasses is forgetting to call <em>super.onProcess()</em>. Consider
      * carefully whether you should call <em>super.onProcess()</em> or not,
@@ -365,16 +366,16 @@ public interface Control extends Serializable {
     /**
      * The on render event handler. This event handler is invoked prior to the
      * control being rendered, and is useful for providing pre rendering logic.
-     * <p/>
+     * <p>
      * The on render method is typically used to populate tables performing some
      * database intensive operation. By putting the intensive operations in the
      * on render method they will not be performed if the user navigates away
      * to a different page.
-     * <p/>
+     * <p>
      * {@link org.apache.click.control.Container} implementations should recursively
      * invoke the onRender method on each of their child controls ensuring that
      * all controls receive this event.
-     * <p/>
+     * <p>
      * <b>Please note:</b> a common problem when overriding onRender in
      * subclasses is forgetting to call <em>super.onRender()</em>. Consider
      * carefully whether you should call <em>super.onRender()</em> or not,
@@ -386,14 +387,14 @@ public interface Control extends Serializable {
     /**
      * The on destroy request event handler. Control classes should use this
      * method to add any resource clean up code.
-     * <p/>
+     * <p>
      * This method is guaranteed to be called before the Page object reference
      * goes out of scope and is available for garbage collection.
-     * <p/>
+     * <p>
      * {@link org.apache.click.control.Container} implementations should recursively
      * invoke the onDestroy method on each of their child controls ensuring that
      * all controls receive this event.
-     * <p/>
+     * <p>
      * <b>Please note:</b> a common problem when overriding onDestroy in
      * subclasses is forgetting to call <em>super.onDestroy()</em>. Consider
      * carefully whether you should call <em>super.onDestroy()</em> or not,
@@ -406,7 +407,7 @@ public interface Control extends Serializable {
      * Render the control's HTML representation to the specified buffer. The
      * control's {@link java.lang.Object#toString()} method should delegate the
      * rendering to the render method for improved performance.
-     * <p/>
+     * <p>
      * An example implementation:
      * <pre class="prettyprint">
      * public class Border extends AbstractContainer {
@@ -436,11 +437,11 @@ public interface Control extends Serializable {
     public void render(HtmlStringBuffer buffer);
 
     /**
-     * Returns <tt>true</tt> if this control has any
-     * <tt>Behavior</tt>s registered, <tt>false</tt> otherwise.
+     * Returns <code>true</code> if this control has any
+     * <code>Behavior</code>s registered, <code>false</code> otherwise.
      *
-     * @return <tt>true</tt> if this control has any
-     * <tt>Behavior</tt>s registered, <tt>false</tt> otherwise
+     * @return <code>true</code> if this control has any
+     * <code>Behavior</code>s registered, <code>false</code> otherwise
      */
     public boolean hasBehaviors();
 
@@ -452,22 +453,22 @@ public interface Control extends Serializable {
     public Set<Behavior> getBehaviors();
 
     /**
-     * Returns <tt>true</tt> if this control is an Ajax target, <tt>false</tt>
+     * Returns <code>true</code> if this control is an Ajax target, <code>false</code>
      * otherwise.
-     * <p/>
+     * <p>
      * In order for a Control to be considered as an Ajax target it must be
      * registered through {@link org.apache.click.ControlRegistry#registerAjaxTarget(org.apache.click.Control) ControlRegistry.registerAjaxTarget}.
-     * <p/>
+     * <p>
      * When the Click handles an Ajax request it iterates the Controls
      * registered with the {@link org.apache.click.ControlRegistry ControlRegistry}
      * and checks if one of them is the Ajax target by calling
-     * {@link #isAjaxTarget(org.openidentityplatform.openam.click.Context) isAjaxTarget}. If <tt>isAjaxTarget</tt>
+     * {@link #isAjaxTarget(org.openidentityplatform.openam.click.Context) isAjaxTarget}. If <code>isAjaxTarget</code>
      * returns true, Click will process that Control's {@link #getBehaviors() behaviors}.
-     * <p/>
+     * <p>
      * <b>Please note:</b> there can only be one target control, so the first
      * Control that is identified as the Ajax target will be processed, the other
      * controls will be skipped.
-     * <p/>
+     * <p>
      * The most common way to check whether a Control is the Ajax target is to
      * check if its {@link #getId ID} is available as a request parameter:
      *
@@ -486,10 +487,10 @@ public interface Control extends Serializable {
      * ID attribute, as that would lead to duplicate IDs, which isn't allowed by
      * the HTML specification. Control implementations has to cater for how the
      * control will be targeted. In the case of ActionLink it might check against
-     * its <tt>id</tt>, and if that isn't available check against its <tt>name</tt>.
+     * its <code>id</code>, and if that isn't available check against its <code>name</code>.
      *
      * @param context the request context
-     * @return <tt>true</tt> if this control is an Ajax target, <tt>false</tt>
+     * @return <code>true</code> if this control is an Ajax target, <code>false</code>
      * otherwise
      */
     public boolean isAjaxTarget(Context context);

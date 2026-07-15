@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:16 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -12,27 +13,26 @@ package com.sun.identity.wsfederation.jaxb.entityconfig;
 /**
  * Java content class for FederationConfigType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/wsfederation/entity-config-schema.xsd line 42)
- * <p>
  * <pre>
- * &lt;complexType name="FederationConfigType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}Signature" minOccurs="0"/>
- *         &lt;element ref="{urn:sun:fm:wsfederation:1.0:federationconfig}Attribute" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;choice>
- *           &lt;choice maxOccurs="unbounded">
- *             &lt;element ref="{urn:sun:fm:wsfederation:1.0:federationconfig}IDPSSOConfig"/>
- *             &lt;element ref="{urn:sun:fm:wsfederation:1.0:federationconfig}SPSSOConfig"/>
- *           &lt;/choice>
- *         &lt;/choice>
- *       &lt;/sequence>
- *       &lt;attribute name="FederationID" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
- *       &lt;attribute name="ID" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *       &lt;attribute name="hosted" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="FederationConfigType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}Signature" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:sun:fm:wsfederation:1.0:federationconfig}Attribute" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;choice&gt;
+ *           &lt;choice maxOccurs="unbounded"&gt;
+ *             &lt;element ref="{urn:sun:fm:wsfederation:1.0:federationconfig}IDPSSOConfig"/&gt;
+ *             &lt;element ref="{urn:sun:fm:wsfederation:1.0:federationconfig}SPSSOConfig"/&gt;
+ *           &lt;/choice&gt;
+ *         &lt;/choice&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="FederationID" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *       &lt;attribute name="ID" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *       &lt;attribute name="hosted" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

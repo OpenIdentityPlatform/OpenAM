@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.soap.config.user;
@@ -312,7 +313,7 @@ public class SoapDeploymentConfig extends DeploymentConfig {
     }
 
     /**
-     * Used by the sts-publish serviceQName to marshal a SoapDeploymentConfig instance to the Map<String, Set<String>>
+     * Used by the sts-publish serviceQName to marshal a SoapDeploymentConfig instance to the {@code Map<String, Set<String>>}
      * representation required by the SMS.
      * @return a Map containing the state of the SoapDeploymentConfig instance in the format consumed by the SMS.
      */
@@ -329,7 +330,7 @@ public class SoapDeploymentConfig extends DeploymentConfig {
     }
 
     /**
-     * Used by the sts-publish serviceQName to marshal the Map<String, Set<String>> returned by the SMS to a SoapDeploymentConfig
+     * Used by the sts-publish serviceQName to marshal the {@code Map<String, Set<String>>} returned by the SMS to a SoapDeploymentConfig
      * instance. Used as part of generating the json representation of published soap-sts instances returned by the
      * sts-publish serviceQName.
      * @return A SoapDeploymentConfig instance corresponding to Map state.

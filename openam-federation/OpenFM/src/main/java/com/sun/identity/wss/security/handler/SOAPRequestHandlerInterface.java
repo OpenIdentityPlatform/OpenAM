@@ -24,7 +24,7 @@
  *
  * $Id: SOAPRequestHandlerInterface.java,v 1.2 2008/06/25 05:50:11 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.wss.security.handler;
@@ -66,7 +66,8 @@ public interface SOAPRequestHandlerInterface {
      *        to store Principals and credentials validated in the request.
      *
      * @param sharedState that may be used to store any shared state 
-     *        information between <code>validateRequest and <secureResponse>
+     *        information between <code>validateRequest</code> and
+     *        <code>secureResponse</code>
      *
      * @param request the <code>HttpServletRequest</code> associated with 
      *        this SOAP Message request.
@@ -105,7 +106,7 @@ public interface SOAPRequestHandlerInterface {
      *
      * @param soapMessage the <code>SOAPMessage</code> that needs to be secured.
      *
-     * @param subject  the <code>Subject<code> of the authenticating entity.
+     * @param subject  the <code>Subject</code> of the authenticating entity.
      *
      * @param sharedState Any shared state information that may be used between
      *        the <code>secureRequest</code> and <code>validateResponse</code>. 

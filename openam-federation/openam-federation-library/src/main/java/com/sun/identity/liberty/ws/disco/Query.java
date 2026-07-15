@@ -24,6 +24,7 @@
  *
  * $Id: Query.java,v 1.2 2008/06/25 05:47:10 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -41,29 +42,29 @@ import com.sun.identity.liberty.ws.disco.common.DiscoUtils;
  * The following schema fragment specifies the expected content within the
  * <code>Query</code> object.
  * <pre>
- * &lt;xs:element name="Query" type="Query"/> 
- * &lt;complexType name="Query">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;group ref="{urn:liberty:disco:2003-08}ResourceIDGroup"/>
- *         &lt;element name="RequestedServiceType" maxOccurs="unbounded" minOccurs="0">
- *           &lt;complexType>
- *             &lt;complexContent>
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;sequence>
- *                   &lt;element ref="{urn:liberty:disco:2003-08}ServiceType"/>
- *                   &lt;element ref="{urn:liberty:disco:2003-08}Options" minOccurs="0"/>
- *                 &lt;/sequence>
- *               &lt;/restriction>
- *             &lt;/complexContent>
- *           &lt;/complexType>
- *         &lt;/element>
- *       &lt;/sequence>
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;xs:element name="Query" type="Query"/&gt; 
+ * &lt;complexType name="Query"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;group ref="{urn:liberty:disco:2003-08}ResourceIDGroup"/&gt;
+ *         &lt;element name="RequestedServiceType" maxOccurs="unbounded" minOccurs="0"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;complexContent&gt;
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                 &lt;sequence&gt;
+ *                   &lt;element ref="{urn:liberty:disco:2003-08}ServiceType"/&gt;
+ *                   &lt;element ref="{urn:liberty:disco:2003-08}Options" minOccurs="0"/&gt;
+ *                 &lt;/sequence&gt;
+ *               &lt;/restriction&gt;
+ *             &lt;/complexContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

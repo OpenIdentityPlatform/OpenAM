@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 2011-2015 ForgeRock AS. All rights reserved.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -50,7 +51,7 @@ public interface AttributeMapper<T> {
      * @param attributeMapConfiguration The map of keys in the source to keys in the result.
      * @param source The source of values.
      * @return A map of attribute keys to values found.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the attributes cannot be mapped from the source
      */
     Map<String, Set<String>> getAttributes(Map<String, String> attributeMapConfiguration, T source)
             throws AuthLoginException;

@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -58,7 +59,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -77,7 +78,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -96,7 +97,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -108,7 +109,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActionNamespaceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.metadataextquery.ActionNamespaceElement createActionNamespaceElement()
@@ -120,7 +121,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActionNamespaceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.metadataextquery.ActionNamespaceElement createActionNamespaceElement(java.lang.String value)
@@ -132,7 +133,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthnQueryDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.metadataextquery.AuthnQueryDescriptorType createAuthnQueryDescriptorType()
@@ -144,7 +145,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeQueryDescriptorElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.metadataextquery.AttributeQueryDescriptorElement createAttributeQueryDescriptorElement()
@@ -156,7 +157,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.metadataextquery.QueryDescriptorType createQueryDescriptorType()
@@ -168,7 +169,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeQueryDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.metadataextquery.AttributeQueryDescriptorType createAttributeQueryDescriptorType()
@@ -180,7 +181,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthzDecisionQueryDescriptorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.saml2.jaxb.metadataextquery.AuthzDecisionQueryDescriptorType createAuthzDecisionQueryDescriptorType()

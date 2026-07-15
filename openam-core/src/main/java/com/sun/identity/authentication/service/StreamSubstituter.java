@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -56,13 +57,13 @@ public class StreamSubstituter {
      * Define a string to substitute.
      * In the content being filtered, all occurrences of ...
      * <pre>
-     *     &lt;subst data="key">otherwise&lt;/subst>
+     *     &lt;subst data="key"&gt;otherwise&lt;/subst&gt;
      * </pre>
      * will be replaced with the value defined for "key".
      * If the key has not been defined,
      * then "otherwise" will be copied to the output stream.
      * More than one <code>date="key"</code> may be specified in the same
-     * &lt;subst> tag in which case they are substituted in order, and
+     * &lt;subst&gt; tag in which case they are substituted in order, and
      * "otherwise" is only copied if none of the keys were found.
      * @param key file name used as key for cache
      * @param val string value for representation of the file 

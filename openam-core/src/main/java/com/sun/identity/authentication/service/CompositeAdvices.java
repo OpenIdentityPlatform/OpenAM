@@ -25,6 +25,7 @@
  * $Id: CompositeAdvices.java,v 1.6 2008/08/19 19:08:53 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.service;
@@ -178,7 +179,7 @@ public class CompositeAdvices {
      * Returns array of choice callback.
      * Get module matching the level and generate choice callback.
      * @return array of choice callback.
-     * @throws AuthException
+     * @throws AuthException if the choice callback cannot be created
      */
     public Callback[] createChoiceCallback() throws AuthException {
         debug.message("In createChoiceCallback");

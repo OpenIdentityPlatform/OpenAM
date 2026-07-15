@@ -24,6 +24,7 @@
  *
  * $Id: XACMLAuthzDecisionStatement.java,v 1.4 2008/06/25 05:48:15 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.saml2;
@@ -34,40 +35,38 @@ import com.sun.identity.xacml.context.Response;
 import com.sun.identity.saml2.assertion.Statement;
 
 /**
- * <code>XACMLAuthzDecisionStatement<code> is an extension of
+ * <code>XACMLAuthzDecisionStatement</code> is an extension of
  * <code>samlp:StatementAbstractType</code> that is carried in a 
  * SAML Assertion to convey <code>xacml-context:Response</code>
  *
  * Schema:
- * <p>
  * <pre>
  * &lt;xs:element name="XACMLAuthzDecisionStatement"
- *          type="xacml-saml:XACMLAuthzDecisionStatementType"/>
- * &lt;xs:complexType name="XACMLAuthzDecisionStatementType">
- *   &lt;xs:complexContent>
- *     &lt;xs:extension base="saml:StatementAbstractType">
- *      &lt;xs:sequence>
- *        &lt;xs:element ref="xacml-context:Response"/>
- *        &lt;xs:element ref="xacml-context:Request"  minOccurs="0"/>
- *      &lt;xs:sequence>
- *    &lt;xs:extension>
- *  &lt;xs:complexContent>
- * &lt;xs:complexType>
- * <pre>
- * </p>
+ *          type="xacml-saml:XACMLAuthzDecisionStatementType"/&gt;
+ * &lt;xs:complexType name="XACMLAuthzDecisionStatementType"&gt;
+ *   &lt;xs:complexContent&gt;
+ *     &lt;xs:extension base="saml:StatementAbstractType"&gt;
+ *      &lt;xs:sequence&gt;
+ *        &lt;xs:element ref="xacml-context:Response"/&gt;
+ *        &lt;xs:element ref="xacml-context:Request"  minOccurs="0"/&gt;
+ *      &lt;xs:sequence&gt;
+ *    &lt;xs:extension&gt;
+ *  &lt;xs:complexContent&gt;
+ * &lt;xs:complexType&gt;
+ * &lt;pre&gt;
+ * &lt;/p&gt;
  *
  * Schema for Base:
  * Schema for the base type is
- * <p>
- * <pre>
- * &lt;complexType name="StatementAbstractType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;p&gt;
+ * &lt;pre&gt;
+ * &lt;complexType name="StatementAbstractType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
- * </p>
  *
  *
  *

@@ -25,6 +25,7 @@
  * $Id: XACMLRequestProcessor.java,v 1.4 2009/09/22 23:00:34 madan_ranganath Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.client;
@@ -71,7 +72,7 @@ public class XACMLRequestProcessor {
     
     /**
      * Returns an instance of <code>XACMLRequestProcessor</code>
-     * @exception if can not return an instance of 
+     * @exception XACMLException if can not return an instance of
      *             <code>XACMLRequestProcessor</code>
      */
     public static XACMLRequestProcessor getInstance() throws XACMLException {

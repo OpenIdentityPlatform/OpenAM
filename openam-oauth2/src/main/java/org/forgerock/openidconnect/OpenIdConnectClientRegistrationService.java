@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect;
@@ -535,7 +535,7 @@ public class OpenIdConnectClientRegistrationService {
      * @return JsonValue representation of the client registration.
      * @throws InvalidRequestException If either the request does not contain the client's id or the client fails to be
      *          authenticated.
-     * @throws InvalidClientMetadata
+     * @throws InvalidClientMetadata if the client's registration metadata is invalid.
      */
     public JsonValue getRegistration(String clientId, String accessToken, OAuth2Request request)
             throws InvalidRequestException, InvalidClientMetadata, InvalidTokenException {

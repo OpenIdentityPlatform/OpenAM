@@ -24,6 +24,7 @@
  *
  * $Id: NameIDInfoKey.java,v 1.2 2008/06/25 05:47:45 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -38,14 +39,15 @@ import java.util.StringTokenizer;
  * of ldap datastore, an equality index need to be created for this 
  * attribute for better search performance.
  *       Value format for this attribute:
- *         <hosted_entity_id>|<remote_entity_id>|<idp_nameid>
+ * <pre>
+ *         &lt;hosted_entity_id&gt;|&lt;remote_entity_id&gt;|&lt;idp_nameid&gt;
  *       where:
- *       <hosted_entity_id>    : entity id for this hosted entity
- *       <remote_entity_id>    : entity id for the remote entity
- *       <idp_nameid>          : name identifier for the IDP
+ *       &lt;hosted_entity_id&gt;    : entity id for this hosted entity
+ *       &lt;remote_entity_id&gt;    : entity id for the remote entity
+ *       &lt;idp_nameid&gt;          : name identifier for the IDP
  *       for example:
  *         http://www.sp1.com|http://www.idp1.com|vPQyHXLnSWLAVh2BoI3gdUrhanC1
- * 
+ * </pre>
  */
 public class NameIDInfoKey {
 

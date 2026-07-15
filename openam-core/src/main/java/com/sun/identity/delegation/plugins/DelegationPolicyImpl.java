@@ -394,11 +394,6 @@ public class DelegationPolicyImpl implements DelegationInterface, ServiceListene
      * @param types a set of subject types. e.g. ROLE, GROUP.
      * @param pattern a filter used to select the subjects.
      *
-     * @return a set of subjects associated with the realm.
-     *
-     * @throws SSOException invalid or expired single-sign-on token
-     * @throws DelegationException for any abnormal condition
-     *
      * @return <code>Set</code> of universal Ids of the subjects associated
      *         with the realm.
      *

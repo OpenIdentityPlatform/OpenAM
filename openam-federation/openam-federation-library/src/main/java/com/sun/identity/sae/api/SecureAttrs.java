@@ -25,6 +25,7 @@
  * $Id: SecureAttrs.java,v 1.12 2009/03/31 17:18:10 exu Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.sae.api;
@@ -47,7 +48,7 @@ import java.security.cert.X509Certificate;
  * Exchange" (SAE) feature. The class uses off the shelf digital
  * signing and encryption algorithms to generate tamperproof/nonrepudiable
  * strings representing attribute maps and to verify these strings.
- * Typical SAE usage is to securely send attributes (authentication &
+ * Typical SAE usage is to securely send attributes (authentication &amp;
  * use profile data) from an asserting application (eg running on an IDP) to 
  * a relying application (eg running on an SP). In this scenario the
  * asserting party uses the "signing" interfaces to generate secure
@@ -293,7 +294,7 @@ public class SecureAttrs
 
     /**
      * Returns an instance to perform crypto operations.
-     *  @param name 
+     *  @param name the name of the <code>SecureAttrs</code> instance to return
      *  @return <code>SecureAttrs</code> instance.
      * 
      */
@@ -307,7 +308,7 @@ public class SecureAttrs
      * Use <code>SecureAttrs.getIstance(name)</code> to obtain the instance.
      * @param name Name of the <code>SecureAttrs</code> instance.
      * @param type Cryptographic key type. Possible values are
-     *         <code>SecureAttrs.SAE_CRYPTO_TYPE_SYM<code>, and
+     *         <code>SecureAttrs.SAE_CRYPTO_TYPE_SYM</code>, and
      *         <code>SecureAttrs.SAE_CRYPTO_TYPE_ASYM</code>
      * @param properties : please see SAE_CONFIG_* constants for configurable 
      *                     values.
@@ -572,12 +573,12 @@ public class SecureAttrs
 
     /** 
      * This interface allows to set the private to be used for signing
-     * as an alternative to passing down <code>SAE_CONFIG_PRIVATE_KEY_ALIAS</a>
+     * as an alternative to passing down <code>SAE_CONFIG_PRIVATE_KEY_ALIAS</code>
      * via <code>init</code>. Use this interface if you do not want
      * SecureAttr to obtain the signing key from a configured keystore.
      * To use this key during signing, specify secret as null.
-     * @param privatekey
-     * 
+     * @param privatekey the private key to be used for signing
+     *
      */
     public void setPrivateKey(PrivateKey privatekey)
     {
@@ -588,7 +589,7 @@ public class SecureAttrs
      * This interface allows to register a public key to be used for signature
      * verification. Use this interface if you do not want SecureAttrs to
      * obtain public keys from a configured keystore.
-     * @param pubkeyalias
+     * @param pubkeyalias the alias under which to register the public key
      * @param x509certificate instance.
      * 
      */

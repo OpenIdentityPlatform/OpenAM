@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -13,19 +14,18 @@ package com.sun.identity.liberty.ws.common.jaxb.secext;
  * This type represents a username token per Section 4.1
  * Java content class for UsernameTokenType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/secext.xsd line 66)
- * <p>
  * <pre>
- * &lt;complexType name="UsernameTokenType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="Username" type="{http://schemas.xmlsoap.org/ws/2003/06/secext}AttributedString"/>
- *         &lt;any/>
- *       &lt;/sequence>
- *       &lt;attribute ref="{http://schemas.xmlsoap.org/ws/2003/06/utility}Id"/>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="UsernameTokenType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="Username" type="{http://schemas.xmlsoap.org/ws/2003/06/secext}AttributedString"/&gt;
+ *         &lt;any/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute ref="{http://schemas.xmlsoap.org/ws/2003/06/utility}Id"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

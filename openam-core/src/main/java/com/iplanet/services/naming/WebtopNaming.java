@@ -25,6 +25,7 @@
  * $Id: WebtopNaming.java,v 1.31 2009/06/20 06:17:02 bigfatrat Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.iplanet.services.naming;
 
@@ -378,7 +379,7 @@ public class WebtopNaming {
      *
      * @return the site URL
      *
-     * @throws URLNotFoundException
+     * @throws URLNotFoundException if the server URL cannot be resolved for the session
      */
     public static String mapSiteToServer(SessionID sid) throws URLNotFoundException {
         URL mapSessionServiceUrl = mapSiteToServer(sid.getSessionServerProtocol(), sid.getSessionServer(),

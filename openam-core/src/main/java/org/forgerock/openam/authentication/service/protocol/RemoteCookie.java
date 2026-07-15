@@ -21,7 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.service.protocol;
@@ -255,7 +255,7 @@ public class RemoteCookie implements Serializable {
      * Set the version of the cookie, updating the underlying representation if
      * present.
      * 
-     * @param version
+     * @param version the cookie version to set
      */
     public void setVersion(int version) {
         if (cookie != null) 

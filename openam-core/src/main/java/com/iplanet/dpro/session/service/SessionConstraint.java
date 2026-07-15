@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.dpro.session.service;
@@ -117,7 +118,7 @@ public class SessionConstraint {
      * Check if the session quota for a given user has been exhausted and
      * perform necessary actions in such as case.
      *
-     * @param internalSession
+     * @param internalSession the internal session whose owner's session quota is checked
      * @return true if the session activation request should be rejected, false otherwise.
      */
     protected boolean checkQuotaAndPerformAction(InternalSession internalSession) {

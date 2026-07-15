@@ -25,7 +25,7 @@
  * $Id: FSUtils.java,v 1.10 2009/11/20 23:52:57 ww203982 Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.common;
@@ -240,7 +240,7 @@ public class FSUtils {
      *  in  the same web container as current opensso web
      * apps serving the request.
      * @param request HttpServletRequest
-     * @param url
+     * @param url the URL to test against the current web container
      * @return true if request and url are in the same web container else false
      */
     public static boolean isSameContainer(
@@ -743,7 +743,7 @@ public class FSUtils {
      *
      * @param exception
      *         Thrown and caught exception
-     * @throws SAML2Exception
+     * @throws SAML2Exception if a SAML2 error occurs
      *         Single general exception that is thrown on
      */
     private static void handleForwardException(Exception exception) throws SAML2Exception {

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2018-2025 3A Systems, LLC.
+ * Portions copyright 2018-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
@@ -76,7 +76,7 @@ public class PersistentCookieAuthModulePostAuthenticationPlugin extends JaspiAut
      * @param response {@inheritDoc}
      * @param ssoToken {@inheritDoc}
      * @return {@inheritDoc}
-     * @throws AuthenticationException {@inheritDoc}
+     * @throws AuthenticationException if the configuration cannot be generated from the SSO token
      */
     @Override
     protected Map<String, Object> generateConfig(HttpServletRequest request, HttpServletResponse response,
@@ -118,7 +118,7 @@ public class PersistentCookieAuthModulePostAuthenticationPlugin extends JaspiAut
      * @param request {@inheritDoc}
      * @param response {@inheritDoc}
      * @param ssoToken {@inheritDoc}
-     * @throws AuthenticationException {@inheritDoc}
+     * @throws AuthenticationException if an error occurs while setting the persistent cookie information
      */
     @SuppressWarnings("unchecked")
 	@Override

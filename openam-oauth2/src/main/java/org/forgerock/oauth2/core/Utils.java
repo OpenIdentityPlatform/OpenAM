@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -71,7 +72,7 @@ public final class Utils {
 
     /**
      * Splits the specified String of response types into a {@code Set} of response types.
-     * <br/>
+     * <br>
      * If the String of response types is {@code null} an empty {@code Set} is returned.
      *
      * @param responseType The String of response types.
@@ -83,7 +84,7 @@ public final class Utils {
 
     /**
      * Splits the specified String of scopes into a {@code Set} of scopes.
-     * <br/>
+     * <br>
      * If the String of scopes is {@code null} an empty {@code Set} is returned.
      *
      * @param scope The String of scopes.
@@ -95,7 +96,7 @@ public final class Utils {
 
     /**
      * Joins the specified {@code Set} of scopes into a space delimited String.
-     * <br/>
+     * <br>
      * If the specified {@code Set} of scopes is null, an empty String is returned.
      *
      * @param scope The scopes to join.

@@ -22,13 +22,14 @@
  ~ your own identifying information:
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.xacml.v3.model;
 
 /**
  * Various Content Types which are dealt with using XACML 3 via HTTP/REST.
- * <p/>
- * Extending MediaTypes, @see javax.ws.rs.core.MediaType.
+ * <p>
+ * Extending MediaTypes, see {@code javax.ws.rs.core.MediaType}.
  *
  * @author jeff.schenk@forgerock.com
  */
@@ -60,8 +61,8 @@ public enum ContentType {
     /**
      * Normalize the Content Received from the actual HTTP Request.
      *
-     * @param contentTypeStringValue
-     * @return
+     * @param contentTypeStringValue the raw Content-Type value received from the HTTP request
+     * @return the matching {@link ContentType}, or {@code null} if the value is {@code null} or empty
      */
     public static ContentType getNormalizedContentType(final String contentTypeStringValue) {
         if ((contentTypeStringValue == null) || (contentTypeStringValue.isEmpty())) {

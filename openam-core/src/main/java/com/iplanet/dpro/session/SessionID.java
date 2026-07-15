@@ -25,7 +25,7 @@
  * $Id: SessionID.java,v 1.10 2009/10/02 23:45:42 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session;
@@ -445,7 +445,7 @@ public class SessionID implements Serializable {
     /**
      * Returns the if the cookies are supported.
      *
-     * @return Boolean object value which is Boolean.<code>TRUE<code> if
+     * @return Boolean object value which is Boolean.<code>TRUE</code> if
      *         supported <code>FALSE</code> otherwise
      */
     public Boolean getCookieMode() {
@@ -523,7 +523,7 @@ public class SessionID implements Serializable {
      * @param encryptedID encrypted ID.
      * @param prototype session ID to copy extensions and tail from
      * @return encoded session id
-     * @throws SessionException
+     * @throws SessionException if the prototype session id cannot be parsed
      */
     public static String makeRelatedSessionID(String encryptedID,
             SessionID prototype) throws SessionException {
@@ -700,7 +700,7 @@ public class SessionID implements Serializable {
      * @param domain session domain
      *
      * @return newly generated session id
-     * @throws SessionException
+     * @throws SessionException if the session id cannot be generated
      */
     public static SessionID generateSessionID(SessionServerConfig serverConfig, String domain) throws SessionException {
 

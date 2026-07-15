@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.authentication.modules.jdbc;
@@ -116,9 +117,9 @@ public class JDBC extends AMLoginModule {
     /**
      * Initializes parameters.
      *
-     * @param subject
-     * @param sharedState
-     * @param options
+     * @param subject the subject to be authenticated
+     * @param sharedState the state shared between authentication modules
+     * @param options the configuration options for this module
      */
     public void init(Subject subject, Map sharedState, Map options) {
         debug.message("in initialize...");

@@ -22,12 +22,13 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.xacml.v3.resources;
 
 /**
  * XACML Resource
- * <p/>
+ * <p>
  * Provides Top Level Object for XACML v3 Resources
  * which represent end components for the overall XACML Framework.
  *

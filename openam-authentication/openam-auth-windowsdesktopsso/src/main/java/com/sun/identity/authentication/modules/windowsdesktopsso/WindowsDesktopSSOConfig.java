@@ -24,6 +24,7 @@
  *
  * $Id: WindowsDesktopSSOConfig.java,v 1.3 2009/04/07 22:55:13 beomsuk Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 
@@ -54,7 +55,7 @@ public class WindowsDesktopSSOConfig extends Configuration {
     /**
      * Constructor
      *
-     * @param config
+     * @param config the configuration this instance delegates to
      */
     public WindowsDesktopSSOConfig(Configuration config) {
         this.config = config;
@@ -63,7 +64,7 @@ public class WindowsDesktopSSOConfig extends Configuration {
     /**
      * Sets principal name.
      *
-     * @param principalName
+     * @param principalName the service principal name to set
      */
     public void setPrincipalName(String principalName) {
         servicePrincipal = principalName;
@@ -72,7 +73,7 @@ public class WindowsDesktopSSOConfig extends Configuration {
     /**
      * Sets key tab file.
      *
-     * @param keytabFile
+     * @param keytabFile the keytab file path to set
      */
     public void setKeyTab(String keytabFile) {
         keytab = keytabFile;
@@ -89,7 +90,7 @@ public class WindowsDesktopSSOConfig extends Configuration {
      * Returns AppConfigurationEntry array for the application <I>appName</I>
      * using Kerberos module.
      *
-     * @param appName
+     * @param appName the application name to build the configuration entry for
      * @return Array of AppConfigurationEntry
      */
     public AppConfigurationEntry[] getAppConfigurationEntry(String appName){

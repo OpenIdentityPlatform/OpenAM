@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click;
@@ -23,13 +24,13 @@ import java.io.Serializable;
 
 /**
  * Provides a listener interface for receiving control action events.
- * The usage model is similar to the <tt>java.awt.event.ActionListener</tt>
+ * The usage model is similar to the <code>java.awt.event.ActionListener</code>
  * interface.
- * <p/>
+ * <p>
  * The class that is interested in processing an action event
  * implements this interface, and the object created with that class is
- * registered with a control, using the control's <tt>setActionListener</tt>
- * method. When the action event occurs, that object's <tt>onAction</tt> method
+ * registered with a control, using the control's <code>setActionListener</code>
+ * method. When the action event occurs, that object's <code>onAction</code> method
  * is invoked.
  *
  * <h3>Listener Example</h3>

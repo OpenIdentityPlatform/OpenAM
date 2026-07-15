@@ -24,6 +24,7 @@
  *
  * $Id: ResourceContent.java,v 1.2 2008/06/25 05:48:11 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -37,15 +38,14 @@ import java.util.List;
  * resource to which access is requested by listing a 
  * sequence of <code>Attribute</code> elements associated with the
  * resource. it may include <code>ResourceContent</code>
- * <p>
  * <pre>
- * &lt;xs:complexType name="ResourceContentType" mixed="true">
- *   &lt;xs:sequence>
+ * &lt;xs:complexType name="ResourceContentType" mixed="true"&gt;
+ *   &lt;xs:sequence&gt;
  *      &lt;xs:any namespace="##any" processContents="lax" minOccurs="0" 
- *         maxOccurs="unbounded"/>
- *   &lt;xs:sequence>
- *   &lt;xs:anyAttribute namespace="##any" processContents="lax"/>
- * &lt;xs:complexType>
+ *         maxOccurs="unbounded"/&gt;
+ *   &lt;xs:sequence&gt;
+ *   &lt;xs:anyAttribute namespace="##any" processContents="lax"/&gt;
+ * &lt;xs:complexType&gt;
  * </pre>
  *
  */

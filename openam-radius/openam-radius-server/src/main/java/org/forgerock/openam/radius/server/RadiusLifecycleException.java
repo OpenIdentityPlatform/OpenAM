@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 /**
  *
@@ -19,7 +20,7 @@
 package org.forgerock.openam.radius.server;
 
 /**
- * Exception to be thrown for Radius startup, shutdown & re-configuration errors.
+ * Exception to be thrown for Radius startup, shutdown &amp; re-configuration errors.
  */
 public class RadiusLifecycleException extends Exception {
     /**

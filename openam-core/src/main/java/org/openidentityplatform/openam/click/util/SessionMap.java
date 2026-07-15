@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click.util;
@@ -34,7 +35,7 @@ import jakarta.servlet.http.HttpSession;
 /**
  * Provides a Map adaptor for HttpSession objects. A SessionMap instance is
  * available in each Velocity page using the name "<span class="blue">session</span>".
- * <p/>
+ * <p>
  * For example suppose we have a User object in the session with the
  * attribute name "user" when a user is logged on.  We can display the users
  * name in the page when the are logged onto the system.
@@ -48,7 +49,7 @@ import jakarta.servlet.http.HttpSession;
  *
  * The ClickServlet adds a SessionMap instance to the Velocity Context before
  * it is merged with the page template.
- * <p/>
+ * <p>
  * The SessionMap supports {@link FlashAttribute} which when accessed via
  * {@link #get(Object)} are removed from the session.
  */
@@ -58,7 +59,7 @@ public class SessionMap implements Map<String, Object> {
     protected HttpSession session;
 
     /**
-     * Create a <tt>HttpSession</tt> <tt>Map</tt> adaptor.
+     * Create a <code>HttpSession</code> <code>Map</code> adaptor.
      *
      * @param value the http session
      */
@@ -103,7 +104,7 @@ public class SessionMap implements Map<String, Object> {
 
     /**
      * This method is not supported and will throw
-     * <tt>UnsupportedOperationException</tt> if invoked.
+     * <code>UnsupportedOperationException</code> if invoked.
      *
      * @see java.util.Map#containsValue(Object)
      */

@@ -19,6 +19,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.examples;
@@ -88,9 +89,9 @@ public class SampleAuth extends AMLoginModule {
     /**
      * This method stores service attributes and localized properties for later
      * use.
-     * @param subject
-     * @param sharedState
-     * @param options
+     * @param subject the subject being authenticated
+     * @param sharedState the state shared between authentication modules
+     * @param options the configuration options for this authentication module
      */
     @Override
     public void init(Subject subject, Map sharedState, Map options) {

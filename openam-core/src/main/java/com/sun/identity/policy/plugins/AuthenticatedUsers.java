@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -46,7 +47,7 @@ import com.sun.identity.policy.Syntax;
 /**
  * This subject applies to all users with valid <code>SSOToken</code>.
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers} instead.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.subject.AuthenticatedUsers} instead.
  */
 @Deprecated
 public class AuthenticatedUsers implements Subject {

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.iplanet.services.naming;
 
@@ -35,7 +36,7 @@ import java.util.Map;
  * these two fields are used.
  *
  * This class balances two competing requirements. The need to be accurate with
- * the Server>Site mapping, and the need to be performant as this code will
+ * the Server&gt;Site mapping, and the need to be performant as this code will
  * be triggered on every invocation of {@link SessionID}.
  */
 public class SessionIDCorrector {
@@ -146,7 +147,7 @@ public class SessionIDCorrector {
      * SessionID S1/SI gives us the following logic:
      *
      * S1 not set, SI set = Primary Server ID
-     * S1 set, SI set = Primary Server ID & Site ID
+     * S1 set, SI set = Primary Server ID &amp; Site ID
      * S1 set, SI not set = Primary Server ID (never used)
      *
      * When working with S1/SI IDs we need to ensure we are working with

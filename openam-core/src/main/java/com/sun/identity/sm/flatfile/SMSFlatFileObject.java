@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -62,7 +63,7 @@ import com.sun.identity.common.CaseInsensitiveTreeSet;
  * a configuration object is hierarchy levels separated by a comma, 
  * for example "ou=serviceName,ou=services,dc=sun,dc=com". 
  * This object would live in the directory 
- * <config-dir>/dc=com/dc=sun/ou=services/ou=serviceName
+ * {@code <config-dir>}/dc=com/dc=sun/ou=services/ou=serviceName
  * The directory has a file with the object's attributes in 
  * java.util.Properties format. The file name is Attributes.properties.
  * Attributes with multi-values are seperated by a comma. 
@@ -792,7 +793,7 @@ public class SMSFlatFileObject extends SMSFlatFileObjectBase {
      * @param token Ignored argument. Access check is assumed to have 
      *        occurred before reaching this method. 
      * @param objName Name of the configuration object to check.
-     * @return <code>true>/code> if the configuration object exists.
+     * @return <code>true</code> if the configuration object exists.
      * @throws IllegalArgumentException if objName is null or empty.
      */
     public boolean entryExists(SSOToken token, String objName) {

@@ -25,6 +25,7 @@
  * $Id: DCTreeServicesImpl.java,v 1.5 2009/01/28 05:34:48 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk.ldap;
@@ -398,6 +399,7 @@ public class DCTreeServicesImpl extends DCTreeServicesHelper implements
      * @return
      *            the organization dn
      * @throws AMException
+     *             if an error occurs while resolving the organization DN
      */
     public String getOrganizationDN(SSOToken token, String domainName)
             throws AMException {

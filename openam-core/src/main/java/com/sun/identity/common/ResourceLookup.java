@@ -25,7 +25,7 @@
  * $Id: ResourceLookup.java,v 1.7 2009/05/02 22:12:04 kevinserwin Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.common;
 
@@ -57,11 +57,11 @@ public class ResourceLookup {
      * Returns the first existing resource in the ordered search paths.
      * 
      * @param context Servlet Context Reference.
-     * @param fileRoot
-     * @param locale
-     * @param orgFilePath
-     * @param clientPath
-     * @param filename
+     * @param fileRoot the root directory under which the resource is searched
+     * @param locale the locale used to build locale-specific search paths
+     * @param orgFilePath the organization-specific path segment
+     * @param clientPath the client-specific path segment
+     * @param filename the name of the file to locate
      * @param resourceDir absolute path of template base directory
      * @return <code>String</code> first existing resource in the ordered
      *         search paths.

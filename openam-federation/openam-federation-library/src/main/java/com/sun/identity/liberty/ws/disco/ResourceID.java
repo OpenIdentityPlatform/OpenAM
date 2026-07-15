@@ -24,6 +24,7 @@
  *
  * $Id: ResourceID.java,v 1.2 2008/06/25 05:47:11 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -40,14 +41,14 @@ import com.sun.identity.shared.xml.XMLUtils;
  * The following schema fragment specifies the expected content within the
  * <code>ResourceID</code> object.
  * <pre>
- * &lt;xs:element name="ResourceID" type="ResourceIDType"/>
- * &lt;complexType name="ResourceIDType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>anyURI">
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;xs:element name="ResourceID" type="ResourceIDType"/&gt;
+ * &lt;complexType name="ResourceIDType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;anyURI"&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

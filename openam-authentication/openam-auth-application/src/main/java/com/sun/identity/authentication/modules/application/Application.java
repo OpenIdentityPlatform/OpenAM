@@ -25,7 +25,7 @@
  * $Id: Application.java,v 1.9 2009/07/23 18:54:17 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.modules.application;
@@ -69,16 +69,16 @@ import com.sun.identity.shared.debug.Debug;
  *  <code>Login.Token1</code> to specify secret.) For example:
  * </p>
  * <pre>
- * "module=Application&IDToken0=UrlAccessAgent&IDToken1=secret"
+ * "module=Application&amp;IDToken0=UrlAccessAgent&amp;IDToken1=secret"
  * </pre>
  * OR
  * <pre>
- * "module=Application&IDToken0=<user id for Agent>&IDToken1=
- *     <password for Agent user>"
+ * "module=Application&amp;IDToken0=&lt;user id for Agent&gt;&amp;IDToken1=
+ *     &lt;password for Agent user&gt;"
  * </pre>
  * Old usage:
  * <pre>
- * "module=Application&Login.Token0=UrlAccessAgent&Login.Token1=secret"
+ * "module=Application&amp;Login.Token0=UrlAccessAgent&amp;Login.Token1=secret"
  * </pre>
  */
 public class Application extends AMLoginModule {

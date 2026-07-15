@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.common;
@@ -68,7 +68,7 @@ public abstract class JaspiAuthLoginModulePostAuthenticationPlugin implements AM
      * @param request {@inheritDoc}
      * @param response {@inheritDoc}
      * @param ssoToken {@inheritDoc}
-     * @throws AuthenticationException {@inheritDoc}
+     * @throws AuthenticationException if the JASPI ServerAuthModule cannot secure the response
      */
     public final void onLoginSuccess(Map requestParamsMap, HttpServletRequest request, HttpServletResponse response,
                                SSOToken ssoToken) throws AuthenticationException {

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -52,7 +53,7 @@ public class ErrorResource extends ServerResource {
      * response to a internal server error.
      *
      * @return {@inheritDoc}
-     * @throws ResourceException {@inheritDoc}
+     * @throws ResourceException if an error occurs while handling the error response.
      */
     protected Representation doHandle() {
         Representation result = null;
@@ -68,7 +69,7 @@ public class ErrorResource extends ServerResource {
      * Calls {@link #doHandle()}.
      *
      * @return {@inheritDoc}
-     * @throws ResourceException {@inheritDoc}
+     * @throws ResourceException if an error occurs while handling the error response.
      */
     protected Representation doConditionalHandle() {
         return doHandle();

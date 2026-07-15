@@ -24,7 +24,7 @@
  *
  * $Id: FSAuthDomainsModelImpl.java,v 1.12 2009/11/10 01:19:49 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  *
  */
 
@@ -82,7 +82,7 @@ public class FSAuthDomainsModelImpl extends AMModelBase
     }
     
     /**
-     * Returns a &lt;code>Set&lt;/code> of all the authentication domains 
+     * Returns a {@code Set} of all the authentication domains
      * starting from the root realm.
      *
      * @return a Set of authentication domain names.
@@ -270,7 +270,7 @@ public class FSAuthDomainsModelImpl extends AMModelBase
      *
      * @param name Name of authentication domain.
      * @param values Map of attribute name to value.
-     * @throws IDFFMetaException if attribute values cannot be set.
+     * @throws AMConsoleException if attribute values cannot be set.
      */
     public void setAttributeValues(String realm, String name, Map values)
         throws AMConsoleException 
@@ -314,7 +314,7 @@ public class FSAuthDomainsModelImpl extends AMModelBase
     }
     
     /**
-     * Returns a &lt;code>Set&lt;/code> of provider names that exist in the
+     * Returns a {@code Set} of provider names that exist in the
      * specified realm.
      *
      * @param realm name of the realm to search.

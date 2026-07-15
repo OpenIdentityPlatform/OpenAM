@@ -113,4 +113,11 @@ public interface OAuth2Uris {
      * @return The URL.
      */
     String getDeviceAuthorizationEndpoint();
+    
+    /**
+     * Returns the default URL for this provider's token Revocation endpoint.
+     *
+     * @return The URL.
+     */
+    String getRevocationEndpoint();
 }

@@ -25,6 +25,7 @@
  * $Id: IDPAccountMapper.java,v 1.5 2008/06/25 05:47:51 qcheng Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.saml2.plugins;
 
@@ -35,7 +36,7 @@ import com.sun.identity.saml2.protocol.ManageNameIDRequest;
 /**
  * The interface <code>IDPAccountMapper</code> is used to map the local identities to the <code>SAML</code> protocol
  * objects and also the vice versa for some of the protocols for e.g. <code>ManageNameIDRequest</code>.
- * <p/>
+ * <p>
  * This mapper interface is used to map the identities only at the <code>SAML Identity Provider</code>. The
  * implementation of this interface will be used by the <code>SAML</code> framework to retrieve the user's account
  * federation information for constructing SAML protocol objects such as <code>Assertion</code> and also to find out

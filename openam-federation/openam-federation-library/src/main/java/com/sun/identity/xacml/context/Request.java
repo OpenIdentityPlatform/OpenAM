@@ -24,6 +24,7 @@
  *
  * $Id: Request.java,v 1.2 2008/06/25 05:48:11 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -36,17 +37,16 @@ import java.util.List;
  * The <code>Request</code> element is the top-level element in the XACML
  * context scehema. Its an abstraction layer used by the policy language.
  * It contains <code>Subject</code>, <code>Resource</code>, <code>Action
- * </code> and <code>Environment<code> elements.
- * <p>
+ * </code> and <code>Environment</code> elements.
  * <pre>
- * &lt;xs:complexType name="RequestType">
- *   &lt;xs:sequence>
- *     &lt;xs:element ref="xacml-context:Subject" maxOccurs="unbounded"/>
- *     &lt;xs:element ref="xacml-context:Resource" maxOccurs="unbounded"/>
- *     &lt;xs:element ref="xacml-context:Action"/>
- *     &lt;xs:element ref="xacml-context:Environment"/>
- *   &lt;xs:sequence>
- * &lt;xs:complexType>
+ * &lt;xs:complexType name="RequestType"&gt;
+ *   &lt;xs:sequence&gt;
+ *     &lt;xs:element ref="xacml-context:Subject" maxOccurs="unbounded"/&gt;
+ *     &lt;xs:element ref="xacml-context:Resource" maxOccurs="unbounded"/&gt;
+ *     &lt;xs:element ref="xacml-context:Action"/&gt;
+ *     &lt;xs:element ref="xacml-context:Environment"/&gt;
+ *   &lt;xs:sequence&gt;
+ * &lt;xs:complexType&gt;
  * </pre>
  *
  */

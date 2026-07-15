@@ -25,6 +25,7 @@
  * $Id: LDAPFilterCondition.java,v 1.8 2009/11/20 23:52:55 ww203982 Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.plugins;
@@ -85,7 +86,7 @@ import org.forgerock.util.time.Duration;
  * in policy configuration service, satisfiies the ldap filter
  * specified in the condition
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.LDAPFilterCondition} instead.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.environment.LDAPFilterCondition} instead.
  */
 @Deprecated
 public class LDAPFilterCondition implements Condition {
@@ -148,7 +149,7 @@ public class LDAPFilterCondition implements Condition {
       *
       * @param property name of property for which to get <code>Syntax</code>
       *
-      * @return <code>Syntax<code> for the property name
+      * @return <code>Syntax</code> for the property name
       */
      public Syntax getPropertySyntax(String property) {
          return (Syntax.ANY);

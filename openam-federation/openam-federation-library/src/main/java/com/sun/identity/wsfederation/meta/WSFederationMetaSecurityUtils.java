@@ -25,6 +25,7 @@
  * $Id: WSFederationMetaSecurityUtils.java,v 1.6 2009/10/28 23:58:59 exu Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.wsfederation.meta;
 
@@ -365,16 +366,18 @@ public final class WSFederationMetaSecurityUtils {
     /** 
      * Restores Base64 encoded format.
      * JAXB will change
-     *      <ds:X509Data>
-     *          <ds:X509Certificate>
+     * <pre>
+     *      &lt;ds:X509Data&gt;
+     *          &lt;ds:X509Certificate&gt;
      *  .........
      *  .........
-     *          </ds:X509Certificate>
-     *      </ds:X509Data>
+     *          &lt;/ds:X509Certificate&gt;
+     *      &lt;/ds:X509Data&gt;
      *  to
-     *      <ds:X509Data>
-     *          <ds:X509Certificate>..................</ds:X509Certificate>
-     *      </ds:X509Data>
+     *      &lt;ds:X509Data&gt;
+     *          &lt;ds:X509Certificate&gt;..................&lt;/ds:X509Certificate&gt;
+     *      &lt;/ds:X509Data&gt;
+     * </pre>
      *
      *  This method will restore the format.
      *  @param xmlstr The xml string containing element 'X509Certificate'.

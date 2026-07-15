@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -340,7 +341,7 @@ public class AMAttributeSchema extends Object {
      * The method returns the default value of the attribute;
      * 
      * @return Set containing the default values of the attribute or
-     *         <code>Collections.EMPTY_SET<code> otherwise
+     *         <code>Collections.EMPTY_SET</code> otherwise
      */
     public Set getDefaultValues() {
         return attrSchema.getDefaultValues();
@@ -383,6 +384,7 @@ public class AMAttributeSchema extends Object {
      * @param i18nKey
      *            value of <code>i18nKey</code>.
      * @throws AMException
+     *             if an error occurs while setting the I18N key
      */
     public void setI18NKey(String i18nKey) throws AMException {
         try {

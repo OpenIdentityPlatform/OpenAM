@@ -25,6 +25,7 @@
  * $Id: NewEncryptedIDImpl.java,v 1.2 2008/06/25 05:48:00 qcheng Exp $
  *
  * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.saml2.protocol.impl;
 
@@ -47,10 +48,9 @@ import com.sun.identity.saml2.xmlenc.EncManager;
  * Java content class for NewEncryptedID element declaration.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 	
- * <p>
  * <pre>
  * &lt;element name="NewEncryptedID" 
- *     type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/>
+ *     type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/&gt;
  * </pre>
  */
 
@@ -88,9 +88,9 @@ public class NewEncryptedIDImpl extends EncryptedElementImpl implements NewEncry
      * Constructor to create <code>NewEncryptedID</code> Object. 
      *
      * @param element Document Element of 
-     *         <code>NewEncryptedID<code> object.
-     * @throws SAML2Exception 
-     *         if <code>NewEncryptedID<code> cannot be created.
+     *         <code>NewEncryptedID</code> object.
+     * @throws SAML2Exception if a SAML2 error occurs
+     *         if <code>NewEncryptedID</code> cannot be created.
      */
     public NewEncryptedIDImpl(Element element) 
     throws SAML2Exception {
@@ -102,9 +102,9 @@ public class NewEncryptedIDImpl extends EncryptedElementImpl implements NewEncry
      * Constructor to create <code>NewEncryptedID</code> Object. 
      *
      * @param xmlString XML Representation of 
-     *        the <code>NewEncryptedID<code> object.
-     * @throws SAML2Exception 
-     *        if <code>NewEncryptedID<code> cannot be created.
+     *        the <code>NewEncryptedID</code> object.
+     * @throws SAML2Exception if a SAML2 error occurs
+     *        if <code>NewEncryptedID</code> cannot be created.
      */
     public NewEncryptedIDImpl(String xmlString)
     throws SAML2Exception {

@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -12,20 +13,19 @@ package com.sun.identity.saml2.jaxb.xmlenc;
 /**
  * Java content class for EncryptionMethodType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/saml2/xenc-schema.xsd line 54)
- * <p>
  * <pre>
- * &lt;complexType name="EncryptionMethodType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="KeySize" type="{http://www.w3.org/2001/04/xmlenc#}KeySizeType" minOccurs="0"/>
- *         &lt;element name="OAEPparams" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/>
- *         &lt;any/>
- *       &lt;/sequence>
- *       &lt;attribute name="Algorithm" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="EncryptionMethodType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="KeySize" type="{http://www.w3.org/2001/04/xmlenc#}KeySizeType" minOccurs="0"/&gt;
+ *         &lt;element name="OAEPparams" type="{http://www.w3.org/2001/XMLSchema}base64Binary" minOccurs="0"/&gt;
+ *         &lt;any/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="Algorithm" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */
@@ -80,9 +80,8 @@ public interface EncryptionMethodType {
     /**
      * Java content class for KeySize element declaration.
      * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/saml2/xenc-schema.xsd line 56)
-     * <p>
      * <pre>
-     * &lt;element name="KeySize" type="{http://www.w3.org/2001/04/xmlenc#}KeySizeType"/>
+     * &lt;element name="KeySize" type="{http://www.w3.org/2001/04/xmlenc#}KeySizeType"/&gt;
      * </pre>
      * 
      */
@@ -115,9 +114,8 @@ public interface EncryptionMethodType {
     /**
      * Java content class for OAEPparams element declaration.
      * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/saml2/xenc-schema.xsd line 57)
-     * <p>
      * <pre>
-     * &lt;element name="OAEPparams" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/>
+     * &lt;element name="OAEPparams" type="{http://www.w3.org/2001/XMLSchema}base64Binary"/&gt;
      * </pre>
      * 
      */

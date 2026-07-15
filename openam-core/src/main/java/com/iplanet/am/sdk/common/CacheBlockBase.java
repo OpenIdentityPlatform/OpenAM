@@ -25,7 +25,7 @@
  * $Id: CacheBlockBase.java,v 1.6 2009/10/29 00:28:46 hengming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC
+ * Portions Copyrighted 2023-2026 3A Systems LLC
  */
 
 package com.iplanet.am.sdk.common;
@@ -199,7 +199,7 @@ public abstract class CacheBlockBase {
      * <b>NOTE:</b> Call to this method should preceeded with
      * expiredAndUpdated() check. For example, isExists() return value holds
      * good only it the entry has not expired. So, check anywhere it is called
-     * the check should be if (!cb.expiredAndUpdated() && cb.isExists()) or
+     * the check should be if (!cb.expiredAndUpdated() &amp;&amp; cb.isExists()) or
      * similar.
      *
      * @return true if it represents a valid entry, false otherwise

@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,27 +13,26 @@ package com.sun.identity.liberty.ws.meta.jaxb;
 /**
  * Java content class for SPDescriptorType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-metadata.xsd line 184)
- * <p>
  * <pre>
- * &lt;complexType name="SPDescriptorType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:liberty:metadata:2003-08}providerDescriptorType">
- *       &lt;sequence>
- *         &lt;element name="AssertionConsumerServiceURL" maxOccurs="unbounded">
- *           &lt;complexType>
- *             &lt;simpleContent>
- *               &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>anyURI">
- *                 &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *                 &lt;attribute name="isDefault" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
- *               &lt;/extension>
- *             &lt;/simpleContent>
- *           &lt;/complexType>
- *         &lt;/element>
- *         &lt;element name="AuthnRequestsSigned" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="SPDescriptorType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:liberty:metadata:2003-08}providerDescriptorType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="AssertionConsumerServiceURL" maxOccurs="unbounded"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;simpleContent&gt;
+ *               &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;anyURI"&gt;
+ *                 &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *                 &lt;attribute name="isDefault" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *               &lt;/extension&gt;
+ *             &lt;/simpleContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *         &lt;element name="AuthnRequestsSigned" type="{http://www.w3.org/2001/XMLSchema}boolean"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */
@@ -80,16 +80,15 @@ public interface SPDescriptorType
     /**
      * Java content class for anonymous complex type.
      * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-metadata.xsd line 189)
-     * <p>
      * <pre>
-     * &lt;complexType>
-     *   &lt;simpleContent>
-     *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>anyURI">
-     *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" />
-     *       &lt;attribute name="isDefault" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
-     *     &lt;/extension>
-     *   &lt;/simpleContent>
-     * &lt;/complexType>
+     * &lt;complexType&gt;
+     *   &lt;simpleContent&gt;
+     *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;anyURI"&gt;
+     *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+     *       &lt;attribute name="isDefault" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+     *     &lt;/extension&gt;
+     *   &lt;/simpleContent&gt;
+     * &lt;/complexType&gt;
      * </pre>
      * 
      */

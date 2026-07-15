@@ -24,7 +24,7 @@
  *
  * $Id: FSNameMappingHandler.java,v 1.3 2008/06/25 05:47:02 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -106,7 +106,8 @@ public class FSNameMappingHandler {
      *  a local provider; <code>false</code> otherwise.
      * @return <code>NameIdentifier</code> of an user corresponding to
      *  <code>remoteProviderID</code>.
-     * @exception FSAccountMgmtException, SAMLException if an error occurred.
+     * @exception FSAccountMgmtException if an error occurred.
+     * @exception SAMLException if an error occurred.
      */
     public NameIdentifier getNameIdentifier(
         String userID,
@@ -158,7 +159,8 @@ public class FSNameMappingHandler {
      *  a local provider; <code>false</code> otherwise.
      * @return <code>NameIdentifier</code> corresponding to
      *  <code>remoteProviderID</code>.
-     * @exception FSAccountMgmtException, SAMLException if an error occurred.
+     * @exception FSAccountMgmtException if an error occurred.
+     * @exception SAMLException if an error occurred.
      */
     public NameIdentifier getNameIdentifier(
         FSNameIdentifierMappingRequest mappingRequest,

@@ -246,8 +246,8 @@ public class XMLDocument implements IXMLUtilsConstants {
      * Returns the DOCTYPE string associated with the first DOCTYPE element
      * present in this document. This method may return null if no DOCTYPE 
      * token is already present in the document.
-     * 
-     * @return
+     *
+     * @return the DOCTYPE string, or {@code null} if the document has no DOCTYPE token
      */
     public String getDoctypeString() {
         String result = null;
@@ -264,10 +264,10 @@ public class XMLDocument implements IXMLUtilsConstants {
      * throw an Exception if the given document does not contain a predefined
      * DOCTYPE element.
      * 
-     * @param newDoctypeString
-     * @throws Exception
+     * @param newDoctypeString the new DOCTYPE string to set on the document
+     * @throws Exception if the document does not contain a predefined DOCTYPE element
      */
-    public void updatedDoctypeString(String newDoctypeString) throws Exception 
+    public void updatedDoctypeString(String newDoctypeString) throws Exception
     {
         DoctypeToken dctoken = getDoctypeToken();
         if (dctoken != null) {

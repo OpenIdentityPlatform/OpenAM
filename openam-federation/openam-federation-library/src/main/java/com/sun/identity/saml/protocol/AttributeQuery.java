@@ -24,6 +24,7 @@
  *
  * $Id: AttributeQuery.java,v 1.2 2008/06/25 05:47:36 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -74,7 +75,7 @@ public class AttributeQuery extends SubjectQuery {
      * tree that was built from the XML string.
      *
      * @param element the DOM tree element which contains an Attribute Query.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public AttributeQuery(Element element) throws SAMLException {
 	// make sure the input is not null
@@ -143,7 +144,7 @@ public class AttributeQuery extends SubjectQuery {
      * @param designators List of <code>AttributeDesignators</code> of this
      *        query.
      * @param theResource the Resource attribute of this query in String format.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public AttributeQuery(Subject theSubject,
 			List designators,
@@ -160,7 +161,7 @@ public class AttributeQuery extends SubjectQuery {
      * @param theSubject Subject of this query.
      * @param designators List of <code>AttributeDesignators</code> of this
      *        query.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */       
     public  AttributeQuery(Subject theSubject,
 				List designators) throws SAMLException {
@@ -172,7 +173,7 @@ public class AttributeQuery extends SubjectQuery {
      * <code>AttributeDesignator</code>, and no Resource attribute.
      *
      * @param theSubject Subject of this query.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public AttributeQuery(Subject theSubject) throws SAMLException {
 	buildAttributeQuery(theSubject, null, null);

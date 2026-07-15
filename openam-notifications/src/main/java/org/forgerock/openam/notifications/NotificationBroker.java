@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.notifications;
@@ -21,7 +22,7 @@ import org.forgerock.json.JsonValue;
 /**
  * Delivers notifications to subscribers of topics.
  * <p>
- * A <tt>NotificationBroker</tt> can be shut down, which will cause
+ * A <code>NotificationBroker</code> can be shut down, which will cause
  * it to reject new notifications.
  *
  * @since 14.0.0

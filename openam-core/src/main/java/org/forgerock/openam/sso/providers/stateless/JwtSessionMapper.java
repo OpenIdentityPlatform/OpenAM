@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.sso.providers.stateless;
 
@@ -44,7 +45,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.iplanet.dpro.session.share.SessionInfo;
 
 /**
- * Responsible for converting {@link SessionInfo} objects to/from JWT with optional signing &/or encryption.
+ * Responsible for converting {@link SessionInfo} objects to/from JWT with optional signing &amp;/or encryption.
  *
  * @since 13.0.0
  */

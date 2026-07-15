@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -14,16 +15,15 @@ package com.sun.identity.liberty.ws.common.jaxb.utility;
  * 
  * Java content class for ReceivedType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/utility.xsd line 96)
- * <p>
  * <pre>
- * &lt;complexType name="ReceivedType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://schemas.xmlsoap.org/ws/2003/06/utility>AttributedDateTime">
- *       &lt;attribute name="Actor" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
- *       &lt;attribute name="Delay" type="{http://www.w3.org/2001/XMLSchema}int" />
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ * &lt;complexType name="ReceivedType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://schemas.xmlsoap.org/ws/2003/06/utility&gt;AttributedDateTime"&gt;
+ *       &lt;attribute name="Actor" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *       &lt;attribute name="Delay" type="{http://www.w3.org/2001/XMLSchema}int" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

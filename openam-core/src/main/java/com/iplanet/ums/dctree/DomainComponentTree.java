@@ -25,6 +25,7 @@
  * $Id: DomainComponentTree.java,v 1.5 2009/01/28 05:34:51 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.ums.dctree;
@@ -55,7 +56,6 @@ import org.forgerock.opendj.ldap.DN;
  * associate with a organizational DIT (convergence tree as noted in nortel
  * spec). Sample of a dctree that starts at dcroot of "o=internet" will look
  * like this
- * <p>
  * 
  * <pre>
  *               o=internet
@@ -529,7 +529,6 @@ public class DomainComponentTree {
      * This function can be used as a cache function for the complete DCTree.
      * The returning hastable provides all the virtual domain name as keys that
      * maps to organization mapping linked in the domain component dc nodes
-     * <p>
      * 
      * @return Hashtable of domain names and associated organizations. Each
      *         domain name is associated with one organization but muliple

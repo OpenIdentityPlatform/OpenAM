@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.cli.rest;
@@ -40,13 +41,13 @@ public class RestCommand {
 
     /**
      * Run a rest command with a SSO Token
-     * @param ssoTokenID
-     * @param url
-     * @param requestMethod
-     * @param headers
-     * @param data
-     * @return
-     * @throws IOException
+     * @param ssoTokenID the SSO token ID used to authenticate the request
+     * @param url the URL of the REST endpoint to call
+     * @param requestMethod the HTTP request method (for example GET or POST)
+     * @param headers the HTTP request headers to send
+     * @param data the request body to send, or empty if there is none
+     * @return the response body read from the REST endpoint
+     * @throws IOException if an I/O error occurs while communicating with the endpoint
      */
     public String sendRestCommand(SSOTokenID ssoTokenID, URL url, String requestMethod, Map<String, String> headers,
             String data) throws IOException {
@@ -56,12 +57,12 @@ public class RestCommand {
 
     /**
      * Run a rest command
-     * @param url
-     * @param requestMethod
-     * @param headers
-     * @param data
-     * @return
-     * @throws IOException
+     * @param url the URL of the REST endpoint to call
+     * @param requestMethod the HTTP request method (for example GET or POST)
+     * @param headers the HTTP request headers to send
+     * @param data the request body to send, or empty if there is none
+     * @return the response body read from the REST endpoint
+     * @throws IOException if an I/O error occurs while communicating with the endpoint
      */
     public String sendRestCommand(URL url, String requestMethod, Map<String, String> headers, String data) throws
             IOException {

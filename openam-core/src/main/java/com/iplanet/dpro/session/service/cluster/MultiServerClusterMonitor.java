@@ -25,7 +25,7 @@
  * $Id: SessionService.java,v 1.37 2010/02/03 03:52:54 bina Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC.
+ * Portions Copyrighted 2023-2026 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.service.cluster;
@@ -75,7 +75,7 @@ public class MultiServerClusterMonitor implements ClusterMonitor {
      * @param sessionDebug The session debug instance.
      * @param serviceConfig The configuration for the session service.
      * @param serverConfig The configuration for the session server.
-     * @throws Exception
+     * @throws Exception if the cluster monitor cannot be initialised
      */
     public MultiServerClusterMonitor(
             Debug sessionDebug,

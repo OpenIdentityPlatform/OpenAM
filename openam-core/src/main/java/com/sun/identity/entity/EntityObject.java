@@ -25,6 +25,7 @@
  * $Id: EntityObject.java,v 1.5 2008/06/25 05:43:26 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entity;
@@ -173,7 +174,7 @@ public class EntityObject {
      * @param entityType Type of entity being created. eg. Agent The types
      *        supported by SDK are configured in the list of Managed Objects
      *        in the <code>DAI</code> service.
-     * @param entityFilter
+     * @param entityFilter filter used to constrain the entity search
      * @return Set of Entity Names.
      * @throws EntityException if there is an internal error in the AM Store.
      * @throws SSOException if the sign on is no longer valid.
@@ -209,7 +210,7 @@ public class EntityObject {
      * @param entityType Type of entity being created. eg. Agent The types
      *        supported by SDK are configured in the list of Managed Objects
      *        in the <code>DAI</code> service.
-     * @param attributes
+     * @param attributes the attribute values to set or replace
      * @throws EntityException if there is an internal error in the AM Store.
      * @throws SSOException if the sign on is no longer valid.
      */

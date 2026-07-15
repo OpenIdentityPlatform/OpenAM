@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.cts.monitoring.impl.queue;
 
@@ -43,7 +44,7 @@ public class DefaultMonitoringResultHandler<T, E extends Exception> implements R
     /**
      * Defers to wrapped handler.
      * @return {@inheritDoc}
-     * @throws E {@inheritDoc}
+     * @throws E if the wrapped result handler throws it
      */
     @Override
     public T getResults() throws E {

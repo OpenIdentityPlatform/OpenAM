@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -40,7 +41,7 @@ package com.sun.identity.policy.util;
  * @author bk95756
  *
  * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
         
 public class AuthServiceConfigInfo {

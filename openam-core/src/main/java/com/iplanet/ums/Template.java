@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -34,7 +35,6 @@ import java.io.Serializable;
  * Represents Template objects in UMS. This is the abstract class for
  * CreationTemplate for object creation and SearchTemplate for defining
  * guidelines for searching functionality.
- * <P>
  * 
  * @see CreationTemplate
  * @see SearchTemplate

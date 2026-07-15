@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -88,7 +89,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -107,7 +108,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -126,7 +127,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -138,7 +139,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusCodeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.StatusCodeElement createStatusCodeElement()
@@ -150,7 +151,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectQueryAbstractType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.SubjectQueryAbstractType createSubjectQueryAbstractType()
@@ -162,7 +163,7 @@ public class ObjectFactory
     /**
      * Create an instance of AssertionArtifactElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.AssertionArtifactElement createAssertionArtifactElement()
@@ -174,7 +175,7 @@ public class ObjectFactory
     /**
      * Create an instance of AssertionArtifactElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.AssertionArtifactElement createAssertionArtifactElement(java.lang.String value)
@@ -186,7 +187,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.RequestElement createRequestElement()
@@ -198,7 +199,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryAbstractType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.QueryAbstractType createQueryAbstractType()
@@ -210,7 +211,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResponseType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.ResponseType createResponseType()
@@ -222,7 +223,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.RequestType createRequestType()
@@ -234,7 +235,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusDetailType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.StatusDetailType createStatusDetailType()
@@ -246,7 +247,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeQueryElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.AttributeQueryElement createAttributeQueryElement()
@@ -258,7 +259,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthorizationDecisionQueryElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.AuthorizationDecisionQueryElement createAuthorizationDecisionQueryElement()
@@ -270,7 +271,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticationQueryType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.AuthenticationQueryType createAuthenticationQueryType()
@@ -282,7 +283,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.StatusElement createStatusElement()
@@ -294,7 +295,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResponseAbstractType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.ResponseAbstractType createResponseAbstractType()
@@ -306,7 +307,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributeQueryType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.AttributeQueryType createAttributeQueryType()
@@ -318,7 +319,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResponseElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.ResponseElement createResponseElement()
@@ -330,7 +331,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusMessageElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.StatusMessageElement createStatusMessageElement()
@@ -342,7 +343,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusMessageElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.StatusMessageElement createStatusMessageElement(java.lang.String value)
@@ -354,7 +355,7 @@ public class ObjectFactory
     /**
      * Create an instance of RespondWithElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.RespondWithElement createRespondWithElement()
@@ -366,7 +367,7 @@ public class ObjectFactory
     /**
      * Create an instance of RespondWithElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.RespondWithElement createRespondWithElement(javax.xml.namespace.QName value)
@@ -378,7 +379,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthorizationDecisionQueryType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.AuthorizationDecisionQueryType createAuthorizationDecisionQueryType()
@@ -390,7 +391,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusDetailElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.StatusDetailElement createStatusDetailElement()
@@ -402,7 +403,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestAbstractType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.RequestAbstractType createRequestAbstractType()
@@ -414,7 +415,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusCodeType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.StatusCodeType createStatusCodeType()
@@ -426,7 +427,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.StatusType createStatusType()
@@ -438,7 +439,7 @@ public class ObjectFactory
     /**
      * Create an instance of QueryElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.QueryElement createQueryElement()
@@ -450,7 +451,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticationQueryElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.AuthenticationQueryElement createAuthenticationQueryElement()
@@ -462,7 +463,7 @@ public class ObjectFactory
     /**
      * Create an instance of SubjectQueryElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.protocol.SubjectQueryElement createSubjectQueryElement()

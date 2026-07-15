@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts;
@@ -26,14 +28,14 @@ import org.forgerock.json.resource.ResourceException;
 public class TokenValidationException extends ResourceException {
 
     /**
-     * {@inheritDoc}
+     * Constructs an exception with the given error code and detail message.
      */
     public TokenValidationException(int code, String message) {
         super(code, message);
     }
 
     /**
-     * {@inheritDoc}
+     * Constructs an exception with the given error code, detail message and underlying cause.
      */
     public TokenValidationException(int code, String message, Throwable cause) {
         super(code, message, cause);

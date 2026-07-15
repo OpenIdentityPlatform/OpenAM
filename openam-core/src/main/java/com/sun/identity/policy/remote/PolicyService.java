@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -42,8 +43,7 @@ import org.w3c.dom.Node;
 /**
  * This <code>PolicyService</code> class repolicyResents a PolicyService
  * XML document. The PolicyService DTD is defined as the following:
- * <p>
- * <pre>
+ * <pre>{@code
  *   <!-- PolicyService element is the root element for remote policy
  *    service. This XML will be typically used between the client
  *    and the server. The client uses the PolicyRequest element to
@@ -59,7 +59,7 @@ import org.w3c.dom.Node;
  *   <!ATTLIST    PolicyService
  *       version    CDATA    "1.0"
  *   >
- * </pre>
+ * }</pre>
  */
 
 public class PolicyService {

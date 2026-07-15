@@ -24,6 +24,7 @@
  *
  * $Id: AccountUtils.java,v 1.2 2008/06/25 05:48:04 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wsfederation.common;
@@ -43,7 +44,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 
 /**
  * <code>AccountUtils</code> is a utility class for setting and retrieving 
- * the <code>WS-Federation<code> account federation information.
+ * the <code>WS-Federation</code> account federation information.
  */
 
 public class AccountUtils {

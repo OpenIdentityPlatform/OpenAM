@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.authentication.audit;
 
@@ -106,9 +107,9 @@ public abstract class AbstractAuthenticationEventAuditor {
     }
 
     /**
-     * Get the realm from the {@Link SSOToken} of the event.
+     * Get the realm from the {@link SSOToken} of the event.
      *
-     * @param token The {@Link SSOToken} of the event.
+     * @param token The {@link SSOToken} of the event.
      * @return The realm or null if it could not be found.
      */
     protected String getRealmFromToken(SSOToken token) {
@@ -121,7 +122,7 @@ public abstract class AbstractAuthenticationEventAuditor {
     }
 
     /**
-     * Get the failed username from the {@Link LoginState} of the event.
+     * Get the failed username from the {@link LoginState} of the event.
      *
      * @param loginState The login state of the event.
      * @return The username or null if it could not be found.

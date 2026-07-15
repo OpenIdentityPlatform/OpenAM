@@ -25,6 +25,7 @@
  * $Id: ServiceManager.java,v 1.27 2009/10/28 04:24:26 hengming Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.sm;
@@ -634,7 +635,7 @@ public class ServiceManager {
     /**
      * Adds a new plugin schema to an existing service
      *
-     * @param pluginDoc 
+     * @param pluginDoc the plugin schema document to add
      * @throws SMSException if an error occurred while performing the operation
      * @throws SSOException if the user's single sign on token is invalid or
      *         expired.

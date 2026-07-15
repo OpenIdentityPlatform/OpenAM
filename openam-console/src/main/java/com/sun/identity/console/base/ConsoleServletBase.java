@@ -25,7 +25,7 @@
  * $Id: ConsoleServletBase.java,v 1.7 2009/03/24 23:57:32 babysunil Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.console.base;
 
@@ -188,7 +188,7 @@ public abstract class ConsoleServletBase
      *
      * @param requestContext - request context
      * @param handlerName - name of handler
-     * @throws ServletException
+     * @throws ServletException if forwarding to the invalid URL view bean fails.
      */
     protected void onRequestHandlerNotFound(
         RequestContext requestContext,
@@ -206,7 +206,7 @@ public abstract class ConsoleServletBase
      * Forwards to invalid URL view bean, in case of no handler specified
      *
      * @param requestContext - request context
-     * @throws ServletException
+     * @throws ServletException if forwarding to the invalid URL view bean fails.
      */
     protected void onRequestHandlerNotSpecified(RequestContext requestContext)
         throws ServletException
@@ -235,8 +235,8 @@ public abstract class ConsoleServletBase
      *
      * @param requestContext - request context
      * @param e Exception that was not handled by the application.
-     * @throws ServletException
-     * @throws IOException
+     * @throws ServletException if the error response cannot be processed.
+     * @throws IOException if the redirect response cannot be sent.
      */
     protected void onUncaughtException(
         RequestContext requestContext,

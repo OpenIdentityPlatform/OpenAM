@@ -25,6 +25,7 @@
  * $Id: CircleOfTrustManager.java,v 1.13 2009/10/28 23:58:56 exu Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.cot;
 
@@ -977,7 +978,7 @@ public class CircleOfTrustManager {
      * @param realm the realm the circle of trust is in.
      * @param name the circle of trust name.
      * @return true if circle of trust name is valid.
-     * @throws <code>COTException</code> if the circle of trust name is invalid.
+     * @throws COTException if the circle of trust name is invalid.
      */
     boolean isValidCOTName(String realm,String name) throws COTException {
         String classMethod = "COTManager.isValidCOTName: ";

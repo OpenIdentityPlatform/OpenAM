@@ -25,6 +25,7 @@
  * $Id: ISPermission.java,v 1.5 2008/08/19 19:09:17 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.jaas;
@@ -79,11 +80,9 @@ import java.util.Collections;
  * sun.security.provider.PolicyFile</code> or defined on the command line 
  * using the -D option.
  *
- * <p>
  * @see java.security.Permission
  * @see javax.security.auth.Subject
  * @see java.security.ProtectionDomain
- * <p>
  *
  * 
  */
@@ -468,17 +467,17 @@ public class ISPermission extends Permission {
 
     /**
      * Returns the hash code value for this Permission object.
-     * <P>
+     * <p>
      * The required <code>hashCode</code> behavior for Permission Objects is
-     * the following: <p>
+     * the following:
      * <ul>
      * <li>Whenever it is invoked on the same Permission object more than 
      *     once during an execution of a Java application, the 
      *     <code>hashCode</code> method
      *     must consistently return the same integer. This integer need not 
      *     remain consistent from one execution of an application to another 
-     *     execution of the same application. <p>
-     * <li>If two Permission objects are equal according to the 
+     *     execution of the same application.
+     * <li>If two Permission objects are equal according to the
      *     <code>equals</code> 
      *     method, then calling the <code>hashCode</code> method on each of the
      *     two Permission objects must produce the same integer result. 
@@ -519,7 +518,7 @@ public class ISPermission extends Permission {
     /**
      * Checks if the specified permission's actions are "implied by" 
      * this object's actions.
-     * <P>
+     * <p>
      * The <code>implies</code> method is used by the
      * <code>AccessController</code> to determine whether or not a requested
      * permission is implied by another permission that is known to be valid

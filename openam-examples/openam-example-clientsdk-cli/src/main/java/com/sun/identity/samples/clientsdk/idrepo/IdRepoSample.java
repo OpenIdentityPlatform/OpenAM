@@ -27,6 +27,7 @@
  */
 /*
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -47,7 +48,6 @@ import com.sun.identity.idm.IdType;
  * This class
  *
  *
- * @author
  */
 public class IdRepoSample {
     static final String DEF_USERNAME = "amAdmin";

@@ -25,7 +25,7 @@
  * $Id: InternalSession.java,v 1.21 2009/03/20 21:05:25 weisun2 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2023 3A Systems LLC
+ * Portions Copyrighted 2023-2026 3A Systems LLC
  */
 package com.iplanet.dpro.session.service;
 
@@ -291,7 +291,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     /**
      * Sets Client ID for this Internal Session.
      *
-     * @param id
+     * @param id the client ID to set for this Internal Session
      */
     public void setClientID(String id) {
         clientID = id;
@@ -352,7 +352,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     /**
      * Sets the maximum idle time (in minutes) for the Internal Session.
      *
-     * @param maxIdleTimeInMinutes
+     * @param maxIdleTimeInMinutes the maximum idle time in minutes to set
      */
     public void setMaxIdleTime(long maxIdleTimeInMinutes) {
     	if (this.maxIdleTimeInMinutes != maxIdleTimeInMinutes) {
@@ -717,7 +717,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
 
     /**
      * Changes the state of the session to ACTIVE after creation.
-     * @param userDN
+     * @param userDN the distinguished name of the user owning the session
      * @return <code> true </code> if the session is successfully activated
      *         after creation , <code>false</code> otherwise
      */
@@ -850,7 +850,7 @@ public class InternalSession implements Serializable, AMSession, SessionPersiste
     /**
      * Sets the {@link SessionState} of the Internal Session.
      *
-     * @param sessionState
+     * @param sessionState the new session state to set
      */
     public void setState(SessionState sessionState) {
         if (this.sessionState != sessionState) {

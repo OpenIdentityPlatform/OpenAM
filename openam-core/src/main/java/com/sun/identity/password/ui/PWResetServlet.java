@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.password.ui;
 
@@ -89,7 +89,7 @@ public class PWResetServlet extends ApplicationServletBase implements Constants
      * Using this callback the character set to be used for
      * decoding POST/GET data will be set.
      * @param requestContext - request context
-     * @throws ServletException 
+     * @throws ServletException if the request cannot be processed.
      */
     protected void onBeforeRequest(RequestContext requestContext)
         throws ServletException
@@ -149,7 +149,7 @@ public class PWResetServlet extends ApplicationServletBase implements Constants
      *
      * @param requestContext  request context
      * @param handlerName  name of handler
-     * @throws ServletException
+     * @throws ServletException if the request cannot be forwarded.
      */
     protected void onRequestHandlerNotFound(
         RequestContext requestContext,
@@ -167,7 +167,7 @@ public class PWResetServlet extends ApplicationServletBase implements Constants
      * Forwards to invalid URL view bean, in case of no handler specified
      *
      * @param requestContext  request context
-     * @throws ServletException
+     * @throws ServletException if the request cannot be forwarded.
      */
     protected void onRequestHandlerNotSpecified(RequestContext requestContext)
         throws ServletException
@@ -185,8 +185,8 @@ public class PWResetServlet extends ApplicationServletBase implements Constants
      *
      * @param requestContext  request context
      * @param e Exception that was not handled by the application.
-     * @throws ServletException
-     * @throws IOException
+     * @throws ServletException if the request cannot be processed.
+     * @throws IOException if an I/O error occurs while responding.
      */
     protected void onUncaughtException(
         RequestContext requestContext,

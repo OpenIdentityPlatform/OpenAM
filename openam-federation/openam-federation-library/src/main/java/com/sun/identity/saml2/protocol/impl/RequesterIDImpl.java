@@ -24,6 +24,7 @@
  *
  * $Id: RequesterIDImpl.java,v 1.2 2008/06/25 05:48:00 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -61,7 +62,7 @@ public class RequesterIDImpl implements RequesterID {
      * Constructor to create the <code>RequesterID</code> Object.
      *
      * @param element Document Element of <code>RequesterID</code> Object.
-     * @throws SAML2Exception if <code>RequesterID<code> cannot be created.
+     * @throws SAML2Exception if <code>RequesterID</code> cannot be created.
      */
 
     public RequesterIDImpl(Element element) throws SAML2Exception {
@@ -73,7 +74,7 @@ public class RequesterIDImpl implements RequesterID {
      *
      * @param xmlString XML String Representation of <code>RequesterID</code>
      *	      object.
-     * @throws SAML2Exception if <code>RequesterID<code> cannot be created.
+     * @throws SAML2Exception if <code>RequesterID</code> cannot be created.
      */
     public RequesterIDImpl(String xmlString) throws SAML2Exception {
 	Document xmlDocument =
@@ -98,7 +99,7 @@ public class RequesterIDImpl implements RequesterID {
     /** 
      * Sets the value of the <code>RequesterID</code> URI.
      *
-     * @param value of the <code>RequesterID<code> URI.
+     * @param value of the <code>RequesterID</code> URI.
      * @throws SAML2Exception if the object is immutable.
      * @see #getValue
      */

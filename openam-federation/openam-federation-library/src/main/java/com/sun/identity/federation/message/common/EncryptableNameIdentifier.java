@@ -25,6 +25,7 @@
  * $Id: EncryptableNameIdentifier.java,v 1.4 2008/06/25 05:46:46 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.message.common;
@@ -90,11 +91,11 @@ public class EncryptableNameIdentifier {
     /**
      * Consturctor creates <code>EncryptableNameIdentifier</code> object.
      *
-     * @param name 
-     * @param nameQualifier
-     * @param format
+     * @param name the name identifier value.
+     * @param nameQualifier the security or administrative domain that qualifies the name.
+     * @param format the format of the name identifier.
      * @param issueInstant the Issue Instant
-     * @param nonce
+     * @param nonce the nonce value used for encryption.
      * @throws FSException if there is an error.
      */
     public EncryptableNameIdentifier(String name,String nameQualifier,

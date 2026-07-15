@@ -25,6 +25,7 @@
  * $Id: AMAuthLevelManager.java,v 1.3 2008/06/25 05:41:51 qcheng Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.config;
@@ -351,11 +352,11 @@ public class AMAuthLevelManager implements ServiceListener {
     /**
      * Implements methods in <code>com.sun.identity.sm.ServiceListener</code>
      *
-     * @param serviceName
-     * @param version
-     * @param groupName
-     * @param serviceComponent
-     * @param type
+     * @param serviceName the name of the service whose configuration changed
+     * @param version the version of the service
+     * @param groupName the name of the configuration group that changed
+     * @param serviceComponent the service component that changed
+     * @param type the type of configuration change
      */
     public void globalConfigChanged(
         String serviceName,
@@ -377,12 +378,12 @@ public class AMAuthLevelManager implements ServiceListener {
     /**
      * Implements methods in <code>com.sun.identity.sm.ServiceListener</code>.
      *
-     * @param serviceName
-     * @param version
-     * @param orgName
-     * @param groupName
-     * @param serviceComponent
-     * @param type
+     * @param serviceName the name of the service whose configuration changed
+     * @param version the version of the service
+     * @param orgName the name of the organization whose configuration changed
+     * @param groupName the name of the configuration group that changed
+     * @param serviceComponent the service component that changed
+     * @param type the type of configuration change
      */
     public void organizationConfigChanged(
         String serviceName,
@@ -412,8 +413,8 @@ public class AMAuthLevelManager implements ServiceListener {
     /**
      * Implements methods in <code>com.sun.identity.sm.ServiceListener</code>.
      *
-     * @param serviceName
-     * @param version
+     * @param serviceName the name of the service whose schema changed
+     * @param version the version of the service
      */
     public void schemaChanged(String serviceName, String version) {
         if (debug.messageEnabled()) {

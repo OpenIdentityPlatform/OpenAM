@@ -25,7 +25,7 @@
  * $Id: SSOTokenManager.java,v 1.7 2009/02/18 23:59:36 qcheng Exp $
  *
  * Portions copyright 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.iplanet.sso;
@@ -361,7 +361,7 @@ public class SSOTokenManager {
      * @exception SSOException
      *                if the single sign on token cannot be created.
      * @exception UnsupportedOperationException
-     * 
+     *                if the operation is not supported by the provider.
      */
     public SSOToken createSSOToken(String tokenId)
             throws UnsupportedOperationException, SSOException {
@@ -391,7 +391,7 @@ public class SSOTokenManager {
      * @exception SSOException
      *                if the single sign on token cannot be created.
      * @exception UnsupportedOperationException
-     * 
+     *                if the operation is not supported by the provider.
      */
     public SSOToken createSSOToken(String tokenId, String clientIP)
             throws UnsupportedOperationException, SSOException {

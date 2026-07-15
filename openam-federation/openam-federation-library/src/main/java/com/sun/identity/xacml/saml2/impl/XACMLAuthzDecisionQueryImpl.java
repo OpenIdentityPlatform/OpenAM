@@ -24,6 +24,7 @@
  *
  * $Id: XACMLAuthzDecisionQueryImpl.java,v 1.4 2008/06/25 05:48:15 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.saml2.impl;
@@ -56,45 +57,44 @@ import java.text.ParseException;
  * extends SAML Protocol schema type <code>RequestAbstractType</code>.
  * It allows an XACML PEP to submit an XACML Request Context in a  SAML
  * Query along with other information. This element is an alternative to 
- * SAML defined <code><samlp:AuthzDecisionQuery></code> that allows an 
+ * SAML defined <code>&lt;samlp:AuthzDecisionQuery&gt;</code> that allows an
  * XACML PEP  to communicate with an XACML PDP using SAML2 protocol.
- * <p>
  * <pre>
  *&lt;xs:element name="XACMLAuthzDecisionQuery"
- *         type="XACMLAuthzDecisionQueryType"/>
- *&lt;xs:complexType name="XACMLAuthzDecisionQueryType">
- *  &lt;xs:complexContent>
- *    &lt;xs:extension base="samlp:RequestAbstractType">
- *      &lt;xs:sequence>
- *        &lt;xs:element ref="xacml-context:Request"/>
- *      &lt;xs:sequence>
+ *         type="XACMLAuthzDecisionQueryType"/&gt;
+ *&lt;xs:complexType name="XACMLAuthzDecisionQueryType"&gt;
+ *  &lt;xs:complexContent&gt;
+ *    &lt;xs:extension base="samlp:RequestAbstractType"&gt;
+ *      &lt;xs:sequence&gt;
+ *        &lt;xs:element ref="xacml-context:Request"/&gt;
+ *      &lt;xs:sequence&gt;
  *      &lt;xs:attribute name="InputContextOnly"
  *                    type="boolean"
  *                    use="optional"
- *                    default="false"/>
+ *                    default="false"/&gt;
  *      &lt;xs:attribute name="ReturnContext"
  *                    type="boolean"
  *                    use="optional"
- *                    default="false"/>
- *    &lt;xs:extension>
- *  &lt;xs:complexContent>
- *&lt;xs:complexType>
+ *                    default="false"/&gt;
+ *    &lt;xs:extension&gt;
+ *  &lt;xs:complexContent&gt;
+ *&lt;xs:complexType&gt;
  * </pre>
  *
  * Schema for Base:
  * <pre>
- *  &lt;complexType name="RequestAbstractType" abstract="true">
- *      &lt;sequence>
- *          &lt;element ref="saml:Issuer" minOccurs="0"/>
- *          &lt;element ref="ds:Signature" minOccurs="0"/>
- *          &lt;element ref="samlp:Extensions" minOccurs="0"/>
- *      &lt;sequence>
- *      &lt;attribute name="ID" type="ID" use="required"/>
- *      &lt;attribute name="Version" type="string" use="required"/>
- *      &lt;attribute name="IssueInstant" type="dateTime" use="required"/>
- *      &lt;attribute name="Destination" type="anyURI" use="optional"/>
- *  	&lt;attribute name="Consent" type="anyURI" use="optional"/>
- *  &lt;complexType>
+ *  &lt;complexType name="RequestAbstractType" abstract="true"&gt;
+ *      &lt;sequence&gt;
+ *          &lt;element ref="saml:Issuer" minOccurs="0"/&gt;
+ *          &lt;element ref="ds:Signature" minOccurs="0"/&gt;
+ *          &lt;element ref="samlp:Extensions" minOccurs="0"/&gt;
+ *      &lt;sequence&gt;
+ *      &lt;attribute name="ID" type="ID" use="required"/&gt;
+ *      &lt;attribute name="Version" type="string" use="required"/&gt;
+ *      &lt;attribute name="IssueInstant" type="dateTime" use="required"/&gt;
+ *      &lt;attribute name="Destination" type="anyURI" use="optional"/&gt;
+ *  	&lt;attribute name="Consent" type="anyURI" use="optional"/&gt;
+ *  &lt;complexType&gt;
  * </pre>
  *
  */
@@ -204,10 +204,10 @@ public class XACMLAuthzDecisionQueryImpl extends RequestAbstractImpl
     
     /**
      * Returns the XML attribute boolean value which provides means
-     * to PEP to request that an <code>xacml-context>Request</code>
+     * to PEP to request that an <code>xacml-context:Request</code>
      * element be included in the <code>XACMlAuthzdecisionStatement</code>
      * resulting from the request. It also governs the contents of that
-     * <code.Request</code> element. If this attribite is "true" then the
+     * <code>Request</code> element. If this attribite is "true" then the
      * PDP SHALL include the <code>xacml-context:Request</code> element in the
      * <code>XACMLAuthzDecisionStatement</code> element in the 
      * <code>XACMLResponse</code>.
@@ -217,7 +217,7 @@ public class XACMLAuthzDecisionQueryImpl extends RequestAbstractImpl
      * have been used by the PDP may be included.
      * If this attribute is "false" then the PDP SHALL NOT include the
      * <code>xacml-context:Request</code> element in the 
-     * <code>XACMLAuthzDecisionStatement<code>.
+     * <code>XACMLAuthzDecisionStatement</code>.
      *
      * @return <code>boolean</code> indicating the value
      * of this attribute.

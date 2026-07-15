@@ -25,7 +25,7 @@
  * $Id: LogService.java,v 1.5 2009/12/15 18:00:14 bigfatrat Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.log.service;
@@ -86,7 +86,7 @@ public class LogService implements RequestHandler {
 
     /**
      * Registers the classes with the SAX parser
-     * @throws Exception
+     * @throws Exception if the SAX parser cannot be initialized.
      */
     @Inject
     public LogService(AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory) throws Exception {
@@ -113,9 +113,9 @@ public class LogService implements RequestHandler {
     /**
      * The method which accepts the request set, parses the xml request and
      * executes the appropriate log operation.
-     * @param requests
-     * @param servletRequest
-     * @param servletResponse
+     * @param requests the list of log requests to process.
+     * @param servletRequest the HTTP servlet request associated with the operation.
+     * @param servletResponse the HTTP servlet response associated with the operation.
      * @return The response set which contains the result of the log operation.
      */
     public ResponseSet process(PLLAuditor auditor, List<Request> requests,

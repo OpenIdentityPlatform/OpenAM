@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -36,10 +37,12 @@ import java.util.StringTokenizer;
  * Provides the Column table data &lt;td&gt; and table header &lt;th&gt;
  * renderer.
  *
- * <table class='htmlHeader' cellspacing='10'>
+ * <table class='htmlHeader'>
+ * <caption>Example</caption>
  * <tr><td>
  *
  * <table id="table" class="isi">
+ * <caption>Example</caption>
  * <thead>
  * <tr>
  * <th>Id</th>
@@ -65,11 +68,11 @@ import java.util.StringTokenizer;
  *
  * </td></tr></table>
  *
- * <p/>
+ * <p>
  *
  * The Column object provide column definitions for the {@link org.apache.click.control.Table} object.
  *
- * <h3>Column Options</h3>
+ * <h2>Column Options</h2>
  *
  * The Column class supports a number of rendering options which include:
  *
@@ -80,7 +83,7 @@ import java.util.StringTokenizer;
  * <li>{@link #dataClass} - the CSS class for the table data cell</li>
  * <li>{@link #dataStyles} - the CSS styles for the table data cell</li>
  * <li>{@link #decorator} - the custom column value renderer</li>
- * <li>{@link #format} - the <tt>MessageFormat</tt> pattern rendering
+ * <li>{@link #format} - the <code>MessageFormat</code> pattern rendering
  *      the column value</li>
  * <li>{@link #headerClass} - the CSS class for the table header cell</li>
  * <li>{@link #headerStyles} - the CSS styles for the table header cell</li>
@@ -89,7 +92,7 @@ import java.util.StringTokenizer;
  * <li>{@link #width} - the table cell width property</li>
  * </ul>
  *
- * <h4>Format Pattern</h4>
+ * <h2>Format Pattern</h2>
  *
  * The {@link #format} property which specifies {@link MessageFormat} pattern
  * a is very useful for formatting column values. For example to render
@@ -115,10 +118,10 @@ import java.util.StringTokenizer;
  * Column orderIdColumn = <span class="kw">new</span> Column(<span class="st">"order.id"</span>, <span class="st">"Order ID"</span>);
  * table.addColumn(orderIdColumn);  </pre>
  *
- * <h4>Column Decorators</h4>
+ * <h2>Column Decorators</h2>
  *
  * The support custom column value rendering you can specify a {@link Decorator}
- * class on columns. The decorator <tt>render</tt> method is passed the table
+ * class on columns. The decorator <code>render</code> method is passed the table
  * row object and the page request Context. Using the table row you can access
  * all the column values enabling you to render a compound value composed of
  * multiple column values. For example:
@@ -137,7 +140,7 @@ import java.util.StringTokenizer;
  *
  * table.addColumn(column); </pre>
 
- * The <tt>Context</tt> parameter of the decorator <tt>render()</tt> method enables you to
+ * The <code>Context</code> parameter of the decorator <code>render()</code> method enables you to
  * render controls to provide additional functionality. For example:
  *
  * <pre class="codeJava">
@@ -178,19 +181,18 @@ import java.util.StringTokenizer;
  *     }
  * } </pre>
  *
- * <h4>Internationalization</h4>
+ * <h2>Internationalization</h2>
  *
  * Column header titles can be localized using the controls parent messages.
  * If the column header title value is null, the column will attempt to find a
  * localized message in the parent messages using the key:
  * <blockquote>
- * <tt>getName() + ".headerTitle"</tt>
+ * <code>getName() + ".headerTitle"</code>
  * </blockquote>
  * If not found then the message will be looked up in the
- * <tt>/click-control.properties</tt> file using the same key.
+ * <code>/click-control.properties</code> file using the same key.
  * If a value still cannot be found then the Column name will be converted
  * into a header title using the method: {@link ClickUtils#toLabel(String)}.
- * <p/>
  *
  * @see Decorator
  * @see org.apache.click.control.Table
@@ -206,7 +208,7 @@ public class Column implements Serializable {
 
     /**
      * The automatically hyperlink column URL and email address values flag,
-     * default value is <tt>false</tt>.
+     * default value is <code>false</code>.
      */
     protected boolean autolink;
 
@@ -238,9 +240,9 @@ public class Column implements Serializable {
      * The maximum column length. If maxLength is greater than 0 and the column
      * data string length is greater than maxLength, the rendered value will be
      * truncated with an eclipse(...).
-     * <p/>
+     * <p>
      * Autolinked email or URL values will not be constrained.
-     * <p/>
+     * <p>
      * The default value is 0.
      */
     protected int maxLength;
@@ -312,7 +314,7 @@ public class Column implements Serializable {
 
     /**
      * Create a Column with no name defined.
-     * <p/>
+     * <p>
      * <b>Please note</b> the control's name must be defined before it is valid.
      */
     public Column() {
@@ -334,7 +336,7 @@ public class Column implements Serializable {
     /**
      * Set the Column with the given HTML attribute name and value. These
      * attributes will be rendered as HTML attributes, for example:
-     * <p/>
+     * <p>
      * If there is an existing named attribute in the Column it will be replaced
      * with the new value. If the given attribute value is null, any existing
      * attribute will be removed.
@@ -553,15 +555,16 @@ public class Column implements Serializable {
      * Column dateColumn = <span class="kw">new</span> Column(<span class="st">"purchaseDate"</span>, <span class="st">"Date"</span>);
      * dateColumn.setFormat(<span class="st">"{0,date,dd MMM yyyy}"</span>); </pre>
      *
-     * <h4>MesssageFormat Patterns</h4>
+     * <b>MesssageFormat Patterns</b>
      *
-     * <table border='1' cellspacing='0' cellpadding='3'>
-     *  <tr bgcolor="#ccccff">
+     * <table border='1'>
+     * <caption>Example</caption>
+     *  <tr>
      *   <th id="ft">Format Type
      *   <th id="fs">Format Style
      *   <th id="sc">Subformat Created
-     *  <tr bgcolor="#ffffff">
-     *   <td bgcolor="#eeeeff" headers="ft" rowspan=5><code>number</code>
+     *  <tr>
+     *   <td headers="ft" rowspan=5><code>number</code>
      *   <td headers="fs"><i>(none)</i>
      *   <td headers="sc"><code>NumberFormat.getInstance(getLocale())</code>
      *  <tr>
@@ -577,7 +580,7 @@ public class Column implements Serializable {
      *   <td headers="fs"><i>SubformatPattern</i>
      *   <td headers="sc"><code>new DecimalFormat(subformatPattern, new DecimalFormatSymbols(getLocale()))</code>
      *  <tr>
-     *   <td bgcolor="#eeeeff" headers="ft" rowspan=6><code>date</code>
+     *   <td headers="ft" rowspan=6><code>date</code>
      *   <td headers="fs"><i>(none)</i>
      *   <td headers="sc"><code>DateFormat.getDateInstance(DateFormat.DEFAULT, getLocale())</code>
      *  <tr>
@@ -596,7 +599,7 @@ public class Column implements Serializable {
      *   <td headers="fs"><i>SubformatPattern</i>
      *   <td headers="sc"><code>new SimpleDateFormat(subformatPattern, getLocale())</code>
      *  <tr>
-     *   <td bgcolor="#eeeeff" headers="ft" rowspan=6><code>time</code>
+     *   <td headers="ft" rowspan=6><code>time</code>
      *   <td headers="fs"><i>(none)</i>
      *   <td headers="sc"><code>DateFormat.getTimeInstance(DateFormat.DEFAULT, getLocale())</code>
      *  <tr>
@@ -615,66 +618,67 @@ public class Column implements Serializable {
      *   <td headers="fs"><i>SubformatPattern</i>
      *   <td headers="sc"><code>new SimpleDateFormat(subformatPattern, getLocale())</code>
      *  <tr>
-     *   <td bgcolor="#eeeeff" headers="ft"><code>choice</code>
+     *   <td headers="ft"><code>choice</code>
      *   <td headers="fs"><i>SubformatPattern</i>
      *   <td headers="sc"><code>new ChoiceFormat(subformatPattern)</code>
      * </table>
      *
-     * <h4>DecimalFormat Pattern Characters</h4>
+     * <b>DecimalFormat Pattern Characters</b>
      *
-     *  <table border='1' cellspacing='0' cellpadding='3'>
-     *      <tr bgcolor="#ccccff">
-     *           <th align=left>Symbol
-     *           <th align=left>Location
-     *           <th align=left>Localized?
-     *           <th align=left>Meaning
-     *      <tr valign=top>
+     *  <table border='1'>
+     * <caption>Example</caption>
+     *      <tr>
+     *           <th>Symbol
+     *           <th>Location
+     *           <th>Localized?
+     *           <th>Meaning
+     *      <tr>
      *           <td><code>0</code>
      *           <td>Number
      *           <td>Yes
      *           <td>Digit
-     *      <tr valign=top bgcolor="#eeeeff">
+     *      <tr>
      *           <td><code>#</code>
      *           <td>Number
      *           <td>Yes
      *           <td>Digit, zero shows as absent
-     *      <tr valign=top>
+     *      <tr>
      *           <td><code>.</code>
      *           <td>Number
      *           <td>Yes
      *           <td>Decimal separator or monetary decimal separator
-     *      <tr valign=top bgcolor="#eeeeff">
+     *      <tr>
      *           <td><code>-</code>
      *           <td>Number
      *           <td>Yes
      *           <td>Minus sign
-     *      <tr valign=top>
+     *      <tr>
      *           <td><code>,</code>
      *           <td>Number
      *           <td>Yes
      *           <td>Grouping separator
-     *      <tr valign=top bgcolor="#eeeeff">
+     *      <tr>
      *           <td><code>E</code>
      *           <td>Number
      *           <td>Yes
      *           <td>Separates mantissa and exponent in scientific notation.
      *               <em>Need not be quoted in prefix or suffix.</em>
-     *      <tr valign=top>
+     *      <tr>
      *           <td><code>;</code>
      *           <td>Subpattern boundary
      *           <td>Yes
      *           <td>Separates positive and negative subpatterns
-     *      <tr valign=top bgcolor="#eeeeff">
+     *      <tr>
      *           <td><code>%</code>
      *           <td>Prefix or suffix
      *           <td>Yes
      *           <td>Multiply by 100 and show as percentage
-     *      <tr valign=top>
+     *      <tr>
      *           <td><code>&#92;u2030</code>
      *           <td>Prefix or suffix
      *           <td>Yes
      *           <td>Multiply by 1000 and show as per mille
-     *      <tr valign=top bgcolor="#eeeeff">
+     *      <tr>
      *           <td><code>&#164;</code> (<code>&#92;u00A4</code>)
      *           <td>Prefix or suffix
      *           <td>No
@@ -682,7 +686,7 @@ public class Column implements Serializable {
      *               doubled, replaced by international currency symbol.
      *               If present in a pattern, the monetary decimal separator
      *               is used instead of the decimal separator.
-     *      <tr valign=top>
+     *      <tr>
      *           <td><code>'</code>
      *           <td>Prefix or suffix
      *           <td>No
@@ -692,20 +696,21 @@ public class Column implements Serializable {
      *               itself, use two in a row: <code>"# o''clock"</code>.
      *  </table>
      *
-     * <h4>SimpleDateFormat Pattern Characters</h4>
+     * <b>SimpleDateFormat Pattern Characters</b>
      *
-     *  <table border="1" cellspacing="0" cellpadding="3">
-     *  <tr bgcolor="#ccccff">
-     *           <th align=left>Letter
-     *           <th align=left>Date or Time Component
-     *           <th align=left>Presentation
-     *           <th align=left>Examples
+     *  <table border="1">
+     * <caption>Example</caption>
+     *  <tr>
+     *           <th>Letter
+     *           <th>Date or Time Component
+     *           <th>Presentation
+     *           <th>Examples
      *       <tr>
      *           <td><code>G</code>
      *           <td>Era designator
      *           <td>Text
      *           <td><code>AD</code>
-     *       <tr bgcolor="#eeeeff">
+     *       <tr>
      *           <td><code>y</code>
      *           <td>Year
      *           <td>Year
@@ -715,7 +720,7 @@ public class Column implements Serializable {
      *           <td>Month in year
      *           <td>Month
      *           <td><code>July</code>; <code>Jul</code>; <code>07</code>
-     *       <tr bgcolor="#eeeeff">
+     *       <tr>
      *           <td><code>w</code>
      *           <td>Week in year
      *           <td>Number
@@ -725,7 +730,7 @@ public class Column implements Serializable {
      *           <td>Week in month
      *           <td>Number
      *           <td><code>2</code>
-     *       <tr bgcolor="#eeeeff">
+     *       <tr>
      *           <td><code>D</code>
      *           <td>Day in year
      *           <td>Number
@@ -735,7 +740,7 @@ public class Column implements Serializable {
      *           <td>Day in month
      *           <td>Number
      *           <td><code>10</code>
-     *       <tr bgcolor="#eeeeff">
+     *       <tr>
      *           <td><code>F</code>
      *           <td>Day of week in month
      *           <td>Number
@@ -745,7 +750,7 @@ public class Column implements Serializable {
      *           <td>Day in week
      *           <td>Text
      *           <td><code>Tuesday</code>; <code>Tue</code>
-     *       <tr bgcolor="#eeeeff">
+     *       <tr>
      *           <td><code>a</code>
      *           <td>Am/pm marker
      *           <td>Text
@@ -755,7 +760,7 @@ public class Column implements Serializable {
      *           <td>Hour in day (0-23)
      *           <td>Number
      *           <td><code>0</code>
-     *       <tr bgcolor="#eeeeff">
+     *       <tr>
      *           <td><code>k</code>
      *           <td>Hour in day (1-24)
      *           <td>Number
@@ -765,7 +770,7 @@ public class Column implements Serializable {
      *           <td>Hour in am/pm (0-11)
      *           <td>Number
      *           <td><code>0</code>
-     *       <tr bgcolor="#eeeeff">
+     *       <tr>
      *           <td><code>h</code>
      *           <td>Hour in am/pm (1-12)
      *           <td>Number
@@ -775,7 +780,7 @@ public class Column implements Serializable {
      *           <td>Minute in hour
      *           <td>Number
      *           <td><code>30</code>
-     *       <tr bgcolor="#eeeeff">
+     *       <tr>
      *           <td><code>s</code>
      *           <td>Second in minute
      *           <td>Number
@@ -785,7 +790,7 @@ public class Column implements Serializable {
      *           <td>Millisecond
      *           <td>Number
      *           <td><code>978</code>
-     *       <tr bgcolor="#eeeeff">
+     *       <tr>
      *           <td><code>z</code>
      *           <td>Time zone
      *           <td>General time zone
@@ -936,17 +941,16 @@ public class Column implements Serializable {
 
     /**
      * Return the table header &lt;th&gt; title.
-     * <p/>
+     * <p>
      * If the header title value is null, this method will attempt to find a
      * localized message in the parent messages using the key:
      * <blockquote>
-     * <tt>getName() + ".headerTitle"</tt>
+     * <code>getName() + ".headerTitle"</code>
      * </blockquote>
      * If not found then the message will be looked up in the
-     * <tt>/click-control.properties</tt> file using the same key.
+     * <code>/click-control.properties</code> file using the same key.
      * If a value still cannot be found then the Column name will be converted
      * into a header title using the method: {@link ClickUtils#toLabel(String)}
-     * <p/>
      *
      * @return the table header title
      */
@@ -970,8 +974,8 @@ public class Column implements Serializable {
     }
 
     /**
-     * Return the Table and Column id appended: &nbsp; "<tt>table-column</tt>"
-     * <p/>
+     * Return the Table and Column id appended: &nbsp; "<code>table-column</code>"
+     * <p>
      * Use the field the "id" attribute value if defined, or the name otherwise.
      *
      * @return HTML element identifier attribute "id" value
@@ -1065,9 +1069,9 @@ public class Column implements Serializable {
     }
 
     /**
-     * Set the Column's the parent <tt>Table</tt>.
+     * Set the Column's the parent <code>Table</code>.
      *
-     * @param table Column's parent <tt>Table</tt>
+     * @param table Column's parent <code>Table</code>
      */
     public void setTable(Table table) {
         this.table = table;
@@ -1076,9 +1080,9 @@ public class Column implements Serializable {
     /**
      * Set the column CSS "text-align" style for the header &lt;th&gt; and
      * data &lt;td&gt; elements.  Valid values include:
-     * <tt>[left, right, center]</tt>
+     * <code>[left, right, center]</code>
      *
-     * @param align the CSS "text-align" value: <tt>[left, right, center]</tt>
+     * @param align the CSS "text-align" value: <code>[left, right, center]</code>
      */
     public void setTextAlign(String align) {
         if (align != null && "middle".equalsIgnoreCase(align)) {
@@ -1114,8 +1118,8 @@ public class Column implements Serializable {
     /**
      * Set the column CSS "vertical-align" style for the header &lt;th&gt; and
      * data &lt;td&gt; elements. Valid values include:
-     * <tt>[baseline | sub | super | top | text-top | middle | bottom |
-     * text-bottom | &lt;percentage&gt; | &lt;length&gt; | inherit]</tt>
+     * <code>[baseline | sub | super | top | text-top | middle | bottom |
+     * text-bottom | &lt;percentage&gt; | &lt;length&gt; | inherit]</code>
      *
      * @param align the CSS "vertical-align" value
      */
@@ -1263,14 +1267,14 @@ public class Column implements Serializable {
 
     /**
      * Return the column name property value from the given row object.
-     * <p/>
-     * If the row object is a <tt>Map</tt> this method will attempt to return
+     * <p>
+     * If the row object is a <code>Map</code> this method will attempt to return
      * the map value for the column name. The row map lookup will be performed
      * using the property name, if a value is not found the property name in
      * uppercase will be used, if a value is still not found the property name
      * in lowercase will be used. If a map value is still not found then this
      * method will return null.
-     * <p/>
+     * <p>
      * Object property values can also be specified using a path expression.
      *
      * @param row the row object to obtain the property from
@@ -1283,14 +1287,14 @@ public class Column implements Serializable {
 
     /**
      * Return the column property value from the given row object and property name.
-     * <p/>
-     * If the row object is a <tt>Map</tt> this method will attempt to return
+     * <p>
+     * If the row object is a <code>Map</code> this method will attempt to return
      * the map value for the column. The row map lookup will be performed using
      * the property name, if a value is not found the property name in uppercase
      * will be used, if a value is still not found the property name in lowercase
      * will be used. If a map value is still not found then this method will
      * return null.
-     * <p/>
+     * <p>
      * Object property values can also be specified using a path expression.
      *
      * @param name the name of the property
@@ -1389,8 +1393,8 @@ public class Column implements Serializable {
     }
 
     /**
-     * Render the given table cell value to the buffer as a <tt>mailto:</tt>
-     * or <tt>http:</tt> hyperlink, or as an ordinary string if the value is
+     * Render the given table cell value to the buffer as a <code>mailto:</code>
+     * or <code>http:</code> hyperlink, or as an ordinary string if the value is
      * determined not be linkable.
      *
      * @param value the table cell value to render

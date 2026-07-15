@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -43,13 +43,13 @@ import jakarta.inject.Inject;
 
 /**
  * This upgrade step upgrades LDAP and AD auth module instances.
- * <p/>
+ * <p>
  * If module instances have value <code>true</code> set for property <code>iplanet-am-auth-ldap-ssl-enabled</code>,
  * the property <code>openam-auth-ldap-connection-mode</code> with value <code>LDAPS</code> will be set.
- * <p/>
+ * <p>
  * If module instances have value <code>false</code> set for property <code>iplanet-am-auth-ldap-ssl-enabled</code>,
  * the property <code>openam-auth-ldap-connection-mode</code> with value <code>LDAP</code> will be set.
- * <p/>
+ * <p>
  * If needed property <code>iplanet-am-auth-ldap-ssl-enabled</code> will be removed.
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")

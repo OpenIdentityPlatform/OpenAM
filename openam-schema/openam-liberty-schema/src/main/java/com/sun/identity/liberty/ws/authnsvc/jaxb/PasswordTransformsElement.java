@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -14,39 +15,38 @@ package com.sun.identity.liberty.ws.authnsvc.jaxb;
  * 
  * Java content class for PasswordTransforms element declaration.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-idwsf-authn-svc.xsd line 166)
- * <p>
  * <pre>
- * &lt;element name="PasswordTransforms">
- *   &lt;complexType>
- *     &lt;complexContent>
- *       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *         &lt;sequence>
- *           &lt;element name="Transform" maxOccurs="unbounded">
- *             &lt;complexType>
- *               &lt;complexContent>
- *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                   &lt;sequence>
- *                     &lt;element name="Parameter" maxOccurs="unbounded" minOccurs="0">
- *                       &lt;complexType>
- *                         &lt;simpleContent>
- *                           &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
- *                             &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *                           &lt;/extension>
- *                         &lt;/simpleContent>
- *                       &lt;/complexType>
- *                     &lt;/element>
- *                   &lt;/sequence>
- *                   &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *                   &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" />
- *                 &lt;/restriction>
- *               &lt;/complexContent>
- *             &lt;/complexType>
- *           &lt;/element>
- *         &lt;/sequence>
- *       &lt;/restriction>
- *     &lt;/complexContent>
- *   &lt;/complexType>
- * &lt;/element>
+ * &lt;element name="PasswordTransforms"&gt;
+ *   &lt;complexType&gt;
+ *     &lt;complexContent&gt;
+ *       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *         &lt;sequence&gt;
+ *           &lt;element name="Transform" maxOccurs="unbounded"&gt;
+ *             &lt;complexType&gt;
+ *               &lt;complexContent&gt;
+ *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                   &lt;sequence&gt;
+ *                     &lt;element name="Parameter" maxOccurs="unbounded" minOccurs="0"&gt;
+ *                       &lt;complexType&gt;
+ *                         &lt;simpleContent&gt;
+ *                           &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
+ *                             &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *                           &lt;/extension&gt;
+ *                         &lt;/simpleContent&gt;
+ *                       &lt;/complexType&gt;
+ *                     &lt;/element&gt;
+ *                   &lt;/sequence&gt;
+ *                   &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *                   &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *                 &lt;/restriction&gt;
+ *               &lt;/complexContent&gt;
+ *             &lt;/complexType&gt;
+ *           &lt;/element&gt;
+ *         &lt;/sequence&gt;
+ *       &lt;/restriction&gt;
+ *     &lt;/complexContent&gt;
+ *   &lt;/complexType&gt;
+ * &lt;/element&gt;
  * </pre>
  * 
  */

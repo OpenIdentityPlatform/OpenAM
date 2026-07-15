@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,38 +13,37 @@ package com.sun.identity.liberty.ws.meta.jaxb;
 /**
  * Java content class for providerDescriptorType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-metadata.xsd line 122)
- * <p>
  * <pre>
- * &lt;complexType name="providerDescriptorType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:metadata:2003-08}KeyDescriptor" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="SoapEndpoint" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
- *         &lt;element name="SingleLogoutServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
- *         &lt;element name="SingleLogoutServiceReturnURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
- *         &lt;element name="FederationTerminationServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
- *         &lt;element name="FederationTerminationServiceReturnURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
- *         &lt;element name="FederationTerminationNotificationProtocolProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="SingleLogoutProtocolProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="RegisterNameIdentifierProtocolProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="RegisterNameIdentifierServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
- *         &lt;element name="RegisterNameIdentifierServiceReturnURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
- *         &lt;element name="NameIdentifierMappingProtocolProfile" type="{urn:oasis:names:tc:SAML:1.0:assertion}AuthorityBindingType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="NameIdentifierMappingEncryptionProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="Organization" type="{urn:liberty:metadata:2003-08}organizationType" minOccurs="0"/>
- *         &lt;element name="ContactPerson" type="{urn:liberty:metadata:2003-08}contactType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="AdditionalMetaLocation" type="{urn:liberty:metadata:2003-08}additionalMetadataLocationType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:metadata:2003-08}Extension" minOccurs="0"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}Signature" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="cacheDuration" type="{http://www.w3.org/2001/XMLSchema}duration" />
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *       &lt;attribute name="protocolSupportEnumeration" use="required" type="{http://www.w3.org/2001/XMLSchema}NMTOKENS" />
- *       &lt;attribute name="validUntil" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="providerDescriptorType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:metadata:2003-08}KeyDescriptor" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="SoapEndpoint" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/&gt;
+ *         &lt;element name="SingleLogoutServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/&gt;
+ *         &lt;element name="SingleLogoutServiceReturnURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/&gt;
+ *         &lt;element name="FederationTerminationServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/&gt;
+ *         &lt;element name="FederationTerminationServiceReturnURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/&gt;
+ *         &lt;element name="FederationTerminationNotificationProtocolProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="SingleLogoutProtocolProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="RegisterNameIdentifierProtocolProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="RegisterNameIdentifierServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/&gt;
+ *         &lt;element name="RegisterNameIdentifierServiceReturnURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/&gt;
+ *         &lt;element name="NameIdentifierMappingProtocolProfile" type="{urn:oasis:names:tc:SAML:1.0:assertion}AuthorityBindingType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="NameIdentifierMappingEncryptionProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="Organization" type="{urn:liberty:metadata:2003-08}organizationType" minOccurs="0"/&gt;
+ *         &lt;element name="ContactPerson" type="{urn:liberty:metadata:2003-08}contactType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="AdditionalMetaLocation" type="{urn:liberty:metadata:2003-08}additionalMetadataLocationType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:metadata:2003-08}Extension" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}Signature" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="cacheDuration" type="{http://www.w3.org/2001/XMLSchema}duration" /&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *       &lt;attribute name="protocolSupportEnumeration" use="required" type="{http://www.w3.org/2001/XMLSchema}NMTOKENS" /&gt;
+ *       &lt;attribute name="validUntil" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

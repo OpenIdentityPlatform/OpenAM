@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -39,8 +40,7 @@ import java.util.Set;
 /**
  * This <code>RequestSet</code> class represents a RequestSet XML document.
  * The RequestSet DTD is defined as the following:
- * </p>
- * 
+ *
  * <pre>
  *    &lt;?xml version=&quot;1.0&quot;&gt;
  *    &lt; !-- This DTD is used by PLL --&gt;
@@ -56,8 +56,7 @@ import java.util.Set;
  *       sid   CDATA #IMPLIED&gt;
  *    ]&gt;
  * </pre>
- * 
- * </p>
+ *
  * Each RequestSet object contains a version, service ID, request set ID, and a
  * collection of Request objects. The RequestSet views each Request object as a
  * String. This makes it possible that the content of the Request object can be

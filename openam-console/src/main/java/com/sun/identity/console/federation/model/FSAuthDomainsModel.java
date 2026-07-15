@@ -24,6 +24,7 @@
  *
  * $Id: FSAuthDomainsModel.java,v 1.3 2008/06/25 05:49:39 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.console.federation.model;
@@ -102,7 +103,7 @@ public interface FSAuthDomainsModel
 
     /**
      * Deletes authentication domains.
-     * @param realm
+     * @param realm the realm containing the authentication domain
      * @param cotName Name of circle of trust
      * @throws AMConsoleException if authentication domains cannot be deleted.
      */
@@ -111,11 +112,10 @@ public interface FSAuthDomainsModel
 
     /**
      * Returns attribute values.
-     * @param realm
+     * @param realm the realm containing the authentication domain
      * @param name Name of authentication domain.
      * @return attribute values.
-     * @throws FSAllianceManagementException if attribute values cannot be 
-     *         obtained.
+     * @throws AMConsoleException if attribute values cannot be obtained.
      */
     Map getAttributeValues(String realm, String name)
 	throws AMConsoleException;
@@ -139,7 +139,7 @@ public interface FSAuthDomainsModel
 
     /**
      * Returns a set of provider names.
-     * @param realm
+     * @param realm the realm to search for provider names
      * @return a set of provider names.
      * @throws AMConsoleException if provider names cannot be obtained.
      */
@@ -148,7 +148,7 @@ public interface FSAuthDomainsModel
 
     /**
      * Returns a set of provider names under a authentication domain.
-     * @param realm
+     * @param realm the realm containing the authentication domain
      * @param name Name of authentication domain.
      * @return a set of provider names under a authentication domain.
      * @throws AMConsoleException if provider names cannot be obtained.

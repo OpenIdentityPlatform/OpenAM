@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -55,9 +56,9 @@ abstract public class UserDataInteraction extends BaseInteraction implements
      * An abstract method to be implemented by child class to process user data
      * for interactive input 
      * 
-     * @pararm userInput User Input 
+     * @param userInput User Input
      * @param state IStateAccess state
-     * 
+     *
      * @return InteractionResult
      */
     abstract public InteractionResult processData(String userInput,
@@ -67,9 +68,9 @@ abstract public class UserDataInteraction extends BaseInteraction implements
      * abstract method to be implemented by child class to process user options
      * for interactive input 
      * 
-     * @pararm userInput User Input 
+     * @param option the user option selected for the interactive input
      * @param state IStateAccess state
-     * 
+     *
      * @return InteractionResult
      */
     abstract public InteractionResult processOption(UserOptionItem option,
@@ -135,8 +136,8 @@ abstract public class UserDataInteraction extends BaseInteraction implements
      * 
      * @return String processedInput
      * 
-     * @throws InstallException
-     * 
+     * @throws InstallException if the silent input cannot be pre-processed
+     *
      */
     public String preProcessSilentInput(Map userResponseMap)
             throws InstallException {
@@ -262,8 +263,8 @@ abstract public class UserDataInteraction extends BaseInteraction implements
      * 
      * Is required flag @return String Processed input result string
      * 
-     * @throws InstallException
-     * 
+     * @throws InstallException if the user input cannot be pre-processed
+     *
      */
     public String preProcessUserInput(String userInput, IStateAccess state,
             boolean isReq) throws InstallException {
@@ -345,8 +346,8 @@ abstract public class UserDataInteraction extends BaseInteraction implements
      * 
      * @return CumulativeValResult
      * 
-     * @throws InstallException
-     * 
+     * @throws InstallException if validation of the processed input fails
+     *
      */
     public CumulativeValResult processValidators(String procInput,
             IStateAccess state, boolean isInter) throws InstallException {
@@ -460,8 +461,8 @@ abstract public class UserDataInteraction extends BaseInteraction implements
      * 
      * @return String default value for the interaction
      * 
-     * @throws InstallException
-     * 
+     * @throws InstallException if the default value cannot be resolved
+     *
      */
     public String processDefaultValFromAllSources(IStateAccess state)
             throws InstallException {
@@ -509,8 +510,8 @@ abstract public class UserDataInteraction extends BaseInteraction implements
      * 
      * @return String default value for the interaction
      * 
-     * @throws InstallException
-     * 
+     * @throws InstallException if the default value cannot be read from state
+     *
      */
     public String processDefaultValFromStateOnly(IStateAccess state)
             throws InstallException {
@@ -527,8 +528,8 @@ abstract public class UserDataInteraction extends BaseInteraction implements
      * 
      * @param state IStateAccess interface @return boolean
      * 
-     * @throws InstallException
-     * 
+     * @throws InstallException if the value cannot be cleared from state
+     *
      */
     public void clearValueInState(IStateAccess state) throws InstallException {
         state.put(getKey(), STR_IN_EMPTY_STRING);

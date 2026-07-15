@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.common.configuration;
@@ -1300,7 +1301,6 @@ public class AgentConfiguration {
      * @param type AttributeSchema type
      * @return a set of attribute schema names whose schema match a given 
      * type.
-     * @throws IdRepoException if there are Id Repository related errors.
      * @throws SSOException if the Single Sign On token is invalid or has
      *         expired.
      * @throws SMSException if there are errors in service management layers.

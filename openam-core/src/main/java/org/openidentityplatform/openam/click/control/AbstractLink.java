@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -34,9 +35,9 @@ import java.util.Set;
 
 /**
  * Provides a Abstract Link control: &nbsp; &lt;a href=""&gt;&lt;/a&gt;.
- * <p/>
+ * <p>
  * See also the W3C HTML reference:
- * <a class="external" target="_blank" title="W3C HTML 4.01 Specification"
+ * <a class="external" target="_blank"
  *    href="http://www.w3.org/TR/html401/struct/links.html#h-12.2">A Links</a>
  *
  * @see ActionLink
@@ -53,9 +54,9 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
 
     /**
      * The image src path attribute.  If the image src is defined then a
-     * <tt>&lt;img/&gt;</tt> element will rendered inside the anchor link when
+     * <code>&lt;img/&gt;</code> element will rendered inside the anchor link when
      * using the AbstractLink {@link #toString()} method.
-     * <p/>
+     * <p>
      * If the image src value is prefixed with '/' then the request context path
      * will be prefixed to the src value when rendered by the control.
      */
@@ -90,7 +91,7 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
 
     /**
      * Create an AbstractLink with no name defined.
-     * <p/>
+     * <p>
      * <b>Please note</b> the control's name must be defined before it is valid.
      */
     public AbstractLink() {
@@ -99,7 +100,7 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
     // Public Attributes ------------------------------------------------------
 
     /**
-     * Return the link html tag: <tt>a</tt>.
+     * Return the link html tag: <code>a</code>.
      *
      * @see AbstractControl#getTag()
      *
@@ -134,7 +135,7 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
     /**
      * Return the AbstractLink anchor &lt;a&gt; tag href attribute.
      * This method will encode the URL with the session ID
-     * if required using <tt>HttpServletResponse.encodeURL()</tt>.
+     * if required using <code>HttpServletResponse.encodeURL()</code>.
      *
      * @return the AbstractLink HTML href attribute
      */
@@ -142,12 +143,12 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
 
     /**
      * Return the image src path attribute. If the image src is defined then a
-     * <tt>&lt;img/&gt;</tt> element will be rendered inside the anchor link
+     * <code>&lt;img/&gt;</code> element will be rendered inside the anchor link
      * when using the AbstractLink {@link #toString()} method.
-     * <p/>
+     * <p>
      * <b>Note:</b> the label will not be rendered in this case (default behavior),
      * unless the {@link #setRenderLabelAndImage(boolean)} flag is set to true.
-     * <p/>
+     * <p>
      * If the src value is prefixed with '/' then the request context path will
      * be prefixed to the src value when rendered by the control.
      *
@@ -161,11 +162,11 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
      * Set the image src path attribute. If the src value is prefixed with
      * '/' then the request context path will be prefixed to the src value when
      * rendered by the control.
-     * <p/>
-     * If the image src is defined then an <tt>&lt;img/&gt;</tt> element will
+     * <p>
+     * If the image src is defined then an <code>&lt;img/&gt;</code> element will
      * be rendered inside the anchor link when using the AbstractLink
      * {@link #toString()} method.
-     * <p/>
+     * <p>
      * <b>Note:</b> the label will not be rendered in this case (default behavior),
      * unless the {@link #setRenderLabelAndImage(boolean)} flag is set to true.
      *
@@ -193,19 +194,19 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
 
     /**
      * Return the label for the AbstractLink.
-     * <p/>
+     * <p>
      * If the label value is null, this method will attempt to find a
      * localized label message in the parent messages using the key:
      * <blockquote>
-     * <tt>getName() + ".label"</tt>
+     * <code>getName() + ".label"</code>
      * </blockquote>
      * If not found then the message will be looked up in the
-     * <tt>/click-control.properties</tt> file using the same key.
+     * <code>/click-control.properties</code> file using the same key.
      * If a value still cannot be found then the ActionLink name will be converted
      * into a label using the method: {@link ClickUtils#toLabel(String)}
-     * <p/>
-     * For example given a <tt>OrderPage</tt> with the properties file
-     * <tt>OrderPage.properties</tt>:
+     * <p>
+     * For example given a <code>OrderPage</code> with the properties file
+     * <code>OrderPage.properties</code>:
      *
      * <pre class="codeConfig">
      * <span class="st">checkout</span>.label=<span class="red">Checkout</span>
@@ -224,7 +225,7 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
      *
      * When a label value is not set, or defined in any properties files, then
      * its value will be created from the Fields name.
-     * <p/>
+     * <p>
      * For example given the ActionLink code:
      *
      * <pre class="codeJava">
@@ -235,7 +236,7 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
      * &lt;a href=".."&gt;<span class="red">Delete Item</span>&lt;/a&gt; </pre>
      *
      * Note the ActionLink label can include raw HTML to render other elements.
-     * <p/>
+     * <p>
      * For example the configured label:
      *
      * <pre class="codeConfig">
@@ -302,7 +303,7 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
      * Set the link parameter with the given parameter name and value. You would
      * generally use parameter if you were creating the entire AbstractLink
      * programmatically and rendering it with the {@link #toString()} method.
-     * <p/>
+     * <p>
      * For example given the ActionLink:
      *
      * <pre class="codeJava">
@@ -404,15 +405,15 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
      * Defines a link parameter that will have its value bound to a matching
      * request parameter. {@link #setParameter(String, Object) setParameter}
      * implicitly defines a parameter as well.
-     * <p/>
+     * <p>
      * <b>Please note:</b> parameters need only be defined for Ajax requests.
-     * For non-Ajax requests, <tt>all</tt> incoming request parameters
+     * For non-Ajax requests, <code>all</code> incoming request parameters
      * are bound, whether they are defined or not. This behavior may change in a
      * future release.
-     * <p/>
+     * <p>
      * <b>Also note:</b> link parameters are bound to request parameters
      * during the {@link #onProcess()} event, so link parameters must be defined
-     * in the Page constructor or <tt>onInit()</tt> event.
+     * in the Page constructor or <code>onInit()</code> event.
      *
      * @param name the name of the parameter to define
      */
@@ -457,17 +458,17 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
     /**
      * Return the 'title' attribute, or null if not defined. The title
      * attribute acts like tooltip message over the link.
-     * <p/>
+     * <p>
      * If the title value is null, this method will attempt to find a
      * localized label message in the parent messages using the key:
      * <blockquote>
-     * <tt>getName() + ".title"</tt>
+     * <code>getName() + ".title"</code>
      * </blockquote>
      * If not found then the message will be looked up in the
-     * <tt>/click-control.properties</tt> file using the same key.
-     * <p/>
-     * For examle given a <tt>ItemsPage</tt> with the properties file
-     * <tt>ItemPage.properties</tt>:
+     * <code>/click-control.properties</code> file using the same key.
+     * <p>
+     * For examle given a <code>ItemsPage</code> with the properties file
+     * <code>ItemPage.properties</code>:
      *
      * <pre class="codeConfig">
      * <span class="st">edit</span>.label=<span class="red">Edit</span>
@@ -584,10 +585,10 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
      * will render the entire anchor link including the tags, the label and
      * any attributes, see {@link #setAttribute(String, String)} for an
      * example.
-     * <p/>
-     * If the image src is defined then a <tt>&lt;img/&gt;</tt> element will
+     * <p>
+     * If the image src is defined then a <code>&lt;img/&gt;</code> element will
      * rendered inside the anchor link instead of the label property.
-     * <p/>
+     * <p>
      * This method invokes the abstract {@link #getHref()} method.
      *
      * @see #toString()
@@ -668,7 +669,7 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
 
     /**
      * Restore the link state from the session for the given request context.
-     * <p/>
+     * <p>
      * This method delegates to {@link #setState(Object)} to set the
      * link restored state.
      *
@@ -683,7 +684,7 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
 
     /**
      * Save the link state to the session for the given request context.
-     * <p/>
+     * <p>
      * * This method delegates to {@link #getState()} to retrieve the link state
      * to save.
      *
@@ -728,13 +729,13 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
 
     /**
      * Render the given link parameters to the buffer.
-     * <p/>
+     * <p>
      * The parameters will be rendered as URL key/value pairs e.g:
-     * "<tt>firstname=john&lastname=smith</tt>".
-     * <p/>
+     * "<code>firstname=john&amp;lastname=smith</code>".
+     * <p>
      * Multivalued parameters will be rendered with each value sharing the same
-     * key e.g: "<tt>name=john&name=susan&name=mary</tt>".
-     * <p/>
+     * key e.g: "<code>name=john&amp;name=susan&amp;name=mary</code>".
+     * <p>
      * The parameter value will be encoded through
      * {@link ClickUtils#encodeUrl(Object, Context)}.
      *
@@ -777,8 +778,8 @@ public abstract class AbstractLink extends AbstractControl implements Stateful {
     /**
      * This method binds the submitted request parameters to the link
      * parameters.
-     * <p/>
-     * For non-Ajax requests this method will bind <tt>all</tt> incoming request
+     * <p>
+     * For non-Ajax requests this method will bind <code>all</code> incoming request
      * parameters to the link. For Ajax requests this method will only bind
      * the parameters already defined on the link.
      *

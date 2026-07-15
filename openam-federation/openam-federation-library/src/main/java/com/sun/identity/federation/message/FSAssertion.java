@@ -25,6 +25,7 @@
  * $Id: FSAssertion.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -86,7 +87,7 @@ public class FSAssertion extends Assertion {
     protected String id;
     
     /**
-     * The value of the <code>MinorVersion</Version> attribute in
+     * The value of the <code>MinorVersion</code> attribute in
      * the <code>Assertion</code>.
      */
     protected int minorVersion = IFSConstants.FF_11_ASSERTION_MINOR_VERSION;
@@ -378,7 +379,7 @@ public class FSAssertion extends Assertion {
     }
     
     /**
-     * Sets  value of <code>id<code> attribute.
+     * Sets  value of <code>id</code> attribute.
      *
      * @param id value of <code>id</code> attribute.
      * @see #getID

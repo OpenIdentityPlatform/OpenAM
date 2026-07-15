@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.session.service;
 
@@ -74,7 +74,7 @@ public class ServicesClusterMonitorHandler {
      * @param sid session id
      * @return server id for the server instance determined to be the current
      *         host
-     * @throws SessionException
+     * @throws SessionException if the current host server cannot be determined
      */
     public String getCurrentHostServer(SessionID sid) throws SessionException {
        return getClusterMonitor().getCurrentHostServer(sid);

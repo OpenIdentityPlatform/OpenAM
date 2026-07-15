@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2014 ForgeRock As
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.shared.debug;
@@ -37,7 +38,6 @@ package com.sun.identity.shared.debug;
  * Manager SDK. The implementation of this interface as well as the
  * <code>com.sun.identity.util.IDebug</code> interface togehter provide the
  * necessary functionality to replace or enhance the Debug service.
- * </p>
  */
 public interface IDebugProvider {
     /**

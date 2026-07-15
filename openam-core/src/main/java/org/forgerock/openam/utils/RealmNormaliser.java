@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.utils;
@@ -39,7 +39,7 @@ public class RealmNormaliser {
 
     /**
      * Normalises the realm.
-     * <br/>
+     * <br>
      * If the specified realm is {@code null} or an empty String, '/' is returned. Otherwise the specified realm is
      * checked for its validity and returned in "/" separated format . 
      *

@@ -24,6 +24,7 @@
  *
  * $Id: RequestSecurityTokenResponseCollection.java,v 1.1 2008/09/19 16:00:56 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.trust;
@@ -52,9 +53,9 @@ public abstract class RequestSecurityTokenResponseCollection {
     }
     
     /**
-     * Sets the list of <code>RequestSecurityTokenResponse<code>s.
+     * Sets the list of <code>RequestSecurityTokenResponse</code>s.
      * @param rstrResponses the list of
-     *            <code>RequestSecurityTokenResponse<code>s.
+     *            <code>RequestSecurityTokenResponse</code>s.
      */
     public void setRequestSecurityTokenResponses(List rstrResponses) {
         this.rstResponses = rstrResponses;
@@ -64,7 +65,8 @@ public abstract class RequestSecurityTokenResponseCollection {
      * Converts into DOM Element.
      * @return the DOM Element for the
      *          <code>RequestSecurityTokenResponseCollection</code>
-     * @throws com.sun.identity.wss.trust.WSTException
+     * @throws com.sun.identity.wss.trust.WSTException if the DOM element
+     *         cannot be created.
      */
     public abstract Element toDOMElement() throws WSTException;
     
@@ -72,7 +74,8 @@ public abstract class RequestSecurityTokenResponseCollection {
      * Converts into XML String.
      * @return the XML String for the
      *                     <code>RequestSecurityTokenResponseCollection</code>
-     * @throws com.sun.identity.wss.trust.WSTException
+     * @throws com.sun.identity.wss.trust.WSTException if the XML string
+     *         cannot be created.
      */
     public abstract String toXMLString() throws WSTException;
 

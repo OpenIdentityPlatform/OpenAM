@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.shared.concurrency;
@@ -65,7 +65,7 @@ import java.util.concurrent.TimeUnit;
  * The ThreadMonitor will use its own internal WatchDog class, itself runnable and a
  * thread pool to provide the monitoring.
  *
- * <br>Thread Policy</br>: All {@link java.lang.Runnable} tasks provided to this
+ * <br>Thread Policy: All {@link java.lang.Runnable} tasks provided to this
  * ThreadMonitor should respond to the standard {@link Thread#interrupt()} signal.
  * This mechanism will be used for coordinating shutdown of the task. All
  * ExecutorServices provided to this framework are assumed to respond to the system
@@ -74,7 +74,7 @@ import java.util.concurrent.TimeUnit;
  * Sadly though the question of "Who will guard the guards themselves?" is intentionally
  * avoided by this class and should be considered out of scope.
  *
- * @link https://en.wikipedia.org/wiki/Quis_custodiet_ipsos_custodes%3F
+ * @see <a href="https://en.wikipedia.org/wiki/Quis_custodiet_ipsos_custodes%3F">Quis custodiet ipsos custodes?</a>
  * @see com.sun.identity.common.ShutdownManager
  * @see org.forgerock.util.thread.listener.ShutdownManager
  */

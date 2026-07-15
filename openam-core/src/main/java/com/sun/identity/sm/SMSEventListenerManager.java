@@ -25,6 +25,7 @@
  * $Id: SMSEventListenerManager.java,v 1.12 2009/01/28 05:35:03 ww203982 Exp $
  *
  * Portions Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.sm;
@@ -44,8 +45,8 @@ import com.sun.identity.shared.debug.Debug;
 
 /**
  * Receives notifications for all SMS object changes from
- * <class>SMSNotificationManager</class> and dispatches the same to <class>
- * CachedSMSEntry</class> and <class>CachedSubEntries</class>. This class
+ * <code>SMSNotificationManager</code> and dispatches the same to <code>
+ * CachedSMSEntry</code> and <code>CachedSubEntries</code>. This class
  * also handles the case of sending deleted event for recursive deletes.
  */
 class SMSEventListenerManager implements SMSObjectListener {

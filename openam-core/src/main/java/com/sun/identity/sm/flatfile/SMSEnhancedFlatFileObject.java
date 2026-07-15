@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -663,7 +664,7 @@ public class SMSEnhancedFlatFileObject extends SMSFlatFileObjectBase {
      * @param token Ignored argument. Access check is assumed to have 
      *        occurred before reaching this method. 
      * @param objName Name of the configuration object to check.
-     * @return <code>true>/code> if the configuration object exists.
+     * @return <code>true</code> if the configuration object exists.
      * @throws IllegalArgumentException if objName is null or empty.
      */
     public boolean entryExists(SSOToken token, String objName) {

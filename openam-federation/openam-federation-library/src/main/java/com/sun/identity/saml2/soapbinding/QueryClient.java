@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.soapbinding;
 
@@ -271,7 +271,7 @@ public class QueryClient {
      *
      * @param entityID entity identifier.
      * @return the <code>Issuer</code> object.
-     * @exception <code>SAML2Exception</code> if there is an error creating
+     * @exception SAML2Exception if there is an error creating
      *            the issuer.
      */
     private static Issuer createIssuer(String entityID)
@@ -287,9 +287,9 @@ public class QueryClient {
      *
      * @param xmlString the String representation of the object.
      * @return the <code>Response</code> object.
-     * @exception <code>IOException</code> if there is an error processing the
+     * @exception IOException if there is an error processing the
      *            response.
-     * @exception <code>SAML2Exception</code> if there is an error processing
+     * @exception SAML2Exception if there is an error processing
      *            the response.
      */
     private static Response getSAMLResponse(String xmlString)
@@ -460,7 +460,7 @@ public class QueryClient {
      * @param realm the realm of the entity.
      * @param pepEntityId identifier of the PEP.
      * @return the <code>XACMLAuthzDecisionQueryConfigElement</code> object.
-     * @exception <code>SAML2Exception</code> if there is an error retreiving
+     * @exception SAML2Exception if there is an error retreiving
      *            the extended configuration.
      */
     private static XACMLAuthzDecisionQueryConfigElement getPEPConfig(
@@ -493,7 +493,7 @@ public class QueryClient {
      * @param realm the realm of the entity.
      * @param pdpEntityId identifier of the PDP.
      * @return the <code>XACMLPDPConfigElement</code> object.
-     * @exception <code>SAML2Exception</code> if there is an error retreiving
+     * @exception SAML2Exception if there is an error retreiving
      *            the extended configuration.
      */
     private static XACMLPDPConfigElement getPDPConfig(
@@ -529,7 +529,7 @@ public class QueryClient {
      * @param realm the realm of the entity.
      * @param pepEntityID entity identifier of the PEP.
      * @param samlResponse the <code>Response</code>.
-     * @exception <code>SAML2Exception</code> if there is an error.
+     * @exception SAML2Exception if there is an error.
      */
     private static Response verifyResponse(String realm,String pepEntityID,
             Response samlResponse) throws SAML2Exception {
@@ -701,7 +701,7 @@ public class QueryClient {
      *
      * @param samlResponse the <code>Response</code> object.
      * @return <code>Response</code> object.
-     * @exception <code>SAML2Exception</code> if there is an error creating
+     * @exception SAML2Exception if there is an error creating
      *            the response.
      */
     private static Response createResponse(Response samlResponse,
@@ -728,7 +728,7 @@ public class QueryClient {
      * @param pepConfig the PEP extended configuration object.
      * @param attrName the attribute name whose value is to be retreived.
      * @return value of the attribute.
-     * @exception <code>SAML2MetaException</code> if there is an error
+     * @exception SAML2MetaException if there is an error
      *             retreiving the value.
      */
     private static String getAttributeValueFromPEPConfig(
@@ -761,7 +761,7 @@ public class QueryClient {
      * @param pdpConfig the PDP extended configuration object.
      * @param attrName the attribute name whose value is to be retreived.
      * @return value of the attribute.
-     * @exception <code>SAML2MetaException</code> if there is an error
+     * @exception SAML2MetaException if there is an error
      *             retreiving the value.
      */
     private static String getAttributeValueFromPDPConfig(
@@ -797,7 +797,7 @@ public class QueryClient {
      * @param realm the entity's realm.
      * @param pepEntityID entity identifier of the PEP.
      * @return true if the value of the attribute is true.
-     * @exception <code>SAML2MetaException</code> if there is an error
+     * @exception SAML2MetaException if there is an error
      * retreiving the configuration.
      */
     private static boolean wantAssertionSigned(String realm,String pepEntityID)
@@ -818,7 +818,7 @@ public class QueryClient {
      * @param realm the entity's realm.
      * @param pepEntityID entity identifier of PEP.
      * @param pdpEntityID entity identifier of PDP.
-     * @throws <code>SAML2Exception</code> if error in verifying
+     * @throws SAML2Exception if error in verifying
      *         the signature.
      */
     private static void signAttributeQuery(XACMLAuthzDecisionQuery xacmlQuery,
@@ -856,7 +856,7 @@ public class QueryClient {
      * @param pdpEntityID entity identifier of PDP.
      * @param response <code>Response</code> to be verified
      * @return true if signature is valid.
-     * @throws <code>SAML2Exception</code> if error in verifying
+     * @throws SAML2Exception if error in verifying
      *         the signature.
      */
     public static boolean verifySignedResponse(String pepEntityID,

@@ -24,6 +24,7 @@
  *
  * $Id: FSAssertionManagerImpl.java,v 1.5 2008/11/10 22:56:58 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -63,7 +64,7 @@ public class FSAssertionManagerImpl implements FSAssertionManagerIF {
      * @param destID The destination site requesting the assertion using
      *  the artifact.
      * @return The Assertion referenced to by artifact.
-     * @exception FSRemoteException, RemoteException If an error occurred during     *  the process
+     * @exception FSRemoteException if an error occurred during the process
      */
     public String getAssertion(
         String metaAlias, String artifact, String destID)
@@ -127,7 +128,7 @@ public class FSAssertionManagerImpl implements FSAssertionManagerIF {
      * @param metaAlias provider's Meta Alias.
      * @return <code>true</code> if the user exists; <code>false</code>
      *  otherwise.
-     * @exception FSRemoteException,RemoteException if error occurred.
+     * @exception FSRemoteException if error occurred.
      */
     public boolean isUserExists(String userDN, String metaAlias)
         throws FSRemoteException

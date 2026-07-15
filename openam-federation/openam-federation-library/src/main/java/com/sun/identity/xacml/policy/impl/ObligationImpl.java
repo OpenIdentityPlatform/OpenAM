@@ -24,6 +24,7 @@
  *
  * $Id: ObligationImpl.java,v 1.3 2008/11/10 22:57:06 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.policy.impl;
@@ -51,21 +52,20 @@ import org.w3c.dom.NodeList;
  * authorization authority.
  * 
  *
- * <p>
  * <pre>
  *
- *   &lt;xs:element name="Obligation" type="xacml:ObligationType"/>
- *      &lt;xs:complexType name="ObligationType">
- *          &lt;xs:sequence>
+ *   &lt;xs:element name="Obligation" type="xacml:ObligationType"/&gt;
+ *      &lt;xs:complexType name="ObligationType"&gt;
+ *          &lt;xs:sequence&gt;
  *              &lt;xs:element ref="xacml:AttributeAssignment" minOccurs="0" 
- *                  maxOccurs="unbounded"/>
- *              &lt;/xs:sequence>
+ *                  maxOccurs="unbounded"/&gt;
+ *              &lt;/xs:sequence&gt;
  *              &lt;xs:attribute name="ObligationId" type="xs:anyURI" 
- *                  use="required"/>
+ *                  use="required"/&gt;
  *              &lt;xs:attribute name="FulfillOn" type="xacml:EffectType" 
- *                  use="required"/>
- *          &lt;/xs:complexType>
- *   &lt;/xs:element>
+ *                  use="required"/&gt;
+ *          &lt;/xs:complexType&gt;
+ *   &lt;/xs:element&gt;
  * </pre>
  */
 public class ObligationImpl implements Obligation {
@@ -110,7 +110,7 @@ public class ObligationImpl implements Obligation {
      * from a  block of existing XML that has already been built into a DOM.
      *
      * @param element  DOM tree for <code>Request</code> object
-     * @exception XACML2Exception if it could not process the Element
+     * @exception XACMLException if it could not process the Element
      */
     public ObligationImpl(Element element) throws XACMLException {
         processElement(element);

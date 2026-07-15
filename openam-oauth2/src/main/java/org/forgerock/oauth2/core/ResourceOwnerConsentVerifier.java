@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -28,7 +29,7 @@ public interface ResourceOwnerConsentVerifier {
 
     /**
      * Determines whether if the resource owner has previously saved consent and whether it should be used.
-     * <br/>
+     * <br>
      * OpenID Connect prompt parameter can mandate that the resource owner is forced to give consent.
      *
      * @param consentSaved {@code true} if the resource owner has previously saved consent.

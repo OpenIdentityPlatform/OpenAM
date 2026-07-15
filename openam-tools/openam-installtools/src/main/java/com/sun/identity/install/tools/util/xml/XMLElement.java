@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -83,9 +84,9 @@ public class XMLElement implements IXMLUtilsConstants {
     /**
      * Adds the given child element at the given index.
      * 
-     * @param child
-     * @param index
-     * @throws Exception
+     * @param child the child element to add
+     * @param index the index at which to insert the child element
+     * @throws Exception if the child element cannot be added
      */
     public void addChildElementAt(XMLElement child, int index) throws Exception
     {
@@ -166,9 +167,9 @@ public class XMLElement implements IXMLUtilsConstants {
      * Appends the given child element to the end of the list of existing child
      * elements.
      * 
-     * @param child
-     * @param addAfterNewLine
-     * @throws Exception
+     * @param child the child element to append
+     * @param addAfterNewLine whether to append a new line after the child element
+     * @throws Exception if the child element cannot be added
      */
     public void addChildElement(XMLElement child, boolean addAfterNewLine)
             throws Exception {
@@ -248,8 +249,6 @@ public class XMLElement implements IXMLUtilsConstants {
      *            the name of the attribute to be updated or added
      * @param value
      *            the value of the attirbute
-     * @throws Exception
-     *             if the update was not successful
      */
     public void updateAttribute(String name, String value) {
         updateAttribute(name, value, true);

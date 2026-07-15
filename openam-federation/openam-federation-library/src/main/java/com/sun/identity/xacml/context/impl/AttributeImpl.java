@@ -24,6 +24,7 @@
  *
  * $Id: AttributeImpl.java,v 1.4 2008/11/10 22:57:05 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context.impl;
@@ -48,18 +49,17 @@ import org.w3c.dom.NodeList;
  * action/subject/resource requested in the <code>Request</code> context by 
  * listing a sequence of <code>Attribute</code> elements associated with 
  * the action.
- * <p>
  * <pre>
- * &lt;xs:element name="Attribute" type="xacml-context:AttributeType"/>
- * &lt;xs:complexType name="AttributeType">
- *    &lt;xs:sequence>
+ * &lt;xs:element name="Attribute" type="xacml-context:AttributeType"/&gt;
+ * &lt;xs:complexType name="AttributeType"&gt;
+ *    &lt;xs:sequence&gt;
  *       &lt;xs:element ref="xacml-context:AttributeValue" 
- *        maxOccurs="unbounded"/>
- *    &lt;xs:sequence>
- *    &lt;xs:attribute name="AttributeId" type="xs:anyURI" use="required"/>
- *    &lt;xs:attribute name="DataType" type="xs:anyURI" use="required"/>
- *    &lt;xs:attribute name="Issuer" type="xs:string" use="optional"/>
- * &lt;xs:complexType>
+ *        maxOccurs="unbounded"/&gt;
+ *    &lt;xs:sequence&gt;
+ *    &lt;xs:attribute name="AttributeId" type="xs:anyURI" use="required"/&gt;
+ *    &lt;xs:attribute name="DataType" type="xs:anyURI" use="required"/&gt;
+ *    &lt;xs:attribute name="Issuer" type="xs:string" use="optional"/&gt;
+ * &lt;xs:complexType&gt;
  * </pre>
  *
  */
@@ -107,7 +107,7 @@ public class AttributeImpl implements Attribute {
      *
      * @param element A <code>org.w3c.dom.Element</code> representing
      *        DOM tree for <code>Request</code> object
-     * @exception XACML2Exception if it could not process the Element
+     * @exception XACMLException if it could not process the Element
      */
     public AttributeImpl(Element element) throws XACMLException {
         processElement(element);
@@ -232,7 +232,7 @@ public class AttributeImpl implements Attribute {
     }
 
     /**
-     * Sets the attribiteId of the <code>>Attribute</code>
+     * Sets the attribiteId of the <code>Attribute</code>
      * @param attributeId <code>URI</code> representing the attribite id.
      * @exception XACMLException if the object is immutable
      */
@@ -254,7 +254,7 @@ public class AttributeImpl implements Attribute {
      * Returns the datatype of the contents of the <code>AttributeValue</code>
      * elements. This will be either a primitive datatype defined by XACML 2.0 
      * specification or a type ( primitive or structured) defined in a  
-     * namespace declared in the <xacml-context> element.
+     * namespace declared in the &lt;xacml-context&gt; element.
      * @return the <code>URI</code> representing the data type.
      */
     public URI getDataType() {
@@ -338,7 +338,7 @@ public class AttributeImpl implements Attribute {
      * Sets the attribute values for this object
      *
      * @param stringValues a <code>List</code> containing
-     *        <code>String<code> values of this object.
+     *        <code>String</code> values of this object.
      * @throws XACMLException if the object is immutable
      *         An object is considered <code>immutable</code> if <code>
      *         makeImmutable()</code> has been invoked on it. It can

@@ -25,6 +25,7 @@
  * $Id: IdRepo.java,v 1.8 2009/07/02 20:33:30 hengming Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.idm;
 
@@ -68,7 +69,9 @@ public abstract class IdRepo {
      * Initialization paramters as configred for a given plugin.
      *
      * @param configParams
+     *     the initialization parameters configured for this plugin
      * @throws IdRepoException
+     *     if the plugin cannot be initialized
      */
     public void initialize(Map<String, Set<String>> configParams) throws IdRepoException {
         configMap = Collections.unmodifiableMap(configParams);
@@ -99,7 +102,6 @@ public abstract class IdRepo {
     }
 
     /**
-     * @return Returns a Set of IdTypes supported by this plugin.
      * Returns the supported types of identities for this
      * plugin. If a plugin does not override this method, it
      * returns an empty set.
@@ -452,6 +454,7 @@ public abstract class IdRepo {
      * @param serviceName
      *     service to assign
      * @param stype
+     *     the schema type of the service attributes
      * @param attrMap
      *     Map of attribute-values.
      * @throws IdRepoException If there are repository related error conditions.
@@ -474,6 +477,7 @@ public abstract class IdRepo {
      * @param name
      *     Name of the object of interest.
      * @param mapOfServicesAndOCs
+     *     the map of service names to their object classes
      * @return
      *     Set of name of services assigned to <code>name</code>
      * @throws IdRepoException If there are repository related error conditions.
@@ -562,6 +566,7 @@ public abstract class IdRepo {
      * @param serviceName
      *     Name of service.
      * @param sType
+     *     the schema type of the service attributes
      * @param attrMap
      *     map of attribute-values.
      * @throws IdRepoException If there are repository related error conditions.
@@ -577,6 +582,7 @@ public abstract class IdRepo {
      * @param token
      *     Single sign on token of identity performing the task.
      * @param listener
+     *     the listener to notify of repository changes
      * @return status code
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.

@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 package com.sun.identity.saml2.jaxb.assertion.impl.runtime;
@@ -127,7 +128,7 @@ public interface XMLSerializer
      * c.endElement();
      * </pre>
      * 
-     * will generate <code>&lt;foo>abc def&lt;bar/>ghi&lt;/foo></code>.
+     * will generate <code>&lt;foo&gt;abc def&lt;bar/&gt;ghi&lt;/foo&gt;</code>.
      */
     void text( String text, String fieldName ) throws SAXException;
     

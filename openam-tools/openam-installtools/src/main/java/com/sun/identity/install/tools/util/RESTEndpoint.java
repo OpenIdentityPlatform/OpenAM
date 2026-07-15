@@ -14,6 +14,7 @@
  * Copyright 2016 ForgeRock AS.
  *
  * Portions Copyright 2008 Sun Microsystems Inc.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.install.tools.util;
 
@@ -75,7 +76,7 @@ public final class RESTEndpoint {
     /**
      * Call a REST endpoint, returning its response.
      * @return RESTResponse object containing status and text of returned value.
-     * @throws IOException
+     * @throws IOException if an I/O error occurs while calling the endpoint
      */
     public RESTResponse call() throws IOException {
 
@@ -242,17 +243,17 @@ public final class RESTEndpoint {
          * This is where we assemble the path (straightforward in itself) but substitute the realm.  For a number of
          * URLs we use, the realm is not involved (none of the OIDC calls use it) but for others (like the identity
          * endpoint) it is very important.  Unfortunately substituting it is painful as we can accidentally change
-         * <p/>
+         * <p>
          * path1/{REALM}/path2
-         * <p/>
+         * <p>
          * to
-         * <p/>
+         * <p>
          * path1//path2
-         * <p/>
+         * <p>
          * when the realm is undefined (i.e. it is the root realm), or even worse:
-         * <p/>
+         * <p>
          * path1///path2
-         * <p/>
+         * <p>
          * when the realm is set to "/".
          *
          * @return the carefully assembled path

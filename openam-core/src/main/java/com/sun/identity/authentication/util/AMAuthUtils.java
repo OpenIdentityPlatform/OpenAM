@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -333,7 +334,7 @@ public class AMAuthUtils {
     }
     
      /**
-     * Returns a <code>Map<code> with all Auth Module instance names as key
+     * Returns a <code>Map</code> with all Auth Module instance names as key
      * and the time the module was authenticated as value.
      *
      * @param ssoToken valid user's single sign on token.

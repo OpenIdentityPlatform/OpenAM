@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,17 +13,16 @@ package com.sun.identity.liberty.ws.idpp.jaxb;
 /**
  * Java content class for MsgTechnology element declaration.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-id-sis-pp.xsd line 209)
- * <p>
  * <pre>
- * &lt;element name="MsgTechnology">
- *   &lt;complexType>
- *     &lt;simpleContent>
- *       &lt;extension base="&lt;urn:liberty:id-sis-pp:2003-08>DSTURI">
- *         &lt;attribute name="msgLimit" type="{http://www.w3.org/2001/XMLSchema}integer" />
- *       &lt;/extension>
- *     &lt;/simpleContent>
- *   &lt;/complexType>
- * &lt;/element>
+ * &lt;element name="MsgTechnology"&gt;
+ *   &lt;complexType&gt;
+ *     &lt;simpleContent&gt;
+ *       &lt;extension base="&lt;urn:liberty:id-sis-pp:2003-08&gt;DSTURI"&gt;
+ *         &lt;attribute name="msgLimit" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
+ *       &lt;/extension&gt;
+ *     &lt;/simpleContent&gt;
+ *   &lt;/complexType&gt;
+ * &lt;/element&gt;
  * </pre>
  * 
  */

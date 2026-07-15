@@ -24,7 +24,7 @@
  *
  * $Id: WSFederationClient.java,v 1.1 2009/12/14 23:42:47 mallas Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.wsfederation.client;
 
@@ -54,7 +54,7 @@ public class WSFederationClient {
      * @param entityRole the entity role of the federation profile.
      *        Possible values are "RP" or "IP".
      * @return the user's SAML assertion xml string.
-     * @throws com.sun.identity.wsfederation.common.WSFederationException
+     * @throws com.sun.identity.wsfederation.common.WSFederationException if a WS-Federation error occurs
      */
     public static String getUserSAMLAssertion(String tokenID,
             String entityID, String entityRole) throws WSFederationException {
@@ -81,7 +81,7 @@ public class WSFederationClient {
      * @param entityRole the entity role of the federation profile.
      *        Possible values are "RP" or "IP".
      * @return the user's SAML assertion xml string.
-     * @throws com.sun.identity.wsfederation.common.WSFederationException
+     * @throws com.sun.identity.wsfederation.common.WSFederationException if a WS-Federation error occurs
      */
     public static String getUserSAMLAssertion(String tokenID, String url,
             String entityID, String entityRole) throws WSFederationException {

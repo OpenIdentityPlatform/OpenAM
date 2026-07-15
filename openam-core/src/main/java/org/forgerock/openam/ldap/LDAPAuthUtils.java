@@ -27,7 +27,7 @@
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014-2016 Nomura Research Institute, Ltd
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
- * Portions Copyrighted 2024-2025 3A Systems LLC
+ * Portions Copyrighted 2024-2026 3A Systems LLC
  */
 
 package org.forgerock.openam.ldap;
@@ -392,9 +392,9 @@ public class LDAPAuthUtils {
     /**
      * Authenticates to the LDAP server using user input.
      *
-     * @param user
-     * @param password
-     * @exception LDAPUtilException
+     * @param user the user name to authenticate
+     * @param password the password to authenticate with
+     * @exception LDAPUtilException if the authentication fails
      */
     public void authenticateUser(String user, String password)
             throws LDAPUtilException {
@@ -522,7 +522,7 @@ public class LDAPAuthUtils {
      * @param oldPwd Current password entered.
      * @param password New password entered.
      * @param confirmPassword Confirm password.
-     * @throws LDAPUtilException
+     * @throws LDAPUtilException if the password cannot be changed
      */
     public void changePassword(
             String oldPwd,
@@ -662,7 +662,7 @@ public class LDAPAuthUtils {
      * Searches and returns user for a specified attribute using parameters
      * specified in constructor and/or by setting properties.
      *
-     * @throws LDAPUtilException
+     * @throws LDAPUtilException if the search for the user fails
      */
     public void searchForUser()
             throws LDAPUtilException {
@@ -1609,7 +1609,7 @@ public class LDAPAuthUtils {
      * Sets the value of the dynamic profile creation configured in
      * Authentication service.
      *
-     * @param isEnable
+     * @param isEnable whether dynamic profile creation is enabled
      */
     public void setDynamicProfileCreationEnabled(boolean isEnable) {
         isDynamicUserEnabled = isEnable;

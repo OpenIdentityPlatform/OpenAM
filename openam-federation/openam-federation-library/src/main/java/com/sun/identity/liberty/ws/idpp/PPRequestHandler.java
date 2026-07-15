@@ -24,6 +24,7 @@
  *
  * $Id: PPRequestHandler.java,v 1.2 2008/06/25 05:47:14 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -104,8 +105,7 @@ public class PPRequestHandler extends DSTRequestHandler {
      * @param requestMsg Request Message.
      * @param responseMsg Response Message.
      * @return Object processed response object.
-     * @exception SOAPFaultException for the interaction redirects 
-     * @exception Exception for any failure.
+     * @exception SOAPFaultException for the interaction redirects
      */
     public Object processDSTRequest(
         Object request, 
@@ -366,7 +366,7 @@ public class PPRequestHandler extends DSTRequestHandler {
       * Get the data from the queried results
       * @param queryResults map of DSTQueryItems and the corresponding results.
       * @return List queried data.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      private List getData(Map queryResults) throws IDPPException {
  
@@ -665,7 +665,7 @@ public class PPRequestHandler extends DSTRequestHandler {
      * Gets the query response and set the status to OK.
      * @param query JAXB query object.
      * @return QueryResponseElement JAXB query response.
-     * @exception IDPPException
+     * @exception IDPPException if an error occurs
      */
     public QueryResponseElement getQueryResponse(QueryElement query)
     throws IDPPException {
@@ -694,7 +694,7 @@ public class PPRequestHandler extends DSTRequestHandler {
      * Gets the modify response and set the status to OK.
      * @param modify JAXB modify object.
      * @return ModifyResponseElement JAXB modify response.
-     * @exception IDPPException
+     * @exception IDPPException if an error occurs
      */
     public ModifyResponseElement getModifyResponse(ModifyElement modify)
     throws IDPPException {
@@ -809,7 +809,7 @@ public class PPRequestHandler extends DSTRequestHandler {
      * @param resource resource that needs an interaction
      * @param msg Message.
      * @return Confirm Interaction JAXB Confirm Element
-     * @exception IDPPException
+     * @exception IDPPException if an error occurs
      */
     private Confirm getInteractConfirmElement(
          boolean isQuery, String resource, Message msg) 
@@ -853,7 +853,7 @@ public class PPRequestHandler extends DSTRequestHandler {
      * @param resource resource that needs an interaction
      * @param msg Message.
      * @return List list of Interaction JAXB TextElements.
-     * @exception IDPPException
+     * @exception IDPPException if an error occurs
      */
 
     private List getInteractTextElements(
@@ -1056,7 +1056,7 @@ public class PPRequestHandler extends DSTRequestHandler {
     /**
      * Gets the service instance update header.
      * 
-     * @exception SOAPFaultException.
+     * @exception SOAPFaultException .
      */
     private ServiceInstanceUpdateHeader getServiceInstanceUpdateHeader()
       throws SOAPFaultException {

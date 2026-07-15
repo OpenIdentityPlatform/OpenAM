@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -82,10 +83,10 @@ public class MigrateFromInstFinderStore extends OrderedPropertyStore {
     /**
      * return the instance name to be migrated from.
      *
-     * @param map
-     * @param keysToUse
-     * @return
-     * @throws InstallException
+     * @param map the instance finder data map to look up
+     * @param keysToUse the list of keys used to build the unique lookup key
+     * @return the instance name to be migrated from
+     * @throws InstallException if the instance name cannot be found in the store
      */
     public String getInstanceName(Map map, ArrayList keysToUse)
     throws InstallException {
@@ -114,9 +115,9 @@ public class MigrateFromInstFinderStore extends OrderedPropertyStore {
     /**
      * get all instances' instance finder data.
      *
-     * @param mapKeys
+     * @param mapKeys the list of instance finder keys to extract for each product
      * @return Map of all product's install details.
-     * @throws InstallException
+     * @throws InstallException if the product details cannot be read from the store
      */
     public Map getAllProductDetails(ArrayList mapKeys) throws InstallException {
         int count = size();
@@ -219,7 +220,7 @@ public class MigrateFromInstFinderStore extends OrderedPropertyStore {
     
     /**
      * get product home of previous product.
-     * @return 
+     * @return the product home directory of the previous product
      */
     public static String getProductHome() {
         return productHome;
@@ -227,7 +228,7 @@ public class MigrateFromInstFinderStore extends OrderedPropertyStore {
     
     /**
      * set product home of previous product.
-     * @oldProductHome product home of previous product.
+     * @param oldProductHome product home of previous product.
      */
     public static void setProductHome(String  oldProductHome) {
         productHome = oldProductHome;

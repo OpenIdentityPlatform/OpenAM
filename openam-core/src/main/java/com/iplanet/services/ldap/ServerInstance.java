@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -32,7 +33,7 @@
 package com.iplanet.services.ldap;
 
 /**
- * The server instance object represents a tuple of <Server, User, BaseDN>. This
+ * The server instance object represents a tuple of {@code <Server, User, BaseDN>}. This
  * Server object provides information regarding the server name, port number.
  * The user object provides the information regarding the authentication type,
  * authentication dn, and password. The baseDN is the search base, which must be

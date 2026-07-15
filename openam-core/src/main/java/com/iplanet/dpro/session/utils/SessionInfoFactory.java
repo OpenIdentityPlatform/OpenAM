@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.iplanet.dpro.session.utils;
 
@@ -96,9 +97,6 @@ public class SessionInfoFactory {
      * @return A non null SessionInfo instance if valid.
      *
      * @throws SessionException If there was an error storing the TokenRestriction on the SessionInfo.
-     *
-     * @throws IllegalAccessException If this method has not been called in-conjunction with
-     * SessionInfoFactory#validateSession
      */
     public SessionInfo makeSessionInfo(InternalSession internalSession, SessionID sid)
             throws SessionException {

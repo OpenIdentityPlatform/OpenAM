@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -29,7 +30,7 @@ import java.util.Date;
 
 /**
  * Provides a Hidden Field control: &nbsp; &lt;input type='hidden'&gt;.
- * <p/>
+ * <p>
  * The HiddenField control is useful for storing state information in a Form,
  * such as object ids, instead of using the Session object. This control is
  * capable of supporting the following classes:<blockquote><ul>
@@ -43,13 +44,13 @@ import java.util.Date;
  * <li>String</li>
  * <li>Serializable</li>
  * </ul></blockquote>
- * <p/>
+ * <p>
  * Serializable non-primitive objects will be serialized, compressed and
  * Base64 encoded, using {@link ClickUtils#encode(Object)}
  * method, and decoded using the corresponding
  * {@link ClickUtils#decode(String)} method.
  *
- * <h3>HiddenField Example</h3>
+ * <h2>HiddenField Example</h2>
  *
  * An example is provided below which uses a hidden field to count the number of
  * times a form is consecutively submitted. The count is displayed in the
@@ -81,7 +82,7 @@ import java.util.Date;
  * } </pre>
  *
  * See also W3C HTML reference
- * <a class="external" target="_blank" title="W3C HTML 4.01 Specification"
+ * <a class="external" target="_blank"
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class HiddenField extends Field {
@@ -145,7 +146,7 @@ public class HiddenField extends Field {
     // ------------------------------------------------------ Public Attributes
 
     /**
-     * Return the hiddenfield's html tag: <tt>input</tt>.
+     * Return the hiddenfield's html tag: <code>input</code>.
      *
      * @see AbstractControl#getTag()
      *

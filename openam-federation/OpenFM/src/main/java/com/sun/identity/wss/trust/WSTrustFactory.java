@@ -24,6 +24,7 @@
  *
  * $Id: WSTrustFactory.java,v 1.1 2008/09/19 16:00:56 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.trust;
@@ -90,7 +91,8 @@ public class WSTrustFactory {
      *        given DOM Element.
      * @param element the DOM Element for <code>RequestSecurityToken</code>
      * @return the instance of <code>RequestSecurityToken</code>
-     * @throws com.sun.identity.wss.trust.WSTException
+     * @throws com.sun.identity.wss.trust.WSTException if the request security
+     *         token cannot be created from the element.
      */
     public RequestSecurityToken createRequestSecurityToken(Element element) 
                     throws WSTException {
@@ -123,7 +125,8 @@ public class WSTrustFactory {
      * @param element the DOM element representation of
      *          <code>RequestSecurityTokenResponse</code>
      * @return an instance of <code>RequestSecurityTokenResponse</code>
-     * @throws com.sun.identity.wss.trust.WSTException
+     * @throws com.sun.identity.wss.trust.WSTException if the request security
+     *         token response cannot be created from the element.
      */
     public RequestSecurityTokenResponse createRequestSecurityTokenResponse
             (Element element) throws WSTException {
@@ -156,8 +159,9 @@ public class WSTrustFactory {
      * for a given DOM Element.
      * @param element the DOM Element representation of
      *        <code>RequestSecurityTokenResponseCollection</code>
-     * @return the <code><code>RequestSecurityTokenResponseCollection</code>
-     * @throws com.sun.identity.wss.trust.WSTException
+     * @return the <code>RequestSecurityTokenResponseCollection</code>
+     * @throws com.sun.identity.wss.trust.WSTException if the request security
+     *         token response collection cannot be created from the element.
      */
     public RequestSecurityTokenResponseCollection 
             createRequestSecurityTokenResponseCollection(Element element)

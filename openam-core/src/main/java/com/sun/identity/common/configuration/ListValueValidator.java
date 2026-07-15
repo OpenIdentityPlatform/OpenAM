@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -50,7 +51,7 @@ import org.forgerock.openam.utils.CollectionUtils;
  *   separator is mandatory "=" equals sign
  *   r.h.s is some string value, anything since this is not so fined 
  *         grained to test values of any one specific property's value set.
- *   index value should be an integer >= 0
+ *   index value should be an integer &gt;= 0
  *   index values can not be duplicates
  *   index values collectively can contain missing mubers
  *   white space is allowed everywhere (except between digits of index value)

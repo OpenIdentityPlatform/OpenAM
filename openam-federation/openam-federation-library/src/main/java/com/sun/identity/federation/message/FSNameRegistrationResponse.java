@@ -25,7 +25,7 @@
  * $Id: FSNameRegistrationResponse.java,v 1.3 2008/06/25 05:46:45 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message;
@@ -132,7 +132,7 @@ public class FSNameRegistrationResponse extends AbstractResponse {
      * Returns the value of <code>ProviderID</code> attribute.
      *
      * @return the value of <code>ProviderID</code> attribute.
-     * @see #setProviderId(String).
+     * @see #setProviderId(String)
      */
     public String getProviderId(){
         return providerId;
@@ -364,7 +364,7 @@ public class FSNameRegistrationResponse extends AbstractResponse {
     /**
      * Sets the Response <code>Status</code>.
      *
-     * @param status the Response <code>Status</code object.
+     * @param status the Response <code>Status</code> object.
      * @see #getStatus
      */
     public void setStatus(Status status) {

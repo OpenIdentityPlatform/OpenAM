@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.session.util;
 
@@ -71,7 +71,6 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * This class Implements utility methods for handling HTTP Session.
- * <p>
  */
 
 public class SessionUtils {
@@ -103,7 +102,6 @@ public class SessionUtils {
     /**
      * Returns a SessionID string based on a HttpServletRequest object or null
      * if session id is not present or there was an error.
-     * <p>
      * 
      * @param request
      *            The HttpServletRequest object which contains the session
@@ -125,7 +123,7 @@ public class SessionUtils {
      * @param servletRequest The HttpServletRequest object which contains the
      *        session string.
      * @return InetAddress the client address
-     * @exception Exception
+     * @exception Exception if the client address cannot be resolved
      */
     public static InetAddress getClientAddress(HttpServletRequest servletRequest) throws Exception {
         return InetAddress.getByName(ClientUtils.getClientIPAddress(servletRequest));
@@ -169,8 +167,8 @@ public class SessionUtils {
      * Returns the remote IP address of the client is a trusted source
      *
      * @param source the InetAddress of the remote client
-     * @return a <code>true </code> if is a trusted source.<code>false> otherwise
-     * @exception Exception
+     * @return <code>true</code> if is a trusted source, <code>false</code> otherwise
+     * @exception SessionException if the trusted source list cannot be built
      */
     public static boolean isTrustedSource(InetAddress source) throws SessionException {
         if (trustedSources == null) {

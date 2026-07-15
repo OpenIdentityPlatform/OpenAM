@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions Copyrighted 2026 3A Systems, LLC
 */
 package org.forgerock.openam.shared.concurrency;
 
@@ -56,7 +57,7 @@ public class ResizableSemaphore extends Semaphore {
      * Overridden method to stop it being protected.
      * Decrease the number of available permits by the amount in the supplied argument.
      *
-     * @param reduction {@inheritdoc}
+     * @param reduction the number of permits to remove
      */
     @Override
     protected void reducePermits(int reduction) {

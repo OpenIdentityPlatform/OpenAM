@@ -25,7 +25,7 @@
  * $Id: AMIdentityRepository.java,v 1.21 2010/01/06 01:58:26 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.idm;
 
@@ -64,7 +64,6 @@ import org.forgerock.openam.utils.CrestQuery;
  * configured. This class provides access to methods which will search, create
  * and delete identities. An instance of this class can be obtained in the
  * following manner:
- * <p>
  *
  * <PRE>
  *

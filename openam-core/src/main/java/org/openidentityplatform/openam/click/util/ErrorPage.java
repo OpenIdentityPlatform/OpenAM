@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click.util;
@@ -26,10 +27,10 @@ import org.openidentityplatform.openam.click.Page;
  * Provides the base error handling Page. The ErrorPage handles any
  * unexpected Exceptions. When the application is not in "production" mode the
  * ErrorPage will provide diagnostic information.
- * <p/>
+ * <p>
  * The ErrorPage template "<span class="blue">click/error.htm</span>" can be
  * customized to your needs.
- * <p/>
+ * <p>
  * Applications which require additional error handling logic must subclass
  * the ErrorPage. For example to rollback a Connection if an SQLException occurred:
  *
@@ -102,14 +103,14 @@ public class ErrorPage extends Page {
     /**
      * This method initializes the ErrorPage, populating the model with error
      * diagnostic information.
-     * <p/>
+     * <p>
      * The following values are added to ErrorPage model for rendering by the
      * error page template:
      *
      * <ul style="margin-top: 0.5em;">
-     * <li><tt>errorReport</tt> &nbsp; - &nbsp; the detailed error report
+     * <li><code>errorReport</code> &nbsp; - &nbsp; the detailed error report
      * &lt;div&gt; element, with an id of 'errorReport'</li>
-     * <li><tt>mode</tt> &nbsp; - &nbsp; the application mode</li>
+     * <li><code>mode</code> &nbsp; - &nbsp; the application mode</li>
      * </ul>
      *
      * @see Page#onInit()
@@ -151,8 +152,8 @@ public class ErrorPage extends Page {
     }
 
     /**
-     * Return the application mode: <tt>["production", "profile", "development",
-     * debug", "trace"]</tt>.
+     * Return the application mode: <code>["production", "profile", "development",
+     * debug", "trace"]</code>.
      *
      * @return the application mode
      */
@@ -161,9 +162,9 @@ public class ErrorPage extends Page {
     }
 
     /**
-     * Set the application mode: <tt>["production", "profile", "development",
-     * debug", "trace"]</tt>
-     * <p/>
+     * Set the application mode: <code>["production", "profile", "development",
+     * debug", "trace"]</code>
+     * <p>
      * The application mode is added to the model by the {@link #onInit()} method.
      * This property is used to determines whether the error page template
      * should display error diagnostic information. The default "error.htm" will

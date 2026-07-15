@@ -27,6 +27,7 @@
  */
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.maven.plugins;
 
@@ -48,33 +49,30 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 /**
  *
  * @author Peter Major
- * @goal generate-cli
  */
+@Mojo(name = "generate-cli")
 public class CLIDefinitionGenerator extends AbstractMojo {
     
     private static Map<String, String> mapLongToShortOptionName =
             new HashMap<String, String>();
     /**
      * A list of fully qualified classnames of CLI definitions.
-     * @parameter
      */
+    @Parameter
     private List<String> definitions = new ArrayList<String>();
     /**
      * The directory where the generated properties files should be written to.
-     * @parameter
-     * @required
      */
+    @Parameter(required = true)
     private String outputDir;
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     protected MavenProject project = new MavenProject();
     
     public void execute() throws MojoExecutionException, MojoFailureException {

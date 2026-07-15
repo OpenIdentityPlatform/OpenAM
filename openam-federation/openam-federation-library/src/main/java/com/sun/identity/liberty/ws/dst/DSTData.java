@@ -24,6 +24,7 @@
  *
  * $Id: DSTData.java,v 1.2 2008/06/25 05:47:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -43,18 +44,18 @@ import org.w3c.dom.NodeList;
  * The following schema fragment specifies the expected content within 
  * the <code>DSTData</code> object.
  * <pre>
- * &lt;complexType>
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;any/>
- *       &lt;/sequence>
+ * &lt;complexType&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;any/&gt;
+ *       &lt;/sequence&gt;
  *       &lt;attribute name="itemIDRef" 
- *       type="{urn:liberty:idpp:2003-08}IDReferenceType" />
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *       type="{urn:liberty:idpp:2003-08}IDReferenceType" /&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 
@@ -84,7 +85,7 @@ public class DSTData {
      * Constructor
      *
      * @param element <code>DOM</code> Element
-     * @throws DSTException
+     * @throws DSTException if a data service error occurs
      */
     public DSTData(org.w3c.dom.Element element) throws DSTException{
         if(element == null) {

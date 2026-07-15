@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -134,7 +135,7 @@ abstract public class OrgReferral implements Referral {
      * Gets the valid values for this referral 
      * @param token SSOToken
      * @return <code>ValidValues</code> object
-     * @exception SSOException if <code>SSOToken></code> is not valid
+     * @exception SSOException if <code>SSOToken</code> is not valid
      * @exception PolicyException if unable to get the list of valid
      * names.
      */
@@ -145,8 +146,8 @@ abstract public class OrgReferral implements Referral {
      * Gets the valid values for this referral matching a pattern
      * @param token SSOToken
      * @param pattern a pattern to match against the value
-     * @return </code>ValidValues</code> object
-     * @exception SSOException if <code>SSOToken></code> is not valid
+     * @return <code>ValidValues</code> object
+     * @exception SSOException if <code>SSOToken</code> is not valid
      * @exception PolicyException if unable to get the list of valid
      * names.
      */
@@ -159,7 +160,7 @@ abstract public class OrgReferral implements Referral {
      * @param token the <code>SSOToken</code> that will be used
      * to determine the syntax
      * @return set of of valid names for the referral.
-     * @exception SSOException if <code>SSOToken></code> is not valid
+     * @exception SSOException if <code>SSOToken</code> is not valid
      */
     public Syntax getValueSyntax(SSOToken token)
             throws SSOException, PolicyException {
@@ -188,8 +189,8 @@ abstract public class OrgReferral implements Referral {
      *        Each key is an environment parameter name.
      *        Each value is a set of values for the parameter.
      * @return policy decision
-     * @throws SSOException
-         * @throws PolicyException
+     * @throws SSOException if the token is invalid
+         * @throws PolicyException if the policy decision cannot be obtained
      */
     public PolicyDecision getPolicyDecision(SSOToken token, 
             String resourceType, String resourceName, Set actionNames, 

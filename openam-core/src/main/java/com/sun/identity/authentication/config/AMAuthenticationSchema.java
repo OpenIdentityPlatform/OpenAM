@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -152,7 +153,7 @@ public class AMAuthenticationSchema
      * @param values A map of the names of <code>AttributeSchema</code> to
      *        modify, and a Set of Values which should replace the default
      *        values of the current schema.
-     * @throws SchemaException
+     * @throws SchemaException if the supplied attribute values are invalid for the schema
      * @throws SMSException if an error occurred while performing the operation
      * @throws SSOException if the single sign on token is invalid or expired
      */

@@ -25,6 +25,7 @@
  * $Id: SecureFileHandler.java,v 1.12 2009/07/27 22:29:42 hvijay Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.log.handlers;
 
@@ -76,10 +77,10 @@ import com.sun.identity.monitoring.SsoServerLoggingSvcImpl;
 import com.sun.identity.security.AdminPasswordAction;
 import com.sun.identity.security.keystore.AMPassword;
 /**
- * This <tt> SecureFileHandler </tt> is very much similar to the
- * <t> java.util.logging.FileHandler </tt>. <p> The <TT> FileHandler </TT>
+ * This <code> SecureFileHandler </code> is very much similar to the
+ * <code> java.util.logging.FileHandler </code>. <p> The <code> FileHandler </code>
  * can either write to a specified file, or it can write to a rotating set
- * of files. <P>
+ * of files. <p>
  * For a archiving set of files, as each file reaches the limit
  * (<i> LogConstants.MAX_FILE_SIZE</I>), it is closed, archived, and a
  * new file opened. Successively older files and named by adding 
@@ -215,15 +216,15 @@ public class SecureFileHandler extends java.util.logging.Handler {
     }
     
     /**
-     * Set (or change) the character encoding used by this <tt>Handler</tt>.
-     * The encoding should be set before any <tt>LogRecords</tt> are written
-     * to the <tt>Handler</tt>.
+     * Set (or change) the character encoding used by this <code>Handler</code>.
+     * The encoding should be set before any <code>LogRecords</code> are written
+     * to the <code>Handler</code>.
      *
      * @param encoding  The name of a supported character encoding.
      *              May be null, to indicate the default platform encoding.
      * @exception  SecurityException  if a security manager exists and if
-     *             the caller does not have <tt>LoggingPermission("control")
-     *             </tt>.
+     *             the caller does not have <code>LoggingPermission("control")
+     *             </code>.
      * @exception  UnsupportedEncodingException if the named encoding is
      *             not supported.
      */

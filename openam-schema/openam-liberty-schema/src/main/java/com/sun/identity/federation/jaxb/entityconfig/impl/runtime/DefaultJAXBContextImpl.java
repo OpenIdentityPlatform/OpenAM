@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 package com.sun.identity.federation.jaxb.entityconfig.impl.runtime;
@@ -89,7 +90,7 @@ public class DefaultJAXBContextImpl extends JAXBContext {
      * java content-tree into XML data.
      *
      * @return a <CODE>Marshaller</CODE> object
-     * @throws JAXBException if an error was encountered while creating the
+     * @throws javax.xml.bind.JAXBException if an error was encountered while creating the
      *                      <code>Marshaller</code> object
      */
     public Marshaller createMarshaller() throws JAXBException {
@@ -101,7 +102,7 @@ public class DefaultJAXBContextImpl extends JAXBContext {
      * data into a java content-tree.
      *
      * @return an <CODE>Unmarshaller</CODE> object
-     * @throws JAXBException if an error was encountered while creating the
+     * @throws javax.xml.bind.JAXBException if an error was encountered while creating the
      *                      <code>Unmarshaller</code> object
      */
     public Unmarshaller createUnmarshaller() throws JAXBException {
@@ -113,7 +114,7 @@ public class DefaultJAXBContextImpl extends JAXBContext {
      * java content-tree.
      *
      * @return an <CODE>Unmarshaller</CODE> object
-     * @throws JAXBException if an error was encountered while creating the
+     * @throws javax.xml.bind.JAXBException if an error was encountered while creating the
      *                      <code>Validator</code> object
      */
     public Validator createValidator() throws JAXBException {
@@ -127,7 +128,7 @@ public class DefaultJAXBContextImpl extends JAXBContext {
      *
      * @param javaContentInterface the Class object 
      * @return an instance of the Java content interface
-     * @exception JAXBException
+     * @exception JAXBException if an error occurs while creating the instance
      */
     public Object newInstance( Class javaContentInterface ) 
         throws JAXBException {

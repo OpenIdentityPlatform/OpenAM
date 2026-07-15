@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -38,7 +39,7 @@ import java.util.Hashtable;
 /**
  * This class represents a collection of <code>ISPermission</code> objects.
  * It extends from <code>PermissionCollection</code> providing implementation 
- * of abstract methods like <code>add</code>, <code>implies</code, <code>
+ * of abstract methods like <code>add</code>, <code>implies</code>, <code>
  * elements</code>. The rest of the required methods are used from the parent
  * class.
  *
@@ -49,7 +50,6 @@ import java.util.Hashtable;
  *      collection, using the <code>implies</code> method.
  * <LI> enumerate all the permissions, using the <code>elements</code> method.
  * </UL>
- * <P>
  *
  * <p>When it is desirable to group together a number of Permission objects of 
  * the same type, the <code>newPermissionCollection</code> method on that 
@@ -66,7 +66,6 @@ import java.util.Hashtable;
  * @see java.security.Permission
  * @see java.security.PermissionCollection
  * @see java.security.Permissions
- * <p>
  *
  */
 public class ISPermissionCollection extends PermissionCollection {
@@ -128,7 +127,7 @@ public class ISPermissionCollection extends PermissionCollection {
      * the collection of ISPermission objects held in this 
      * ISPermissionCollection.
      * This method takes in a permission and loops through all the 
-     * permissions in its store and call their <code>implies></code> to 
+     * permissions in its store and call their <code>implies()</code> to
      * evaluate the result.
      *
      * @param perm the Permission object to compare.

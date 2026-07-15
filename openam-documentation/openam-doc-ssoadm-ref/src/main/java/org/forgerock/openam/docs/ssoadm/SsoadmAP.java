@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.docs.ssoadm;
 
@@ -73,12 +74,12 @@ public class SsoadmAP extends AbstractProcessor {
     }
 
     /**
-     * Two field annotations hold documentation content: @Macro and
-     * @SubCommandInfo. @Macro holds field content to be merged with
-     * @SubCommandInfo field content for @SubCommandInfo annotations that
-     * reference @Macro.
+     * Two field annotations hold documentation content: {@code @Macro} and
+     * {@code @SubCommandInfo}. {@code @Macro} holds field content to be merged with
+     * {@code @SubCommandInfo} field content for {@code @SubCommandInfo} annotations that
+     * reference {@code @Macro}.
      *
-     * @SubCommandInfo field annotations hold descriptions,
+     * {@code @SubCommandInfo} field annotations hold descriptions,
      * manadatoryOptions, and optionalOptions used in reference
      * documentation.
      *

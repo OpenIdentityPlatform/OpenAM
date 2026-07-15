@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.oauth2;
 
@@ -125,7 +125,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
      * @param ssoTokenManager An instance of the SSOTokenManager
      * @param cookieExtractor An instance of the CookieExtractor
      * @param auditLogger An instance of OAuth2AuditLogger
-     * @param failureFactory
+     * @param failureFactory An instance of the ClientAuthenticationFailureFactory.
      * @param utils OAuth2 utilities
      */
     @Inject

@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.rest.config.user;
@@ -43,8 +44,8 @@ import java.util.*;
  * see https://weblogs.java.net/blog/emcmanus/archive/2010/10/25/using-builder-pattern-subclasses
  *
  * Also attempted to marshal the RestSTSInstanceConfig to/from json with the jackson ObjectMapper. But I was adding
- * @JsonSerialize and @JsonDeserialize annotations, and because builder-based classes don't expose ctors which
- * take the complete field set, I would have to create @JsonCreator instances which would have to pull all of the
+ * {@code @JsonSerialize} and {@code @JsonDeserialize} annotations, and because builder-based classes don't expose ctors which
+ * take the complete field set, I would have to create {@code @JsonCreator} instances which would have to pull all of the
  * values out of a map anyway, which is 75% of the way towards a hand-rolled json marshalling implementation based on
  * json-fluent. So a hand-rolled implementation it is.
  */

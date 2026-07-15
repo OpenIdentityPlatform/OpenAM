@@ -24,6 +24,7 @@
  *
  * $Id: SPProvidedNameIdentifier.java,v 1.2 2008/06/25 05:46:48 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.message.common;
@@ -52,9 +53,9 @@ public class SPProvidedNameIdentifier extends NameIdentifier {
     /**
      * Constructor creates <code>SPProvidedNameIdentifier</code> object.
      *
-     * @param name
-     * @param nameQualifier
-     * @param format
+     * @param name the name identifier value.
+     * @param nameQualifier the security or administrative domain that qualifies the name.
+     * @param format the format of the name identifier.
      * @throws SAMLException on errors.
      */
     public SPProvidedNameIdentifier(String name, String nameQualifier,

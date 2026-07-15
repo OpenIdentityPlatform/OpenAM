@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock Inc.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.indextree.events;
 
 /**
  * Implemented by any class wanting to be notified of any index change events.
- * <p/>
+ * <p>
  * It is essential that any implementing class is registered with the
  * {@link IndexChangeObservable#registerObserver(IndexChangeObserver)} in order to be included within any notifications.
  *

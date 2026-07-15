@@ -106,7 +106,7 @@ public class SessionService {
      * @param masterSid   master session id
      * @param restriction TokenRestriction Object
      * @return restricted token id
-     * @throws SessionException
+     * @throws SessionException if the restricted token cannot be created
      */
     public String getRestrictedTokenId(String masterSid, TokenRestriction restriction) throws SessionException {
         SessionID sessionID = new SessionID(masterSid);
@@ -155,7 +155,7 @@ public class SessionService {
     /**
      * Destroy a Internal Session, whose session id has been specified.
      *
-     * @param sessionID
+     * @param sessionID the session id of the authentication session to destroy
      */
     public void destroyAuthenticationSession(final SessionID sessionID) {
         InternalSession authenticationSession = InjectorHolder.getInstance(AuthenticationSessionStore.class).removeSession(sessionID);
@@ -192,9 +192,9 @@ public class SessionService {
     /**
      * Returns the Session information.
      *
-     * @param sid
-     * @param reset
-     * @throws SessionException
+     * @param sid the session id to retrieve information for
+     * @param reset whether to reset the idle time of the session
+     * @throws SessionException if the session information cannot be retrieved
      */
     public SessionInfo getSessionInfo(SessionID sid, boolean reset) throws SessionException {
         return sessionOperationStrategy.getOperation(sid).getSessionInfo(sid, reset);
@@ -204,8 +204,9 @@ public class SessionService {
      * Gets all valid Internal Sessions, depending on the value of the user's
      * preferences.
      *
-     * @param s
-     * @throws SessionException
+     * @param s the requesting session
+     * @param pattern the search pattern used to match sessions
+     * @throws SessionException if the valid sessions cannot be retrieved
      */
     public SearchResults<SessionInfo> getValidSessions(Session s, String pattern) throws SessionException {
         return sessionOperationStrategy.getOperation(s.getSessionID()).getValidSessions(s, pattern);
@@ -232,8 +233,8 @@ public class SessionService {
     /**
      * Logout the user.
      *
-     * @param session
-     * @throws SessionException
+     * @param session the session to log out
+     * @throws SessionException if the logout operation fails
      */
     public void logout(final Session session) throws SessionException {
         sessionOperationStrategy.getOperation(session.getSessionID()).logout(session);
@@ -243,7 +244,7 @@ public class SessionService {
      * Adds listener to a Internal Sessions.
      *
      * @param session Session
-     * @param url
+     * @param url the notification URL to which session events are sent
      * @throws SessionException Session is null OR the Session is invalid
      */
     public void addSessionListener(SSOToken clientToken, Session session, String url) throws SessionException {
@@ -255,10 +256,10 @@ public class SessionService {
      * protected
      *
      * @param clientToken - Token of the client setting external property.
-     * @param sessionId
-     * @param name
-     * @param value
-     * @throws SessionException
+     * @param sessionId the session id on which to set the property
+     * @param name the name of the property to set
+     * @param value the value to set for the property
+     * @throws SessionException if the property cannot be set
      */
     public void setExternalProperty(SSOToken clientToken, SessionID sessionId, String name, String value)
             throws SessionException {

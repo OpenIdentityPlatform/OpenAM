@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.uma;
@@ -71,11 +72,12 @@ public interface UmaPolicyService {
     Promise<Void, ResourceException> deletePolicy(Context context, String resourceSetId);
 
     /**
+     * Queries the UMA policies in the backend store.
      *
-     *
-     * @param context
-     * @param request
-     * @return
+     * @param context the request context
+     * @param request the query request describing which policies to return
+     * @return a promise containing a pair of the query response and the matching {@code UmaPolicy}
+     *         collection, or a {@code ResourceException}
      */
     Promise<Pair<QueryResponse, Collection<UmaPolicy>>, ResourceException> queryPolicies(Context context,
             QueryRequest request);

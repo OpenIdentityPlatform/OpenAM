@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,17 +13,16 @@ package com.sun.identity.liberty.ws.interaction.jaxb;
 /**
  * Java content class for TextType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-interact-svc.xsd line 126)
- * <p>
  * <pre>
- * &lt;complexType name="TextType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:liberty:is:2003-08}InquiryElementType">
- *       &lt;attribute name="format" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="maxChars" type="{http://www.w3.org/2001/XMLSchema}integer" />
- *       &lt;attribute name="minChars" type="{http://www.w3.org/2001/XMLSchema}integer" />
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="TextType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:liberty:is:2003-08}InquiryElementType"&gt;
+ *       &lt;attribute name="format" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="maxChars" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
+ *       &lt;attribute name="minChars" type="{http://www.w3.org/2001/XMLSchema}integer" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

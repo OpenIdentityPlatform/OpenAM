@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.authentication.client;
 
@@ -1947,7 +1947,7 @@ public class AuthClientUtils {
     /**
      * Returns the Cookie object created based on the <code>cookieName</code>,
      * Session ID and <code>cookieDomain</code>.
-     * If <code>AuthContext,/code> status is not <code>SUCCESS</code> then
+     * If <code>AuthContext</code> status is not <code>SUCCESS</code> then
      * cookie is created with authentication cookie Name, else AM Cookie Name
      * will be used to create cookie.
      *
@@ -2289,7 +2289,7 @@ public class AuthClientUtils {
 
     /**
      * @deprecated use {@link #getDomainNameByRequest(
-     * jakarta.servlet.http.HttpServletRequest, java.util.Map<String, String>)} instead.
+     * jakarta.servlet.http.HttpServletRequest, java.util.Map)} instead.
      */
     public static String getDomainNameByRequest(Map<String, String> requestHash) {
         String realm = getRealmFromPolicyAdvice(requestHash);

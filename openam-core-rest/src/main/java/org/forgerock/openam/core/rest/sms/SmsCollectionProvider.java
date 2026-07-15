@@ -14,7 +14,7 @@
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -210,7 +210,6 @@ public class SmsCollectionProvider extends SmsResourceProvider {
     /**
      * Creates a new child instance of config. The parent config referenced by the request path is found, and
      * new config is created using the provided name property.
-     * {@inheritDoc}
      */
     @Create(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> createInstance(final Context context, CreateRequest request) {
@@ -279,7 +278,6 @@ public class SmsCollectionProvider extends SmsResourceProvider {
     /**
      * Deletes a child instance of config. The parent config referenced by the request path is found, and
      * the config is deleted using the resourceId.
-     * {@inheritDoc}
      */
     @Delete(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> deleteInstance(Context context, final String resourceId) {
@@ -326,7 +324,6 @@ public class SmsCollectionProvider extends SmsResourceProvider {
     /**
      * Reads a child instance of config. The parent config referenced by the request path is found, and
      * the config is read using the resourceId.
-     * {@inheritDoc}
      */
     @Read(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> readInstance(Context context, String resourceId) {
@@ -352,7 +349,6 @@ public class SmsCollectionProvider extends SmsResourceProvider {
     /**
      * Updates a child instance of config. The parent config referenced by the request path is found, and
      * the config is updated using the resourceId.
-     * {@inheritDoc}
      */
     @Update(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> updateInstance(Context context, String resourceId,
@@ -388,7 +384,6 @@ public class SmsCollectionProvider extends SmsResourceProvider {
      * <p>
      * Note that only query filter is supported, and only a filter of value {@code true} (i.e. all values).
      * Sorting and paging are not supported.
-     * {@inheritDoc}
      */
     @Query(operationDescription = @Operation, type = QueryType.FILTER, queryableFields = "*")
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,

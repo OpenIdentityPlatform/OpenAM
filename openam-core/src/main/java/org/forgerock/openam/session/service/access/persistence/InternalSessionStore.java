@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.session.service.access.persistence;
@@ -69,7 +70,6 @@ public interface InternalSessionStore {
      *
      * @param session Non null SessionID.
      * @exception SessionPersistenceException If the storage operation failed.
-     * @return The InternalSession that was removed from the cache.
      */
     void remove(InternalSession session) throws SessionPersistenceException;
 

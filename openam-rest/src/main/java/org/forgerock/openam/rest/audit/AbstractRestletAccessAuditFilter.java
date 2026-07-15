@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.rest.audit;
 
@@ -67,8 +67,8 @@ public abstract class AbstractRestletAccessAuditFilter extends Filter {
      * @param restlet The restlet for which events will be logged.
      * @param auditEventPublisher The publisher responsible for logging the events.
      * @param auditEventFactory The factory that can be used to create the events.
-     * @param requestDetailCreator
-     * @param responseDetailCreator
+     * @param requestDetailCreator The auditor used to record details from the request body.
+     * @param responseDetailCreator The auditor used to record details from the response body.
      */
     public AbstractRestletAccessAuditFilter(Component component, Restlet restlet,
             AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,

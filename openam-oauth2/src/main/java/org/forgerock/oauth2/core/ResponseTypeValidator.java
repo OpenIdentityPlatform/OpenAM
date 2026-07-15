@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -47,9 +47,12 @@ public class ResponseTypeValidator {
      * @param clientRegistration The client registration.
      * @param requestedResponseTypes The requested response types.
      * @param providerSettings The OAuth2ProviderSettings instance.
-     * @throws org.forgerock.oauth2.core.exceptions.InvalidRequestException
-     * @throws org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException
-     * @throws org.forgerock.oauth2.core.exceptions.ServerException
+     * @throws org.forgerock.oauth2.core.exceptions.InvalidRequestException if the provider has no allowed response
+     *          types configured.
+     * @throws org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException if the requested response type is
+     *          not supported by either the OAuth2 client or provider.
+     * @throws org.forgerock.oauth2.core.exceptions.ServerException if there is a problem retrieving the provider's
+     *          allowed response types.
      */
     public void validate(ClientRegistration clientRegistration, Set<String> requestedResponseTypes,
             OAuth2ProviderSettings providerSettings, OAuth2Request request)

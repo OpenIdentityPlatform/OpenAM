@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -77,11 +78,11 @@ public class ExecuteCommand {
      * Method executeCommand
      *
      *
-     * @param commandArray
-     * @param environment
-     * @param resultBuffer
+     * @param commandArray the command and its arguments to execute
+     * @param environment the environment variable settings for the command
+     * @param resultBuffer the buffer that receives the command output
      *
-     * @return
+     * @return the exit status code returned by the executed command
      *
      */
     public static int executeCommand(

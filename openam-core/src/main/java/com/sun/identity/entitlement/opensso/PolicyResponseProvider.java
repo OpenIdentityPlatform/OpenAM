@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2011-2015 ForgeRock AS. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -138,7 +139,7 @@ public class PolicyResponseProvider implements ResourceAttribute {
      * @param resourceName The resource name of the policy eval
      * @param environment environment map from the policy eval client
      * @return The attributes (only one since resource attributes are singled)
-     * @throws EntitlementException 
+     * @throws EntitlementException if the response provider fails to evaluate the attributes
      */
     public Map<String, Set<String>> evaluate(Subject adminSubject, String realm, Subject subject, String resourceName, Map<String, Set<String>> environment) throws EntitlementException {
         try {
@@ -213,7 +214,7 @@ public class PolicyResponseProvider implements ResourceAttribute {
 
     /**
      * Given a JSON state representation, updates the class appropriately
-     * @param state 
+     * @param state the JSON representation of the provider state to restore
      */
     public void setState(String state) {
         try {

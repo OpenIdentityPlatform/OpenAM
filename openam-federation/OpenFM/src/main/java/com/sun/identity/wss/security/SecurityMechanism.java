@@ -24,6 +24,7 @@
  *
  * $Id: SecurityMechanism.java,v 1.8 2008/08/31 15:50:03 mrudul_uchil Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.security;
@@ -717,7 +718,7 @@ public class SecurityMechanism {
     /**
      * Returns all the list of <code>SecurityMechanism</code>s supported
      * by the Web Services Client.
-     * @return the list of <code>SecurityMechanism<code>s supported
+     * @return the list of <code>SecurityMechanism</code>s supported
      * by the Web Services Client.
      */
     public static List getAllWSCSecurityMechanisms() {
@@ -737,7 +738,7 @@ public class SecurityMechanism {
     }
 
     /**
-     * Returns all the list of <code>SecurityMechanism<code>s supported
+     * Returns all the list of <code>SecurityMechanism</code>s supported
      *     by the Web Services Provider.
      * @return the list of <code>SecurityMechanism</code>s supported
      *     by the Web Services Provider.

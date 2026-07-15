@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.cts.impl.queue;
 
@@ -40,7 +41,7 @@ import com.sun.identity.shared.debug.Debug;
  * once.
  *
  *
- * @param
+ * @param <T> the type of result handled
  */
 public class AsyncResultHandler<T> implements ResultHandler<T, CoreTokenException> {
     private static final String NULL_SIGNAL = "--NULL--";
@@ -76,7 +77,7 @@ public class AsyncResultHandler<T> implements ResultHandler<T, CoreTokenExceptio
      * Blocking call to wait for the results of processing.
      *
      * @return {@inheritDoc}
-     * @throws CoreTokenException {@inheritDoc}
+     * @throws CoreTokenException if an error occurs while waiting for or retrieving the results
      */
     @SuppressWarnings("unchecked")
     public T getResults() throws CoreTokenException {

@@ -24,6 +24,7 @@
  *
  * $Id: FSAssertionManagerIF.java,v 1.4 2008/06/25 05:46:51 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -46,7 +47,8 @@ public interface FSAssertionManagerIF extends Remote {
      * @param destID The destination site requesting the assertion using
      *  the artifact.
      * @return The Assertion referenced to by artifact.
-     * @exception FSRemoteException, RemoteException If an error occurred during
+     * @exception FSRemoteException If an error occurred during
+     * @exception RemoteException If an error occurred during
      *  the process
      */
     public String getAssertion(
@@ -58,7 +60,8 @@ public interface FSAssertionManagerIF extends Remote {
      * @param metaAlias hosted provider meta alias
      * @param artifact assertion artifact string
      * @return destination id
-     * @exception FSRemoteException, RemoteException if error occurred.
+     * @exception FSRemoteException if error occurred.
+     * @exception RemoteException if error occurred.
      */
     public String getDestIdForArtifact(String metaAlias, String artifact)
         throws FSRemoteException, RemoteException;
@@ -69,7 +72,8 @@ public interface FSAssertionManagerIF extends Remote {
      * @param metaAlias hosted provider's meta alias
      * @return <code>true</code> if the user exists; <code>false</code> 
      *  otherwise.
-     * @exception FSRemoteException,RemoteException if error occurred.
+     * @exception FSRemoteException if error occurred.
+     * @exception RemoteException if error occurred.
      */
     public boolean isUserExists(String userDN, String metaAlias)
         throws FSRemoteException, RemoteException;
@@ -77,7 +81,7 @@ public interface FSAssertionManagerIF extends Remote {
     /**
      * Returns the error status of a given artifact.
      * @param metaAlias hosted provider's meta alias
-     * @param artifact
+     * @param artifact the assertion artifact whose status is requested
      * @return status encoded in XML
      */
     public String getErrorStatus( String metaAlias, String artifact )

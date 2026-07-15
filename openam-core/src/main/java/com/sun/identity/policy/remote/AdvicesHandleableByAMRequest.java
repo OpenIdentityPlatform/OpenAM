@@ -25,6 +25,7 @@
  * $Id: AdvicesHandleableByAMRequest.java,v 1.5 2008/08/19 19:09:19 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.remote;
@@ -35,16 +36,14 @@ import org.w3c.dom.Node;
  * This <code>AdvicesHandleableByAMRequest</code> class represents a 
  * <code>AdvicesHandleableByAMRequest</code> XML element. The 
  * AdvicesHandleableByAMRequest DTD is defined as the following:
- * <p>
- * <pre>
+ * <pre>{@code
  *    <!-- AdvicesHandleableByAMRequest element requests the server to return
  *         the names of policy advices that could be handled by OpenAM
  *         if PEP redirects the user agent to OpenAM
  *    -->
  *
  *    <!ELEMENT    AdvicesHandleableByAMRequest    EMPTY >
- * </pre>
- * <p>
+ * }</pre>
  */
 public class AdvicesHandleableByAMRequest {
     static final String ADVICES_HANDLEABLE_BY_AM_REQUEST_XML =

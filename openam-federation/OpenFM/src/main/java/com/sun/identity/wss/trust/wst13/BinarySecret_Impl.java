@@ -24,6 +24,7 @@
  *
  * $Id: BinarySecret_Impl.java,v 1.1 2009/08/29 03:06:01 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.trust.wst13;
@@ -71,7 +72,8 @@ public class BinarySecret_Impl extends BinarySecret {
     /**
      * Returns the DOM Element representation for the binary secret.
      * @return the DOM Element representation for the binary secret.
-     * @throws com.sun.identity.wss.sts.protocol.WSTException
+     * @throws com.sun.identity.wss.trust.WSTException if the DOM element
+     *         cannot be created.
      */
     public Element toDOMElement()  throws WSTException {
         if(secretE != null) {
@@ -84,7 +86,8 @@ public class BinarySecret_Impl extends BinarySecret {
     /**
      * Converts into XML String
      * @return the XML String for <code>BinarySecret</code>.
-     * @throws com.sun.identity.wss.trust.WSTException
+     * @throws com.sun.identity.wss.trust.WSTException if the XML string
+     *         cannot be created.
      */
     public String toXMLString() throws WSTException {
         

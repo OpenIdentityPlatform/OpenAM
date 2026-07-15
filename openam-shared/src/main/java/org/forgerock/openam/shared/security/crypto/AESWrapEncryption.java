@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.shared.security.crypto;
@@ -90,7 +91,7 @@ public class AESWrapEncryption implements AMEncryption, ConfigurableKey {
 
     /**
      * Sets the encryption key from a password. The actual encryption key will be derived from the password using
-     * the <a href="">PBKDF2</a> key derivation algorithm. Use the system properties
+     * the <a href="https://datatracker.ietf.org/doc/html/rfc2898">PBKDF2</a> key derivation algorithm. Use the system properties
      * {@code org.forgerock.openam.encryption.key.salt}, {@code org.forgerock.openam.encryption.key.iterations} and
      * {@code org.forgerock.openam.encryption.key.size} to set the salt (no default, must be set), number of
      * iterations (defaults to 250,000) and output key size (defaults to 128-bits, can be 128, 192 or 256).

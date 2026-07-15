@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.cli.record;
@@ -48,7 +49,7 @@ public class StartRecord extends AuthenticatedCommand {
     /**
      * Start recording handle
      * @param rc Request Context.
-     * @throws CLIException
+     * @throws CLIException if an error occurs while processing the request
      */
     public void handleRequest(RequestContext rc) throws CLIException {
         super.handleRequest(rc);

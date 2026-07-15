@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -25,9 +26,10 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
 /**
  * Provides a Radio control: &nbsp; &lt;input type='radio'&gt;.
  *
- * <table class='htmlHeader' cellspacing='6'>
+ * <table class='htmlHeader'>
+ * <caption>Example</caption>
  * <tr>
- * <td><input type='radio' name='header' value='Radio Control'>Radio</input></td>
+ * <td>&lt;input type='radio' name='header' value='Radio Control'&gt;Radio&lt;/input&gt;</td>
  * </tr>
  * </table>
  *
@@ -36,9 +38,9 @@ import org.openidentityplatform.openam.click.util.HtmlStringBuffer;
  * When used with a RadioGroup the Radio control will derive its name from the
  * parent RadioGroup, if the Radio's name is not defined.
  *
- * <p/>
+ * <p>
  * See also W3C HTML reference
- * <a class="external" target="_blank" title="W3C HTML 4.01 Specification"
+ * <a class="external" target="_blank"
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  *
  * @see RadioGroup
@@ -96,7 +98,7 @@ public class Radio extends Field {
     // ------------------------------------------------------ Public Attributes
 
     /**
-     * Return the radio's html tag: <tt>input</tt>.
+     * Return the radio's html tag: <code>input</code>.
      *
      * @see AbstractControl#getTag()
      *
@@ -175,7 +177,7 @@ public class Radio extends Field {
      *
      * @param parent the parent of the Control
      * @throws IllegalArgumentException if the given parent instance is
-     * referencing <tt>this</tt> object: <tt>if (parent == this)</tt>
+     * referencing <code>this</code> object: <code>if (parent == this)</code>
      */
     @Override
     public void setParent(Object parent) {
@@ -187,25 +189,25 @@ public class Radio extends Field {
 
     /**
      * Return the field display label.
-     * <p/>
+     * <p>
      * If the label value is null, this method will attempt to find a
      * localized label message in the parent messages using the key:
-     * <p/>
+     * <p>
      * If the Radio name attribute is not null:
      * <blockquote>
-     * <tt>super.getName() + ".label"</tt>
+     * <code>super.getName() + ".label"</code>
      * </blockquote>
      * If the Radio name attribute is null and the parent of the Radio is the RadioGroup:
      * <blockquote>
-     * <tt>parent.getName() + "." + getValue() + ".label"</tt>
+     * <code>parent.getName() + "." + getValue() + ".label"</code>
      * </blockquote>
      * If not found then the message will be looked up in the
-     * <tt>/click-control.properties</tt> file using the same key.
+     * <code>/click-control.properties</code> file using the same key.
      * If a value still cannot be found then the Field name will be
      * the radio value.
-     * <p/>
-     * For example given a <tt>CustomerPage</tt> with the properties file
-     * <tt>CustomerPage.properties</tt>:
+     * <p>
+     * For example given a <code>CustomerPage</code> with the properties file
+     * <code>CustomerPage.properties</code>:
      *
      * <pre class="codeConfig">
      * <span class="st">gender.M</span>.label=<span class="red">Male</span>

@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.authentication.modules.ldap;
 
@@ -68,7 +69,8 @@ public class LDAPCallbacks {
      * method of a <code>CallbackHandler</code> to ask for user name and
      * password to procees Login Page.
      *
-     * @throws LoginException
+     * @throws LoginException if no callback handler is available or the
+     *         login callbacks cannot be presented to the user
      */
     public void setLoginScreen() throws LoginException  {
         loginCallbacks();
@@ -79,9 +81,10 @@ public class LDAPCallbacks {
      * method of a <code>CallbackHandler</code> to ask for old, new and
      * confirm passwords to procees change password screen.
      *
-     * @throws LoginException
+     * @throws LoginException if no callback handler is available or the
+     *         change password callbacks cannot be presented to the user
      */
-    public void setPwdExpiryScreen() throws LoginException {  
+    public void setPwdExpiryScreen() throws LoginException {
         chgPwdCallback();
     }
 
@@ -90,9 +93,12 @@ public class LDAPCallbacks {
      * <code>invokeCallback</code> method of a <code>CallbackHandler</code> to
      * display information messages, warning messages and error messages.
      *
-     * @param type
-     * @param msg
-     * @throws LoginException
+     * @param type the message type to display, one of the
+     *        <code>TextOutputCallback</code> constants (information, warning
+     *        or error)
+     * @param msg the message text to display to the user
+     * @throws LoginException if no callback handler is available or the
+     *         message callback cannot be presented to the user
      */
     public void sendMessage(int type, String msg) throws LoginException {
         messageCallback(type,msg);

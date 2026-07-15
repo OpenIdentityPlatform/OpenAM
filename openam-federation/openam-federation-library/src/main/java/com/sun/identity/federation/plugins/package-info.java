@@ -24,12 +24,13 @@
  *
  * $Id: package-info.java,v 1.2 2008/06/25 05:46:50 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /**
  * Defines Federation Adapter for Service Provider.
  *
  * 
- * @deprecated since 12.0.0
+ * Deprecated since 12.0.0.
  */
 package com.sun.identity.federation.plugins;

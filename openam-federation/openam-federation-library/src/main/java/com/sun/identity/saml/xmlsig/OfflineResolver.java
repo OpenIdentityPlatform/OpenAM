@@ -25,6 +25,7 @@
  * $Id: OfflineResolver.java,v 1.2 2008/06/25 05:47:38 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.xmlsig;
@@ -63,9 +64,9 @@ public class OfflineResolver extends ResourceResolverSpi {
    /**
     * Method engineResolve
     *
-    * @param uri
-    * @param BaseURI
-    * @throws ResourceResolverException
+    * @param uri the URI attribute to resolve
+    * @param BaseURI the base URI against which the URI is resolved
+    * @throws ResourceResolverException if an error occurs
     */
    public XMLSignatureInput engineResolve(Attr uri, String BaseURI) throws ResourceResolverException {
 
@@ -99,8 +100,8 @@ public class OfflineResolver extends ResourceResolverSpi {
    /**
     * We resolve http URIs <I>without</I> fragment.
     *
-    * @param uri
-    * @param BaseURI
+    * @param uri the URI attribute to resolve
+    * @param BaseURI the base URI against which the URI is resolved
     */
    public boolean engineCanResolve(Attr uri, String BaseURI) {
 

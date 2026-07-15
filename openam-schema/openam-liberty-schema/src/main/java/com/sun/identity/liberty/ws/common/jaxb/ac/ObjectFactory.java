@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -204,7 +205,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -223,7 +224,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -242,7 +243,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -254,7 +255,7 @@ public class ObjectFactory
     /**
      * Create an instance of PrincipalAuthenticationMechanismElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PrincipalAuthenticationMechanismElement createPrincipalAuthenticationMechanismElement()
@@ -266,7 +267,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticatorType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticatorType createAuthenticatorType()
@@ -278,7 +279,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationLimitDurationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationLimitDurationElement createActivationLimitDurationElement()
@@ -290,7 +291,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticatorTransportProtocolType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticatorTransportProtocolType createAuthenticatorTransportProtocolType()
@@ -302,7 +303,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticationMethodType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticationMethodType createAuthenticationMethodType()
@@ -314,7 +315,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyActivationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.KeyActivationElement createKeyActivationElement()
@@ -326,7 +327,7 @@ public class ObjectFactory
     /**
      * Create an instance of MobileNetworkNoEncryptionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.MobileNetworkNoEncryptionType createMobileNetworkNoEncryptionType()
@@ -338,7 +339,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecurityAuditType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SecurityAuditType createSecurityAuditType()
@@ -350,7 +351,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyStorageType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.KeyStorageType createKeyStorageType()
@@ -362,7 +363,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.StatusType createStatusType()
@@ -374,7 +375,7 @@ public class ObjectFactory
     /**
      * Create an instance of PrivateKeyProtectionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PrivateKeyProtectionElement createPrivateKeyProtectionElement()
@@ -386,7 +387,7 @@ public class ObjectFactory
     /**
      * Create an instance of IdentificationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.IdentificationElement createIdentificationElement()
@@ -398,7 +399,7 @@ public class ObjectFactory
     /**
      * Create an instance of SharedSecretDynamicPlaintextType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SharedSecretDynamicPlaintextType createSharedSecretDynamicPlaintextType()
@@ -410,7 +411,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticationMethodElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticationMethodElement createAuthenticationMethodElement()
@@ -422,7 +423,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResumeSessionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ResumeSessionType createResumeSessionType()
@@ -434,7 +435,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationPinType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationPinType createActivationPinType()
@@ -446,7 +447,7 @@ public class ObjectFactory
     /**
      * Create an instance of GoverningAgreementsElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.GoverningAgreementsElement createGoverningAgreementsElement()
@@ -458,7 +459,7 @@ public class ObjectFactory
     /**
      * Create an instance of ZeroKnowledgeElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ZeroKnowledgeElement createZeroKnowledgeElement()
@@ -470,7 +471,7 @@ public class ObjectFactory
     /**
      * Create an instance of DigSigType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.DigSigType createDigSigType()
@@ -482,7 +483,7 @@ public class ObjectFactory
     /**
      * Create an instance of PreviousSessionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PreviousSessionElement createPreviousSessionElement()
@@ -494,7 +495,7 @@ public class ObjectFactory
     /**
      * Create an instance of TechnicalProtectionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.TechnicalProtectionType createTechnicalProtectionType()
@@ -506,7 +507,7 @@ public class ObjectFactory
     /**
      * Create an instance of AsymmetricDecryptionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AsymmetricDecryptionType createAsymmetricDecryptionType()
@@ -518,7 +519,7 @@ public class ObjectFactory
     /**
      * Create an instance of AsymmetricKeyAgreementType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AsymmetricKeyAgreementType createAsymmetricKeyAgreementType()
@@ -530,7 +531,7 @@ public class ObjectFactory
     /**
      * Create an instance of SSLElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SSLElement createSSLElement()
@@ -542,7 +543,7 @@ public class ObjectFactory
     /**
      * Create an instance of WTLSType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.WTLSType createWTLSType()
@@ -554,7 +555,7 @@ public class ObjectFactory
     /**
      * Create an instance of WrittenConsentElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.WrittenConsentElement createWrittenConsentElement()
@@ -566,7 +567,7 @@ public class ObjectFactory
     /**
      * Create an instance of SmartcardType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SmartcardType createSmartcardType()
@@ -578,7 +579,7 @@ public class ObjectFactory
     /**
      * Create an instance of MobileNetworkNoEncryptionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.MobileNetworkNoEncryptionElement createMobileNetworkNoEncryptionElement()
@@ -590,7 +591,7 @@ public class ObjectFactory
     /**
      * Create an instance of IdentificationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.IdentificationType createIdentificationType()
@@ -602,7 +603,7 @@ public class ObjectFactory
     /**
      * Create an instance of GenerationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.GenerationElement createGenerationElement()
@@ -614,7 +615,7 @@ public class ObjectFactory
     /**
      * Create an instance of LengthElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.LengthElement createLengthElement()
@@ -626,7 +627,7 @@ public class ObjectFactory
     /**
      * Create an instance of PhysicalVerificationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PhysicalVerificationType createPhysicalVerificationType()
@@ -638,7 +639,7 @@ public class ObjectFactory
     /**
      * Create an instance of GoverningAgreementRefType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.GoverningAgreementRefType createGoverningAgreementRefType()
@@ -650,7 +651,7 @@ public class ObjectFactory
     /**
      * Create an instance of IPAddressType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.IPAddressType createIPAddressType()
@@ -662,7 +663,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationLimitSessionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationLimitSessionElement createActivationLimitSessionElement()
@@ -674,7 +675,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.StatusElement createStatusElement()
@@ -686,7 +687,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecretKeyProtectionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SecretKeyProtectionElement createSecretKeyProtectionElement()
@@ -698,7 +699,7 @@ public class ObjectFactory
     /**
      * Create an instance of IPAddressElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.IPAddressElement createIPAddressElement()
@@ -710,7 +711,7 @@ public class ObjectFactory
     /**
      * Create an instance of IPSecType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.IPSecType createIPSecType()
@@ -722,7 +723,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationPinElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationPinElement createActivationPinElement()
@@ -734,7 +735,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationLimitElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationLimitElement createActivationLimitElement()
@@ -746,7 +747,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.TokenElement createTokenElement()
@@ -758,7 +759,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationLimitUsagesElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationLimitUsagesElement createActivationLimitUsagesElement()
@@ -770,7 +771,7 @@ public class ObjectFactory
     /**
      * Create an instance of PasswordType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PasswordType createPasswordType()
@@ -782,7 +783,7 @@ public class ObjectFactory
     /**
      * Create an instance of WTLSElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.WTLSElement createWTLSElement()
@@ -794,7 +795,7 @@ public class ObjectFactory
     /**
      * Create an instance of TimeSyncTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.TimeSyncTokenType createTimeSyncTokenType()
@@ -806,7 +807,7 @@ public class ObjectFactory
     /**
      * Create an instance of IPSecElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.IPSecElement createIPSecElement()
@@ -818,7 +819,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResumeSessionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ResumeSessionElement createResumeSessionElement()
@@ -830,7 +831,7 @@ public class ObjectFactory
     /**
      * Create an instance of MobileNetworkEndToEndEncryptionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.MobileNetworkEndToEndEncryptionElement createMobileNetworkEndToEndEncryptionElement()
@@ -842,7 +843,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecurityAuditElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SecurityAuditElement createSecurityAuditElement()
@@ -854,7 +855,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticationContextStatementType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticationContextStatementType createAuthenticationContextStatementType()
@@ -866,7 +867,7 @@ public class ObjectFactory
     /**
      * Create an instance of OperationalProtectionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.OperationalProtectionElement createOperationalProtectionElement()
@@ -878,7 +879,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticationContextStatementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticationContextStatementElement createAuthenticationContextStatementElement()
@@ -890,7 +891,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ExtensionElement createExtensionElement()
@@ -902,7 +903,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticatorElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticatorElement createAuthenticatorElement()
@@ -914,7 +915,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecretKeyProtectionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SecretKeyProtectionType createSecretKeyProtectionType()
@@ -926,7 +927,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticatingAuthorityElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticatingAuthorityElement createAuthenticatingAuthorityElement()
@@ -938,7 +939,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationLimitSessionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationLimitSessionType createActivationLimitSessionType()
@@ -950,7 +951,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyStorageElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.KeyStorageElement createKeyStorageElement()
@@ -962,7 +963,7 @@ public class ObjectFactory
     /**
      * Create an instance of TechnicalProtectionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.TechnicalProtectionElement createTechnicalProtectionElement()
@@ -974,7 +975,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationLimitDurationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationLimitDurationType createActivationLimitDurationType()
@@ -986,7 +987,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeySharingElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.KeySharingElement createKeySharingElement()
@@ -998,7 +999,7 @@ public class ObjectFactory
     /**
      * Create an instance of MobileNetworkEndToEndEncryptionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.MobileNetworkEndToEndEncryptionType createMobileNetworkEndToEndEncryptionType()
@@ -1010,7 +1011,7 @@ public class ObjectFactory
     /**
      * Create an instance of DeactivationCallCenterType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.DeactivationCallCenterType createDeactivationCallCenterType()
@@ -1022,7 +1023,7 @@ public class ObjectFactory
     /**
      * Create an instance of SmartcardElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SmartcardElement createSmartcardElement()
@@ -1034,7 +1035,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmptyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.EmptyType createEmptyType()
@@ -1046,7 +1047,7 @@ public class ObjectFactory
     /**
      * Create an instance of TimeSyncTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.TimeSyncTokenElement createTimeSyncTokenElement()
@@ -1058,7 +1059,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyActivationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.KeyActivationType createKeyActivationType()
@@ -1070,7 +1071,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationLimitType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationLimitType createActivationLimitType()
@@ -1082,7 +1083,7 @@ public class ObjectFactory
     /**
      * Create an instance of PasswordElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PasswordElement createPasswordElement()
@@ -1094,7 +1095,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeySharingType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.KeySharingType createKeySharingType()
@@ -1106,7 +1107,7 @@ public class ObjectFactory
     /**
      * Create an instance of GoverningAgreementsType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.GoverningAgreementsType createGoverningAgreementsType()
@@ -1118,7 +1119,7 @@ public class ObjectFactory
     /**
      * Create an instance of SwitchAuditType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SwitchAuditType createSwitchAuditType()
@@ -1130,7 +1131,7 @@ public class ObjectFactory
     /**
      * Create an instance of TokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.TokenType createTokenType()
@@ -1142,7 +1143,7 @@ public class ObjectFactory
     /**
      * Create an instance of GenerationType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.GenerationType createGenerationType()
@@ -1154,7 +1155,7 @@ public class ObjectFactory
     /**
      * Create an instance of OperationalProtectionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.OperationalProtectionType createOperationalProtectionType()
@@ -1166,7 +1167,7 @@ public class ObjectFactory
     /**
      * Create an instance of PhysicalVerificationElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PhysicalVerificationElement createPhysicalVerificationElement()
@@ -1178,7 +1179,7 @@ public class ObjectFactory
     /**
      * Create an instance of AlphabetElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AlphabetElement createAlphabetElement()
@@ -1190,7 +1191,7 @@ public class ObjectFactory
     /**
      * Create an instance of MobileNetworkRadioEncryptionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.MobileNetworkRadioEncryptionType createMobileNetworkRadioEncryptionType()
@@ -1202,7 +1203,7 @@ public class ObjectFactory
     /**
      * Create an instance of HTTPElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.HTTPElement createHTTPElement()
@@ -1214,7 +1215,7 @@ public class ObjectFactory
     /**
      * Create an instance of AsymmetricDecryptionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AsymmetricDecryptionElement createAsymmetricDecryptionElement()
@@ -1226,7 +1227,7 @@ public class ObjectFactory
     /**
      * Create an instance of ZeroKnowledgeType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ZeroKnowledgeType createZeroKnowledgeType()
@@ -1238,7 +1239,7 @@ public class ObjectFactory
     /**
      * Create an instance of SharedSecretChallengeResponseElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SharedSecretChallengeResponseElement createSharedSecretChallengeResponseElement()
@@ -1250,7 +1251,7 @@ public class ObjectFactory
     /**
      * Create an instance of AlphabetType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AlphabetType createAlphabetType()
@@ -1262,7 +1263,7 @@ public class ObjectFactory
     /**
      * Create an instance of PrivateKeyProtectionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PrivateKeyProtectionType createPrivateKeyProtectionType()
@@ -1274,7 +1275,7 @@ public class ObjectFactory
     /**
      * Create an instance of LengthType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.LengthType createLengthType()
@@ -1286,7 +1287,7 @@ public class ObjectFactory
     /**
      * Create an instance of MobileNetworkRadioEncryptionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.MobileNetworkRadioEncryptionElement createMobileNetworkRadioEncryptionElement()
@@ -1298,7 +1299,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ExtensionType createExtensionType()
@@ -1310,7 +1311,7 @@ public class ObjectFactory
     /**
      * Create an instance of SharedSecretDynamicPlaintextElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SharedSecretDynamicPlaintextElement createSharedSecretDynamicPlaintextElement()
@@ -1322,7 +1323,7 @@ public class ObjectFactory
     /**
      * Create an instance of SharedSecretChallengeResponseType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SharedSecretChallengeResponseType createSharedSecretChallengeResponseType()
@@ -1334,7 +1335,7 @@ public class ObjectFactory
     /**
      * Create an instance of ActivationLimitUsagesType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.ActivationLimitUsagesType createActivationLimitUsagesType()
@@ -1346,7 +1347,7 @@ public class ObjectFactory
     /**
      * Create an instance of WrittenConsentType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.WrittenConsentType createWrittenConsentType()
@@ -1358,7 +1359,7 @@ public class ObjectFactory
     /**
      * Create an instance of AsymmetricKeyAgreementElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AsymmetricKeyAgreementElement createAsymmetricKeyAgreementElement()
@@ -1370,7 +1371,7 @@ public class ObjectFactory
     /**
      * Create an instance of GoverningAgreementRefElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.GoverningAgreementRefElement createGoverningAgreementRefElement()
@@ -1382,7 +1383,7 @@ public class ObjectFactory
     /**
      * Create an instance of SSLType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SSLType createSSLType()
@@ -1394,7 +1395,7 @@ public class ObjectFactory
     /**
      * Create an instance of DigSigElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.DigSigElement createDigSigElement()
@@ -1406,7 +1407,7 @@ public class ObjectFactory
     /**
      * Create an instance of PreviousSessionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PreviousSessionType createPreviousSessionType()
@@ -1418,7 +1419,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticatorTransportProtocolElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticatorTransportProtocolElement createAuthenticatorTransportProtocolElement()
@@ -1430,7 +1431,7 @@ public class ObjectFactory
     /**
      * Create an instance of HTTPType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.HTTPType createHTTPType()
@@ -1442,7 +1443,7 @@ public class ObjectFactory
     /**
      * Create an instance of AuthenticatingAuthorityType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.AuthenticatingAuthorityType createAuthenticatingAuthorityType()
@@ -1454,7 +1455,7 @@ public class ObjectFactory
     /**
      * Create an instance of PrincipalAuthenticationMechanismType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.PrincipalAuthenticationMechanismType createPrincipalAuthenticationMechanismType()
@@ -1466,7 +1467,7 @@ public class ObjectFactory
     /**
      * Create an instance of DeactivationCallCenterElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.DeactivationCallCenterElement createDeactivationCallCenterElement()
@@ -1478,7 +1479,7 @@ public class ObjectFactory
     /**
      * Create an instance of SwitchAuditElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.ac.SwitchAuditElement createSwitchAuditElement()

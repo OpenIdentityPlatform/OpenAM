@@ -24,6 +24,7 @@
  *
  * $Id: IDPPExtension.java,v 1.2 2008/06/25 05:47:17 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -51,7 +52,7 @@ public interface IDPPExtension {
      * </code>
      * @return list of <code>PPISExtensionElement</code> <code>JAXB</code>
      * Objects.
-     * @exception IDPPException.
+     * @exception IDPPException .
      */
     public List getExtAttributes() throws IDPPException;
 

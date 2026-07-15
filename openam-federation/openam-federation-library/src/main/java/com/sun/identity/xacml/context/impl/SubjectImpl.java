@@ -24,6 +24,7 @@
  *
  * $Id: SubjectImpl.java,v 1.3 2008/06/25 05:48:13 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context.impl;
@@ -49,16 +50,15 @@ import org.w3c.dom.NodeList;
  * subject of the <code>Request</code> context by listing a 
  * sequence of <code>Attribute</code> elements associated with the
  * subject. A subject is an entity associated with the access request.
- * <p>
  * <pre>
- * &lt;xs:complexType name="SubjectType">
- *  &lt;xs:sequence>
+ * &lt;xs:complexType name="SubjectType"&gt;
+ *  &lt;xs:sequence&gt;
  *   &lt;xs:element ref="xacml-context:Attribute" minOccurs="0"
- *      maxOccurs="unbounded"/>
- * &lt;xs:sequence>
+ *      maxOccurs="unbounded"/&gt;
+ * &lt;xs:sequence&gt;
  * &lt;xs:attribute name="SubjectCategory" type="xs:anyURI" 
- *  default="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"/>
- * &lt;xs:complexType>
+ *  default="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"/&gt;
+ * &lt;xs:complexType&gt;
  * </pre>
  *
  */

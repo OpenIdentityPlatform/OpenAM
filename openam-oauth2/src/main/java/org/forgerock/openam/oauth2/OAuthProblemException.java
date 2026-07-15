@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.oauth2;
@@ -135,7 +136,7 @@ public class OAuthProblemException extends ResourceException {
         /**
          * Create a new exception from the given {@code request} parameter.
          * 
-         * @param request
+         * @param request the OAuth2 request to associate with the exception.
          * @return new instance of OAuthProblemException
          */
         public OAuthProblemException handle(Request request) {
@@ -282,7 +283,7 @@ public class OAuthProblemException extends ResourceException {
 
     /**
      * Save the exception into the request.
-     * <p/>
+     * <p>
      * Save the OAuthProblemException into the attributes and the
      * {@link OAuthProblemException#popException(org.restlet.Request)} method
      * retreive it.
@@ -323,12 +324,12 @@ public class OAuthProblemException extends ResourceException {
 
     /**
      * Used for formatting error according to chapter 4.2.2.1.
-     * <p/>
+     * <p>
      * Authorization Code (Query) HTTP/1.1 302 Found Location:
-     * https://client.example.com/cb?error=access_denied&state=xyz
-     * <p/>
+     * https://client.example.com/cb?error=access_denied&amp;state=xyz
+     * <p>
      * Implicit (Fragment) HTTP/1.1 302 Found Location:
-     * https://client.example.com/cb#error=access_denied&state=xyz
+     * https://client.example.com/cb#error=access_denied&amp;state=xyz
      * 
      * @see <a
      *      href="http://tools.ietf.org/html/draft-ietf-oauth-v2-24#section-4.2.2.1">4.2.2.1.

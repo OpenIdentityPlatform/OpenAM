@@ -25,6 +25,7 @@
  * $Id: SMSJAXRPCObjectImpl.java,v 1.22 2009/10/28 04:24:27 hengming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.sm.jaxrpc;
@@ -259,7 +260,7 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
     /**
      * Returns the suborganization names. Returns a set of SMSEntry objects that
      * are suborganization names. The paramter <code>numOfEntries</code>
-     * identifies the number of entries to return, if code>0</code> returns
+     * identifies the number of entries to return, if <code>0</code> returns
      * all the entries.
      */
     public Set searchSubOrgNames(String tokenID, String dn, String filter,
@@ -636,7 +637,7 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
      * 
      * @param name DN of the object changed
      * @param type change type
-     * @throws java.rmi.RemoteException
+     * @throws java.rmi.RemoteException if a remote communication error occurs
      */
     public void notifyObjectChanged(String name, int type)
             throws RemoteException {

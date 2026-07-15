@@ -24,6 +24,7 @@
  *
  * $Id: NameIDMappingRequestImpl.java,v 1.3 2008/11/10 22:57:03 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.protocol.impl;
@@ -71,9 +72,9 @@ public class NameIDMappingRequestImpl extends RequestAbstractImpl
     /**
      * Constructor to create <code>ManageNameIDRequest</code> Object. 
      *
-     * @param element Document Element of <code>ManageNameIDRequest<code>
+     * @param element Document Element of <code>ManageNameIDRequest</code>
      *     object.
-     * @throws SAML2Exception if <code>ManageNameIDRequest<code> cannot be
+     * @throws SAML2Exception if <code>ManageNameIDRequest</code> cannot be
      *     created.
      */
     public NameIDMappingRequestImpl(Element element) throws SAML2Exception {
@@ -89,8 +90,8 @@ public class NameIDMappingRequestImpl extends RequestAbstractImpl
      * Constructor to create <code>ManageNameIDRequest</code> Object. 
      *
      * @param xmlString XML Representation of the
-     *     <code>ManageNameIDRequest<code> object.
-     * @throws SAML2Exception if <code>ManageNameIDRequest<code> cannot be
+     *     <code>ManageNameIDRequest</code> object.
+     * @throws SAML2Exception if <code>ManageNameIDRequest</code> cannot be
      *     created.
      */
     public NameIDMappingRequestImpl(String xmlString) throws SAML2Exception {

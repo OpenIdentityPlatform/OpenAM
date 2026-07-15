@@ -24,6 +24,7 @@
  *
  * $Id: BinarySecurityToken.java,v 1.9 2009/07/24 21:51:06 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.security;
@@ -188,7 +189,8 @@ public class BinarySecurityToken implements SecurityToken {
     /**
      * Constructor to create Kerberos Token
      * @param kbSpec The Kerberos Token Specification
-     * @throws com.sun.identity.wss.security.SecurityException
+     * @throws com.sun.identity.wss.security.SecurityException if the Kerberos
+     *         token cannot be created.
      */
     public BinarySecurityToken(KerberosTokenSpec kbSpec) 
                       throws SecurityException {

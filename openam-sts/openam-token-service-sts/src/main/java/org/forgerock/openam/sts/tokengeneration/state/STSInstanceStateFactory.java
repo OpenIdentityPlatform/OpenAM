@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.state;
@@ -24,7 +26,7 @@ import org.forgerock.openam.sts.config.user.STSInstanceConfig;
  * interface is an encapsulation of the STSInstanceConfig state, and a SAML2CryptoProvider and OpenIdConnectTokenPKIProvider
  * driven by this state.
  * This factory will be consulted to produce the instance state, which is then cached. Implementations of this interface
- * will, in turn, consume a STSInstanceConfigStore<T> instance to access the SMS, in order to obtain the STSInstanceConfig
+ * will, in turn, consume a {@code STSInstanceConfigStore<T>} instance to access the SMS, in order to obtain the STSInstanceConfig
  * necessary to produce an STSInstanceState instance.
  */
 public interface STSInstanceStateFactory<S extends STSInstanceState, T extends STSInstanceConfig> {

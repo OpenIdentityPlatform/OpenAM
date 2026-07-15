@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -25,14 +26,15 @@ import java.text.MessageFormat;
 /**
  * Provides a Text Field control: &nbsp; &lt;input type='text'&gt;.
  *
- * <table class='htmlHeader' cellspacing='6'>
+ * <table class='htmlHeader'>
+ * <caption>Example</caption>
  * <tr>
  * <td>Text Field</td>
- * <td><input type='text' value='string' title='TextField Control'/></td>
+ * <td>&lt;input type='text' value='string'/&gt;</td>
  * </tr>
  * </table>
  *
- * <h3>TextField Example</h3>
+ * <h2>TextField Example</h2>
  *
  * The example below shows how to a TextField to a Form, and how it will be
  * rendered as HTML.
@@ -52,9 +54,9 @@ import java.text.MessageFormat;
  *
  * For another example using TextField see the {@link org.apache.click.control.Form}
  * Javadoc example.
- * <p/>
+ * <p>
  * See also the W3C HTML reference:
- * <a class="external" target="_blank" title="W3C HTML 4.01 Specification"
+ * <a class="external" target="_blank"
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  */
 public class TextField extends Field {
@@ -91,7 +93,7 @@ public class TextField extends Field {
     /**
      * The maximum field length validation constraint. If the value is zero this
      * validation constraint is not applied. The default value is zero.
-     * <p/>
+     * <p>
      * If maxLength is greater than zero, then maxLength is rendered as the
      * HTML attribute 'maxlength'.
      */
@@ -183,7 +185,7 @@ public class TextField extends Field {
 
     /**
      * Create a TextField with no name defined.
-     * <p/>
+     * <p>
      * <b>Please note</b> the control's name must be defined before it is valid.
      */
     public TextField() {
@@ -192,7 +194,7 @@ public class TextField extends Field {
     // ------------------------------------------------------ Public Attributes
 
     /**
-     * Return the textfield's html tag: <tt>input</tt>.
+     * Return the textfield's html tag: <code>input</code>.
      *
      * @see org.apache.click.control.AbstractControl#getTag()
      *
@@ -207,7 +209,7 @@ public class TextField extends Field {
      * Returns the maximum field length validation constraint. If the
      * {@link #maxLength} property is greater than zero, the Field values length
      * will be validated against this constraint when processed.
-     * <p/>
+     * <p>
      * If maxLength is greater than zero, it is rendered as the field
      * attribute 'maxlength'
      *
@@ -221,7 +223,7 @@ public class TextField extends Field {
      * Sets the maximum field length. If the {@link #maxLength} property is
      * greater than zero, the Field values length will be validated against
      * this constraint when processed.
-     * <p/>
+     * <p>
      * If maxLength is greater than zero, it is rendered as the field
      * attribute 'maxlength'
      *
@@ -272,9 +274,9 @@ public class TextField extends Field {
     }
 
     /**
-     * Return the input type: '<tt>text</tt>'.
+     * Return the input type: '<code>text</code>'.
      *
-     * @return the input type: '<tt>text</tt>'
+     * @return the input type: '<code>text</code>'
      */
     public String getType() {
         return "text";
@@ -346,11 +348,11 @@ public class TextField extends Field {
 
     /**
      * Validate the TextField request submission.
-     * <p/>
+     * <p>
      * A field error message is displayed if a validation error occurs.
      * These messages are defined in the resource bundle: <blockquote>
      * <pre>org.apache.click.control.MessageProperties</pre></blockquote>
-     * <p/>
+     * <p>
      * Error message bundle key names include: <blockquote><ul>
      * <li>field-maxlength-error</li>
      * <li>field-minlength-error</li>
@@ -384,8 +386,8 @@ public class TextField extends Field {
 
     /**
      * Return the field JavaScript client side validation function.
-     * <p/>
-     * The function name must follow the format <tt>validate_[id]</tt>, where
+     * <p>
+     * The function name must follow the format <code>validate_[id]</code>, where
      * the id is the DOM element id of the fields focusable HTML element, to
      * ensure the function has a unique name.
      *

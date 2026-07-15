@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.openidentityplatform.openam.click.service;
@@ -64,21 +65,21 @@ import org.xml.sax.SAXException;
 
 /**
  * Provides a Click XML configuration service class.
- * <p/>
+ * <p>
  * This class reads Click configuration information from a file named
- * <tt>click.xml</tt>. The service will first lookup the <tt>click.xml</tt>
- * under the applications <tt>WEB-INF</tt> directory, and if not found
+ * <code>click.xml</code>. The service will first lookup the <code>click.xml</code>
+ * under the applications <code>WEB-INF</code> directory, and if not found
  * attempt to load the configuration file from the classpath root.
- * <p/>
- * Configuring Click through the <tt>click.xml</tt> file is the most common
+ * <p>
+ * Configuring Click through the <code>click.xml</code> file is the most common
  * technique.
- * <p/>
+ * <p>
  * However you can instruct Click to use a different service implementation.
  * Please see {@link org.apache.click.service.ConfigService} for more details.
  */
 public class XmlConfigService implements ConfigService, EntityResolver {
 
-    /** The name of the Click logger: &nbsp; "<tt>org.apache.click</tt>". */
+    /** The name of the Click logger: &nbsp; "<code>org.apache.click</code>". */
     static final String CLICK_LOGGER = "org.apache.click";
 
     /** The click deployment directory path: &nbsp; "/click". */
@@ -89,21 +90,21 @@ public class XmlConfigService implements ConfigService, EntityResolver {
 
     /**
      * The default velocity properties filename: &nbsp;
-     * "<tt>/WEB-INF/velocity.properties</tt>".
+     * "<code>/WEB-INF/velocity.properties</code>".
      */
     static final String DEFAULT_VEL_PROPS = "/WEB-INF/velocity.properties";
 
-    /** The click DTD file name: &nbsp; "<tt>click.dtd</tt>". */
+    /** The click DTD file name: &nbsp; "<code>click.dtd</code>". */
     static final String DTD_FILE_NAME = "click.dtd";
 
     /**
      * The resource path of the click DTD file: &nbsp;
-     * "<tt>/org/apache/click/click.dtd</tt>".
+     * "<code>/org/apache/click/click.dtd</code>".
      */
     static final String DTD_FILE_PATH = "/org/apache/click/" + DTD_FILE_NAME;
 
     /**
-     * The user supplied macro file name: &nbsp; "<tt>macro.vm</tt>".
+     * The user supplied macro file name: &nbsp; "<code>macro.vm</code>".
      */
     static final String MACRO_VM_FILE_NAME = "macro.vm";
 
@@ -128,13 +129,13 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     private static final Object PAGE_LOAD_LOCK = new Object();
 
     /**
-     * The name of the Velocity logger: &nbsp; "<tt>org.apache.velocity</tt>".
+     * The name of the Velocity logger: &nbsp; "<code>org.apache.velocity</code>".
      */
     static final String VELOCITY_LOGGER = "org.apache.velocity";
 
     /**
      * The global Velocity macro file name: &nbsp;
-     * "<tt>VM_global_library.vm</tt>".
+     * "<code>VM_global_library.vm</code>".
      */
     static final String VM_FILE_NAME = "VM_global_library.vm";
 
@@ -316,8 +317,8 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Return the application mode String value: &nbsp; <tt>["production",
-     * "profile", "development", "debug"]</tt>.
+     * Return the application mode String value: &nbsp; <code>["production",
+     * "profile", "development", "debug"]</code>.
      *
      * @return the application mode String value
      */
@@ -447,14 +448,14 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     /**
      * Return true if the given path is a Page class template, false
      * otherwise. By default this method returns true if the path has a
-     * <tt>.htm</tt> or <tt>.jsp</tt> extension.
-     * <p/>
-     * If you want to map alternative templates besides <tt>.htm</tt> and
-     * <tt>.jsp</tt> files you can override this method and provide extra
+     * <code>.htm</code> or <code>.jsp</code> extension.
+     * <p>
+     * If you want to map alternative templates besides <code>.htm</code> and
+     * <code>.jsp</code> files you can override this method and provide extra
      * checks against the given path whether it should be added as a
      * template or not.
-     * <p/>
-     * Below is an example showing how to allow <tt>.xml</tt> paths to
+     * <p>
+     * Below is an example showing how to allow <code>.xml</code> paths to
      * be recognized as Page class templates.
      *
      * <pre class="prettyprint">
@@ -472,9 +473,9 @@ public class XmlConfigService implements ConfigService, EntityResolver {
      *     }
      * } </pre>
      *
-     * Here is an example <tt>web.xml</tt> showing how to configure a custom
-     * ConfigService through the context parameter <tt>config-service-class</tt>.
-     * We also map <tt>*.xml</tt> requests to be routed through ClickServlet:
+     * Here is an example <code>web.xml</code> showing how to configure a custom
+     * ConfigService through the context parameter <code>config-service-class</code>.
+     * We also map <code>*.xml</code> requests to be routed through ClickServlet:
      *
      * <pre class="prettyprint">
      * &lt;web-app xmlns="http://java.sun.com/xml/ns/j2ee"
@@ -512,11 +513,11 @@ public class XmlConfigService implements ConfigService, EntityResolver {
      *
      * <b>Please note</b>: even though you can add extra template mappings by
      * overriding this method, it is still recommended to keep the default
-     * <tt>.htm</tt> mapping by invoking <tt>super.isTemplate(String)</tt>.
+     * <code>.htm</code> mapping by invoking <code>super.isTemplate(String)</code>.
      * The reason being that Click ships with some default templates such as
      * {@link org.apache.click.service.ConfigService#ERROR_PATH} and {@link org.apache.click.service.ConfigService#NOT_FOUND_PATH}
-     * that must be mapped as <tt>.htm</tt>.
-     * <p/>
+     * that must be mapped as <code>.htm</code>.
+     * <p>
      * Please see the ConfigService <a href="#config">javadoc</a> for details
      * on how to configure a custom ConfigService implementation.
      *
@@ -679,7 +680,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     /**
      * @see org.apache.click.service.ConfigService#getNotFoundPageClass()
      *
-     * @return the page not found <tt>Page</tt> <tt>Class</tt>
+     * @return the page not found <code>Page</code> <code>Class</code>
      */
     public Class<? extends Page> getNotFoundPageClass() {
         XmlConfigService.PageElm page = (XmlConfigService.PageElm) pageByPathMap.get(NOT_FOUND_PATH);
@@ -695,7 +696,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     /**
      * @see org.apache.click.service.ConfigService#getErrorPageClass()
      *
-     * @return the error handling page <tt>Page</tt> <tt>Class</tt>
+     * @return the error handling page <code>Page</code> <code>Class</code>
      */
     public Class<? extends Page> getErrorPageClass() {
         PageElm page = (XmlConfigService.PageElm) pageByPathMap.get(ERROR_PATH);
@@ -797,7 +798,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
 
     /**
      * This method resolves the click.dtd for the XML parser using the
-     * classpath resource: <tt>/org/apache/click/click.dtd</tt>.
+     * classpath resource: <code>/org/apache/click/click.dtd</code>.
      *
      * @see EntityResolver#resolveEntity(String, String)
      *
@@ -824,15 +825,15 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     /**
      * Find and return the page class for the specified pagePath and
      * pagesPackage.
-     * <p/>
-     * For example if the pagePath is <tt>'/edit-customer.htm'</tt> and
-     * package is <tt>'com.mycorp'</tt>, the matching page class will be:
-     * <tt>com.mycorp.EditCustomer</tt> or <tt>com.mycorp.EditCustomerPage</tt>.
-     * <p/>
-     * If the page path is <tt>'/admin/add-customer.htm'</tt> and package is
-     * <tt>'com.mycorp'</tt>, the matching page class will be:
-     * <tt>com.mycorp.admin.AddCustomer</tt> or
-     * <tt>com.mycorp.admin.AddCustomerPage</tt>.
+     * <p>
+     * For example if the pagePath is <code>'/edit-customer.htm'</code> and
+     * package is <code>'com.mycorp'</code>, the matching page class will be:
+     * <code>com.mycorp.EditCustomer</code> or <code>com.mycorp.EditCustomerPage</code>.
+     * <p>
+     * If the page path is <code>'/admin/add-customer.htm'</code> and package is
+     * <code>'com.mycorp'</code>, the matching page class will be:
+     * <code>com.mycorp.admin.AddCustomer</code> or
+     * <code>com.mycorp.admin.AddCustomerPage</code>.
      *
      * @param pagePath the path used for matching against a page class name
      * @param pagesPackage the package of the page class
@@ -945,12 +946,12 @@ public class XmlConfigService implements ConfigService, EntityResolver {
      * Returns true if Click resources (JavaScript, CSS, images etc) packaged
      * in jars can be deployed to the root directory of the webapp, false
      * otherwise.
-     * <p/>
+     * <p>
      * By default this method will return false in restricted environments where
      * write access to the underlying file system is disallowed. Example
      * environments where write access is not allowed include the WebLogic JEE
      * server and Google App Engine. (Note: WebLogic provides the property
-     * <tt>"Archived Real Path Enabled"</tt> that controls whether web
+     * <code>"Archived Real Path Enabled"</code> that controls whether web
      * applications can access the file system or not. See the Click user manual
      * for details).
      *
@@ -968,7 +969,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     // ------------------------------------------------ Package Private Methods
 
     /**
-     * Loads all Click Pages defined in the <tt>click.xml</tt> file, including
+     * Loads all Click Pages defined in the <code>click.xml</code> file, including
      * manually defined Pages, auto mapped Pages and excluded Pages.
      *
      * @param rootElm the root xml element containing the configuration
@@ -1106,7 +1107,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
     /**
      * Build the {@link #pageByPathMap} by associating template files with
      * matching Java classes found on the classpath.
-     * <p/>
+     * <p>
      * This method also rebuilds the {@link #excludesList}. This list contains
      * URL paths that should not be auto-mapped.
      *
@@ -1365,7 +1366,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
      * Deploy from the classpath all resources found under the directory
      * 'META-INF/resources/'. For backwards compatibility resources under the
      * directory 'META-INF/web/' are also deployed.
-     * <p/>
+     * <p>
      * Only jars and folders available on the classpath are scanned.
      *
      * @throws IOException if the resources cannot be deployed
@@ -1951,7 +1952,7 @@ public class XmlConfigService implements ConfigService, EntityResolver {
 
     /**
      * Provide an Excluded Page class.
-     * <p/>
+     * <p>
      * <b>PLEASE NOTE</b> this class is <b>not</b> for public use, and can be
      * ignored.
      */
