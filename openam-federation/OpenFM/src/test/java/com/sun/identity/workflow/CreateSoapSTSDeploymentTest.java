@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -85,16 +84,18 @@ public class CreateSoapSTSDeploymentTest {
 
     private static final boolean WITH_KEYSTORE_FILE = true;
     private static final boolean WITH_CUSTOM_WSDL = true;
+    /*
+    Classpath resource names, not filesystem paths: they must keep '/' on every platform, so they
+    cannot be built with Paths.get() (which yields '\' separators on Windows and resolves to null).
+     */
+    private static final String INPUT_WAR_RESOURCE = "/com/sun/identity/workflow/slim-openam-soap-sts-server.war";
+    private static final String CUSTOM_WSDL_RESOURCE = "/com/sun/identity/workflow/custom.wsdl";
+    private static final String KEYSTORE_RESOURCE = "/com/sun/identity/workflow/keystore.jks";
+
     private File outputWarFile;
-    private Path inputWarFilePath;
-    private Path customWsdlFilePath;
-    private Path keystoreFilePath;
 
     @BeforeClass
     public void setup() throws Exception {
-        inputWarFilePath = Paths.get("/com", "sun", "identity", "workflow", "slim-openam-soap-sts-server.war");
-        customWsdlFilePath = Paths.get("/com", "sun", "identity", "workflow", "custom.wsdl");
-        keystoreFilePath = Paths.get("/com", "sun", "identity", "workflow", "keystore.jks");
         outputWarFile = Files.createTempFile("soap-sts", "war").toFile();
     }
 
@@ -117,7 +118,7 @@ public class CreateSoapSTSDeploymentTest {
     }
 
     private void verifyGeneratedWarCorrectness(boolean withKeystoreFile, boolean withCustomWsdl) throws IOException {
-        try (JarInputStream jarInputStream  = new JarInputStream(getClass().getResourceAsStream(inputWarFilePath.toString()))) {
+        try (JarInputStream jarInputStream  = new JarInputStream(getClass().getResourceAsStream(INPUT_WAR_RESOURCE))) {
             final JarFile outputWar = new JarFile(outputWarFile);
             assertEquals(getJarInputStreamEntryNames(jarInputStream), getNonAddedOutputWarFileEntryNames(outputWar));
             assertNotNull(jarInputStream.getManifest());
@@ -142,7 +143,7 @@ public class CreateSoapSTSDeploymentTest {
     }
 
     private void verifyCustomWsdlFileCorrectness(JarFile outputWar) throws IOException {
-        try (InputStream inputWsdlStream = getClass().getResourceAsStream(customWsdlFilePath.toString());
+        try (InputStream inputWsdlStream = getClass().getResourceAsStream(CUSTOM_WSDL_RESOURCE);
              InputStream fromWarInputStream = outputWar.getInputStream(outputWar.getJarEntry(WEB_INF_CLASSES + WSDL_FILE_NAMES_PARAM_VALUE))) {
             final String customWsdlInput = readStringFromInputStream(inputWsdlStream);
             final String customWsdlInWar = readStringFromInputStream(fromWarInputStream);
@@ -238,7 +239,7 @@ public class CreateSoapSTSDeploymentTest {
         @Override
         protected JarInputStream getJarInputStream() throws WorkflowException {
             try {
-                return new JarInputStream(getClass().getResourceAsStream(inputWarFilePath.toString()));
+                return new JarInputStream(getClass().getResourceAsStream(INPUT_WAR_RESOURCE));
             } catch (IOException e) {
                 throw new WorkflowException("error opening test resource .war file: " + e);
             }
@@ -271,9 +272,9 @@ public class CreateSoapSTSDeploymentTest {
         @Override
         protected InputStream getInputStreamForKeystoreFileOrCustomWsdlFile(String fileName) throws IOException {
             if (WSDL_FILE_NAMES_PARAM_VALUE.equals(fileName)) {
-                return getClass().getResourceAsStream(customWsdlFilePath.toString());
+                return getClass().getResourceAsStream(CUSTOM_WSDL_RESOURCE);
             } else if (KEYSTORE_FILE_NAMES_PARAM_VALUE.equals(fileName)) {
-                return getClass().getResourceAsStream(keystoreFilePath.toString());
+                return getClass().getResourceAsStream(KEYSTORE_RESOURCE);
             }
             throw new IllegalStateException("Unexpected fileName parameter in " +
                     "MyCreateSoapSTSDeployment#getInputStreamForKeystoreFileOrCustomWsdlFile: " + fileName);
