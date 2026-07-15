@@ -25,6 +25,7 @@
  * $Id: AMCertPath.java,v 1.5 2009/07/16 00:02:24 beomsuk Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.security.cert;
@@ -107,9 +108,12 @@ public class AMCertPath {
     }
 
     /**
-     * It does cert path validation together with CRL check and ocsp checking 
+     * It does cert path validation together with CRL check and ocsp checking
      * if they are properly configured.
-     * @param certs
+     * @param certs the certificate chain to validate, ordered from the target certificate to the trust anchor
+     * @param crlEnabled true if CRL-based revocation checking should be performed
+     * @param ocspEnabled true if OCSP-based revocation checking should be performed
+     * @return true if the certificate path is valid, false otherwise
      **/
     public boolean verify(X509Certificate[] certs, boolean crlEnabled,
                           boolean ocspEnabled) {

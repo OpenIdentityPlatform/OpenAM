@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -45,8 +46,8 @@ abstract public class UserResponseInteraction extends BaseInteraction {
      * of a UserOption with value of InteractionResultStatus object that
      * corresponds to that UserOption.
      * 
-     * @return a Map constructed with <UserOption' display Item,
-     *         InteractionResultStatus>.
+     * @return a Map constructed with {@code <UserOption display Item,
+     *         InteractionResultStatus>}.
      */
     abstract protected Map getResultStatusMap();
 

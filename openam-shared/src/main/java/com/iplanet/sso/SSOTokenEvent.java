@@ -24,6 +24,7 @@
  *
  * $Id: SSOTokenEvent.java,v 1.4 2008/08/15 01:05:20 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.sso;
@@ -32,7 +33,6 @@ package com.iplanet.sso;
  * The <code>SSOTokenEvent</code> is an interface that represents an SSO token
  * event.The single sign on token event represents a change in 
  * <code>SSOToken</code>.
- * </p>
  * The following are possible SSO token event types:
  * <ul>
  * <li><code>SSO_TOKEN_IDLE_TIMEOUT</code>,
@@ -90,7 +90,7 @@ public interface SSOTokenEvent {
      *         <ul>
      *         <li><code>SSO_TOKEN_IDLE_TIMEOUT</code></li>
      *         <li><code>SSO_TOKEN_MAX_TIMEOUT</code></li>
-     *         <li><code>SSO_TOKEN_DESTROY</code></li> and
+     *         <li><code>SSO_TOKEN_DESTROY</code> and</li>
      *         <li><code>SSO_TOKEN_PROPERTY_CHANGED</code></li>
      *         </ul>
      * @throws SSOException if the <code>SSOTokenEvent</code> type is

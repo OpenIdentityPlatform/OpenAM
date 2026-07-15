@@ -1117,7 +1117,7 @@ public class DJLDAPv3Repo extends IdRepo implements IdentityMovedOrRenamedListen
     /**
      * Performs a search in the directory based on the provided parameters.
      * Using the pattern and avPairs parameters an example search filter would look something like:
-     * <code>(&(|(attr1=value1)(attr2=value2))(searchAttr=pattern)(objectclassfilter))</code>.
+     * {@code (&(|(attr1=value1)(attr2=value2))(searchAttr=pattern)(objectclassfilter))}.
      *
      * @param token Not used.
      * @param type The type of the identity.

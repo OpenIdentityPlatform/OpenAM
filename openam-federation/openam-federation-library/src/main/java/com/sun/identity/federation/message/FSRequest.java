@@ -24,6 +24,7 @@
  *
  * $Id: FSRequest.java,v 1.3 2008/06/25 05:46:45 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /**
@@ -116,7 +117,7 @@ public class FSRequest extends Request {
      *        value is null then one will be generated.
      * @param query <code>AuthenticationQuery</code> to be included in
      *        the Request.
-     * @throws <code>SAMLException</code> on error.
+     * @throws SAMLException on error.
      */
     public FSRequest(String requestId, Query query) throws SAMLException {
         super(requestId, query);
@@ -140,7 +141,7 @@ public class FSRequest extends Request {
      *            <code>AttributeQuery</code>, 1 or more
      *            <code>AssertionIDReference</code>, or 1 or more of
      *            <code>AssertionArtifact</code>.
-     * @throws <code>SAMLException</code> throws errors on exception.
+     * @throws SAMLException throws errors on exception.
      */
     public FSRequest(String requestId, List contents) throws SAMLException {
         super(requestId, contents);
@@ -175,7 +176,7 @@ public class FSRequest extends Request {
      *
      * @param xml the <code>XML</code> Document string.
      * @return the <code>Request</code> object.
-     * @throws <code>SAMLException</code> on error.
+     * @throws SAMLException on error.
      */
     public static Request parseXML(String xml) throws SAMLException {
         // parse the xml string
@@ -189,7 +190,7 @@ public class FSRequest extends Request {
      * a <code>XML</code> Document Element.
      *
      * @param root the <code>XML</code> Document Element.
-     * @throws <code>SAMLException</code> on error.
+     * @throws SAMLException on error.
      */
     public FSRequest(Element root) throws SAMLException {
         // Make sure this is a Request
@@ -391,7 +392,7 @@ public class FSRequest extends Request {
     /* Returns the value of <code>RespondWith</code> attribute.
      *
      * @return value of the <code>RespondWith</code> attribute.
-     * @throws <code>SAMLException</code> on error.
+     * @throws SAMLException on error.
      */
     private String checkAndGetRespondWith(String respondWith)
     throws SAMLException {
@@ -427,7 +428,7 @@ public class FSRequest extends Request {
      *
      * @param majorVer a String representing the <code>MajorVersion</code> to
      *        be set.
-     * @throws <code>FSMsgException</code> on error.
+     * @throws FSMsgException on error.
      */
     
     private void parseMajorVersion(String majorVer) throws SAMLException {
@@ -466,7 +467,7 @@ public class FSRequest extends Request {
      *
      * @param minorVer a String representing the <code>MinorVersion</code> to
      *        be set.
-     * @throws <code>SAMLException</code> when the version mismatchs.
+     * @throws SAMLException when the version mismatchs.
      */
     private void parseMinorVersion(String minorVer) throws SAMLException {
         try {
@@ -501,7 +502,7 @@ public class FSRequest extends Request {
      * <code>AttributeQeury</code>, or <code>AuthorizationDecisionQuery</code>.
      *
      * @param child a <code>DOM</code> Node.
-     * @throws <code>SAMLException</code> if the <code>Query</code> is invalid.
+     * @throws SAMLException if the <code>Query</code> is invalid.
      */
     private void parseQuery(Node child) throws SAMLException {
         NamedNodeMap nm = child.getAttributes();

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -255,7 +256,7 @@ public class BasicClientTypesManager implements ClientTypesManager {
      * _attributes is a comma delimited list of attributes for the client type
      *
      * @param props The properties file to parse
-     * @throws InvalidPropertiesFormatException
+     * @throws InvalidPropertiesFormatException if the properties are missing the required client list or are malformed
      */
     protected void processProps(Properties props)
     throws InvalidPropertiesFormatException {
@@ -278,7 +279,7 @@ public class BasicClientTypesManager implements ClientTypesManager {
      *
      * @param clientName The name of the client to populate
      * @param props The incoming properties file
-     * @throws InvalidPropertiesFormatException
+     * @throws InvalidPropertiesFormatException if the client properties are malformed
      */
     protected void populateClient(String clientName, Properties props)
     throws InvalidPropertiesFormatException {

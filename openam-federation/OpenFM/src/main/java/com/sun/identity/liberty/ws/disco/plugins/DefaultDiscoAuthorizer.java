@@ -24,6 +24,7 @@
  *
  * $Id: DefaultDiscoAuthorizer.java,v 1.2 2008/06/25 05:49:56 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -176,7 +177,8 @@ public class DefaultDiscoAuthorizer implements Authorizer {
      *          <code>com.sun.identity.liberty.ws.soapbinding.Message</code>.
      * @return <code>AuthorizationDecision</code> object contains authorization
      *             decision information for the given resource.
-     * @exception Exception
+     * @exception Exception if an error occurs while making the authorization
+     *             decision.
      */
     public Object getAuthorizationDecision(
                   Object credential,

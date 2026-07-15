@@ -18,6 +18,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.sm.ldap;
 
@@ -71,7 +72,7 @@ public class CTSDataLayer {
     /**
      * Release an obtained Connection back to the pool.
      *
-     * @param ldapConnection
+     * @param ldapConnection the connection to release back to the pool
      */
     public void releaseConnection(Connection ldapConnection) {
         ldapConnection.close();
@@ -81,8 +82,8 @@ public class CTSDataLayer {
      * Release an obtained Connection back to the pool, with a
      * specified return code for clean-up.
      *
-     * @param ldapConnection
-     * @param ldapErrorCode
+     * @param ldapConnection the connection to release back to the pool
+     * @param ldapErrorCode the LDAP return code used during clean-up
      */
     public void releaseConnection(Connection ldapConnection, int ldapErrorCode ) {
         releaseConnection(ldapConnection);
@@ -92,7 +93,7 @@ public class CTSDataLayer {
      * Release an obtained Connection back to the pool, with a
      * specified Last LDAP Stack Exception for clean-up.
      *
-     * @param ldapConnection
+     * @param ldapConnection the connection to release back to the pool
      * @param lastLDAPException - Last up Stream LDAP Exception, can be null if no issues arose
      *                          with the connection or operations.
      */

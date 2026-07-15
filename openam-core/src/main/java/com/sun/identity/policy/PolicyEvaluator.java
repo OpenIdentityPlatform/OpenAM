@@ -25,6 +25,7 @@
  * $Id: PolicyEvaluator.java,v 1.19 2010/01/14 23:18:35 dillidorai Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy;
@@ -1286,7 +1287,7 @@ public class PolicyEvaluator {
      *              <li><code>ResourceResult.SUBTREE_SCOPE</code>
      *              <li><code>ResourceResult.STRICT_SUBTREE_SCOPE</code>
      *              <li><code>ResourceResult.SELF_SCOPE</code>
-     *              <ul>
+     *              </ul>
      *              If the scope is <code>ResourceResult.SUBTREE_SCOPE</code>,
      *              the method will return a set of <code>ResourceResult</code>
      *              objects, one of them for the <code>resourceName</code> and

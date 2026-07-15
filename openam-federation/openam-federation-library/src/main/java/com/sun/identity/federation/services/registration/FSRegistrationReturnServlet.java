@@ -289,7 +289,8 @@ public class FSRegistrationReturnServlet extends HttpServlet {
      * @param isIDP whether the remote provider is an IDP or not
      * @return <code>true</code> if the signature is valid; <code>false</code>
      *  otherwise.
-     * @exception SAMLException, FSException if an error occurred during the
+     * @exception SAMLException if an error occurred during the
+     * @exception FSException if an error occurred during the
      *  process
      */
     private boolean verifyResponseSignature(

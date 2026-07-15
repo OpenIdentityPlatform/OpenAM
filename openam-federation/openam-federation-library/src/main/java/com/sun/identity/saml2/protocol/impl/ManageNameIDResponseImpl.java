@@ -24,6 +24,7 @@
  *
  * $Id: ManageNameIDResponseImpl.java,v 1.2 2008/06/25 05:48:00 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -48,10 +49,9 @@ import com.sun.identity.saml2.protocol.ProtocolFactory;
  * Java content class for ManageNameIDResponse element declaration.
  * <p>The following schema fragment specifies the expected
  * 	content contained within this java content object.
- * <p>
  * <pre>
  * &lt;element name="ManageNameIDResponse" 
- *   type="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType"/>
+ *   type="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType"/&gt;
  * </pre>
  */
 public class ManageNameIDResponseImpl 
@@ -69,9 +69,9 @@ extends StatusResponseImpl implements ManageNameIDResponse {
      * Constructor to create <code>ManageNameIDResponse</code> Object. 
      *
      * @param element Document Element of 
-     *         <code>ManageNameIDRequest<code> object.
-     * @throws SAML2Exception 
-     *         if <code>ManageNameIDRequest<code> cannot be created.
+     *         <code>ManageNameIDRequest</code> object.
+     * @throws SAML2Exception if a SAML2 error occurs
+     *         if <code>ManageNameIDRequest</code> cannot be created.
      */
     public ManageNameIDResponseImpl(Element element) throws SAML2Exception {
     	parseElement(element);
@@ -85,9 +85,9 @@ extends StatusResponseImpl implements ManageNameIDResponse {
      * Constructor to create <code>ManageNameIDResponse</code> Object. 
      *
      * @param xmlString XML Representation of 
-     *        the <code>ManageNameIDRequest<code> object.
-     * @throws SAML2Exception 
-     *        if <code>ManageNameIDRequest<code> cannot be created.
+     *        the <code>ManageNameIDRequest</code> object.
+     * @throws SAML2Exception if a SAML2 error occurs
+     *        if <code>ManageNameIDRequest</code> cannot be created.
      */
     public ManageNameIDResponseImpl(String xmlString) throws SAML2Exception {
     	Document doc = XMLUtils.toDOMDocument(xmlString, SAMLUtils.debug);
@@ -168,7 +168,7 @@ extends StatusResponseImpl implements ManageNameIDResponse {
      * document String format based on the <code>ManageNameIDResponse</code> 
      * schema described above.
      * @return An XML String representing the <code>ManageNameIDResponse</code>.
-     * @throws SAML2Exception ,if it could not create String object.
+     * @throws SAML2Exception if it could not create String object.
      */
     public String toXMLString() throws SAML2Exception {
         return toXMLString(true, false);

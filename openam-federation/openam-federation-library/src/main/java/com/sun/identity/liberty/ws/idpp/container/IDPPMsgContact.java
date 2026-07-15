@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC.
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -62,7 +63,7 @@ public class IDPPMsgContact extends IDPPBaseContainer {
       * Gets the common name jaxb element 
       * @param userMap user map
       * @return InformalNameElement JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPMsgContact:getContainerObject:Init");
@@ -100,7 +101,7 @@ public class IDPPMsgContact extends IDPPBaseContainer {
       * @param entry MsgContact Entry
       * @userMap UserData Map.
       * @return MsgContactElement. 
-      * @exception JAXBException.
+      * @exception JAXBException .
       */
      private MsgContactElement parseEntry(String entry, Map userMap)
         throws JAXBException {
@@ -200,7 +201,7 @@ public class IDPPMsgContact extends IDPPBaseContainer {
       * @param select Select expression.
       * @param data list of new data objects.
       * @return Attribute key value pair for the given select.
-      * @throws IDPPException.
+      * @throws IDPPException .
       */
      public Map getDataMapForSelect(String select, List data) 
         throws IDPPException {

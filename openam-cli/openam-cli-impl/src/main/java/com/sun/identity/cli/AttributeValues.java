@@ -23,6 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.cli;
 
@@ -243,7 +244,7 @@ public class AttributeValues {
      * @param bAdd <code>true</code> to add the values of <code>map2</code>
      *        <code>map1</code>. <code>false</code> to remove values of
      *        <code>map2</code> from <code>map1</code>.
-     * @return <code>true</code. is <code>map1</code> is altered.
+     * @return {@code true} if {@code map1} is altered.
      */
     public static boolean mergeAttributeValues(
         Map map1,
@@ -282,7 +283,7 @@ public class AttributeValues {
      * @param bAdd <code>true</code> to add the values of <code>map2</code>
      *        <code>map1</code>. <code>false</code> to remove values of
      *        <code>map2</code> from <code>map1</code>.
-     * @return <code>true</code. is <code>map1</code> is altered.
+     * @return {@code true} if {@code map1} is altered.
      */
     public static boolean mergeAttributeValues(
         Map map1, 

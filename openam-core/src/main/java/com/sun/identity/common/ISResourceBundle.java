@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -128,7 +129,7 @@ public class ISResourceBundle extends ListResourceBundle {
      * @param locale
      *            Specific locale of ResourceBundle
      * @return ResourceBundle with the key-value pairs.
-     * @throws SSOException
+     * @throws SSOException if the single sign-on token is invalid or expired
      */
     public static ResourceBundle getResourceBundle(SSOToken token,
             String rbName, Locale locale) throws SSOException {

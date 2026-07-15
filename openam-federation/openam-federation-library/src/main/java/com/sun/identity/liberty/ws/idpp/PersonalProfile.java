@@ -106,7 +106,7 @@ public class PersonalProfile {
       *                       it's value.
       * @return Map map of processed query items and the correspoding list 
       * of results.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
       public Map queryData(Object credential,
                           String resourceID, 
@@ -416,7 +416,7 @@ public class PersonalProfile {
        * @param String userDN.
        * @param List list of DSTQueryItems.
        * @return Map of user attribute value pairs.
-       * @throws IDPPException.
+       * @throws IDPPException .
        */
       private Map getUserData(String userDN, List dstQueryItems) 
       throws IDPPException {
@@ -490,7 +490,7 @@ public class PersonalProfile {
      *                       it's value. 
      * @param request a Document object 
      * @return true if successful in modifying the data.
-     * @exception IDPPException.
+     * @exception IDPPException .
      */
       public boolean modifyData(Object credential,
                                 String resourceID,

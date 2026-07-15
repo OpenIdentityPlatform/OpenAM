@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC.
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -63,7 +64,7 @@ public class IDPPFacade extends IDPPBaseContainer {
       * Gets the Facade JAXB Element. 
       * @param userMap user map
       * @return FacadeElement JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
 
@@ -163,7 +164,7 @@ public class IDPPFacade extends IDPPBaseContainer {
       * @param select Select Expression.
       * @param data list of new data objects.
       * @return Map Key/value data map.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Map getDataMapForSelect(String select, List data) 
      throws IDPPException {

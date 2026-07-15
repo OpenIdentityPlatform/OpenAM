@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -76,8 +77,7 @@ public interface IDirectoryServices {
     public boolean doesEntryExists(SSOToken token, String entryDN);
 
     /**
-     * Returns the integer type of the object represented by the <cpde> DN
-     * </code>.
+     * Returns the integer type of the object represented by the <code>DN</code>.
      * 
      * @param token
      *            User's single sign on token
@@ -392,7 +392,7 @@ public interface IDirectoryServices {
      * @param objectType
      *            profile type
      * @param recursive
-     *            if true, remove all sub entries & the object
+     *            if true, remove all sub entries &amp; the object
      * @param softDelete
      *            Used to let pre/post callback plugins know that this delete is
      *            either a soft delete (marked for deletion) or a purge/hard
@@ -530,8 +530,11 @@ public interface IDirectoryServices {
      * @param entryDN
      *            DN of the profile
      * @param profileType
+     *            the profile type of the entry
      * @throws AMException
+     *             if an error occurs while retrieving the group filter and scope
      * @throws SSOException
+     *             if the single sign-on token is invalid or has expired
      */
     public String[] getGroupFilterAndScope(SSOToken token, String entryDN,
             int profileType) throws SSOException, AMException;
@@ -696,6 +699,7 @@ public interface IDirectoryServices {
      * objectclass.
      * 
      * @param objectclass
+     *            the object class whose attributes are returned
      * @return The set of attribute names (both required and optional) for this
      *         objectclass
      */
@@ -707,7 +711,7 @@ public interface IDirectoryServices {
      * @param objectType
      *            Integere represenintg object type.
      * @param orgDN
-     *            Organization <code< DN </code>
+     *            Organization <code>DN</code>
      * @param searchTemplateName
      *            Name of search template
      * @return Search filter

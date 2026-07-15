@@ -25,6 +25,7 @@
  * $Id: AMEvent.java,v 1.8 2009/01/28 05:34:47 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk;
@@ -167,7 +168,6 @@ public class AMEvent extends EventObject {
 
     /**
      * Returns the type of the source object that caused the event.
-     * <p>
      * @return Returns one of the following possible values:
      * <ul>
      * <li> <code>AMObject.USER</code>

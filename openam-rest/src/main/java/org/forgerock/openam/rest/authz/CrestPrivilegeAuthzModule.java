@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest.authz;
@@ -45,7 +45,7 @@ import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationPermissionFactory;
 
 /**
- * A CREST authorization module for performing privilege checking, {@see PrivilegeAuthzModule} for more detail.
+ * A CREST authorization module for performing privilege checking, see {@link PrivilegeAuthzModule} for more detail.
  *
  * @since 14.0.0
  */

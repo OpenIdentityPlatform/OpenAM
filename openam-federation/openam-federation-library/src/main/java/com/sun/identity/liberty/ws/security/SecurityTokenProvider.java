@@ -24,6 +24,7 @@
  *
  * $Id: SecurityTokenProvider.java,v 1.3 2008/06/25 05:47:21 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -104,7 +105,7 @@ public interface SecurityTokenProvider {
      * @return Assertion which contains an <code>AuthenticationStatement</code>.
      * @throws SecurityTokenException if the assertion could not be
      *        obtained.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public SecurityAssertion getSAMLAuthenticationToken(
 				NameIdentifier senderIdentity)
@@ -118,7 +119,7 @@ public interface SecurityTokenProvider {
      * @param senderIdentity name identifier of the sender.
      * @param invocatorSession <code>SessionContext</code> of  the invocation
      *        identity, it is normally obtained by the credential reference in
-     *        the SAML <code>AttributeDesignator<code> for discovery resource
+     *        the SAML <code>AttributeDesignator</code> for discovery resource
      *        offering which is part of the liberty <code>ID-FF</code>
      *        <code>AuthenResponse</code>.
      * @param resourceID id for the resource to be accessed.
@@ -140,7 +141,7 @@ public interface SecurityTokenProvider {
      * @param recipientProviderID recipient's provider ID.
      * @return <code>SecurityAssertion</code> object.
      * @throws SecurityTokenException if the assertion could not be obtained
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public SecurityAssertion getSAMLAuthorizationToken(
 				NameIdentifier senderIdentity,
@@ -172,7 +173,7 @@ public interface SecurityTokenProvider {
      *        Assertion (for <code>AuthorizeRequester</code> directive). If
      *        false, a <code>SessionContextStatement</code> will be included i
      *        the Assertion (for <code>AuthenticationSessionContext</code>
-     *        directive). In the case when both <code>AuthorizeRequester</code
+     *        directive). In the case when both <code>AuthorizeRequester</code>
      *        and <code>AuthenticationSessionContext</code> directive need to be
      *        handled, use "true" as parameter here since the
      *        <code>SessionContext</code> will always be included in the
@@ -252,7 +253,7 @@ public interface SecurityTokenProvider {
      *        false, a <code>SessionContextStatement</code> will be included
      *        in the Assertion (for <code>AuthenticationSessionContext</code>
      *        directive). In the case when both <code>AuthorizeRequester</code>
-     *        and <code>AuthenticationSessionContext/code> directive need to be
+     *        and <code>AuthenticationSessionContext</code> directive need to be
      *	      handled, use "true" as parameter here since the
      *	      <code>SessionContext</code> will always be included in the
      *	      <code>ResourceAccessStatement</code>.

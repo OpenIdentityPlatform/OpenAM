@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -47,7 +48,7 @@ public abstract class OAuth2Filter extends Filter {
 
     /**
      * Validates that the request is valid for the OAuth2 endpoint being requested.
-     * <br/>
+     * <br>
      * Will also add no cache headers to the response.
      *
      * @param request The Restlet request.

@@ -253,7 +253,7 @@ public class InteractionManager {
      * @throws InteractionException for generic interaction error
      * @throws InteractionRedirectException if user agent is redirected to 
      *                     <code>WSP</code> for resource owner interactions
-     * @throws SOAPBindingException  for generic SOAP binding errors
+     * @throws SOAPBindingException for generic SOAP binding errors
      * @throws SOAPFaultException if the response message has SOAP fault
      *
      * 
@@ -396,7 +396,7 @@ public class InteractionManager {
      * @throws InteractionException for generic interaction error
      * @throws InteractionRedirectException if user agent is redirected to 
      *                     <code>WSP</code> for resource owner interactions
-     * @throws SOAPBindingException  for generic SOAP errors
+     * @throws SOAPBindingException for generic SOAP errors
      * @throws SOAPFaultException if the response message has SOAP fault
      *
      * 

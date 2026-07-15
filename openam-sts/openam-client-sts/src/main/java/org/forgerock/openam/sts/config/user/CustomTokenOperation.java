@@ -12,6 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.config.user;
@@ -109,7 +110,7 @@ public class CustomTokenOperation {
 
     /**
      * Called to marshal back to an instance of the CustomTokenOperation from the format supported by the AdminUI
-     * @param smsString
+     * @param smsString the SMS string representation of a {@code CustomTokenOperation}, of the format token_name'|'implementation_class
      * @throws IllegalArgumentException if the smsString is not of the format token_name'|'implementation_class.
      * @return a CustomTokenOperation instance constituted from the parsed string
      */

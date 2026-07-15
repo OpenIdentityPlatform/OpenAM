@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -62,7 +63,7 @@ public class FileEditor {
      * @return true if all the patterns were found and deleted. False if some
      *         patterns were not found. In such cases no changes are made to 
      *         the file.
-     * @throws Exception
+     * @throws Exception if an error occurs while reading or writing the file
      */
     public boolean deleteLines(Set matchPatterns) throws Exception {
         boolean success = false;

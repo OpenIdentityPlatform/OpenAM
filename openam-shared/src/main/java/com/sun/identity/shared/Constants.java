@@ -978,7 +978,7 @@ public interface Constants {
             "com.sun.identity.sm.enableDataStoreNotification";
 
     /**
-     * property string for controlling SMS, AMSDK & IdRepo cache
+     * property string for controlling SMS, AMSDK &amp; IdRepo cache
      */
     static final String SDK_GLOBAL_CACHE_PROPERTY =
             "com.iplanet.am.sdk.caching.enabled";

@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted [2015] [Intellectual Reserve, Inc (IRI)]
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.authentication.modules.radius;
 
@@ -62,8 +63,6 @@ public class RADIUSPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Return the RADIUS username for this <code>RADIUSPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return the RADIUS username for this <code>RADIUSPrincipal</code>
      */
@@ -73,8 +72,6 @@ public class RADIUSPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Return a string representation of this <code>RADIUSPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return a string representation of this <code>RADIUSPrincipal</code>.
      */
@@ -85,8 +82,6 @@ public class RADIUSPrincipal implements Principal, java.io.Serializable {
     /**
      * Compares the specified Object with this <code>RADIUSPrincipal</code> for equality.  Returns true if the given
      * object is also a <code>RADIUSPrincipal</code> and the two RADIUSPrincipals have the same username.
-     * <p/>
-     * <p/>
      *
      * @param o Object to be compared for equality with this <code>RADIUSPrincipal</code>.
      * @return true if the specified Object is equal equal to this <code>RADIUSPrincipal</code>.
@@ -113,8 +108,6 @@ public class RADIUSPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Return a hash code for this <code>RADIUSPrincipal</code>.
-     * <p/>
-     * <p/>
      *
      * @return a hash code for this <code>RADIUSPrincipal</code>.
      */

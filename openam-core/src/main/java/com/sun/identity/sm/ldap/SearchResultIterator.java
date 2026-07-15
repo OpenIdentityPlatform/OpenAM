@@ -25,6 +25,7 @@
  * $Id: SearchResultIterator.java,v 1.2 2009/04/02 20:22:43 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.sm.ldap;
 
@@ -56,7 +57,7 @@ public class SearchResultIterator implements Iterator<SMSDataEntry> {
      * Constructs a <code>SearchResultIterator</code>
      *  @param results LDAP Search Results object.
      * @param excludeDNs a set of distinguished names to be excluded
-     * @param conn
+     * @param conn the LDAP connection backing the search results
      */
     public SearchResultIterator(ConnectionEntryReader results, Set<String> excludeDNs, Connection conn) {
         this.results = results;

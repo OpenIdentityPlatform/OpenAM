@@ -385,7 +385,8 @@ public class FSServiceUtils {
      * Outputs the DOM representation given as root as XML string.
      * @param root The <code>DOM</code> representation to be outputted
      * @return string representation of <code>DOM</code> node.
-     * @exception TransformerException, TransformerConfigurationException,
+     * @exception TransformerException if an error occurs
+     * @exception TransformerConfigurationException if an error occurs
      *  FileNotFoundException
      */
     public static String printDocument (Node root) throws TransformerException, TransformerConfigurationException,

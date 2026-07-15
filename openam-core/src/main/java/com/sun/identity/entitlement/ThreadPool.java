@@ -25,6 +25,7 @@
  * $Id: ThreadPool.java,v 1.1 2009/08/19 05:40:34 veiming Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entitlement;
@@ -95,7 +96,7 @@ public class ThreadPool {
      * Runs a user defined task.
      * 
      * @param task user defined task.
-     * @throws ThreadPoolException
+     * @throws ThreadPoolException if the task cannot be accepted by the thread pool.
      */
     public final void run(Runnable task)
         throws ThreadPoolException {

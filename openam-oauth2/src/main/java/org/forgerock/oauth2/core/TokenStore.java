@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -28,7 +29,7 @@ import org.forgerock.util.query.QueryFilter;
 
 /**
  * Interface for a Token Store which the OAuth2 Provider will implement.
- * <br/>
+ * <br>
  * The Token Store will be where all types of OAuth2 tokens will be stored and later retrieved.
  *
  * @since 12.0.0
@@ -51,8 +52,8 @@ public interface TokenStore {
      * @param redirectUri         The redirect uri.
      * @param nonce               The nonce.
      * @param request             The OAuth2 request.
-     * @param codeChallenge
-     * @param codeChallengeMethod
+     * @param codeChallenge       The PKCE code challenge.
+     * @param codeChallengeMethod The PKCE code challenge method.
      * @return An AuthorizationCode.
      * @throws ServerException   If any internal server error occurs.
      * @throws NotFoundException If the realm does not have an OAuth 2.0 provider service.

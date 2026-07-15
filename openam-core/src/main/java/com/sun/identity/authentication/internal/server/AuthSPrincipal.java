@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -72,7 +73,6 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
     /**
      * Create an AuthSPrincipal with a username.
      * 
-     * <p>
      * 
      * @param name
      *            the username for this user.
@@ -93,7 +93,6 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
     /**
      * Return the username for this <code>AuthPrincipal</code>.
      * 
-     * <p>
      * 
      * @return the username for this <code>AuthPrincipal</code>
      */
@@ -104,7 +103,6 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
     /**
      * Return the AuthMethod for this <code>AuthPrincipal</code>.
      * 
-     * <p>
      * 
      * @return the AuthMethod for this <code>AuthPrincipal</code>
      */
@@ -115,7 +113,6 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
     /**
      * Return the AuthLevel for this <code>AuthPrincipal</code>.
      * 
-     * <p>
      * 
      * @return the AuthLevel for this <code>AuthPrincipal</code>
      */
@@ -126,7 +123,6 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
     /**
      * Set the AuthMethod for this <code>AuthPrincipal</code>.
      * 
-     * <p>
      * 
      * @param auth_method
      *            AuthMethod for this <code>AuthPrincipal</code>
@@ -138,7 +134,6 @@ public class AuthSPrincipal implements Principal, java.io.Serializable {
     /**
      * Set the AuthLevel for this <code>AuthPrincipal</code>.
      * 
-     * <p>
      * 
      * @param auth_level
      *            AuthLevel for this <code>AuthPrincipal</code>

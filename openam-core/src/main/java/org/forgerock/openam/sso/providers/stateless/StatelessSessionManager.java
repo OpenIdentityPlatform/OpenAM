@@ -12,7 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
-* Portions copyright 2025 3A Systems LLC.
+* Portions copyright 2025-2026 3A Systems LLC.
 */
 
 package org.forgerock.openam.sso.providers.stateless;
@@ -107,7 +107,7 @@ public class StatelessSessionManager {
      *
      * @param tokenId Non null TokenID to use for parsing.
      * @return A non null StatelessSessionID.
-     * @throws SessionException
+     * @throws SessionException if the stateless session cannot be generated
      */
     public StatelessSession generate(String tokenId) throws SessionException {
         return generate(new SessionID(tokenId));

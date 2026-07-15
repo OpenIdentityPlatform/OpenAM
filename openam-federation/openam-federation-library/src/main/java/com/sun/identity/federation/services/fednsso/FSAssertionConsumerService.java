@@ -87,7 +87,8 @@ public class FSAssertionConsumerService extends HttpServlet {
      * Handles artifact profile.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException, IOException if error occurrs.
+     * @exception ServletException if error occurrs.
+     * @exception IOException if error occurrs.
      */
     public void doGet(
         HttpServletRequest request, 
@@ -225,7 +226,8 @@ public class FSAssertionConsumerService extends HttpServlet {
      * Handles post profile.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException, IOException if error occurs.
+     * @exception ServletException if error occurs.
+     * @exception IOException if error occurs.
      */
     public void doPost(
         HttpServletRequest request, 

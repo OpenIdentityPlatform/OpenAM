@@ -25,6 +25,7 @@
  * $Id: Cache.java,v 1.4 2009/12/12 00:03:13 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -88,13 +89,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Generally, the default load factor (.75) offers a good tradeoff between
  * time and space costs.  Higher values decrease the space overhead but
  * increase the time cost to look up an entry (which is reflected in most
- * <tt>Cache</tt> operations, including <tt>get</tt> and <tt>put</tt>).<p>
+ * <code>Cache</code> operations, including <code>get</code> and <code>put</code>).<p>
  *
  * The capacity controls a tradeoff between wasted space and the
  * need for <code>rehash</code> operations, which are time-consuming.
  * No <code>rehash</code> operations will <i>ever</i> occur if the 
  * capacity is greater than the maximum number of entries the
- * <tt>Cache</tt> will contain divided by its load factor.  However,
+ * <code>Cache</code> will contain divided by its load factor.  However,
  * setting the capacity too high can waste space.<p>
  *
  * If many entries are to be made into a <code>Cache</code>, 
@@ -217,7 +218,7 @@ public class Cache extends Dictionary implements Map {
 
     /**
      * Constructs a new, empty Cache with the specified capacity and default
-     * load factor, which is <tt>0.75</tt>.
+     * load factor, which is <code>0.75</code>.
      *
      * @param name Name of cache.
      * @param initCapacity
@@ -302,7 +303,7 @@ public class Cache extends Dictionary implements Map {
      *            a value to search for.
      * @return <code>true</code> if and only if some key maps to the
      *         <code>value</code> argument in this Cache as determined by the
-     *         <tt>equals</tt> method; <code>false</code> otherwise.
+     *         <code>equals</code> method; <code>false</code> otherwise.
      * @exception NullPointerException
      *                if the value is <code>null</code>.
      * @see #containsKey(Object)
@@ -352,7 +353,7 @@ public class Cache extends Dictionary implements Map {
      * @param key
      *            possible key.
      * @return <code>true</code> if and only if the specified object is a key
-     *         in this Cache, as determined by the <tt>equals</tt> method;
+     *         in this Cache, as determined by the <code>equals</code> method;
      *         <code>false</code> otherwise.
      * @see #contains(Object)
      */
@@ -624,14 +625,14 @@ public class Cache extends Dictionary implements Map {
     }
 
     /**
-     * Returns a string representation of this <tt>Cache</tt> object in the
+     * Returns a string representation of this <code>Cache</code> object in the
      * form of a set of entries, enclosed in braces and separated by the ASCII
-     * characters "<tt>,&nbsp;</tt>" (comma and space). Each entry is
-     * rendered as the key, an equals sign <tt>=</tt>, and the associated
-     * element, where the <tt>toString</tt> method is used to convert the key
+     * characters "<code>,&nbsp;</code>" (comma and space). Each entry is
+     * rendered as the key, an equals sign <code>=</code>, and the associated
+     * element, where the <code>toString</code> method is used to convert the key
      * and element to strings.
      * <p>
-     * Overrides to <tt>toString</tt> method of <tt>Object</tt>.
+     * Overrides to <code>toString</code> method of <code>Object</code>.
      * 
      * @return a string representation of this Cache.
      */

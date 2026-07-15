@@ -370,7 +370,7 @@ public class XMLUtils {
      * Obtains a new instance of a DOM Document object
      * 
      * @return a new instance of a DOM Document object
-     * @exception Exception
+     * @exception ParserConfigurationException
      *                if an error occurs while constructing a new document
      */
     public static Document newDocument() throws ParserConfigurationException {
@@ -585,7 +585,7 @@ public class XMLUtils {
 
     /**
      * Method to get Values within AttributeValuePair as a java.util.Set
-     * If <class>unescape<class> is set to false, xml escaped chars will not
+     * If <code>unescape</code> is set to false, xml escaped chars will not
      * be unescaped.
      */
     public static Set<String> getAttributeValuePair(Node node, boolean unescape) {
@@ -613,7 +613,7 @@ public class XMLUtils {
 
     /**
      * Method to get the value of "Value" node
-     * If <class>unescape<class> is set to false, xml escaped chars will not
+     * If <code>unescape</code> is set to false, xml escaped chars will not
      * be unescaped.
      */
     public static String getValueOfValueNode(Node n, boolean unescape) {
@@ -629,7 +629,7 @@ public class XMLUtils {
 
     /**
      * Method to get the value of "Value" node
-     * If <class>unescape<class> is set to false, xml escaped chars will not
+     * If <code>unescape</code> is set to false, xml escaped chars will not
      * be unescaped.
      */
     public static String getValueOfValueNodeNoTrim(Node n, boolean unescape) {
@@ -788,7 +788,7 @@ public class XMLUtils {
     }
 
     /**
-     * Removes invalid XML characters from the input text and then replaces XML special character <code>&</code>,
+     * Removes invalid XML characters from the input text and then replaces XML special character <code>&amp;</code>,
      * <code>&lt;</code>, <code>&gt;</code>, <code>"</code>, <code>'</code> with corresponding entity references.
      *
      * @param text The input that needs to be escaped. May be null.

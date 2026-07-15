@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -63,18 +64,15 @@ import com.iplanet.sso.SSOToken;
  * <p>
  * <b>Note:</b>
  * <ul>
- * <p>
  * <li> When more than one plugin modules are configured at a particular
  * Organization level, the call backs for each of the plugins will occur one
  * after the other. Also, note that the order in which plugins are called back
  * is cannot pre-determined in any way.
- * 
- * <p>
+ *
  * <li> Since the methods of this class will be invoked by the Identity Server
  * SDK and will control the flow of SDK, extreme caution should be taken while
  * overriding these methods to avoid performance bottle necks.
- * 
- * <p>
+ *
  * <li> The exceptions thrown by the pre-processing methods of this class will
  * be treated as a failure of external processing and the operation in progress
  * will be halted by the SDK. The exception thrown should include a proper user
@@ -168,7 +166,7 @@ public class AMCallBack {
      *            <li> {@link AMObject#ASSIGNABLE_DYNAMIC_GROUP 
      *            AMObject.ASSIGNABLE_DYNAMIC_GROUP}
      *            </ul>
-     * @return Map of updated values for <code>attributes<code> or null. If this
+     * @return Map of updated values for <code>attributes</code> or null. If this
      *         returned map is not null, then this map will be used while
      *         performing the operation. 
      * @throws AMPreCallBackException if an 
@@ -417,7 +415,7 @@ public class AMCallBack {
      *            AMObject.ASSIGNABLE_DYNAMIC_GROUP}
      *            </ul>
      * 
-     * @return Set of updated values for <code>members<code> or null. If null
+     * @return Set of updated values for <code>members</code> or null. If null
      * value or empty set is returned, no users will be added. Hence, if no
      * modification is being performed to the original set, it needs to be 
      * back.
@@ -487,7 +485,7 @@ public class AMCallBack {
      *            AMObject.ASSIGNABLE_DYNAMIC_GROUP}
      *            </ul>
      * 
-     * @return Set of updated values for <code>members<code> or null. If null
+     * @return Set of updated values for <code>members</code> or null. If null
      * value or empty set is returned, no users will be removed. Hence, if no
      * modification is being performed to the original set, it needs to be 
      * back.

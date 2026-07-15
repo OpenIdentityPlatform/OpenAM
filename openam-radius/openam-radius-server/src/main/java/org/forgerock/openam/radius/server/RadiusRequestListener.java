@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.radius.server;
 
@@ -46,7 +47,6 @@ import java.util.concurrent.TimeUnit;
  * for handling those that are. If the listener is being shutdown then it accepts packets and drops them to drain any
  * buffered incoming requests while packets in process of being handled are polished off and can send their responses
  * through the backing channel. Then it closes the channel and exits.
- * <p/>
  */
 public class RadiusRequestListener implements Runnable {
 

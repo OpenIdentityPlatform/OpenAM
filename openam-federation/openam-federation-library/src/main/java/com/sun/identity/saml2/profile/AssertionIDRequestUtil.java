@@ -142,7 +142,7 @@ public class AssertionIDRequestUtil {
      * returns <code>Assertion</code> coming from the Assertion ID Request
      * Service.
      *
-     * @param assertionID the asssertionID</code> object
+     * @param assertionID the asssertionID object
      * @param samlAuthorityEntityID entity ID of SAML authority
      * @param role SAML authority role, for example,
      * <code>SAML2Constants.ATTR_AUTH_ROLE</code>, 

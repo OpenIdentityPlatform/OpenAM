@@ -24,6 +24,7 @@
  *
  * $Id: IDPEntryImpl.java,v 1.2 2008/06/25 05:47:59 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -62,8 +63,8 @@ public class IDPEntryImpl implements IDPEntry {
     /**
      * Constructor to create <code>IDPEntry</code> Object. 
      *
-     * @param element Document Element of <code>IDPEntry<code> object.
-     * @throws SAML2Exception if <code>IDPEntry<code> cannot be created.
+     * @param element Document Element of <code>IDPEntry</code> object.
+     * @throws SAML2Exception if <code>IDPEntry</code> cannot be created.
      */
     public IDPEntryImpl(Element element) throws SAML2Exception {
         parseElement(element);
@@ -73,8 +74,8 @@ public class IDPEntryImpl implements IDPEntry {
     /**
      * Constructor to create <code>IDPEntry</code> Object. 
      *
-     * @param xmlString XML Representation of the <code>IDPEntry<code> object.
-     * @throws SAML2Exception if <code>IDPEntry<code> cannot be created.
+     * @param xmlString XML Representation of the <code>IDPEntry</code> object.
+     * @throws SAML2Exception if <code>IDPEntry</code> cannot be created.
      */
 
     public IDPEntryImpl(String xmlString) throws SAML2Exception {

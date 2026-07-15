@@ -25,6 +25,7 @@
  * $Id: RequestedAuthnContext.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -39,9 +40,8 @@ import java.util.List;
  * Java content class for RequestedAuthnContext element declaration.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 	
- * <p>
  * <pre>
- * &lt;element name="RequestedAuthnContext" type="{urn:oasis:names:tc:SAML:2.0:protocol}RequestedAuthnContextType"/>
+ * &lt;element name="RequestedAuthnContext" type="{urn:oasis:names:tc:SAML:2.0:protocol}RequestedAuthnContextType"/&gt;
  * </pre>
  * 
  * 

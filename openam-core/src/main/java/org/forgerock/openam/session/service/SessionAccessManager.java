@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions Copyrighted 2024-2025 3A Systems LLC
+ * Portions Copyrighted 2024-2026 3A Systems LLC
  */
 package org.forgerock.openam.session.service;
 
@@ -82,7 +82,6 @@ public class SessionAccessManager {
      * @param sessionId The session ID to recover the InternalSession for.
      * @return The InternalSession from the InternalSessionCache or null if the internal session could not be retrieved
      * or recovered.
-     * @throws SessionException If anything goes wrong.
      */
     public InternalSession getInternalSession(SessionID sessionId) {
         if (sessionId == null || StringUtils.isEmpty(sessionId.toString()) || sessionId.isSessionHandle()) {
@@ -166,7 +165,6 @@ public class SessionAccessManager {
     /**
      * Remove an internal session from the internal session cache.
      * @param internalSession the session to remove
-     * @return the removed internal session
      */
     public void removeInternalSession(InternalSession internalSession) {
         if (null == internalSession) {

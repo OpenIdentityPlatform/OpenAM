@@ -24,6 +24,7 @@
  *
  * $Id: OldProvidedNameIdentifier.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -51,9 +52,9 @@ public class OldProvidedNameIdentifier extends NameIdentifier {
     /**
      * Constructor to create <code>OldProvidedNameIdentifier</code> object.
      *
-     * @param name
-     * @param nameQualifier
-     * @param format
+     * @param name the name identifier value.
+     * @param nameQualifier the security or administrative domain that qualifies the name.
+     * @param format the format of the name identifier.
      * @throws SAMLException on error.
      */
     public OldProvidedNameIdentifier(String name,String nameQualifier,
@@ -110,8 +111,8 @@ public class OldProvidedNameIdentifier extends NameIdentifier {
     /**
      * Constructor creates <code>OldProvidedNameIdentifier</code> object.
      *
-     * @param securityDomain
-     * @param name
+     * @param securityDomain the security domain of the name identifier.
+     * @param name the name identifier value.
      * @throws FSMsgException it there is an error creating this object.
      */
     public OldProvidedNameIdentifier(
@@ -155,7 +156,7 @@ public class OldProvidedNameIdentifier extends NameIdentifier {
      * Returns a String representation of this object.
      *
      * @return a String representation of this object.
-     * @throws FSMsgExceptionif there is an error converting
+     * @throws FSMsgException if there is an error converting
      *         this object to a string.
      */
     public String toXMLString() throws FSMsgException {

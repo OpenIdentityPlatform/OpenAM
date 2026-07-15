@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.dashboard;
@@ -74,7 +74,8 @@ public final class DashboardResource {
     }
 
     /**
-     * {@inheritDoc}
+     * Reads dashboard information for the given resource identifier, which may be the dashboard
+     * definitions, the applications available to the user, or the applications assigned to the user.
      */
     @Read(operationDescription = @Operation(
             description = DASHBOARD_RESOURCE + READ_DESCRIPTION))

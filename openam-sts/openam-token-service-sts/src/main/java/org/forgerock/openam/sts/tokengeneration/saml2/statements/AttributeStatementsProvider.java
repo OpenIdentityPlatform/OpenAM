@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS. All rights reserved.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -40,7 +42,7 @@ public interface AttributeStatementsProvider {
      *                        any attributes, then an empty list should be returned.
      * @return The list of AttributeStatement instances containing the mapped attributes, or an empty list, if no attributes could
      * be mapped.
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the attribute statements could not be generated
      */
     List<AttributeStatement> get(SSOToken ssoToken, SAML2Config saml2Config, AttributeMapper attributeMapper) throws TokenCreationException;
 }

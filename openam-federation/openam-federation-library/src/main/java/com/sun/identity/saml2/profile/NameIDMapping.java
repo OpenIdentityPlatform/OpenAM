@@ -435,7 +435,6 @@ public class NameIDMapping {
      * @return <code>ManageNameIDServiceElement</code> for the entity or null
      * @throws SAML2MetaException if unable to retrieve the first identity
      *     provider's SSO configuration.
-     * @throws SessionException invalid or expired single-sign-on session
      */
     static public NameIDMappingServiceElement getNameIDMappingService(
         String realm, String entityId, String binding)

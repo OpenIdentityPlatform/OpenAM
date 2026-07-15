@@ -24,6 +24,7 @@
  *
  * $Id: RequestSecurityToken.java,v 1.2 2009/10/13 23:19:49 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.trust;
@@ -158,14 +159,16 @@ public abstract class RequestSecurityToken {
     /**
      * Returns the DOM Element representation for the request security token.
      * @return the DOM Element representation for the request security token.
-     * @throws com.sun.identity.wss.sts.protocol.WSTException
+     * @throws com.sun.identity.wss.trust.WSTException if the DOM element
+     *         cannot be created.
      */
     public abstract Element toDOMElement()  throws WSTException;
     
     /**
      * Converts into XML String
      * @return the XML String for <code>RequestSecurityToken</code>.
-     * @throws com.sun.identity.wss.trust.WSTException
+     * @throws com.sun.identity.wss.trust.WSTException if the XML string
+     *         cannot be created.
      */
     public abstract String toXMLString() throws WSTException;
         

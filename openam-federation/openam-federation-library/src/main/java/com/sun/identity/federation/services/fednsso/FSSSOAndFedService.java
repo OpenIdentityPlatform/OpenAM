@@ -109,7 +109,8 @@ public class FSSSOAndFedService  extends HttpServlet {
      * Processes single sign on request.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException, IOException if an error occurred
+     * @exception ServletException if an error occurred
+     * @exception IOException if an error occurred
      */
     public void doGet(
         HttpServletRequest request, 
@@ -269,7 +270,8 @@ public class FSSSOAndFedService  extends HttpServlet {
      * Processes single sign on POST request.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException, IOException if an error occurred
+     * @exception ServletException if an error occurred
+     * @exception IOException if an error occurred
      */
     public void doPost(
         HttpServletRequest request, 

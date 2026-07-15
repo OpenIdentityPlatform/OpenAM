@@ -24,6 +24,7 @@
  *
  * $Id: FAMSecurityToken.java,v 1.6 2009/12/23 22:32:28 mrudul_uchil Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.wss.security;
 
@@ -55,7 +56,8 @@ public class FAMSecurityToken implements SecurityToken {
      /**
       * Constructor for FAMSecurityToken
       * @param ssoToken Single Sign on token of the subject.
-      * @throws com.sun.identity.wss.security.SecurityException
+      * @throws com.sun.identity.wss.security.SecurityException if the single
+      *         sign-on token is invalid.
       */
      public FAMSecurityToken(SSOToken ssoToken) throws SecurityException {
          try {
@@ -72,7 +74,8 @@ public class FAMSecurityToken implements SecurityToken {
      /**
       * Constructor that uses DOM Element
       * @param element the DOM representation of security token.
-      * @throws com.sun.identity.wss.security.SecurityException
+      * @throws com.sun.identity.wss.security.SecurityException if the security
+      *         token cannot be parsed from the element.
       */
      public FAMSecurityToken(Element element) throws SecurityException {
         if(element == null) {

@@ -25,6 +25,7 @@
  * $Id: SMSPropertiesObserver.java,v 1.1 2008/07/30 00:50:15 arviranga Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  */
 
@@ -38,7 +39,7 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.opendj.ldap.LdapException;
 
 /**
- * Listenes to changes to <class>SystemProperties</class> and reinitialized
+ * Listenes to changes to <code>SystemProperties</code> and reinitialized
  * configuration framework. The properties that takes effect upon change are:
  * com.iplanet.am.sdk.caching.enabled
  * com.sun.identity.sm.cache.enabled

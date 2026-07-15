@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -59,7 +60,7 @@ import java.security.AccessController;
  * in the environment is a member of at least one <code>AMIdentity</code> 
  * object specified in the Condition.
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.AMIdentityMembershipCondition}
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.environment.AMIdentityMembershipCondition}
  * instead.
  */
 @Deprecated
@@ -99,7 +100,7 @@ public class AMIdentityMembershipCondition implements Condition {
       *
       * @param property property name
       *
-      * @return <code>Syntax<code> for the property name
+      * @return <code>Syntax</code> for the property name
       */
      public Syntax getPropertySyntax(String property)
      {
@@ -116,7 +117,7 @@ public class AMIdentityMembershipCondition implements Condition {
       * @param property property name.
       * @param locale locale for which the property name must be customized.
       * @return display name for the property name.
-      * @throws PolicyException
+      * @throws PolicyException if the display name cannot be determined
       */
      public String getDisplayName(String property, Locale locale) 
        throws PolicyException
@@ -145,7 +146,7 @@ public class AMIdentityMembershipCondition implements Condition {
      *  properties.
      *  @param properties the properties of the condition that governs
      *         whether a policy applies. The properties should
-     *         define value for the key <code>Condition.AM_IDENTITY_NAME<code>. 
+     *         define value for the key <code>Condition.AM_IDENTITY_NAME</code>.
      *         The value should be a <code>Set</code>.
      *         Each element of the <code>Set</code> should be
      *         a String, the uuid of <code>AMIdentity</code>. Please note that
@@ -203,7 +204,7 @@ public class AMIdentityMembershipCondition implements Condition {
      * in the environment is a member of at least one <code>AMIdentity</code> 
      * object specified in the Condition. Invocator uuid would be specified as
      * the value of key <code>Condition.INVOCATOR_PRINCIPAL_UUID</code> in the
-     * <code>environment</code> parameter. The value should be a <code>Set<code>
+     * <code>environment</code> parameter. The value should be a <code>Set</code>
      * of <code>String</code> objects.
      *
      * @param token single sign on token of the user

@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions Copyrighted 2026 3A Systems, LLC.
 */
 package org.forgerock.openam.services.push.sns.utils;
 
@@ -32,7 +33,7 @@ import org.forgerock.openam.services.push.PushNotificationServiceConfig;
 import org.forgerock.openam.utils.StringUtils;
 
 /**
- * A utility class for {@see SnsRegistrationPredicate} to aid testing.
+ * A utility class for {@link org.forgerock.openam.services.push.sns.SnsRegistrationPredicate} to aid testing.
  */
 public class SnsPushResponseUpdater {
 

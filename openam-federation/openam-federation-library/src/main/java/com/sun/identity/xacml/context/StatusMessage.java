@@ -24,6 +24,7 @@
  *
  * $Id: StatusMessage.java,v 1.2 2008/06/25 05:48:12 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -36,11 +37,10 @@ import java.util.List;
  * The <code>StatusMessage</code> element is a container of 
  * one or more <code>StatusMessage</code>s issuded by authorization authority.
  * 
- * <p/>
  * <pre>
  *
  * Schema:
- *  &lt;xs:element name="StatusMessage" type="xs:string"/>
+ *  &lt;xs:element name="StatusMessage" type="xs:string"/&gt;
  * </pre>
  */
 public interface StatusMessage {

@@ -24,6 +24,7 @@
  *
  * $Id: SignatureProvider.java,v 1.10 2009/08/29 03:06:47 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /*
@@ -609,7 +610,7 @@ public interface SignatureProvider {
      * @param document the document to be validated
      * @param key the secret key to be used for validating signature
      * @return true if verification is successful.
-     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException
+     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException if the object cannot be signed
      */
     public boolean verifyWSSSignature(org.w3c.dom.Document document,
                          java.security.Key key)
@@ -624,7 +625,7 @@ public interface SignatureProvider {
      * @param encryptAlias the certificate alias that may be used to decrypt
      *        the symmetric key that may be part of <code>KeyInfo</code>
      * @return true if verification is successful.
-     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException
+     * @throws com.sun.identity.saml.xmlsig.XMLSignatureException if the object cannot be signed
      */
     public boolean verifyWSSSignature(org.w3c.dom.Document document,
                          java.security.Key key,

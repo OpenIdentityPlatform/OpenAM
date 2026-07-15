@@ -25,7 +25,7 @@
  * $Id: FSAssertionManager.java,v 1.12 2009/08/03 18:18:36 bigfatrat Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
- * Portions Copyrighted 2026 3A Systems LLC
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -376,7 +376,8 @@ public final class FSAssertionManager {
      * @param inResponseTo value to InResponseTo attribute. It's the request ID.
      * @param minorVersion request minor version, used to determine assertion's
      *  minor version
-     * @exception FSException,SAMLException if error occurrs
+     * @exception FSException if error occurrs
+     * @exception SAMLException if error occurrs
      */
     public AssertionArtifact createFSAssertionArtifact(
         String id,
@@ -447,7 +448,8 @@ public final class FSAssertionManager {
      * @param idpHandle identity provider issued <code>NameIdentifier</code>
      * @param inResponseTo value to InResponseTo attribute. It's the request ID.
      * @param assertionMinorVersion minor version the assertion should use
-     * @exception FSException,SAMLException if error occurrs
+     * @exception FSException if error occurrs
+     * @exception SAMLException if error occurrs
      */
     public FSAssertion createFSAssertion(
         String id,

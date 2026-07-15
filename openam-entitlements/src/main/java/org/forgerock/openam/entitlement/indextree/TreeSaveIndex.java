@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock Inc.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.indextree;
 
@@ -25,7 +26,7 @@ import java.util.Set;
 
 /**
  * Implementation provides a simple save index, which is the passed policy rule as a path index.
- * <p />
+ * <p>
  * Expects the passed resource to have already been normalised.
  *
  * @author apforrest

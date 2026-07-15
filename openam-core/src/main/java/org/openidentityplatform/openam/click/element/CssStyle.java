@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.element;
 
@@ -26,9 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Provides a Css HEAD element for including <tt>inline</tt> Cascading
+ * Provides a Css HEAD element for including <code>inline</code> Cascading
  * Stylesheets using the &lt;style&gt; tag.
- * <p/>
+ * <p>
  * Example usage:
  *
  * <pre class="prettyprint">
@@ -48,7 +49,7 @@ import java.util.Map;
  *     }
  * } </pre>
  *
- * The <tt>cssStyle</tt> instance will render as follows:
+ * The <code>cssStyle</code> instance will render as follows:
  *
  * <pre class="prettyprint">
  * &lt;style type="text/css"&gt;
@@ -57,10 +58,10 @@ import java.util.Map;
  *
  * Below is an example showing how to render inline CSS from a Velocity
  * template.
- * <p/>
- * First we create a Velocity template <tt>(/css/style-template.css)</tt> which
- * contains the variable <tt>$context</tt> that must be replaced at runtime with
- * the application <tt>context path</tt>:
+ * <p>
+ * First we create a Velocity template <code>(/css/style-template.css)</code> which
+ * contains the variable <code>$context</code> that must be replaced at runtime with
+ * the application <code>context path</code>:
  *
  * <pre class="prettyprint">
  * .blue {
@@ -95,8 +96,8 @@ import java.util.Map;
  *     }
  * } </pre>
  *
- * The <tt>Css</tt> above will render as follows (assuming the context path is
- * <tt>myApp</tt>):
+ * The <code>Css</code> above will render as follows (assuming the context path is
+ * <code>myApp</code>):
  *
  * <pre class="prettyprint">
  * &lt;style type="text/css"&gt;
@@ -105,9 +106,9 @@ import java.util.Map;
  * }
  * &lt;/style&gt; </pre>
  *
- * <h3>Character data (CDATA) support</h3>
+ * <h2>Character data (CDATA) support</h2>
  *
- * Sometimes it is necessary to wrap <tt>inline</tt> {@link CssStyle Css} in
+ * Sometimes it is necessary to wrap <code>inline</code> {@link CssStyle Css} in
  * CDATA tags. Two use cases are common for doing this:
  * <ul>
  * <li>For XML parsing: When using Ajax one often send back partial
@@ -138,7 +139,7 @@ import java.util.Map;
  * Notice the CDATA tags are commented out which ensures older browsers that
  * don't understand the CDATA tag, will ignore it and only process the actual
  * content.
- * <p/>
+ * <p>
  * For an overview of XHTML validation and CDATA tags please see
  * <a target="_blank" href="http://javascript.about.com/library/blxhtml.htm">http://javascript.about.com/library/blxhtml.htm</a>.
  */
@@ -186,11 +187,11 @@ public class CssStyle extends ResourceElement {
     /**
      * Construct a new Css style element for the given template path
      * and template model.
-     * <p/>
+     * <p>
      * When the CssStyle is rendered the template and model will be merged and
      * the result will be rendered together with any CssStyle
      * {@link #setContent(String) content}.
-     * <p/>
+     * <p>
      *
      * For example:
      * <pre class="prettyprint">
@@ -283,7 +284,7 @@ public class CssStyle extends ResourceElement {
 
     /**
      * Set the path of the template to render.
-     * <p/>
+     * <p>
      * If the {@link #template} property is set, the template and {@link #model}
      * will be merged and the result will be rendered together with any CssStyle
      * {@link #setContent(String) content}.
@@ -308,7 +309,7 @@ public class CssStyle extends ResourceElement {
 
     /**
      * Set the model of the template to render.
-     * <p/>
+     * <p>
      * If the {@link #template} property is set, the template and {@link #model}
      * will be merged and the result will be rendered together with any CssStyle
      * {@link #setContent(String) content}.
@@ -408,7 +409,7 @@ public class CssStyle extends ResourceElement {
     /**
      * Render the CssStyle {@link #setContent(String) content}
      * to the specified buffer.
-     * <p/>
+     * <p>
      * <b>Please note:</b> if the {@link #setTemplate(String) template}
      * property is set, this method will merge the {@link #setTemplate(String) template}
      * and {@link #setModel(Map) model} and the result will be
@@ -440,7 +441,7 @@ public class CssStyle extends ResourceElement {
     /**
      * Render the CDATA tag prefix to the specified buffer if
      * {@link #isCharacterData()} returns true. The default value is
-     * <tt>/&lowast;&lt;![CDATA[&lowast;/</tt>.
+     * <code>/&lowast;&lt;![CDATA[&lowast;/</code>.
      *
      * @param buffer buffer to append the conditional comment prefix
      */
@@ -454,7 +455,7 @@ public class CssStyle extends ResourceElement {
     /**
      * Render the CDATA tag suffix to the specified buffer if
      * {@link #isCharacterData()} returns true. The default value is
-     * <tt>/&lowast;]]&gt;&lowast;/</tt>.
+     * <code>/&lowast;]]&gt;&lowast;/</code>.
      *
      * @param buffer buffer to append the conditional comment prefix
      */

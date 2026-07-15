@@ -588,7 +588,7 @@ public class Step3 extends LDAPStoreWizardPage {
 
     /**
      * Validate an Existing SM Host for Configuration Backend.
-     * @return
+     * @return true if the SM host is valid
      */
     public boolean validateSMHost() {
         Context ctx = getContext();

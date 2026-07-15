@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.blacklist;
@@ -73,7 +74,7 @@ public final class BloomFilterBlacklist<T extends Blacklistable> implements Blac
      * given service configuration. If the bloom filter does not contain a given entry, then we know for definite
      * that it is not blacklisted. Otherwise, we delegate to the given entry blacklist to check if it actually is
      * blacklisted or not, to eliminate false positives.
-     * <p/>
+     * <p>
      * In order to ensure that the bloom filter is kept in-sync with the definitive blacklist (to avoid false
      * negatives), this implementation will subscribe to blacklist notifications from the delegate.
      *

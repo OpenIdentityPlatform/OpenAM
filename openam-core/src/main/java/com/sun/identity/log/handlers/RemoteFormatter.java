@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -44,6 +45,7 @@ import com.sun.identity.log.spi.Debug;
  * service. This xml string conforms to the logDTD.xml file which is given
  * below.
  *
+ * <pre>{@code
  * <?XML version="1.0">
  *
  * <!--This DTD is used by Logging operation-->
@@ -68,6 +70,7 @@ import com.sun.identity.log.spi.Debug;
  * <!ELEMENT index (#PCDATA)>
  * <!ELEMENT paramValue (#PCDATA)>
  * ]
+ * }</pre>
  */
 public class RemoteFormatter extends Formatter {
 

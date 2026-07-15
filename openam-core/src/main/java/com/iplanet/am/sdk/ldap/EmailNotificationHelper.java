@@ -25,7 +25,7 @@
  * $Id: EmailNotificationHelper.java,v 1.5 2009/01/28 05:34:48 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.iplanet.am.sdk.ldap;
@@ -56,7 +56,7 @@ import jakarta.mail.MessagingException;
 
 /**
  * This class has the functionality to send email notifications to the users
- * listed in the notification list for create, delete & modify
+ * listed in the notification list for create, delete &amp; modify
  */
 public class EmailNotificationHelper {
 
@@ -208,9 +208,9 @@ public class EmailNotificationHelper {
     }
 
     /**
-     * The proper setUser<>NotificationList method should be called before
-     * calling this method. 
-     * 
+     * The proper {@code setUser<>NotificationList} method should be called before
+     * calling this method.
+     *
      * @param attributes
      *            the attributes of the user
      */
@@ -229,9 +229,9 @@ public class EmailNotificationHelper {
     }
 
     /**
-     * The proper setUser<>NotificationList method should be called before
+     * The proper {@code setUser<>NotificationList} method should be called before
      * calling this method.
-     * 
+     *
      * @param attributes
      *            the attributes of the user
      */
@@ -251,9 +251,9 @@ public class EmailNotificationHelper {
 
     // TODO: Refactor this method.
     /**
-     * The proper setUser<>NotificationList method should be called before
+     * The proper {@code setUser<>NotificationList} method should be called before
      * calling this method.
-     * 
+     *
      * @param token
      *            a valid single sign on token
      * @param attributes

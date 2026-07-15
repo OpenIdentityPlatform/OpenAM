@@ -25,6 +25,7 @@
  * $Id: IdRepoSampleDeleteId.java,v 1.3 2008/06/25 05:41:13 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -46,7 +47,6 @@ import com.sun.identity.idm.IdRepoException;
  * This class 
  *
  *
- * @author 
  */
 public class IdRepoSampleDeleteId {
 

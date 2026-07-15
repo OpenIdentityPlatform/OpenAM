@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openidconnect;
@@ -25,7 +26,7 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 
 /**
  * Interface for a OpenId Connect Token Store which the OpenId Connect Provider will implement.
- * <br/>
+ * <br>
  * The OpenId Connect Token Store will be where all OpenId Connect tokens will be stored and later retrieved.
  *
  * @since 12.0.0

@@ -25,7 +25,7 @@
  * $Id: AMCRLStore.java,v 1.7 2009/01/28 05:35:12 ww203982 Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2023-2025 3A Systems, LLC.
+ * Portions Copyrighted 2023-2026 3A Systems, LLC.
  */
 package com.sun.identity.security.cert;
 
@@ -125,7 +125,7 @@ public class AMCRLStore extends AMCertStore {
      * and all the access information for CRLDistributionPointExtension and
      * CRLIssuingDistributionPoint Extension
      *
-     * @param param
+     * @param param the LDAP certificate store parameters used to configure this CRL store
      */
     public AMCRLStore(AMLDAPCertStoreParameters param) {
         super(param);
@@ -134,7 +134,9 @@ public class AMCRLStore extends AMCertStore {
     /**
      * Checks certificate and returns corresponding stored CRL in ldap store
      *
-     * @param certificate
+     * @param certificate the certificate whose CRL should be retrieved
+     * @return the stored CRL for the certificate's issuer, or null if none was found
+     * @throws IOException if an error occurs while accessing the CRL store
      */
     public X509CRL getCRL(X509Certificate certificate) throws IOException {
         SearchResultEntry crlEntry = null;
@@ -227,7 +229,7 @@ public class AMCRLStore extends AMCertStore {
     /**
      * Checks certificate and returns corresponding stored CRL in cached CRL store.
      *
-     * @param certificate
+     * @param certificate the certificate whose issuer is used to look up the cached CRL
      * @return Cached CRL information about the certificate.
      */
     public X509CRL getCRLFromCache(X509Certificate certificate) {
@@ -237,8 +239,8 @@ public class AMCRLStore extends AMCertStore {
     /**
      * Checks certificate and update CRL in cached CRL store.
      *
-     * @param certificate
-     * @param crl
+     * @param certificate the certificate whose issuer identifies the cache entry
+     * @param crl the CRL to store in the cache, or null to remove the cached entry
      */
     public void updateCRLCache(X509Certificate certificate, X509CRL crl) {
         String issuer = CertUtils.getIssuerName(certificate);
@@ -711,27 +713,28 @@ public class AMCRLStore extends AMCertStore {
      * (example : ldap://server:port/uid=ca,o=company.com)
      * This dn entry has to have CRL in attribute certificaterevocationlist
      * or certificaterevocationlist;binary.
-     * <p/>
+     * <p>
      * if attrNames does only contain one value the ldap search filter will be
      * (attrName=Value_of_the_corresponding_Attribute_from_SubjectDN)
      * e.g. SubjectDN of issuer cert 'C=BE, CN=Citizen CA, serialNumber=201007'
      * attrNames is 'CN', search filter used will be (CN=Citizen CA)
-     * <p/>
+     * <p>
      * if attrNames does contain serveral values the ldap search filter value will be
      * a comma separated list of name attribute values, the search attribute will be 'cn'
      * (cn="attrNames[0]=Value_of_the_corresponding_Attribute_from_SubjectDN,
      * attrNames[1]=Value_of_the_corresponding_Attribute_from_SubjectDN")
-     * <p/>
+     * <p>
      * e.g. SubjectDN of issuer cert 'C=BE, CN=Citizen CA, serialNumber=201007'
      * attrNames is {"CN","serialNumber"}, search filter used will be
      * (cn=CN=Citizen CA,serialNumber=201007)
-     * <p/>
+     * <p>
      * The order of the values of attrNames matter as they must match the value of the
      * 'cn' attribute of a crlDistributionPoint entry in the directory server
      *
-     * @param ldapParam
-     * @param cert
-     * @param attrNames, attributes names from the subjectDN of the issuer cert
+     * @param ldapParam the LDAP certificate store parameters used to connect to the store
+     * @param cert the certificate whose issuer CRL should be retrieved
+     * @param attrNames the attribute names from the subjectDN of the issuer cert used to build the search filter
+     * @return the CRL retrieved for the certificate's issuer, or null if none was found
      */
     public static X509CRL getCRL(AMLDAPCertStoreParameters ldapParam, X509Certificate cert, String... attrNames) {
         X509CRL crl = null;

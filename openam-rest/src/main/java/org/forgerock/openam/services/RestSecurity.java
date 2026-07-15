@@ -20,6 +20,8 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.services;
@@ -252,7 +254,7 @@ public class RestSecurity {
     /**
      * Retrieves the Self-Registration CTS Token Life Time
      * @return Long representing the time that the Token shall be valid
-     * @throws ServiceNotFoundException
+     * @throws ServiceNotFoundException if the self-registration token life time setting cannot be retrieved
      */
     public Long getSelfRegTLT() throws ServiceNotFoundException {
         if ((restSecurityConfiguration != null) && (restSecurityConfiguration.selfRegTokenLifeTime != null)) {
@@ -275,7 +277,7 @@ public class RestSecurity {
     /**
      * Retrieves the Forgotten Password CTS Token Life Time
      * @return Long representing the time that the Token shall be valid
-     * @throws ServiceNotFoundException
+     * @throws ServiceNotFoundException if the forgotten password token life time setting cannot be retrieved
      */
     public Long getForgotPassTLT() throws ServiceNotFoundException {
         if ((restSecurityConfiguration != null) && (restSecurityConfiguration.forgotPasswordTokenLifeTime != null)) {

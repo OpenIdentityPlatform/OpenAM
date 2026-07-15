@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: CoreTokenStore.java,v 1.1 2009/11/19 00:07:41 qcheng Exp $
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.coretoken.spi;
@@ -82,7 +84,7 @@ public interface CoreTokenStore {
      * @param queryString HTTP query string.
      * @return JSON array of token.id values for resources that match
      *         the query. May be empty.
-     * @throws CoreTokenException
+     * @throws CoreTokenException if the token search fails.
      */
     public JSONArray searchTokens (Subject subject,
         String queryString) throws CoreTokenException;

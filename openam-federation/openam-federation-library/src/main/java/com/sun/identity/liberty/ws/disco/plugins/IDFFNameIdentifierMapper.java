@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC.
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -49,7 +50,6 @@ import java.util.List;
 /**
  * The class <code>IDFFNameIdentifierMapper</code> is an implementation
  * of <code>NameIdentifierMapper</code> for Liberty ID-FF providers.
- * <p>
  *
  */
 public class IDFFNameIdentifierMapper implements NameIdentifierMapper {

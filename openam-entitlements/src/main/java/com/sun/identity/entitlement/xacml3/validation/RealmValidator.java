@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.entitlement.xacml3.validation;
 
@@ -39,8 +40,10 @@ public class RealmValidator {
     }
 
     /**
+     * Validates that every realm in the collection exists in the framework.
+     *
      * @param realms Non null but possibly empty collection.
-     * @return True if collection is empty, or if the Realm exists in the framework.
+     * @throws EntitlementException if a realm in the collection does not exist in the framework.
      */
     public void validateRealms(Collection<String> realms) throws EntitlementException {
         Collection<String> all = getAllRealmNames();

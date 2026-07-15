@@ -24,7 +24,7 @@
  *
  * $Id: DSTClient.java,v 1.5 2008/12/16 01:48:32 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.liberty.ws.dst;
@@ -288,7 +288,7 @@ public class DSTClient {
     /**
      * Parses the given discovery resource offering for the Data service.
      * @param offering ResourceOffering 
-     * @exception DSTException.
+     * @exception DSTException .
      */
     private void parseResourceOffering(ResourceOffering offering)
     throws DSTException {
@@ -452,7 +452,7 @@ public class DSTClient {
     /**
      * Generates X509 security token for the WSC.
      * @param credential Credential of WSC
-     * @exception DSTException
+     * @exception DSTException if a data service error occurs
      */
     private void generateBinarySecurityToken(Object credential)
      throws DSTException {

@@ -1,5 +1,6 @@
 /**
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -27,7 +28,7 @@ public class ClientSdkSessionOperationStrategy implements SessionOperationStrate
 
     /**
      * Default constructor appropriate for Client SDK usage.
-     * @param clientSdkOperations
+     * @param clientSdkOperations the ClientSdkOperations used to perform remote session operations
      */
     public ClientSdkSessionOperationStrategy(ClientSdkOperations clientSdkOperations) {
         this.clientSdkOperations = clientSdkOperations;

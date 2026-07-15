@@ -223,7 +223,7 @@ public class QueryHandlerServlet extends HttpServlet {
      * @param realm the realm name of the Policy Decision Point (PDP).
      * @param pdpEntityID the entity id of the policy decision provider.
      * @param assertion the <code>Assertion</code> to be signed.
-     * @exception <code>SAML2Exception</code> it there is an error signing
+     * @exception SAML2Exception it there is an error signing
      *            the assertion.
      */
     static void signAssertion(String realm,String pdpEntityID,
@@ -262,7 +262,7 @@ public class QueryHandlerServlet extends HttpServlet {
      * @param request the <code>HttpServletRequest</code> object.
      * @param soapMsg the <code>SOAPMessage</code> object
      * @return the <code>Response</code> object.
-     * @exception <code>SAML2Exception</code> if there is an error processing
+     * @exception SAML2Exception if there is an error processing
      *            the request.
      */
     Response processSAMLRequest(String realm,String pdpEntityID,Element reqAbs,
@@ -329,7 +329,7 @@ public class QueryHandlerServlet extends HttpServlet {
      * @param samlRequest the <code>RequestAbstract</code> object.
      * @param request the <code>HttpServletRequest</code> object.
      * @param soapMsg the <code>SOAPMessage</code> object.
-     * @exception <code>SAML2Exception</code> if there is an error processing
+     * @exception SAML2Exception if there is an error processing
      *            the request and returning a  response.
      */
     Response processXACMLResponse(String realm,String pdpEntityID,
@@ -470,11 +470,11 @@ public class QueryHandlerServlet extends HttpServlet {
     /**
      * Signs the <code>Response</code>.
      *
-     * @param response the <code>Response<code> object.
+     * @param response the <code>Response</code> object.
      * @param realm the realm of the entity.
      * @param pepEntityID Policy Enforcement Point Entity Identitifer.
      * @param pdpEntityID Policy Decision Point Entity Identifier.
-     * @exception <code>SAML2Exception</code> if there is an exception.
+     * @exception SAML2Exception if there is an exception.
      */
     static void signResponse(Response response,
                                String realm, String pepEntityID,

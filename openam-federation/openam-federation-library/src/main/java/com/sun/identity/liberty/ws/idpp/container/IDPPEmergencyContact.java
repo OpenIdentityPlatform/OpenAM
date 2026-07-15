@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC.
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -61,7 +62,7 @@ public class IDPPEmergencyContact extends IDPPBaseContainer {
       * Gets the Emergency Contact Object 
       * @param userMap user map
       * @return EmergencyContactElement JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPEmergencyContact:getContainerObject:Init");
@@ -108,7 +109,7 @@ public class IDPPEmergencyContact extends IDPPBaseContainer {
       * @param select Select expression.
       * @param data list of new data objects.
       * @return Attribute key value pair for the given select.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Map getDataMapForSelect(String select, List data) 
      throws IDPPException {

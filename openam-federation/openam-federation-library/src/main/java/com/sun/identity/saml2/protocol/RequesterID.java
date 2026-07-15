@@ -25,6 +25,7 @@
  * $Id: RequesterID.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -57,7 +58,7 @@ public interface RequesterID {
     /** 
      * Sets the value of the <code>RequesterID</code> URI.
      *
-     * @param value of the <code>RequesterID<code> URI.
+     * @param value of the <code>RequesterID</code> URI.
      * @throws SAML2Exception if the object is immutable.
      * @see #getValue
      */

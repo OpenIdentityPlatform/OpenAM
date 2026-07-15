@@ -24,6 +24,7 @@
  *
  * $Id: ECPRelayStateImpl.java,v 1.2 2008/06/25 05:47:46 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.ecp.impl;
@@ -175,7 +176,7 @@ public class ECPRelayStateImpl implements ECPRelayState {
      *  @param declareNS determines whether or not the namespace is declared
      *      within the Element.
      *  @return a String representation of this Object.
-     *  @exception SAML2Exception ,if it could not create String object.
+     *  @exception SAML2Exception if it could not create String object.
      */
     public String toXMLString(boolean includeNSPrefix,boolean declareNS)
         throws SAML2Exception {

@@ -25,6 +25,7 @@
  * $Id: IdentityServicesImpl.java,v 1.20 2010/01/06 19:11:17 veiming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.idsvcs.opensso;
@@ -435,7 +436,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
      * @param searchModifiers The search modifiers
      * @param admin Your SSO token.
      * @return a list of matching identifiers.
-     * @throws ResourceException
+     * @throws ResourceException if the identity repository search fails.
      */
     public List<String> search(CrestQuery crestQuery, Map<String, Set<String>> searchModifiers, SSOToken admin)
             throws ResourceException {
@@ -490,7 +491,7 @@ public class IdentityServicesImpl implements com.sun.identity.idsvcs.IdentitySer
      * @param searchModifiers The search modifiers
      * @param admin Your SSO token.
      * @return a list of matching identities.
-     * @throws ResourceException
+     * @throws ResourceException if the identity repository search fails.
      */
     public List<IdentityDetails> searchIdentityDetails(CrestQuery crestQuery,
                                                        Map<String, Set<String>> searchModifiers,

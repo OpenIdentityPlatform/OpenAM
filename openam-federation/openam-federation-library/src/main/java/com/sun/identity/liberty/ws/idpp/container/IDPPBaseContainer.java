@@ -25,7 +25,7 @@
  * $Id: IDPPBaseContainer.java,v 1.2 2008/06/25 05:47:15 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
- * Portions Copyrighted 2026 3A Systems LLC.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -327,7 +327,7 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
       * Gets AnalyzedName JAXB Object.
       * @param userMap user map
       * @return AnalyzedNameType JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      protected AnalyzedNameType getAnalyzedName(Map userMap) 
      throws IDPPException {
@@ -377,7 +377,7 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
       * This method is an implementation of IDPPContainer. 
       * @param userMap user map
       * @return Document XML document representation of container.
-      * @exception IDPPException
+      * @exception IDPPException if an error occurs
       */
      public Document toXMLDocument(Map userMap) 
      throws IDPPException {

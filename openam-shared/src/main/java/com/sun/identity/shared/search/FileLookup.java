@@ -24,6 +24,7 @@
  *
  * $Id: FileLookup.java,v 1.4 2008/06/25 05:53:05 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.shared.search;
@@ -98,6 +99,7 @@ public class FileLookup {
      * Returns all possible paths for the specified file in an ordered array.
      * If all parameters specified are non-null, then the order of the
      * filepaths is generated in the following manner:
+     * <pre>{@code
      *   <type>_<locale>/<component>/<clientPath>/<filename>
      *   <type>_<locale>/<component>/<filename>
      *   <type>_<locale>/<component>/<orgPath>/<clientPath>/<filename>
@@ -108,7 +110,7 @@ public class FileLookup {
      *     of the locale.  For example, if the original <locale> value
      *     was "jp_JP_WIN", then the above would be <type>_jp_JP_WIN.
      *     The next groups would be <type>_jp_JP and <type>_jp.
-     *   
+     *
      *     If the platform locale is different from the specified locale,
      *     then the pattern for <locale> is repeated with the platform
      *     locale, with the addition of using no "_<locale>" (i.e.,
@@ -116,8 +118,8 @@ public class FileLookup {
      *
      *     Additionally, "default" is used as "<type>", and the above
      *     patterns are repeated.
+     * }</pre>
      *
-     * 
      * @param type The base filepath to begin the search. If null, "default"
      *        is the start of the filepath.
      * @param locale The locale for the file of interest.
@@ -125,7 +127,7 @@ public class FileLookup {
      * @param orgPath The organization part of the filepath, if any.
      * @param clientPath The client type for that part of the filepath
      * @param filename The filename of interest
-     * @throws FileLookupException
+     * @throws FileLookupException if an error occurs while locating the files.
      * @return <code>File[]</code> of ordered search paths.
      */
     public static File[] getOrderedPaths(
@@ -370,10 +372,10 @@ public class FileLookup {
      * @param component The component part of the filepath, if any.
      * @param clientPath The client type for that part of the filepath
      * @param filename The filename of interest
-     * @param templateDir
-     * @param enableCache
+     * @param templateDir The base template filepath to prepend.
+     * @param enableCache True if the File object is to be cached.
      * @return first existing file in the ordered search paths.
-     * @throws FileLookupException
+     * @throws FileLookupException if an error occurs while locating the file.
      */
     public static File getFirstExisting(
         String type,
@@ -400,7 +402,7 @@ public class FileLookup {
      * @param templateDir The base template filepath to prepend.
      * @param enableCache True if the File object is to be cached.
      * @return first existing file in the ordered search paths.
-     * @throws FileLookupException
+     * @throws FileLookupException if an error occurs while locating the file.
      */
     public static File getFirstExisting(
         String type,
@@ -470,7 +472,7 @@ public class FileLookup {
      * @param locale The locale for the file of interest.
      * @param filename The filename of interest.
      * @return url of document, or null if no document was found.
-     * @throws FileLookupException
+     * @throws FileLookupException if an error occurs while locating the file.
      */
     public static String getFirstExistingRemote(
         String server,

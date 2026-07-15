@@ -13,7 +13,7 @@
 *
 * Copyright 2014-2016 ForgeRock AS.
 * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
-* Portions copyright 2025 3A Systems LLC.
+* Portions copyright 2025-2026 3A Systems LLC.
 */
 package org.forgerock.openam.entitlement.rest;
 
@@ -279,7 +279,7 @@ public class ApplicationsResource extends RealmAwareResource {
 
     /**
      * Creates an {@link ApplicationWrapper} to hold the {@link Application} object.
-     * <p/>
+     * <p>
      * This method provides an abstraction to aid testing.
      *
      * @param application

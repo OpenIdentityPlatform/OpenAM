@@ -24,7 +24,7 @@
  *
  * $Id: FSNameRegistrationHandler.java,v 1.7 2008/12/19 06:50:47 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -1564,7 +1564,8 @@ public class FSNameRegistrationHandler {
      * @param idAttrName name of the id attribute to be signed
      * @param id the value of the id attribute to be signed
      * @return signed Name registration request
-     * @exception SAMLException, FSMsgException if error occurred.
+     * @exception SAMLException if error occurred.
+     * @exception FSMsgException if error occurred.
      */
     protected SOAPMessage signRegistrationRequest(
         SOAPMessage msg, String idAttrName, String id) 

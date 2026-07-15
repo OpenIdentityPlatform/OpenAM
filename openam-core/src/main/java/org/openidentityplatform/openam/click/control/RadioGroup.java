@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.control;
 
@@ -33,13 +34,14 @@ import java.util.Map;
 /**
  * Provides a RadioGroup control.
  *
- * <table class='htmlHeader' cellspacing='6'>
+ * <table class='htmlHeader'>
+ * <caption>Example</caption>
  * <tr>
  * <td>Radio Group</td>
  * <td>
- * <input type='radio' name='header' value='R'>Red </input>
- * <input type='radio' name='header' checked value='G'>Green </input>
- * <input type='radio' name='header' value='B'>Blue</input>
+ * &lt;input type='radio' name='header' value='R'&gt;Red &lt;/input&gt;
+ * &lt;input type='radio' name='header' checked value='G'&gt;Green &lt;/input&gt;
+ * &lt;input type='radio' name='header' value='B'&gt;Blue&lt;/input&gt;
  * </td>
  * </tr>
  * </table>
@@ -49,7 +51,7 @@ import java.util.Map;
  * the RadioGroup. This will ensure the buttons will toggle together so that
  * only one button is selected at a time.
  *
- * <h3>RadioGroup Example</h3>
+ * <h2>RadioGroup Example</h2>
  *
  * The example below illustrates a RadioGroup being added to a form.
  *
@@ -75,18 +77,19 @@ import java.util.Map;
  * This radio group field would be render as:
  *
  * <table class='htmlExample'>
+ * <caption>Example</caption>
  *  <tr>
  *   <td>Packaging</td>
  *   <td>
- *    <input type='radio' name='group' checked value='STD'>Standard</input><br>
- *    <input type='radio' name='group' value='PRO'>Protective</input><br>
- *    <input type='radio' name='group' value='GFT'>Gift Wrap</input>
+ *    &lt;input type='radio' name='group' checked value='STD'&gt;Standard&lt;/input&gt;<br>
+ *    &lt;input type='radio' name='group' value='PRO'&gt;Protective&lt;/input&gt;<br>
+ *    &lt;input type='radio' name='group' value='GFT'&gt;Gift Wrap&lt;/input&gt;
  *   </td>
  *  </tr>
  * </table>
  *
  * See also W3C HTML reference
- * <a class="external" target="_blank" title="W3C HTML 4.01 Specification"
+ * <a class="external" target="_blank"
  *    href="http://www.w3.org/TR/html401/interact/forms.html#h-17.4">INPUT</a>
  *
  * @see Radio
@@ -174,7 +177,7 @@ public class RadioGroup extends Field {
 
     /**
      * Create a RadioGroup field with no name.
-     * <p/>
+     * <p>
      * <b>Please note</b> the control's name must be defined before it is valid.
      */
     public RadioGroup() {
@@ -223,8 +226,8 @@ public class RadioGroup extends Field {
      * Add the given Map of radio values and labels to the RadioGroup.
      * The Map entry key will be used as the radio value and the Map entry
      * value will be used as the radio label.
-     * <p/>
-     * It is recommended that <tt>LinkedHashMap</tt> is used as the Map
+     * <p>
+     * It is recommended that <code>LinkedHashMap</code> is used as the Map
      * parameter to maintain the order of the radio items.
      *
      * @param options the Map of radio option values and labels to add
@@ -324,7 +327,7 @@ public class RadioGroup extends Field {
     /**
      * @see Field#setForm(Form)
      *
-     * @param form Field's parent <tt>Form</tt>
+     * @param form Field's parent <code>Form</code>
      */
     @Override
     public void setForm(Form form) {
@@ -543,11 +546,11 @@ public class RadioGroup extends Field {
 
     /**
      * Validate the RadioGroup request submission.
-     * <p/>
+     * <p>
      * A field error message is displayed if a validation error occurs.
      * These messages are defined in the resource bundle: <blockquote>
      * <pre>org.apache.click.control.MessageProperties</pre></blockquote>
-     * <p/>
+     * <p>
      * Error message bundle key names include: <blockquote><ul>
      * <li>select-error</li>
      * </ul></blockquote>

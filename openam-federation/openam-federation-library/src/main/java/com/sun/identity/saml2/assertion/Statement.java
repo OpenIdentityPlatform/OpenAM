@@ -24,6 +24,7 @@
  *
  * $Id: Statement.java,v 1.2 2008/06/25 05:47:41 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -38,14 +39,13 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * SAML itself derives its core statements from this extension point.
  * Its <code>StatementAbstractType</code> complex type is abstract and is
  * thus usable only as the base of a derived type.
- * <p>
  * <pre>
- * &lt;complexType name="StatementAbstractType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="StatementAbstractType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

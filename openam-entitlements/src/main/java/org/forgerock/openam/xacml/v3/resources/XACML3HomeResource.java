@@ -1,3 +1,29 @@
+/**
+ *
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC.
+ */
 package org.forgerock.openam.xacml.v3.resources;
 
 import com.sun.identity.shared.debug.Debug;
@@ -11,7 +37,7 @@ import java.io.IOException;
 
 /**
  * XACML Resource for Home Documents
- * <p/>
+ * <p>
  * Provides main end-point for all XACML Home requests.
  *
  * @author Jeff.Schenk@forgerock.com
@@ -32,8 +58,8 @@ public class XACML3HomeResource extends XACML3Resource {
      * Creates Home Document Content providing hints.
      *
      * @return String -- Containing Response in requested ContentType.
-     * @throws jakarta.servlet.ServletException
-     * @throws java.io.IOException
+     * @throws org.json.JSONException if the home document cannot be built
+     * @throws java.io.IOException if writing the home document fails
      */
     public static String getHome() throws JSONException, IOException {
         String classMethod = "XacmlHomeResource:getHome";
@@ -54,7 +80,7 @@ public class XACML3HomeResource extends XACML3Resource {
     /**
      * Home Document
      * XML Home Document using ATOM RFC4287
-     * @return
+     * @return the XML home document as a String
      */
     public static String getXMLHomeDocument() {
         StringBuilder sb = new StringBuilder();
@@ -74,7 +100,7 @@ public class XACML3HomeResource extends XACML3Resource {
      * Formulate our Home Document.
      *
      * @return JSONObject
-     * @throws org.json.JSONException
+     * @throws org.json.JSONException if the JSON home document cannot be built
      */
     public static JSONObject getJSONHomeDocument() throws JSONException {
         JSONObject resources = new JSONObject();

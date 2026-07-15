@@ -28,7 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.console.agentconfig;
 
@@ -271,10 +271,10 @@ public class AgentsViewBean
     }
     
     /**
-     * Returns <code>true>/code> if tab set of more than one tab.
+     * Returns {@code true} if tab set of more than one tab.
      *
      * @param event Child Display Event.
-     * @return <code>true>/code> if tab set of more than one tab.
+     * @return {@code true} if tab set of more than one tab.
      */
     public boolean beginTabCommonDisplay(ChildDisplayEvent event) {
         return (tabModel.getNodeCount() > 1);
@@ -1131,7 +1131,6 @@ public class AgentsViewBean
      * Handles parentage path request.
      *
      * @param event Request Invocation Event.
-     * @throws ModelControlException if table model cannot be restored.
      */
     public void handleParentagepathHrefRequest(RequestInvocationEvent event) {
         String path = (String)getDisplayFieldValue(PARENTAGE_PATH_HREF);

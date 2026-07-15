@@ -25,6 +25,7 @@
  * $Id: SubjectAttributesManager.java,v 1.3 2009/09/24 22:37:43 hengming Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entitlement;
@@ -46,9 +47,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Manages multiple instances of <class>SubjectAttributesCollector</class>,
- * and to be called by <class>Evaluator</class> and <class>
- * EntitlementSubject</class> implementations to obtain users' attributes and
+ * Manages multiple instances of <code>SubjectAttributesCollector</code>,
+ * and to be called by <code>Evaluator</code> and <code>
+ * EntitlementSubject</code> implementations to obtain users' attributes and
  * memberships.
  */
 public class SubjectAttributesManager {
@@ -270,7 +271,7 @@ public class SubjectAttributesManager {
 
     /**
      * Returns the attribute values of the given user represented by
-     * <class>Subject</class> object.
+     * <code>Subject</code> object.
      * @param subject identity of the user.
      * @param attrNames requested attribute names.
      * @return a map of attribute names and their values.
@@ -325,7 +326,7 @@ public class SubjectAttributesManager {
 
     /**
      * Returns the attribute values of the given user represented by
-     * <class>Subject</class> object.
+     * <code>Subject</code> object.
      * @param subject identity of the user.
      * @param attrNames requested attribute names.
      * @return a map of attribute names and their values.

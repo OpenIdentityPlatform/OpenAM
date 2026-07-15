@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2011 ForgeRock AS
  * Portions Copyrighted 2015 Intellectual Reserve, Inc (IRI)
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.radius.common;
 
@@ -55,7 +56,6 @@ public class RequestAuthenticator implements Authenticator {
      * @param rand   in instance of SecureRandom as the source of randomness.
      * @param secret the secret shared between a radius client and server.
      * @throws NoSuchAlgorithmException if the MD5 algorithm is not available.
-     * @throws UnsupportedEncodingException 
      */
     public RequestAuthenticator(SecureRandom rand, String secret)
             throws NoSuchAlgorithmException {

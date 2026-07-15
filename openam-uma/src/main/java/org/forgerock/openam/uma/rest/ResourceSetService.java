@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -173,7 +173,7 @@ public class ResourceSetService {
      * @param resourceSet The resource set to check.
      * @param resourceUserId The id of the user to check.
      * @param realm The realm to check in.
-     * @return @code{true} if the user can access that ResourceSet.
+     * @return {@code true} if the user can access that ResourceSet.
      */
     public boolean isSharedWith(ResourceSetDescription resourceSet, String resourceUserId, String realm)
             throws InternalServerErrorException{

@@ -25,7 +25,7 @@
  * $Id: SAMLPOSTProfileServlet.java,v 1.4 2009/06/12 22:21:39 mallas Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml.servlet;
 
@@ -331,8 +331,8 @@ public class SAMLPOSTProfileServlet extends HttpServlet {
      *
      * @param request <code>HttpServletRequest</code> instance
      * @param response <code>HttpServletResponse</code> instance
-     * @throws  ServletException if there is an error.
-     * @throws  IOException if there is an error.
+     * @throws ServletException if there is an error.
+     * @throws IOException if there is an error.
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response)
                        throws ServletException, IOException {

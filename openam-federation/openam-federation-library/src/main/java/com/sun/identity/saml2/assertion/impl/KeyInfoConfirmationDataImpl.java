@@ -24,6 +24,7 @@
  *
  * $Id: KeyInfoConfirmationDataImpl.java,v 1.2 2008/06/25 05:47:44 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -47,7 +48,7 @@ import com.sun.identity.saml2.common.SAML2SDKUtils;
 /**
  * The <code>KeyInfoConfirmationData</code> constrains a 
  * <code>SubjectConfirmationData</code> element to contain one or more
- * <ds:KeyInfo> elements that identify cryptographic keys that are used
+ * &lt;ds:KeyInfo&gt; elements that identify cryptographic keys that are used
  * in some way to authenticate an attesting entity. The particular 
  * confirmation method MUST define the exact mechanism by which the
  * confirmation data can be used. The optional attributes defined by

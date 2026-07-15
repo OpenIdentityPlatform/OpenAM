@@ -182,11 +182,11 @@ public class MSISDNValidation {
     }
 
     /**
-     * Returns user ID which has <code>sunIdentityMSISDNNumber</code> matching 
-     * the <code>msisdn<code> number.
+     * Returns user ID which has <code>sunIdentityMSISDNNumber</code> matching
+     * the <code>msisdn</code> number.
      *
      * @param msisdnNumber to search.
-     * @throws AuthLoginException
+     * @throws AuthLoginException if the MSISDN number is invalid or the user cannot be looked up
      */
     protected String getUserId(String msisdnNumber) throws AuthLoginException {
         String validatedUserID = null;

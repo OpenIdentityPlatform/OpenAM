@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.common.configuration;
@@ -678,7 +679,6 @@ public class ServerConfiguration extends ConfigurationBase {
      * @throws SMSException if errors access in the service management
      *         datastore.
      * @throws SSOException if the <code>ssoToken</code> is not valid.
-     * @throws UnknownPropertyNameException if property names are unknown.
      * @throws ConfigurationException  if the property name and values are not
      *         valid.
      */

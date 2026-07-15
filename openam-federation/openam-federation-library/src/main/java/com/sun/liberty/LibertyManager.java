@@ -1250,8 +1250,8 @@ public class LibertyManager {
     /**
      * Returns the realm by parsing the metaAlias. MetaAlias format is
      * <pre>
-     * &lt;realm>/&lt;any string without '/'> for non-root realm or
-     * /&lt;any string without '/'> for root realm.
+     * &lt;realm&gt;/&lt;any string without '/'&gt; for non-root realm or
+     * /&lt;any string without '/'&gt; for root realm.
      * </pre>
      * @param metaAlias The metaAlias.
      * @return the realm associated with the metaAlias.

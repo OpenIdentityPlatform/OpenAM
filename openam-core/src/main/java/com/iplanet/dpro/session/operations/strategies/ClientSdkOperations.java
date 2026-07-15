@@ -75,8 +75,8 @@ public class ClientSdkOperations implements SessionOperations {
      *
      * @param session The Session to update.
      * @param reset If true, then update the last modified timestamp of the Session.
-     * @return
-     * @throws SessionException
+     * @return the refreshed SessionInfo for the given session
+     * @throws SessionException if the session could not be refreshed
      */
     public SessionInfo refresh(Session session, boolean reset) throws SessionException {
         SessionID sessionID = session.getID();

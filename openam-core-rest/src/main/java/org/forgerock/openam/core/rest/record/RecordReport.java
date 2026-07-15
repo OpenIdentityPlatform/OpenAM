@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.core.rest.record;
 
@@ -75,8 +76,8 @@ public class RecordReport {
     /**
      * Create the infoReport
      *
-     * @param record
-     * @return
+     * @param record the record to build the report from
+     * @return the information report as a JSON value
      */
     public JsonValue infoReport(Record record) {
         JsonObject report = JsonValueBuilder.jsonValue();
@@ -117,9 +118,9 @@ public class RecordReport {
     /**
      * Get Date from info report
      *
-     * @param jsonRecordProperties
-     * @return
-     * @throws ParseException
+     * @param jsonRecordProperties the JSON info report to extract the date from
+     * @return the date extracted from the info report
+     * @throws ParseException if the date cannot be parsed
      */
     public Date getDateFromInfoReport(JsonValue jsonRecordProperties) throws ParseException, JsonValueException {
         JsonValue globalInfo = jsonRecordProperties.get(GLOBAL_INFO_LABEL).required();
@@ -203,8 +204,8 @@ public class RecordReport {
     /**
      * Create the history report
      *
-     * @param record
-     * @return
+     * @param record the record whose history is reported
+     * @return the history report as a formatted string
      */
     public String recordHistoryReport(Record record) {
         StringBuilder report = new StringBuilder();

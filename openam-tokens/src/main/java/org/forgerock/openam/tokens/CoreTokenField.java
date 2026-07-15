@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.tokens;
 
@@ -25,10 +26,9 @@ import java.util.Calendar;
  * only attributes available to populate for any Token that is to be stored.
  *
  * Other enumerations may exist for the convenience of development, however
- * they must link to these enumerated values.
- *
- * @see org.forgerock.openam.cts.api.fields.SAMLTokenField
- * @see org.forgerock.openam.cts.api.fields.OAuthTokenField
+ * they must link to these enumerated values; examples include
+ * {@code org.forgerock.openam.cts.api.fields.SAMLTokenField} and
+ * {@code org.forgerock.openam.cts.api.fields.OAuthTokenField}.
  */
 public enum CoreTokenField {
     /**

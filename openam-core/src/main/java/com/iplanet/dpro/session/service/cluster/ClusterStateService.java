@@ -29,7 +29,7 @@
 /*
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2023 3A Systems LLC.
+ * Portions Copyrighted 2023-2026 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.service.cluster;
@@ -184,7 +184,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     /**
      * Get Servers within Cluster
-     * @return Map<String, StateInfo>
+     * @return {@code Map<String, StateInfo>} of servers within the cluster keyed by server ID
      */
     protected Map<String, StateInfo> getServers() {
         return servers;
@@ -219,7 +219,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     /**
      * Is Specified ServerId our Local Server Id?
-     * @param serverId
+     * @param serverId the server ID to compare against the local server ID
      * @return boolean indicating true if the serverId matches the local server ID.
      */
     protected boolean isLocalServerId(String serverId) {
@@ -465,7 +465,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     /**
      * Internal method for checking health status using sock.connect()
-     * <p/>
+     * <p>
      * TODO -- Use a better mechanism for alive status. 10.1+.
      *
      * @param info server info instance

@@ -24,6 +24,7 @@
  *
  * $Id: Status.java,v 1.2 2008/06/25 05:48:12 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -36,17 +37,17 @@ import java.util.List;
  * The <code>Status</code> element is a container of 
  * one or more <code>Status</code>s issuded by authorization authority.
  * 
- * <p/>
  * <pre>
  *
  * Schema:
- * &lt;xs:complexType name="StatusType">
- *     &lt;xs:sequence>
- *         &lt;xs:element ref="xacml-context:StatusCode"/>
- *         &lt;xs:element ref="xacml-context:StatusMessage" minOccurs="0"/>
- *         &lt;xs:element ref="xacml-context:StatusDetail" minOccurs="0"/>
- *     &lt;xs:sequence>
- * &lt;xs:complexType>
+ * &lt;xs:complexType name="StatusType"&gt;
+ *     &lt;xs:sequence&gt;
+ *         &lt;xs:element ref="xacml-context:StatusCode"/&gt;
+ *         &lt;xs:element ref="xacml-context:StatusMessage" minOccurs="0"/&gt;
+ *         &lt;xs:element ref="xacml-context:StatusDetail" minOccurs="0"/&gt;
+ *     &lt;xs:sequence&gt;
+ * &lt;xs:complexType&gt;
+ * </pre>
  */
 public interface Status {
 

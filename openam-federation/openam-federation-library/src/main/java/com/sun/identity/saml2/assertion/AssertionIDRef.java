@@ -24,6 +24,7 @@
  *
  * $Id: AssertionIDRef.java,v 1.2 2008/06/25 05:47:40 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.assertion;
@@ -34,9 +35,8 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * This class represents the AssertionIDRef element.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 	
- * <p>
  * <pre>
- * &lt;element name="AssertionIDRef" type="NCName"/>
+ * &lt;element name="AssertionIDRef" type="NCName"/&gt;
  * </pre>
  *
  * 

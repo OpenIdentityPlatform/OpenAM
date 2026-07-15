@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest;
@@ -224,7 +224,7 @@ final public class RestUtils {
 
     /**
      * Parses out deployment url
-     * @param deploymentURL
+     * @param deploymentURL the deployment URL to parse the deployment URI from
      */
     public static StringBuilder getFullDeploymentURI(final String deploymentURL) throws URISyntaxException{
 
@@ -249,7 +249,7 @@ final public class RestUtils {
 
     /**
      * Gets an SSOToken for Administrator
-     * @return
+     * @return the administrator SSOToken
      */
     public static SSOToken getToken() {
         return AccessController.doPrivileged(AdminTokenAction.getInstance());

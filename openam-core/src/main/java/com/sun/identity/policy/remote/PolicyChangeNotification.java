@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -43,8 +44,7 @@ import org.w3c.dom.Node;
  * This <code>PolicyChangeNotification</code> class represents a 
  * PolicyChangeNotification XML document. The PolicyChangeNotification
  *  DTD is defined as the following:
- * <p>
- * <pre>
+ * <pre>{@code
  * <!-- PolicyNotification element specifies a policy notification.
  *      There are two types of notifications that are supported.
  *      Policy Change Notification and Subject Change Notification.
@@ -73,9 +73,8 @@ import org.w3c.dom.Node;
  * -->
  *
  * <!ELEMENT    ResourceName    ( #PCDATA ) >
- *
+ * }
  * </pre>
- * <p>
  */
 
 public class PolicyChangeNotification {
@@ -160,7 +159,7 @@ public class PolicyChangeNotification {
      * the XML.
      *
      * @param pNode the XML DOM node for the
-     *        <code>PolicyChangeNotification<code> object.
+     *        <code>PolicyChangeNotification</code> object.
      * @return constructed <code>PolicyChangeNotification</code> object.
      */
     public static PolicyChangeNotification parseXML(Node pNode)

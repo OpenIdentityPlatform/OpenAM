@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC.
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -64,7 +65,7 @@ public class IDPPDemographics extends IDPPBaseContainer {
       * Gets the common name jaxb element 
       * @param userMap user map
       * @return CommonNameElement JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
 
@@ -172,7 +173,7 @@ public class IDPPDemographics extends IDPPBaseContainer {
       * @param select Select expression.
       * @param data list of new data objects.
       * @return Map Attribute key value pair map for the given select.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Map getDataMapForSelect(String select, List data) 
      throws IDPPException {
@@ -261,7 +262,7 @@ public class IDPPDemographics extends IDPPBaseContainer {
       * @param obj DemographicsType JAXB object.
       * @param map map that sets attribute/value pairs.
       * @return Map Attribute value pair map that needs to be modified. 
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      private Map getDemographicsMap(Object obj, Map map) 
         throws IDPPException {
@@ -306,7 +307,7 @@ public class IDPPDemographics extends IDPPBaseContainer {
       * @param dataObject list of data objects
       * @param map map to be filled in
       * @return Map map to be returned
-      * @exception IDPPException
+      * @exception IDPPException if an error occurs
       */
      private Map getLanguageMap(List dataObject, Map map) throws IDPPException {
         IDPPUtils.debug.message("IDPPDemographics:getLanguageMap:Init");

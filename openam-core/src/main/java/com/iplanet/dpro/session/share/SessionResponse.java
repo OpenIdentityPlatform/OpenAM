@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -46,8 +47,7 @@ import com.sun.identity.common.SearchResults;
  * This <code>SessionResponse</code> class represents a
  * <code>SessionResponse</code> XML document. The <code>SessionResponse</code>
  * DTD is defined as the following:
- * </p>
- * 
+ *
  * <pre>
  *     &lt;?xml version=&quot;1.0&quot;&gt;
  *     &lt; !DOCTYPE SessionResponse [
@@ -97,8 +97,6 @@ import com.sun.identity.common.SearchResults;
  *     &lt; !ELEMENT Status (#PCDATA)&gt;
  *     ]&gt;
  * </pre>
- * 
- * </p>
  */
 
 public class SessionResponse {
@@ -241,7 +239,7 @@ public class SessionResponse {
     /**
      * Sets the flag.
      *
-     * @param flag 
+     * @param flag the boolean flag value to set on this response
      */
     public void setBooleanFlag(boolean flag) {
         booleanFlag = flag;

@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
- * Portions Copyrighted 2026 3A Systems LLC.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -93,7 +93,7 @@ import com.sun.identity.shared.xml.XMLUtils;
  * Class with utility methods to map from
  * <code>com.sun.identity.entity.Privilege</code>
  * to
- * </code>com.sun.identity.entitlement.xacml3.core.Policy</code>
+ * <code>com.sun.identity.entitlement.xacml3.core.Policy</code>
  */
 public class XACMLPrivilegeUtils {
 

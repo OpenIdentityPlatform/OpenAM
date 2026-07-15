@@ -165,12 +165,12 @@ public class MSISDN extends AMLoginModule {
     /**
      * Validates the authentication credentials.
      *
-     * @param callbacks
-     * @param state
+     * @param callbacks the callbacks presented to this module for the request
+     * @param state the current authentication state
      * @return ISAuthConstants.LOGIN_SUCCEED on login success
-     * @exception AuthLoginException
+     * @exception AuthLoginException if the credentials cannot be validated
      */
-    public int process(Callback[] callbacks, int state) 
+    public int process(Callback[] callbacks, int state)
             throws AuthLoginException {
         debug.message("MSISDN : in process ..");
         if (errorMsgKey != null) {

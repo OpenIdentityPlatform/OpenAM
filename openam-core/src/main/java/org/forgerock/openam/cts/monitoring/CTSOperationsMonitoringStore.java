@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.cts.monitoring;
@@ -22,7 +23,7 @@ import org.forgerock.openam.cts.api.tokens.Token;
 
 /**
  * A data structure for storing monitoring information about CTS operations.
- * <br/>
+ * <br>
  * The CTS will use an instance of this data structure to store information about operations as and when they occur
  * and then the CTS monitoring framework will us the same instance to pull information out to send to clients
  * as monitoring requests are made.
@@ -33,10 +34,10 @@ public interface CTSOperationsMonitoringStore {
 
     /**
      * Adds a Token operation into the monitoring store.
-     * <br/>
+     * <br>
      * The operation is mapped to the type of the token. The operations per configurable period and cumulative count
      * will be updated for the token type and operation.
-     * <br/>
+     * <br>
      * Passing in <code>null</code> as the token will mean that the operation is not mapped to a particular token
      * type, this is for operations such as delete and list as the type of token cannot be determined.
      * The operations per configurable period and cumulative count will be updated for the operation.
@@ -49,10 +50,10 @@ public interface CTSOperationsMonitoringStore {
 
     /**
      * Gets the average rate of operations made in a given period.
-     * <br/>
+     * <br>
      * Will return the number of the specified operation made on the specified type token in a given
      * (configurable) period.
-     * <br/>
+     * <br>
      * Passing in <code>null</code> as the operation will mean that the method will return the number of the specified
      * operation made on tokens, which the type cannot be determined, i.e. Delete and List operations.
      *
@@ -64,10 +65,10 @@ public interface CTSOperationsMonitoringStore {
 
     /**
      * Gets the minimum rate of operations made in a given period.
-     * <br/>
+     * <br>
      * Will return the number of the specified operation made on the specified type token in a given
      * (configurable) period.
-     * <br/>
+     * <br>
      * Passing in <code>null</code> as the operation will mean that the method will return the number of the specified
      * operation made on tokens, which the type cannot be determined, i.e. Delete and List operations.
      *
@@ -79,10 +80,10 @@ public interface CTSOperationsMonitoringStore {
 
     /**
      * Gets the maximum rate of operations made in a given period.
-     * <br/>
+     * <br>
      * Will return the number of the specified operation made on the specified type token in a given
      * (configurable) period.
-     * <br/>
+     * <br>
      * Passing in <code>null</code> as the operation will mean that the method will return the number of the specified
      * operation made on tokens, which the type cannot be determined, i.e. Delete and List operations.
      *
@@ -94,10 +95,10 @@ public interface CTSOperationsMonitoringStore {
 
     /**
      * Gets the cumulative count of operations made since server start up.
-     * <br/>
+     * <br>
      * Will return the total number of the specified operation made on the specified type of token since the server
      * stared.
-     * <br/>
+     * <br>
      * Passing in <code>null</code> as the operation will mean that the method will return the total number of
      * the specified operation made on tokens, which the type cannot be determined, i.e. Delete and List operations.
      *
@@ -109,7 +110,7 @@ public interface CTSOperationsMonitoringStore {
 
     /**
      * Gets the cumulative count of failures of this operation type since server startup.
-     * <br/>
+     * <br>
      * Note that failure counts are not distinguished by token type as in most failure cases this information is not
      * available.
      *

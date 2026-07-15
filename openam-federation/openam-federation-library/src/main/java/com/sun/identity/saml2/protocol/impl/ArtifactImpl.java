@@ -24,6 +24,7 @@
  *
  * $Id: ArtifactImpl.java,v 1.2 2008/06/25 05:47:58 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -43,7 +44,6 @@ import com.sun.identity.saml2.common.SAML2SDKUtils;
 /**
  * This class implements interface <code>Artifact</code>. It models 
  * type <code>urn:oasis:names:tc:SAML:2.0:artifact-04 Artifact</code>.
- * <p>
  * <pre>
  * SAML_artifact := B64(TypeCode EndpointIndex RemainingArtifact)
  * TypeCode      := Byte1Byte2

@@ -25,6 +25,7 @@
  * $Id: EncryptedIDImpl.java,v 1.2 2008/06/25 05:47:43 qcheng Exp $
  *
  * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.saml2.assertion.impl;
 
@@ -46,10 +47,9 @@ import com.sun.identity.saml2.xmlenc.EncManager;
  * Java content class for EncryptedID element declaration.
  * <p>The following schema fragment specifies the expected         
  *    content contained within this java content object. 
- * <p>
  * <pre>
  * &lt;element name="EncryptedID" 
- * type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/>
+ * type="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedElementType"/&gt;
  * </pre>
  * 
  */

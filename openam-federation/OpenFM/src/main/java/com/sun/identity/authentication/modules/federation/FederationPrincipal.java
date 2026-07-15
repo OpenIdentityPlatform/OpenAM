@@ -24,6 +24,7 @@
  *
  * $Id: FederationPrincipal.java,v 1.2 2008/06/25 05:49:31 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.modules.federation;
@@ -49,8 +50,6 @@ public class FederationPrincipal implements Principal, Serializable {
     /**
      * Return the LDAP username for this <code>FederationPrincipal</code>.
      *
-     * <p>
-     *
      * @return the LDAP username for this <code>FederationPrincipal</code>
      */
     public String getName() {
@@ -59,8 +58,6 @@ public class FederationPrincipal implements Principal, Serializable {
 
     /**
      * Return a string representation of this <code>FederationPrincipal</code>.
-     *
-     * <p>
      *
      * @return a string representation of this <code>FederationPrincipal</code>.
      */
@@ -73,8 +70,6 @@ public class FederationPrincipal implements Principal, Serializable {
      * for equality.  Returns true if the given object is also a
      * <code>FederationPrincipal</code> and the two FederationPrincipals
      * have the same username.
-     *
-     * <p>
      *
      * @param o Object to be compared for equality with this
      *                <code>FederationPrincipal</code>.
@@ -102,8 +97,6 @@ public class FederationPrincipal implements Principal, Serializable {
  
     /**
      * Return a hash code for this <code>FederationPrincipal</code>.
-     *
-     * <p>
      *
      * @return a hash code for this <code>FederationPrincipal</code>.
      */

@@ -17,13 +17,21 @@ on:
   push:
     branches: [ 'sustaining/15.2.x','master','issues/**','features/**' ]
   pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build-maven:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ 'ubuntu-latest' ]
         java: [ '11', '17', '21', '25', '26' ]
-        os: [ 'ubuntu-latest', 'macos-latest', 'windows-latest' ]
+        include:
+          - { os: 'macos-latest',   java: '11' }
+          - { os: 'macos-latest',   java: '26' }
+          - { os: 'windows-latest', java: '11' }
+          - { os: 'windows-latest', java: '26' }
       fail-fast: false
     steps:
     - uses: actions/checkout@v6

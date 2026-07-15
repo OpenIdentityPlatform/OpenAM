@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -60,8 +61,8 @@ public abstract class ValidatorBase implements IValidation {
      *            IStateAccess state
      * 
      * @return ValidationResult Object
-     * @throws InstallException
-     * 
+     * @throws InstallException if the named validator cannot be found or invoked
+     *
      */
     public ValidationResult validate(String name, String value, Map props,
             IStateAccess state) throws InstallException {

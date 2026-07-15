@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.session.authorisation;
 
@@ -84,8 +84,8 @@ public class SessionChangeAuthorizer {
      * Returns true if the subject has top level admin role
      *
      * @param actorsSessionID SessionID of the current acting subject.
-     * @throws SessionException
-     * @throws SSOException
+     * @throws SessionException if there is a problem accessing the session
+     * @throws SSOException if the single sign on token is invalid or expired
      */
     public boolean hasTopLevelAdminRole(final SessionID actorsSessionID) throws SessionException, SSOException {
         SSOToken ssoSession = ssoTokenManager.createSSOToken(actorsSessionID.toString());

@@ -24,6 +24,7 @@
  *
  * $Id: SAEPrincipal.java,v 1.2 2008/06/25 05:49:31 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.modules.sae;
@@ -54,8 +55,6 @@ public class SAEPrincipal implements Principal, java.io.Serializable {
     /**
      * Returns the username for this <code>SAEPrincipal</code>.
      *
-     * <p>
-     *
      * @return the username for this <code>SAEPrincipal</code>
      */
     public String getName() {
@@ -64,8 +63,6 @@ public class SAEPrincipal implements Principal, java.io.Serializable {
 
     /**
      * Returns a string representation of this <code>SAEPrincipal</code>.
-     *
-     * <p>
      *
      * @return a string representation of this <code>SAEPrincipal</code>.
      */
@@ -78,8 +75,6 @@ public class SAEPrincipal implements Principal, java.io.Serializable {
      * for equality.  Returns true if the given object is also a
      * <code>SAEPrincipal</code> and the two SAEPrincipals
      * have the same username.
-     *
-     * <p>
      *
      * @param o Object to be compared for equality with this
      *		<code>SAEPrincipal</code>.
@@ -105,8 +100,6 @@ public class SAEPrincipal implements Principal, java.io.Serializable {
  
     /**
      * Returns a hash code for this <code>SAEPrincipal</code>.
-     *
-     * <p>
      *
      * @return a hash code for this <code>SAEPrincipal</code>.
      */

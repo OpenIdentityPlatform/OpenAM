@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -201,9 +202,7 @@ public class AuthLoginException extends LoginException implements L10NMessage {
      * Returns the resource bundle name.
      *
      * @return Resource Bundle Name associated with this error message.
-     * @see #getL10NMessage(java.util.Locale).
-     *
-     * 
+     * @see #getL10NMessage(java.util.Locale)
      */
     public String getResourceBundleName() {
         return _bundleName;

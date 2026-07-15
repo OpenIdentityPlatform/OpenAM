@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.rest.service;
@@ -32,7 +33,7 @@ public class XACMLServiceEndpointApplication extends ServiceEndpointApplication 
             "application/xacml+xml; version=3.0", "XACML v3.0 XML");
 
     /**
-     * {@inheritDoc}
+     * Constructs a new XACMLServiceEndpointApplication.
      * Sets the default media type as "application/json".
      */
     public XACMLServiceEndpointApplication() {
@@ -42,7 +43,7 @@ public class XACMLServiceEndpointApplication extends ServiceEndpointApplication 
 
     /**
      * Returns the XACML router.
-     * @return
+     * @return the XACML router
      */
     protected Restlet getRouter() {
         return InjectorHolder.getInstance(Key.get(Router.class, Names.named("XacmlRouter")));

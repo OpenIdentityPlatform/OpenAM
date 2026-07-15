@@ -29,6 +29,7 @@
 /*
  * Portions Copyrighted 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.shared.locale;
 
@@ -377,7 +378,7 @@ public class Locale {
 
     /**
      * Gets Date object from date string with specified locale. Syntax of date
-     * string is defined in amUser_&lt;locale> properties file.
+     * string is defined in amUser_&lt;locale&gt; properties file.
      * 
      * @param dateString
      *            date string
@@ -677,7 +678,7 @@ public class Locale {
      * @param enc
      *            the encoding format.
      * @return the encoded string.
-     * @throws UnsupportedEncodingException
+     * @throws UnsupportedEncodingException if the named encoding is not supported.
      */
     public static String URLEncodeField(String input, String enc)
             throws UnsupportedEncodingException {
@@ -711,7 +712,7 @@ public class Locale {
     }
 
     /**
-     * This method is replacement function for <code>URLEncoder<code> Function
+     * This method is replacement function for <code>URLEncoder</code> Function
      * URL encoder function converts input string into <code>URLencoded</code>
      * byte stream after converting Unicode string into bytes using native
      * encoding. The <code>URLEncoder</code> does not work for Sun Java System

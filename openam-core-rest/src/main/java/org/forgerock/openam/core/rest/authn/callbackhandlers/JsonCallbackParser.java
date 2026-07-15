@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.core.rest.authn.callbackhandlers;
@@ -43,7 +44,6 @@ public interface JsonCallbackParser<T extends Callback> {
      * Converts the given Callback into JSON format.
      *
      * The JSON representation of the Callback MUST be in the following form:
-     * <p></p>
      * <code>
      * {
      *      type : "NameCallback",
@@ -61,7 +61,6 @@ public interface JsonCallbackParser<T extends Callback> {
      *      ]
      * }
      * </code>
-     * <p></p>
      *
      * The type field MUST be the name of the Callback class.
      * Output fields detail information that the client can use to display to the user.

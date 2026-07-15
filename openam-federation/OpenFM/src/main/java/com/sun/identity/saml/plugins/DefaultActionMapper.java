@@ -25,6 +25,7 @@
  * $Id: DefaultActionMapper.java,v 1.4 2008/08/19 19:12:24 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.plugins;
@@ -81,7 +82,6 @@ public class DefaultActionMapper implements ActionMapper {
      * "urn:com:sun:identity"; and its SubjectConfirmationData contains
      * TEXT node only, then the method returns the concatenated string of all
      * the TEXT nodes. Otherwise, it returns null.
-     * <p>
      * @see com.sun.identity.saml.plugins.ActionMapper#getSSOTokenID
      */
     public String getSSOTokenID(AuthorizationDecisionQuery query) {
@@ -105,7 +105,6 @@ public class DefaultActionMapper implements ActionMapper {
      * This method exams the Evidence in the AuthorizationDecisionQuery.
      * It returns the first valid Assertion that contains at least one
      * AuthenticationStatement.
-     * <p>
      * @see com.sun.identity.saml.plugins.ActionMapper#getSSOAssertion
      */
     public Assertion getSSOAssertion(AuthorizationDecisionQuery query,

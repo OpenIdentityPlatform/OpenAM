@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -73,8 +73,8 @@ public class TokenInvalidator {
      * @param clientId The client id.
      * @param userName The username denoting the resource owner id
      * @param authGrantId The auth grant id.
-     * @throws ServerException
-     * @throws NotFoundException
+     * @throws ServerException if an internal server error occurs while invalidating the tokens.
+     * @throws NotFoundException if the realm does not have an OAuth 2.0 provider service.
      */
     public void invalidateTokens(OAuth2Request request, String clientId, String userName,
             String authGrantId) throws  ServerException, NotFoundException {

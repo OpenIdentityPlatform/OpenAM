@@ -25,6 +25,7 @@
  * $Id: ScopingImpl.java,v 1.5 2009/03/12 20:32:41 huacui Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.protocol.impl;
@@ -71,7 +72,7 @@ public class ScopingImpl implements Scoping {
      * Constructor to create the <code>Scoping</code> Object.
      *
      * @param element Document Element of <code>Scoping</code> Object.
-     * @throws SAML2Exception if <code>Scoping<code> cannot be created.
+     * @throws SAML2Exception if <code>Scoping</code> cannot be created.
      */
 
     public ScopingImpl(Element  element) throws SAML2Exception {
@@ -83,7 +84,7 @@ public class ScopingImpl implements Scoping {
      *
      * @param xmlString XML String Representation of <code>Scoping</code>
      *        Object.
-     * @throws SAML2Exception if <code>Scoping<code> cannot be created.
+     * @throws SAML2Exception if <code>Scoping</code> cannot be created.
      */
 
     public ScopingImpl(String xmlString) throws SAML2Exception {

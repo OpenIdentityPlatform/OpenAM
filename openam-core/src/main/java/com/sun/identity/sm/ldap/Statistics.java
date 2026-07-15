@@ -24,6 +24,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted [2010-2012] [ForgeRock AS]
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  */
 package com.sun.identity.sm.ldap;
@@ -90,8 +91,8 @@ public class Statistics implements Serializable {
     
     /**
      * Returns the singleton instance
-     * 
-     * @return 
+     *
+     * @return the singleton Statistics instance
      */
     public static synchronized Statistics getInstance() {
         if (instance == null) {
@@ -298,8 +299,8 @@ public class Statistics implements Serializable {
     
     /**
      * Get the total number of reads record count
-     * 
-     * @return 
+     *
+     * @return the total number of records read
      */
     public int getTotalReadRecordCount() {
         return totalReadRecordCount;

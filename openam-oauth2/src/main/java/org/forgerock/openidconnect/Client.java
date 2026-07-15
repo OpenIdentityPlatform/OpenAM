@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect;
@@ -732,7 +732,7 @@ public class Client extends JsonValue {
 
     /**
      * Sets the id token signed response alg of the OAuth2Client.
-     * <br/>
+     * <br>
      * If the specified idTokenSignedResponseAlgorithm is {@code null} the value is defaulted to 'HS256'.
      *
      * @param idTokenSignedResponseAlgorithm The id token signed response alg.

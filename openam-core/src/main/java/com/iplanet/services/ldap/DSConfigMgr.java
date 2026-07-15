@@ -25,6 +25,7 @@
  * $Id: DSConfigMgr.java,v 1.18 2009/01/28 05:34:49 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.services.ldap;
@@ -141,7 +142,7 @@ public class DSConfigMgr implements IDSConfigMgr {
      * variable.
      * 
      * @return DSConfigMgr The singleton instance.
-     * @throws LDAPServiceException
+     * @throws LDAPServiceException if the configuration manager cannot be initialized.
      */
     public static synchronized DSConfigMgr getDSConfigMgr()
             throws LDAPServiceException {

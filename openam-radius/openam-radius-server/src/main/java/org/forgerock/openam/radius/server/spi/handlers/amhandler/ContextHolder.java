@@ -14,6 +14,7 @@
  * Copyrighted 2015 Intellectual Reserve, Inc (IRI)
  *
  * Portions Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.radius.server.spi.handlers.amhandler;
 
@@ -32,7 +33,6 @@ import com.sun.identity.shared.locale.L10NMessageImpl;
 
 /**
  * Holds server side info for an authentication conversation in progress for a user via a radius client.
- * <p/>
  */
 public class ContextHolder {
 

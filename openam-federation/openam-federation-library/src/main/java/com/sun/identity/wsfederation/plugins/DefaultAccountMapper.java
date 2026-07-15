@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC.
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -95,7 +96,7 @@ public class DefaultAccountMapper {
      * @param nameID <code>NameID</code> object.
      * @param hostEntityID hosted <code>EntityID</code>.
      * @param remoteEntityID remote <code>EntityID</code>.
-     * @exception <code>WSFederationException</code> if any failure.
+     * @exception WSFederationException if any failure.
      */
     protected Map getSearchParameters(NameIdentifier nameID, 
          String realm, String hostEntityID, String remoteEntityID) 

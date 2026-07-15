@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest.service;
@@ -30,7 +30,7 @@ import java.util.Set;
 /**
  * This class is used to create an instance of the Restlet ServerServlet programmatically outside of the Servlet
  * Container.
- * <br/>
+ * <br>
  * This enables the creation of an instance as a delegate that can be passed requests from another Java HttpServlet
  * that is created by the Servlet Container.
  *
@@ -58,7 +58,7 @@ public class RestletServiceServlet extends ServerServlet {
 
     /**
      * Overridden to return the ServiceEndpointApplication class name for the "org.restlet.application" init parameter.
-     * <br/>
+     * <br>
      * All other parameter requests get passed onto the underlying Java HttpServlet.
      *
      * @param name {@inheritDoc}
@@ -94,9 +94,9 @@ public class RestletServiceServlet extends ServerServlet {
     }
 
     /**
-     * Overridden to include the "org.restlet.application" init paramter name.
+     * Overridden to include the "org.restlet.application" init parameter name.
      *
-     * @return {@code}
+     * @return an enumeration of the init parameter names, including the "org.restlet.application" parameter
      */
     @SuppressWarnings("unchecked")
     @Override

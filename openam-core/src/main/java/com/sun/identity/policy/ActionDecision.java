@@ -25,6 +25,7 @@
  * $Id: ActionDecision.java,v 1.5 2008/06/25 05:43:43 qcheng Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.policy;
 
@@ -83,7 +84,7 @@ public class ActionDecision {
     /**
      * Constructor
      * @param actionName name of the action.
-     * @param values a <code>Set></code> of <code>String</code> values for the 
+     * @param values a <code>Set</code> of <code>String</code> values for the
      * action
      * 
      */
@@ -139,7 +140,7 @@ public class ActionDecision {
     /**
      * Gets the action values for the action.  
      *
-     * @return a <code>Set>/code> of String values
+     * @return a <code>Set</code> of String values
      * 
      */
     public Set getValues() {

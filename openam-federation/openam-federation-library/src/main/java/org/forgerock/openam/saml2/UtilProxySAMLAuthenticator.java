@@ -431,7 +431,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
      * Iterates through the RequestedAuthnContext from the Service Provider and
      * check if user has already authenticated with a sufficient authentication
      * level.
-     * <p/>
+     * <p>
      * If RequestAuthnContext is not found in the authenticated AuthnContext
      * then session upgrade will be done .
      *

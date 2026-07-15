@@ -24,13 +24,14 @@
  *
  * $Id: package-info.java,v 1.2 2008/06/25 05:47:08 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /**
  * Provides classes to manage liberty authentication service protocol.
  *
  * 
- * @deprecated since 12.0.0
+ * Deprecated since 12.0.0.
  */
 package com.sun.identity.liberty.ws.authnsvc.protocol;
 

@@ -306,7 +306,8 @@ public class FSIntersiteTransferService extends HttpServlet {
      * Generates <code>AuthnRequest</code> and sends it to <code>IDP</code>.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException,IOException if error occurred
+     * @exception ServletException if error occurred
+     * @exception IOException if error occurred
      */
     public void doGet(
         HttpServletRequest request, 
@@ -506,7 +507,8 @@ public class FSIntersiteTransferService extends HttpServlet {
      * Generates <code>AuthnRequest</code> and sends it to <code>IDP</code>.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException,IOException if error occurred
+     * @exception ServletException if error occurred
+     * @exception IOException if error occurred
      */
     public void doPost(
         HttpServletRequest request, 

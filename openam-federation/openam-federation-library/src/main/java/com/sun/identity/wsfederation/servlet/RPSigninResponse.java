@@ -321,7 +321,7 @@ public class RPSigninResponse extends WSFederationAction {
      *  @param sessionProvider Session provider
      *  @param attrMap the Attribute Map
      *  @param session the valid session object
-     *  @throws com.sun.identity.plugin.session.SessionException 
+     *  @throws com.sun.identity.plugin.session.SessionException if a session error occurs
      */
     public static void setAttrMapInSession(
         SessionProvider sessionProvider,

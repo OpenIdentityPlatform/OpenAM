@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS. All rights reserved.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -37,7 +39,7 @@ public interface AuthenticationStatementsProvider {
      * @param saml2Config The STS-instance-specific SAML2 configurations
      * @param authnContextClassRef The AuthNContext class ref pulled out of the TokenGenerationServiceInvocationState.
      * @return The list of AuthnStatements
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the authentication statements could not be generated
      */
     List<AuthnStatement> get(SAML2Config saml2Config, String authnContextClassRef) throws TokenCreationException;
 }

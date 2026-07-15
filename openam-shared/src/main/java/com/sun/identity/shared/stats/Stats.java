@@ -25,6 +25,7 @@
  * $Id: Stats.java,v 1.5 2008/08/08 00:40:59 ww203982 Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.shared.stats;
@@ -63,10 +64,12 @@ import java.util.ResourceBundle;
  * <p>
  * Allows a uniform interface to statistics information in a uniform format.
  * <code>Stats</code> supports different states of filing stats information:
- * <code>OFF</code>, <code>FILE</code> and <code>CONSOLE</code>. <BR>
- * <li> <code>OFF</code> statistics is turned off.
- * <li> <code>FILE</code> statistics information is written to a file
- * <li> <code>CONSOLE</code> statistics information is written on console
+ * <code>OFF</code>, <code>FILE</code> and <code>CONSOLE</code>.
+ * <ul>
+ * <li> <code>OFF</code> statistics is turned off.</li>
+ * <li> <code>FILE</code> statistics information is written to a file</li>
+ * <li> <code>CONSOLE</code> statistics information is written on console</li>
+ * </ul>
  * <p>
  * Stats service uses the property file, <code>AMConfig.properties</code>, to
  * set the default stats level and the output directory where the stats files
@@ -418,12 +421,9 @@ public class Stats implements ShutdownListener {
      *            <p>
      *            <code>Stats.OFF</code>
      *            <p>
-     *            <p>
      *            <code>Stats.FILE</code>
      *            <p>
-     *            <p>
      *            <code>Stats.CONSOLE</code>
-     *            <p>
      */
     public void setStats(int statsType) {
         switch (statsType) {

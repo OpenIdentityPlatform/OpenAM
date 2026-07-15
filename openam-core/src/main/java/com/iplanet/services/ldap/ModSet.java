@@ -25,6 +25,7 @@
  * $Id: ModSet.java,v 1.4 2009/01/28 05:34:49 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.services.ldap;
@@ -132,15 +133,13 @@ public class ModSet implements java.io.Serializable {
     /**
      * Specifies another modification to be added to the set of modifications.
      * @param op the type of modification to make. This can be one of the following:
-     *   <P>
      *   <UL>
      *   <LI><CODE>LDAPModification.ADD</CODE> (the value should be added to the attribute)
      *   <LI><CODE>LDAPModification.DELETE</CODE> (the value should be removed from the attribute)
      *   <LI><CODE>LDAPModification.REPLACE</CODE> (the value should replace the existing value of the attribute)
-     *   </UL><P>
+     *   </UL><p>
      * If you are working with a binary value (not a string value), you need to bitwise OR (|) the
      * modification type with <CODE>LDAPModification.BVALUES</CODE>.
-     * <P>
      *
      * @param attr the attribute (possibly with values) to modify
      */

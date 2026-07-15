@@ -24,6 +24,7 @@
  *
  * $Id: Evidence.java,v 1.2 2008/06/25 05:47:41 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -38,23 +39,22 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * The <code>Evidence</code> element contains one or more assertions or
  * assertion references that the SAML authority relied on in issuing the
  * authorization decision. It has the <code>EvidenceType</code> complex type.
- * <p>
  * <pre>
- * &lt;complexType name="EvidenceType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice maxOccurs="unbounded">
+ * &lt;complexType name="EvidenceType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice maxOccurs="unbounded"&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *         AssertionIDRef"/>
+ *         AssertionIDRef"/&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *         AssertionURIRef"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Assertion"/>
+ *         AssertionURIRef"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Assertion"/&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}
- *         EncryptedAssertion"/>
- *       &lt;/choice>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *         EncryptedAssertion"/&gt;
+ *       &lt;/choice&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  *
  * 

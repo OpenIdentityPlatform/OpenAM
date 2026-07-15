@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -94,7 +95,7 @@ public class L10NMessageImpl extends Exception implements L10NMessage {
     /**
      * Returns localized error message.
      * 
-     * @param locale
+     * @param locale the locale in which to render the message.
      * @return localized error message.
      * @see #L10NMessageImpl(String, String, Object[])
      */

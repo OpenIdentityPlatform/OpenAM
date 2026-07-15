@@ -25,6 +25,7 @@
  * $Id: AccountUtils.java,v 1.2 2008/06/25 05:47:45 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.common;
@@ -43,7 +44,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
 /**
  * This class <code>AccountUtils</code> is a utility class for
- * setting and retrieving the <code>SAML2<code> account federation information.
+ * setting and retrieving the <code>SAML2</code> account federation information.
  */
 
 public class AccountUtils {

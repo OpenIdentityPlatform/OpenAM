@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.uma;
@@ -34,7 +35,7 @@ public final class PolicySearch {
     /**
      *
      *
-     * @param policies
+     * @param policies the collection of UMA policies this search is based on
      */
     public PolicySearch(Collection<UmaPolicy> policies) {
         this.policies = policies;
@@ -51,9 +52,9 @@ public final class PolicySearch {
     /**
      *
      *
-     * @param field
-     * @param value
-     * @return
+     * @param field the JSON pointer identifying the field to match on
+     * @param value the value the field must equal
+     * @return a new {@code PolicySearch} containing the policies whose field matches the value
      */
     public PolicySearch equals(JsonPointer field, Object value) {
         PolicySearch policySearch = new PolicySearch();
@@ -84,7 +85,7 @@ public final class PolicySearch {
     /**
      *
      *
-     * @return
+     * @return the collection of UMA policies held by this search
      */
     public Collection<UmaPolicy> getPolicies() {
         return policies;
@@ -93,8 +94,8 @@ public final class PolicySearch {
     /**
      *
      *
-     * @param search
-     * @return
+     * @param search the search whose policies should be combined with this one
+     * @return a new {@code PolicySearch} containing the union of both sets of policies
      */
     public PolicySearch combine(PolicySearch search) {
         HashSet<UmaPolicy> combinedPolicies = new HashSet<UmaPolicy>(this.policies);
@@ -105,8 +106,8 @@ public final class PolicySearch {
     /**
      *
      *
-     * @param search
-     * @return
+     * @param search the search whose policies should be removed from this one
+     * @return a new {@code PolicySearch} with the given search's policies removed
      */
     public PolicySearch remove(PolicySearch search) {
         Set<UmaPolicy> subPolicies = new HashSet<UmaPolicy>(this.policies);

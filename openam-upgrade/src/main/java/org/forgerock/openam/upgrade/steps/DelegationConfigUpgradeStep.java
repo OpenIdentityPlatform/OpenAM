@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.upgrade.steps;
 
@@ -58,7 +58,7 @@ import com.sun.identity.sm.ServiceConfigManager;
  * Upgrade step looks at the delegation XML (amDelegation.xml) and compares it against the current service model to
  * identify any additions. Additions include new permission or privilege entries, or additional permissions that have
  * been added to a preexisting privilege. These additions are then reflected in the service model during upgrade.
- * <p />
+ * <p>
  * This upgrade logic makes assumptions that the XML is in a consistent format as well as the the service model. It also
  * makes an assumption that for each listed permission under a privilege that there is a corresponding permission entry.
  *

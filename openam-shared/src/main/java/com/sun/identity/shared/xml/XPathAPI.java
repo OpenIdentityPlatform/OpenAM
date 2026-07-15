@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.shared.xml;
@@ -71,7 +72,7 @@ public class XPathAPI {
    * @param str XPath string.
    * @return The first node found that matches the XPath, or null.
    *
-   * @throws XPathException
+   * @throws XPathException if the XPath expression cannot be evaluated.
    */
    public static Node selectSingleNode(Node doc, String str) throws XPathException {
        return selectSingleNode(doc, str, doc);
@@ -85,7 +86,7 @@ public class XPathAPI {
    * @param nsNode Node where namespace prefix in XPath is resolved from.
    * @return The first node found that matches the XPath, or null.
    *
-   * @throws XPathException
+   * @throws XPathException if the XPath expression cannot be evaluated.
    */
    public static Node selectSingleNode(Node doc, String str, Node nsNode) throws XPathException {
        SimpleNamespaceContext nsctx = new SimpleNamespaceContext(nsNode);
@@ -100,7 +101,7 @@ public class XPathAPI {
    * @param nsctx Namespace where the prefix in XPath is resolved from.
    * @return The first node found that matches the XPath, or null.
    *
-   * @throws XPathException
+   * @throws XPathException if the XPath expression cannot be evaluated.
    */
    public static Node selectSingleNode(Node doc, String str, NamespaceContext nsctx) throws XPathException {
        NodeList nl = selectNodeList(doc, str, nsctx);
@@ -118,7 +119,7 @@ public class XPathAPI {
    * @param str XPath string.
    * @return a NodeList of the matched result.
    *
-   * @throws XPathException
+   * @throws XPathException if the XPath expression cannot be evaluated.
    */
    public static NodeList selectNodeList(Node doc, String str) throws XPathException {
        return selectNodeList(doc, str, doc);
@@ -132,7 +133,7 @@ public class XPathAPI {
    * @param nsNode Node where namespace prefix in XPath is resolved from.
    * @return a NodeList of the matched result.
    *
-   * @throws XPathException
+   * @throws XPathException if the XPath expression cannot be evaluated.
    */
    public static NodeList selectNodeList(Node doc, String str, Node nsNode) throws XPathException {
        SimpleNamespaceContext nsctx = new SimpleNamespaceContext(nsNode);
@@ -148,7 +149,7 @@ public class XPathAPI {
    * @param nsctx Namespace where the prefix in XPath is resolved from.
    * @return a NodeList.
    *
-   * @throws XPathException
+   * @throws XPathException if the XPath expression cannot be evaluated.
    */
    public static NodeList selectNodeList(Node doc, String str, NamespaceContext nsctx) throws XPathException {
        XPathFactory xpf = xpathFactoryCache.getInstanceForCurrentThread();

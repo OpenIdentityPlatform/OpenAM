@@ -24,6 +24,7 @@
  *
  * $Id: FSRealmAttributePlugin.java,v 1.2 2008/06/25 05:46:55 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -37,7 +38,6 @@ import java.util.List;
  * AttributeStatements into the <code>Assertion</code> by the Identity Provider
  * during the Single Sign-on process. The implementation of this plugin
  * must return list of SAML <code>AttributeStatement</code>s.
- * </p>
  * 
  */ 
 public interface FSRealmAttributePlugin {
@@ -49,7 +49,7 @@ public interface FSRealmAttributePlugin {
      * @param remoteProviderID Remote ProviderID.
      * @param subject <code>FSSubject</code> to use in the statements
      * @param token session object
-     * @return List A list of SAML <code>AttributeStatement<code>s.
+     * @return List A list of SAML <code>AttributeStatement</code>s.
      */
     public List getAttributeStatements(
         String realm,

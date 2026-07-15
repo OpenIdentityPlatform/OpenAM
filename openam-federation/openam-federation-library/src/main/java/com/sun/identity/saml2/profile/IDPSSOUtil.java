@@ -2914,7 +2914,7 @@ public class IDPSSOUtil {
      * @param realm       the realm name.
      * @param idpEntityID the identity provider entity identifier
      * @param response    the SAMLv2 <code>Response</code>
-     * @throws <code>SAML2Exception</code> if there is an
+     * @throws SAML2Exception if there is an
      *                                     error signing the response.
      */
     private static void signResponse(String realm, String idpEntityID,

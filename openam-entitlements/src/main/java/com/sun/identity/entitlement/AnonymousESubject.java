@@ -23,6 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: AnonymousESubject.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.entitlement;
 
@@ -58,8 +59,7 @@ public class AnonymousESubject {
      * @param environment Environment parameters.
      * @return <code>SubjectDecision</code> of
      * <code>ESubject</code> evaluation
-     * @throws com.sun.identity.entitlement,  EntitlementException in case
-     * of any error
+     * @throws EntitlementException in case of any error
      */
     public SubjectDecision evaluate(
             Subject subject,

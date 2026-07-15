@@ -12,13 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.cts.monitoring;
 
 /**
  * A data structure for storing monitoring information about CTS connections.
- * <br/>
+ * <br>
  * The CTS will use an instance of this data structure to store information about connection attempts
  * and the CTS monitoring framework will us the same instance to pull information out to send to clients
  * as monitoring requests are made.

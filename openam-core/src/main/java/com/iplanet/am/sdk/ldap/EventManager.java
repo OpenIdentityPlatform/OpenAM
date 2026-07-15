@@ -25,6 +25,7 @@
  * $Id: EventManager.java,v 1.7 2009/01/28 05:34:48 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk.ldap;
@@ -53,7 +54,6 @@ import org.forgerock.opendj.ldap.SearchScope;
  * instantiated directly. It is only instantiated when an instance of
  * AMCacheManager is created and since AMCacheManager class is a singleton it is
  * guaranted to have only one instance of this class.
- * <p>
  */
 class EventManager {
     protected static final int EVENT_SCOPE = SearchScope.WHOLE_SUBTREE.intValue();

@@ -24,6 +24,7 @@
  *
  * $Id: FSResponse.java,v 1.2 2008/06/25 05:46:45 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.message;
@@ -514,7 +515,7 @@ public class FSResponse extends Response {
      * Signs the Response.
      *
      * @param certAlias the Certificate Alias.
-     * @throws XMLSignatureException if <code>FSAuthnRequest</code>
+     * @throws SAMLException if <code>FSAuthnRequest</code>
      *         cannot be signed.
      */
     public void signXML(String certAlias) throws SAMLException {

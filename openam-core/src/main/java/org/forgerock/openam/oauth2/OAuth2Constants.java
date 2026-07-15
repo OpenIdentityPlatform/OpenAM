@@ -258,7 +258,7 @@ public class OAuth2Constants {
     /**
      * 11.3.2. Initial Registry Contents
      *
-     * @see <a href="">11.3. The OAuth Authorization Endpoint Response Type
+     * @see <a href="http://tools.ietf.org/html/rfc6749#section-11.3">11.3. The OAuth Authorization Endpoint Response Type
      *      Registry</a>
      */
     public static class AuthorizationEndpoint {
@@ -342,7 +342,7 @@ public class OAuth2Constants {
     public static class Bearer {
         /**
          * 5.2.1. The "Bearer" Authentication Scheme
-         * <p/>
+         * <p>
          * Authentication Scheme Name:
          */
         public static final String BEARER = "Bearer";
@@ -385,7 +385,6 @@ public class OAuth2Constants {
 
         /**
          * Mac
-         * <p/>
          *
          * <pre>
          *  Authorization: MAC id="h480djs93hd8",
@@ -732,10 +731,10 @@ public class OAuth2Constants {
          * This optional parameter indicates whether the user should be prompted
          * for re-authentication and consent to grant account access to your
          * application each time he tries to complete a particular action.
-         * <p/>
+         * <p>
          * The default value is auto, which indicates that a user would only need
          * to grant access the first time he tried to access a protected resource.
-         * <p/>
+         * <p>
          * The parameter value may contain a combination of the following values
          * separated by spaces:
          * <ul>

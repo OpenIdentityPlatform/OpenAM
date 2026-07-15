@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click;
 
@@ -51,7 +52,7 @@ public class Context {
 
     // -------------------------------------------------------------- Constants
 
-    /** The user's session Locale key: &nbsp; <tt>locale</tt>. */
+    /** The user's session Locale key: &nbsp; <code>locale</code>. */
     public static final String LOCALE = "locale";
 
     /**
@@ -170,12 +171,12 @@ public class Context {
      * false otherwise. Unlike {@link #getThreadLocalContext()} this method
      * can safely be used and will not throw an exception if Context is not
      * available on the current thread.
-     * <p/>
+     * <p>
      * This method is very useful inside a {@link Control} constructor which
      * might need access to the Context. As Controls could potentially be
      * instantiated during Click startup (in order to deploy their resources),
      * this check can be used to determine whether Context is available or not.
-     * <p/>
+     * <p>
      * For example:
      *
      * <pre class="prettyprint">
@@ -254,7 +255,7 @@ public class Context {
     /**
      * Return the page resource path from the request. For example:
      * <pre class="codeHtml">
-     * <span class="blue">http://www.mycorp.com/banking/secure/login.htm</span>  ->  <span class="red">/secure/login.htm</span> </pre>
+     * <span class="blue">http://www.mycorp.com/banking/secure/login.htm</span>  -&gt;  <span class="red">/secure/login.htm</span> </pre>
      *
      * @return the page resource path from the request
      */
@@ -292,18 +293,18 @@ public class Context {
 
     /**
      * Return true is this is an Ajax request, false otherwise.
-     * <p/>
-     * An Ajax request is identified by the presence of the request <tt>header</tt>
-     * or request <tt>parameter</tt>: "<tt>X-Requested-With</tt>".
-     * "<tt>X-Requested-With</tt>" is the de-facto standard identifier used by
+     * <p>
+     * An Ajax request is identified by the presence of the request <code>header</code>
+     * or request <code>parameter</code>: "<code>X-Requested-With</code>".
+     * "<code>X-Requested-With</code>" is the de-facto standard identifier used by
      * Ajax libraries.
-     * <p/>
-     * <b>Note:</b> incoming requests that contains a request <tt>parameter</tt>
-     * "<tt>X-Requested-With</tt>" will result in this method returning true, even
-     * though the request itself was not initiated through a <tt>XmlHttpRequest</tt>
+     * <p>
+     * <b>Note:</b> incoming requests that contains a request <code>parameter</code>
+     * "<code>X-Requested-With</code>" will result in this method returning true, even
+     * though the request itself was not initiated through a <code>XmlHttpRequest</code>
      * object. This allows one to programmatically enable Ajax requests. A common
      * use case for this feature is when uploading files through an IFrame element.
-     * By specifying "<tt>X-Requested-With</tt>" as a request parameter the IFrame
+     * By specifying "<code>X-Requested-With</code>" as a request parameter the IFrame
      * request will be handled like a normal Ajax request.
      *
      * @return true if this is an Ajax request, false otherwise
@@ -360,9 +361,9 @@ public class Context {
 
     /**
      * Return the named request parameter. This method supports
-     * <tt>"multipart/form-data"</tt> POST requests and should be used in
-     * preference to the <tt>HttpServletRequest</tt> method
-     * <tt>getParameter()</tt>.
+     * <code>"multipart/form-data"</code> POST requests and should be used in
+     * preference to the <code>HttpServletRequest</code> method
+     * <code>getParameter()</code>.
      *
      * @see org.apache.click.control.Form#onProcess()
      * @see #isMultipartRequest()
@@ -385,9 +386,9 @@ public class Context {
      * Returns an array of String objects containing all of the values the given
      * request parameter has, or null if the parameter does not exist.
      *
-     * @param name a <tt>String</tt> containing the name of the parameter whose
+     * @param name a <code>String</code> containing the name of the parameter whose
      *     value is requested
-     * @return an array of <tt>String</tt> objects containing the parameter's values
+     * @return an array of <code>String</code> objects containing the parameter's values
      */
     public String[] getRequestParameterValues(String name) {
         if (name == null) {
@@ -401,10 +402,10 @@ public class Context {
 
     /**
      * Return the named session attribute, or null if not defined.
-     * <p/>
+     * <p>
      * If the session is not defined this method will return null, and a
      * session will not be created.
-     * <p/>
+     * <p>
      * This method supports {@link FlashAttribute} which when accessed are then
      * removed from the session.
      *
@@ -429,7 +430,7 @@ public class Context {
 
     /**
      * This method will set the named object in the HttpSession.
-     * <p/>
+     * <p>
      * This method will create a session if one does not already exist.
      *
      * @param name the storage name for the object in the session
@@ -472,7 +473,7 @@ public class Context {
 
     /**
      * This method will set the named object as a flash HttpSession object.
-     * <p/>
+     * <p>
      * The flash object will exist in the session until it is accessed once,
      * and then removed. Flash objects are typically used to display a message
      * once.
@@ -506,7 +507,6 @@ public class Context {
 
     /**
      * Sets the given cookie value in the servlet response with the path "/".
-     * <p/>
      * @see ClickUtils#setCookie(HttpServletRequest, HttpServletResponse, String, String, int, String)
      *
      * @param name the cookie name
@@ -539,7 +539,7 @@ public class Context {
 
     /**
      * Return a new Page instance for the given path.
-     * <p/>
+     * <p>
      * This method can be used to create a target page for the
      * {@link org.apache.click.Page#setForward(org.apache.click.Page)}, for example:
      *
@@ -549,7 +549,7 @@ public class Context {
      *
      * setForward(userEdit); </pre>
      *
-     * The given page path must start with a <tt>'/'</tt>.
+     * The given page path must start with a <code>'/'</code>.
      *
      * @param path the Page path as configured in the click.xml file
      * @return a new Page object
@@ -569,7 +569,7 @@ public class Context {
 
     /**
      * Return a new Page instance for the given class.
-     * <p/>
+     * <p>
      * This method can be used to create a target page for the
      * {@link org.apache.click.Page#setForward(org.apache.click.Page)}, for example:
      *
@@ -601,7 +601,7 @@ public class Context {
     }
 
     /**
-     * Return the page <tt>Class</tt> for the given path.
+     * Return the page <code>Class</code> for the given path.
      *
      * @param path the page path
      * @return the page class for the given path
@@ -614,7 +614,7 @@ public class Context {
 
     /**
      * Return the Click application mode value: &nbsp;
-     * <tt>["production", "profile", "development", "debug", "trace"]</tt>.
+     * <code>["production", "profile", "development", "debug", "trace"]</code>.
      *
      * @return the application mode value
      */
@@ -624,7 +624,7 @@ public class Context {
 
     /**
      * Return the Click application charset or ISO-8859-1 if not is defined.
-     * <p/>
+     * <p>
      * The charset is defined in click.xml through the charset attribute
      * on the click-app element.
      *
@@ -660,11 +660,11 @@ public class Context {
     }
 
     /**
-     * Returns a map of <tt>FileItem arrays</tt> keyed on request parameter
+     * Returns a map of <code>FileItem arrays</code> keyed on request parameter
      * name for "multipart" POST requests (file uploads). Thus each map entry
-     * will consist of one or more <tt>FileItem</tt> objects.
+     * will consist of one or more <code>FileItem</code> objects.
      *
-     * @return map of <tt>FileItem arrays</tt> keyed on request parameter name
+     * @return map of <code>FileItem arrays</code> keyed on request parameter name
      * for "multipart" POST requests
      */
     public Map<String, FileItem[]> getFileItemMap() {
@@ -675,7 +675,7 @@ public class Context {
      * Returns the value of a request parameter as a FileItem, for
      * "multipart" POST requests (file uploads), or null if the parameter
      * is not found.
-     * <p/>
+     * <p>
      * If there were multivalued parameters in the request (ie two or more
      * file upload fields with the same name), the first fileItem
      * in the array is returned.
@@ -702,14 +702,14 @@ public class Context {
 
     /**
      * Return the users Locale.
-     * <p/>
+     * <p>
      * If the users Locale is stored in their session this will be returned.
      * Else if the click-app configuration defines a default Locale this
      * value will be returned, otherwise the request's Locale will be returned.
-     * <p/>
+     * <p>
      * To override the default request Locale set the users Locale using the
      * {@link #setLocale(Locale)} method.
-     * <p/>
+     * <p>
      * Pages and Controls obtain the users Locale using this method.
      *
      * @return the users Locale in the session, or if null the request Locale
@@ -733,7 +733,7 @@ public class Context {
     /**
      * This method stores the given Locale in the users session. If the given
      * Locale is null, the "locale" attribute will be removed from the session.
-     * <p/>
+     * <p>
      * The Locale object is stored in the session using the {@link #LOCALE}
      * key.
      *
@@ -760,10 +760,10 @@ public class Context {
     /**
      * Return a rendered Velocity template and model for the given
      * class and model data.
-     * <p/>
-     * This method will merge the class <tt>.htm</tt> Velocity template and
+     * <p>
+     * This method will merge the class <code>.htm</code> Velocity template and
      * model data using the applications Velocity Engine.
-     * <p/>
+     * <p>
      * An example of the class template resolution is provided below:
      * <pre class="codeConfig">
      * <span class="cm">// Full class name</span>
@@ -800,7 +800,7 @@ public class Context {
 
     /**
      * Return a rendered Velocity template and model data.
-     * <p/>
+     * <p>
      * Example method usage:
      * <pre class="codeJava">
      * <span class="kw">public String</span> toString() {

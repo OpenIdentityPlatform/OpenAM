@@ -352,7 +352,8 @@ public class FSReturnLogoutServlet extends HttpServlet {
      * @param isRemoteIDP whether the remote provider is an IDP or not
      * @return <code>true</code> if the signature is verified; <code>null</code>
      *  otherwise.
-     * @exception SAMLException, FSException
+     * @exception SAMLException if a SAML error occurs
+     * @exception FSException if a federation error occurs
      */
     private boolean verifyResponseSignature(
         HttpServletRequest request,

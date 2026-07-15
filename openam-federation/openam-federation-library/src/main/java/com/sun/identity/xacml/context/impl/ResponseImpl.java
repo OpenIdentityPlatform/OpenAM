@@ -24,6 +24,7 @@
  *
  * $Id: ResponseImpl.java,v 1.4 2008/11/10 22:57:05 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context.impl;
@@ -52,15 +53,15 @@ import org.w3c.dom.NodeList;
  * one or more <code>Result</code>s issuded by authorization authority.
  *
  *
- * <p/>
+ * <p>
  * schema:
  * <pre>
- *      &lt;xs:complexType name="ResponseType">
- *          &lt;xs:sequence>
+ *      &lt;xs:complexType name="ResponseType"&gt;
+ *          &lt;xs:sequence&gt;
  *              &lt;xs:element ref="xacml-context:Result" 
- *                      maxOccurs="unbounded"/>
- *          &lt;xs:sequence>
- *      &lt;xs:complexType>
+ *                      maxOccurs="unbounded"/&gt;
+ *          &lt;xs:sequence&gt;
+ *      &lt;xs:complexType&gt;
  * </pre>
  */
 public class ResponseImpl implements Response {
@@ -79,7 +80,7 @@ public class ResponseImpl implements Response {
      * Constructs a <code>Response</code> object from an XML string
      *
      * @param xml string representing a <code>Response</code> object
-     * @throws SAMLException if the XML string could not be processed
+     * @throws XACMLException if the XML string could not be processed
      */
     public ResponseImpl(String xml) throws XACMLException {
         Document document = XMLUtils.toDOMDocument(xml, XACMLSDKUtils.debug);
@@ -102,7 +103,7 @@ public class ResponseImpl implements Response {
      * @param element XML DOM element representing a <code>Response</code> 
      * object
      *
-     * @throws SAMLException if the DOM element could not be processed
+     * @throws XACMLException if the DOM element could not be processed
      */
     public ResponseImpl(Element element) throws XACMLException {
         processElement(element);
@@ -241,7 +242,7 @@ public class ResponseImpl implements Response {
      * @param element XML DOM element representing a <code>Response</code> 
      * object
      *
-     * @throws SAMLException if the DOM element could not be processed
+     * @throws XACMLException if the DOM element could not be processed
      */
     private void processElement(Element element) throws XACMLException {
         if (element == null) {

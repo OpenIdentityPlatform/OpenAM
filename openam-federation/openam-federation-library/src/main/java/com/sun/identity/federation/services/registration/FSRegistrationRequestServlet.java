@@ -408,7 +408,8 @@ public class FSRegistrationRequestServlet extends HttpServlet {
      * @return <code>true</code> if the signature is verified;
      *  <code>false</code>
      *  otherwise
-     * @exception SAMLException, FSException if an error occurred during
+     * @exception SAMLException if an error occurred during
+     * @exception FSException if an error occurred during
      *  the process
      */
     private boolean verifyRegistrationSignature(

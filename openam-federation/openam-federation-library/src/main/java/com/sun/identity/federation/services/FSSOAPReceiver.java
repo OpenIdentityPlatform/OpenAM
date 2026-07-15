@@ -135,7 +135,8 @@ public class FSSOAPReceiver extends HttpServlet {
      * Handles post request.
      * @param request http request object
      * @param response http response object
-     * @exception ServletException, IOException if error occurrs.
+     * @exception ServletException if error occurrs.
+     * @exception java.io.IOException if error occurrs.
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response)
         throws jakarta.servlet.ServletException, java.io.IOException
@@ -1467,7 +1468,7 @@ public class FSSOAPReceiver extends HttpServlet {
      * @param msg request soap message
      * @param cert Certificate to be used in verifying the signature.
      * @return boolean <code>true</code> if signature verfication successful;
-     *  otherwise return <code>false.
+     *  otherwise return <code>false</code>.
      */
     protected boolean verifyRequestSignature(
         Element elt, 
@@ -1504,7 +1505,8 @@ public class FSSOAPReceiver extends HttpServlet {
      * @param id the value of the id attributer to be signed
      * @param hostedConfig hosted provider's extended meta
      * @return SOAPMessage the signed response message
-     * @exception SAMLException, FSMsgException if error occurrs
+     * @exception SAMLException if error occurrs
+     * @exception FSMsgException if error occurrs
      */
     protected SOAPMessage signResponse (
         SOAPMessage msg,

@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC.
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -66,7 +67,7 @@ public class IDPPExtensionContainer extends IDPPBaseContainer {
       * Gets the container extension jaxb object.
       * @param userMap user map
       * @return ExtensionElement JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPContainers:getContainerObject:Init");
@@ -172,7 +173,7 @@ public class IDPPExtensionContainer extends IDPPBaseContainer {
       * @param select Select expression.
       * @param data list of new data objects.
       * @return Attribute key value pair for the given select.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Map getDataMapForSelect(String select, List data) 
      throws IDPPException {
@@ -228,7 +229,7 @@ public class IDPPExtensionContainer extends IDPPBaseContainer {
       * Gets the PP ISExtension element.
       * @param attrName Extension attribute name.
       * @param attrValue Extension attribute value.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */ 
      private PPISExtensionElement getISExtension(
          String attrName, String attrValue) throws IDPPException {

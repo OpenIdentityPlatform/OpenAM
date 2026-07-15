@@ -1656,7 +1656,8 @@ public class FSSingleLogoutHandler {
      * @param idAttrName id attribute name
      * @param id id attribute value
      * @return the signed logout request
-     * @exception SAMLException, FSMsgException if an error occurred during
+     * @exception SAMLException if an error occurred during
+     * @exception FSMsgException if an error occurred during
      *  the process
      */
     private SOAPMessage signLogoutRequest(

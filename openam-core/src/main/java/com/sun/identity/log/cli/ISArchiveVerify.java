@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -99,7 +100,7 @@ public class ISArchiveVerify{
     /**
      * Main method for the class. It drives verify procedure by invoking 
      * runCommand method.
-     * @param args
+     * @param args the command line arguments
      * @throws Exception if it fails to processing verification.
      */
     public static void main(String[] args) throws Exception {

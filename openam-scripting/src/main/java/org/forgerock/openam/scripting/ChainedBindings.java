@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.scripting;
@@ -31,7 +32,7 @@ import java.util.Set;
  * the current scope first, and then in the parent scope. Setting a variable always does so in the current scope.
  * Each scope bindings object is held as a reference to the original bindings objects passed to the constructor.
  * Therefore any changes made to a variable will be reflected in the current scope.
- * <p/>
+ * <p>
  * Note: chained scopes effectively act as a linked list. Therefore performance for getting/setting variables will
  * decrease roughly linearly with the number of chained scopes (assuming constant access times within each individual
  * scope).

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -888,8 +889,8 @@ public interface AMOrganization extends AMObject {
      *            attribute-value pairs to be set
      * @param serviceNameAndAttrs
      *            service name and attribute map where the map is like this:
-     *            <code>&lt;serviceName>&lt;AttrMap>
-     *      (attrMap=&lt;attrName>&lt;Set of attrvalues>)</code>
+     *            <code>&lt;serviceName&gt;&lt;AttrMap&gt;
+     *      (attrMap=&lt;attrName&gt;&lt;Set of attrvalues&gt;)</code>
      * @return <code>AMGroup</code> object of newly created group.
      * @throws AMException
      *             if an error is encountered when trying to access/retrieve
@@ -1116,15 +1117,15 @@ public interface AMOrganization extends AMObject {
             SSOException;
 
     /**
-     * Creates dynamic group. Takes <code>serviceNameAndAttr<code> map
+     * Creates dynamic group. Takes <code>serviceNameAndAttr</code> map
      * so that services can be assigned to the group which is just created.
      *
      * @param name of group to be created
      * @param attributes to be set in group 
      * @param serviceNameAndAttrs service name and attribute map where the map
      *        is like this:
-     * <code>&lt;serviceName>&lt;AttrMap>
-     *       (attrMap=&lt;attrName>&lt;Set of attrvalues>)</code>
+     * <code>&lt;serviceName&gt;&lt;AttrMap&gt;
+     *       (attrMap=&lt;attrName&gt;&lt;Set of attrvalues&gt;)</code>
      * @return <code>AMGroup</code> object of newly created group.
      * @throws AMException if an error is encountered when trying to
      *         access/retrieve data from the data store.
@@ -1351,8 +1352,8 @@ public interface AMOrganization extends AMObject {
      *            to be set in group node.
      * @param serviceNameAndAttrs
      *            service name and attribute map where the map is like this:
-     *            <code>&lt;serviceName>&lt;AttrMap>
-     *              (attrMap=&lt;attrName>&lt;Set of attrvalues>)</code>.
+     *            <code>&lt;serviceName&gt;&lt;AttrMap&gt;
+     *              (attrMap=&lt;attrName&gt;&lt;Set of attrvalues&gt;)</code>.
      * @return <code>AMGroup</code> object of newly created group.
      * @throws AMException
      *             if an error is encountered when trying to access/retrieve
@@ -2009,7 +2010,9 @@ public interface AMOrganization extends AMObject {
      *            search template.
      * @return <code>AMUser</code> object of user found.
      * @throws AMException
+     *             if an error occurs while retrieving the user
      * @throws SSOException
+     *             if the single sign-on token is invalid or has expired
      */
     AMUser getUser(String uid, String userSearchTemplate) throws AMException,
             SSOException;

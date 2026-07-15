@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2023-2025 3A Systems LLC
+ * Portions Copyrighted 2023-2026 3A Systems LLC
  */
 package com.sun.identity.authentication.audit;
 
@@ -141,7 +141,7 @@ public class AuthenticationProcessEventAuditor extends AbstractAuthenticationEve
     /**
      * Log a logout event.
      *
-     * @param token The {@Link SSOToken} of the event.
+     * @param token The {@link SSOToken} of the event.
      */
     public void auditLogout(SSOToken token) {
         String realm = getRealmFromToken(token);

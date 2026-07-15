@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.sms;
@@ -139,7 +139,6 @@ public class SmsSingletonProvider extends SmsResourceProvider {
 
     /**
      * Reads config for the singleton instance referenced, and returns the JsonValue representation.
-     * {@inheritDoc}
      */
     @Read(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> handleRead(Context serverContext) {
@@ -197,7 +196,6 @@ public class SmsSingletonProvider extends SmsResourceProvider {
 
     /**
      * Updates config for the singleton instance referenced, and returns the JsonValue representation.
-     * {@inheritDoc}
      */
     @Update(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> handleUpdate(Context serverContext,
@@ -225,7 +223,6 @@ public class SmsSingletonProvider extends SmsResourceProvider {
 
     /**
      * Deletes config for the singleton instance referenced.
-     * {@inheritDoc}
      */
     @Delete(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> handleDelete(Context serverContext) {
@@ -270,7 +267,6 @@ public class SmsSingletonProvider extends SmsResourceProvider {
 
     /**
      * Creates config for the singleton instance referenced, and returns the JsonValue representation.
-     * {@inheritDoc}
      */
     @Create(operationDescription = @Operation)
     public Promise<ResourceResponse, ResourceException> handleCreate(Context serverContext,

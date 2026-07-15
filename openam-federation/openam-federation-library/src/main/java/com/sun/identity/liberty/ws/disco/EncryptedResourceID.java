@@ -24,6 +24,7 @@
  *
  * $Id: EncryptedResourceID.java,v 1.4 2008/06/25 05:47:10 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -43,19 +44,18 @@ import com.sun.identity.xmlenc.*;
  * Resource ID element for the Discovery Service.
  * <p>The following schema fragment specifies the expected content within the
  * <code>EncryptedResourceID</code> object.
- * <p>
  * <pre>
- * &lt;xs:element name="EncryptedResourceID" type="EncryptedResourceIDType"/>
- * &lt;complexType name="EncryptedResourceIDType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{http://www.w3.org/2001/04/xmlenc#}EncryptedData"/>
- *         &lt;element ref="{http://www.w3.org/2001/04/xmlenc#}EncryptedKey"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;xs:element name="EncryptedResourceID" type="EncryptedResourceIDType"/&gt;
+ * &lt;complexType name="EncryptedResourceIDType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{http://www.w3.org/2001/04/xmlenc#}EncryptedData"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2001/04/xmlenc#}EncryptedKey"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

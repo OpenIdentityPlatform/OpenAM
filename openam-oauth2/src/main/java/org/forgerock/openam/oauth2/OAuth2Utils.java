@@ -13,7 +13,7 @@
  *
  * Copyright 2012-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corp.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2;
@@ -70,7 +70,7 @@ public class OAuth2Utils {
     /**
      * Gets the deployment URI of the OAuth2 authorization server
      * @param request the request to get the deployment uri of
-     * @return
+     * @return the deployment URI of the OAuth2 authorization server.
      */
     public String getDeploymentURL(HttpServletRequest request){
         String uri = request.getRequestURI();
@@ -91,7 +91,6 @@ public class OAuth2Utils {
     /**
      * Determines if a string is empty. Empty is defined as null or empty
      * string.
-     * <p/>
      *
      * <pre>
      *  OAuth2Utils.isEmpty(null)               = true
@@ -165,16 +164,16 @@ public class OAuth2Utils {
     /**
      * Get the realm from the Attributes first and then look for the realm in
      * the request.
-     * <p/>
+     * <p>
      * Example: Restlet Template populates the realm into the
      * {@link Request#attributes} {@code TemplateRoute route =
      * router.attach("/oauth2/ realm}/authorize", (Restlet)authorization);}
-     * <p/>
+     * <p>
      * Example: Custom code fetches it from the query, the body or more secure
      * from the User Session
      *
-     * @param request
-     * @return
+     * @param request the Restlet request to extract the realm from.
+     * @return the realm associated with the request, or {@code "/"} if none is specified.
      */
     public String getRealm(Request request) {
         HttpServletRequest httpRequest = ServletUtils.getRequest(request);
@@ -230,7 +229,7 @@ public class OAuth2Utils {
 
     /**
      * Get the parameters from the request.
-     * <p/>
+     * <p>
      * If the method is GET then the parameters are fetched from the query If
      * the request has no body/payload then the parameters are fetched from the
      * query If the content type is "application/x-www-form-urlencoded" then the

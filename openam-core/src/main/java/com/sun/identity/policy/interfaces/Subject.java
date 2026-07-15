@@ -25,6 +25,7 @@
  * $Id: Subject.java,v 1.3 2009/05/05 18:27:47 mrudul_uchil Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -70,10 +71,8 @@ public interface Subject extends Cloneable {
      * @param token the <code>SSOToken</code> that will be used
      * to determine the syntax
      *
-     * @return <code>Set</code> of valid names for the user collection.
-     *
      * @exception SSOException if <code>SSOToken</code> is not valid
-     * @exception <code>PolicyException</code> if unable to get the list of 
+     * @exception PolicyException if unable to get the list of
      * valid names.
      *
      * @return <code>Syntax</code> of the values for the <code>Subject</code>

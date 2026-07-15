@@ -25,6 +25,7 @@
  * $Id: DelegationManager.java,v 1.10 2008/06/25 05:43:24 qcheng Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.delegation;
 
@@ -95,7 +96,7 @@ public final class DelegationManager {
      * the specified realm, or <code>DelegationException</code> will be
      * thrown.
      *
-     * @param token  <code.SSOToken</code> of the user delegating privileges.
+     * @param token  <code>SSOToken</code> of the user delegating privileges.
      * @param orgName  The name of the realm for which the user delegates
      *         privileges.
      *

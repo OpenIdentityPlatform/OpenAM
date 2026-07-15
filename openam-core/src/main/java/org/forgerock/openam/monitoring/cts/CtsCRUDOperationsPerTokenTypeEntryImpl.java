@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.monitoring.cts;
@@ -28,7 +29,7 @@ import org.forgerock.openam.utils.Enums;
 /**
  * Implementation of the monitoring endpoints for CTS CRUDL operations (except query and delete)
  * for specific token type.
- * <br/>
+ * <br>
  * This endpoint should not be used for query(list) and delete operations on the CTS. This is because the token
  * type cannot be determined for these operations. For query and delete operations use the
  * {@link CtsCRUDOperationsEntryImpl}.

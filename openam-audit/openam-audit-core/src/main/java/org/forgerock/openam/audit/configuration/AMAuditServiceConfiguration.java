@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.audit.configuration;
 
@@ -25,7 +26,7 @@ import java.util.Set;
  * Audit service configuration specific to OpenAM. An instance of the current state can be retrieved from
  * {@link AuditServiceConfigurationProvider}. The instance retrieved from {@link AuditServiceConfigurationProvider}
  * will represent the current settings in the SMS.
- * <p/>
+ * <p>
  * Each of the Audit Services has its own configuration, which is stored with the Audit Service and can be retrieved
  * in a thread-safe way via its own accessor methods -
  * {@link AMAuditService#isAuditEnabled(String, org.forgerock.openam.audit.AuditConstants.EventName)}.

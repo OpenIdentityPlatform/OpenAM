@@ -13,6 +13,7 @@
  *
  * Copyright 2006-2009 Sun Microsystems Inc.
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.shared.resourcename;
@@ -652,8 +653,10 @@ public abstract class BasePrefixResourceName<T, E extends Exception> implements 
      * one level wild card appears is same resource String.
      * Also removes ( purges) mutiple consecutive delimiters to 1,
      * in the URI.
+     * <ul>
      * <li>So http://xyz.com///abc///d becomes http://xyz.com/abc/d
      * where "/" is the delimiter.</li>
+     * </ul>
      *
      * @param res the prefix resource string to be canonicalized
      * @return the prefix resource string in its canonicalized form.

@@ -25,6 +25,7 @@
  * $Id: AMLDAPCertStoreParameters.java,v 1.3 2009/01/28 05:35:12 ww203982 Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.security.cert;
@@ -45,8 +46,8 @@ public class AMLDAPCertStoreParameters {
     private boolean doCRLupdate = true;
 
     /**
-     * @param server
-     * @param port
+     * @param server the LDAP server host name
+     * @param port the LDAP server port
      */
     public AMLDAPCertStoreParameters(String server, int port) {
         serverName = server;

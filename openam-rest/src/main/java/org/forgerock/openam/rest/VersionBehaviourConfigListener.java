@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.rest;
@@ -60,7 +61,7 @@ public class VersionBehaviourConfigListener implements ServiceListener, Resource
 
     /**
      * Registers the listener with the {@code ServiceConfigManager} and sets the initial default version behaviour.
-     * @param mgr
+     * @param mgr the service configuration manager to register this listener with
      */
     public void register(ServiceConfigManager mgr) {
         this.mgr = mgr;
@@ -104,6 +105,7 @@ public class VersionBehaviourConfigListener implements ServiceListener, Resource
      * @param serviceComponent
      *            name of the service components that changed.
      * @param type
+     *            the type of configuration change that occurred.
      */
     @Override
     public void globalConfigChanged(String serviceName, String version, String groupName, String serviceComponent,

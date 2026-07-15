@@ -25,6 +25,7 @@
  * $Id: AMClientCapData.java,v 1.7 2009/01/28 05:34:49 ww203982 Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.services.cdm.clientschema;
@@ -279,7 +280,7 @@ public class AMClientCapData implements IDSEventListener {
      * the ServiceSchemaManager for the service 4. Get the ServiceSchema for the
      * Global schema 5. Get the schema for the "internalData" schema. (temp
      * var). 6. Get the schema for the "clientData" schema id. (overwrite 8). 7.
-     * Get the ROOT_SUFFIX 8. Read config info & properties schema from
+     * Get the ROOT_SUFFIX 8. Read config info &amp; properties schema from
      * ServiceSchema 9. Add Listeners to EventService.
      */
     private synchronized void init(String instanceRDN) throws Exception {
@@ -1090,7 +1091,7 @@ public class AMClientCapData implements IDSEventListener {
      * 
      * @return Set of Maps. Each Map has the propertyNames for the Key and Value
      *         is Set of Property values. By default, the keys returned are
-     *         clientType, userAgent & parentID.
+     *         clientType, userAgent &amp; parentID.
      */
     public Set getMinimalClientInfo() {
         Set clients = new HashSet();

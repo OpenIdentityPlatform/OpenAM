@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -222,7 +223,7 @@ public class SMSSchema {
      * @param serviceName
      *            name of the service
      * @return service schema in serialized String format
-     * @throws SMSException
+     * @throws SMSException if the schema cannot be retrieved.
      */
     protected String getSchema(String serviceName) throws SMSException {
         String oldServiceName = this.serviceName;
@@ -237,7 +238,7 @@ public class SMSSchema {
      * stored in a directory.
      * 
      * @return service schema in serialized String format
-     * @throws SMSException
+     * @throws SMSException if the schema cannot be retrieved.
      */
     public String getSchema() throws SMSException {
         Node node = null;
@@ -260,7 +261,7 @@ public class SMSSchema {
      * @param pluginName
      *            name of the plugin schema name
      * @return service plugin schema in serialized String format
-     * @throws SMSException
+     * @throws SMSException if the plugin schema cannot be retrieved.
      */
     public String getPluginSchema(String serviceName, String pluginName)
             throws SMSException {
@@ -278,7 +279,7 @@ public class SMSSchema {
      * @param pluginName
      *            name of the plugin schema name
      * @return service plugin schema in serialized String format
-     * @throws SMSException
+     * @throws SMSException if the plugin schema cannot be retrieved.
      */
     public String getPluginSchema(String pluginName) throws SMSException {
         Node parent = getServiceNode();
@@ -303,7 +304,7 @@ public class SMSSchema {
      *
      * @param pluginName plugin schema name
      * @return service plugin schema in serialized String format
-     * @throws SMSException
+     * @throws SMSException if the plugin schema cannot be retrieved.
      */
     public String getPluginSchema(Node pluginName) throws SMSException {
         return (PLUGIN_PREFIX_1 + getServiceName() + PLUGIN_PREFIX_2
@@ -429,7 +430,7 @@ public class SMSSchema {
     }
 
     /**
-     * The method escapes '&', '<', '>', '"', '''
+     * The method escapes '&amp;', '&lt;', '&gt;', '"', '''
      */
     public static String escapeSpecialCharacters(String txt) {
         if (txt == null) {

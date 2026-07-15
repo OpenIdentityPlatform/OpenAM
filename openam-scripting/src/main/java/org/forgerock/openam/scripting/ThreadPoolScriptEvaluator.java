@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.scripting;
@@ -123,7 +123,7 @@ public final class ThreadPoolScriptEvaluator implements ScriptEvaluator {
      * requested so may resize over a period of time. If the thread pool is not reconfigurable, or if the new
      * configuration parameters are not valid, then an error is logged and the pool is left in its original
      * configuration.
-     * <p/>
+     * <p>
      * NB: All settings can be changed without a restart and the pool will adjust over time to the new settings.
      */
     private static final class ThreadPoolConfigurator implements StandardScriptEngineManager.ConfigurationListener {

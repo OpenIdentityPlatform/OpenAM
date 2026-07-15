@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click;
 
@@ -22,7 +23,7 @@ package org.openidentityplatform.openam.click;
  * Provides a Page life cycle interceptor. Classes implementing this interface
  * can be used to listen for key page life cycle events and abort further page
  * processing if required.
- * <p/>
+ * <p>
  * PageInterceptors can be used for many different purposes including:
  * <ul>
  * <li>enforcing application wide page security policies</li>
@@ -31,37 +32,37 @@ package org.openidentityplatform.openam.click;
  * </ul>
  *
  * A Click application can define multiple page interceptors that are invoked in
- * the order in which they are returned by the <tt>ConfigService</tt>.
+ * the order in which they are returned by the <code>ConfigService</code>.
  *
- * <h3><a name="scope"></a>Scope</h3>
+ * <h3><a id="scope"></a>Scope</h3>
  *
  * Page interceptors can be defined with a request level scope, whereby a new
  * page interceptor will be created with each page request providing a thread
  * safe programming model.
- * <p/>
+ * <p>
  * Please note, as new interceptor instances are created with each request, care
  * should be taken to ensure that these objects are light weight and do not
  * introduce a performance bottleneck into your application.
- * <p/>
+ * <p>
  * Alternatively, page interceptors can be defined with application level scope
  * whereby a single instance is created for the application and is used for
  * all requests.
- * <p/>
+ * <p>
  * Note application scope interceptors are more efficient that request scope
  * interceptors, but you are responsible for ensuring that they are thread safe
  * and support reentrant method invocations as multiple page requests are
  * processed at the same time.
  *
- * <h3><a name="configuration"></a>Configuration</h3>
+ * <h3><a id="configuration"></a>Configuration</h3>
  *
- * Application PageInterceptors are configured in the <tt>click.xml</tt>
+ * Application PageInterceptors are configured in the <code>click.xml</code>
  * configuration file. PageInterceptors must support construction using a
  * no-args public constructor.
- * <p/>
+ * <p>
  * Page interceptors can have multiple properties configured with their XML
  * definition which are set after the constructor has been called. Properties
  * are set using OGNL via {@link org.apache.click.util.PropertyUtils}.
- * <p/>
+ * <p>
  * An example configuration is provided below:
  *
  * <pre class="prettyprint">
@@ -73,7 +74,7 @@ package org.openidentityplatform.openam.click;
  * The default scope for page interceptors is "request", but this can be configured
  * as "application" as is done in the example configuration above.
  *
- * <h3><a name="example"></a>Example</h3>
+ * <h3><a id="example"></a>Example</h3>
  *
  * <pre class="prettyprint">
  * public class SecurityInterceptor implements PageInterceptor {
@@ -93,7 +94,7 @@ package org.openidentityplatform.openam.click;
  *
  *       // TODO: user context check.
  *
- *       if (authentication != null && authentication.required()) {
+ *       if (authentication != null &amp;&amp; authentication.required()) {
  *          sendRedirect(getNotAuthenticatedPath(), context);
  *          return false;
  *       }
@@ -197,11 +198,11 @@ public interface PageInterceptor {
      * Provides a post page object creation interceptor method, which is passed
      * the instance of the newly created page. This interceptor method is called
      * before the page {@link Page#onSecurityCheck()} method is invoked.
-     * <p/>
+     * <p>
      * If this method returns true then the normal page processing is performed,
      * otherwise if this method returns false the request is considered to have
      * been handled.
-     * <p/>
+     * <p>
      * Please note the page {@link Page#onDestroy()} method will still be invoked.
      *
      * @param page the newly instantiated page instance
@@ -213,11 +214,11 @@ public interface PageInterceptor {
     /**
      * Provides a page interceptor before response method. This method is invoked
      * prior to the page redirect, forward or rendering phase.
-     * <p/>
+     * <p>
      * If this method returns true then the normal page processing is performed,
      * otherwise if this method returns false request is considered to have been
      * handled.
-     * <p/>
+     * <p>
      * Please note the page {@link Page#onDestroy()} method will still be invoked.
      *
      * @param page the newly instantiated page instance

@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.federation.meta;
 
@@ -212,9 +213,9 @@ public class IDFFCOTUtils {
      * @param entityConfig the <code>EntityConfigElement</code> object
      * @param objFactory the object factory object
      * @param idffMetaMgr the <code>IDFFMetaManager</code> object.
-     * @throws <code>IDFFMetaException</code> if there is an error retrieving
+     * @throws IDFFMetaException if there is an error retrieving
      *         and updating the entityConfig.
-     * @throws <code>JAXBException</code> if there is an error setting the
+     * @throws JAXBException if there is an error setting the
      *         config.
      */
     private void updateCOTAttrInConfig(String realm,

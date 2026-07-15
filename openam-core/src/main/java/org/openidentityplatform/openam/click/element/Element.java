@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.element;
 
@@ -29,7 +30,7 @@ import java.util.Map;
  * Provides a base class for rendering HTML elements, for example
  * JavaScript (&lt;script&gt;) and Cascading Stylesheets
  * (&lt;link&gt; / &lt;style&gt;).
- * <p/>
+ * <p>
  * Subclasses should override {@link #getTag()} to return a specific HTML tag.
  */
 public class Element implements Serializable {
@@ -44,8 +45,8 @@ public class Element implements Serializable {
     // Public Properties ------------------------------------------------------
 
     /**
-     * Returns the Element HTML tag, the default value is <tt>null</tt>.
-     * <p/>
+     * Returns the Element HTML tag, the default value is <code>null</code>.
+     * <p>
      * Subclasses should override this method and return the correct tag.
      *
      * @return this Element HTML tag
@@ -154,7 +155,7 @@ public class Element implements Serializable {
 
     /**
      * Render the HTML representation of the Element to the specified buffer.
-     * <p/>
+     * <p>
      * If {@link #getTag()} returns null, this method will return an empty
      * string.
      *
@@ -201,10 +202,10 @@ public class Element implements Serializable {
 
     /**
      * Render the specified {@link #getTag() tag} and {@link #getAttributes()}.
-     * <p/>
+     * <p>
      * <b>Please note:</b> the tag will not be closed by this method. This
      * enables callers of this method to append extra attributes as needed.
-     * <p/>
+     * <p>
      * For example the result of calling:
      * <pre class="prettyprint">
      * Field field = new TextField("mytext");

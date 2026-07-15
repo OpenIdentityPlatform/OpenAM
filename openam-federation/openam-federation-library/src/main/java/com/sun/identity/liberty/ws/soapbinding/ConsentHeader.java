@@ -24,6 +24,7 @@
  *
  * $Id: ConsentHeader.java,v 1.2 2008/06/25 05:47:22 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -134,8 +135,8 @@ public class ConsentHeader {
     }
 
     /**
-     * Returns value of </code>mustUnderstand</code> attribute.
-     * @return value of </code>mustUnderstand</code> attribute
+     * Returns value of <code>mustUnderstand</code> attribute.
+     * @return value of <code>mustUnderstand</code> attribute
      */
     public Boolean getMustUnderstand() {
         return mustUnderstand;

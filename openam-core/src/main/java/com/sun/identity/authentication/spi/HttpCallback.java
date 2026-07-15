@@ -24,7 +24,7 @@
  *
  * $Id: HttpCallback.java,v 1.4 2009/07/28 19:40:45 beomsuk Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -142,14 +142,14 @@ public class HttpCallback implements Callback, Serializable {
     
     /**
      * Set the authorization string to a <code>HttpCallback</code> object.
-     * @param authorization 
+     * @param authorization the authorization string to set
      */
     public void setAuthorization(String authorization) {
         this.authToken = authorization;
     }
 
     /**
-     * Returns <code>true<code> if the callback is for HTTPBasic.
+     * Returns <code>true</code> if the callback is for HTTPBasic.
      */
     public boolean isForHTTPBasic() {
         return (negoValue != null)
@@ -157,7 +157,7 @@ public class HttpCallback implements Callback, Serializable {
     }
 
     /**
-     * Returns <code>true<code> if the callback is for WindowsDesktopSSO.
+     * Returns <code>true</code> if the callback is for WindowsDesktopSSO.
      */
     public boolean isForWindowsDesktopSSO() {
         return (negoValue != null)

@@ -635,7 +635,8 @@ public class FSProcessLogoutServlet extends HttpServlet {
      * @param remoteEntity Id the remote provider's entity id
      * @return <code>true</code> if the signature is valid; <code>false</code>
      *  otherwise.
-     * @exception SAMLException, FSException if an error occurred during the
+     * @exception SAMLException if an error occurred during the
+     * @exception FSException if an error occurred during the
      *  process
      */
     private boolean verifyLogoutSignature(

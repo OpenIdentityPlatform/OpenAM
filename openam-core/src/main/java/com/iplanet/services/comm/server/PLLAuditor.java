@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package com.iplanet.services.comm.server;
 
@@ -66,7 +66,7 @@ public class PLLAuditor {
      * @param debug               Debug instance.
      * @param auditEventPublisher AuditEventPublisher to which publishing of events can be delegated.
      * @param auditEventFactory   AuditEventFactory for audit event builders.
-     * @param httpServletRequest
+     * @param httpServletRequest  the HTTP servlet request associated with the operation to be audited.
      */
     public PLLAuditor(Debug debug, AuditEventPublisher auditEventPublisher, AuditEventFactory auditEventFactory,
                       HttpServletRequest httpServletRequest) {
@@ -79,8 +79,6 @@ public class PLLAuditor {
 
     /**
      * Publishes an audit event with details of the attempted CREST operation, if the 'access' topic is audited.
-     *
-     * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     public void auditAccessAttempt() {
         if (auditEventPublisher.isAuditing(realm, ACCESS_TOPIC, EventName.AM_ACCESS_ATTEMPT)) {
@@ -102,7 +100,7 @@ public class PLLAuditor {
 
     /**
      * Publishes an event with details of the successfully completed CREST operation, if the 'access' topic is audited.
-     * <p/>
+     * <p>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
      */
@@ -133,7 +131,7 @@ public class PLLAuditor {
 
     /**
      * Publishes an event with details of the failed CREST operation, if the 'access' topic is audited.
-     * <p/>
+     * <p>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
      *
@@ -145,7 +143,7 @@ public class PLLAuditor {
 
     /**
      * Publishes an event with details of the failed CREST operation, if the 'access' topic is audited.
-     * <p/>
+     * <p>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
      *

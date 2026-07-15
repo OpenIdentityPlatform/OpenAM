@@ -48,7 +48,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * The <code>PLLNotificationServlet</code> class is used to receive
  * notifications from servers and forward those notifications to the high level
  * services and applications for processing.
- * </p>
+ * <p>
  * The doPost() method gets the XML NotificationSet document from the
  * HttpRequest object, then parses the XML documnent and reconstructs a
  * NotificationSet object.

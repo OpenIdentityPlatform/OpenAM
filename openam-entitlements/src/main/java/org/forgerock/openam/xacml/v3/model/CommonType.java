@@ -22,12 +22,12 @@
  ~ your own identifying information:
  ~ "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.xacml.v3.model;
 
 /**
  * Normalized Content Types from Specific Types.
- * <p/>
  *
  * @author jeff.schenk@forgerock.com
  * @see ContentType

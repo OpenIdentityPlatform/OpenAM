@@ -25,7 +25,7 @@
  * $Id: LoginLogoutMapping.java,v 1.11 2009/06/03 20:46:50 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.authentication.UI;           
 
@@ -126,8 +126,8 @@ public class LoginLogoutMapping extends HttpServlet {
      *
      * @param request servlet request
      * @param response servlet response
-     * @throws ServletException
-     * @throws java.io.IOException
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws java.io.IOException if an I/O error occurs
      */
     protected void processRequest(
         HttpServletRequest request,
@@ -166,8 +166,8 @@ public class LoginLogoutMapping extends HttpServlet {
      *
      * @param request servlet request.
      * @param response servlet response.
-     * @throws ServletException
-     * @throws java.io.IOException
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws java.io.IOException if an I/O error occurs
      */
     protected void doGet(
         HttpServletRequest request,
@@ -180,8 +180,8 @@ public class LoginLogoutMapping extends HttpServlet {
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
-     * @throws ServletException
-     * @throws java.io.IOException
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws java.io.IOException if an I/O error occurs
      */
     protected void doPost(
         HttpServletRequest request,

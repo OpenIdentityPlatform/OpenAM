@@ -25,6 +25,7 @@
  * $Id: OpenSSOCoreTokenStore.java,v 1.1 2009/11/19 00:07:41 qcheng Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.coretoken.spi;
@@ -97,11 +98,11 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
 
     /**
      * 
-     * @param subject
-     * @param attributes
+     * @param subject the subject containing the admin token requesting token creation
+     * @param attributes the token attributes in JSON format
      * @return the created token in JSON format
-     * @throws CoreTokenException
-     * @throws JSONException
+     * @throws CoreTokenException if the token cannot be created
+     * @throws JSONException if the JSON attributes cannot be processed
      */
     public String createToken(Subject subject,
         JSONObject attributes)
@@ -145,10 +146,10 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
 
     /**
      *
-     * @param adminSubject
-     * @param tokenId
+     * @param adminSubject the admin subject requesting the read
+     * @param tokenId the ID of the token to read
      * @return token value from SM with the given tokenId
-     * @throws CoreTokenException
+     * @throws CoreTokenException if the token cannot be read
      */
     public String readToken(Subject adminSubject, String tokenId)
         throws CoreTokenException {
@@ -177,10 +178,9 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
 
     /**
      *
-     * @param subject
-     * @param tokenId
-     * @throws CoreTokenException
-     * @throws JSONException
+     * @param subject the subject containing the admin token requesting deletion
+     * @param tokenId the ID of the token to delete
+     * @throws CoreTokenException if the token cannot be deleted
      */
     public void deleteToken(Subject subject, String tokenId)
         throws CoreTokenException {
@@ -209,10 +209,10 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
 
     /**
      * 
-     * @param subject
-     * @param queryString
+     * @param subject the subject containing the admin token requesting the search
+     * @param queryString the query string used to match tokens
      * @return JSON array of tokens matching the queryString
-     * @throws CoreTokenException
+     * @throws CoreTokenException if the search cannot be performed
      */
     public JSONArray searchTokens (Subject subject,
         String queryString) throws CoreTokenException {
@@ -246,10 +246,10 @@ public class OpenSSOCoreTokenStore implements CoreTokenStore {
      * Updates a token.
      * @param subject caller subject.
      * @param tokenId token.id of the token to be updated.
-     * @param eTag
-     * @param newVals
-     * @throws CoreTokenException
-     * @throws JSONException
+     * @param eTag the entity tag of the token used for optimistic concurrency
+     * @param newVals the new values to apply to the token in JSON format
+     * @throws CoreTokenException if the token cannot be updated
+     * @throws JSONException if the JSON values cannot be processed
      */
     public void updateToken(Subject subject, String tokenId,
         String eTag, JSONObject newVals)

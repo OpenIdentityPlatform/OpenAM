@@ -26,6 +26,7 @@
  * 
  * Portions Copyrighted 2026 3A Systems LLC.
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -66,7 +67,7 @@ public class IDPPAddressCard extends IDPPBaseContainer {
       * Gets the container object i.e. LegalIdentity JAXB Object 
       * @param userMap user map
       * @return LegalIdentityElement JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
 
@@ -232,7 +233,7 @@ public class IDPPAddressCard extends IDPPBaseContainer {
       * @param select select expression
       * @param data list of new data objects.
       * @return Attribute key value pair for the given select.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Map getDataMapForSelect(String select, List data) 
       throws IDPPException {
@@ -272,7 +273,7 @@ public class IDPPAddressCard extends IDPPBaseContainer {
      * @param expContext Given select expression context.
      * @param dataElement DataElement. 
      * @return Map Modifiable attribute value pair.
-     * @exception IDPPException.
+     * @exception IDPPException .
      */
     private Map getDataMap(String expContext, Object dataElement)
        throws IDPPException {

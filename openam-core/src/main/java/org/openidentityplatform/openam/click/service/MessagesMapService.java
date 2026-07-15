@@ -15,6 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.openidentityplatform.openam.click.service;
 
@@ -28,11 +29,11 @@ import jakarta.servlet.ServletContext;
 /**
  * Provides a messages map factory service for the Click runtime.
  *
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  * The default {@link org.apache.click.service.MessagesMapService} implementation is {@link DefaultMessagesMapService}.
- * <p/>
+ * <p>
  * You can instruct Click to use a different implementation by adding
- * the following element to your <tt>click.xml</tt> configuration file.
+ * the following element to your <code>click.xml</code> configuration file.
  *
  * <pre class="codeConfig">
  * &lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
@@ -44,14 +45,14 @@ import jakarta.servlet.ServletContext;
  *
  * &lt;/click-app&gt; </pre>
  *
- * The class <tt>com.mycorp.CustomMessagesMapService</tt> might be defined as follows:
+ * The class <code>com.mycorp.CustomMessagesMapService</code> might be defined as follows:
  *
  * <pre class="prettyprint">
  * package com.mycorp;
  *
  * public class CustomMessagesMapService implements MessagesMapService {
  *
- *     public Map<String, String> createMessagesMap(Class&lt;?&gt; baseClass, String globalResource, Locale locale) {
+ *     public Map&lt;String, String&gt; createMessagesMap(Class&lt;?&gt; baseClass, String globalResource, Locale locale) {
  *         return new MyMessagesMap(baseClass, globalResource, locale);
  *     }
  * } </pre>
@@ -60,7 +61,7 @@ public interface MessagesMapService {
 
     /**
      * Initialize the MessagesMapService with the given application servlet context.
-     * <p/>
+     * <p>
      * This method is invoked after the MessagesMapService has been constructed.
      *
      * @param servletContext the application servlet context

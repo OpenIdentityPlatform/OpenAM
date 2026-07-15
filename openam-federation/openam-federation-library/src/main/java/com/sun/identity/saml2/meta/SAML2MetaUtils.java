@@ -25,7 +25,7 @@
  * $Id: SAML2MetaUtils.java,v 1.9 2009/09/21 17:28:12 exu Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
- * Portions Copyrighted 2026 3A Systems LLC.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.saml2.meta;
 
@@ -262,8 +262,8 @@ public final class SAML2MetaUtils {
     /**
      * Returns the realm by parsing the metaAlias. MetaAlias format is
      * <pre>
-     * &lt;realm>/&lt;any string without '/'> for non-root realm or
-     * /&lt;any string without '/'> for root realm.
+     * &lt;realm&gt;/&lt;any string without '/'&gt; for non-root realm or
+     * /&lt;any string without '/'&gt; for root realm.
      * </pre>
      * @param metaAlias The metaAlias.
      * @return the realm associated with the metaAlias.

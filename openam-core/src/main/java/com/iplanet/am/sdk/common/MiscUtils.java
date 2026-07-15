@@ -25,6 +25,7 @@
  * $Id: MiscUtils.java,v 1.5 2009/01/28 05:34:47 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk.common;
@@ -126,7 +127,7 @@ public class MiscUtils {
      *            the first AttrSet
      * @param attrSet2
      *            the second AttrSet
-     * @return an AttrSet which has combined values of attrSet1 & attrSet2
+     * @return an AttrSet which has combined values of attrSet1 &amp; attrSet2
      */
     public static AttrSet combineAttrSets(AttrSet attrSet1, AttrSet attrSet2) {
 
@@ -438,7 +439,7 @@ public class MiscUtils {
      * remove these attributes from newly created entries. Such empty sets
      * should be ignored, when entry is being created.
      * 
-     * @param attrMap
+     * @param attrMap the attribute-value map from which empty value sets are removed
      * @return map without empty set.
      */
     public static Map removeEmptyValues(Map attrMap) {

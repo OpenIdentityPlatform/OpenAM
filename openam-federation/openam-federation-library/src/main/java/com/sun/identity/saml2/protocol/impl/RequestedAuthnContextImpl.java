@@ -24,6 +24,7 @@
  *
  * $Id: RequestedAuthnContextImpl.java,v 1.2 2008/06/25 05:48:00 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -50,19 +51,18 @@ import com.sun.identity.saml2.protocol.RequestedAuthnContext;
  * Java content class for RequestedAuthnContextType complex type.
  * <p>The following schema fragment specifies the expected 
  *	content contained within this java content object. 
- * <p>
  * <pre>
- * &lt;complexType name="RequestedAuthnContextType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;choice>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AuthnContextClassRef" maxOccurs="unbounded"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AuthnContextDeclRef" maxOccurs="unbounded"/>
- *       &lt;/choice>
- *       &lt;attribute name="Comparison" type="{urn:oasis:names:tc:SAML:2.0:protocol}AuthnContextComparisonType" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="RequestedAuthnContextType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;choice&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AuthnContextClassRef" maxOccurs="unbounded"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AuthnContextDeclRef" maxOccurs="unbounded"/&gt;
+ *       &lt;/choice&gt;
+ *       &lt;attribute name="Comparison" type="{urn:oasis:names:tc:SAML:2.0:protocol}AuthnContextComparisonType" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  */
 public class RequestedAuthnContextImpl implements RequestedAuthnContext {
@@ -189,7 +189,7 @@ public class RequestedAuthnContextImpl implements RequestedAuthnContext {
      * 
      * @param value List of String representing authentication context
      *          class referance.
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *          if the object is immutable.
      * @see #getAuthnContextClassRef
      */
@@ -233,7 +233,7 @@ public class RequestedAuthnContextImpl implements RequestedAuthnContext {
      *
      * @param value List of String representing authentication context
      *          declaration referance.
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *          if the object is immutable.
      * @see #getAuthnContextDeclRef
      */
@@ -269,7 +269,7 @@ public class RequestedAuthnContextImpl implements RequestedAuthnContext {
      * Sets the value of the comparison property.
      * 
      * @param value An String representing comparison method.
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *          if the object is immutable.
      * @see #getComparison
      */
@@ -287,7 +287,7 @@ public class RequestedAuthnContextImpl implements RequestedAuthnContext {
      * Returns an XML Representation of this object.
      *
      * @return A string containing the valid XML for this element
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *          if unable to get the XML string. 
      */
     public String toXMLString() throws SAML2Exception {
@@ -302,7 +302,7 @@ public class RequestedAuthnContextImpl implements RequestedAuthnContext {
      * @param declareNS Determines whether or not the namespace is declared
      *          within the Element.
      * @return A string containing the valid XML for this element
-     * @throws com.sun.identity.saml2.common.SAML2Exception
+     * @throws com.sun.identity.saml2.common.SAML2Exception if a SAML2 error occurs
      *          if unable to get the XML string. 
      */
     public String toXMLString(boolean includeNSPrefix, boolean declareNS) 

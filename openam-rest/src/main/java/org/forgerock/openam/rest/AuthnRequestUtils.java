@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.rest;
 
@@ -43,7 +43,7 @@ public class AuthnRequestUtils {
 
     /**
      * Finds and extracts the Token ID from the request.
-     * <br/>
+     * <br>
      * Uses a future to get the the cookie name, so as to allow OpenAM to set the System Property as it will not be set
      * when the container is initialising the filters and servlets. If the System Property has not been set and this
      * method is called it will return <code>null</code>.
