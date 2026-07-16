@@ -30,9 +30,6 @@
     <description>OpenAM Federation</description>
     <artifactId>OpenFM</artifactId>
     <packaging>jar</packaging>
-    <properties>
-        <skipTests>true</skipTests>
-    </properties>
     <profiles>
         <profile>
             <id>set-compiler-release</id>
@@ -59,6 +56,71 @@
     </profiles>
     <!-- Build -->
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!--
+                        The excluded classes are OpenSSO-era tests that ran inside a deployed OpenAM:
+                        they obtain an Application SSO token via AdminTokenAction and drive
+                        ServiceManager/IdRepo directly. Outside a configured server they fail in the
+                        constructor or in @BeforeClass, and TestNG aborts the entire suite when one
+                        test class cannot be instantiated. That is why this module carried a blanket
+                        skipTests property from 2013 until 2026, hiding every test it owns.
+
+                        Excluding them by name keeps the remaining unit tests running, and any newly
+                        added test is still picked up by surefire's default patterns. Reviving the
+                        list below needs a live OpenAM.
+                    -->
+                    <excludes>
+                        <!-- whole packages: every test here drives a live server -->
+                        <exclude>com/sun/identity/policy/*.java</exclude>
+                        <exclude>com/sun/identity/rest/*.java</exclude>
+                        <exclude>com/sun/identity/xacml/**/*.java</exclude>
+                        <!-- in-container harness leftovers, not tests themselves -->
+                        <exclude>com/sun/identity/unittest/TestHarness.java</exclude>
+                        <exclude>com/sun/identity/unittest/TestListener.java</exclude>
+                        <!-- entitlement: unit tests share these packages, so list per class -->
+                        <exclude>com/sun/identity/entitlement/AndConditionEvalTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ApplicationCacheAfterRealmChangeTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ApplicationCreatorNDateTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ApplicationDelegationTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ApplicationFilterTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ApplicationPrivilegeMetaTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ApplicationTypeTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/CanBeDeletedAppTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/DecisionMergeTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/DelegationIsAllowedSubResourceTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/DelegationPrivilegeIdRepoAccessTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/DelegationPrivilegeSubResourceTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/DelegationPrivilegeTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/HttpStarEvaluationTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/IdentityGroupToEntitlementGroupTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/IDPPTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/log/LogTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/MultiWildcardEvalTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/opensso/EntitlementServiceTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/opensso/RealmRemovedTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/OrConditionEvalTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/OrgAliasReferralTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/PrivilegeDelegationTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/PrivilegeManagerTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ReferralPrivilegeRemovalTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ReferralPrivilegeTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ReferralPrivilegeWithRemovedRealmTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/ReferredResourcesTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/SingleWildCardEvaluatorTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/SubRealmEvaluationTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/SubRealmGroupTest.java</exclude>
+                        <exclude>com/sun/identity/entitlement/TestAttributeEvaluator.java</exclude>
+                        <exclude>com/sun/identity/entitlement/TestEvaluator.java</exclude>
+                        <exclude>com/sun/identity/entitlement/TestGroupEvaluator.java</exclude>
+                        <exclude>com/sun/identity/entitlement/XACMLExportTest.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

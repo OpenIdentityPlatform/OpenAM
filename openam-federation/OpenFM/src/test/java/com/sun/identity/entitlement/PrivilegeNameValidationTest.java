@@ -24,6 +24,9 @@
  *
  * $Id: PriivlegeNameValidation.java,v 1.1 2009/11/25 18:09:50 veiming Exp $
  */
+/*
+ * Portions Copyrighted 2026 3A Systems, LLC
+ */
 
 package com.sun.identity.entitlement;
 
@@ -33,13 +36,13 @@ import org.testng.annotations.Test;
  *
  * @author dennis
  */
-public class PriivlegeNameValidation {
+public class PrivilegeNameValidationTest {
 
     @Test
     public void allLetters() throws Exception {
         if (!PrivilegeManager.isNameValid("test")) {
             throw new Exception(
-                "PriivlegeNameValidation.allLetters test failed");
+                "PrivilegeNameValidationTest.allLetters test failed");
         }
     }
 
@@ -47,7 +50,7 @@ public class PriivlegeNameValidation {
     public void allNumeric() throws Exception {
         if (!PrivilegeManager.isNameValid("999")) {
             throw new Exception(
-                "PriivlegeNameValidation.allNumeric test failed");
+                "PrivilegeNameValidationTest.allNumeric test failed");
         }
     }
 
@@ -55,7 +58,7 @@ public class PriivlegeNameValidation {
     public void allAlphaNumeric() throws Exception {
         if (!PrivilegeManager.isNameValid("test123")) {
             throw new Exception(
-                "PriivlegeNameValidation.allAlphaNumeric test failed");
+                "PrivilegeNameValidationTest.allAlphaNumeric test failed");
         }
     }
 
@@ -63,7 +66,7 @@ public class PriivlegeNameValidation {
     public void withUnderscore() throws Exception {
         if (!PrivilegeManager.isNameValid("test_123")) {
             throw new Exception(
-                "PriivlegeNameValidation.withUnderscore test failed");
+                "PrivilegeNameValidationTest.withUnderscore test failed");
         }
     }
 
@@ -71,7 +74,7 @@ public class PriivlegeNameValidation {
     public void withDash() throws Exception {
         if (!PrivilegeManager.isNameValid("test-12")) {
             throw new Exception(
-                "PriivlegeNameValidation.withDash test failed");
+                "PrivilegeNameValidationTest.withDash test failed");
         }
     }
 
@@ -79,7 +82,7 @@ public class PriivlegeNameValidation {
     public void withSpecialChar() throws Exception {
         if (PrivilegeManager.isNameValid("test^")) {
             throw new Exception(
-                "PriivlegeNameValidation.withDash test failed");
+                "PrivilegeNameValidationTest.withSpecialChar test failed");
         }
     }
 
