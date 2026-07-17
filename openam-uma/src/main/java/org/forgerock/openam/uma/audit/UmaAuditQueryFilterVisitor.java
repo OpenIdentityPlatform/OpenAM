@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.uma.audit;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * A visitor that returns a Map containing fieldname -> value representing fieldname==value style filters
+ * A visitor that returns a Map containing {@code fieldname -> value} representing {@code fieldname==value} style filters
  * @since 13.0.0
  */
 public class UmaAuditQueryFilterVisitor implements QueryFilterVisitor<org.forgerock.util.query.QueryFilter<String>, Void, JsonPointer> {

@@ -24,6 +24,7 @@
  *
  * $Id: ServiceInstance.java,v 1.2 2008/06/25 05:47:11 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -44,20 +45,19 @@ import com.sun.identity.shared.xml.XMLUtils;
  * distinct protocol endpoint.
  * <p>The following schema fragment specifies the expected content 
  * within the <code>ServiceInstance</code> object.
- * <p>
  * <pre>
- * &lt;xs:element name="ServiceInstance" type="ServiceInstanceType"/>
- * &lt;complexType name="ServiceInstanceType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:disco:2003-08}ServiceType"/>
- *         &lt;element name="ProviderID" type="{urn:liberty:metadata:2003-08}entityIDType"/>
- *         &lt;element name="Description" type="{urn:liberty:disco:2003-08}DescriptionType" maxOccurs="unbounded"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;xs:element name="ServiceInstance" type="ServiceInstanceType"/&gt;
+ * &lt;complexType name="ServiceInstanceType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:disco:2003-08}ServiceType"/&gt;
+ *         &lt;element name="ProviderID" type="{urn:liberty:metadata:2003-08}entityIDType"/&gt;
+ *         &lt;element name="Description" type="{urn:liberty:disco:2003-08}DescriptionType" maxOccurs="unbounded"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

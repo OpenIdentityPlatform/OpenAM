@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sm.config;
@@ -21,7 +22,7 @@ import java.util.Set;
 
 /**
  * Builder to construct the config object represented.
- * <p/>
+ * <p>
  * The builder needs to declare which service configuration sources to pull on using
  * {@link ConfigSource} and each setter needs to declare which attribute to be
  * populated with using {@link ConfigAttribute}.

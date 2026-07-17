@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.core.rest.record;
 
@@ -45,8 +46,8 @@ public class Record {
     /**
      * Create a RecordDebug instance
      *
-     * @param recordProperties
-     * @param folderPath
+     * @param recordProperties the properties describing the record
+     * @param folderPath the path of the folder where the record output is stored
      */
     public Record(RecordProperties recordProperties, String folderPath) {
         this.recordProperties = recordProperties;
@@ -58,7 +59,7 @@ public class Record {
     /**
      * Get the record properties
      *
-     * @return
+     * @return the record properties
      */
     public RecordProperties getRecordProperties() {
         return recordProperties;
@@ -67,7 +68,7 @@ public class Record {
     /**
      * Get the record folder path
      *
-     * @return
+     * @return the record folder path
      */
     public String getFolderPath() {
         return this.folderPath;
@@ -76,7 +77,7 @@ public class Record {
     /**
      * Get record status
      *
-     * @return
+     * @return the current record status
      */
     public RecordStatus getRecordStatus() {
         return recordStatus;
@@ -108,7 +109,7 @@ public class Record {
     /**
      * Get the history of the records
      *
-     * @return
+     * @return the history of the record statuses keyed by date
      */
     public Map<Date, RecordStatus> getRecordsHistory() {
         return recordHistory;
@@ -117,7 +118,7 @@ public class Record {
     /**
      * Export into json.
      *
-     * @return
+     * @return the JSON representation of this record
      */
     public JsonValue exportJson() {
         JsonValue properties = RecordProperties.toJson(this.getRecordProperties());

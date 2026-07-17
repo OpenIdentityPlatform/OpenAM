@@ -24,6 +24,7 @@
  *
  * $Id: AuthenticationQuery.java,v 1.2 2008/06/25 05:47:36 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -136,7 +137,7 @@ public class AuthenticationQuery extends SubjectQuery {
      * @param subject the Subject of the <code>AuthenticationQuery</code>.
      * @param authMethod the <code>AuthenticationMethod</code> in string
      *        format. It could be null.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public AuthenticationQuery(Subject subject,
 				String authMethod) 
@@ -154,7 +155,7 @@ public class AuthenticationQuery extends SubjectQuery {
      * Constructor.
      *
      * @param subject The Subject of the <code>AuthenticationQuery</code>.
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public AuthenticationQuery(Subject subject) throws SAMLException {
 	if (subject == null) {
@@ -196,7 +197,7 @@ public class AuthenticationQuery extends SubjectQuery {
     }
 
     /**
-     * Returns a String representation of the <samlp:AuthenticationQuery> 
+     * Returns a String representation of the {@code <samlp:AuthenticationQuery>}
      * element.
      *
      * @param includeNS Determines whether or not the namespace qualifier

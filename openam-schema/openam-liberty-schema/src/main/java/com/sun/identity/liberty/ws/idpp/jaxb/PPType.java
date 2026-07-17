@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,31 +13,30 @@ package com.sun.identity.liberty.ws.idpp.jaxb;
 /**
  * Java content class for PPType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-id-sis-pp.xsd line 32)
- * <p>
  * <pre>
- * &lt;complexType name="PPType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}InformalName" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LInformalName" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}CommonName" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LegalIdentity" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}EmploymentIdentity" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}AddressCard" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgContact" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Facade" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Demographics" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}SignKey" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}EncryptKey" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}EmergencyContact" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LEmergencyContact" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Extension" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attGroup ref="{urn:liberty:id-sis-pp:2003-08}commonAttributes"/>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="PPType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}InformalName" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LInformalName" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}CommonName" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LegalIdentity" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}EmploymentIdentity" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}AddressCard" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgContact" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Facade" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Demographics" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}SignKey" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}EncryptKey" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}EmergencyContact" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LEmergencyContact" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Extension" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attGroup ref="{urn:liberty:id-sis-pp:2003-08}commonAttributes"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

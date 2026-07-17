@@ -24,6 +24,7 @@
  *
  * $Id: XACMLAuthzDecisionStatementImpl.java,v 1.4 2008/11/10 22:57:06 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -51,34 +52,30 @@ import org.w3c.dom.NodeList;
 /**
  * This is the default implementation of interface <code>XACMLAuthzDecisionStatement</code>.
  *
- * <p>
  * <pre>
  * &lt;xs:element name="XACMLAuthzDecisionStatement"
- *          type="xacml-saml:XACMLAuthzDecisionStatementType"/>
- * &lt;xs:complexType name="XACMLAuthzDecisionStatementType">
- *   &lt;xs:complexContent>
- *     &lt;xs:extension base="saml:StatementAbstractType">
- *      &lt;xs:sequence>
- *        &lt;xs:element ref="xacml-context:Response"/>
- *        &lt;xs:element ref="xacml-context:Request"  minOccurs="0"/>
- *      &lt;xs:sequence>
- *    &lt;xs:extension>
- *  &lt;xs:complexContent>
- *&lt;xs:complexType>
+ *          type="xacml-saml:XACMLAuthzDecisionStatementType"/&gt;
+ * &lt;xs:complexType name="XACMLAuthzDecisionStatementType"&gt;
+ *   &lt;xs:complexContent&gt;
+ *     &lt;xs:extension base="saml:StatementAbstractType"&gt;
+ *      &lt;xs:sequence&gt;
+ *        &lt;xs:element ref="xacml-context:Response"/&gt;
+ *        &lt;xs:element ref="xacml-context:Request"  minOccurs="0"/&gt;
+ *      &lt;xs:sequence&gt;
+ *    &lt;xs:extension&gt;
+ *  &lt;xs:complexContent&gt;
+ *&lt;xs:complexType&gt;
  * </pre>
- * </p>
  *
  * Schema for the base type is
- * <p>
  * <pre>
- * &lt;complexType name="StatementAbstractType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="StatementAbstractType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
- * </p>
  *
  */
 public class XACMLAuthzDecisionStatementImpl 

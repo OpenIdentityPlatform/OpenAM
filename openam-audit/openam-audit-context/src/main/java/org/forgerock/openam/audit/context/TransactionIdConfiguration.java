@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.audit.context;
 
 /**
  * Responsible for deciding whether or not transaction ID received as HTTP header should be accepted.
- * <p/>
+ * <p>
  * The decision should be made based on the value of the System Property "org.forgerock.http.TrustTransactionHeader";
  * unfortunately, due to cyclic dependency issues, it's not possible to access the com.iplanet.am.util.SystemProperties
  * from this module.

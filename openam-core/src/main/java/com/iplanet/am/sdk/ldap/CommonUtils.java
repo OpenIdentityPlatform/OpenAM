@@ -25,6 +25,7 @@
  * $Id: CommonUtils.java,v 1.8 2009/01/28 05:34:48 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk.ldap;
@@ -156,7 +157,7 @@ class CommonUtils {
      *            the first AttrSet
      * @param attrSet2
      *            the second AttrSet
-     * @return an AttrSet which has combined values of attrSet1 & attrSet2
+     * @return an AttrSet which has combined values of attrSet1 &amp; attrSet2
      */
     protected static AttrSet combineAttrSets(AttrSet attrSet1, AttrSet attrSet2)
     {

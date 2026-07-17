@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.cts.impl;
 
@@ -38,7 +39,7 @@ import java.util.List;
 /**
  * This class is used in SAML2 failover mode to store/recover serialized
  * state of Assertion/Response object.
- * <p/>
+ * <p>
  * This class acts as a Proxy to perform distinct SAML2
  * operations and allow the CTSPersistentStore implementation
  * to handle the actual CRUD for Tokens.

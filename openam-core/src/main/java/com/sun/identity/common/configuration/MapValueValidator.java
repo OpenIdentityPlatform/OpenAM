@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -69,13 +70,13 @@ import org.forgerock.openam.utils.CollectionUtils;
 public class MapValueValidator implements ServiceAttributeValidator {
 
     /**
-     *  1)  [[\\S]&&[^\\[]&&[^\\]]]+   means at least one non-whitespace 
+     *  1)  [[\\S]&amp;&amp;[^\\[]&amp;&amp;[^\\]]]+   means at least one non-whitespace 
      *                                 character except not a [ or ]
      *  
-     *  2)  [[^\\[]&&[^\\]]]*          means zero or more of anything 
+     *  2)  [[^\\[]&amp;&amp;[^\\]]]*          means zero or more of anything 
      *                                 except not a [ or ] 
      *
-     *  1 & 2 are combined to match values that have a key
+     *  1 &amp; 2 are combined to match values that have a key
      *
      *  3)  \\s*\\[\\s*\\]\\s*=\\s*    means the case of []=  which is used for 
      *                                 many default map values

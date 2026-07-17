@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -333,7 +334,7 @@ public class I18n {
      * @param pattern
      *            pattern for which the message to be formatted
      * @param j
-     *            Object to be formatted & substituted
+     *            Object to be formatted &amp; substituted
      * @param l
      *            locale in a string format
      * @return Returns the formatted message
@@ -353,7 +354,7 @@ public class I18n {
      * @param pattern
      *            pattern for which the message to be formatted
      * @param i
-     *            Integer to be formatted & substituted
+     *            Integer to be formatted &amp; substituted
      * @param l
      *            locale in a string format
      * @return Returns the formatted message

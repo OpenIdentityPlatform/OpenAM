@@ -25,6 +25,7 @@
  * $Id: LogoutResponse.java,v 1.2 2008/06/25 05:47:56 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -42,7 +43,7 @@ import com.sun.identity.saml2.protocol.impl.LogoutResponseImpl;
  *
  * <pre>
  * &lt;element name="LogoutResponse" 
- * type="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType"/>
+ * type="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType"/&gt;
  * </pre>
  *
  * 

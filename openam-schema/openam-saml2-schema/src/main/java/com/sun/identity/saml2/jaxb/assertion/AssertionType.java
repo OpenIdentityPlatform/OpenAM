@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -12,30 +13,29 @@ package com.sun.identity.saml2.jaxb.assertion;
 /**
  * Java content class for AssertionType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/saml2/saml-schema-assertion-2.0.xsd line 87)
- * <p>
  * <pre>
- * &lt;complexType name="AssertionType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Issuer"/>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}Signature" minOccurs="0"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Subject" minOccurs="0"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Conditions" minOccurs="0"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Advice" minOccurs="0"/>
- *         &lt;choice maxOccurs="unbounded" minOccurs="0">
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Statement"/>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AuthnStatement"/>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AuthzDecisionStatement"/>
- *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AttributeStatement"/>
- *         &lt;/choice>
- *       &lt;/sequence>
- *       &lt;attribute name="ID" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *       &lt;attribute name="IssueInstant" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
- *       &lt;attribute name="Version" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="AssertionType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Issuer"/&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}Signature" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Subject" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Conditions" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Advice" minOccurs="0"/&gt;
+ *         &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Statement"/&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AuthnStatement"/&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AuthzDecisionStatement"/&gt;
+ *           &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}AttributeStatement"/&gt;
+ *         &lt;/choice&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="ID" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *       &lt;attribute name="IssueInstant" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" /&gt;
+ *       &lt;attribute name="Version" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

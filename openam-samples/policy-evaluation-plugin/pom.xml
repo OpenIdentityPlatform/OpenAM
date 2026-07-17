@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -22,7 +23,8 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>14.6.7-SNAPSHOT</version>
+        <version>16.1.2-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>org.openidentityplatform.openam.examples</groupId>
     <artifactId>policy-evaluation-plugin</artifactId>

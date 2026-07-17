@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 /**
@@ -26,7 +27,7 @@
  *     &#64;Field(CoreTokenField.STRING_ONE)
  *     private String name;
  *     &#64;Field(CoreTokenField.BLOB, converter = MapToJsonBytesConverter.class)
- *     private Map&lt;String,?> complexData;
+ *     private Map&lt;String,?&gt; complexData;
  *
  *     // getters and setters follow...
  * }

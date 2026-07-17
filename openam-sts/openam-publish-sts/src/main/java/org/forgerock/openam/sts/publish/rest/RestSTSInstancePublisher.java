@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.publish.rest;
@@ -41,7 +43,7 @@ public interface RestSTSInstancePublisher {
      * @param republish Determines whether this is an initial publish, or a re-publish. If re-publish, instanceConfig
      *                  not written to the SMS.
      * @return the urlElement, including the realm, at which the Rest STS instance has been published.
-     * @throws STSPublishException
+     * @throws STSPublishException if the Rest STS instance could not be published
      */
     String publishInstance(RestSTSInstanceConfig instanceConfig, RestSTS instance, boolean republish) throws STSPublishException;
 
@@ -53,7 +55,7 @@ public interface RestSTSInstancePublisher {
      *                             on another server, and thus removed from the SMS, but requiring removal from the CREST router.
      *                             Set to false in all other cases.
      *
-     * @throws STSPublishException
+     * @throws STSPublishException if the Rest STS instance could not be removed
      */
     void removeInstance(String stsId, String realm, boolean removeOnlyFromRouter) throws STSPublishException;
 
@@ -133,7 +135,7 @@ public interface RestSTSInstancePublisher {
      * @param stsId The sts id, obtained from RestSTSInstanceConfig#getDeploymentSubPath
      * @param realm The realm in which the Rest STS is to be deployed.
      * @return The RestSTSInstanceConfig corresponding to this published instance
-     * @throws STSPublishException
+     * @throws STSPublishException if the published instance state could not be obtained
      */
     RestSTSInstanceConfig getPublishedInstance(String stsId, String realm) throws STSPublishException;
 
@@ -162,7 +164,7 @@ public interface RestSTSInstancePublisher {
      * @param stsId The sts id, obtained from RestSTSInstanceConfig#getDeploymentSubPath
      * @param realm The realm in which the Rest STS is to be deployed.
      *
-     * @throws STSPublishException
+     * @throws STSPublishException if the SMS could not be queried for the instance
      */
     boolean isInstancePersistedInSMS(String stsId, String realm) throws STSPublishException;
 

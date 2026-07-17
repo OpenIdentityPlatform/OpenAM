@@ -25,7 +25,7 @@
  * $Id: WindowsDesktopSSO.java,v 1.7 2009/07/28 19:40:45 beomsuk Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.modules.windowsdesktopsso;
@@ -128,11 +128,11 @@ public class WindowsDesktopSSO extends AMLoginModule {
     }
 
     /**
-     * Initialize parameters. 
+     * Initialize parameters.
      *
-     * @param subject
-     * @param sharedState
-     * @param options
+     * @param subject the subject to be authenticated
+     * @param sharedState the state shared between authentication modules
+     * @param options the configuration options for this module
      */
     public void init(Subject subject, Map sharedState, Map options) {
         this.options = options;
@@ -154,8 +154,8 @@ public class WindowsDesktopSSO extends AMLoginModule {
     /**
      * Processes the authentication request.
      *
-     * @param callbacks
-     * @param state
+     * @param callbacks the callbacks presented to this module for the request
+     * @param state the current authentication state
      * @return  -1 as succeeded; 0 as failed.
      * @exception AuthLoginException upon any failure.
      */

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -57,7 +57,7 @@ public class TokenIntrospectionResource extends ServerResource {
      * Wraps the introspection service in a Restlet API.
      * @param body The body - this is ignored but needs to be present to be made available in the request.
      * @return A JSON representation of the introspection result.
-     * @throws org.forgerock.oauth2.restlet.OAuth2RestletException
+     * @throws org.forgerock.oauth2.restlet.OAuth2RestletException if an error occurs while introspecting the token.
      */
     @Post("form")
     @Get

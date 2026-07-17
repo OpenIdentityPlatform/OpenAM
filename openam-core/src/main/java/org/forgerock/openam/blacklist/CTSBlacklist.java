@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions Copyrighted 2022-2025 3A Systems, LLC.
+ * Portions Copyrighted 2022-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.blacklist;
@@ -54,7 +54,7 @@ import com.sun.identity.shared.debug.Debug;
  * Entry blacklist that stores blacklisted entries in the CTS until they expire. A stable ID is stored in the CTS
  * for each entry that has been blacklisted. Normal CTS reaper process will remove entries from the blacklist
  * after they have expired.
- * <p/>
+ * <p>
  * The fields used by this class are:
  * <ul>
  *     <li>{@link CoreTokenField#TOKEN_TYPE} - the CTS token type.</li>
@@ -65,7 +65,7 @@ import com.sun.identity.shared.debug.Debug;
  *     <li>{@link CoreTokenField#STRING_ONE} - the ID of the <em>server</em> on which the entry was first
  *     blacklisted. From {@link WebtopNamingQuery#getAMServerID()}.</li>
  * </ul>
- * <p/>
+ * <p>
  * In addition to blacklisting entries and checking the blacklist, this class also periodically polls the CTS for
  * blacklist changes made on other servers since the last check. This is used to send local notifications to
  * subscribed blacklist {@link Listener}s for <em>all</em> blacklist entries, not just local ones. This feature is

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock Inc.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.utils.indextree;
 
@@ -37,12 +38,12 @@ import java.util.Set;
  * they and their immediate children have interest in the character. Any previously elected node that has interest is
  * reelected and any child nodes that have interest are elected for the first time; all other previously elected nodes
  * are disregarded. The same approach is taken for each character of the resource.
- * <p />
+ * <p>
  * Once this process has completed for all characters of the resource, any nodes that exist in the election pool will
  * have in some way matched the resource, whether explicitly or implicitly via the use of wildcards. Each node in the
  * pool is now asked whether it represents an end point and hence a previously added rule. The list of those that do
  * is the list that is returned.
- * <p/>
+ * <p>
  * Rules are added in a tree structure, each node representing the next character within a rule. The tree node that
  * represents the last character of a rule is know as an end point; end point nodes mark this fact. The following
  * rules end up in the proceeding structure:
@@ -60,17 +61,17 @@ import java.util.Set;
  * In the above scenario '/', 'p' and 'l' all become end points, marking in the tree where a policy rule ends. The three
  * rules equate to 85 characters, but once in the tree structure this reduces to 50 characters, giving a compression
  * just over 40% in this scenario.
- * <p/>
+ * <p>
  * Only additions to the tree actually modify the trees structure and therefore concise synchronisation has been added
  * to this method, to ensure it's thread safe whilst not hindering the performance of the tree. Tree removes never
  * actually remove node elements but instead reduce end point markers on the matching nodes. Searches can rest assured
  * that the tree structure will always be stable, however due to the lack of synchronisation to keep performance high,
  * there's a chance that a read may retrieve stale data if an add occurs at the same time.
- * <p />
+ * <p>
  * This implementation makes use of simple tree node references to help improve tree navigation performance and to keep
  * the memory footprint to a minimal. It does this by using tree nodes that contain basic references to its position in
  * the tree as opposed to using other structures to assist, such as {@link List}.
- * <p/>
+ * <p>
  * It makes use of a factory for the node creation so that the behavior of resource evaluation can be adapted.
  *
  * @author apforrest

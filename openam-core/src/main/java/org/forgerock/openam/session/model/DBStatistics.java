@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -78,8 +79,8 @@ public class DBStatistics {
     
     /**
      * Returns the current uptime (in ms.) of the amsessiondb server
-     * 
-     * @return 
+     *
+     * @return the current uptime of the amsessiondb server, in milliseconds
      */
     public long getUptime() {
         return currentTimeMillis() - startTime;

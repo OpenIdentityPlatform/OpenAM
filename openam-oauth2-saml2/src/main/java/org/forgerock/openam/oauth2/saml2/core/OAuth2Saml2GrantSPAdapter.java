@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2012-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2.saml2.core;
@@ -44,14 +44,14 @@ import java.util.Map;
 public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void initialize(Map initParams){
         return;
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void preSingleSignOnRequest(
             String hostedEntityID,
@@ -66,7 +66,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
 
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void preSingleSignOnProcess(
             String hostedEntityID,
@@ -81,7 +81,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public boolean postSingleSignOnSuccess(
             String hostedEntityID,
@@ -128,7 +128,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
 
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public boolean postSingleSignOnFailure(
             String hostedEntityID,
@@ -144,7 +144,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
 
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void postNewNameIDSuccess(
             String hostedEntityID,
@@ -159,7 +159,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void postTerminateNameIDSuccess(
             String hostedEntityID,
@@ -174,7 +174,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void preSingleLogoutProcess(
             String hostedEntityID,
@@ -190,7 +190,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public void postSingleLogoutSuccess(
             String hostedEntityID,

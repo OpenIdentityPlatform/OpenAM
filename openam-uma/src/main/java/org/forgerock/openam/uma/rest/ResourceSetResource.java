@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.uma.rest;
@@ -142,7 +142,7 @@ import org.forgerock.util.query.QueryFilterVisitor;
     }
 
     /**
-     * {@inheritDoc}
+     * Reads a single resource set instance, optionally augmenting it with its associated policies.
      */
     @Read(operationDescription = @Operation(
             errors = {
@@ -176,8 +176,8 @@ import org.forgerock.util.query.QueryFilterVisitor;
     /**
      * "revokeAll" action supported, which will delete all a user's resource set UMA policies.
      *
-     * @param context {@inheritDoc}
-     * @param request {@inheritDoc}
+     * @param context the request context
+     * @param request the action request identifying the action to perform
      */
     @Action(name = "revokeAll",
             operationDescription = @Operation(
@@ -205,8 +205,8 @@ import org.forgerock.util.query.QueryFilterVisitor;
     /**
      * Support for querying by equals for /name and /resourceServer with AND only.
      *
-     * @param context {@inheritDoc}
-     * @param request {@inheritDoc}
+     * @param context the request context
+     * @param request the query request describing the filter to apply
      */
     @Query(operationDescription = @Operation(
                     errors = {
@@ -570,8 +570,8 @@ import org.forgerock.util.query.QueryFilterVisitor;
     /**
      * Update the none system labels on a resource set only
      *
-     * @param context {@inheritDoc}
-     * @param request {@inheritDoc}
+     * @param context the request context
+     * @param request the update request containing the new resource set content
      */
     @Update(operationDescription = @Operation(
             errors = {

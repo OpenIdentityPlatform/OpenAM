@@ -25,6 +25,7 @@
  * $Id: SessionIndex.java,v 1.2 2008/06/25 05:47:58 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -41,7 +42,7 @@ import com.sun.identity.saml2.protocol.impl.SessionIndexImpl;
  * of a authenticated principal.
  *
  * <pre>
- * &lt;element name="SessionIndex" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ * &lt;element name="SessionIndex" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  * </pre>
  *
  * 

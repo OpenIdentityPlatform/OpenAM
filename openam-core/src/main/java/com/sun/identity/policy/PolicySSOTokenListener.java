@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -44,7 +45,7 @@ import com.sun.identity.policy.plugins.LDAPRoles;
  * SSOTokenListener interface and is used for maintaining the 
  * policy decision cache , subject evaluation cache, User
  * Role cache maintained by <code>LDAPRoles</code> subject,
- * as well as the user </code>nsRole</code> attribute values cache.
+ * as well as the user <code>nsRole</code> attribute values cache.
  */
 
 public class PolicySSOTokenListener 

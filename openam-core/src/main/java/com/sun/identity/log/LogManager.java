@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2013 Cybernetica AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.log;
 
@@ -542,9 +543,9 @@ public class LogManager extends java.util.logging.LogManager {
      *  specific attribute changes that would mean logging has
      *  changed to a new location or has re-started.  these are:
      *    1. logging location
-     *    2. new Status == ACTIVE && old Level == OFF &&
+     *    2. new Status == ACTIVE &amp;&amp; old Level == OFF &amp;&amp;
      *       new Level != OFF
-     *    3. old Status == INACTIVE && new Status == ACTIVE &&
+     *    3. old Status == INACTIVE &amp;&amp; new Status == ACTIVE &amp;&amp;
      *       new Level != OFF
      *    4. old Backend != new Backend (File <-> DB)
      *    5. old Security Status != new Security Status

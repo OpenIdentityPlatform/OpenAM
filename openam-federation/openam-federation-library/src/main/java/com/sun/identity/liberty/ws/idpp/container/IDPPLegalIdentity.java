@@ -24,6 +24,7 @@
  *
  * $Id: IDPPLegalIdentity.java,v 1.2 2008/06/25 05:47:16 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
@@ -60,7 +61,7 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
       * Gets the container object i.e. LegalIdentity JAXB Object 
       * @param userMap user map
       * @return LegalIdentityElement JAXB Object.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
 
@@ -134,7 +135,7 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
       * Gets the AltIDType JAXB Object.
       * @param userMap user data
       * @return AltIDType JAXB Object
-      * @exception IDPPException
+      * @exception IDPPException if an error occurs
       */
      private AltIDType getAltID(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPLegalIdentity:getAltID:Init");
@@ -175,7 +176,7 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
       * Gets the VATType JAXB Object.
       * @param userMap user data
       * @return VATType JAXB Object
-      * @exception IDPPException
+      * @exception IDPPException if an error occurs
       */
      private VATType getVAT(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPLegalIdentity:getVATType:Init");
@@ -290,7 +291,7 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
       * @param select select expression
       * @param data list of new data objects.
       * @return Attribute key value pair for the given select.
-      * @exception IDPPException.
+      * @exception IDPPException .
       */
      public Map getDataMapForSelect(String select, List data) 
      throws IDPPException {
@@ -490,7 +491,7 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
       * @param dataObject List of altID objects
       * @param map map of attrib/val pairs
       * @return Map map of attrib/val pairs
-      * @exception IDPPException
+      * @exception IDPPException if an error occurs
       */ 
      private Map getAltIDMap(List dataObject, Map map) throws IDPPException {
         //Currently, we handle only one AltID.

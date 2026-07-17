@@ -12,7 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
-* Portions copyright 2025 3A Systems LLC.
+* Portions copyright 2025-2026 3A Systems LLC.
 */
 package org.forgerock.openam.saml2;
 
@@ -431,7 +431,7 @@ public class UtilProxySAMLAuthenticator extends SAMLBase implements SAMLAuthenti
      * Iterates through the RequestedAuthnContext from the Service Provider and
      * check if user has already authenticated with a sufficient authentication
      * level.
-     * <p/>
+     * <p>
      * If RequestAuthnContext is not found in the authenticated AuthnContext
      * then session upgrade will be done .
      *

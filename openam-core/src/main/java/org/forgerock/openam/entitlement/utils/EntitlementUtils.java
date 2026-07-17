@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.entitlement.utils;
 
@@ -215,7 +216,7 @@ public final class EntitlementUtils {
     }
 
     /**
-     * Converts the map of actions into a set format where the map's key->value combinations are separated by an equals
+     * Converts the map of actions into a set format where the map's key-&gt;value combinations are separated by an equals
      * character.
      *
      * @param actions The map of actions that needs to be converted.

@@ -21,7 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.service.protocol;
@@ -200,7 +200,7 @@ public class RemoteSession implements HttpSession, Serializable {
      * Same functionality as @see getAttribute.
      *
      * @deprecated
-     * @param name
+     * @param name the name of the attribute to retrieve
      * @return The value of the named attribute or null if not found or non-serializable
      */
     public Object getValue(String name) {

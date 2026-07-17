@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -2724,7 +2725,7 @@ class AMOrganizationImpl extends AMObjectImpl implements AMOrganization {
      * @param searchControl
      *            specifies the search scope to be used, VLV ranges etc.,
      * @param avfilter
-     *            this attribute-value pairs filter will be & with user search
+     *            this attribute-value pairs filter will be &amp; with user search
      *            filter
      * 
      * @return AMSearchResults which contains a Set DNs of Users matching the
@@ -2751,7 +2752,7 @@ class AMOrganizationImpl extends AMObjectImpl implements AMOrganization {
      * @param searchControl
      *            specifies the search scope to be used, VLV ranges etc.,
      * @param avfilter
-     *            this attribute-value pairs filter will be & with user search
+     *            this attribute-value pairs filter will be &amp; with user search
      *            filter
      * 
      * @return AMSearchResults which contains a Set DNs of Users matching the

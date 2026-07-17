@@ -25,6 +25,7 @@
  * $Id: Request.java,v 1.2 2008/06/25 05:47:37 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.protocol;
@@ -465,7 +466,7 @@ public class Request extends AbstractRequest {
      * Constructor.
      *
      * @param root <code>Request</code> element
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public Request(Element root) throws SAMLException {
 	// Make sure this is a Request

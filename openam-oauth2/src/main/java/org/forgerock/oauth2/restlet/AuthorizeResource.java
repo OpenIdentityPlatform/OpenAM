@@ -87,7 +87,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
 
     /**
      * Handles GET requests to the OAuth2 authorize endpoint.
-     * <br/>
+     * <br>
      * This method will be called when a client has requested a resource owner grants it authorization to access a
      * resource.
      *
@@ -151,7 +151,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
 
     /**
      * Handles POST requests to the OAuth2 authorize endpoint.
-     * <br/>
+     * <br>
      * This method will be called when a user has given their consent for an authorization request.
      *
      * @param entity The entity on the request.

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -47,7 +48,7 @@ public class InstallException extends Exception {
      * 
      * @param localizedMessage
      *            The message indicating the nature of the failure.
-     * @param ex
+     * @param e
      *            The exception that originally caused the failure.
      */
     public InstallException(LocalizedMessage localizedMessage, Exception e) {
@@ -58,7 +59,7 @@ public class InstallException extends Exception {
     /**
      * This constructor takes a message indicating the nature of the failure.
      * 
-     * @param msg
+     * @param localizedMessage
      *            The message indicating the nature of the failure.
      */
     public InstallException(LocalizedMessage localizedMessage) {

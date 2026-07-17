@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2017-2025 3A Systems, LLC
+ * Portions Copyrighted 2017-2026 3A Systems, LLC
  */
 package com.iplanet.am.util;
 
@@ -84,7 +84,7 @@ import com.sun.identity.sm.SMSEntry;
  * <p>
  * If multiple servers are running, each may have their own configuration file.
  * The naming convention for such scenarios is
- * <code>AMConfig-&lt;serverName></code>.
+ * <code>AMConfig-&lt;serverName&gt;</code>.
  * 
  */
 public class SystemProperties {
@@ -457,11 +457,11 @@ public class SystemProperties {
     }
 
     /**
-     * Initializes properties bundle from the <code>file<code> 
+     * Initializes properties bundle from the <code>file</code> 
      * passed.
      *
      * @param file type <code>String</code>, file name for the resource bundle
-     * @exception MissingResourceException
+     * @exception MissingResourceException if the resource bundle for the given file cannot be found
      */
     public static void initializeProperties(String file) throws MissingResourceException {
         Properties props = new Properties();

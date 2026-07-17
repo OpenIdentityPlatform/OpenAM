@@ -38,7 +38,7 @@ import java.util.Vector;
 
 /**
  * Holder of the attribute instances in an instance of the
- * {@link com.sun.identity.authentication.modules.radius.client .Packet} type which is the superclass of all radius
+ * {@code com.sun.identity.authentication.modules.radius.client.Packet} type which is the superclass of all radius
  * packet types. Maintains the order in which attributes are added.
  */
 public class AttributeSet {

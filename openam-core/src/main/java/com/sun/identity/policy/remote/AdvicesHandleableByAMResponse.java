@@ -25,6 +25,7 @@
  * $Id: AdvicesHandleableByAMResponse.java,v 1.4 2008/08/19 19:09:19 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.remote;
@@ -39,7 +40,6 @@ import org.w3c.dom.Node;
  * AdvicesHandleableByAMResponse XML element. 
  * The AdvicesHandleableByAMResponse DTD is 
  * defined as the following:
- * <p>
  * <pre>
  *    <!-- AdvicesHandleableByAMResponse element is the response from server
  *         that contains the names of policy advices that could be
@@ -47,9 +47,8 @@ import org.w3c.dom.Node;
  *         if PEP redirects the user agent to OpenAM
  *    -->
  *
- *    <!ELEMENT    AdvicesHandleableByAMResponse    (AttributeValuePair?) >
+ *    &lt;!ELEMENT    AdvicesHandleableByAMResponse    (AttributeValuePair?) &gt;
  * </pre>
- * <p>
  */
 
 public class AdvicesHandleableByAMResponse {

@@ -28,7 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.console.realm.model;
 
@@ -214,8 +214,6 @@ public class RMRealmModelImpl
     * type attributes. Returning other default values runs the risk
     * of violating the attribute uniqueness plugin while creating a 
     * new realm.
-    *
-    * @throws AMConsoleException if map cannot be obtained.
     */
     public Map getDefaultValues() {
         Map map = new HashMap();
@@ -247,8 +245,6 @@ public class RMRealmModelImpl
 
     /**
      * Returns Map of attribute name to empty set of values.
-     *
-     * @throws AMConsoleException if map cannot be obtained.
      */
     public Map getDataMap() {
         Map map = new HashMap();

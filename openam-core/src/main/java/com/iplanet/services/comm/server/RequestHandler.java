@@ -25,7 +25,7 @@
  * $Id: RequestHandler.java,v 1.2 2008/06/25 05:41:35 qcheng Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.iplanet.services.comm.server;
@@ -44,7 +44,7 @@ import java.util.List;
  * The <code>RequestHandler</code> interface needs to be implemented by high
  * level services and applications in order to be able to receive requests from
  * the Platform Low Level API.
- * </p>
+ * <p>
  * High level services and applications shall return Response objects filled
  * with exception classes and exception messages if there is an exception during
  * the request processing.
@@ -61,7 +61,7 @@ public interface RequestHandler {
      * @param auditor
      *            Delegate for publication of 'access' audit events.
      * @param requests
-     *            A Set<Request> of Request objects.
+     *            A {@code Set<Request>} of Request objects.
      * @param servletRequest
      *            Reference to HttpServletRequest object.
      * @param servletResponse

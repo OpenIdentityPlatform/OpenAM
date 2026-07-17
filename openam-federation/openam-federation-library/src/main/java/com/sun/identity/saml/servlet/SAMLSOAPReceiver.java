@@ -24,6 +24,7 @@
  *
  * $Id: SAMLSOAPReceiver.java,v 1.3 2009/06/12 22:21:39 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /*
@@ -178,7 +179,7 @@ public class SAMLSOAPReceiver extends HttpServlet {
      * @param req <code>HttpServletRequest</code> object.
      * @param resp <code>HttpServletResponse</code> object.
      * @throws ServletException if there is an error.
-     * @throws IOException if there is an error.
+     * @throws java.io.IOException if there is an error.
      */
     public void doPost(HttpServletRequest req,
                        HttpServletResponse resp)

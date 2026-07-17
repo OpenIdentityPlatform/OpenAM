@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -35,7 +36,6 @@ import com.iplanet.am.util.AMClientDetector;
 
 /**
  * Provides common access to client data.
- * <p>
  * <p>
  * Client data is accessed for a particular client type. The underlying client
  * data is stored in the profile service, but this interface should always used

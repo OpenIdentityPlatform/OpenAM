@@ -24,6 +24,7 @@
  *
  * $Id: ResultImpl.java,v 1.4 2008/11/10 22:57:05 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context.impl;
@@ -53,17 +54,17 @@ import org.w3c.dom.NodeList;
  * The <code>Result</code> element contains decision, status and obligations
  * per resource id
  *
- * <p/>
+ * <p>
  * schema
  * <pre>
- *  &lt;xs:complexType name="ResultType">
- *      &lt;xs:sequence>
- *          &lt;xs:element ref="xacml-context:Decision"/>
- *          &lt;xs:element ref="xacml-context:Status" minOccurs="0"/>
- *          &lt;xs:element ref="xacml:Obligations" minOccurs="0"/>
- *      &lt;xs:sequence>
- *      &lt;xs:attribute name="ResourceId" type="xs:string" use="optional"/>
- *  &lt;xs:complexType>
+ *  &lt;xs:complexType name="ResultType"&gt;
+ *      &lt;xs:sequence&gt;
+ *          &lt;xs:element ref="xacml-context:Decision"/&gt;
+ *          &lt;xs:element ref="xacml-context:Status" minOccurs="0"/&gt;
+ *          &lt;xs:element ref="xacml:Obligations" minOccurs="0"/&gt;
+ *      &lt;xs:sequence&gt;
+ *      &lt;xs:attribute name="ResourceId" type="xs:string" use="optional"/&gt;
+ *  &lt;xs:complexType&gt;
  *
  * </pre>
  */
@@ -86,7 +87,7 @@ public class ResultImpl implements Result {
      * Constructs a <code>Result</code> object from an XML string
      *
      * @param xml string representing a <code>Result</code> object
-     * @throws SAMLException if the XML string could not be processed
+     * @throws XACMLException if the XML string could not be processed
      */
     public ResultImpl(String xml) throws XACMLException {
         Document document = XMLUtils.toDOMDocument(xml, XACMLSDKUtils.debug);
@@ -109,7 +110,7 @@ public class ResultImpl implements Result {
      * @param element XML DOM element representing a <code>Result</code> 
      * object
      *
-     * @throws SAMLException if the DOM element could not be processed
+     * @throws XACMLException if the DOM element could not be processed
      */
     public ResultImpl(Element element) throws XACMLException {
         processElement(element);

@@ -24,6 +24,7 @@
  *
  * $Id: GetCompleteImpl.java,v 1.2 2008/06/25 05:47:59 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -94,9 +95,9 @@ public class GetCompleteImpl implements GetComplete {
     }
     
     /** 
-     * Sets the value of the <code>GetComplete<code> URI.
+     * Sets the value of the <code>GetComplete</code> URI.
      *
-     * @param value new value of the <code>GetComplete<code> URI.
+     * @param value new value of the <code>GetComplete</code> URI.
      * @throws SAML2Exception if the object is immutable.
      * @see #getValue
      */

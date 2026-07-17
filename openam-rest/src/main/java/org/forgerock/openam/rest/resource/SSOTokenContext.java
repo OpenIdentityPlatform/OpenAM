@@ -13,7 +13,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.rest.resource;
@@ -58,8 +58,8 @@ public class SSOTokenContext extends AbstractContext implements SubjectContext {
 
     /**
      * Construct a new SSOTokenContext using a supplier for the SSOToken instance.
-     * @param debug
-     * @param sessionCache
+     * @param debug the debug logger used by this context
+     * @param sessionCache the session cache used to look up the session for the caller
      * @param parent The parent context.
      * @param token A supplier for the SSOToken to derive the other attributes of this context from.
      */

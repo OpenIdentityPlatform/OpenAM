@@ -24,6 +24,7 @@
  *
  * $Id: HttpURLResourceName.java,v 1.1 2009/11/24 21:42:35 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -45,7 +46,7 @@ package com.sun.identity.shared.whitelist;
   * Behaviour of existing URLResourceName was not changed to
   * maintain backward compatibility.
   *
-  * @see {@see BaseURLResourceName}
+  * @see org.forgerock.openam.shared.resourcename.BaseURLResourceName
   */
 
 public class HttpURLResourceName extends URLResourceName {

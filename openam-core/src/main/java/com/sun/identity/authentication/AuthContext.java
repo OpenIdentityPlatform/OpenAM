@@ -25,7 +25,7 @@
  * $Id: AuthContext.java,v 1.25 2009/11/21 01:12:59 qcheng Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.authentication;
 
@@ -1108,7 +1108,7 @@ public class AuthContext extends Object implements java.io.Serializable {
      * Returns <code>true</code> if the login process requires more information
      * from the user to complete the authentication.
      *
-     * NOTE: This method has to be called as a condition of a <ode>while</code>
+     * NOTE: This method has to be called as a condition of a <code>while</code>
      * loop in order to complete the authentication process and get the correct
      * <code>Status</code> after submitting the requirements.
      *

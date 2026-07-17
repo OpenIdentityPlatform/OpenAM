@@ -25,6 +25,7 @@
  * $Id: PolicyRequest.java,v 1.5 2008/08/19 19:09:19 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.remote;
@@ -37,8 +38,7 @@ import org.w3c.dom.Node;
 /**
  * This <code>PolicyRequest</code> class represents a PolicyRequest
  * XML document. The PolicyRequest DTD is defined as the following:
- * <p>
- * <pre>
+ * <pre>{@code
  *  <!-- PolicyRequest element is used by the client to request the
  *    policy evaluation decisions or to add/remove a policy listener.
  *    The attribute appSSOToken provides the SSO token of the client
@@ -55,8 +55,7 @@ import org.w3c.dom.Node;
  *      appSSOToken    CDATA        #REQUIRED
  *      requestId      CDATA        #REQUIRED
  *  >
- * </pre>
- * <p>
+ * }</pre>
  */
 public class PolicyRequest {
     /**

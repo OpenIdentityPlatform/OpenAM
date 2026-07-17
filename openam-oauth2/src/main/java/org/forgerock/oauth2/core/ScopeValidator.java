@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -113,7 +114,7 @@ public interface ScopeValidator {
     /**
      * Provided as an extension point to allow the OAuth2 provider to return additional data from an access token
      * request.
-     * <br/>
+     * <br>
      * Any additional data to be returned should be added to the access token by invoking,
      * AccessToken#addExtraData(String, String).
      *

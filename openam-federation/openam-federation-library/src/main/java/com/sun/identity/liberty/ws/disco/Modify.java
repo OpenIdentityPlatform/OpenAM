@@ -24,6 +24,7 @@
  *
  * $Id: Modify.java,v 1.2 2008/06/25 05:47:10 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -41,19 +42,19 @@ import com.sun.identity.liberty.ws.disco.common.DiscoUtils;
  * The following schema fragment specifies the expected content within
  * the <code>Modify</code> object.
  * <pre>
- * &lt;xs:element name="Modify" type="ModifyType"/>
- * &lt;complexType name="ModifyType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;group ref="{urn:liberty:disco:2003-08}ResourceIDGroup"/>
- *         &lt;element name="InsertEntry" type="{urn:liberty:disco:2003-08}InsertEntryType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="RemoveEntry" type="{urn:liberty:disco:2003-08}RemoveEntryType" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;xs:element name="Modify" type="ModifyType"/&gt;
+ * &lt;complexType name="ModifyType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;group ref="{urn:liberty:disco:2003-08}ResourceIDGroup"/&gt;
+ *         &lt;element name="InsertEntry" type="{urn:liberty:disco:2003-08}InsertEntryType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="RemoveEntry" type="{urn:liberty:disco:2003-08}RemoveEntryType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

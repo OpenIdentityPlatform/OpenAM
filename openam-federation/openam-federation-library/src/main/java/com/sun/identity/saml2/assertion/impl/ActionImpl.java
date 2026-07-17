@@ -24,6 +24,7 @@
  *
  * $Id: ActionImpl.java,v 1.2 2008/06/25 05:47:42 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.assertion.impl;
@@ -44,16 +45,15 @@ import com.sun.identity.saml2.common.SAML2SDKUtils;
  * This class is an implementation of interface <code>Action</code>.
  * The <code>Action</code> element specifies an action on the specified
  * resource for which permission is sought. Its type is <code>ActionType</code>.
- * <p>
  * <pre>
- * &lt;complexType name="ActionType">
- *   &lt;simpleContent>
- *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
+ * &lt;complexType name="ActionType"&gt;
+ *   &lt;simpleContent&gt;
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema&gt;string"&gt;
  *       &lt;attribute name="Namespace" use="required"
- *       type="{http://www.w3.org/2001/XMLSchema}anyURI" />
- *     &lt;/extension>
- *   &lt;/simpleContent>
- * &lt;/complexType>
+ *       type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/simpleContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  *
  */

@@ -24,6 +24,7 @@
  *
  * $Id: FSAuthenticationStatement.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.message;
@@ -295,7 +296,7 @@ public class FSAuthenticationStatement extends AuthenticationStatement {
     /**
      * Returns the value of <code>SessionIndex</code> attribute.
      *
-     * @return the value of </code>SessionIndex</code> attribute.
+     * @return the value of <code>SessionIndex</code> attribute.
      * @see #setSessionIndex(String)
      */
     public String getSessionIndex(){

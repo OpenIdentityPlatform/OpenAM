@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.authentication.callbacks;
 
@@ -55,7 +56,7 @@ public class PollingWaitCallback implements Callback {
 
     /**
      * Gets a new PollingWaitCallbackBuilder to use for construction of a PollingWaitCallback.
-     * @returna new PollingWaitCallbackBuilder object.
+     * @return a new PollingWaitCallbackBuilder object.
      */
     public static PollingWaitCallbackBuilder makeCallback() {
         return new PollingWaitCallbackBuilder();

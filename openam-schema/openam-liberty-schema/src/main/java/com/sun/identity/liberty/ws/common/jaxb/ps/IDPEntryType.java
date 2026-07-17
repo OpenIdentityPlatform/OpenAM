@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,19 +13,18 @@ package com.sun.identity.liberty.ws.common.jaxb.ps;
 /**
  * Java content class for anonymous complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-protocols-schema.xsd line 226)
- * <p>
  * <pre>
- * &lt;complexType>
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:iff:2003-08}ProviderID"/>
- *         &lt;element name="ProviderName" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="Loc" type="{http://www.w3.org/2001/XMLSchema}anyURI"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:iff:2003-08}ProviderID"/&gt;
+ *         &lt;element name="ProviderName" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
+ *         &lt;element name="Loc" type="{http://www.w3.org/2001/XMLSchema}anyURI"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

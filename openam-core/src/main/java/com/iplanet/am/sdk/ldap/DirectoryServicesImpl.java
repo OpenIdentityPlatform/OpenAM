@@ -25,6 +25,7 @@
  * $Id: DirectoryServicesImpl.java,v 1.14 2009/11/20 23:52:51 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk.ldap;
@@ -1635,7 +1636,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
      * @param objectType
      *            profile type
      * @param recursive
-     *            if true, remove all sub entries & the object
+     *            if true, remove all sub entries &amp; the object
      * @param softDelete
      *            Used to let pre/post callback plugins know that this delete is
      *            either a soft delete (marked for deletion) or a purge/hard
@@ -2612,10 +2613,15 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
      * Sets the filter for a dynamic group in the datastore.
      * 
      * @param token
+     *            the single sign-on token used to authorize the operation
      * @param entryDN
+     *            the DN of the dynamic group entry
      * @param filter
+     *            the search filter to set on the dynamic group
      * @throws AMException
+     *             if an error occurs while setting the group filter
      * @throws SSOException
+     *             if the single sign-on token is invalid or has expired
      */
     public void setGroupFilter(SSOToken token, String entryDN, String filter)
             throws AMException, SSOException {
@@ -3029,7 +3035,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
     }
 
     /**
-     * Create a COS Definition based on serviceID & attribute set & type. For
+     * Create a COS Definition based on serviceID &amp; attribute set &amp; type. For
      * policy attribute, will set cosattribute to "override" For other
      * attribute, will set cosattribute to "default"
      */
@@ -3364,6 +3370,7 @@ public class DirectoryServicesImpl implements AMConstants, IDirectoryServices {
      * objectclass based on the LDAP schema
      * 
      * @param objectclass
+     *            the object class whose attributes are returned
      * @return the attributes for the objectclass
      */
     public Set getAttributesForSchema(String objectclass) {

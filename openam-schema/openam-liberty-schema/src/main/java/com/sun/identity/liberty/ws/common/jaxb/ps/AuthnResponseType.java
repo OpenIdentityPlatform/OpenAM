@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,20 +13,19 @@ package com.sun.identity.liberty.ws.common.jaxb.ps;
 /**
  * Java content class for AuthnResponseType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-protocols-schema.xsd line 127)
- * <p>
  * <pre>
- * &lt;complexType name="AuthnResponseType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:SAML:1.0:protocol}ResponseType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:iff:2003-08}Extension" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:iff:2003-08}ProviderID"/>
- *         &lt;element ref="{urn:liberty:iff:2003-08}RelayState" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute ref="{urn:liberty:iff:2003-08}consent"/>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="AuthnResponseType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:oasis:names:tc:SAML:1.0:protocol}ResponseType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:iff:2003-08}Extension" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:iff:2003-08}ProviderID"/&gt;
+ *         &lt;element ref="{urn:liberty:iff:2003-08}RelayState" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute ref="{urn:liberty:iff:2003-08}consent"/&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

@@ -1,0 +1,3 @@
+# Keep HTML checked out with LF on all platforms so javadoc doclint
+# (JDK 25/26) does not treat CR (from CRLF) as part of a multi-line tag name.
+*.html text eol=lf

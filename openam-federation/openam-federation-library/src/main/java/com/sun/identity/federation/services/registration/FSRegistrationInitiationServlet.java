@@ -24,7 +24,7 @@
  *
  * $Id: FSRegistrationInitiationServlet.java,v 1.7 2008/12/19 06:50:47 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -141,7 +141,8 @@ public class FSRegistrationInitiationServlet extends HttpServlet {
      *  request the client has made of the servlet.
      * @param response <code>HttpServletResponse</code> object that contains
      *  the response the servlet sends to the client.
-     * @exception ServletException, IOException if the request could not be
+     * @exception ServletException if the request could not be
+     * @exception IOException if the request could not be
      *  handled
      */
     private void doGetPost(

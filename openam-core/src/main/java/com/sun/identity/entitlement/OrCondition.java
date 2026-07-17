@@ -25,6 +25,7 @@
  * $Id: OrCondition.java,v 1.2 2009/09/05 00:24:04 veiming Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.entitlement;
 
@@ -70,7 +71,7 @@ public class OrCondition extends LogicalCondition {
      * @param resourceName Resource name.
      * @param environment Environment parameters.
      * @return the {@link ConditionDecision} having performed the {@link EntitlementCondition}(s) evaluation.
-     * @throws {@link EntitlementException} in case of any error.
+     * @throws EntitlementException in case of any error.
      */
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName,
                                       Map<String, Set<String>> environment) throws EntitlementException {

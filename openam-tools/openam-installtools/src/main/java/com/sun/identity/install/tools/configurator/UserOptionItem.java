@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -44,12 +45,12 @@ import com.sun.identity.install.tools.util.LocalizedMessage;
  * </pre>
  * 
  * <br>
- * Here 1, 2 & 3 are display items and the rest of the Strings are localized
+ * Here 1, 2 &amp; 3 are display items and the rest of the Strings are localized
  * messages for each of those option. The localized message will be of the
  * format: <br>
  * {0}. Continue with installation <br>
- * Interaction Example 2: <br> [ ? : Help, < : Back, ] <br>
- * Here ? and < are display items. The localized messages will looks like <br>
+ * Interaction Example 2: <br> [ ? : Help, &lt; : Back, ] <br>
+ * Here ? and &lt; are display items. The localized messages will looks like <br>
  * 
  * <pre>
  *   {0} : Help

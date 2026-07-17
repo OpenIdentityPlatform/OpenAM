@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.conditions.environment;
 
@@ -89,10 +90,10 @@ public final class ConditionConstants {
      * Key that is used to define request IP address that is passed down as part of the <code>environment</code> Map
      * to <code>evaluate</code> of an <code>EntitlementCondition</code> for condition evaluation. Value for the key
      * should be a <code>String</code> representation of IP of the client,
-     * <p/>
+     * <p>
      * For IP version 4:
      * The form is  n.n.n.n where n is a value between 0 and 255 inclusive.
-     * <p/>
+     * <p>
      * For IP version 6:
      * The form is x:x:x:x:x:x:x:x where x is the hexadecimal values of the eight 16-bit pieces of the address.
      */
@@ -167,7 +168,6 @@ public final class ConditionConstants {
      * <pre>
      *    HH:mm
      * </pre>
-     *</p>
      *
      * <p>
      * Some sample values are
@@ -175,7 +175,6 @@ public final class ConditionConstants {
      *     08:25
      *     18:45
      * </pre>
-     * </p>
      *
      * @see #END_TIME
      */
@@ -194,7 +193,6 @@ public final class ConditionConstants {
      * <pre>
      *    HH:mm
      * </pre>
-     *</p>
      *
      * <p>
      * Some sample values are
@@ -202,7 +200,6 @@ public final class ConditionConstants {
      *     08:25
      *     18:45
      * </pre>
-     * </p>
      *
      * @see #START_TIME
      */
@@ -224,7 +221,6 @@ public final class ConditionConstants {
      *     Sun
      *     Mon
      * </pre>
-     * </p>
      *
      * @see #END_DAY
      */
@@ -246,7 +242,6 @@ public final class ConditionConstants {
      *     Sun
      *     Mon
      * </pre>
-     * </p>
      *
      * @see #START_DAY
      */
@@ -269,7 +264,6 @@ public final class ConditionConstants {
      *     2001:02:26
      *     2002:12:31
      * </pre>
-     * </p>
      *
      * @see #END_DATE
      */
@@ -292,7 +286,6 @@ public final class ConditionConstants {
      *     2001:02:26
      *     2002:12:31
      * </pre>
-     * </p>
      *
      * @see #START_DATE
      */
@@ -354,7 +347,7 @@ public final class ConditionConstants {
      *     <li>122.100.85.45-125.110.90.66</li>
      *     <li>145.64.55.35-215.110.173.145</li>
      *     <li>15.64.55.35</li>
-     * </ul></p>
+     * </ul>
      *
      * <p>The patterns for IP Version 6 is:
      *    x:x:x:x:x:x:x:x[-x:x:x:x:x:x:x:x]
@@ -441,7 +434,6 @@ public final class ConditionConstants {
      * finace.yahoo.com
      * *.yahoo.com
      * </pre>
-     * </p>
      */
     public static final String DNS_NAME = "dnsName";
 

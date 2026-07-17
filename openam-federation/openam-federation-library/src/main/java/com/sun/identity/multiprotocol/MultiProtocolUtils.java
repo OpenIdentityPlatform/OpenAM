@@ -24,7 +24,7 @@
  *
  * $Id: MultiProtocolUtils.java,v 1.4 2009/03/20 21:06:32 weisun2 Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.multiprotocol;
@@ -343,7 +343,7 @@ public class MultiProtocolUtils {
      *         <code>LOGOUT_NO_ACTION_STATUS</code>  - single loglout not
      *                                                 performed.
      * @return single logout status in string form. Possible values:
-     *         <code>IFSConstants.LOGOUT_SUCCESS<code>,
+     *         <code>IFSConstants.LOGOUT_SUCCESS</code>,
      *         <code>IFSConstants.LOGOUT_FAILURE</code>
      */
     public static String getLogoutStatus(int status) {

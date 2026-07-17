@@ -24,6 +24,7 @@
  *
  * $Id: ProviderUtil.java,v 1.4 2008/08/06 17:28:12 exu Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.util;
@@ -58,7 +59,7 @@ public class ProviderUtil {
      * class name is specified with property 
      * "com.sun.identity.liberty.ws.uti.providerManagerClass"
      * in FederationConfig.
-     * @return <code>ProviderManager</code.
+     * @return <code>ProviderManager</code>.
      */
     public static ProviderManager getProviderManager() {
         return providerManager;

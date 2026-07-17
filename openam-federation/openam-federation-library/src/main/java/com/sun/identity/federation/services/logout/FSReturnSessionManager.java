@@ -25,6 +25,7 @@
  * $Id: FSReturnSessionManager.java,v 1.4 2009/01/28 05:35:07 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services.logout;
@@ -135,7 +136,7 @@ public final class FSReturnSessionManager{
     /**
      * Gets the singleton instance of <code>FSReturnSessionManager</code>.
      * There is a single instance for each hosted provider.
-     * @return metaAlias the hosted provider whose instance needs to be
+     * @param metaAlias the hosted provider whose instance needs to be
      *  returned
      * @return the singleton <code>FSReturnSessionManager</code> instance
      */

@@ -25,6 +25,7 @@
  * $Id: DelegationUtils.java,v 1.7 2008/07/06 05:48:31 arviranga Exp $
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.delegation;
@@ -131,7 +132,7 @@ public class DelegationUtils {
      * @param parent parent realm's <code>OrganizationConfigManager</code>
               where default privileges are picked from.
      * @param child realm where default privileges are copied from the
-     *        </code>parent</code>.
+     *        <code>parent</code>.
      */
     public static void copyRealmPrivilegesFromParent(SSOToken token,
             OrganizationConfigManager parent, OrganizationConfigManager child)

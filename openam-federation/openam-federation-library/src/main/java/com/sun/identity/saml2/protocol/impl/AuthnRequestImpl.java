@@ -24,6 +24,7 @@
  *
  * $Id: AuthnRequestImpl.java,v 1.8 2009/06/09 20:28:32 exu Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -52,8 +53,8 @@ import org.w3c.dom.NodeList;
 
 
 /** 
- * The <code>AuthnRequestImpl</code> implements the 
- * </code>AuthnRequest</code> interface , defines methods for 
+ * The <code>AuthnRequestImpl</code> implements the
+ * <code>AuthnRequest</code> interface , defines methods for
  * properties required by a saml request.
  */
 
@@ -351,7 +352,7 @@ public class AuthnRequestImpl extends RequestAbstractImpl
      * Returns the value of the <code>AssertionConsumerServiceIndex</code> 
      * attribute.
      *
-     * @return value of the <code>AssertionConsumerServiceIndex<code> 
+     * @return value of the <code>AssertionConsumerServiceIndex</code> 
      *         attribute.
      * @see #setAssertionConsumerServiceIndex(Integer)
      */
@@ -382,7 +383,7 @@ public class AuthnRequestImpl extends RequestAbstractImpl
      * Returns the value of the <code>AttributeConsumingServiceIndex</code>
      * attribute.
      *
-     * @return value of the <code>AttributeConsumingServiceIndex<code>
+     * @return value of the <code>AttributeConsumingServiceIndex</code>
      *		attribute.
      * @see #setAttributeConsumingServiceIndex(Integer)
      */
@@ -449,7 +450,7 @@ public class AuthnRequestImpl extends RequestAbstractImpl
      *		qualifier is prepended to the Element when converted
      *	@param declareNS determines whether or not the namespace is declared
      *		within the Element.
-     *	@exception SAML2Exception ,if it could not create String object.
+     *	@exception SAML2Exception if it could not create String object.
      *	@return a String representation of this Object.
      **/
     

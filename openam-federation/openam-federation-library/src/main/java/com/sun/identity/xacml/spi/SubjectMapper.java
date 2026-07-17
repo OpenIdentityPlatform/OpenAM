@@ -25,6 +25,7 @@
  * $Id: SubjectMapper.java,v 1.2 2008/06/25 05:48:16 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.spi;
@@ -72,7 +73,7 @@ public interface SubjectMapper {
      * @param xacmlContextSubjects <code>xacml-context:Subject</code>s from the
      * <code>xacml-context:Request</code> object.
      * @return OpenAM <code>SSOToken</code> representing the mapped native subject.
-     * If the mapping fails, <code>null<code> would be returned
+     * If the mapping fails, <code>null</code> would be returned
      * @exception XACMLException if an error conditions occurs.
      */
     public Object mapToNativeSubject(List xacmlContextSubjects) 

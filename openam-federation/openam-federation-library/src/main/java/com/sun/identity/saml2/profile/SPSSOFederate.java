@@ -25,7 +25,7 @@
  * $Id: SPSSOFederate.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -403,7 +403,7 @@ public class SPSSOFederate {
      * @param realm the realm the sp is configured in
      * @param spEntityID the entity id of the sp to get the attributes map for
      * @return a map of SAML2 Attributes with String keys mapped to a collection of values
-     * @throws SAML2MetaException
+     * @throws SAML2MetaException if a SAML2 metadata error occurs
      */
     public static Map<String, Collection<String>> getAttrsMapForAuthnReq(String realm, String spEntityID)
             throws SAML2MetaException {
@@ -434,12 +434,12 @@ public class SPSSOFederate {
     /**
      * Gets the Post Binding message
      *
-     * @param idpsso
-     * @param spsso
-     * @param spConfigAttrsMap
-     * @param authnRequest
-     * @return
-     * @throws SAML2Exception
+     * @param idpsso the standard metadata of the identity provider
+     * @param spsso the standard metadata of the service provider
+     * @param spConfigAttrsMap the extended configuration attributes of the service provider
+     * @param authnRequest the authentication request to be sent
+     * @return the post binding message as an HTML form string
+     * @throws SAML2Exception if a SAML2 error occurs
      */
     public static String getPostBindingMsg(IDPSSODescriptorElement idpsso, SPSSODescriptorElement spsso,
                                             Map spConfigAttrsMap, AuthnRequest authnRequest)
@@ -795,7 +795,7 @@ public class SPSSOFederate {
      * @param ssourl the url for the single sign on request
      * @param isForECP boolean to indicatge if the request originated from an ECP
      * @return a new AuthnRequest object
-     * @throws SAML2Exception
+     * @throws SAML2Exception if a SAML2 error occurs
      */
     public static AuthnRequest createAuthnRequest(final HttpServletRequest request, 
                                                   final HttpServletResponse response, 
@@ -1260,7 +1260,7 @@ public class SPSSOFederate {
      * @param queryString the query string
      * @param certAlias the certificate alias
      * @return the signed query string
-     * @throws SAML2Exception
+     * @throws SAML2Exception if a SAML2 error occurs
      */
     public static String signQueryString(final String queryString, final String certAlias)
         throws SAML2Exception {

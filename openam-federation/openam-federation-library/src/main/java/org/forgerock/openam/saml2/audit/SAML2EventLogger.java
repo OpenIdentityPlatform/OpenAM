@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015 ForgeRock AS.
+* Portions Copyrighted 2026 3A Systems, LLC
 */
 package org.forgerock.openam.saml2.audit;
 
@@ -25,14 +26,12 @@ public interface SAML2EventLogger {
 
     /**
      * Publishes an audit event with details of the attempted SAML2 operation, if the 'access' topic is audited.
-     *
-     * @throws AuditException If an exception occurred that prevented the audit event from being published.
      */
     void auditAccessAttempt();
 
     /**
      * Publishes an event with details of the successfully completed SAML2 operation, if the 'access' topic is audited.
-     * <p/>
+     * <p>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
      */
@@ -40,7 +39,7 @@ public interface SAML2EventLogger {
 
     /**
      * Publishes an event with details of the failed CREST operation, if the 'access' topic is audited.
-     * <p/>
+     * <p>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
      *

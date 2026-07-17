@@ -25,6 +25,7 @@
  * $Id: SSOPrincipal.java,v 1.2 2008/06/25 05:41:42 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.sso.providers.dpro;
@@ -43,7 +44,7 @@ public class SSOPrincipal implements java.security.Principal {
     /**
      * Creates a SSOPrincipal object
      * 
-     * @param String The name of the principal
+     * @param name The name of the principal
      */
 
     public SSOPrincipal(String name) {
@@ -53,7 +54,7 @@ public class SSOPrincipal implements java.security.Principal {
     /**
      * Compares this principal to the specified object.  Returns true
      * if the object passed in matches the principal.
-     * @param Object The object to be compared
+     * @param object The object to be compared
      * @return <code>true</code>if the principal match.
      *         <code>false</code>
      */

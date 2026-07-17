@@ -25,7 +25,7 @@
  * $Id: InteractionManager.java,v 1.5 2008/08/06 17:28:10 exu Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.liberty.ws.interaction;
@@ -253,7 +253,7 @@ public class InteractionManager {
      * @throws InteractionException for generic interaction error
      * @throws InteractionRedirectException if user agent is redirected to 
      *                     <code>WSP</code> for resource owner interactions
-     * @throws SOAPBindingException  for generic SOAP binding errors
+     * @throws SOAPBindingException for generic SOAP binding errors
      * @throws SOAPFaultException if the response message has SOAP fault
      *
      * 
@@ -398,7 +398,7 @@ public class InteractionManager {
      * @throws InteractionException for generic interaction error
      * @throws InteractionRedirectException if user agent is redirected to 
      *                     <code>WSP</code> for resource owner interactions
-     * @throws SOAPBindingException  for generic SOAP errors
+     * @throws SOAPBindingException for generic SOAP errors
      * @throws SOAPFaultException if the response message has SOAP fault
      *
      * 

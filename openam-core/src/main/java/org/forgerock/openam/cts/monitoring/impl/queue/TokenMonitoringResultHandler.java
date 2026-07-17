@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.cts.monitoring.impl.queue;
 
@@ -43,7 +44,7 @@ public class TokenMonitoringResultHandler implements ResultHandler<Token, CoreTo
 
     /**
      * @return Delegates to wrapped handler.
-     * @throws CoreTokenException {@inheritDoc}
+     * @throws CoreTokenException if the wrapped handler fails to return the results
      */
     @Override
     public Token getResults() throws CoreTokenException {

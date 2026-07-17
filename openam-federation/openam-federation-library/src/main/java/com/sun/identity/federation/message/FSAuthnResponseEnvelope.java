@@ -24,6 +24,7 @@
  *
  * $Id: FSAuthnResponseEnvelope.java,v 1.2 2008/06/25 05:46:43 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.message;
@@ -138,7 +139,7 @@ public class FSAuthnResponseEnvelope {
    }
 
   /**
-   * Sets the value of <code>MinorVersion<code> attribute.
+   * Sets the value of <code>MinorVersion</code> attribute.
    *
    * @param minorVersion the <code>MinorVersion</code> attribute.
    */
@@ -238,7 +239,7 @@ public class FSAuthnResponseEnvelope {
     }
     
    /**
-    * Creates a String representation of the <code>Response<code> object.
+    * Creates a String representation of the <code>Response</code> object.
     * @param includeNS : Determines whether or not the namespace qualifier
     *        is prepended to the Element when converted
     * @param declareNS : Determines whether or not the namespace is declared

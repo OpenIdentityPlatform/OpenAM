@@ -24,6 +24,7 @@
  *
  * $Id: SubjectConfirmation.java,v 1.2 2008/06/25 05:47:33 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
   
 package com.sun.identity.saml.assertion;
@@ -59,7 +60,7 @@ public class SubjectConfirmation {
      *
      * @param subjectConfirmationElement a DOM Element representing the 
      *        <code>SubjectConfirmation</code> object. 
-     * @throws SAMLException
+     * @throws SAMLException if a SAML error occurs
      */
     public SubjectConfirmation(org.w3c.dom.Element subjectConfirmationElement) 
         throws SAMLException 

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.entitlement.xacml3;
@@ -70,12 +70,13 @@ public class XACMLReaderWriter {
      * Translate provided XACML PolicySet into OpenAM Privileges, ReferralPrivileges, Applications and ResourceTypes.
      * XACML export file doesn't map Application and Resource Type completely and hence dummy ResourceType Ids
      * are assigned to ResourceTypes created and same is used for linking Application, Privilege to the ResourceType.
-     * <p />
      *
-     * From a policySet instance: <br />
+     * From a policySet instance: <br>
+     * <ul>
      * <li> An application is created for every unique application name found in the Policy instances.</li>
      * <li> One ResourceType instance (with dummy uuid) per Policy is created.</li>
      * <li> One instance of Privilege per Policy instance is created. </li>
+     * </ul>
      *
      * @param policySet The set of policies to translate
      * @return OpenAM Privileges, ReferralPrivileges, Applications and ResourceTypes.

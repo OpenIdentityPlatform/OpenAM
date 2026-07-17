@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,19 +13,18 @@ package com.sun.identity.liberty.ws.meta.jaxb;
 /**
  * Java content class for IDPDescriptorType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-metadata.xsd line 205)
- * <p>
  * <pre>
- * &lt;complexType name="IDPDescriptorType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:liberty:metadata:2003-08}providerDescriptorType">
- *       &lt;sequence>
- *         &lt;element name="SingleSignOnServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI"/>
- *         &lt;element name="SingleSignOnProtocolProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded"/>
- *         &lt;element name="AuthnServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="IDPDescriptorType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:liberty:metadata:2003-08}providerDescriptorType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="SingleSignOnServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI"/&gt;
+ *         &lt;element name="SingleSignOnProtocolProfile" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded"/&gt;
+ *         &lt;element name="AuthnServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -57,7 +58,7 @@ import java.util.Collections;
  * implementation  of <code>Condition</code> that lets you specify 
  * the realm to which user should authenticate for the policy to apply
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.AuthenticateToRealmCondition} instead.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.environment.AuthenticateToRealmCondition} instead.
  */
 @Deprecated
 public class AuthenticateToRealmCondition implements Condition {

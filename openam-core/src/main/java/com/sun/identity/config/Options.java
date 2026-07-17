@@ -69,7 +69,7 @@ public class Options extends SetupPage {
     }
 
     /**
-     * @return boolean If <tt>true</tt>, the options.htm page will be customized for a new installation,
+     * @return boolean If <code>true</code>, the options.htm page will be customized for a new installation,
      * otherwise it will be customized for an upgrade.
      *
      * Automatic upgrades from 9.5 onwards are supported.

@@ -24,6 +24,7 @@
  *
  * $Id: SubjectQueryAbstract.java,v 1.2 2008/06/25 05:47:58 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -37,17 +38,16 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * This class represents the SubjectQueryAbstractType complex type.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 	
- * <p>
  * <pre>
- * &lt;complexType name="SubjectQueryAbstractType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}RequestAbstractType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Subject"/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="SubjectQueryAbstractType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}RequestAbstractType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Subject"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  * 

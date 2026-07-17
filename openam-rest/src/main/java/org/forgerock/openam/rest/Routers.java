@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.rest;
@@ -437,7 +438,7 @@ public class Routers {
          * version of {@literal 1} into the route.</p>
          *
          * @param resourceClass The annotated resource endpoint class. Should be annotated with
-         *         {@link org.forgerock.json.resource.annotations.RequestHandler}.
+         *         {@code org.forgerock.json.resource.annotations.RequestHandler}.
          */
         public void toAnnotatedCollection(Class<? extends Object> resourceClass) {
             Reject.ifNull(resourceClass);
@@ -452,7 +453,7 @@ public class Routers {
          * version of {@literal 1} into the route.</p>
          *
          * @param resourceClass The annotated resource endpoint class. Should be annotated with
-         *         {@link org.forgerock.json.resource.annotations.RequestHandler}.
+         *         {@code org.forgerock.json.resource.annotations.RequestHandler}.
          */
         public void toAnnotatedSingleton(Class<? extends Object> resourceClass) {
             Reject.ifNull(resourceClass);
@@ -856,7 +857,7 @@ public class Routers {
          * matching the route should be routed to.
          *
          * @param resourceClass The annotated resource endpoint class. Should be annotated with
-         *         {@link org.forgerock.json.resource.annotations.RequestHandler}.
+         *         {@code org.forgerock.json.resource.annotations.RequestHandler}.
          */
         public VersionableResourceRoute toAnnotatedCollection(Class<? extends Object> resourceClass) {
             Reject.ifNull(resourceClass);
@@ -868,7 +869,7 @@ public class Routers {
          * matching the route should be routed to.
          *
          * @param resourceClass The annotated resource endpoint class. Should be annotated with
-         *         {@link org.forgerock.json.resource.annotations.RequestHandler}.
+         *         {@code org.forgerock.json.resource.annotations.RequestHandler}.
          */
         public VersionableResourceRoute toAnnotatedSingleton(Class<? extends Object> resourceClass) {
             Reject.ifNull(resourceClass);

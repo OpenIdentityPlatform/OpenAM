@@ -25,6 +25,7 @@
  * $Id: ResponseProvider.java,v 1.5 2008/08/19 19:09:16 veiming Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.interfaces;
@@ -106,7 +107,7 @@ public interface ResponseProvider extends Cloneable {
      *
      * @param property property name
      *
-     * @return <code>Syntax<code> for the property name
+     * @return <code>Syntax</code> for the property name
      */
     public Syntax getPropertySyntax(String property);
 
@@ -121,7 +122,7 @@ public interface ResponseProvider extends Cloneable {
      * @param property property name
      * @param locale locale for which the property name must be customized
      * @return display name for the property name.
-     * @throws PolicyException
+     * @throws PolicyException if the display name cannot be determined.
      */
     public String getDisplayName(String property, Locale locale)
         throws PolicyException;
@@ -177,7 +178,7 @@ public interface ResponseProvider extends Cloneable {
      *          (<code>String</code>).
      *
      * @throws PolicyException if the decision could not be computed
-     * @throws SSOException <code>token is not valid
+     * @throws SSOException if the <code>token</code> is not valid
      *
      */
     public Map getResponseDecision(SSOToken token,  

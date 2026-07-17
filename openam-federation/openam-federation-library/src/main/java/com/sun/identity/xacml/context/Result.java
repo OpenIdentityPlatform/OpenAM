@@ -24,6 +24,7 @@
  *
  * $Id: Result.java,v 1.3 2008/06/25 05:48:12 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -36,17 +37,16 @@ import java.util.List;
  * The <code>Result</code> element is a container of 
  * one or more <code>Result</code>s issuded by authorization authority.
  * 
- * <p/>
  * <pre>
  * schema:
- *      &lt;xs:complexType name="ResultType">
- *          &lt;xs:sequence>
- *              &lt;xs:element ref="xacml-context:Decision"/>
- *              &lt;xs:element ref="xacml-context:Status" minOccurs="0"/>
- *              &lt;xs:element ref="xacml:Obligations" minOccurs="0"/>
- *          &lt;xs:sequence>
- *          &lt;xs:attribute name="ResourceId" type="xs:string" use="optional"/>
- *      &lt;xs:complexType>
+ *      &lt;xs:complexType name="ResultType"&gt;
+ *          &lt;xs:sequence&gt;
+ *              &lt;xs:element ref="xacml-context:Decision"/&gt;
+ *              &lt;xs:element ref="xacml-context:Status" minOccurs="0"/&gt;
+ *              &lt;xs:element ref="xacml:Obligations" minOccurs="0"/&gt;
+ *          &lt;xs:sequence&gt;
+ *          &lt;xs:attribute name="ResourceId" type="xs:string" use="optional"/&gt;
+ *      &lt;xs:complexType&gt;
  * </pre>
  */
 public interface Result {

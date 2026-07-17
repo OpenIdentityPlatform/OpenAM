@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.install.tools.handler;
 
@@ -58,7 +59,7 @@ public class MigrateHandler extends ConfigHandlerBase implements
     
     /**
      * to make sure that migrate has no additional parameter.
-     * @param arguments
+     * @param arguments the command-line arguments passed to the migrate option
      * @return true if there's no additional parameter, false otherwise.
      */
     public boolean checkArguments(List arguments) {
@@ -78,7 +79,7 @@ public class MigrateHandler extends ConfigHandlerBase implements
     
     /**
      * handle the request of migration.
-     * @param arguments
+     * @param arguments the command-line arguments passed to the migrate option
      */
     public void handleRequest(List arguments) {
         

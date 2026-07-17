@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2010-2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.services.util;
@@ -133,8 +134,8 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
 
     /**
      * Method declaration
-     * 
-     * @param clearText
+     *
+     * @param clearText the clear-text bytes to encrypt
      */
     public byte[] encrypt(byte[] clearText) {
         return pbeEncrypt(clearText);
@@ -142,8 +143,8 @@ public class JCEEncryption implements AMEncryption, ConfigurableKey {
 
     /**
      * Method declaration
-     * 
-     * @param encText
+     *
+     * @param encText the encrypted bytes to decrypt
      */
     public byte[] decrypt(byte[] encText) {
         return pbeDecrypt(encText);

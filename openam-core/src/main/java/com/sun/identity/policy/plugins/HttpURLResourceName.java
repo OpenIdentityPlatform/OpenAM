@@ -25,6 +25,7 @@
  * $Id: HttpURLResourceName.java,v 1.4 2008/06/25 05:43:51 qcheng Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.policy.plugins;
 
@@ -37,7 +38,7 @@ import com.sun.identity.shared.debug.Debug;
  * This class was no longer in sync with expected policy evaluation and moved away from the behaviour of
  * {@link URLResourceName} which duplicates the behaviour of {@link com.sun.identity.entitlement.URLResourceName}
  * that is used by the server when evaluation a policy request in self mode.
- * <p />
+ * <p>
  * To help reduce the cost of upgrade this class has been modified to ensure it continues with eager normalisation of
  * resource URLs but otherwise delegates directly to its subclass {@link URLResourceName}.
  *

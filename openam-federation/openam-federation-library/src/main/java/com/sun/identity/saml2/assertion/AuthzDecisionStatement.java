@@ -24,6 +24,7 @@
  *
  * $Id: AuthzDecisionStatement.java,v 1.2 2008/06/25 05:47:40 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -39,25 +40,24 @@ import com.sun.identity.saml2.common.SAML2Exception;
  * subject tot he specified resource has resulted in the specified authorization
  * decision on the basis of some optionally specified evidence. Its type is
  * <code>AuthzDecisionStatementType</code>.
- * <p>
  * <pre>
- * &lt;complexType name="AuthzDecisionStatementType">
- *   &lt;complexContent>
+ * &lt;complexType name="AuthzDecisionStatementType"&gt;
+ *   &lt;complexContent&gt;
  *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:assertion}
- *     StatementAbstractType">
- *       &lt;sequence>
+ *     StatementAbstractType"&gt;
+ *       &lt;sequence&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Action"
- *         maxOccurs="unbounded"/>
+ *         maxOccurs="unbounded"/&gt;
  *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}Evidence"
- *         minOccurs="0"/>
- *       &lt;/sequence>
+ *         minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
  *       &lt;attribute name="Decision" use="required"
- *       type="{urn:oasis:names:tc:SAML:2.0:assertion}DecisionType" />
+ *       type="{urn:oasis:names:tc:SAML:2.0:assertion}DecisionType" /&gt;
  *       &lt;attribute name="Resource" use="required"
- *       type="{http://www.w3.org/2001/XMLSchema}anyURI" />
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ *       type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

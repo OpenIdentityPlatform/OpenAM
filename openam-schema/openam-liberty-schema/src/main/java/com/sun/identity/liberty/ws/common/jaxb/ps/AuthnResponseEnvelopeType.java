@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,18 +13,17 @@ package com.sun.identity.liberty.ws.common.jaxb.ps;
 /**
  * Java content class for AuthnResponseEnvelopeType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-protocols-schema.xsd line 243)
- * <p>
  * <pre>
- * &lt;complexType name="AuthnResponseEnvelopeType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:liberty:iff:2003-08}ResponseEnvelopeType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:iff:2003-08}AuthnResponse"/>
- *         &lt;element name="AssertionConsumerServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI"/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="AuthnResponseEnvelopeType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:liberty:iff:2003-08}ResponseEnvelopeType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:iff:2003-08}AuthnResponse"/&gt;
+ *         &lt;element name="AssertionConsumerServiceURL" type="{http://www.w3.org/2001/XMLSchema}anyURI"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

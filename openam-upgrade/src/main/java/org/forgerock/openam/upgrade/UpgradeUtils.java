@@ -25,6 +25,7 @@
  * $Id: UpgradeUtils.java,v 1.18 2009/09/30 17:35:24 goodearth Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.upgrade;
@@ -831,7 +832,7 @@ public class UpgradeUtils {
      * @param schemaType the schemaType
      * @param attributeName name of the attribute
      * @param defaultValues a set of values to be added to the attribute
-     * @throws <code>UpgradeException</code> if there is an error.
+     * @throws UpgradeException if there is an error.
      * 
      */
     public static void addAttributeDefaultValues(
@@ -874,7 +875,7 @@ public class UpgradeUtils {
      * @param choiceValuesMap a set of choice values values to
      *        be added to the attribute, the key is the i18NKey and
      *        the values it the choice value
-     * @throws <code>UpgradeException</code> if there is an error.
+     * @throws UpgradeException if there is an error.
      */
 
     public static void addAttributeChoiceValues(
@@ -1083,7 +1084,7 @@ public class UpgradeUtils {
      *
      * @param serviceName name of the service.
      * @param value the i18NFileName attribute value.
-     * @throws <code>UpgradeException</code> when there is an error.
+     * @throws UpgradeException when there is an error.
      */
     public static void seti18NFileName(
             String serviceName,
@@ -1108,7 +1109,7 @@ public class UpgradeUtils {
      *
      * @param serviceName name of the service.
      * @param revisionNumber the revisionNumber of the service.
-     * @throws <code>UpgradeException</code> if there is an error.
+     * @throws UpgradeException if there is an error.
      */
     public static void setServiceRevision(
             String serviceName,
@@ -1484,7 +1485,7 @@ public class UpgradeUtils {
     /**
      * Imports service data.
      * @param fileName the file containing the data in xml format.
-     * @throws <code>UpgradeException</code> on error
+     * @throws UpgradeException on error
      */
     public static void importServiceData(
             String fileName)
@@ -1530,7 +1531,7 @@ public class UpgradeUtils {
      * Imports service data
      *
      * @param fileList list of files to be imported.
-     * @throws UpgradeException
+     * @throws UpgradeException if the service data cannot be imported.
      */
     public static void importServiceData(List<String> fileList)
             throws UpgradeException {
@@ -1602,7 +1603,7 @@ public class UpgradeUtils {
      * Imports new service schema.
      *
      * @param fileList list of files
-     * @throws UpgradeException
+     * @throws UpgradeException if the new service schema cannot be imported.
      */
     public static void importNewServiceSchema(
             List<String> fileList) throws UpgradeException {
@@ -1970,7 +1971,6 @@ public class UpgradeUtils {
      *
      * @param serverInstance the server instance value
      * @param serverId the server identifier
-     * @throws UpgradeException if there is an error.
      */
     public static void createServiceInstance(
             String serverInstance, String serverId) {
@@ -1993,7 +1993,6 @@ public class UpgradeUtils {
      *
      * @param serverInstance the server instance value
      * @param serverId the server identifier
-     * @throws UpgradeException if there is an error.
      */
     public static void createServiceInstance(
             String serverInstance, String serverId,
@@ -2294,7 +2293,7 @@ public class UpgradeUtils {
      * Returns the <code>ServiceManager</code>.
      *
      * @return the <code>ServiceManager</code> object.
-     * @throws <code>UpgradeException</cpde> if there is an error.
+     * @throws UpgradeException if there is an error.
      */
     private static ServiceManager getServiceManager() throws UpgradeException {
         ServiceManager ssm = null;
@@ -2318,7 +2317,7 @@ public class UpgradeUtils {
      *
      * @param adminToken admin SSOToken
      * @return the <code>ServiceManager</code> object.
-     * @throws <code>UpgradeException</cpde> if there is an error.
+     * @throws UpgradeException if there is an error.
      */
     private static ServiceManager getServiceManager(SSOToken adminToken)
     throws UpgradeException {
@@ -2945,7 +2944,7 @@ public class UpgradeUtils {
     /**
      * Returns the <code>serverconfig.xml</code> file contents as a string.
      *
-     * @return a string representing the <code>serverconfig.xml<code> file.
+     * @return a string representing the <code>serverconfig.xml</code> file.
      */
     public static String getServerConfigXML() {
         String fileName =

@@ -24,6 +24,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted [2010-2012] [ForgeRock AS]
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  */
 package com.sun.identity.sm.model;
@@ -56,8 +57,8 @@ public class AMSessionRepositoryDeferredOperation implements Serializable {
      * Constructor using AMRootEntity, so any Object extending our root object can be
      * used as a payload for our event.
      *
-     * @param operation
-     * @param parameters
+     * @param operation the deferred operation type
+     * @param parameters the parameters for the operation
      */
     public AMSessionRepositoryDeferredOperation(Enum<AMSessionRepositoryDeferredOperationType> operation, Object[] parameters) {
         this.setOperation(operation);

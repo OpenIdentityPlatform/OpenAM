@@ -24,6 +24,7 @@
  *
  * $Id: ArtifactResolveImpl.java,v 1.2 2008/06/25 05:47:58 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -64,17 +65,16 @@ import com.sun.identity.saml2.protocol.impl.RequestAbstractImpl;
  * protocol message be returned in an <code>ArtifactResponse</code> message
  * by specifying an artifact that represents the SAML protocol message.
  * It has the complex type <code>ArtifactResolveType</code>.
- * <p>
  * <pre>
- * &lt;complexType name="ArtifactResolveType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}RequestAbstractType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}Artifact"/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="ArtifactResolveType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}RequestAbstractType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:protocol}Artifact"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  */
 public class ArtifactResolveImpl extends RequestAbstractImpl

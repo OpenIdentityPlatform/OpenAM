@@ -24,6 +24,7 @@
  *
  * $Id: ProtocolFactory.java,v 1.5 2008/06/25 05:47:57 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.protocol;
@@ -341,7 +342,7 @@ public class ProtocolFactory  {
      *
      * @param  value XML String Representation of <code>Extensions</code>
      *	    object.
-     * @return instance of <code>Extensions<code> object.
+     * @return instance of <code>Extensions</code> object.
      * @throws SAML2Exception if <code>Extensions</code> cannot be created.
      */
     public Extensions createExtensions(String value) throws SAML2Exception {
@@ -409,8 +410,8 @@ public class ProtocolFactory  {
     /**
      * Returns the <code>IDPEntry</code> Object.
      *
-     * @return instance of <code>IDPEntry<code> object.
-     * @throws SAML2Exception if <code>IDPEntry<code> cannot be created.
+     * @return instance of <code>IDPEntry</code> object.
+     * @throws SAML2Exception if <code>IDPEntry</code> cannot be created.
      */
     public IDPEntry createIDPEntry() throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -425,9 +426,9 @@ public class ProtocolFactory  {
     /**
      * Returns the <code>IDPEntry</code> Object.
      *
-     * @param value Document Element of <code>IDPEntry<code> object.
-     * @return instance of <code>IDPEntry<code> object.
-     * @throws SAML2Exception if <code>IDPEntry<code> cannot be created.
+     * @param value Document Element of <code>IDPEntry</code> object.
+     * @return instance of <code>IDPEntry</code> object.
+     * @throws SAML2Exception if <code>IDPEntry</code> cannot be created.
      */
     public IDPEntry createIDPEntry(Element value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -442,9 +443,9 @@ public class ProtocolFactory  {
     /**
      * Returns the <code>IDPEntry</code> Object.
      *
-     * @param value XML Representation of the <code>IDPEntry<code> object.
-     * @return instance of <code>IDPEntry<code> Object.
-     * @throws SAML2Exception if <code>IDPEntry<code> cannot be created.
+     * @param value XML Representation of the <code>IDPEntry</code> object.
+     * @return instance of <code>IDPEntry</code> Object.
+     * @throws SAML2Exception if <code>IDPEntry</code> cannot be created.
      */
     public IDPEntry createIDPEntry(String value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -459,8 +460,8 @@ public class ProtocolFactory  {
     /**
      * Returns the <code>IDPList</code> Object.
      *
-     * @return instance of <code>IDPList<code> Object.
-     * @throws SAML2Exception if <code>IDPList<code> cannot be created.
+     * @return instance of <code>IDPList</code> Object.
+     * @throws SAML2Exception if <code>IDPList</code> cannot be created.
      */
     public IDPList createIDPList() throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -476,8 +477,8 @@ public class ProtocolFactory  {
      * Returns the <code>IDPList</code> Object.
      *
      * @param value Document Element of <code>IDPList</code> Object.
-     * @return instance of <code>IDPList<code> Object.
-     * @throws SAML2Exception if <code>IDPList<code> cannot be created.
+     * @return instance of <code>IDPList</code> Object.
+     * @throws SAML2Exception if <code>IDPList</code> cannot be created.
      */
     public IDPList createIDPList(Element value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -494,7 +495,7 @@ public class ProtocolFactory  {
      *
      * @param value XML String Representation of <code>IDPList</code> Object.
      * @return instance of <code>IDPList</code> Object.
-     * @throws SAML2Exception if <code>IDPList<code> cannot be created.
+     * @throws SAML2Exception if <code>IDPList</code> cannot be created.
      */
     public IDPList createIDPList(String value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -510,7 +511,7 @@ public class ProtocolFactory  {
      * Returns the <code>NameIDPolicy</code> Object.
      *
      * @return instance of <code>NameIDPolicy</code> Object.
-     * @throws SAML2Exception if <code>NameIDPolicy<code> cannot be created.
+     * @throws SAML2Exception if <code>NameIDPolicy</code> cannot be created.
      */
     public NameIDPolicy createNameIDPolicy() throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -527,7 +528,7 @@ public class ProtocolFactory  {
      *
      * @param value Document Element of <code>NameIDPolicy</code> Object.
      * @return instance of <code>NameIDPolicy</code> Object.
-     * @throws SAML2Exception if <code>NameIDPolicy<code> cannot be created.
+     * @throws SAML2Exception if <code>NameIDPolicy</code> cannot be created.
      */
     public NameIDPolicy createNameIDPolicy(Element value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -545,7 +546,7 @@ public class ProtocolFactory  {
      * @param value XML String Representation of <code>NameIDPolicy</code>
      *	    object.
      * @return instance of <code>NameIDPolicy</code> object.
-     * @throws SAML2Exception if <code>NameIDPolicy<code> cannot be created.
+     * @throws SAML2Exception if <code>NameIDPolicy</code> cannot be created.
      */
     public NameIDPolicy createNameIDPolicy(String value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -561,7 +562,7 @@ public class ProtocolFactory  {
      * Returns the <code>RequesterID</code> Object.
      *
      * @return instance of <code>RequesterID</code> Object.
-     * @throws SAML2Exception if <code>RequesterID<code> cannot be created.
+     * @throws SAML2Exception if <code>RequesterID</code> cannot be created.
      */
     public RequesterID createRequesterID() throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -578,7 +579,7 @@ public class ProtocolFactory  {
      *
      * @param value Document Element of <code>RequesterID</code> Object.
      * @return instance of <code>RequesterID</code> Object.
-     * @throws SAML2Exception if <code>RequesterID<code> cannot be created.
+     * @throws SAML2Exception if <code>RequesterID</code> cannot be created.
      */
     public RequesterID createRequesterID(Element value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -596,7 +597,7 @@ public class ProtocolFactory  {
      * @param value XML String Representation of <code>RequesterID</code>
      *	    object.
      * @return instance of <code>RequesterID</code> Object.
-     * @throws SAML2Exception if <code>RequesterID<code> cannot be created.
+     * @throws SAML2Exception if <code>RequesterID</code> cannot be created.
      */
     public RequesterID createRequesterID(String value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -612,7 +613,7 @@ public class ProtocolFactory  {
      * Returns the <code>Scoping</code> Object.
      *
      * @return instance of <code>Scoping</code> Object.
-     * @throws SAML2Exception if <code>Scoping<code> cannot be created.
+     * @throws SAML2Exception if <code>Scoping</code> cannot be created.
      */
     public Scoping createScoping() throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -629,7 +630,7 @@ public class ProtocolFactory  {
      *
      * @param value Document Element of <code>Scoping</code> Object.
      * @return instance of <code>Scoping</code> Object.
-     * @throws SAML2Exception if <code>Scoping<code> cannot be created.
+     * @throws SAML2Exception if <code>Scoping</code> cannot be created.
      */
     public Scoping createScoping(Element value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -646,7 +647,7 @@ public class ProtocolFactory  {
      *
      * @param value XML String Representation of <code>Scoping</code> Object.
      * @return instance of <code>Scoping</code> Object.
-     * @throws SAML2Exception if <code>Scoping<code> cannot be created.
+     * @throws SAML2Exception if <code>Scoping</code> cannot be created.
      */
     public Scoping createScoping(String value) throws SAML2Exception {
 	Object obj = SAML2SDKUtils.getObjectInstance(
@@ -841,7 +842,7 @@ public class ProtocolFactory  {
     /**
      * Returns an new identifier object.
      *
-     * @param value of the <code>NewID<code>.
+     * @param value of the <code>NewID</code>.
      * @throws SAML2Exception if it failed to instantiate the object.
      * @return an immutable requested authentication context object.
      */

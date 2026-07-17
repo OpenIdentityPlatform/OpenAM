@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2016 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2023-2025 3A Systems LLC
+ * Portions Copyrighted 2023-2026 3A Systems LLC
  */
 package com.sun.identity.authentication.service;
 
@@ -979,9 +979,9 @@ public class AuthD implements ConfigurationListener {
      * Returns the dynamic replacement of the URL from the Success or Failure 
      * URLs.
      *
-     * @param URL
-     * @param servletRequest
-     * @return the dynamic replacement of the URL from the Success or Failure 
+     * @param URL the URL to process for dynamic replacement
+     * @param servletRequest the servlet request providing the dynamic variable values
+     * @return the dynamic replacement of the URL from the Success or Failure
      * URLs.
      */
     public String processURL(String URL, HttpServletRequest servletRequest) {

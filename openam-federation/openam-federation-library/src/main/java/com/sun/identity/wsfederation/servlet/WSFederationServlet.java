@@ -24,6 +24,7 @@
  *
  * $Id: WSFederationServlet.java,v 1.6 2008/08/19 19:11:17 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /*
@@ -49,8 +50,8 @@ public class WSFederationServlet extends HttpServlet {
     /** Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
-     * @throws jakarta.servlet.ServletException 
-     * @throws java.io.IOException 
+     * @throws jakarta.servlet.ServletException if a servlet error occurs
+     * @throws java.io.IOException if an I/O error occurs
      */
     protected void doGet(HttpServletRequest request, 
         HttpServletResponse response)
@@ -83,8 +84,8 @@ public class WSFederationServlet extends HttpServlet {
     /** Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
-     * @throws jakarta.servlet.ServletException 
-     * @throws java.io.IOException 
+     * @throws jakarta.servlet.ServletException if a servlet error occurs
+     * @throws java.io.IOException if an I/O error occurs
      */
     protected void doPost(HttpServletRequest request, 
         HttpServletResponse response)

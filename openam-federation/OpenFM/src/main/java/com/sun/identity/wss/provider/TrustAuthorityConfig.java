@@ -24,6 +24,7 @@
  *
  * $Id: TrustAuthorityConfig.java,v 1.14 2009/02/28 00:59:42 mrudul_uchil Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.wss.provider;
@@ -386,7 +387,8 @@ public abstract class TrustAuthorityConfig {
 
     /**
      * Deletes the trust authrority configuration.
-     * @exception ProviderException
+     * @exception ProviderException if the trust authority configuration is
+     *            unable to be deleted.
      */
     protected abstract void delete() throws ProviderException;
 

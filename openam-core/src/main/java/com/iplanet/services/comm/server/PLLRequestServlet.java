@@ -55,7 +55,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * The <code>PLLRequestServlet</code> class is used to receive requests from
  * applications and forward those requests to the corresponding servers for
  * processing.
- * </p>
+ * <p>
  * The doPost() method gets the XML RequestSet document from the HttpRequest
  * object, then parses the XML documnent and reconstructs a RequestSet object.
  * 

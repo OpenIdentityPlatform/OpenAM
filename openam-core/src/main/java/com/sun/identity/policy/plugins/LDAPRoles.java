@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.plugins;
@@ -259,7 +260,7 @@ public class LDAPRoles implements Subject {
      * @param token the <code>SSOToken</code> that will be used
      * to determine the syntax
      * @return set of of valid names for the user collection.
-     * @exception SSOException if <code>SSOToken></code> is not valid
+     * @exception SSOException if <code>SSOToken</code> is not valid
      */
     public Syntax getValueSyntax(SSOToken token) throws SSOException {
         return (Syntax.MULTIPLE_CHOICE);
@@ -274,7 +275,7 @@ public class LDAPRoles implements Subject {
      *
      * @return <code>ValidValues</code> object
      *
-     * @exception SSOException if <code>SSOToken></code> is not valid
+     * @exception SSOException if <code>SSOToken</code> is not valid
      * @exception PolicyException if unable to get the list of valid
      * names.
      */
@@ -295,7 +296,7 @@ public class LDAPRoles implements Subject {
      *
      * @return <code>ValidValues</code> object
      *
-     * @exception SSOException if <code>SSOToken></code> is not valid
+     * @exception SSOException if <code>SSOToken</code> is not valid
      * @exception PolicyException if unable to get the list of valid
      * names.
      */

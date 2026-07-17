@@ -25,6 +25,7 @@
  * $Id: OSChecker.java,v 1.2 2008/06/25 05:51:29 qcheng Exp $
  *
  * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.install.tools.util;
@@ -101,12 +102,13 @@ public class OSChecker {
 
     /**
      * Method matchApprox
-     * 
-     * 
+     *
+     *
      * @param name
-     * 
-     * @return
-     * 
+     *            the operating system name to match against
+     *
+     * @return true if the current OS name begins with the given name
+     *
      */
     public static boolean matchApprox(String name) {
         return (osName.regionMatches(true, 0, name, 0, name.length()));
@@ -139,11 +141,10 @@ public class OSChecker {
      * Check if current operating system architecture matches with a given
      * architecture
      * 
-     * @param name
-     * 
-     * @return
-     * 
-     * @see
+     * @param name the architecture name to compare against
+     *
+     * @return true if the current OS architecture matches the given name
+     *
      */
     public static boolean matchArch(String name) {
         return osArchitecture.equalsIgnoreCase(name);
@@ -151,10 +152,10 @@ public class OSChecker {
 
     /**
      * Method isSolaris
-     * 
-     * 
-     * @return
-     * 
+     *
+     *
+     * @return true if the current operating system is Solaris
+     *
      */
     public static boolean isSolaris() {
         return matchApprox(SUNOS);
@@ -162,10 +163,10 @@ public class OSChecker {
 
     /**
      * Method isWindows
-     * 
-     * 
-     * @return
-     * 
+     *
+     *
+     * @return true if the current operating system is Windows
+     *
      */
     static public boolean isWindows() {
         return matchApprox(WINDOWS);
@@ -173,10 +174,10 @@ public class OSChecker {
 
     /**
      * Method isUnix
-     * 
-     * 
-     * @return
-     * 
+     *
+     *
+     * @return true if the current operating system is a Unix variant
+     *
      */
     public static boolean isUnix() {
         return (isSolaris() || isHPUX() || isLinux() || isAIX() || isOSX());
@@ -231,10 +232,10 @@ public class OSChecker {
 
     /**
      * Method isHPUX
-     * 
-     * 
-     * @return
-     * 
+     *
+     *
+     * @return true if the current operating system is HP-UX
+     *
      */
     public static boolean isHPUX() {
         return (matchApprox(HPUX));

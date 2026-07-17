@@ -24,6 +24,7 @@
  *
  * $Id: IdRepoSampleCreateId.java,v 1.15 2008/09/24 19:50:10 goodearth Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -47,7 +48,6 @@ import com.sun.identity.idm.IdType;
  * This class 
  *
  *
- * @author 
  */
 public class IdRepoSampleCreateId {
 

@@ -12,6 +12,7 @@
 * information: "Portions Copyrighted [year] [name of copyright owner]".
 *
 * Copyright 2014-2016 ForgeRock AS.
+* Portions Copyrighted 2026 3A Systems, LLC
 */
 
 package org.forgerock.openam.sts.config.user;
@@ -893,7 +894,7 @@ public class SAML2Config {
      *
      * @param json the {@link JsonValue} representation.
      * @return a SAML2Config object
-     * @throws IllegalStateException
+     * @throws IllegalStateException if the {@code JsonValue} cannot be marshalled into a {@code SAML2Config} instance
      */
     public static SAML2Config fromJson(JsonValue json) throws IllegalStateException {
         try {

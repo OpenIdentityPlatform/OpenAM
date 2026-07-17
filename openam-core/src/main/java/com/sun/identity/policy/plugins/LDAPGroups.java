@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation 
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.plugins;
@@ -431,7 +432,7 @@ public class LDAPGroups implements Subject {
      * @return <code>true</code> if the user is memeber of the
      * given subject; <code>false</code> otherwise.
      *
-     * @exception SSOException if <code>SSOToken>/code> is not valid
+     * @exception SSOException if <code>SSOToken</code> is not valid
      * @exception PolicyException if an error occured while
      * checking if the user is a member of this subject
      */

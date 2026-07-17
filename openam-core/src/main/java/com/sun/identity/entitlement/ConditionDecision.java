@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -50,7 +51,7 @@ public class ConditionDecision {
 
     /**
      * Constructs an instance of <code>ConditionDecision</code>.
-     * <p/>
+     * <p>
      * Deprecated, favour the factory methods.
      *
      * @param satisfied
@@ -65,7 +66,7 @@ public class ConditionDecision {
 
     /**
      * Constructs an instance of <code>ConditionDecision</code>.
-     * <p/>
+     * <p>
      * Deprecated, favour the factory methods.
      *
      * @param satisfied
@@ -128,7 +129,7 @@ public class ConditionDecision {
 
     /**
      * Clears the current advice associated with this <code>ConditionDecision</code>.
-     * <p/>
+     * <p>
      * Deprecated method as a given instance should be immutable.
      */
     @Deprecated
@@ -138,7 +139,7 @@ public class ConditionDecision {
 
     /**
      * Adds an advice (from another <code>ConditionDecision</code>) to this <code>ConditionDecision</code>.
-     * <p/>
+     * <p>
      * Deprecated method as a given instance should be immutable.
      *
      * @param decision

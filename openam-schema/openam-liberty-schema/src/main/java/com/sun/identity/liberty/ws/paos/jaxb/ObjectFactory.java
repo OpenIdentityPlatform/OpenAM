@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -63,7 +64,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -82,7 +83,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -101,7 +102,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -113,7 +114,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResponseElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.paos.jaxb.ResponseElement createResponseElement()
@@ -125,7 +126,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmptyType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.paos.jaxb.EmptyType createEmptyType()
@@ -137,7 +138,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.paos.jaxb.ExtensionElement createExtensionElement()
@@ -149,7 +150,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.paos.jaxb.StatusType createStatusType()
@@ -161,7 +162,7 @@ public class ObjectFactory
     /**
      * Create an instance of ExtensionType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.paos.jaxb.ExtensionType createExtensionType()
@@ -173,7 +174,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.paos.jaxb.RequestElement createRequestElement()
@@ -185,7 +186,7 @@ public class ObjectFactory
     /**
      * Create an instance of StatusElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.paos.jaxb.StatusElement createStatusElement()
@@ -197,7 +198,7 @@ public class ObjectFactory
     /**
      * Create an instance of ResponseType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.paos.jaxb.ResponseType createResponseType()
@@ -209,7 +210,7 @@ public class ObjectFactory
     /**
      * Create an instance of RequestType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.paos.jaxb.RequestType createRequestType()

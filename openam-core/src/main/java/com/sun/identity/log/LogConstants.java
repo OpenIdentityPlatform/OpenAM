@@ -27,6 +27,7 @@
  * Portions Copyrighted 2011-2015 ForgeRock AS.
  * Portions Copyrighted 2013 Cybernetica AS.
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.log;
@@ -34,7 +35,7 @@ package com.sun.identity.log;
 import java.util.logging.Level;
 
 /**
- * Defines constants used in the Logging service. <tt> LogConstants </TT>
+ * Defines constants used in the Logging service. <code> LogConstants </code>
  * helps in maintaining a central repository of all the constants used in the
  * package.
  * 

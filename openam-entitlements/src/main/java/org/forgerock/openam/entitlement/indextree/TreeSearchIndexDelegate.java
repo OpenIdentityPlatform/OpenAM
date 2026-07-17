@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.indextree;
@@ -28,7 +28,7 @@ import java.util.Set;
 
 /**
  * Implementation provides search index by means of an in memory rule index cache.
- * <p/>
+ * <p>
  * Expects the passed resource to have already been normalised.
  */
 public class TreeSearchIndexDelegate implements ISearchIndex {

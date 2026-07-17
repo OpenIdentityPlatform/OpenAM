@@ -24,6 +24,7 @@
  *
  * $Id: XMLEncryptionManager.java,v 1.5 2009/08/29 07:30:38 mallas Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -298,7 +299,7 @@ public class XMLEncryptionManager {
      * @param kekAlias Key Encryption Key Cert Alias.
      *
      * @return org.w3.dom.Document Decrypted XML Document.
-     * @exception XMLEncryptionException
+     * @exception EncryptionException if the document could not be decrypted
      */
     public org.w3c.dom.Document decryptAndReplace(
         org.w3c.dom.Document encryptedDoc,

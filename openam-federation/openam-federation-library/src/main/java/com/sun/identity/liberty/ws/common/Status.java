@@ -24,6 +24,7 @@
  *
  * $Id: Status.java,v 1.2 2008/06/25 05:47:09 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -36,18 +37,18 @@ import javax.xml.namespace.QName;
  * The following schema fragment specifies the expected content within the  
  * <code>Status</code> object.
  * <pre>
- * &lt;complexType name="Status">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="Status" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="code" use="required" type="{http://www.w3.org/2001/XMLSchema}QName" />
- *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="ref" type="{http://www.w3.org/2001/XMLSchema}IDREF" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="Status"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="Status" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="code" use="required" type="{http://www.w3.org/2001/XMLSchema}QName" /&gt;
+ *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="ref" type="{http://www.w3.org/2001/XMLSchema}IDREF" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  *
  * 

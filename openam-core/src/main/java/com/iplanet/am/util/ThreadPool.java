@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -141,9 +142,9 @@ public class ThreadPool {
      * 
      * @param task
      *            user defined task.
-     * @throws ThreadPoolException
+     * @throws ThreadPoolException if the thread pool is being shut down and no more tasks can be accepted
      */
-    public final void run(Runnable task) throws ThreadPoolException 
+    public final void run(Runnable task) throws ThreadPoolException
     {
         WorkerThread t = null;
         synchronized (this) {

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.http.authz;
 
@@ -43,14 +43,14 @@ import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationPermissionFactory;
 
 /**
- * An HTTP authorization module for performing privilege checking, {@see PrivilegeAuthzModule} for more detail.
+ * An HTTP authorization module for performing privilege checking, see {@link PrivilegeAuthzModule} for more detail.
  *
  * @since 14.0.0
  */
 public class HttpPrivilegeAuthzModule extends PrivilegeAuthzModule implements Filter {
 
     /**
-     * Create a new instance of {@link HttpAuthorizationModule}.
+     * Create a new instance of {@link HttpPrivilegeAuthzModule}.
      *
      * @param evaluator The Delegation Evaluator.
      * @param actionToDefinition The action to definition map.

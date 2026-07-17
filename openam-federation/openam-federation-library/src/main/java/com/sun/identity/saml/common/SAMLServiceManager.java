@@ -24,6 +24,7 @@
  *
  * $Id: SAMLServiceManager.java,v 1.10 2008/12/15 23:02:19 hengming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.common;
@@ -90,7 +91,7 @@ public class SAMLServiceManager implements ConfigurationListener {
 
     /**
      * This class contains the mapping between supported target 
-     * host:port(target) and its saml-aware-servlet URL & sourceid.
+     * host:port(target) and its saml-aware-servlet URL &amp; sourceid.
      * target is the primary Key.
      */
     public static class SiteEntry {
@@ -294,7 +295,7 @@ public class SAMLServiceManager implements ConfigurationListener {
         /**
          * Returns certificate alias can be used to verify a signature signed
          * by the partner site. It is used when the signature doesn't contain
-         * a &lt;KeyInfo> element.
+         * a &lt;KeyInfo&gt; element.
          * @return String certificate alias.
          */
         public String getCertAlias() {return certalias;}

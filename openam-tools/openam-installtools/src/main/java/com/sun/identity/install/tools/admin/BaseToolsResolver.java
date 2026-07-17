@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -77,7 +78,7 @@ public abstract class BaseToolsResolver {
      * Gets all the supported options. This method needs be implemented by all
      * the installer implementations, to specify the list of custom supproted 
      * options. 
-     * @return an ArrayList of <code>ToolsOptionsInfo<code> objects, in the
+     * @return an ArrayList of <code>ToolsOptionsInfo</code> objects, in the
      * desired order.
      */
     public abstract ArrayList getSupportedOptions();

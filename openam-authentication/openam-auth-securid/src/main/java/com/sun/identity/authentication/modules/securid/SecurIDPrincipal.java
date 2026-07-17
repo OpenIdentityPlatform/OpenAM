@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.authentication.modules.securid;
 
@@ -54,7 +55,6 @@ public class SecurIDPrincipal implements Principal, java.io.Serializable {
     /**
      * Return the SecurID username for this <code>SecurIDPrincipal</code>.
      *
-     * <p>
      *
      * @return the SecurID username for this <code>SecurIDPrincipal</code>
      */
@@ -65,7 +65,6 @@ public class SecurIDPrincipal implements Principal, java.io.Serializable {
     /**
      * Return a string representation of this <code>SecurIDPrincipal</code>.
      *
-     * <p>
      *
      * @return a string representation of this <code>SecurIDPrincipal</code>.
      */
@@ -79,7 +78,6 @@ public class SecurIDPrincipal implements Principal, java.io.Serializable {
      * <code>SecurIDPrincipal</code> and the two SecurIDPrincipals
      * have the same username.
      *
-     * <p>
      *
      * @param o Object to be compared for equality with this
      *		<code>SecurIDPrincipal</code>.
@@ -106,7 +104,6 @@ public class SecurIDPrincipal implements Principal, java.io.Serializable {
     /**
      * Return a hash code for this <code>SecurIDPrincipal</code>.
      *
-     * <p>
      *
      * @return a hash code for this <code>SecurIDPrincipal</code>.
      */

@@ -25,7 +25,7 @@
  * $Id: AMIdentity.java,v 1.37 2009/11/20 23:52:54 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2019-2023 3A Systems LLC.
+ * Portions Copyrighted 2019-2026 3A Systems LLC.
  */
 package com.sun.identity.idm;
 
@@ -71,7 +71,6 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * constructing <code> AMIdentity </code> objects by using
  * <code> AMIdentityRepository
  * </code> interfaces. For example:
- * <p>
  *
  * <PRE>
  *
@@ -84,7 +83,6 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * single sign-on token passed above. The results obtained from search performed
  * using AMIdentityRepository also return AMIdentity objects. The type of an
  * object can be determined by doing the following:
- * <p>
  *
  * <PRE>
  *
@@ -93,7 +91,6 @@ import com.sun.identity.sm.ServiceSchemaManager;
  * </PRE>
  *
  * The name of an object can be determined by:
- * <p>
  *
  * <PRE>
  *
@@ -445,7 +442,7 @@ public class AMIdentity {
      *        <code>(String)</code>
      *        to a <code>Set</code> of attribute values <code>(String)</code>.
      *        It is arranged as:
-     *        Map::attrMap -->
+     *        Map::attrMap --&gt;
      *        Key: String::AttributeName
      *        Value: Set::AttributeValues (Set of String)
      * @throws IdRepoException
@@ -992,7 +989,7 @@ public class AMIdentity {
      * the identity. The attributes for the service are validated
      * against the service schema.
      *
-     * This method is only valid for <AMIdentity> object of type User.
+     * This method is only valid for <code>AMIdentity</code> object of type User.
      *
      * @param serviceName Name of the service.
      * @param attrNames Set of attributes name.

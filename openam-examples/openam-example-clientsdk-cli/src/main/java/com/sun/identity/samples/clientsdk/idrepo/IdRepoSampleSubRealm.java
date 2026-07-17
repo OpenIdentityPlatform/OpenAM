@@ -24,6 +24,7 @@
  *
  * $Id: IdRepoSampleSubRealm.java,v 1.2 2008/06/25 05:41:14 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.samples.clientsdk.idrepo;
@@ -37,7 +38,6 @@ import com.sun.identity.idm.AMIdentity;
  * This class 
  *
  *
- * @author 
  */
 public class IdRepoSampleSubRealm {
 

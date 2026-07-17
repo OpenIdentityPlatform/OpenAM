@@ -24,6 +24,7 @@
  *
  * $Id: FSRedirectException.java,v 1.2 2008/06/25 05:46:40 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /*
@@ -141,7 +142,7 @@ import java.io.StringWriter;
  *       }
  *
  * 3. Throwing an Exception using the ResourceSetManager
- * <TBD : write some eg & format for properties file>
+ * &lt;TBD : write some eg &amp; format for properties file&gt;
  * 
  * - Logging/Dealing with an Exception, inclunding all nested exceptions
  *       try {
@@ -150,7 +151,7 @@ import java.io.StringWriter;
  *       } catch (FSRedirectException fse) {
  *
  *               if (fse.getRootCause() instanceof UMSException) {
- *                       PrintWriter pw = new PrintWriter(<some file stream>);
+ *                       PrintWriter pw = new PrintWriter(&lt;some file stream&gt;);
  *                       fse.log(pw);
  *               } else {
  *                      System.out.println(fse.getMessage());
@@ -305,9 +306,9 @@ public class FSRedirectException extends L10NMessageImpl {
     }
     
     /**
-     * Prints this exception's stack trace to <tt>System.err</tt>.
+     * Prints this exception's stack trace to <code>System.err</code>.
      * If this exception has a root exception; the stack trace of the
-     * root exception is printed to <tt>System.err</tt> instead.
+     * root exception is printed to <code>System.err</code> instead.
      * 
      */
     public void printStackTrace() {
@@ -362,7 +363,7 @@ public class FSRedirectException extends L10NMessageImpl {
      *   java.lang.Throwable
      *   java.lang.Exception
      *   FSRedirectException
-     *   <name of exception being thrown>
+     *   &lt;name of exception being thrown&gt;
      * </pre>
      */
     static private String getStackTrace(Throwable xcpt) {

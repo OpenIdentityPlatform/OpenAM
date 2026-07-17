@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.idm.plugins.database;
@@ -767,7 +768,7 @@ public class JdbcSimpleUserDao implements DaoInterface {
      *         Callers should be sure to specify which attributes to fetch.
      * @param limit is maximum number of results to return. This is added to the
      *          END of the WHERE clause using mysql LIMIT on a query.
-     *          Default if no limit(if limit<0) is specified is LIMIT=1
+     *          Default if no limit(if limit&lt;0) is specified is LIMIT=1
      *          Limit is ignored in this implementation since it is not
      *          portable SQL
      * @param filterOperand is a string of AND, or OR and is used to add
@@ -1047,7 +1048,7 @@ public class JdbcSimpleUserDao implements DaoInterface {
      * @param userIDAttributeName the name of the attribute which uniquely identifies users, e.g. "uid".
      * @param limit is maximum number of results to return. This is added to the
      *          END of the WHERE clause using mysql LIMIT on a query.
-     *          Default if no limit(if limit<0) is specified is LIMIT=1
+     *          Default if no limit(if limit&lt;0) is specified is LIMIT=1
      *          Limit is ignored in this implementation since it is not
      *          portable SQL
      * @param queryFilter the query filter sent, more or less directly, from a CREST endpoint _queryFilter value.

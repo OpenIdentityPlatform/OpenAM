@@ -25,7 +25,7 @@
  * $Id: SAMLAwareServlet.java,v 1.5 2009/06/12 22:21:39 mallas Exp $
  *
  * Portions Copyrighted 2013 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml.servlet;
 
@@ -67,13 +67,14 @@ public class SAMLAwareServlet extends HttpServlet {
      * Overrides doGet method to support <code>SAML</code> web browser artifact
      * profile in two ways:
      * <pre>
-     * - Initiates <code>SAML</code> single sign-on
-     * - Accepts <code>SAML</code> artifact to complete single sign-on
+     * - Initiates &lt;code&gt;SAML&lt;/code&gt; single sign-on
+     * - Accepts &lt;code&gt;SAML&lt;/code&gt; artifact to complete single sign-on
      * </pre>
      *
      * @param request <code>HttpServletRequest</code> instance.
      * @param response <code>HttpServletResponse</code> instance.
-     * @throws IOException,ServletException if there is an error.
+     * @throws IOException if there is an error.
+     * @throws ServletException if there is an error.
      */
     public void doGet(HttpServletRequest request,HttpServletResponse response) 
                       throws IOException, ServletException {
@@ -117,7 +118,8 @@ public class SAMLAwareServlet extends HttpServlet {
      *
      * @param request <code>HttpServletRequest</code> instance.
      * @param response <code>HttpServletResponse</code> instance.
-     * @throws IOException,ServletException if there is an error.
+     * @throws IOException if there is an error.
+     * @throws ServletException if there is an error.
      */
     public void doPost(HttpServletRequest request,HttpServletResponse response)
                        throws IOException, ServletException {
@@ -170,7 +172,7 @@ public class SAMLAwareServlet extends HttpServlet {
      * @param request the <code>HttpServletRequest</code> object.
      * @param response the <code>HttpServletResponse</code> object.
      * @param target String representing the target host.
-     * @throws IOException  if there is an error.
+     * @throws IOException if there is an error.
      * @throws SAMLException if there is an error. 
      */
     private void IntersiteTransfer(HttpServletRequest request,

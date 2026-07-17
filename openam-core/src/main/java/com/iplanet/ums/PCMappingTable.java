@@ -25,6 +25,7 @@
  * $Id: PCMappingTable.java,v 1.3 2009/01/28 05:34:50 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.ums;
@@ -203,9 +204,9 @@ class PCMappingTable implements java.io.Serializable {
      * 
      * <PRE>
      * 
-     * &ltfilter&gt ::= &ltand&gt | &ltitem&gt &ltand&gt ::= '(' '&'
-     * &ltitemlist&gt ')' &ltitemlist&gt ::= &ltitem&gt | &ltitem&gt
-     * &ltitemlist&gt &ltitem&gt ::= '(' &ltattr&gt '=' &ltvalue&gt ')'
+     * &lt;filter&gt; ::= &lt;and&gt; | &lt;item&gt; &lt;and&gt; ::= '(' '&amp;'
+     * &lt;itemlist&gt; ')' &lt;itemlist&gt; ::= &lt;item&gt; | &lt;item&gt;
+     * &lt;itemlist&gt; &lt;item&gt; ::= '(' &lt;attr&gt; '=' &lt;value&gt; ')'
      * 
      * </PRE>
      * 

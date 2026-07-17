@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -12,17 +13,16 @@ package com.sun.identity.saml2.jaxb.assertion;
 /**
  * Java content class for KeyInfoConfirmationDataType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/saml2/saml-schema-assertion-2.0.xsd line 147)
- * <p>
  * <pre>
- * &lt;complexType name="KeyInfoConfirmationDataType">
- *   &lt;complexContent>
- *     &lt;restriction base="{urn:oasis:names:tc:SAML:2.0:assertion}SubjectConfirmationDataType">
- *       &lt;sequence>
- *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}KeyInfo" maxOccurs="unbounded"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="KeyInfoConfirmationDataType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{urn:oasis:names:tc:SAML:2.0:assertion}SubjectConfirmationDataType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{http://www.w3.org/2000/09/xmldsig#}KeyInfo" maxOccurs="unbounded"/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

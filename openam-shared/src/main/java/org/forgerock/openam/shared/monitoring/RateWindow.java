@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.shared.monitoring;
 
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class maintains the rate of an event for a sample rate over a window of a particular size.
- * <br/>
+ * <br>
  * The window is constructed with a given size and sample rate and the window will move continuously at interval
  * defined by the sample rate. The min, max and average will always be of the current window position, ie as the window
  * moves and sample are not covered by the window the sample will not be included in the  min, max and average
@@ -105,7 +106,7 @@ public class RateWindow {
 
     /**
      * Gets the average rate for the sample rate averaged across the whole window.
-     * <br/>
+     * <br>
      * Does not include the latest window slot if time has not passed beyond it yet as otherwise could skew the average
      * as that time slot has not yet completed and may get more events made in it.
      *

@@ -26,6 +26,7 @@
  */
 /*
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.entitlement;
 
@@ -228,25 +229,33 @@ public abstract class LogicalCondition extends EntitlementConditionAdaptor {
             return false;
         }
         LogicalCondition object = (LogicalCondition) obj;
-        if (eConditions == null) {
-            if (object.getEConditions() != null) {
+        // Read both sides through the accessors: subclasses may keep the nested
+        // conditions elsewhere and override the getters (NotCondition holds a single
+        // condition and leaves these fields null), so reading this.field against
+        // object.getter() would compare two different representations.
+        Set<EntitlementCondition> thisEConditions = getEConditions();
+        Set<EntitlementCondition> otherEConditions = object.getEConditions();
+        if (thisEConditions == null) {
+            if (otherEConditions != null) {
                 return false;
             }
         } else { // eConditions not null
-            if ((object.getEConditions()) == null) {
+            if (otherEConditions == null) {
                 return false;
-            } else if (!eConditions.containsAll(object.getEConditions())) {
+            } else if (!thisEConditions.containsAll(otherEConditions)) {
                 return false;
-            } else if (!object.getEConditions().containsAll(eConditions)) {
+            } else if (!otherEConditions.containsAll(thisEConditions)) {
                 return false;
             }
         }
-        if (pConditionName == null) {
-            if (object.getPConditionName() != null) {
+        String thisPConditionName = getPConditionName();
+        String otherPConditionName = object.getPConditionName();
+        if (thisPConditionName == null) {
+            if (otherPConditionName != null) {
                 return false;
             }
         } else {
-            if (!pConditionName.equals(object.getPConditionName())) {
+            if (!thisPConditionName.equals(otherPConditionName)) {
                 return false;
             }
         }

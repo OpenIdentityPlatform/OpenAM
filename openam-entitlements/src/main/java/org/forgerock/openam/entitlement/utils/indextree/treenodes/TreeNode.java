@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock Inc.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
@@ -19,16 +20,16 @@ import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContex
 
 /**
  * A representation of a node with a tree structure.
- * <p/>
+ * <p>
  * A tree node can have one parent and many children. Children are represented by single references to one another. So
  * a parent has a single reference to its first child and then corresponding children can be accessed via a child's
  * sibling reference.
- * <p/>
+ * <p>
  * A tree node represents a single character within an index rule. An index rule is the path in the tree up to an end
  * point. Each tree node is responsible for determining whether it has interest in a passed resource character. For
  * instance a tree node may represent a wildcard and therefore may have interest in a set of characters. Implementations
  * of this interface determine the concrete behaviour.
- * <p/>
+ * <p>
  * Tree nodes have a notion of end points. An end point denotes the final character of an index rule that was added to
  * the tree structure. Therefore the path of an end point is an index rule. For instance, if two index rules "abcd" and
  * "abcdef" were added to the tree, there would be no way to determine that the path to tree node "d" represented an

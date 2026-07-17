@@ -25,6 +25,7 @@
  * $Id: NameIDMappingResponse.java,v 1.2 2008/06/25 05:47:57 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -40,18 +41,17 @@ import com.sun.identity.saml2.protocol.impl.NameIDMappingResponseImpl;
  * This class represents the NameIDMappingResponseType complex type.
  * <p>The following schema fragment specifies the expected 	
  * content contained within this java content object. 	
- * <p>
  * <pre>
- * &lt;complexType name="NameIDMappingResponseType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType">
- *       &lt;choice>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}NameID"/>
- *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedID"/>
- *       &lt;/choice>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="NameIDMappingResponseType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType"&gt;
+ *       &lt;choice&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}NameID"/&gt;
+ *         &lt;element ref="{urn:oasis:names:tc:SAML:2.0:assertion}EncryptedID"/&gt;
+ *       &lt;/choice&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  *
  * 

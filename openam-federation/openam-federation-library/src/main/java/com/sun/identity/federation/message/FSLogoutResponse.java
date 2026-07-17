@@ -25,7 +25,7 @@
  * $Id: FSLogoutResponse.java,v 1.4 2008/06/25 05:46:44 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message;
@@ -107,7 +107,7 @@ public class FSLogoutResponse extends AbstractResponse {
      * @param status the  Logout <code>Status</code>  object.
      * @param providerId the value of <code>ProviderID</code> attribute.
      * @param relayState the value of <code>RelayState</code> attribute.
-     * @throws <code>FSMsgException</code> if this object cannot be created.
+     * @throws FSMsgException if this object cannot be created.
      */
     public FSLogoutResponse(String responseID,
             String inResponseTo,
@@ -338,7 +338,7 @@ public class FSLogoutResponse extends AbstractResponse {
      * Returns the value of <code>ProviderID</code> attribute.
      *
      * @return the value of <code>ProviderID</code> attribute.
-     * @see #setProviderId(String).
+     * @see #setProviderId(String)
      */
     
     public String getProviderId(){
@@ -398,7 +398,7 @@ public class FSLogoutResponse extends AbstractResponse {
     /**
      * Sets the Logout <code>Status</code>.
      *
-     * @param status the Logout <code>Status</code code.
+     * @param status the Logout <code>Status</code>.
      * @see #getStatus
      */
     public void setStatus(String status) {
@@ -416,7 +416,7 @@ public class FSLogoutResponse extends AbstractResponse {
     /**
      * Sets the Logout <code>Status</code>.
      *
-     * @param status the Logout <code>Status</code object.
+     * @param status the Logout <code>Status</code> object.
      * @see #getStatus
      */
     public void setStatus(Status status) {
@@ -752,7 +752,7 @@ public class FSLogoutResponse extends AbstractResponse {
      * Signs the <code>LogoutResponse</code>.
      *
      * @param certAlias the Certificate Alias.
-     * @throws XMLSignatureException if this object cannot be signed.
+     * @throws SAMLException if this object cannot be signed.
      */
     public void signXML(String certAlias) throws SAMLException {
         FSUtils.debug.message("FSLogoutResponse.signXML: Called");

@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.http.client.request;
 
@@ -24,7 +25,7 @@ package org.forgerock.http.client.request;
 public class HttpClientRequestFactory {
 
     /**
-     * Create a new empty {@link HttpClientRequest} that can be sent over a {@link org.forgerock.http.client.HttpClient}.
+     * Create a new empty {@link HttpClientRequest} that can be sent over a {@code org.forgerock.http.client.HttpClient}.
      *
      * @return An empty {@link HttpClientRequest}.
      */

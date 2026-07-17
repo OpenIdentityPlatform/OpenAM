@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package org.forgerock.openam.auditors;
 
@@ -100,7 +101,7 @@ public abstract class ConfigAuditor {
     /**
      * Publishes an event with details of the successfully completed configuration creation operation,
      * if the 'config' topic is audited.
-     * <p/>
+     * <p>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
      * @param newState The state of the entry which is created
@@ -121,7 +122,7 @@ public abstract class ConfigAuditor {
     /**
      * Publishes an event with details of the successfully completed configuration modification operation,
      * if the 'config' topic is audited.
-     * <p/>
+     * <p>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
      * @param finalState The derived final state of the entry
@@ -143,7 +144,7 @@ public abstract class ConfigAuditor {
     /**
      * Publishes an event with details of the successfully completed configuration deletion operation,
      * if the 'config' topic is audited.
-     * <p/>
+     * <p>
      * Any exception that occurs while trying to publish the audit event will be
      * captured in the debug logs but otherwise ignored.
      */

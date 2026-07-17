@@ -12,12 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2023 3A Systems LLC
+ * Portions copyright 2023-2026 3A Systems LLC
  */
 
 package org.forgerock.openam.session;
 
-import static java.security.AccessController.*;
+import java.security.AccessController;
 
 import java.util.Date;
 
@@ -132,7 +132,7 @@ public class SessionCuller extends GeneralTaskRunnable {
 
     /**
      * Checks if Polling is enabled
-     * @return <code> true if polling is enabled , <code>false<code> otherwise
+     * @return <code> true if polling is enabled , </code>false<code> otherwise
      */
     private boolean getIsPolling() {
         return isPolling;
@@ -170,7 +170,7 @@ public class SessionCuller extends GeneralTaskRunnable {
                     if (sender == null) {
                         sender = new SessionPollerSender(session, this);
                     }
-                    RestrictedTokenContext.doUsing(getContext(),
+                    RestrictedTokenContext.doUsing(AccessController.getContext(),
                             new RestrictedTokenAction() {
                                 public Object run() throws Exception {
                                     try {

@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
  * Portions Copyrighted 2021 Open Identity Platform Community.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.authentication.jaas;
@@ -172,11 +173,10 @@ public class LoginContext implements org.forgerock.openam.authentication.service
     
     /**
      * Sets next module by module name, allows to modify auth chain during auth
-     * 
-     * @param moduleName
-     * 
+     *
+     * @param moduleName the name of the module to set as the next module
      */
-   
+
     public void setNextModule(String moduleName) {
     	boolean found = false;
     	moduleStackQueue.clear();
@@ -199,11 +199,10 @@ public class LoginContext implements org.forgerock.openam.authentication.service
     
     /**
      * Sets next module by module index in chain, allows to modify auth chain during auth
-     * 
-     * @param moduleName
-     * 
+     *
+     * @param moduleIndex the index in the chain of the module to set as the next module
      */
-    
+
     public void setNextModule(int moduleIndex) {
     	moduleStackQueue.clear();
     	for(int i = 0; i < moduleStack.length; i++ ) {
@@ -243,7 +242,7 @@ public class LoginContext implements org.forgerock.openam.authentication.service
      * Resets auth chain to particular module, auth chain starts with this module
      * 
      * @param moduleIndex index of module
-     * @throws ResetAuthChainException 
+     * @throws ResetAuthChainException if resetting the auth chain to the module is denied
      */
     
     public void resetAuthChainToModule(int moduleIndex) throws ResetAuthChainException {

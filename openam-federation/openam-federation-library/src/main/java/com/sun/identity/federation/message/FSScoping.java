@@ -24,7 +24,7 @@
  *
  * $Id: FSScoping.java,v 1.2 2008/06/25 05:46:45 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message;
@@ -244,7 +244,6 @@ public class FSScoping {
      * object.
      *
      * @param request the <code>HttpServletRequest</code> object.
-     * @throws FSMsgException if there is an error creating this object.
      */
     public static FSScoping parseURLEncodedRequest(HttpServletRequest request) {
         

@@ -14,7 +14,7 @@
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
  * Portions copyright 2019 Open Source Solution Technology Corporation
- * Portions Copyrighted 2024 3A Systems LLC.
+ * Portions Copyrighted 2024-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -84,7 +84,7 @@ import freemarker.template.Template;
 
 /**
  * Models all of the possible settings the OAuth2 provider can have and that can be configured.
- * <br/>
+ * <br>
  * The actual implementation is responsible for providing the method in which these settings are configured. This
  * interface only describes the API for other code to get the OAuth2 provider settings.
  *

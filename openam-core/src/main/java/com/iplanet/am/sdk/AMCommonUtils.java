@@ -25,6 +25,7 @@
  * $Id: AMCommonUtils.java,v 1.7 2009/01/28 05:34:46 ww203982 Exp $
  *
  * Portions Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk;
@@ -143,7 +144,7 @@ public class AMCommonUtils implements AMConstants {
      *            the first AttrSet
      * @param attrSet2
      *            the second AttrSet
-     * @return an AttrSet which has combined values of attrSet1 & attrSet2
+     * @return an AttrSet which has combined values of attrSet1 &amp; attrSet2
      */
     protected static AttrSet combineAttrSets(AttrSet attrSet1, AttrSet attrSet2)
     {
@@ -456,7 +457,7 @@ public class AMCommonUtils implements AMConstants {
      * remove these attributes from newly created entries. Such empty sets
      * should be ignored, when entry is being created.
      * 
-     * @param attrMap
+     * @param attrMap the attribute-value map from which empty value sets are removed
      * @return map without empty set.
      */
     public static Map removeEmptyValues(Map attrMap) {

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -45,8 +46,7 @@ import org.w3c.dom.Node;
  * This <code>ResourceResultRequest</code> class represents a
  * GetResourceResults XML document. The GetResourceResults
  * DTD is defined as the following:
- * <p>
- * <pre>
+ * <pre>{@code
  * <!-- GetResourceResults element is used by the client to request
  *      the policy evaluation decisions for a particular user regarding
  *      a given service and a resource and possibly its sub resources.
@@ -75,8 +75,7 @@ import org.w3c.dom.Node;
  *     resourceName    CDATA        #REQUIRED
  *     resourceScope   (self | strict-subtree | subtree)  "strict-subtree"
  * >
- * </pre>
- * <p>
+ * }</pre>
  */
 
 public class ResourceResultRequest {

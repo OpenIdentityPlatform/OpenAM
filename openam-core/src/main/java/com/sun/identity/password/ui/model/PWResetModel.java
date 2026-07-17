@@ -26,6 +26,7 @@
  *
  * Portions Copyrighted 2012-2015 ForgeRock AS.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.password.ui.model;
@@ -174,7 +175,6 @@ public interface PWResetModel {
     /**
      * Returns <code>true</code> if message debugging is enabled.
      *
-     * @see com.iplanet.am.util.Debug#messageEnabled
      * @return <code>true</code> if message debugging is enabled
      *        <code>false</code> if message debugging is disabled
      */

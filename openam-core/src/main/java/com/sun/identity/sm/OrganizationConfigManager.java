@@ -25,7 +25,7 @@
  * $Id: OrganizationConfigManager.java,v 1.31 2010/01/20 17:01:36 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.sm;
 
@@ -269,8 +269,8 @@ public class OrganizationConfigManager {
      *            Map of attributes for the organization per service. The
      *            parameter Map attributes contains another Map as its value,
      *            which then has attribute names and values. The way it is
-     *            arranged is: Map::attributes --> Key: String::ServiceName
-     *            Value: Map::svcAttributes Map::svcAttributes --> Key:
+     *            arranged is: Map::attributes --&gt; Key: String::ServiceName
+     *            Value: Map::svcAttributes Map::svcAttributes --&gt; Key:
      *            String::AttributeName Value: Set::AttributeValues
      * 
      * @return organization config manager of the newly created

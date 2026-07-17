@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS. All rights reserved.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.tokengeneration.saml2.statements;
@@ -59,7 +61,7 @@ public class DefaultAttributeMapper extends DefaultLibraryIDPAttributeMapper imp
      *                     This implementation detail should not change the specifics of the contract, however, in which
      *                     the attributeMap is a fundamental constituent.
      * @return The list of SAML2 Attribute instances to be included in the AttributeStatement.
-     * @throws TokenCreationException
+     * @throws TokenCreationException if the attributes could not be retrieved for the subject
      */
     public List<Attribute> getAttributes(SSOToken token, Map<String, String> attributeMap) throws TokenCreationException {
         try {

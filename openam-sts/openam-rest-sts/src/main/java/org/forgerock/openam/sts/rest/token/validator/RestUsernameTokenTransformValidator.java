@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.rest.token.validator;
@@ -25,7 +27,7 @@ import org.forgerock.openam.sts.token.validator.PrincipalFromSession;
 import org.forgerock.openam.sts.token.validator.ValidationInvocationContext;
 
 /**
- * Responsible for validating RestUsernameToken instances, which is simply a <username,password> combination.
+ * Responsible for validating RestUsernameToken instances, which is simply a {@code <username,password>} combination.
  */
 public class RestUsernameTokenTransformValidator implements RestTokenTransformValidator<RestUsernameToken> {
     private final AuthenticationHandler<RestUsernameToken> authenticationHandler;

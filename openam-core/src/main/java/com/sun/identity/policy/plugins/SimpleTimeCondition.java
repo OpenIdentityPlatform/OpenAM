@@ -25,6 +25,7 @@
  * $Id: SimpleTimeCondition.java,v 1.5 2010/01/05 22:00:26 dillidorai Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.policy.plugins;
@@ -49,7 +50,7 @@ import java.text.*;
  * of <code>Condition</code>. This lets you define the time range
  * of week days and/or date range during which a policy applies. 
  *
- * @deprecated Use {@link org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition} instead.
+ * @deprecated Use {@code org.forgerock.openam.entitlement.conditions.environment.SimpleTimeCondition} instead.
  */
 @Deprecated
 public class SimpleTimeCondition implements Condition {
@@ -119,7 +120,7 @@ public class SimpleTimeCondition implements Condition {
      *
      * @param property property name
      *
-     * @return <code>Syntax<code> for the property name
+     * @return <code>Syntax</code> for the property name
      */
     public Syntax getPropertySyntax(String property) {
         return Syntax.NONE;
@@ -712,7 +713,7 @@ public class SimpleTimeCondition implements Condition {
      *
      * @throws PolicyException if the condition has not been initialized
      *         with a successful call to <code>setProperties(Map)</code> and/or
-     *         the value of keys <code>REQUEST_TIME and/or
+     *         the value of keys <code>REQUEST_TIME</code> and/or
      *         <code>REQUEST_TIME_ZONE</code> are invalid.
      * @throws SSOException if the token is invalid
      * @see #setProperties(Map)

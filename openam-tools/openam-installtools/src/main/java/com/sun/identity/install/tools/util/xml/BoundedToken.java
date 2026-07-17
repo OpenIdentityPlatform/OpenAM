@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -30,8 +31,8 @@ package com.sun.identity.install.tools.util.xml;
 
 /**
  * Represents a bounded string fragment of an XML document. A bounded string
- * framgement is defined as a set of characters that begins with a '<' and end
- * with '>' character.
+ * framgement is defined as a set of characters that begins with a {@code '<'} and end
+ * with {@code '>'} character.
  */
 public class BoundedToken extends Token {
 

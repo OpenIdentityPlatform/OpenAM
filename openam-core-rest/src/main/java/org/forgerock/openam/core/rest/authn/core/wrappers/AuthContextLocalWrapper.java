@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.core.rest.authn.core.wrappers;
@@ -34,7 +35,7 @@ import org.forgerock.openam.utils.StringUtils;
 
 /**
  * A wrapper class around AuthContextLocal.
- * <p/>
+ * <p>
  * Providing a wrapper around these methods allows for easy decoupling and unit testing.
  */
 public class AuthContextLocalWrapper implements AuthenticationContext {

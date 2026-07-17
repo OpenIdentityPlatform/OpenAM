@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -293,7 +294,7 @@ public class CallBackHelper extends CallBackHelperBase {
     }
 
     /**
-     * Special method for pre processing memberShip modification for roles &
+     * Special method for pre processing memberShip modification for roles &amp;
      * groups.
      */
     public Set preProcessModifyMemberShip(SSOToken token, String entryDN,
@@ -334,7 +335,7 @@ public class CallBackHelper extends CallBackHelperBase {
     }
 
     /**
-     * Special method for post processing memberShip modification for roles &
+     * Special method for post processing memberShip modification for roles &amp;
      * groups.
      */
     public void postProcessModifyMemberShip(SSOToken token, String entryDN,

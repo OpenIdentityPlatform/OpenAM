@@ -24,6 +24,7 @@
  *
  * $Id: DataStoreProvider.java,v 1.2 2008/06/25 05:47:27 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /**
@@ -37,7 +38,7 @@ import java.util.Set;
 
 
 /**
- * Interface used for storing & retrieving information. Also used to search
+ * Interface used for storing &amp; retrieving information. Also used to search
  * user.
  * 
  */

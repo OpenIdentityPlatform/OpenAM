@@ -25,6 +25,7 @@
  * $Id: Debug.java,v 1.5 2008/06/25 05:47:47 qcheng Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml2.idpdiscovery;
@@ -258,8 +259,8 @@ public class Debug {
     /** Checks if message debugging is enabled.
      *
      * <p><b>NOTE:</b> It is recommended that <code>messageEnabled()</code>
-     * be used instead of <code>debugEnabled()</code> as the former is more 
-     * intuitive.</>
+     * be used instead of <code>debugEnabled()</code> as the former is more
+     * intuitive.</p>
      *
      * @return <code>true</code> if message debugging is enabled
      *        <code>false</code> if message debugging is disabled
@@ -311,7 +312,7 @@ public class Debug {
      * <li><code>Debug.ERROR</code>
      * <li><code>Debug.WARNING</code>
      * <li><code>Debug.MESSAGE</code>
-     * <pli<code>Debug.ON</code>
+     * <li><code>Debug.ON</code>
      * </ul>
      *
      * @return debug state.
@@ -464,7 +465,7 @@ public class Debug {
     /** Prints error messages only if debug state is greater than
      * Debug.OFF. If the debug file is not accessible and debugging is enabled, 
      * the message along with a time stamp and thread info will be printed on
-     * <code>System.out</code>.</p>
+     * <code>System.out</code>.
      *
      * <p>This method creates the debug file if does not exist; otherwise it
      * starts appending to the existing debug file. When invoked for the first
@@ -580,7 +581,7 @@ public class Debug {
      * <li><code>Debug.WARNING</code>
      * <li><code>Debug.MESSAGE</code>
      * <li><code>Debug.ON</code>
-     * <ul>
+     * </ul>
      */
     public void setDebug(int debugType) {
         switch (debugType) {
@@ -602,7 +603,7 @@ public class Debug {
      * Enables or disables debugging based on the value of debug attribute,
      * <code>com.iplanet.services.debug.level</code>, in the
      * <code>DebugConfig.properties</code> file.
-     * <code>DebugConfig.properties<code>
+     * <code>DebugConfig.properties</code>
      * file should be accessible from CLASSPATH.
      * If the property is not defined, debug level is set to <code>error</code>.
      *

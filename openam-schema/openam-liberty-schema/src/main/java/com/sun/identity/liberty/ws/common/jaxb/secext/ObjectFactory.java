@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -78,7 +79,7 @@ public class ObjectFactory
      *     the Class object of the javacontent interface to instantiate
      * @return
      *     a new instance
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public java.lang.Object newInstance(java.lang.Class javaContentInterface)
@@ -97,7 +98,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @return
      *     the value of the requested property
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error retrieving the given property or value
      */
     public java.lang.Object getProperty(java.lang.String name)
@@ -116,7 +117,7 @@ public class ObjectFactory
      *     the name of the property to retrieve
      * @param value
      *     the value of the property to be set
-     * @throws PropertyException
+     * @throws javax.xml.bind.PropertyException
      *     when there is an error processing the given property or value
      */
     public void setProperty(java.lang.String name, java.lang.Object value)
@@ -128,7 +129,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecurityTokenReferenceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.SecurityTokenReferenceType createSecurityTokenReferenceType()
@@ -140,7 +141,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyIdentifierType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.KeyIdentifierType createKeyIdentifierType()
@@ -152,7 +153,7 @@ public class ObjectFactory
     /**
      * Create an instance of KeyIdentifierElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.KeyIdentifierElement createKeyIdentifierElement()
@@ -164,7 +165,7 @@ public class ObjectFactory
     /**
      * Create an instance of UsernameTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.UsernameTokenType createUsernameTokenType()
@@ -176,7 +177,7 @@ public class ObjectFactory
     /**
      * Create an instance of PasswordString
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.PasswordString createPasswordString()
@@ -188,7 +189,7 @@ public class ObjectFactory
     /**
      * Create an instance of EncodedString
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.EncodedString createEncodedString()
@@ -200,7 +201,7 @@ public class ObjectFactory
     /**
      * Create an instance of BinarySecurityTokenType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.BinarySecurityTokenType createBinarySecurityTokenType()
@@ -212,7 +213,7 @@ public class ObjectFactory
     /**
      * Create an instance of UsernameTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.UsernameTokenElement createUsernameTokenElement()
@@ -224,7 +225,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecurityHeaderType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.SecurityHeaderType createSecurityHeaderType()
@@ -236,7 +237,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.ReferenceElement createReferenceElement()
@@ -248,7 +249,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecurityElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.SecurityElement createSecurityElement()
@@ -260,7 +261,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmbeddedType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.EmbeddedType createEmbeddedType()
@@ -272,7 +273,7 @@ public class ObjectFactory
     /**
      * Create an instance of AttributedString
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.AttributedString createAttributedString()
@@ -284,7 +285,7 @@ public class ObjectFactory
     /**
      * Create an instance of NonceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.NonceElement createNonceElement()
@@ -296,7 +297,7 @@ public class ObjectFactory
     /**
      * Create an instance of SecurityTokenReferenceElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.SecurityTokenReferenceElement createSecurityTokenReferenceElement()
@@ -308,7 +309,7 @@ public class ObjectFactory
     /**
      * Create an instance of ReferenceType
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.ReferenceType createReferenceType()
@@ -320,7 +321,7 @@ public class ObjectFactory
     /**
      * Create an instance of EmbeddedElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.EmbeddedElement createEmbeddedElement()
@@ -332,7 +333,7 @@ public class ObjectFactory
     /**
      * Create an instance of BinarySecurityTokenElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.BinarySecurityTokenElement createBinarySecurityTokenElement()
@@ -344,7 +345,7 @@ public class ObjectFactory
     /**
      * Create an instance of PasswordElement
      * 
-     * @throws JAXBException
+     * @throws javax.xml.bind.JAXBException
      *     if an error occurs
      */
     public com.sun.identity.liberty.ws.common.jaxb.secext.PasswordElement createPasswordElement()

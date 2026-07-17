@@ -24,6 +24,7 @@
  *
  * $Id: ArtifactResponseImpl.java,v 1.2 2008/06/25 05:47:59 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -57,17 +58,16 @@ import com.sun.identity.saml2.protocol.ArtifactResponse;
 /**
  * The <code>ArtifactResopnse</code> message has the complex type
  * <code>ArtifactResponseType</code>.
- * <p>
  * <pre>
- * &lt;complexType name="ArtifactResponseType">
- *   &lt;complexContent>
- *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType">
- *       &lt;sequence>
- *         &lt;any/>
- *       &lt;/sequence>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="ArtifactResponseType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{urn:oasis:names:tc:SAML:2.0:protocol}StatusResponseType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;any/&gt;
+ *       &lt;/sequence&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  */
 public class ArtifactResponseImpl extends StatusResponseImpl

@@ -58,9 +58,9 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
      * Default constructor with dependencies exposed.
      *
      * @param tokenIdFactory Non null.
-     * @param serialisation
-     * @param oAuthValues
-     * @param blobUtils
+     * @param serialisation the JSON serialisation helper used to marshal token state
+     * @param oAuthValues the helper used to read OAuth specific values
+     * @param blobUtils the token blob utilities used to read and write the token blob
      */
     @Inject
     public OAuthAdapter(TokenIdFactory tokenIdFactory, JSONSerialisation serialisation,

@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.session;
@@ -76,7 +76,7 @@ public class SessionServiceURLService {
      * @param port Session Server port.
      * @param uri Session Server URI.
      * @return URL Session Service URL.
-     * @exception com.iplanet.dpro.session.SessionException
+     * @exception com.iplanet.dpro.session.SessionException if the session service URL cannot be resolved
      */
     public URL getSessionServiceURL(String protocol, String server, String port, String uri)
             throws SessionException {
@@ -100,7 +100,7 @@ public class SessionServiceURLService {
      *
      * @param serverID server ID from the platform server list.
      * @return Session Service URL.
-     * @exception SessionException
+     * @exception SessionException if the session service URL cannot be resolved
      */
     public URL getSessionServiceURL(String serverID) throws SessionException {
         try {
@@ -123,7 +123,7 @@ public class SessionServiceURLService {
      *
      * @param sid Session ID
      * @return Session Service URL.
-     * @exception SessionException
+     * @exception SessionException if the session service URL cannot be resolved
      */
     public URL getSessionServiceURL(SessionID sid) throws SessionException {
         String primaryId;

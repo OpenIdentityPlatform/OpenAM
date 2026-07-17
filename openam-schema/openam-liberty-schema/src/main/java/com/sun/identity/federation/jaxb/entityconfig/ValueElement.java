@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,9 +13,8 @@ package com.sun.identity.federation.jaxb.entityconfig;
 /**
  * Java content class for Value element declaration.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/idff-entity-config-schema.xsd line 74)
- * <p>
  * <pre>
- * &lt;element name="Value" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ * &lt;element name="Value" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  * </pre>
  * 
  */

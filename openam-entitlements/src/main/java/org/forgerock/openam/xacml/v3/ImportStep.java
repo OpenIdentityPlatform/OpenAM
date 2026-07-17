@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.xacml.v3;
 
@@ -32,7 +33,7 @@ public interface ImportStep {
     /**
      * Name of the step. For example name of the resource type or application.
      *
-     * @return
+     * @return the name of the step
      */
     String getName();
 

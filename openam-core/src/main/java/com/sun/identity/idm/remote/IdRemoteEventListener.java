@@ -25,6 +25,7 @@
  * $Id: IdRemoteEventListener.java,v 1.7 2009/01/28 05:35:00 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.idm.remote;
@@ -91,7 +92,7 @@ public class IdRemoteEventListener {
     }
 
     /**
-     * Constructor for <class>EventListener</class>. Should be instantiated
+     * Constructor for <code>EventListener</code>. Should be instantiated
      * once by <code>RemoteServicesImpl</code>
      *
      */
@@ -223,7 +224,6 @@ public class IdRemoteEventListener {
      * Sends notifications to listeners added via <code>addListener</code>.
      * The parameter <code>nItem</code> is an XML document having a single
      * notification event, using the following DTD.
-     * <p>
      * 
      * <pre>
      *       &lt;!-- EventNotification element specifes the change notification

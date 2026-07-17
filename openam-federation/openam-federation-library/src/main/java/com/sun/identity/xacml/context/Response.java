@@ -24,6 +24,7 @@
  *
  * $Id: Response.java,v 1.2 2008/06/25 05:48:12 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.xacml.context;
@@ -36,14 +37,13 @@ import java.util.List;
  * The <code>Response</code> element is a container of 
  * one or more <code>Result</code>s issued by policy decision point
  * 
- * <p/>
  * <pre>
  * schema:
- *      &lt;xs:complexType name="ResponseType">
- *          &lt;xs:sequence>
- *              &lt;xs:element ref="xacml-context:Result" maxOccurs="unbounded"/>
- *          &lt;xs:sequence>
- *      &lt;xs:complexType>
+ *      &lt;xs:complexType name="ResponseType"&gt;
+ *          &lt;xs:sequence&gt;
+ *              &lt;xs:element ref="xacml-context:Result" maxOccurs="unbounded"/&gt;
+ *          &lt;xs:sequence&gt;
+ *      &lt;xs:complexType&gt;
  * </pre>
  */
 public interface Response {

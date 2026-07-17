@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.audit.context;
 
@@ -24,9 +25,9 @@ import java.util.concurrent.TimeUnit;
 import org.forgerock.util.thread.ExecutorServiceFactory;
 
 /**
- * Responsible for filtering the API of {@ExecutorServiceFactory} to exclude any
+ * Responsible for filtering the API of {@link ExecutorServiceFactory} to exclude any
  * methods that do not offer a means of setting thread names and to ensure that
- * new methods added to {@ExecutorServiceFactory} are always called via
+ * new methods added to {@link ExecutorServiceFactory} are always called via
  * {@link AuditRequestContextPropagatingExecutorServiceFactory}.
  *
  * @see ExecutorServiceFactory

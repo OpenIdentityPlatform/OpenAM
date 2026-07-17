@@ -24,6 +24,7 @@
  *
  * $Id: RequestedService.java,v 1.2 2008/06/25 05:47:11 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -42,25 +43,23 @@ import com.sun.identity.shared.xml.XMLUtils;
  * instance complying with one of the specified service type.
  * <p>The following schema fragment specifies the expected content 
  * within the <code>RequestedService</code> object.
- * <p>
  * <pre>
- * &lt;complexType>
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:disco:2003-08}ServiceType"/>
- *         &lt;element ref="{urn:liberty:disco:2003-08}Options" minOccurs="0"/>
- *   *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:disco:2003-08}ServiceType"/&gt;
+ *         &lt;element ref="{urn:liberty:disco:2003-08}Options" minOccurs="0"/&gt;
+ *   *       &lt;/sequence&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
- * <p>
  * <pre>
  * In this implementation, the value of Options has the following meanings:
  * When the List of options is null, no Options element will be created;
  * When the List of options is an empty List, or is Collection.EMPTY_LIST,
- *        empty Options element &lt;Options>&lt;/Options> will be created;
+ *        empty Options element &lt;Options&gt;&lt;/Options&gt; will be created;
  * When the List of options is not empty,
  *        Options element with child Option element(s) will be created.
  * </pre>

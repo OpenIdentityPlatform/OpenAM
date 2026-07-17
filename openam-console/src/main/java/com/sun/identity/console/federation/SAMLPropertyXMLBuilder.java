@@ -24,6 +24,7 @@
  *
  * $Id: SAMLPropertyXMLBuilder.java,v 1.7 2009/10/15 00:02:02 asyhuang Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.console.federation;
@@ -186,7 +187,7 @@ public class SAMLPropertyXMLBuilder
     /**
      * get samlv1.x Property.
      *
-     * @param name
+     * @param name the name of the SAML property to return
      * @return samlv1.x Property
      */
     public static SAMLProperty getSAMLProperty(String name) {

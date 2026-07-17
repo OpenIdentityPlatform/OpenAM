@@ -25,6 +25,7 @@
  * $Id: FSNameIdentifierMappingRequest.java,v 1.2 2008/06/25 05:46:44 qcheng Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.message;
@@ -61,7 +62,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * The class <code>FSNameIdentifierMappingRequest</code> is used to
- * create or parse <code>NameIdentifierMappingRequest<code>.
+ * create or parse <code>NameIdentifierMappingRequest</code>.
  *
  * 
  * @deprecated since 12.0.0
@@ -76,7 +77,7 @@ public class FSNameIdentifierMappingRequest extends AbstractRequest {
     private String signatureString;
     
     /**
-     * Constructor to create <code> FSNameIdentifierMappingRequest<code>.
+     * Constructor to create <code> FSNameIdentifierMappingRequest</code>.
      *
      * @param providerID the requesting provider's ID
      * @param nameIdentifier the <code>NameIdentifier</code> qualified by the
@@ -97,7 +98,7 @@ public class FSNameIdentifierMappingRequest extends AbstractRequest {
     }
     
     /**
-     * Constructor to create <code> FSNameIdentifierMappingRequest<code> from
+     * Constructor to create <code> FSNameIdentifierMappingRequest</code> from
      * the Document Element.
      *
      * @param root the <code>NameIdentifierMappingRequest</code> Document

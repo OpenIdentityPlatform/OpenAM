@@ -24,13 +24,14 @@
  *
  * $Id: package-info.java,v 1.2 2008/06/25 05:47:07 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 /**
  * Defines interface to handle different SASL mechanisms.
  *
  * 
- * @deprecated since 12.0.0
+ * Deprecated since 12.0.0.
  */
 package com.sun.identity.liberty.ws.authnsvc.mechanism;
 

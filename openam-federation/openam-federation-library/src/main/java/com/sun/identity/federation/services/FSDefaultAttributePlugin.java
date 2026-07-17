@@ -24,6 +24,7 @@
  *
  * $Id: FSDefaultAttributePlugin.java,v 1.4 2008/11/10 22:56:58 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -70,7 +71,7 @@ public class FSDefaultAttributePlugin implements FSAttributePlugin {
      * @param remoteEntityID Remote provider's entity id
      * @param subject Subject subject of the authenticated principal.
      * @param token user's session.
-     * @return list of SAML <code>AttributeStatement<code>s.
+     * @return list of SAML <code>AttributeStatement</code>s.
      * @deprecated This method is deprecated.
      * @see #getAttributeStatements(String,String,String,FSSubject,Object)
      */
@@ -92,7 +93,7 @@ public class FSDefaultAttributePlugin implements FSAttributePlugin {
      * @param remoteEntityID Remote provider's entity id
      * @param subject Subject subject of the authenticated principal.
      * @param token user's session.
-     * @return list of SAML <code>AttributeStatement<code>s.
+     * @return list of SAML <code>AttributeStatement</code>s.
      */
     public List getAttributeStatements(
            String realm,

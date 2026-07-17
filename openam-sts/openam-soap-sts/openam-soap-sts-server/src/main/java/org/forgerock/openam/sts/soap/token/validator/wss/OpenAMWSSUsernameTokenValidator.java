@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A-Systems LLC.
+ * Portions Copyrighted 2025-2026 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.token.validator.wss;
@@ -32,7 +32,7 @@ import org.slf4j.Logger;
  * The org.apache.cxf.sts.token.validator.UsernameTokenValidator class ultimately calls a org.apache.ws.security.validate.Validator
  * instance (set via a setter) to perform the actual token validation. This class implements the ws.security.validate.Validator
  * interface and will be set in the cxf.sts.token.validator.UsernameTokenValidator class. It will perform the actual
- * UsernameToken validation by calling the OpenAM REST interface via bound TokenAuthenticationRequestDispacher<UsernameToken>
+ * UsernameToken validation by calling the OpenAM REST interface via bound {@code TokenAuthenticationRequestDispacher<UsernameToken>}
  *
  */
 public class OpenAMWSSUsernameTokenValidator extends org.apache.wss4j.dom.validate.UsernameTokenValidator {

@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -39,10 +40,10 @@ public class NewSubSchemaWrapper {
     
     /**
      * Creates a new sub schema wrapper
-     * 
-     * @param serviceName
-     * @param subSchemaName
-     * @param subSchemas 
+     *
+     * @param serviceName the name of the service within which this sub schema will be defined
+     * @param subSchemaName the name of the new sub schema to be created
+     * @param subSchemas the DOM node holding the sub schema definition
      */
     public NewSubSchemaWrapper(String serviceName, String subSchemaName, Node subSchemas) {
         this.serviceName = serviceName;

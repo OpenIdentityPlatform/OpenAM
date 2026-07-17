@@ -27,6 +27,7 @@
  */
 /**
  * Portions Copyrighted 2012-2013 ForgeRock Inc
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.shared.jaxrpc;
 
@@ -95,10 +96,8 @@ public class SOAPClient {
     
     /**
      * Constructor for applications that would like to dynamically set the SOAP
-     * endponts using <code>
-     * <code>setUrls(String[] urls)</code> before
-     * invoking either <code>send()</code> or <code>
-     * call()</code>.
+     * endponts using <code>setUrls(String[] urls)</code> before
+     * invoking either <code>send()</code> or <code>call()</code>.
      */
     public SOAPClient() throws IOException {
         // do nothing

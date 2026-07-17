@@ -24,6 +24,7 @@
  *
  * $Id: IDPEntry.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 
@@ -66,7 +67,7 @@ public class IDPEntry {
      *
      * @param providerID the Identity Provider identifier.
      * @param providerName the Identity Provider name.
-     * @param location
+     * @param location the location URL of the Identity Provider.
      */
     public IDPEntry(String providerID,String providerName,String location) {
         this.providerID = providerID;
@@ -226,8 +227,8 @@ public class IDPEntry {
      * Constructor creates <code>IDPEntry</code> Object from
      * Document Element.
      *
-     * @param root Document Element of <code>IDPEntry<code> object.
-     * @throws FSMsgException if <code>IDPEntry<code> cannot be created.
+     * @param root Document Element of <code>IDPEntry</code> object.
+     * @throws FSMsgException if <code>IDPEntry</code> cannot be created.
      */
     
     public IDPEntry(Element root) throws FSMsgException {

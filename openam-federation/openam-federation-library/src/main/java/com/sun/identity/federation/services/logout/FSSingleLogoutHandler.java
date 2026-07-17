@@ -25,7 +25,7 @@
  * $Id: FSSingleLogoutHandler.java,v 1.15 2009/11/04 00:06:11 exu Exp $
  *
  * Portions Copyrighted 2013 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  *
  */
 package com.sun.identity.federation.services.logout;
@@ -1656,7 +1656,8 @@ public class FSSingleLogoutHandler {
      * @param idAttrName id attribute name
      * @param id id attribute value
      * @return the signed logout request
-     * @exception SAMLException, FSMsgException if an error occurred during
+     * @exception SAMLException if an error occurred during
+     * @exception FSMsgException if an error occurred during
      *  the process
      */
     private SOAPMessage signLogoutRequest(

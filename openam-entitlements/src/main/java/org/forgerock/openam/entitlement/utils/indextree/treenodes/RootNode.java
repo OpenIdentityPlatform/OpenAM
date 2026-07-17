@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013 ForgeRock Inc.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
@@ -19,7 +20,7 @@ import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContex
 
 /**
  * Root node of the tree structure.
- * <p/>
+ * <p>
  * As there can be many nodes at the root level, the idea of this root node was created to represent the parent of those
  * potential nodes. This helps when describing algorithms by having a single point of access into the tree. It has no
  * other function than to be an 'anchor' to the structure.

@@ -24,7 +24,7 @@
  *
  * $Id: RequestAuthnContext.java,v 1.2 2008/06/25 05:46:47 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message.common;
@@ -70,7 +70,7 @@ public class RequestAuthnContext {
      *        Note: authnContextClassRefList and authContextStatementRefList
      *        are mutually exclusive lists.
      * @param authnContextComparison AuthnContext Comparison Type.
-     *        Possible values are  <code>exact</code>, <code>minimum<code>,
+     *        Possible values are  <code>exact</code>, <code>minimum</code>,
      *        <code>better</code> and <code>maximum</code>.
      */
     public RequestAuthnContext (
@@ -392,7 +392,7 @@ public class RequestAuthnContext {
      * object.
      *
      * @param request the <code>HttpServletRequest</code> object.
-     * @return <code><RequestAuthnContext/code> object.
+     * @return <code>RequestAuthnContext</code> object.
      * @throws FSMsgException if there is an error
      *         creating <code>RequestAuthnContext</code> object.
      */

@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -113,8 +113,6 @@ public class SubjectTypesResource {
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementSubject}s to return.
      *
      * Looks up all the names of subjects registered in the system, and then returns each one to the
@@ -161,8 +159,6 @@ public class SubjectTypesResource {
     }
 
     /**
-     * {@inheritDoc}
-     *
      * Uses the {@link EntitlementRegistry} to locate the {@link EntitlementSubject} to return.
      */
     @Read(operationDescription = @Operation(

@@ -25,6 +25,7 @@
  * $Id: AdminTokenAction.java,v 1.14 2009/06/19 02:35:11 bigfatrat Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.security;
@@ -65,7 +66,6 @@ import java.security.PrivilegedAction;
  * Note: Java security permissions check for OpenAM can be enabled
  * by setting the property <code>com.sun.identity.security.checkcaller</code> to
  * true in <code>AMConfig.properties</code> file.
- * </PRE>
  *
  * 
  */

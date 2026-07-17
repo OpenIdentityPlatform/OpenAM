@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.shared.concurrency;
@@ -27,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Lock factory is responsible for delivering up locks that are shared for a given key. This allows locking to be more
  * fine grained as opposed to blocking all threads for all circumstances. K represents the key type used to index the
  * lock instance. Given that K is used to indirectly index the lock, it must satisfy the hash code and equals methods.
- * <p/>
+ * <p>
  * To alleviate the responsibility of the developer and avoid potential memory leaks, the factory manages the internal
  * clean up of unreferenced locks. Locks are cached within a {@link WeakHashMap} against a key. Each lock has a strong
  * reference to its key, so that once all consumers of a lock give up their strong references to the lock, the single
@@ -123,7 +124,7 @@ public class LockFactory<K> {
 
     /**
      * The key reference lock is an re-entrant lock that maintains the only strong reference to its associated key.
-     * <p/>
+     * <p>
      * Once all consumers give up their strong reference to the lock, no strong references remain on the lock
      * and the lock is now garbage collected. After this no strong references remain on the associated key and
      * so the lock cache can now clear out its cached entry

@@ -25,6 +25,7 @@
  * $Id: NotificationSet.java,v 1.2 2008/06/25 05:41:35 qcheng Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.iplanet.services.comm.share;
 
@@ -33,8 +34,7 @@ import java.util.Vector;
 /**
  * This <code>NotificationSet</code> class represents a NotificationSet XML
  * document. The NotificationSet DTD is defined as the following:
- * </p>
- * 
+ *
  * <pre>
  *     &lt;?xml version=&quot;1.0&quot;&gt;
  *     &lt; !-- This DTD is used by PLL --&gt;
@@ -49,8 +49,7 @@ import java.util.Vector;
  *       dtdid CDATA #IMPLIED&gt;
  *     ]&gt;
  * </pre>
- * 
- * </p>
+ *
  * Each NotificationSet object contains a version, service ID, notification set
  * ID, and a collection of Notification objects. The NotificationSet views each
  * Notification object as a String. This makes it possible that the content of

@@ -24,7 +24,7 @@
  *
  * $Id: SecureSOAPMessage.java,v 1.30 2010/01/23 00:20:27 mrudul_uchil Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.wss.security.handler;
@@ -979,8 +979,8 @@ public class SecureSOAPMessage {
      }
 
      /**
-      * Returns the messageID from the <wsa:Addressing> header.
-      * @return the messageID from the <wsa:Addressing> header.
+      * Returns the messageID from the {@code <wsa:Addressing>} header.
+      * @return the messageID from the {@code <wsa:Addressing>} header.
       */
      public String getMessageID() {
          return messageID;

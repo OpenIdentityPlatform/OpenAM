@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:34:07 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC
 //
 
 
@@ -12,9 +13,8 @@ package com.sun.identity.saml2.jaxb.assertion;
 /**
  * Java content class for AttributeValue element declaration.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/saml2/saml-schema-assertion-2.0.xsd line 310)
- * <p>
  * <pre>
- * &lt;element name="AttributeValue" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ * &lt;element name="AttributeValue" type="{http://www.w3.org/2001/XMLSchema}anyType"/&gt;
  * </pre>
  * 
  */
@@ -25,14 +25,14 @@ public interface AttributeValueElement
 
     /**
      * This property is used to control <a href="http://www.w3.org/TR/2001/REC-xmlschema-0-20010502/#Nils">the xsi:nil feature</a> of W3C XML Schema. 
-     * Setting this property to true will cause the output to be &lt;{0} xsi:nil="true" /> regardless of the values of the other properties.
+     * Setting this property to true will cause the output to be &lt;{0} xsi:nil="true" /&gt; regardless of the values of the other properties.
      * 
      */
     boolean isNil();
 
     /**
      * Passing <code>true</code> will generate xsi:nil in the XML outputThis property is used to control <a href="http://www.w3.org/TR/2001/REC-xmlschema-0-20010502/#Nils">the xsi:nil feature</a> of W3C XML Schema. 
-     * Setting this property to true will cause the output to be &lt;{0} xsi:nil="true" /> regardless of the values of the other properties.
+     * Setting this property to true will cause the output to be &lt;{0} xsi:nil="true" /&gt; regardless of the values of the other properties.
      * 
      */
     void setNil(boolean value);

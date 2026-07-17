@@ -3,6 +3,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -43,14 +44,13 @@ import javax.xml.bind.annotation.XmlType;
  * <p>Java class for EffectType.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
  * <pre>
- * &lt;simpleType name="EffectType">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="Permit"/>
- *     &lt;enumeration value="Deny"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="EffectType"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="Permit"/&gt;
+ *     &lt;enumeration value="Deny"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  * 
  */

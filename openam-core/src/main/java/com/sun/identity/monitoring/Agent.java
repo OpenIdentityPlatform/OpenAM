@@ -25,6 +25,7 @@
  * $Id: Agent.java,v 1.9 2009/11/10 01:33:22 bigfatrat Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.monitoring;
@@ -1213,8 +1214,8 @@ public class Agent {
 
     /**
      * receive Set of site names
-     * @param sNames site name -> primary URL
-     * @param urlSites is opposite... primary URL -> site name
+     * @param sNames site name -&gt; primary URL
+     * @param urlSites is opposite... primary URL -&gt; site name
      */
     public static void siteNames (Map<String, String> sNames, Map<String, String> urlSites) {
         String classMethod = "Agent.siteNames:";

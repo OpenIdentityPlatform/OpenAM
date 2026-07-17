@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -83,12 +84,12 @@ public class NetworkValidator extends ValidatorBase {
     }
 
     /**
-     * Checks whether the given host is a valid host or not It allows IP
-     * addresses &
-     * 
-     * @param host
-     * @param props
-     * @param state
+     * Checks whether the given host is a valid host or not. It allows IP
+     * addresses and host names.
+     *
+     * @param host the host name or IP address to validate
+     * @param props the map of name/value validation properties
+     * @param state the installer state access
      * 
      * @return ValidationResult
      * 
@@ -140,10 +141,10 @@ public class NetworkValidator extends ValidatorBase {
 
     /**
      * Checks whether the host name is fully qualified
-     * 
-     * @param host
-     * @param props
-     * @param state
+     *
+     * @param host the host name to check for full qualification
+     * @param props the map of name/value validation properties
+     * @param state the installer state access
      * 
      * @return ValidationResult
      * 
@@ -176,10 +177,10 @@ public class NetworkValidator extends ValidatorBase {
 
     /**
      * Checks if the host name is local
-     * 
-     * @param host
-     * @param props
-     * @param state
+     *
+     * @param host the host name to check
+     * @param props the map of name/value validation properties
+     * @param state the installer state access
      * 
      * @return ValidationResult
      * 
@@ -220,11 +221,11 @@ public class NetworkValidator extends ValidatorBase {
 
     /**
      * Method validateProtocol
-     * 
-     * 
-     * @param proto
-     * @param props
-     * @param state
+     *
+     *
+     * @param proto the protocol string to validate
+     * @param props the map of name/value validation properties
+     * @param state the installer state access
      * 
      * @return ValidationResult
      * 
@@ -257,11 +258,11 @@ public class NetworkValidator extends ValidatorBase {
 
     /**
      * Method validateURI
-     * 
-     * 
-     * @param uri
-     * @param props
-     * @param state
+     *
+     *
+     * @param uri the URI to validate
+     * @param props the map of name/value validation properties
+     * @param state the installer state access
      * 
      * @return ValidationResult
      * 

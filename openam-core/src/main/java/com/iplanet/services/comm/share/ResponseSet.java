@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -36,8 +37,7 @@ import java.util.Vector;
 /**
  * This <code>ResponseSet</code> class represents a ResponseSet XML document.
  * The ResponseSet DTD is defined as the following:
- * </p>
- * 
+ *
  * <pre>
  *     &lt;?xml version=&quot;1.0&quot;&gt;
  *     &lt; !-- This DTD is used by PLL --&gt;
@@ -52,8 +52,7 @@ import java.util.Vector;
  *       dtdid CDATA #IMPLIED&gt;
  *     ]&gt;
  * </pre>
- * 
- * </p>
+ *
  * Each ResponseSet object contains a version, service ID, response set ID, the
  * original request set ID, and a collection of Response objects. The
  * ResponseSet views each Response object as a String. This makes it possible

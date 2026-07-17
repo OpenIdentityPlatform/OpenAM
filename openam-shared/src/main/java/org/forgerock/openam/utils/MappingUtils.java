@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.utils;
@@ -37,7 +38,7 @@ public final class MappingUtils {
 
     /**
      * This method parses out the local_attribute=source_attributes as they are encapsulated in the authN module
-     * configurations into a more usable, Map<String, String> format.
+     * configurations into a more usable, {@code Map<String, String>} format.
      * @param configuredMappings The set of local=source mappings.
      * @return The derived Map instance.
      */

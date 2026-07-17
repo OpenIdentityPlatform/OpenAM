@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -60,20 +61,20 @@ public interface EntitlementSubject {
     /**
      * Returns attribute names and values that could be used for indexing.
      * These values will be used by the authorization engine to obtain the
-     * applicable policies for a given <class>Subject</class>.
+     * applicable policies for a given <code>Subject</code>.
      *
      * @return a map of key-value pairs that will be used for indexing the
-     * entitlements that contain this <class>EntitlementSubject</class>.
+     * entitlements that contain this <code>EntitlementSubject</code>.
      */
     Map<String, Set<String>> getSearchIndexAttributes();
 
     /**
      * Returns a set of attribute names that are used for evaluation.
-     * During evaluation, the <class>Evaluator</class> would try to populate
-     * these attributes in the <class>Subject</class> for the <class>
-     * EntitlementSubject</class>'s consumption.
+     * During evaluation, the <code>Evaluator</code> would try to populate
+     * these attributes in the <code>Subject</code> for the <code>
+     * EntitlementSubject</code>'s consumption.
      *
-     * @return a set of attributes that would be required by the <class>EntitlementSubject</class>'s implementation.
+     * @return a set of attributes that would be required by the <code>EntitlementSubject</code>'s implementation.
      */
     Set<String> getRequiredAttributeNames();
 

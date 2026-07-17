@@ -24,7 +24,7 @@
  *
  * $Id: IDFFModelImpl.java,v 1.9 2009/11/10 01:19:49 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  *
  */
 package com.sun.identity.console.federation.model;
@@ -225,7 +225,7 @@ public class IDFFModelImpl
      * @param realm the realm in which the entity resides.
      * @param entityName Name of Entity Descriptor.
      * @return provider-affiliate common attribute values.
-     * @throws IDFFMetaException if attribute values cannot be obtained.
+     * @throws AMConsoleException if attribute values cannot be obtained.
      */
     public Map getCommonAttributeValues(String realm, String entityName)
             throws AMConsoleException {
@@ -932,7 +932,6 @@ public class IDFFModelImpl
      * @param realm where entity exists.
      * @param attrValues Map of attribute name to set of values.
      * @throws AMConsoleException if provider cannot be modified.
-     * @throws JAXBException if provider cannot be retrieved.
      */
     public void updateIDPEntityConfig(
             String realm,
@@ -985,7 +984,6 @@ public class IDFFModelImpl
      * @param entityName name of Entity Descriptor.
      * @param attrValues Map of attribute name to set of values.
      * @throws AMConsoleException if provider cannot be modified.
-     * @throws JAXBException if provider cannot be retrieved.
      */
     public void updateSPEntityConfig(
             String realm,
@@ -1616,7 +1614,7 @@ public class IDFFModelImpl
      *
      * @param realm the realm in which the entity resides.
      * @return the IDFF entity descriptor
-     * @throws AMConsoleException
+     * @throws AMConsoleException if the entity descriptor names cannot be obtained.
      */
     public Set getAllEntityDescriptorNames(String realm)
             throws AMConsoleException {

@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,18 +13,17 @@ package com.sun.identity.liberty.ws.idpp.jaxb;
 /**
  * Java content class for KeyInfoType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-id-sis-pp.xsd line 18)
- * <p>
  * <pre>
- * &lt;complexType name="KeyInfoType">
- *   &lt;complexContent>
- *     &lt;extension base="{http://www.w3.org/2000/09/xmldsig#}KeyInfoType">
- *       &lt;attribute ref="{urn:liberty:id-sis-pp:2003-08}ACC"/>
- *       &lt;attribute ref="{urn:liberty:id-sis-pp:2003-08}ACCTime"/>
- *       &lt;attribute ref="{urn:liberty:id-sis-pp:2003-08}modificationTime"/>
- *       &lt;attribute ref="{urn:liberty:id-sis-pp:2003-08}modifier"/>
- *     &lt;/extension>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="KeyInfoType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;extension base="{http://www.w3.org/2000/09/xmldsig#}KeyInfoType"&gt;
+ *       &lt;attribute ref="{urn:liberty:id-sis-pp:2003-08}ACC"/&gt;
+ *       &lt;attribute ref="{urn:liberty:id-sis-pp:2003-08}ACCTime"/&gt;
+ *       &lt;attribute ref="{urn:liberty:id-sis-pp:2003-08}modificationTime"/&gt;
+ *       &lt;attribute ref="{urn:liberty:id-sis-pp:2003-08}modifier"/&gt;
+ *     &lt;/extension&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

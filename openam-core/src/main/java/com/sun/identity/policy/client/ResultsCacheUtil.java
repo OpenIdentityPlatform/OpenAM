@@ -2,6 +2,7 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+ * Portions Copyrighted 2026 3A Systems, LLC
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -59,7 +60,7 @@ public class ResultsCacheUtil {
       * client that is listening for notifications from policy service
       *
       * @param xml XML notification envelope
-      * @throws PolicyEvaluationException 
+      * @throws PolicyEvaluationException if the notification cannot be processed
       *
       */
     public static void processNotification(String xml)
@@ -82,7 +83,7 @@ public class ResultsCacheUtil {
       * client that is listening for notifications from policy service
       *
       * @param message notification as JSON string
-      * @throws PolicyEvaluationException 
+      * @throws PolicyEvaluationException if the notification cannot be processed
       *
       */
     public static void processRESTNotification(String message)

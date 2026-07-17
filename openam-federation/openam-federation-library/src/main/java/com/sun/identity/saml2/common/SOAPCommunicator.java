@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.common;
@@ -78,7 +78,7 @@ public class SOAPCommunicator {
      * Opens a SOAP Connection.
      *
      * @return a new <code>SOAPConnection</code>
-     * @throws if there was an exception creating the
+     * @throws SOAPException if there was an exception creating the
      *            <code>SOAPConnection</code> object.
      */
     public SOAPConnection openSOAPConnection() throws SOAPException {
@@ -267,7 +267,7 @@ public class SOAPCommunicator {
      *
      * @param request <code>HttpServletRequest</code> includes SOAP Message.
      * @return SOAPMessage if request include any soap message in the header.
-     * @throws IOException   if error in creating input stream.
+     * @throws IOException if error in creating input stream.
      * @throws SOAPException if error in creating soap message.
      */
     public SOAPMessage getSOAPMessage(final HttpServletRequest request)
@@ -289,7 +289,7 @@ public class SOAPCommunicator {
      * @param isClientMessage true if the message is sent from SOAP client to
      *                        server.
      * @return SOAPMessage if the peer send back any reply.
-     * @throws SOAPException  if error in creating soap message.
+     * @throws SOAPException if error in creating soap message.
      * @throws SAML2Exception if error in creating soap message.
      */
     public SOAPMessage sendSOAPMessage(final String xmlMessage,

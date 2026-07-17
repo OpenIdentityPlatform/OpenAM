@@ -25,7 +25,7 @@
  * $Id: FSAuthnRequest.java,v 1.4 2008/07/08 06:03:37 exu Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.message;
@@ -109,7 +109,7 @@ public class FSAuthnRequest extends AbstractRequest {
      * @param authnCxt Authentication Context used for the SSO.
      * @param relaySt Relay State i.e. original URL to be redirected after SSO.
      * @param authContextCompType AuthContext comparison type.
-     * @throws <code>FSMsgException</code> on error.
+     * @throws FSMsgException on error.
      */
     public FSAuthnRequest(String requestId,
             List respondWiths,
@@ -164,7 +164,7 @@ public class FSAuthnRequest extends AbstractRequest {
      * Constructor to create <code>FSAuthnRequest</code> object.
      *
      * @param root the Document Element object.
-     * @throws <code>FSMsgException</code> on error.
+     * @throws FSMsgException on error.
      */
     public FSAuthnRequest(Element root) throws FSMsgException {
         String tag = null;
@@ -791,9 +791,9 @@ public class FSAuthnRequest extends AbstractRequest {
     }
     
     /**
-     * Returns the value of <code>ProtocolProfile<code> attribute.
+     * Returns the value of <code>ProtocolProfile</code> attribute.
      *
-     * @return the value of <code>ProtocolProfile<code> attribute.
+     * @return the value of <code>ProtocolProfile</code> attribute.
      * @see #setProtocolProfile(String)
      */
     public String getProtocolProfile() {
@@ -801,9 +801,9 @@ public class FSAuthnRequest extends AbstractRequest {
     }
     
     /**
-     * Sets the value of <code>ProtocolProfile<code> attribute.
+     * Sets the value of <code>ProtocolProfile</code> attribute.
      *
-     * @param protocolProf the value of <code>ProtocolProfile<code> attribute.
+     * @param protocolProf the value of <code>ProtocolProfile</code> attribute.
      * @see #getProtocolProfile()
      */
     public void setProtocolProfile(String protocolProf) {
@@ -854,7 +854,7 @@ public class FSAuthnRequest extends AbstractRequest {
      * Returns the value of <code>ProviderID</code> attribute.
      *
      * @return the value of <code>ProviderID</code> attribute.
-     * @see #setProviderId(String).
+     * @see #setProviderId(String)
      */
     public String getProviderId() {
         return providerId;
@@ -1533,7 +1533,7 @@ public class FSAuthnRequest extends AbstractRequest {
      * Signs the Request.
      *
      * @param certAlias the Certificate Alias.
-     * @throws XMLSignatureException if <code>FSAuthnRequest</code>
+     * @throws SAMLException if <code>FSAuthnRequest</code>
      *         cannot be signed.
      */
 

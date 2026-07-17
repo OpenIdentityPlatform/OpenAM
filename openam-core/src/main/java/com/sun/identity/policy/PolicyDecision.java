@@ -25,6 +25,7 @@
  * $Id: PolicyDecision.java,v 1.3 2008/06/25 05:43:44 qcheng Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.policy;
 
@@ -139,10 +140,10 @@ public class PolicyDecision {
      * action.
      *
      * @param newActionDecision an <code>ActionDecision</code> to be added.
-     * @param trueValue <code>String</code> representing the </code>true</code>
+     * @param trueValue <code>String</code> representing the <code>true</code>
      * value in the action schema.
-     * @param falseValue <code>String</code> representing the 
-     * </code>false</code> value in the action schema.
+     * @param falseValue <code>String</code> representing the
+     * <code>false</code> value in the action schema.
      * 
      */
     public void addActionDecision(ActionDecision newActionDecision, 
@@ -441,8 +442,8 @@ public class PolicyDecision {
 
     /**
      * Sets the <code>timeToLive</code> value of the policy decision to the
-     * smallest of <code>timeToLive(s)<code> of contained
-     * <code>ActionDecision(s)<code>. Also sets value of
+     * smallest of <code>timeToLive(s)</code> of contained
+     * <code>ActionDecision(s)</code>. Also sets value of
      * <code>advicesAreSet</code>. This is set to <code>true</code>
      * if any of the contained action decision(s) has advice defined.
      */

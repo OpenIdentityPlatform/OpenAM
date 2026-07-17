@@ -24,6 +24,7 @@
  *
  * $Id: FSSPAuthenticationContextInfo.java,v 1.3 2008/11/10 22:56:58 veiming Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.federation.services;
@@ -97,7 +98,7 @@ public class FSSPAuthenticationContextInfo {
      * Creates new FSSPAuthenticationContextInfo 
      * @param authenticationContext the authContext name.
      * @param authenticationLevel the authentication level.
-     * @throws FSSPAuthenticationContextInfo if
+     * @throws FSException if
      *         <code>authenticationContext</code> or
      *         <code>authenticationLevel</code> is invalid.
      */
@@ -115,7 +116,7 @@ public class FSSPAuthenticationContextInfo {
      *
      * @param authenticationContext the authContext name.
      * @param authenticationLevel the authentication level.
-     * @throws FSSPAuthenticationContextInfo if
+     * @throws FSException if
      *         <code>authenticationContext</code> or
      *         <code>authenticationLevel</code> is invalid.
      */

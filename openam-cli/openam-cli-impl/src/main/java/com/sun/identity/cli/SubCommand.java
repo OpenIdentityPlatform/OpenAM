@@ -25,6 +25,7 @@
  * $Id: SubCommand.java,v 1.11 2008/10/21 03:14:31 veiming Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.cli;
 
@@ -442,10 +443,10 @@ public class SubCommand {
     }
 
     /**
-     * Returns <true> if the option is supported.
+     * Returns {@code true} if the option is supported.
      *
      * @param name Name of the argument/option.
-     * @return <true> if the option is supported.
+     * @return {@code true} if the option is supported.
      */
     public boolean isSupportedOption(String name) {
         boolean isSupported = false;

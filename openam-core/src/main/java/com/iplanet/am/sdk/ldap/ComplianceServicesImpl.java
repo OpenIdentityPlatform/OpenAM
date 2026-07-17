@@ -25,6 +25,7 @@
  * $Id: ComplianceServicesImpl.java,v 1.10 2009/11/20 23:52:51 ww203982 Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.iplanet.am.sdk.ldap;
@@ -418,7 +419,6 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
      * Method which checks the attribute set for the presence of
      * "inetuserstatus" attribute. If the attribute exists and has a value of
      * "deleted", the method returns true, if not it returns false.
-     * <p>
      * 
      * @param attrSet
      *            The attrSet to be verified
@@ -441,7 +441,6 @@ public class ComplianceServicesImpl implements AMConstants, IComplianceServices
      * existing list of attribute names and then fetches the attribute set from
      * LDAP. The compliance attributes are verified for "inetuserstatus"
      * attribute.
-     * <p>
      * 
      * @param po a PersistentObject of the entry.
      * @param attributeNames Array of attribute names.

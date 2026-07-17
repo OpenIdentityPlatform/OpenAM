@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sm.config;
@@ -20,7 +21,7 @@ import java.util.Set;
 
 /**
  * Provides a custom transformation to the attribute values.
- * <p/>
+ * <p>
  * The transformed type should be the same type as that of parameter being passed via the setter.
  *
  * @since 13.0.0

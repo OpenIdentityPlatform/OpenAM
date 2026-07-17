@@ -24,6 +24,7 @@
  *
  * $Id: SubjectLocality.java,v 1.2 2008/06/25 05:47:33 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.saml.assertion;
@@ -119,7 +120,7 @@ public class SubjectLocality {
     }
    
     /**
-     * Sets the DNS address for <code>SubjectLocality></code> locality.
+     * Sets the DNS address for <code>SubjectLocality</code> locality.
      *
      * @param dnsAddress A String representation of DNS address.
      * @return true indicating the success of the operation.

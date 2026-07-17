@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -14,21 +15,20 @@ package com.sun.identity.liberty.ws.common.jaxb.utility;
  * 
  * Java content class for TimestampTraceType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/utility.xsd line 157)
- * <p>
  * <pre>
- * &lt;complexType name="TimestampTraceType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;choice maxOccurs="unbounded" minOccurs="0">
- *           &lt;element ref="{http://schemas.xmlsoap.org/ws/2003/06/utility}Received"/>
- *           &lt;any/>
- *         &lt;/choice>
- *       &lt;/sequence>
- *       &lt;attGroup ref="{http://schemas.xmlsoap.org/ws/2003/06/utility}commonAtts"/>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="TimestampTraceType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice maxOccurs="unbounded" minOccurs="0"&gt;
+ *           &lt;element ref="{http://schemas.xmlsoap.org/ws/2003/06/utility}Received"/&gt;
+ *           &lt;any/&gt;
+ *         &lt;/choice&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attGroup ref="{http://schemas.xmlsoap.org/ws/2003/06/utility}commonAtts"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

@@ -25,6 +25,7 @@
  * $Id: SMSUtils.java,v 1.5 2008/07/11 01:46:21 arviranga Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.sm;
 
@@ -250,7 +251,7 @@ public class SMSUtils {
 
         /**
          * Get the node type name
-         * @return
+         * @return the node type name
          */
         public String getNodeName() {
             return name;

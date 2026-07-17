@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,23 +13,22 @@ package com.sun.identity.liberty.ws.disco.jaxb;
 /**
  * Java content class for DescriptionType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-arch-disco-svc.xsd line 78)
- * <p>
  * <pre>
- * &lt;complexType name="DescriptionType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="SecurityMechID" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded"/>
- *         &lt;element name="CredentialRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;choice>
- *           &lt;group ref="{urn:liberty:disco:2003-08}WsdlRef"/>
- *           &lt;group ref="{urn:liberty:disco:2003-08}BriefSoapHttpDescription"/>
- *         &lt;/choice>
- *       &lt;/sequence>
- *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="DescriptionType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="SecurityMechID" type="{http://www.w3.org/2001/XMLSchema}anyURI" maxOccurs="unbounded"/&gt;
+ *         &lt;element name="CredentialRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;choice&gt;
+ *           &lt;group ref="{urn:liberty:disco:2003-08}WsdlRef"/&gt;
+ *           &lt;group ref="{urn:liberty:disco:2003-08}BriefSoapHttpDescription"/&gt;
+ *         &lt;/choice&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

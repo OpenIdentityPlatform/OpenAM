@@ -3,6 +3,7 @@
 // See <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2012.06.11 at 10:33:54 AM PDT 
+// Portions Copyrighted 2026 3A Systems, LLC.
 //
 
 
@@ -12,27 +13,26 @@ package com.sun.identity.liberty.ws.idpp.jaxb;
 /**
  * Java content class for MsgContactType complex type.
  * <p>The following schema fragment specifies the expected content contained within this java content object. (defined at file:/Users/allan/A-SVN/trunk/opensso/products/federation/library/xsd/liberty/lib-id-sis-pp.xsd line 192)
- * <p>
  * <pre>
- * &lt;complexType name="MsgContactType">
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Nick" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LNick" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LComment" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgType" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgMethod" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgTechnology" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgProvider" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgAccount" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgSubaccount" minOccurs="0"/>
- *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Extension" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attGroup ref="{urn:liberty:id-sis-pp:2003-08}commonAttributes"/>
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType name="MsgContactType"&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Nick" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LNick" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}LComment" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgType" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgMethod" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgTechnology" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgProvider" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgAccount" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}MsgSubaccount" minOccurs="0"/&gt;
+ *         &lt;element ref="{urn:liberty:id-sis-pp:2003-08}Extension" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attGroup ref="{urn:liberty:id-sis-pp:2003-08}commonAttributes"/&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  * 
  */

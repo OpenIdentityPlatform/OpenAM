@@ -24,7 +24,7 @@
  *
  * $Id: AuthXMLRequest.java,v 1.10 2009/08/17 21:17:50 mrudul_uchil Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 /*
@@ -169,7 +169,7 @@ public class AuthXMLRequest {
     /**
      * Sets the <code>authIdentifier</code> - session ID
      *
-     * @param authIdentifier
+     * @param authIdentifier the authentication identifier (session ID) to set
      */
     public void setAuthIdentifier(String authIdentifier) {
         this.authIdentifier = authIdentifier;
@@ -235,7 +235,7 @@ public class AuthXMLRequest {
     /**
      * Sets the index Type.
      *
-     * @param strIndexType
+     * @param strIndexType the index type name to set
      */
     public void setIndexType(String strIndexType) {
         if (strIndexType.equalsIgnoreCase("service")) {

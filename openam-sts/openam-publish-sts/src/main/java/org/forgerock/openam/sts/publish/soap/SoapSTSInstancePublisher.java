@@ -12,6 +12,8 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ *
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.sts.publish.soap;
@@ -35,7 +37,7 @@ public interface SoapSTSInstancePublisher {
      * means persisting it to the SMS and exposing it via CREST.
      * @param instanceConfig The configuration state for the to-be-published Soap STS instance.
      * @return the urlElement, including the realm, at which the Soap STS instance has been published.
-     * @throws org.forgerock.openam.sts.STSPublishException
+     * @throws org.forgerock.openam.sts.STSPublishException if the Soap STS instance could not be published
      */
     String publishInstance(SoapSTSInstanceConfig instanceConfig) throws STSPublishException;
 
@@ -44,7 +46,7 @@ public interface SoapSTSInstancePublisher {
      * @param stsId The sts id, obtained from SoapSTSInstanceConfig#getDeploymentSubPath
      * @param realm The realm in which the Soap STS is to be deployed.
      *
-     * @throws STSPublishException
+     * @throws STSPublishException if the Soap STS instance could not be removed
      */
     void removeInstance(String stsId, String realm) throws STSPublishException;
 
@@ -70,7 +72,7 @@ public interface SoapSTSInstancePublisher {
      * @param stsId The sts id, obtained from SoapSTSInstanceConfig#getDeploymentSubPath
      * @param realm The realm in which the Soap STS is to be deployed.
      * @return The SoapSTSInstanceConfig corresponding to this published instance
-     * @throws STSPublishException
+     * @throws STSPublishException if the published instance state could not be obtained
      */
     SoapSTSInstanceConfig getPublishedInstance(String stsId, String realm) throws STSPublishException;
 

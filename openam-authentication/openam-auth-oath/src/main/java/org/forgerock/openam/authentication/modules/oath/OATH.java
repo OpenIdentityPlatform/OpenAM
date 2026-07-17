@@ -21,6 +21,7 @@
  * your own identifying information:
  *
  * Portions Copyrighted 2014 Nomura Research Institute, Ltd
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package org.forgerock.openam.authentication.modules.oath;
@@ -155,9 +156,9 @@ public class OATH extends AMLoginModule {
      * settings, and the username from the previous authentication module in
      * the chain.
      *
-     * @param subject
-     * @param sharedState
-     * @param options
+     * @param subject the subject to be authenticated
+     * @param sharedState the state shared with other configured authentication modules
+     * @param options the options configured for this authentication module
      */
     @Override
     public void init(Subject subject,
@@ -232,8 +233,8 @@ public class OATH extends AMLoginModule {
      * Processes the OTP input by the user. Checks the OTP for validity, and
      * resynchronizes the server as needed.
      *
-     * @param callbacks
-     * @param state
+     * @param callbacks the callbacks submitted for the current authentication state
+     * @param state the current authentication state
      * @return -1 for success; 0 for failure
      * @throws AuthLoginException upon any errors
      */
