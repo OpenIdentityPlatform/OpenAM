@@ -17,14 +17,11 @@ package org.openidentityplatform.openam.config.servlet;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -62,6 +59,7 @@ public class ConfiguratorServletUpgradeRoutingTest {
 
         HttpSession session = mock(HttpSession.class);
         request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn("GET");
         when(request.getSession()).thenReturn(session);
         when(request.getSession(false)).thenReturn(session);
         when(request.getParameter("locale")).thenReturn("en");
@@ -72,21 +70,16 @@ public class ConfiguratorServletUpgradeRoutingTest {
     }
 
     @Test
-    public void upgradeActionLinkRoutesToServiceLoaderDiscoveredPageInsteadOfClick() throws Exception {
-        RequestDispatcher clickDispatcher = mock(RequestDispatcher.class);
-        when(servletContext.getNamedDispatcher("click-servlet")).thenReturn(clickDispatcher);
-
+    public void upgradeActionLinkRoutesToServiceLoaderDiscoveredPage() throws Exception {
         when(request.getServletPath()).thenReturn("/config/upgrade/upgrade.htm");
         when(request.getParameter("actionLink")).thenReturn("doUpgrade");
 
         // No real OpenAM bootstrap in this test JVM, so Upgrade's constructor sets error = true and
         // doUpgrade() NPEs on the still-null `upgrade` field (see UpgradeTest) - that NPE, wrapped
         // by ConfiguratorServlet.invokeAction(), is itself the proof that routing reached the real
-        // Upgrade.doUpgrade(), rather than a 404 (unknown action) or a silent Click forward.
+        // Upgrade.doUpgrade(), rather than a 404 (unknown action).
         assertThatThrownBy(() -> servlet.service(request, response))
                 .isInstanceOf(ServletException.class)
                 .hasCauseInstanceOf(NullPointerException.class);
-
-        verify(clickDispatcher, never()).forward(request, response);
     }
 }

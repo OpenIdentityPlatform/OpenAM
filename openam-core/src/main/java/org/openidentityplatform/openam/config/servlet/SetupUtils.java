@@ -1,17 +1,29 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [year] [name of copyright owner]".
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * Copyright 2026 3A Systems LLC.
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package org.openidentityplatform.openam.config.servlet;
 
@@ -36,11 +48,9 @@ import org.forgerock.util.time.Duration;
 import org.json.JSONObject;
 
 /**
- * Pure, request/response-free helpers shared by the still-Click {@code AjaxPage} and the new
- * {@link SetupPage}, so both configurator engines apply byte-identical validation semantics while
- * they run side by side. As pages migrate off Click, the duplication this replaces shrinks to
- * nothing; once {@code AjaxPage} is deleted (final increment) this can be folded back inline if
- * the split is no longer worth it.
+ * Pure, request/response-free helpers used by {@link SetupPage}, ported from the old Click-era
+ * {@code AjaxPage} so the configurator keeps byte-identical validation semantics. Kept as a
+ * separate class rather than folded into {@code SetupPage} because none of these need page state.
  */
 public final class SetupUtils {
 

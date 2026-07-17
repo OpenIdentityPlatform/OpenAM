@@ -42,8 +42,7 @@ import org.testng.annotations.Test;
  *
  * <p>{@code checkAgentPassword} is not the live handler step6.htm/step6.ftl actually posts to
  * (that's the base {@code checkPasswords}, exercised via {@code Step1Test}/{@code
- * ConfiguratorServletTest} - same base method, same behavior) - see
- * docs/migration/click-to-freemarker/04-implementation-notes.md. It is still covered here since
+ * ConfiguratorServletTest} - same base method, same behavior). It is still covered here since
  * it stays a live, annotated, web-invokable endpoint for URL-preservation parity with the old
  * Click page.
  */

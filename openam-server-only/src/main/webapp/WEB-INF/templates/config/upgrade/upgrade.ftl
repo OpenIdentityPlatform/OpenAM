@@ -14,6 +14,7 @@
   ~ information: "Portions copyright [year] [name of copyright owner]".
   ~
   ~ Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+  ~ Portions Copyrighted 2026 3A Systems LLC.
   -->
 
 <script type="text/javascript">

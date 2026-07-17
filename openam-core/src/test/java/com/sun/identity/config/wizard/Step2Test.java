@@ -106,8 +106,7 @@ public class Step2Test {
             // suite runs in: Windows doesn't honor the read-only attribute for writes into a
             // directory, and a privileged (e.g. root) test runner on POSIX bypasses permission
             // checks entirely. Same "not reliably reproducible across environments" category as
-            // the other environment-dependent branches documented in
-            // docs/migration/click-to-freemarker/04-implementation-notes.md.
+            // the other environment-dependent branches.
             tempDir.toFile().setWritable(true);
             throw new SkipException(
                     "Cannot make " + tempDir + " non-writable in this environment (Windows or privileged test runner)");
@@ -150,6 +149,5 @@ public class Step2Test {
     // initializer that loads serviceDefaultValues.properties - a resource that lives only in
     // openam-server-only/src/main/resources/config/, never on openam-core's classpath (test or
     // main) in any build configuration. That makes this method untestable from an openam-core
-    // unit test regardless of environment; see docs/migration/click-to-freemarker/
-    // 04-implementation-notes.md.
+    // unit test regardless of environment.
 }

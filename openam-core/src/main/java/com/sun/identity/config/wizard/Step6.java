@@ -60,7 +60,7 @@ public class Step6 extends ProtectedSetupPage {
 
     // Not referenced by step6.htm/step6.ftl (the template posts to the base checkPasswords
     // handler instead, same as Step1), but kept web-invokable for byte-identical behavior with
-    // the old Click page - see docs/migration/click-to-freemarker/04-implementation-notes.md.
+    // the old Click page.
     @ConfiguratorAction
     public boolean checkAgentPassword() {
         String agentPassword = toString("agent");

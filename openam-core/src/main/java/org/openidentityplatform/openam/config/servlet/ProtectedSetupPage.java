@@ -11,7 +11,8 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
- * Copyright 2026 3A Systems LLC.
+ * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package org.openidentityplatform.openam.config.servlet;
 

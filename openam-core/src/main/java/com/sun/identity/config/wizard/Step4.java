@@ -160,8 +160,7 @@ public class Step4 extends ProtectedSetupPage {
             addModel("selectLDAPv3tivoli", "");
         } else if (val.equals("LDAPv3ForODSEE")) {
             // NOTE: pre-existing bug ported verbatim from the old Click page (verified against
-            // source, see docs/migration/click-to-freemarker/04-implementation-notes.md): this
-            // branch sets selectLDAPv3odsee to "checked" and then immediately overwrites it back
+            // source): this branch sets selectLDAPv3odsee to "checked" and then overwrites it back
             // to "" instead of setting selectLDAPv3opends. Net effect (unchanged from Click):
             // neither the ODSEE nor OpenDS radio renders checked when the store type is ODSEE,
             // and selectLDAPv3opends is left unset. The template defaults these vars with !"" so

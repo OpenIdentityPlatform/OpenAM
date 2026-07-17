@@ -51,8 +51,7 @@ import freemarker.template.TemplateException;
  * Sole handler for the configurator/upgrade wizard's {@code *.htm} mapping. Per-request it looks
  * the request path up in a small, explicit migrated-page registry: a registered path is
  * instantiated as a {@link SetupPage} and rendered with FreeMarker; an unregistered path 404s.
- * Apache Click, the vendored fork, and every page's old Click base class are gone as of this
- * increment - see {@code docs/migration/click-to-freemarker/03-migration-plan.md}.
+ * Apache Click, the vendored fork, and every page's old Click base class have been removed.
  */
 public class ConfiguratorServlet extends HttpServlet {
 
@@ -90,6 +89,15 @@ public class ConfiguratorServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Overriding service() bypasses HttpServlet's per-method dispatch, so guard the verb here.
+        // The old ClickServlet overrode only doGet/doPost, leaving HttpServlet.service() to reject
+        // anything else with 405; without this, actionLink dispatch would run for PUT/DELETE/TRACE too.
+        String method = req.getMethod();
+        if (!"GET".equals(method) && !"POST".equals(method) && !"HEAD".equals(method)) {
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            return;
+        }
+
         String path = req.getServletPath();
         Class<? extends SetupPage> pageClass = PAGES.get(path);
 

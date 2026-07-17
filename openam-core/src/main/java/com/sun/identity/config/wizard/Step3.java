@@ -159,8 +159,7 @@ public class Step3 extends LDAPStoreWizardPage {
         // handler (see ConfiguratorServlet.invokeAction), regardless of the method's return value.
         // The callers (enableRemote/disableRemote in step3.ftl) are fire-and-forget - no callback
         // reads the response - and Step3.onInit() has no session side effects beyond what is set
-        // above, so skipping that render is behaviorally invisible to the wizard. See
-        // docs/migration/click-to-freemarker/04-implementation-notes.md.
+        // above, so skipping that render is behaviorally invisible to the wizard.
         skipRender();
         return true;
     }

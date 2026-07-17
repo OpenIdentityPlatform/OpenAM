@@ -43,8 +43,7 @@ import org.testng.annotations.Test;
  * <p>{@code validateUMHost}/{@code validateUMDomainName} are not covered here: both require a
  * live LDAP (and, for the AD path, DNS SRV) connection, which would make this suite slow and
  * environment-dependent - the same disproportionate-effort call already made for the
- * already-configured branch of {@code onSecurityCheck} in increment 1's Step1Test. See
- * docs/migration/click-to-freemarker/04-implementation-notes.md.
+ * already-configured branch of {@code onSecurityCheck} in increment 1's Step1Test.
  */
 public class Step4Test {
 

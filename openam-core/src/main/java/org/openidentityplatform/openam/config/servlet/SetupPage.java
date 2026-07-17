@@ -1,17 +1,29 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [year] [name of copyright owner]".
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * Copyright 2026 3A Systems LLC.
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package org.openidentityplatform.openam.config.servlet;
 
@@ -44,9 +56,7 @@ import org.forgerock.opendj.ldap.ResultCode;
  * framework-agnostic half of the old {@code com.sun.identity.config.util.AjaxPage}, holding a
  * {@link ConfiguratorContext} instead of a Click thread-local context.
  *
- * <p>Pure validation/formatting logic shared with the still-Click {@code AjaxPage} lives in
- * {@link SetupUtils} so both engines stay behaviorally identical while pages migrate one at a
- * time.
+ * <p>Pure validation/formatting logic ported from {@code AjaxPage} lives in {@link SetupUtils}.
  */
 public abstract class SetupPage {
 
@@ -88,9 +98,9 @@ public abstract class SetupPage {
     private final Map<String, Object> model = new HashMap<>();
     private ConfiguratorContext context;
     private boolean skipRender = false;
-    // Protected, not private: matches the old AjaxPage's visibility. Wizard.createConfig() (and
-    // DefaultSummary, not yet migrated) read this field directly to stamp the "locale" request
-    // parameter sent to AMSetupServlet.processRequest().
+    // Protected, not private: matches the old AjaxPage's visibility. Wizard.createConfig() and
+    // DefaultSummary read this field directly to stamp the "locale" request parameter sent to
+    // AMSetupServlet.processRequest().
     protected java.util.Locale configLocale;
     private ResourceBundle rb;
     private String hostName;
@@ -351,13 +361,16 @@ public abstract class SetupPage {
             responseString = getLocalizedString("password.dont.match");
         } else if (otherPassword != null && otherPassword.equals(password)) {
             responseString = getLocalizedString("agent.admin.password.same");
+        } else if (!"admin".equals(type) && !"agent".equals(type)) {
+            // Every shipped caller (step1, step6, defaultSummary) sends type=admin or type=agent.
+            // Refuse an unrecognized/absent type rather than defaulting to the admin password, so a
+            // hand-built request can't reach ADMIN_PWD through the else branch.
+            responseString = getLocalizedString("missing.required.field");
         } else {
-            if ("agent".equals(type)) {
-                type = SessionAttributeNames.CONFIG_VAR_AMLDAPUSERPASSWD;
-            } else {
-                type = SetupConstants.CONFIG_VAR_ADMIN_PWD;
-            }
-            getContext().setSessionAttribute(type, password);
+            String attribute = "agent".equals(type)
+                    ? SessionAttributeNames.CONFIG_VAR_AMLDAPUSERPASSWD
+                    : SetupConstants.CONFIG_VAR_ADMIN_PWD;
+            getContext().setSessionAttribute(attribute, password);
         }
 
         writeToResponse(responseString);

@@ -49,7 +49,7 @@ import org.testng.annotations.Test;
  * The "resolvable host" branch of {@code validateConfigStoreHost} is exercised with {@code
  * localhost} (resolvable without real network); the {@code UnknownHostException} branch is not,
  * since DNS behavior for a deliberately-invalid hostname is not reliably reproducible across
- * environments. See docs/migration/click-to-freemarker/04-implementation-notes.md.
+ * environments.
  */
 public class Step3Test {
 
@@ -103,8 +103,7 @@ public class Step3Test {
     // NOTE: the old Click ActionLinks returned `true` here with no setPath(null)/writeToResponse
     // call; ConfiguratorServlet's actionLink dispatch never renders regardless of the handler's
     // return value, and nothing reads this fire-and-forget call's response body either way - see
-    // the NOTE in Step3.setConfigType() and 04-implementation-notes.md. Only the session
-    // side-effects are asserted here.
+    // the NOTE in Step3.setConfigType(). Only the session side-effects are asserted here.
 
     @Test
     public void setConfigTypeEmbeddedDefaultsHostToLocalhost() {

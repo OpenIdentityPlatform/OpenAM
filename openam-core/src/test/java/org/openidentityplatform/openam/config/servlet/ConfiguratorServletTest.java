@@ -42,8 +42,7 @@ import org.testng.annotations.Test;
  * (steps 1-7, the wizard shell, {@code Options}, {@code DefaultSummary} and {@code Upgrade} -
  * every real configurator page there is): a registered path dispatches {@code ?actionLink=}
  * requests to the matching {@code @ConfiguratorAction} method, and an unregistered path 404s.
- * Apache Click (and the named-dispatch fallback to it) is gone as of increment 8 - see
- * {@code docs/migration/click-to-freemarker/03-migration-plan.md}.
+ * Apache Click (and the named-dispatch fallback to it) has been removed.
  *
  * <p>{@code upgrade.htm} is used below to prove the {@code ServiceLoader}-registered page path
  * still resolves - within {@code openam-core}'s own test classpath (which never has
@@ -81,6 +80,7 @@ public class ConfiguratorServletTest {
                 .when(session).setAttribute(anyString(), any());
 
         request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn("GET");
         when(request.getSession()).thenReturn(session);
         when(request.getSession(false)).thenReturn(session);
         when(request.getParameter("locale")).thenReturn("en");
@@ -177,5 +177,105 @@ public class ConfiguratorServletTest {
         servlet.service(request, response);
 
         verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    // --- HTTP-method guard ---------------------------------------------------------------------
+    // Overriding service() bypasses HttpServlet's per-method dispatch (the old ClickServlet overrode
+    // doGet/doPost, so anything else 405'd); the guard must reject other verbs before action dispatch.
+
+    @Test
+    public void rejectsPutBeforeDispatchingAnyAction() throws Exception {
+        when(request.getMethod()).thenReturn("PUT");
+        when(request.getServletPath()).thenReturn(ANY_PAGE);
+        when(request.getParameter("actionLink")).thenReturn("validateInput");
+        when(request.getParameter("key")).thenReturn("serverURL");
+        when(request.getParameter("value")).thenReturn("https://openam.example.com/openam");
+
+        servlet.service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        assertThat(sessionAttributes).isEmpty();
+        assertThat(responseBody.toString()).isEmpty();
+    }
+
+    @Test
+    public void rejectsDelete() throws Exception {
+        when(request.getMethod()).thenReturn("DELETE");
+        when(request.getServletPath()).thenReturn(ANY_PAGE);
+
+        servlet.service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+    }
+
+    @Test
+    public void rejectsTrace() throws Exception {
+        when(request.getMethod()).thenReturn("TRACE");
+        when(request.getServletPath()).thenReturn(ANY_PAGE);
+
+        servlet.service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+    }
+
+    @Test
+    public void allowsPostForActionDispatch() throws Exception {
+        when(request.getMethod()).thenReturn("POST");
+        callValidateInput("serverURL", "https://openam.example.com/openam");
+
+        assertThat(sessionAttributes).containsEntry("serverURL", "https://openam.example.com/openam");
+    }
+
+    @Test
+    public void allowsHeadForActionDispatch() throws Exception {
+        when(request.getMethod()).thenReturn("HEAD");
+        callValidateInput("serverURL", "https://openam.example.com/openam");
+
+        assertThat(sessionAttributes).containsEntry("serverURL", "https://openam.example.com/openam");
+    }
+
+    // --- checkPasswords type handling ----------------------------------------------------------
+    // checkPasswords is the only writer of ADMIN_PWD/AMLDAPUSERPASSWD (validateInput's allow-list
+    // excludes them). An unrecognized/absent type must be refused, not defaulted to ADMIN_PWD.
+
+    private void callCheckPasswords(String type) throws Exception {
+        when(request.getServletPath()).thenReturn(ANY_PAGE);
+        when(request.getParameter("actionLink")).thenReturn("checkPasswords");
+        when(request.getParameter("password")).thenReturn("longenough1");
+        when(request.getParameter("confirm")).thenReturn("longenough1");
+        when(request.getParameter("type")).thenReturn(type);
+
+        servlet.service(request, response);
+    }
+
+    @Test
+    public void checkPasswordsStoresAdminPasswordForTypeAdmin() throws Exception {
+        callCheckPasswords("admin");
+
+        assertThat(sessionAttributes).containsEntry("ADMIN_PWD", "longenough1");
+    }
+
+    @Test
+    public void checkPasswordsStoresAgentPasswordForTypeAgent() throws Exception {
+        callCheckPasswords("agent");
+
+        assertThat(sessionAttributes).containsEntry("AMLDAPUSERPASSWD", "longenough1");
+        assertThat(sessionAttributes).doesNotContainKey("ADMIN_PWD");
+    }
+
+    @Test
+    public void checkPasswordsRefusesAbsentType() throws Exception {
+        callCheckPasswords(null);
+
+        assertThat(sessionAttributes).isEmpty();
+        assertThat(responseBody.toString()).isEqualTo(MISSING_FIELD);
+    }
+
+    @Test
+    public void checkPasswordsRefusesUnknownType() throws Exception {
+        callCheckPasswords("bogus");
+
+        assertThat(sessionAttributes).isEmpty();
+        assertThat(responseBody.toString()).isEqualTo(MISSING_FIELD);
     }
 }

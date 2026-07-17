@@ -109,6 +109,7 @@ public class ConfiguratorServletRenderSmokeTest extends PowerMockTestCase {
                 .when(session).removeAttribute(anyString());
 
         request = mock(HttpServletRequest.class);
+        when(request.getMethod()).thenReturn("GET");
         when(request.getSession()).thenReturn(session);
         when(request.getSession(false)).thenReturn(session);
         when(request.getServletContext()).thenReturn(servletContext);

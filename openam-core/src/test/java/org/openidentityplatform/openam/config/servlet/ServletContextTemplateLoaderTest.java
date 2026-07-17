@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
 /**
  * Covers the FreeMarker rendering mechanism {@link ConfiguratorServlet} builds on: loading a
  * {@code .ftl} through a jakarta {@code ServletContext} (which FreeMarker's own
- * {@code WebappTemplateLoader} cannot do - see docs/migration/click-to-freemarker), then merging
+ * {@code WebappTemplateLoader} cannot do), then merging
  * it with a page-like model (localized strings via method call, {@code context}/{@code path}
  * variables).
  */

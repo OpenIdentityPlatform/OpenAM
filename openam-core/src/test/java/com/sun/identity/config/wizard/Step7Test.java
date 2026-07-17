@@ -51,8 +51,7 @@ import org.testng.annotations.Test;
  * (Java evaluates the {@code getAttribute(key, default)} default argument eagerly) - this binds
  * real local sockets (see {@code AMSetupUtils.getFirstUnusedPort}), same as the original Click
  * page. {@code request.getServerName()} is stubbed to {@code "localhost"} below purely to make
- * that pre-existing side effect deterministic; see
- * docs/migration/click-to-freemarker/04-implementation-notes.md.
+ * that pre-existing side effect deterministic.
  *
  * <p>The already-configured branch of {@code onSecurityCheck} isn't covered here either, same
  * disproportionate-effort call as every other step since increment 1's Step1Test.
@@ -97,9 +96,10 @@ public class Step7Test {
 
         Map<String, Object> model = step7.getModel();
         assertThat(model.get("isEmbedded")).isEqualTo("1");
-        // step7.htm/step7.ftl's embedded-only rows guard on "$embedded"/"embedded", a key Step7
-        // never populates (it only ever sets "isEmbedded") - a pre-existing template/model key
-        // mismatch, not introduced by this port. See the implementation notes.
+        // Step7 sets "isEmbedded", which is exactly the key step7.ftl's embedded-only rows guard on.
+        // The old step7.htm guarded on "$embedded" instead - a key Step7 never set, so those rows
+        // never rendered; the port corrected the template to "isEmbedded". The legacy key name is
+        // never introduced into the model.
         assertThat(model).doesNotContainKey("embedded");
         assertThat(model.get("configStoreHost")).isEqualTo("localhost");
         assertThat(model.get("displayConfigStoreSSL")).isEqualTo("No");
