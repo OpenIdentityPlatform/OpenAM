@@ -1200,6 +1200,8 @@ Implements the `CacheForAMonth`. This filter implements the `org.forgerock.opena
 
 `/ws/*`::
 Implements the `AuthNFilter` and `AuthZFilter`. These filters implement the `com.sun.identity.rest.AuthNFilter` and `com.sun.identity.rest.AuthZFilter` filter classes.
++
+The `/ws/1/entitlement/listener` resource registers a callback URL that OpenAM sends an HTTP POST to whenever an entitlement policy changes. To prevent server-side request forgery (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-g499-5qm8-4grm[GHSA-g499-5qm8-4grm, window=\_blank]), a registered listener URL must use the `http` or `https` scheme and must not resolve to a loopback, link-local (including the cloud metadata range `169.254.0.0/16`), private/site-local, or multicast address; unsafe URLs are rejected at registration and are never contacted when notifications are sent. To restore the previous, unrestricted behavior at runtime — for example, when the listener endpoint is hosted on an internal address — set the advanced server property `org.openidentityplatform.entitlement.listener.allow-any-url` to `true`.
 
 `/login`::
 With the help of the `LoginLogoutMapping.java` file, this would forward to the `/UI/Login.jsp` endpoint.

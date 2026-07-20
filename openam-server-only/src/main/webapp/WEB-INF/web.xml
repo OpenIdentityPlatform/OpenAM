@@ -351,7 +351,7 @@
         <servlet-name>ws</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
+            <param-name>jakarta.ws.rs.Application</param-name>
             <param-value>com.sun.identity.rest.RestService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -642,7 +642,7 @@
         <servlet-name>federationrest</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
+            <param-name>jakarta.ws.rs.Application</param-name>
             <param-value>com.sun.identity.rest.FederationRestService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
