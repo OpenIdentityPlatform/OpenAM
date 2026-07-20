@@ -24,7 +24,7 @@
  *
  * $Id: CookieWriterServlet.java,v 1.7 2009/11/03 00:50:34 madan_ranganath Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.idpdiscovery;
@@ -205,7 +205,8 @@ public class CookieWriterServlet extends HttpServlet {
                     "Cannot reset preferred idp."
                 );
                 if (isValidReturn) {
-                    response.sendRedirect(returnURL);
+                    sendValidatedRedirect(request, response, classMethod,
+                        returnURL);
                 } else {
                     CookieUtils.sendError(request, response,
                         response.SC_INTERNAL_SERVER_ERROR, "noRedirectionURL",
@@ -284,9 +285,10 @@ public class CookieWriterServlet extends HttpServlet {
                         classMethod +
                         "Redirect to " +
                         returnURL
-                    );                        
+                    );
                 }
-                response.sendRedirect(returnURL);
+                sendValidatedRedirect(request, response, classMethod,
+                    returnURL);
             } else {
                 if (CookieUtils.debug.messageEnabled()) {
                     CookieUtils.debug.message(
@@ -304,8 +306,35 @@ public class CookieWriterServlet extends HttpServlet {
         } catch(IOException e) {
             CookieUtils.debug.error(classMethod, e);
         }
-    }    
-    
+    }
+
+    /**
+     * Redirects to the supplied RelayState URL only when it passes
+     * {@link CookieUtils#isRedirectUrlValid}, otherwise returns an error.
+     * Prevents the writer service from acting as an open redirect
+     * (GHSA-2pf8-52jh-5x3m).
+     *
+     * @param request the incoming request.
+     * @param response the response used to redirect or to report the error.
+     * @param classMethod label used for debug logging.
+     * @param returnURL the RelayState URL to redirect to.
+     * @exception IOException if the redirect could not be sent.
+     */
+    private void sendValidatedRedirect(HttpServletRequest request,
+        HttpServletResponse response, String classMethod, String returnURL)
+        throws IOException {
+        if (CookieUtils.isRedirectUrlValid(request, returnURL)) {
+            response.sendRedirect(returnURL);
+        } else {
+            CookieUtils.debug.error(classMethod
+                + "Invalid RelayState redirect URL, refusing open redirect: "
+                + returnURL);
+            CookieUtils.sendError(request, response,
+                response.SC_BAD_REQUEST, "invalidRelayStateUrl",
+                CookieUtils.bundle.getString("invalidRelayStateUrl"));
+        }
+    }
+
     /**
      * This function is used to reset the preferred IDP cookie based on the
      * present value and the providerId of the IDP that calls this service

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -1432,9 +1432,13 @@ This endpoint is also gated by the advanced server property `com.sun.identity.li
 
 `/idffwriter, /saml2writer`::
 Used by a servlet with a matching name (`idffwriter`, `saml2writer`). Associated with the `CookieWriterServlet` class. Used by the IDP to help the web container find app-specific info, such as Java classes or Java Archives (JARs).
++
+This endpoint redirects to the URL supplied in the `RelayState` parameter. To prevent it from being abused as an open redirect (GHSA-2pf8-52jh-5x3m), only relative URLs, same-origin URLs, and URLs matching the advanced server property `org.openidentityplatform.openam.idpdiscovery.relaystate.whitelist` are accepted; other targets are rejected with HTTP 400. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the server configuration reference.
 
 `/idffreader, /saml2reader`::
 Used by a servlet with a matching name (`idffreader`, `saml2reader`). Associated with the `CookieReaderServlet` class. Used by the SP to help find the preferred IDP.
++
+This endpoint also redirects to the URL supplied in the `RelayState` parameter, and applies the same redirect-URL validation described above for the writer endpoints.
 
 `/multiprotocolrelay`::
 Used by a servlet named `MultiProtocolRelayServlet`. Associated with the `MultiProtocolRelayServlet` class. Also used in federation as a RelayState to continue to the next protocol.

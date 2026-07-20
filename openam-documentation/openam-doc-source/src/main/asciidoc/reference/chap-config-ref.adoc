@@ -6065,6 +6065,18 @@ When the session cookie is not HttpOnly, `tokenId` is always returned in the res
 +
 Default: `false`
 
+`org.openidentityplatform.openam.idpdiscovery.relaystate.whitelist`::
+Whitelist of URL patterns that the SAML 2.0 and ID-FF IDP discovery reader and writer services (`/saml2reader`, `/saml2writer`, `/idffreader`, `/idffwriter`, served by `CookieReaderServlet` and `CookieWriterServlet`) are allowed to redirect to through the `RelayState` parameter.
+
++
+To prevent these unauthenticated endpoints from being abused as an open redirect (GHSA-2pf8-52jh-5x3m), the value of `RelayState` is validated before any redirect. Relative URLs, and URLs that target the same scheme, host, and port as the incoming request, are always allowed. Any other absolute URL is rejected with HTTP 400 unless it matches one of the patterns configured here.
+
++
+Specify a semicolon-separated list of URL patterns, using `*` as a wildcard, for example `https://sp.example.com:443/*;https://sp2.example.com/*`. Add the return URLs of any service providers that drive discovery from a different host than OpenAM. This setting was introduced as part of the GHSA-2pf8-52jh-5x3m hardening.
+
++
+Default: empty (only relative and same-origin redirect URLs are allowed)
+
 `securidHelper.ports`::
 Port on which SecurID daemon listens.
 

@@ -1162,6 +1162,11 @@ SAML v2.0 service that writes identity provider entity identifiers to Common Dom
 SAML2 Reader Service URL::
 SAML v2.0 service that reads identity provider entity identifiers from Common Domain cookies, used in identity provider discovery. Example: `\http://www.disco.example:8080/openam/saml2reader`.
 
+[NOTE]
+====
+The discovery reader and writer endpoints redirect the browser to the URL passed in their `RelayState` parameter. To prevent them from being abused as an open redirect (GHSA-2pf8-52jh-5x3m), OpenAM only follows relative URLs, URLs on the same scheme/host/port as the discovery service, and URLs that match the advanced server property `org.openidentityplatform.openam.idpdiscovery.relaystate.whitelist`. If the service providers in your circle of trust run on a different host than the common-domain discovery service, add their return URLs to that property. This is independent of the circle of trust __RelayState URL List__, which governs the SAML v2.0 SSO and SLO flows. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
+====
+
 Status::
 Whether this circle of trust is operational.
 
