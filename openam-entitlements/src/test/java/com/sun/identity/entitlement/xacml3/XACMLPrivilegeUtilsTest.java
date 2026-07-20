@@ -14,12 +14,14 @@
  * Copyright 2014 Nomura Research Institute, Ltd.
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package com.sun.identity.entitlement.xacml3;
 
+import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
+import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ReferralPrivilege;
 import com.sun.identity.entitlement.xacml3.core.Match;
@@ -244,6 +246,57 @@ public class XACMLPrivilegeUtilsTest {
         assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("ordinary>name")).isTrue();
         assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("ordinary<name")).isTrue();
         assertThat(XACMLPrivilegeUtils.containsUndesiredCharacters("ordinary\\name")).isTrue();
+    }
+
+    @Test
+    public void createDefaultObjectShouldReturnNullForNullInput() {
+        assertNull(XACMLPrivilegeUtils.createDefaultObject(null, EntitlementSubject.class));
+    }
+
+    @Test
+    public void createDefaultObjectShouldReturnNullForNonEntitlementClass() {
+        // Classes that do not implement the expected entitlement type must never be instantiated
+        assertNull(XACMLPrivilegeUtils.createDefaultObject("java.util.Date", EntitlementSubject.class));
+        assertNull(XACMLPrivilegeUtils.createDefaultObject("com.sun.rowset.JdbcRowSetImpl", EntitlementSubject.class));
+    }
+
+    @Test
+    public void createDefaultObjectShouldReturnNullForNonExistentClass() {
+        assertNull(XACMLPrivilegeUtils.createDefaultObject(
+                "com.sun.identity.entitlement.NonExistentClassXyz", EntitlementSubject.class));
+    }
+
+    @Test
+    public void createDefaultObjectShouldInstantiateAllowedEntitlementClass() {
+        Object ob = XACMLPrivilegeUtils.createDefaultObject(
+                "com.sun.identity.entitlement.JwtClaimSubject", EntitlementSubject.class);
+        assertNotNull(ob, "Expected allowed entitlement class to be instantiated");
+        assertThat(ob).isInstanceOf(com.sun.identity.entitlement.JwtClaimSubject.class);
+    }
+
+    @Test
+    public void createDefaultObjectShouldAcceptCustomPluginInArbitraryPackage() {
+        // Custom plugins registered via EntitlementModule may live in any package; the gate
+        // is the marker interface, not the package prefix.
+        Object ob = XACMLPrivilegeUtils.createDefaultObject(
+                "org.example.policy.CustomTestSubject", EntitlementSubject.class);
+        assertNotNull(ob, "Expected custom-package EntitlementSubject to be instantiated");
+        assertThat(ob).isInstanceOf(EntitlementSubject.class);
+    }
+
+    @Test
+    public void createDefaultObjectShouldRejectClassThatDoesNotMatchExpectedType() {
+        // JwtClaimSubject is a valid EntitlementSubject but not an EntitlementCondition
+        assertNull(XACMLPrivilegeUtils.createDefaultObject(
+                "com.sun.identity.entitlement.JwtClaimSubject", EntitlementCondition.class));
+    }
+
+    @Test
+    public void createDefaultObjectShouldReturnNullForSiblingPackageClass() {
+        // com.sun.identity.entitlementmalicious shares characters with the entitlement package
+        // but is a distinct sibling; gadgets there must be rejected regardless of name similarity
+        assertNull(XACMLPrivilegeUtils.createDefaultObject(
+                "com.sun.identity.entitlementmalicious.Foo", EntitlementSubject.class));
     }
 
 }
