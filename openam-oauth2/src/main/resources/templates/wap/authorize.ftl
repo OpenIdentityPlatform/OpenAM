@@ -5,6 +5,7 @@
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
   ~ Copyright 2012-2015 ForgeRock AS.
+  ~ Portions Copyrighted 2026 3A Systems LLC.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -35,11 +36,11 @@
         </section>
 </card>
 <card id="form" newcontext="true">
-        <form action="${target!'.'}" method="post">
+        <form action="${(target!'.')?html}" method="post">
             <h4>The following private info is requested</h4>
         <#if display_scope??>
             <#list display_scope as r>
-                <b>${r}</b><br/>
+                <b>${r?html}</b><br/>
             </#list>
         </#if>
             <br/>
@@ -66,8 +67,8 @@
             <input type="hidden" name="csrf" value="${csrf?html}"/>
         </#if>
             <!-- Required parameters -->
-            <input type="hidden" name="response_type" value="${response_type}"/>
-            <input type="hidden" name="client_id" value="${client_id}"/>
+            <input type="hidden" name="response_type" value="${response_type?html}"/>
+            <input type="hidden" name="client_id" value="${client_id?html}"/>
             Save Consent: <input type="checkbox" name="save_consent" />
             <!-- Custom parameters -->
             <!--input type="hidden" name="decision" value="allow"/>

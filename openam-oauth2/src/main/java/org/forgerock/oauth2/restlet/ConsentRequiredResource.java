@@ -109,12 +109,16 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
 
     private void addDisplayScopesAndClaims(ResourceOwnerConsentRequired consentRequired, Map<String, Object> data) {
         JsonValue scopes = json(array());
+        List<String> scopeNames = new ArrayList<>();
         Set<String> allScopeClaims = new HashSet<>();
         final Map<String, List<String>> compositeScopes = consentRequired.getClaims().getCompositeScopes();
         final Map<String, String> claimDescriptions = consentRequired.getClaimDescriptions();
         final Map<String, Object> claimValues = new LinkedHashMap<>(consentRequired.getClaims().getValues());
 
         for (Map.Entry<String, String> scope : consentRequired.getScopeDescriptions().entrySet()) {
+            if (scope.getValue() != null) {
+                scopeNames.add(scope.getValue());
+            }
             JsonValue value = json(object(field("name", encodeForHTML(scope.getValue()))));
             scopes.add(value.getObject());
             List<String> scopeClaims = compositeScopes.get(scope.getKey());
@@ -137,6 +141,10 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
             }
         }
         data.put("display_scopes", scopes.toString());
+        // Raw (unencoded) scope descriptions for the WAP consent template, which iterates them as a
+        // FreeMarker sequence and applies ?html escaping at the template layer. Set after the raw query
+        // parameters have been copied into the model so an attacker cannot supply display_scope themselves.
+        data.put("display_scope", scopeNames);
 
         for (String claim : allScopeClaims) {
             claimValues.remove(claim);
