@@ -386,6 +386,11 @@ For dynamic registration you need the relying party profile data, and an access 
 ======
 As described in xref:#openam-openid-client-registration["OpenID Connect Relying Party Registration"], you can allow relying parties to register without having an access token by setting the advanced server property, `org.forgerock.openam.openidconnect.allow.open.dynamic.registration`, to `true`. When using that setting in production systems, take care to limit or throttle dynamic registration.
 ======
+
+[NOTE]
+======
+When a registration request includes a `sector_identifier_uri`, OpenAM fetches that URL to verify that it lists the client's `redirect_uris`. To prevent server-side request forgery (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-7c7p-4mff-c9vg[GHSA-7c7p-4mff-c9vg, window=\_blank]), the `sector_identifier_uri` must use the `https` scheme and must not resolve to a loopback, link-local (including the cloud metadata range `169.254.0.0/16`), private/site-local, or multicast address; otherwise registration is rejected with `Invalid sector_identifier_uri requested`. To restore the previous, unrestricted behavior at runtime — for example, when the relying party's file is hosted on an internal address — set the advanced server property `org.openidentityplatform.oauth2.oidc.sector-identifier-uri.allow-any-url` to `true`.
+======
 On successful registration, OpenAM responds with information including an access token to allow the relying party subsequently to read and edit its profile:
 
 . Register an initial OAuth 2.0 client statically with a client ID, such as `masterClient` and client secret like `password`.

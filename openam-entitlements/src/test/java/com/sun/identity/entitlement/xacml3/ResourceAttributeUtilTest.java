@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions copyright 2026 3A Systems, LLC.
+ * Portions copyright 2026 3A Systems LLC.
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -80,6 +80,20 @@ public class ResourceAttributeUtilTest {
 
         // Then
         assertThat(result.getPropertyName()).isEqualTo(attribute.getPropertyName());
+    }
+
+    @Test(expectedExceptions = EntitlementException.class)
+    public void fromJSONShouldRejectNonResourceAttributeClass() throws EntitlementException {
+        util = new ResourceAttributeUtil();
+        // java.util.Date is on the classpath but is not a ResourceAttribute — must be rejected
+        util.fromJSON("java.util.Date-z-{}");
+    }
+
+    @Test(expectedExceptions = EntitlementException.class)
+    public void fromJSONShouldRejectKnownGadgetClass() throws EntitlementException {
+        util = new ResourceAttributeUtil();
+        // Classic JNDI gadget — must be rejected even if accidentally present on classpath
+        util.fromJSON("com.sun.rowset.JdbcRowSetImpl-z-{}");
     }
 
     /**

@@ -33,6 +33,9 @@
 package com.sun.identity.saml2.idpdiscovery;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import jakarta.servlet.http.Cookie;
@@ -45,6 +48,8 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.Locale;
+import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
+import org.forgerock.openam.shared.security.whitelist.ValidDomainExtractor;
 
 
 /**
@@ -80,6 +85,19 @@ public class CookieUtils {
     private static String errorUrl = System.getProperty(
         IDPDiscoveryConstants.ERROR_URL_PARAM_NAME);
 
+    // Validates RelayState redirect URLs so the reader/writer discovery
+    // services cannot be abused as an open redirect (GHSA-2pf8-52jh-5x3m).
+    // Relative URLs and the request's own origin are always allowed; any other
+    // absolute URL must match a configured whitelist pattern.
+    private static final RedirectUrlValidator<Collection<String>>
+        REDIRECT_URL_VALIDATOR = new RedirectUrlValidator<Collection<String>>(
+            new ValidDomainExtractor<Collection<String>>() {
+                public Collection<String> extractValidDomains(
+                        Collection<String> configInfo) {
+                    return configInfo;
+                }
+            });
+
     /**
      * Gets property value of "com.iplanet.am.cookie.secure"
      *
@@ -107,6 +125,59 @@ public class CookieUtils {
         return cookieSameSite;
     }
 
+    /**
+     * Returns the configured RelayState redirect whitelist patterns.
+     *
+     * @return the list of configured URL patterns, never <code>null</code>.
+     */
+    private static List<String> getRelayStateWhitelist() {
+        List<String> patterns = new ArrayList<String>();
+        String configured = SystemProperties.get(
+            IDPDiscoveryConstants.IDPDISCOVERY_RELAYSTATE_WHITELIST);
+        if (configured != null) {
+            StringTokenizer st = new StringTokenizer(configured, ";");
+            while (st.hasMoreTokens()) {
+                String pattern = st.nextToken().trim();
+                if (pattern.length() > 0) {
+                    patterns.add(pattern);
+                }
+            }
+        }
+        return patterns;
+    }
+
+    /**
+     * Validates a RelayState redirect URL before it is used in a redirect.
+     * Relative URLs and URLs targeting the same scheme/host/port as the
+     * incoming request are always allowed. Any other absolute URL is only
+     * permitted when it matches a pattern configured through the
+     * {@link IDPDiscoveryConstants#IDPDISCOVERY_RELAYSTATE_WHITELIST} property.
+     * This prevents the IDP discovery reader/writer services from being abused
+     * as an open redirect (GHSA-2pf8-52jh-5x3m).
+     *
+     * @param request the incoming request, used to derive the local origin.
+     * @param url the RelayState URL to validate.
+     * @return <code>true</code> if the URL is safe to redirect to.
+     */
+    public static boolean isRedirectUrlValid(HttpServletRequest request,
+            String url) {
+        if (url == null || url.trim().length() == 0) {
+            return false;
+        }
+        // Normalise backslashes so that "/\evil.com" style values are
+        // evaluated as the protocol-relative "//evil.com" a browser follows.
+        String normalized = url.replace('\\', '/');
+        List<String> patterns = getRelayStateWhitelist();
+        patterns.add(request.getScheme() + "://" + request.getServerName()
+            + ":" + request.getServerPort() + "/*");
+        boolean valid = REDIRECT_URL_VALIDATOR.isRedirectUrlValid(
+            normalized, patterns);
+        if (!valid) {
+            debug.warning("CookieUtils.isRedirectUrlValid: refusing redirect "
+                + "to untrusted RelayState URL: " + url);
+        }
+        return valid;
+    }
 
     public static boolean isSAML2(HttpServletRequest req) {
         // check this is for idff or saml2

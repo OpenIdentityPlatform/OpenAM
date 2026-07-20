@@ -46,9 +46,11 @@ import com.sun.identity.security.EncodeAction;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.AccessController;
+import java.security.Principal;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -1609,7 +1611,19 @@ public class AuthXMLUtils {
             
             if (callback == null) {
                 if ((className != null) && (className.length() != 0)) {
-                    Class xmlClass = Class.forName(className);
+                    // The class name is read from attacker-controllable XML on the
+                    // unauthenticated /authservice endpoint. Load the class without
+                    // running its static initializers and verify it implements
+                    // DSAMECallbackInterface BEFORE instantiating it; otherwise an
+                    // arbitrary class could be instantiated, leading to remote code
+                    // execution (GHSA-wg5r-wc3x-39vc).
+                    Class xmlClass = Class.forName(className, false,
+                        AuthXMLUtils.class.getClassLoader());
+                    if (!DSAMECallbackInterface.class.isAssignableFrom(xmlClass)) {
+                        debug.error("createCustomCallback : class " + className
+                            + " is not a DSAMECallbackInterface implementation");
+                        return null;
+                    }
                     callback = (DSAMECallbackInterface) xmlClass.newInstance();
                 }
             }
@@ -1760,6 +1774,44 @@ public class AuthXMLUtils {
         return encodedString;
     }
     
+    // Hardened deserialization filter for the encrypted <Subject> value received
+    // from the auth server. The value is Java-serialized, so without a class
+    // allowlist a forged or relayed response could trigger gadget-chain code
+    // execution in the AuthContext client. A legitimate javax.security.auth.Subject
+    // graph only contains the Subject itself, JDK collections/scalars and
+    // java.security.Principal implementations (GHSA-wg5r-wc3x-39vc, related
+    // deserialization hardening).
+    private static final ObjectInputFilter SUBJECT_DESERIALISATION_FILTER =
+        AuthXMLUtils::filterSubjectClass;
+
+    private static ObjectInputFilter.Status filterSubjectClass(
+            ObjectInputFilter.FilterInfo info) {
+        // Reject oversized or deeply nested graphs before resolving any class.
+        if (info.depth() > 20L || info.references() > 1000L
+                || info.arrayLength() > 10000L) {
+            return ObjectInputFilter.Status.REJECTED;
+        }
+        Class<?> clazz = info.serialClass();
+        if (clazz == null) {
+            return ObjectInputFilter.Status.UNDECIDED;
+        }
+        while (clazz.isArray()) {
+            clazz = clazz.getComponentType();
+        }
+        if (clazz.isPrimitive() || Principal.class.isAssignableFrom(clazz)) {
+            return ObjectInputFilter.Status.ALLOWED;
+        }
+        String name = clazz.getName();
+        if (name.startsWith("java.lang.") || name.startsWith("java.util.")
+                || name.startsWith("java.security.")
+                || name.startsWith("javax.security.")) {
+            return ObjectInputFilter.Status.ALLOWED;
+        }
+        debug.warning("getDeSerializedSubject : rejected class " + name
+            + " during Subject deserialization");
+        return ObjectInputFilter.Status.REJECTED;
+    }
+
     /**
      * Deserializes Subject.
      *
@@ -1784,6 +1836,7 @@ public class AuthXMLUtils {
             //convert byte to object using streams
             byteIn = new ByteArrayInputStream(byteDecrypted);
             objInStream  = new ObjectInputStream(byteIn);
+            objInStream.setObjectInputFilter(SUBJECT_DESERIALISATION_FILTER);
             tempObject = objInStream.readObject();
         }catch(Exception e){
             debug.message("Exception Message in decrypt: " , e);

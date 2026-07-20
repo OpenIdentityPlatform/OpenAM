@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.workflow;
@@ -25,7 +26,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -45,16 +45,14 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-/*
-To actually run this test, comment-out the <skipTests>true</skipTests> property in the pom.xml and run
-mvn -Dtest=CreateSoapSTSDeploymentTest verify
-from the command-line (other tests in the test-suite don't run successfully - hence the skipTests property.)
- */
 public class CreateSoapSTSDeploymentTest {
     private static final String REALM_PARAM = "realm";
     private static final String OPENAM_URL_PARAM = "openAMUrl";
     private static final String SOAP_AGENT_NAME_PARAM = "soapAgentName";
     private static final String SOAP_AGENT_PASSWORD_PARAM = "soapAgentPassword";
+    private static final String SOAP_AGENT_RETRY_NUMBER_PARAM = "soapAgentRetryNumber";
+    private static final String SOAP_AGENT_RETRY_INITIAL_INTERVAL_PARAM = "soapAgentRetryInitialInterval";
+    private static final String SOAP_AGENT_RETRY_MULTIPLIER_PARAM = "soapAgentRetryMultiplier";
     private static final String KEYSTORE_FILE_NAMES_PARAM = "keystoreFileNames";
     private static final String WSDL_FILE_NAMES_PARAM = "wsdlFileNames";
 
@@ -62,6 +60,9 @@ public class CreateSoapSTSDeploymentTest {
     private static final String OPENAM_URL_PARAM_VALUE = "https://host.com:443/om";
     private static final String SOAP_AGENT_NAME_PARAM_VALUE = "da_soap_agent";
     private static final String SOAP_AGENT_PASSWORD_PARAM_VALUE = "da_soap_agent_pw";
+    private static final String SOAP_AGENT_RETRY_NUMBER_PARAM_VALUE = "3";
+    private static final String SOAP_AGENT_RETRY_INITIAL_INTERVAL_PARAM_VALUE = "500";
+    private static final String SOAP_AGENT_RETRY_MULTIPLIER_PARAM_VALUE = "1.5";
     private static final String KEYSTORE_FILE_NAMES_PARAM_VALUE = "keystore.jks";
     private static final String WSDL_FILE_NAMES_PARAM_VALUE = "custom.wsdl";
 
@@ -69,6 +70,10 @@ public class CreateSoapSTSDeploymentTest {
     private static final String SOAP_PROPERTY_FILE_AM_SESSION_COOKIE_NAME_KEY = "am_session_cookie_name";
     private static final String SOAP_PROPERTY_FILE_SOAP_STS_AGENT_USERNAME_KEY = "soap_sts_agent_username";
     private static final String SOAP_PROPERTY_FILE_REALM_KEY = "am_realm";
+    private static final String SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_NUMBER_KEY = "soap_sts_agent_retry_number";
+    private static final String SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_INITIAL_INTERVAL_KEY =
+            "soap_sts_agent_retry_initial_interval";
+    private static final String SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_MULTIPLIER_KEY = "soap_sts_agent_retry_multiplier";
 
     private static final String AM_SESSION_COOKIE_NAME = "custom_cookie_name";
 
@@ -79,16 +84,18 @@ public class CreateSoapSTSDeploymentTest {
 
     private static final boolean WITH_KEYSTORE_FILE = true;
     private static final boolean WITH_CUSTOM_WSDL = true;
+    /*
+    Classpath resource names, not filesystem paths: they must keep '/' on every platform, so they
+    cannot be built with Paths.get() (which yields '\' separators on Windows and resolves to null).
+     */
+    private static final String INPUT_WAR_RESOURCE = "/com/sun/identity/workflow/slim-openam-soap-sts-server.war";
+    private static final String CUSTOM_WSDL_RESOURCE = "/com/sun/identity/workflow/custom.wsdl";
+    private static final String KEYSTORE_RESOURCE = "/com/sun/identity/workflow/keystore.jks";
+
     private File outputWarFile;
-    private Path inputWarFilePath;
-    private Path customWsdlFilePath;
-    private Path keystoreFilePath;
 
     @BeforeClass
     public void setup() throws Exception {
-        inputWarFilePath = Paths.get("/com", "sun", "identity", "workflow", "slim-openam-soap-sts-server.war");
-        customWsdlFilePath = Paths.get("/com", "sun", "identity", "workflow", "custom.wsdl");
-        keystoreFilePath = Paths.get("/com", "sun", "identity", "workflow", "keystore.jks");
         outputWarFile = Files.createTempFile("soap-sts", "war").toFile();
     }
 
@@ -111,7 +118,7 @@ public class CreateSoapSTSDeploymentTest {
     }
 
     private void verifyGeneratedWarCorrectness(boolean withKeystoreFile, boolean withCustomWsdl) throws IOException {
-        try (JarInputStream jarInputStream  = new JarInputStream(getClass().getResourceAsStream(inputWarFilePath.toString()))) {
+        try (JarInputStream jarInputStream  = new JarInputStream(getClass().getResourceAsStream(INPUT_WAR_RESOURCE))) {
             final JarFile outputWar = new JarFile(outputWarFile);
             assertEquals(getJarInputStreamEntryNames(jarInputStream), getNonAddedOutputWarFileEntryNames(outputWar));
             assertNotNull(jarInputStream.getManifest());
@@ -136,7 +143,7 @@ public class CreateSoapSTSDeploymentTest {
     }
 
     private void verifyCustomWsdlFileCorrectness(JarFile outputWar) throws IOException {
-        try (InputStream inputWsdlStream = getClass().getResourceAsStream(customWsdlFilePath.toString());
+        try (InputStream inputWsdlStream = getClass().getResourceAsStream(CUSTOM_WSDL_RESOURCE);
              InputStream fromWarInputStream = outputWar.getInputStream(outputWar.getJarEntry(WEB_INF_CLASSES + WSDL_FILE_NAMES_PARAM_VALUE))) {
             final String customWsdlInput = readStringFromInputStream(inputWsdlStream);
             final String customWsdlInWar = readStringFromInputStream(fromWarInputStream);
@@ -194,6 +201,12 @@ public class CreateSoapSTSDeploymentTest {
             assertEquals(warProperties.getProperty(SOAP_PROPERTY_FILE_AM_SESSION_COOKIE_NAME_KEY), AM_SESSION_COOKIE_NAME);
             assertEquals(warProperties.getProperty(SOAP_PROPERTY_FILE_SOAP_STS_AGENT_USERNAME_KEY), SOAP_AGENT_NAME_PARAM_VALUE);
             assertEquals(warProperties.getProperty(SOAP_PROPERTY_FILE_REALM_KEY), REALM_PARAM_VALUE);
+            assertEquals(warProperties.getProperty(SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_NUMBER_KEY),
+                    SOAP_AGENT_RETRY_NUMBER_PARAM_VALUE);
+            assertEquals(warProperties.getProperty(SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_INITIAL_INTERVAL_KEY),
+                    SOAP_AGENT_RETRY_INITIAL_INTERVAL_PARAM_VALUE);
+            assertEquals(warProperties.getProperty(SOAP_PROPERTY_FILE_SOAP_STS_AGENT_RETRY_MULTIPLIER_KEY),
+                    SOAP_AGENT_RETRY_MULTIPLIER_PARAM_VALUE);
         }
     }
 
@@ -205,6 +218,9 @@ public class CreateSoapSTSDeploymentTest {
         paramMap.put(OPENAM_URL_PARAM, OPENAM_URL_PARAM_VALUE);
         paramMap.put(SOAP_AGENT_NAME_PARAM, SOAP_AGENT_NAME_PARAM_VALUE);
         paramMap.put(SOAP_AGENT_PASSWORD_PARAM, SOAP_AGENT_PASSWORD_PARAM_VALUE);
+        paramMap.put(SOAP_AGENT_RETRY_NUMBER_PARAM, SOAP_AGENT_RETRY_NUMBER_PARAM_VALUE);
+        paramMap.put(SOAP_AGENT_RETRY_INITIAL_INTERVAL_PARAM, SOAP_AGENT_RETRY_INITIAL_INTERVAL_PARAM_VALUE);
+        paramMap.put(SOAP_AGENT_RETRY_MULTIPLIER_PARAM, SOAP_AGENT_RETRY_MULTIPLIER_PARAM_VALUE);
         if (withKeystoreFile) {
             paramMap.put(KEYSTORE_FILE_NAMES_PARAM, KEYSTORE_FILE_NAMES_PARAM_VALUE);
         }
@@ -223,7 +239,7 @@ public class CreateSoapSTSDeploymentTest {
         @Override
         protected JarInputStream getJarInputStream() throws WorkflowException {
             try {
-                return new JarInputStream(getClass().getResourceAsStream(inputWarFilePath.toString()));
+                return new JarInputStream(getClass().getResourceAsStream(INPUT_WAR_RESOURCE));
             } catch (IOException e) {
                 throw new WorkflowException("error opening test resource .war file: " + e);
             }
@@ -256,9 +272,9 @@ public class CreateSoapSTSDeploymentTest {
         @Override
         protected InputStream getInputStreamForKeystoreFileOrCustomWsdlFile(String fileName) throws IOException {
             if (WSDL_FILE_NAMES_PARAM_VALUE.equals(fileName)) {
-                return getClass().getResourceAsStream(customWsdlFilePath.toString());
+                return getClass().getResourceAsStream(CUSTOM_WSDL_RESOURCE);
             } else if (KEYSTORE_FILE_NAMES_PARAM_VALUE.equals(fileName)) {
-                return getClass().getResourceAsStream(keystoreFilePath.toString());
+                return getClass().getResourceAsStream(KEYSTORE_RESOURCE);
             }
             throw new IllegalStateException("Unexpected fileName parameter in " +
                     "MyCreateSoapSTSDeployment#getInputStreamForKeystoreFileOrCustomWsdlFile: " + fileName);

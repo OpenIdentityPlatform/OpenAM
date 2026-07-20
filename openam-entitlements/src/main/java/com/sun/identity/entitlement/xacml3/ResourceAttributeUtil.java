@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -75,17 +76,25 @@ public class ResourceAttributeUtil {
      */
     public ResourceAttribute fromJSON(String json) throws EntitlementException {
         try {
-            return (ResourceAttribute) mapper.readValue(getJSON(json), getClass(json));
+            return mapper.readValue(getJSON(json), getClass(json));
         } catch (IOException e) {
             throw new EntitlementException(JSON_PARSE_ERROR, e);
         }
     }
 
-    private Class getClass(String json) throws EntitlementException {
+    private Class<? extends ResourceAttribute> getClass(String json) throws EntitlementException {
         int pos = getSeparatorIndex(json);
         String classname = json.substring(0, pos);
         try {
-            return Class.forName(classname);
+            // Load WITHOUT initialising so static initialisers of a malicious class cannot run
+            // before the type check; only real ResourceAttribute implementations may proceed.
+            Class<?> cla = Class.forName(classname, false, ResourceAttributeUtil.class.getClassLoader());
+            if (!ResourceAttribute.class.isAssignableFrom(cla)) {
+                throw new EntitlementException(
+                        EntitlementException.UNKNOWN_RESOURCE_ATTRIBUTE_CLASS,
+                        new Object[]{classname});
+            }
+            return cla.asSubclass(ResourceAttribute.class);
         } catch (ClassNotFoundException e) {
             throw new EntitlementException(
                     EntitlementException.UNKNOWN_RESOURCE_ATTRIBUTE_CLASS,

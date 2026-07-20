@@ -24,6 +24,7 @@
  *
  * $Id: IDPDiscoveryConstants.java,v 1.5 2009/11/03 00:50:34 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2021-2026 3A Systems LLC.
  */
 
 
@@ -52,9 +53,18 @@ public interface IDPDiscoveryConstants {
                         "com.sun.identity.saml2.idpdiscovery.cookietype";
     public static final String IDPDISCOVERY_URL_SCHEME = 
                         "com.sun.identity.saml2.idpdiscovery.urlscheme";
-    public static final String IDPDISCOVERY_COOKIE_DOMAIN = 
+    public static final String IDPDISCOVERY_COOKIE_DOMAIN =
                         "com.sun.identity.saml2.idpdiscovery.cookiedomain";
-    public static final String HTTPS = "https"; 
+    /**
+     * Semicolon-separated list of URL patterns that the IDP discovery
+     * reader/writer services are allowed to redirect to through the RelayState
+     * parameter, in addition to relative URLs and the request's own
+     * scheme/host/port. Example:
+     * <code>https://sp.example.com:443/*;https://sp2.example.com/*</code>.
+     */
+    public static final String IDPDISCOVERY_RELAYSTATE_WHITELIST =
+                        "org.openidentityplatform.openam.idpdiscovery.relaystate.whitelist";
+    public static final String HTTPS = "https";
     public static final String DEBUG_LEVEL = 
                         "com.iplanet.services.debug.level";  
     public static final String DEBUG_DIR = 

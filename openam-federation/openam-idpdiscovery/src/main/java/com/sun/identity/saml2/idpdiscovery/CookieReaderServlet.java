@@ -24,7 +24,7 @@
  *
  * $Id: CookieReaderServlet.java,v 1.4 2009/03/26 19:41:29 madan_ranganath Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.idpdiscovery;
@@ -172,7 +172,16 @@ public class CookieReaderServlet extends HttpServlet {
                     }
                      
                 }
-                response.sendRedirect(returnURL);
+                if (CookieUtils.isRedirectUrlValid(request, returnURL)) {
+                    response.sendRedirect(returnURL);
+                } else {
+                    CookieUtils.debug.error(classMethod
+                        + "Invalid RelayState redirect URL, refusing open "
+                        + "redirect: " + returnURL);
+                    CookieUtils.sendError(request, response,
+                        response.SC_BAD_REQUEST, "invalidRelayStateUrl",
+                        CookieUtils.bundle.getString("invalidRelayStateUrl"));
+                }
                 return;
             } else {
                 CookieUtils.sendError(request, response,
