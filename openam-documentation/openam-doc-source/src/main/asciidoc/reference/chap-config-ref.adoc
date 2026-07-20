@@ -3766,7 +3766,7 @@ If enabled, OpenAM will make a call to `System.getSecurityManager().checkPackage
 
 [NOTE]
 ==========
-This feature only takes effect if the security manager is enabled for the JVM.
+This feature only takes effect if the security manager is enabled for the JVM. The JVM security manager is deprecated, disabled by default, and cannot be installed on recent Java versions, so this setting may have no effect; do not rely on it as the sole safeguard. For Groovy scripts, compile-time AST transformation annotations (such as `@Grab` and `@ASTTest`) are rejected during compilation regardless of this setting.
 ==========
 +
 `ssoadm` attribute: `useSecurityManager`

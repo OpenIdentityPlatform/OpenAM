@@ -12,7 +12,8 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2014-2015 ForgeRock AS.
-*/
+* Portions copyright 2026 3A Systems, LLC
+ */
 package org.forgerock.openam.scripting.factories;
 
 import groovy.lang.GroovyClassLoader;
@@ -20,6 +21,7 @@ import groovy.transform.ThreadInterrupt;
 import javax.script.ScriptEngine;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
+import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineFactory;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
 import org.forgerock.util.Reject;
@@ -37,11 +39,27 @@ public class GroovyEngineFactory extends GroovyScriptEngineFactory {
 
     private final GroovyScriptEngineImpl groovyScriptEngine;
 
+    static {
+        // Disable Grape/Ivy dependency resolution globally. The runtime sandbox cannot intercept @Grab because it is a
+        // compile-time AST transform that fetches and loads arbitrary artefacts; RejectASTTransformsCustomizer rejects
+        // the annotation, and this is belt-and-suspenders in case any other compilation path is added.
+        System.setProperty("groovy.grape.enable", "false");
+    }
+
     public GroovyEngineFactory() {
         CompilerConfiguration compilerConfig = new CompilerConfiguration();
         // Apply sandbox before any other customisation, otherwise sandbox will be applied to implementation details.
         compilerConfig.addCompilationCustomizers(new SandboxTransformer());
+        // The runtime sandbox above only governs script execution. Reject compile-time AST transforms such as
+        // @ASTTest and @Grab, which would otherwise run arbitrary code during compilation (i.e. on validate/create),
+        // escaping the sandbox entirely. See RejectASTTransformsCustomizer for details.
+        compilerConfig.addCompilationCustomizers(new RejectASTTransformsCustomizer());
         compilerConfig.addCompilationCustomizers(new ASTTransformationCustomizer(ThreadInterrupt.class));
+        // Defense in depth: enable the indirect-import check so that fully-qualified references cannot bypass any
+        // import restrictions. The runtime GroovyValueFilter remains the primary control over what scripts may access.
+        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer();
+        secureASTCustomizer.setIndirectImportCheckEnabled(true);
+        compilerConfig.addCompilationCustomizers(secureASTCustomizer);
         GroovyClassLoader classLoader = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(),
                 compilerConfig);
         groovyScriptEngine = new GroovyScriptEngineImpl(classLoader);
