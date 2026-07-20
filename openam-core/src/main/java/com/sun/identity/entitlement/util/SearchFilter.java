@@ -25,9 +25,12 @@
  * $Id: SearchFilter.java,v 1.2 2009/10/14 03:18:41 veiming Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.entitlement.util;
+
+import org.forgerock.opendj.ldap.Filter;
 
 /**
  * This class encapsulates the information required for searching
@@ -125,7 +128,7 @@ public class SearchFilter {
      */
     public String getFilter() {
         if (value != null) {
-            return "(" + attribute.toFilter("=") + "=" + value +")";
+            return Filter.equality(attribute.getLdapAttribute(), attribute.getAttributeName() + "=" + value).toString();
         }
 
         /*

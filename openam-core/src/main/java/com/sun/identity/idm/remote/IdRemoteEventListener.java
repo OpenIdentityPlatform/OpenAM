@@ -49,6 +49,7 @@ import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoListener;
+import com.sun.identity.jaxrpc.JAXRPCUtil;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
@@ -116,8 +117,10 @@ public class IdRemoteEventListener {
                 // Throws exception if NotificationURL is null
                 url = WebtopNaming.getNotificationURL();
                 
-                // Register for IdRepo Service
-                Object result = client.send("registerNotificationURL_idrepo", url.toString(), null, null);
+                // Register for IdRepo Service. Send the app (server/agent) SSO cookie so the
+                // server can authenticate this registration (GHSA-w858-46wv-v45w).
+                Object result = client.send("registerNotificationURL_idrepo", url.toString(), null,
+                        JAXRPCUtil.getAppSSOTokenCookie());
                 if (result != null) {
                     remoteId = result.toString();
                 }
@@ -137,7 +140,8 @@ public class IdRemoteEventListener {
                     public void shutdown() {
                         try {
                             if (remoteId != null) {
-                                client.send("deRegisterNotificationURL_idrepo", remoteId, null, null);
+                                client.send("deRegisterNotificationURL_idrepo", remoteId, null,
+                                        JAXRPCUtil.getAppSSOTokenCookie());
                                 if (DEBUG.messageEnabled()) {
                                     DEBUG.message("IdRemoteEventListener: deRegisterNotificationURL_idrepo for "
                                             + remoteId);

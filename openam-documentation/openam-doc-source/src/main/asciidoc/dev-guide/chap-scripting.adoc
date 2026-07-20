@@ -96,6 +96,13 @@ Classes called by the script are checked against the whitelist first, and must m
 
 You can also configure the scripting engine to make an additional call to the JVM security manager for each class that is accessed. The security manager throws an exception if a class being called is not allowed to execute.
 
+[NOTE]
+======
+The JVM security manager is deprecated, disabled by default, and cannot be installed at all on recent Java versions. Do not rely on it as your only safeguard: the whitelist and blacklist remain the primary runtime controls.
+======
+
+For Groovy scripts, the scripting engine additionally rejects compile-time AST (Abstract Syntax Tree) transformation annotations, such as `@Grab` and `@ASTTest`. Unlike the whitelist, blacklist, and security manager checks—which apply while a script __runs__—these annotations execute arbitrary code during script __compilation__, which occurs as soon as a script is validated or created, before the script is ever run. A script that uses a blocked transform is rejected with a compilation error, and Grape dependency resolution (the `@Grab` family of annotations) is disabled.
+
 For more information on configuring script engine security, see xref:../reference/chap-config-ref.adoc#scripting-configuration["Scripting"] in the __Reference__.
 .Important Points About Script Engine Security
 --
@@ -120,6 +127,9 @@ __Access__ includes actions such as:
 * Accessing a method or field that returns an instance of that class.
 
 ======
+
+Groovy compile-time transforms are blocked.::
+The whitelist, blacklist, and security manager apply only while a script __runs__. Groovy also supports AST transformation annotations—such as `@Grab` and `@ASTTest`—that run arbitrary code at __compile__ time, when a script is validated or created. OpenAM blocks these transforms during compilation so that they cannot be used to bypass the runtime security settings. Benign transforms, such as `@Field`, remain available.
 
 Potentially dangerous Java classes are blacklisted by default.::
 All Java reflection classes (`java.lang.Class`, `java.lang.reflect.*`) are blacklisted by default to avoid bypassing the security settings.

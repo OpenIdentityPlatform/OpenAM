@@ -198,7 +198,51 @@ public class WebAuthnAuthentication extends AMLoginModule {
 	private static final Set<String> ALLOWED_AUTHENTICATOR_CLASSES = Set.of(
 			AuthenticatorImpl.class.getName()
 	);
-	
+
+	// The whole AuthenticatorImpl object graph is made up of webauthn4j data
+	// objects, so the library's own package is allowlisted as a prefix.
+	private static final String WEBAUTHN4J_PACKAGE_PREFIX = "com.webauthn4j.";
+
+	// Safe JDK value/container types that legitimately appear in the
+	// AuthenticatorImpl graph (UUID inside AAGUID, java.lang.Enum as the
+	// superclass of the COSE/transport enums, boxed primitives and the
+	// collections used for transports / keyOps / extensions). Every element of
+	// these containers is itself checked by the same filter, so allowing a
+	// container cannot smuggle in a gadget class.
+	private static final Set<String> ALLOWED_JDK_CLASSES = Set.of(
+			"java.lang.Boolean",
+			"java.lang.Byte",
+			"java.lang.Character",
+			"java.lang.Short",
+			"java.lang.Integer",
+			"java.lang.Long",
+			"java.lang.Number",
+			"java.lang.String",
+			"java.lang.Enum",
+			"java.math.BigInteger",
+			"java.util.UUID",
+			"java.util.ArrayList",
+			"java.util.LinkedList",
+			"java.util.HashSet",
+			"java.util.LinkedHashSet",
+			"java.util.TreeSet",
+			"java.util.HashMap",
+			"java.util.LinkedHashMap",
+			"java.util.TreeMap",
+			"java.util.Arrays$ArrayList",
+			"java.util.Collections$EmptyList",
+			"java.util.Collections$EmptyMap",
+			"java.util.Collections$EmptySet",
+			"java.util.Collections$SingletonList",
+			"java.util.Collections$SingletonMap",
+			"java.util.Collections$SingletonSet",
+			"java.util.Collections$UnmodifiableCollection",
+			"java.util.Collections$UnmodifiableList",
+			"java.util.Collections$UnmodifiableRandomAccessList",
+			"java.util.Collections$UnmodifiableMap",
+			"java.util.Collections$UnmodifiableSet"
+	);
+
 	@SuppressWarnings("unchecked")
 	protected Set<Authenticator> loadAuthenticators(AMIdentity identity) throws AuthLoginException {
 		Set<Authenticator> authenticators = new HashSet<>();
@@ -222,11 +266,27 @@ public class WebAuthnAuthentication extends AMLoginModule {
 		try (ObjectInputStream ois =
 					 new ObjectInputStream(new ByteArrayInputStream(authBytes))) {
 			ois.setObjectInputFilter(filterInfo -> {
-				if(filterInfo.depth() > 1) {
+				Class<?> cls = filterInfo.serialClass();
+				if (cls == null) {
+					// Not a class-resolution check (e.g. array length); leave the
+					// decision to the JVM-wide default filter.
+					return ObjectInputFilter.Status.UNDECIDED;
+				}
+				// Validate the element type rather than the array type itself.
+				while (cls.isArray()) {
+					cls = cls.getComponentType();
+				}
+				if (cls.isPrimitive()) {
 					return ObjectInputFilter.Status.ALLOWED;
 				}
-				Class<?> cls = filterInfo.serialClass();
-				if (ALLOWED_AUTHENTICATOR_CLASSES.contains(cls.getName())) {
+				final String className = cls.getName();
+				// The root object (depth 1) must be exactly AuthenticatorImpl;
+				// its superclasses and the whole nested graph are at depth > 1.
+				if (filterInfo.depth() == 1 && !ALLOWED_AUTHENTICATOR_CLASSES.contains(className)) {
+					return ObjectInputFilter.Status.REJECTED;
+				}
+				if (className.startsWith(WEBAUTHN4J_PACKAGE_PREFIX)
+						|| ALLOWED_JDK_CLASSES.contains(className)) {
 					return ObjectInputFilter.Status.ALLOWED;
 				}
 				return ObjectInputFilter.Status.REJECTED;

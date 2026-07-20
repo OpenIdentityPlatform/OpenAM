@@ -25,6 +25,7 @@
  * $Id: PrivilegeChangeNotifier.java,v 1.5 2010/01/07 00:19:11 veiming Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.entitlement;
@@ -49,7 +50,9 @@ import org.forgerock.openam.entitlement.PolicyConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.common.HttpURLConnectionManager;
+import com.sun.identity.common.SsrfUrlValidator;
 import com.sun.identity.entitlement.interfaces.ResourceName;
 
 public class PrivilegeChangeNotifier {
@@ -105,6 +108,24 @@ public class PrivilegeChangeNotifier {
         return instance;
     }
 
+    /**
+     * When set to {@code true}, entitlement listener notification URLs are not SSRF-validated
+     * (restores the pre-fix behaviour). Runtime toggle for deployments whose listener endpoints
+     * are hosted on internal addresses. Default {@code false}.
+     */
+    public static final String ALLOW_ANY_LISTENER_URL =
+            "org.openidentityplatform.entitlement.listener.allow-any-url";
+
+    /**
+     * @param url a candidate entitlement listener notification callback URL.
+     * @return {@code true} if the URL may be used — i.e. it is SSRF-safe (http/https, not a
+     *     loopback/link-local/private/metadata address) or {@link #ALLOW_ANY_LISTENER_URL} is set.
+     */
+    public static boolean isListenerUrlAllowed(String url) {
+        return SystemProperties.getAsBoolean(ALLOW_ANY_LISTENER_URL, false)
+                || SsrfUrlValidator.isSafeRemoteUrl(url);
+    }
+
     public void notify(
         Subject adminSubject,
         String realm,
@@ -125,6 +146,14 @@ public class PrivilegeChangeNotifier {
 
             String json = toJSONString(realm, privilegeName, resources);
             for (URL url : urls) {
+                // Do not POST to unsafe (loopback/link-local/private/metadata) URLs — this
+                // prevents stored SSRF via registered listener URLs (GHSA-g499-5qm8-4grm),
+                // including any already persisted before this fix.
+                if (!isListenerUrlAllowed(url.toString())) {
+                    PolicyConstants.DEBUG.warning(
+                        "PrivilegeChangeNotifier.notify: skipping unsafe listener URL: " + url);
+                    continue;
+                }
                 thrdPool.submit(new Task(adminSubject, url.toString(), json));
             }
         } catch (JSONException e) {
@@ -239,6 +268,11 @@ public class PrivilegeChangeNotifier {
                 try {
                     URL urlObj = new URL(url);
                     HttpURLConnection conn = HttpURLConnectionManager.getConnection(urlObj);
+                    // Do not follow redirects: the SSRF guard validates the registered URL,
+                    // but a 3xx to an internal/metadata address (e.g. 169.254.169.254) would
+                    // otherwise be followed and defeat that check (GHSA-g499-5qm8-4grm). Set on
+                    // this connection only, not in the shared HttpURLConnectionManager.
+                    conn.setInstanceFollowRedirects(false);
                     conn.setConnectTimeout(HTTP_TIMEOUT);
                     conn.setDoOutput(true);
                     wr = new OutputStreamWriter(

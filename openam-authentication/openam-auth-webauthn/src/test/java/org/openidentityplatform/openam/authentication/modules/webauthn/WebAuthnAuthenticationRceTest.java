@@ -130,6 +130,32 @@ public class WebAuthnAuthenticationRceTest {
         assertThat(unsafeOperations).doesNotContain("rce");
     }
 
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void nestedGadgetBelowLegitRoot_isRejected() throws Exception {
+
+        // Root is a valid AuthenticatorImpl (passes the depth-1 allowlist check),
+        // but a non-allowlisted gadget is nested inside it via the transports set
+        // (depth > 1). This is exactly the graph the depth>1 short-circuit allowed.
+        AuthenticatorImpl auth = getAuthenticator();
+        Set transports = new java.util.HashSet();
+        transports.add(new MaliciousPayload("rce"));
+        auth.setTransports((Set) transports);
+
+        String encoded = marshalToBase64(auth);
+        when(identity.getAttribute(anyString())).thenReturn(Collections.singleton(encoded));
+
+        boolean rejected = false;
+        try {
+            webAuthnAuthentication.loadAuthenticators(identity);
+        } catch (AuthLoginException e) {
+            rejected = true;
+        }
+
+        assertThat(rejected).as("nested non-allowlisted class must be rejected").isTrue();
+        assertThat(unsafeOperations).doesNotContain("rce");
+    }
+
     private static String marshalToBase64(Object obj) {
         byte[] bytes = SerializationUtils.serialize((Serializable) obj);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);

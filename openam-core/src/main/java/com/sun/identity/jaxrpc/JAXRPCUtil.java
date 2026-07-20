@@ -28,12 +28,18 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.jaxrpc;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.sso.SSOToken;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.jaxrpc.JAXRPCHelper;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
+import java.security.AccessController;
 import java.util.HashMap;
 import javax.xml.rpc.Stub;
 
@@ -135,5 +141,34 @@ public class JAXRPCUtil extends JAXRPCHelper {
             s._setProperty(javax.xml.rpc.Stub.ENDPOINT_ADDRESS_PROPERTY, iurl);
         }
         return (s);
+    }
+
+    /**
+     * Returns the application (server/agent) SSO token as an HTTP cookie string
+     * ({@code <cookieName>=<tokenId>}) suitable for the {@code cookies} argument of
+     * {@code SOAPClient.send(...)}. This lets the server authenticate the caller of the
+     * notification-URL registration methods from the request cookie (GHSA-w858-46wv-v45w)
+     * without changing the JAXRPC method contract.
+     *
+     * @return the SSO cookie string, or {@code null} if the app token or cookie name is
+     *     unavailable (in which case no cookie is sent).
+     */
+    public static String getAppSSOTokenCookie() {
+        try {
+            SSOToken appToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            if (appToken == null) {
+                return null;
+            }
+            String cookieName = SystemProperties.get(Constants.AM_COOKIE_NAME);
+            if (cookieName == null || cookieName.isEmpty()) {
+                return null;
+            }
+            return cookieName + "=" + appToken.getTokenID().toString();
+        } catch (Throwable t) {
+            if (debug.warningEnabled()) {
+                debug.warning("JAXRPCUtil.getAppSSOTokenCookie: unable to obtain app token", t);
+            }
+            return null;
+        }
     }
 }
