@@ -46,6 +46,7 @@ import java.security.cert.X509Certificate;
 
 import org.forgerock.openam.ldap.LDAPRequests;
 import org.forgerock.opendj.ldap.Attribute;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
@@ -305,15 +306,13 @@ public class AMCertStore {
      * @return searchFilter
      */
     public static String setSearchFilter(String attrName, String attrValue) {
-        String searchFilter = new StringBuffer(128).append("(")
-                    .append(attrName).append("=")
-                    .append(attrValue).append(")").toString();
- 
+        String searchFilter = Filter.equality(attrName, attrValue).toString();
+
         if (debug.messageEnabled()) {
             debug.message("AMCertStore.setSearchFilter : " +
                 "ldc.search: using this filter: " + searchFilter);
         }
-                
+
         return searchFilter;
     }
 
