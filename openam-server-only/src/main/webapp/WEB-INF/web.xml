@@ -98,6 +98,10 @@
         <filter-class>com.sun.identity.rest.AuthNFilter</filter-class>
     </filter>
     <filter>
+        <filter-name>JAXRPCRequestFilter</filter-name>
+        <filter-class>com.sun.identity.jaxrpc.JAXRPCRequestFilter</filter-class>
+    </filter>
+    <filter>
         <filter-name>AuthZFilter</filter-name>
         <filter-class>com.sun.identity.rest.AuthZFilter</filter-class>
     </filter>
@@ -225,6 +229,10 @@
     <filter-mapping>
         <filter-name>AuthNFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>JAXRPCRequestFilter</filter-name>
+        <url-pattern>/jaxrpc/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AuthZFilter</filter-name>

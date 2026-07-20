@@ -1233,6 +1233,8 @@ All of these endpoints are associated with link:http://www.forgerock.org/securit
 
 `/jaxrpc/*, /identityservices/*`::
 These endpoints provide information on configured web services, including the port name, status, URL, and implementation class. Both endpoints show the same data. The IdentityServices servlet name points to the following description: "Web Service Endpoint - Identity Services".
++
+As of link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-w858-46wv-v45w[OpenAM Security Advisory GHSA-w858-46wv-v45w, window=\_blank], the notification-URL registration methods exposed under `/jaxrpc/*` (`registerNotificationURL` and `registerNotificationURL_idrepo`) require the caller to be authenticated as a server or an agent. The caller's SSO token is read from the request cookie and must be an administrative (server) token or an application (agent) session; otherwise the registration is rejected. This prevents an unauthenticated caller from registering an arbitrary callback URL and turning the endpoint into a persistent server-side request forgery (SSRF) vector, whereby OpenAM would issue HTTP POST requests to that URL on every configuration change. To restore the previous, unauthenticated behavior at runtime (for example, for legacy remote clients that do not send an SSO cookie), set the advanced server property `org.openidentityplatform.notification.register.skip-auth-check` to `true`.
 
 `/SMSServlet`::
 Includes system configuration information when available, as documented in the comments to the `AMSystemConfig.java` file.
