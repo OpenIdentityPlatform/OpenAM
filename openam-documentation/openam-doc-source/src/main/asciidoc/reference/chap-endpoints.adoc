@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -1200,6 +1200,8 @@ Implements the `CacheForAMonth`. This filter implements the `org.forgerock.opena
 
 `/ws/*`::
 Implements the `AuthNFilter` and `AuthZFilter`. These filters implement the `com.sun.identity.rest.AuthNFilter` and `com.sun.identity.rest.AuthZFilter` filter classes.
++
+The `/ws/1/entitlement/listener` resource registers a callback URL that OpenAM sends an HTTP POST to whenever an entitlement policy changes. To prevent server-side request forgery (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-g499-5qm8-4grm[GHSA-g499-5qm8-4grm, window=\_blank]), a registered listener URL must use the `http` or `https` scheme and must not resolve to a loopback, link-local (including the cloud metadata range `169.254.0.0/16`), private/site-local, or multicast address; unsafe URLs are rejected at registration and are never contacted when notifications are sent. To restore the previous, unrestricted behavior at runtime — for example, when the listener endpoint is hosted on an internal address — set the advanced server property `org.openidentityplatform.entitlement.listener.allow-any-url` to `true`.
 
 `/login`::
 With the help of the `LoginLogoutMapping.java` file, this would forward to the `/UI/Login.jsp` endpoint.
@@ -1233,6 +1235,8 @@ All of these endpoints are associated with link:http://www.forgerock.org/securit
 
 `/jaxrpc/*, /identityservices/*`::
 These endpoints provide information on configured web services, including the port name, status, URL, and implementation class. Both endpoints show the same data. The IdentityServices servlet name points to the following description: "Web Service Endpoint - Identity Services".
++
+As of link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-w858-46wv-v45w[OpenAM Security Advisory GHSA-w858-46wv-v45w, window=\_blank], the notification-URL registration methods exposed under `/jaxrpc/*` (`registerNotificationURL` and `registerNotificationURL_idrepo`) require the caller to be authenticated as a server or an agent. The caller's SSO token is read from the request cookie and must be an administrative (server) token or an application (agent) session; otherwise the registration is rejected. This prevents an unauthenticated caller from registering an arbitrary callback URL and turning the endpoint into a persistent server-side request forgery (SSRF) vector, whereby OpenAM would issue HTTP POST requests to that URL on every configuration change. To restore the previous, unauthenticated behavior at runtime (for example, for legacy remote clients that do not send an SSO cookie), set the advanced server property `org.openidentityplatform.notification.register.skip-auth-check` to `true`.
 
 `/SMSServlet`::
 Includes system configuration information when available, as documented in the comments to the `AMSystemConfig.java` file.
@@ -1432,9 +1436,13 @@ This endpoint is also gated by the advanced server property `com.sun.identity.li
 
 `/idffwriter, /saml2writer`::
 Used by a servlet with a matching name (`idffwriter`, `saml2writer`). Associated with the `CookieWriterServlet` class. Used by the IDP to help the web container find app-specific info, such as Java classes or Java Archives (JARs).
++
+This endpoint redirects to the URL supplied in the `RelayState` parameter. To prevent it from being abused as an open redirect (GHSA-2pf8-52jh-5x3m), only relative URLs, same-origin URLs, and URLs matching the advanced server property `org.openidentityplatform.openam.idpdiscovery.relaystate.whitelist` are accepted; other targets are rejected with HTTP 400. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the server configuration reference.
 
 `/idffreader, /saml2reader`::
 Used by a servlet with a matching name (`idffreader`, `saml2reader`). Associated with the `CookieReaderServlet` class. Used by the SP to help find the preferred IDP.
++
+This endpoint also redirects to the URL supplied in the `RelayState` parameter, and applies the same redirect-URL validation described above for the writer endpoints.
 
 `/multiprotocolrelay`::
 Used by a servlet named `MultiProtocolRelayServlet`. Associated with the `MultiProtocolRelayServlet` class. Also used in federation as a RelayState to continue to the next protocol.

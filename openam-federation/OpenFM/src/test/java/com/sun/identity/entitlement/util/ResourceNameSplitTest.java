@@ -44,7 +44,7 @@ import org.testng.annotations.Test;
  */
 public class ResourceNameSplitTest {
     @Test
-    public boolean testHost() 
+    public void testHost()
         throws Exception {
         ResourceNameSplitter splitter = new ResourceNameSplitter();
         Map<String, Set<String>> map = parseResource("resourceNameSplitHost");
@@ -53,35 +53,31 @@ public class ResourceNameSplitTest {
             ResourceSearchIndexes comp = splitter.getIndexes(k, null);
             Set<String> results = comp.getHostIndexes();
             if (!results.equals(set)) {
-                String msg = "ResourceNameSplitTest.testHost: " + k + 
+                String msg = "ResourceNameSplitTest.testHost: " + k +
                     " failed.";
                 UnittestLog.logError(msg);
                 throw new Exception(msg);
             }
         }
-        
-        return true;
     }
 
     @Test
-    public boolean testPath() 
+    public void testPath()
         throws Exception {
         ResourceNameSplitter splitter = new ResourceNameSplitter();
         Map<String, Set<String>> map = parseResource("resourceNameSplitURI");
         for (String k : map.keySet()) {
             Set<String> set = map.get(k);
-            
+
             ResourceSearchIndexes comp = splitter.getIndexes(k, null);
             Set<String> results = comp.getPathIndexes();
             if (!results.equals(set)) {
-                String msg = "ResourceNameSplitTest.testPath: " + k + 
+                String msg = "ResourceNameSplitTest.testPath: " + k +
                     " failed.";
                 UnittestLog.logError(msg);
                 throw new Exception(msg);
             }
         }
-        
-        return true;
     }
     
     private Map<String, Set<String>> parseResource(String rbName) {

@@ -25,6 +25,7 @@
  * $Id: SMSJAXRPCObject.java,v 1.21 2009/10/28 04:24:26 hengming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.sm.jaxrpc;
@@ -528,9 +529,11 @@ public class SMSJAXRPCObject extends SMSObject implements SMSObjectListener {
                     PLLClient.addNotificationHandler(
                         JAXRPCUtil.SMS_SERVICE,
                         new SMSNotificationHandler());
-                    // Register for notification with SMS Server
+                    // Register for notification with SMS Server. Send the app (server/agent)
+                    // SSO cookie so the server can authenticate this registration
+                    // (GHSA-w858-46wv-v45w).
                     client.send("registerNotificationURL",
-                        url.toString(), null, null);
+                        url.toString(), null, JAXRPCUtil.getAppSSOTokenCookie());
                     if (debug.messageEnabled()) {
                         debug.message("SMSJAXRPCObject: Using " +
                             "notification mechanism for cache updates: " + url);

@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.iplanet.am.sdk.remote;
 
@@ -59,6 +60,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.iplanet.ums.SearchControl;
 import com.iplanet.ums.SortKey;
 import com.sun.identity.idm.server.IdRepoJAXRPCObjectImpl;
+import com.sun.identity.jaxrpc.JAXRPCRequestFilter;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import java.util.concurrent.ConcurrentHashMap;
@@ -958,10 +960,27 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
     }
     
     public String registerNotificationURL(String url) throws RemoteException {
+       // Only a server or an agent may register a notification URL. This prevents
+       // unauthenticated callers from turning this endpoint into a stored SSRF
+       // (GHSA-w858-46wv-v45w).
+       if (!JAXRPCRequestFilter.isServerOrAgentAuthorized()) {
+           if (debug.warningEnabled()) {
+               debug.warning("DirectoryManagerImpl.registerNotificationURL: rejecting "
+                       + "unauthorized registration for URL: " + url);
+           }
+           return "0";
+       }
        return registerNotificationURL(url, notificationURLs);
     }
-    
+
     public void deRegisterNotificationURL(String notificationID) throws RemoteException {
+        if (!JAXRPCRequestFilter.isServerOrAgentAuthorized()) {
+            if (debug.warningEnabled()) {
+                debug.warning("DirectoryManagerImpl.deRegisterNotificationURL: rejecting "
+                        + "unauthorized deregistration for ID: " + notificationID);
+            }
+            return;
+        }
         synchronized (notificationURLs) {
             URL url = notificationURLs.remove(notificationID);
             if (url != null && debug.messageEnabled()) {

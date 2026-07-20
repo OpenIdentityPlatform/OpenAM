@@ -54,6 +54,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.jaxrpc.JAXRPCRequestFilter;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
@@ -693,6 +694,13 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     }
 
     public void deRegisterNotificationURL_idrepo(String notificationID) throws RemoteException {
+        if (!JAXRPCRequestFilter.isServerOrAgentAuthorized()) {
+            if (idRepoDebug.warningEnabled()) {
+                idRepoDebug.warning("IdRepoJAXRPCObjectImpl.deRegisterNotificationURL_idrepo: "
+                        + "rejecting unauthorized deregistration for ID: " + notificationID);
+            }
+            return;
+        }
         synchronized (idRepoNotificationURLs) {
             URL url = idRepoNotificationURLs.remove(notificationID);
             if (url != null && idRepoDebug.messageEnabled()) {
@@ -744,6 +752,16 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     }
 
     public String registerNotificationURL_idrepo(String url) throws RemoteException {
+        // Only a server or an agent may register a notification URL. This prevents
+        // unauthenticated callers from turning this endpoint into a stored SSRF
+        // (GHSA-w858-46wv-v45w).
+        if (!JAXRPCRequestFilter.isServerOrAgentAuthorized()) {
+            if (idRepoDebug.warningEnabled()) {
+                idRepoDebug.warning("IdRepoJAXRPCObjectImpl.registerNotificationURL_idrepo: "
+                        + "rejecting unauthorized registration for URL: " + url);
+            }
+            return "0";
+        }
         return registerNotificationURL(url, idRepoNotificationURLs);
     }
 

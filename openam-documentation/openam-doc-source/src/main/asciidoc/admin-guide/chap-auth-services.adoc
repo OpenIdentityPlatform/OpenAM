@@ -1357,6 +1357,9 @@ Match Certificate in LDAP::
 When enabled, OpenAM searches for a match for the user's certificate in the LDAP directory. If a match is found and not revoked according to a CRL or OCSP validation, then authentication succeeds.
 
 +
+Attribute values extracted from the certificate Subject DN are escaped per RFC 4515 before being placed into the LDAP search filter, so DN values containing filter metacharacters (`*`, `(`, `)`, `\`) cannot alter the filter.
+
++
 `ssoadm` attribute: `iplanet-am-auth-cert-check-cert-in-ldap`
 
 Subject DN Attribute Used to Search LDAP for Certificates::
@@ -1379,6 +1382,9 @@ Indicates which attribute and value in the certificate Issuer DN is used to find
 
 +
 Default: CN
+
++
+Issuer DN attribute values are escaped per RFC 4515 before being placed into the LDAP search filter.
 
 +
 If only one attribute is specified, the LDAP search filter used to find the CRL based on the Subject DN of the CA certificate is `(attr-name=attr-value-in-subject-DN)`.

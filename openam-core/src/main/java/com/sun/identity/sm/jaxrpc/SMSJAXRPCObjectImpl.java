@@ -43,6 +43,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.jaxrpc.JAXRPCRequestFilter;
 import com.sun.identity.jaxrpc.JAXRPCUtil;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -565,6 +566,16 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
         initialize();
         // Default value if there are any issues with the registration process.
         String id = "0";
+        // Only a server or an agent may register a notification URL. This prevents
+        // unauthenticated callers from turning this endpoint into a stored SSRF
+        // (GHSA-w858-46wv-v45w).
+        if (!JAXRPCRequestFilter.isServerOrAgentAuthorized()) {
+            if (debug.warningEnabled()) {
+                debug.warning("SMSJAXRPCObjectImpl.registerNotificationURL: rejecting "
+                        + "unauthorized registration for URL: " + url);
+            }
+            return id;
+        }
         try {
             // Check URL is not the local server
             if (!url.toLowerCase().startsWith(serverURL)) {
@@ -623,6 +634,13 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
     }
 
     public void deRegisterNotificationURL(String id) throws RemoteException {
+        if (!JAXRPCRequestFilter.isServerOrAgentAuthorized()) {
+            if (debug.warningEnabled()) {
+                debug.warning("SMSJAXRPCObjectImpl.deRegisterNotificationURL: rejecting "
+                        + "unauthorized deregistration for ID: " + id);
+            }
+            return;
+        }
         synchronized (notificationURLs) {
             URL url = notificationURLs.remove(id);
             if (url != null && debug.messageEnabled()) {

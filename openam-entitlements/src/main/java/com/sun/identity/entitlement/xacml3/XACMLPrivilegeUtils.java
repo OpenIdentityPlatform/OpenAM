@@ -1272,7 +1272,7 @@ public class XACMLPrivilegeUtils {
                 > XACMLConstants.JSON_SUBJECT_DATATYPE.length()) {
             className = dataType.substring(
                     XACMLConstants.JSON_SUBJECT_DATATYPE.length() + 1);
-            Object ob = createDefaultObject(className);
+            Object ob = createDefaultObject(className, EntitlementSubject.class);
             if (ob != null && ob instanceof EntitlementSubject) {
                 es = (EntitlementSubject)ob;
             } else {
@@ -1301,7 +1301,7 @@ public class XACMLPrivilegeUtils {
                 > XACMLConstants.JSON_CONDITION_DATATYPE.length()) {
             className = dataType.substring(
                     XACMLConstants.JSON_CONDITION_DATATYPE.length() + 1);
-            Object ob = createDefaultObject(className);
+            Object ob = createDefaultObject(className, EntitlementCondition.class);
             if (ob != null && ob instanceof EntitlementCondition) {
                 ec = (EntitlementCondition)ob;
             } else {
@@ -1317,14 +1317,22 @@ public class XACMLPrivilegeUtils {
         return ec;
     }
 
-    static Object createDefaultObject(String className) {
+    static Object createDefaultObject(String className, Class<?> expectedType) {
         if (className == null) {
             return null;
         }
+        String trimmed = className.trim();
         Object ob = null;
         try {
-            Class cla = Class.forName(className.trim());
-            ob =  cla.newInstance();
+            // Load WITHOUT initialising so a malicious class's static initialisers cannot run
+            // before the type check; only real entitlement types may be instantiated.
+            Class<?> cla = Class.forName(trimmed, false, XACMLPrivilegeUtils.class.getClassLoader());
+            if (!expectedType.isAssignableFrom(cla)) {
+                PrivilegeManager.debug.error("XACMLPrivilegeUtils.createDefaultObject(),"
+                        + "rejected disallowed class: " + trimmed);
+                return null;
+            }
+            ob = cla.newInstance();
         } catch (ClassNotFoundException e) {
             PrivilegeManager.debug.error("XACMLPrivilegeUtils.createDefaultObject(),"
                     + "hit exception", e);

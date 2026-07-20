@@ -98,6 +98,10 @@
         <filter-class>com.sun.identity.rest.AuthNFilter</filter-class>
     </filter>
     <filter>
+        <filter-name>JAXRPCRequestFilter</filter-name>
+        <filter-class>com.sun.identity.jaxrpc.JAXRPCRequestFilter</filter-class>
+    </filter>
+    <filter>
         <filter-name>AuthZFilter</filter-name>
         <filter-class>com.sun.identity.rest.AuthZFilter</filter-class>
     </filter>
@@ -227,6 +231,10 @@
         <url-pattern>/ws/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
+        <filter-name>JAXRPCRequestFilter</filter-name>
+        <url-pattern>/jaxrpc/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
         <filter-name>AuthZFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>
     </filter-mapping>
@@ -343,7 +351,7 @@
         <servlet-name>ws</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
+            <param-name>jakarta.ws.rs.Application</param-name>
             <param-value>com.sun.identity.rest.RestService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -634,7 +642,7 @@
         <servlet-name>federationrest</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
+            <param-name>jakarta.ws.rs.Application</param-name>
             <param-value>com.sun.identity.rest.FederationRestService</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>

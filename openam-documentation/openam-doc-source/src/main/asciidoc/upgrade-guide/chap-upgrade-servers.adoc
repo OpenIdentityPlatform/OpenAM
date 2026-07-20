@@ -54,6 +54,13 @@ Two related advanced server properties were also introduced and now default to a
 If your deployment depends on the previous (insecure) behaviour, review and adjust these properties before promoting the upgrade. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
 ====
 
+[IMPORTANT]
+====
+Starting with this release the SAML 2.0 and ID-FF IDP discovery reader and writer endpoints (`/saml2reader`, `/saml2writer`, `/idffreader`, `/idffwriter`) validate the `RelayState` redirect URL as part of the GHSA-2pf8-52jh-5x3m hardening. Relative and same-origin redirect URLs continue to work unchanged. Absolute URLs that point to a *different* host are now rejected with HTTP 400 unless they match the new advanced server property `org.openidentityplatform.openam.idpdiscovery.relaystate.whitelist` (a semicolon-separated list of URL patterns, empty by default).
+
+If your common-domain discovery deployment hosts service providers on a different host than OpenAM, add their return URLs to this property before promoting the upgrade. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====

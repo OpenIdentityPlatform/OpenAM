@@ -25,6 +25,7 @@
  * $Id: CRLValidator.java,v 1.3 2008/06/25 05:52:58 qcheng Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.security.cert;
 
@@ -131,8 +132,12 @@ public class CRLValidator {
         boolean certgood = true;
 
     	try {
+            if (!new AMCertPath(null).verify(new X509Certificate[]{cert}, false, false)) {
+                debug.error(method + "trust chain verify failed, rejecting before CRL fetch.");
+                return certgood = false;
+            }
             Vector crls = new Vector();
-            X509CRL crl = 
+            X509CRL crl =
                AMCRLStore.getCRL(ldapParams, cert, crlSearchAttr);
 
             if (crl != null) {
@@ -171,11 +176,26 @@ public class CRLValidator {
     
     /**
      * Get certificate revocation list from cofigured ldap store
-     * @param cert cert to be validated 
+     * @param cert cert to be validated
      * @return crl if ldap store configured with crl
+     * @deprecated Has no callers. Use {@link #validateCertificate(X509Certificate, boolean)}
+     *             instead; a CRL Distribution Point fetch must never run for a certificate
+     *             that has not passed the trust-chain check.
      */
+    @Deprecated
     static public X509CRL getCRL(X509Certificate cert) {
         X509CRL crl = null;
+        // Same SSRF guard as validateCertificate(): the CRL DP fetch inside
+        // AMCRLStore.getCRL() follows a URL taken from the certificate itself.
+        try {
+            if (!new AMCertPath(null).verify(new X509Certificate[]{cert}, false, false)) {
+                debug.error("CRLValidator.getCRL: trust chain verify failed, rejecting before CRL fetch.");
+                return null;
+            }
+        } catch (Exception e) {
+            debug.error("CRLValidator.getCRL: trust chain verify failed.", e);
+            return null;
+        }
         //Get the CN of the input certificate
         String attrValue = CertUtils.getAttributeValue(cert.getIssuerX500Principal(), crlSearchAttr);
 
