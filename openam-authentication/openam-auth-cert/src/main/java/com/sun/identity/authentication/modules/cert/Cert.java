@@ -67,11 +67,8 @@ import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.encode.Base64;
 
-import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
-import sun.security.util.ObjectIdentifier;
 import sun.security.x509.CertificateExtensions;
-import sun.security.x509.DistributionPoint;
 import sun.security.x509.GeneralName;
 import sun.security.x509.GeneralNameInterface;
 import sun.security.x509.GeneralNames;
@@ -491,6 +488,10 @@ public class Cert extends AMLoginModule {
     	int ret = ISAuthConstants.LOGIN_IGNORE;
 		
     	try {
+            if (!new AMCertPath(null).verify(allCerts, false, false)) {
+                debug.error("Cert.doJCERevocationValidation: trust chain verify failed, rejecting before CRL fetch.");
+                return ret;
+            }
             Vector crls = new Vector();
             for (X509Certificate cert : allCerts) {
                 X509CRL crl = AMCRLStore.getCRL(ldapParam, cert, amAuthCert_chkAttributesCRL);
