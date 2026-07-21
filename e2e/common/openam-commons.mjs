@@ -25,6 +25,11 @@ export async function getAdminToken(request) {
     return getAuthToken(request, ADMIN_USER, ADMIN_PASS)
 }
 
+// Resolves the SSO tokenId from the /json/authenticate response body. Note this only works when the
+// session cookie is NOT HttpOnly, or when org.openidentityplatform.openam.httponly.allowTokenInBody
+// is enabled: in the default HttpOnly deployment the token is delivered solely via Set-Cookie and is
+// not echoed in the body, so this helper returns undefined. Specs that rely on it must run against a
+// server with HttpOnly disabled (see the CI matrix in .github/workflows/build.yml).
 export async function getAuthToken(request, username, password) {
   const resp = await request.post(`${OPENAM_BASE}/json/authenticate`, {
     headers: { 

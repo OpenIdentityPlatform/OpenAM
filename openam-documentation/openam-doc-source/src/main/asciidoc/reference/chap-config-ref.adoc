@@ -5624,7 +5624,7 @@ When set to `true`, mark cookies as HttpOnly to prevent scripts and third-party 
 Both the classic UI and the XUI support HttpOnly session cookies. When HttpOnly is enabled, the XUI relies on the automatically sent cookie instead of reading the token from JavaScript, and a successful `/json/authenticate` response delivers the token only through the `Set-Cookie` header (the `tokenId` is, by default, no longer returned in the response body). See `org.openidentityplatform.openam.httponly.allowTokenInBody` to control that behaviour.
 
 +
-Default: `false`
+Default: `true`
 
 `com.sun.identity.enableUniqueSSOTokenCookie`::
 If `true`, then OpenAM is using protection against cookie hijacking.
