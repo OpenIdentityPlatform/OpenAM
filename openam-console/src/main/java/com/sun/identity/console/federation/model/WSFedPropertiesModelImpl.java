@@ -386,9 +386,17 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
                         ((TokenIssuerEndpointElement)o).getValue().getAddress().
                             setValue(tknissEndPt);
                     } else if (o instanceof TokenIssuerNameElement) {
-                        AttributeExtensibleURI attr = new AttributeExtensibleURI();
-                        attr.setValue(tknissName);
-                        ((TokenIssuerNameElement)o).setValue(attr);
+                        TokenIssuerNameElement issuerName =
+                            (TokenIssuerNameElement)o;
+                        if (issuerName.getValue() != null) {
+                            // mutate in place to keep any extensible attributes
+                            issuerName.getValue().setValue(tknissName);
+                        } else {
+                            AttributeExtensibleURI attr =
+                                new AttributeExtensibleURI();
+                            attr.setValue(tknissName);
+                            issuerName.setValue(attr);
+                        }
                     }
                 }
                 metaManager.setFederation(realm, fedElem);

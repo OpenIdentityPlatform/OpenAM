@@ -438,4 +438,55 @@ public final class WSFederationMetaUtils {
         }
         return endpointBaseUrl;
     }
+
+    /**
+     * Returns the value of the <code>&lt;TokenSigningCertificate&gt;</code>
+     * element for the given standard metadata.
+     * @param fed The standard metadata for the entity.
+     * @return byte array containing the decoded value of the
+     * <code>&lt;TokenSigningCertificate&gt;</code> element
+     */
+    public static byte[] findTokenSigningCertificate(
+        com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement fed)
+    {
+        for ( Object o: fed.getValue().getAny() )
+        {
+            if ( o instanceof
+                com.sun.identity.wsfederation.jaxb.wsfederation.TokenSigningKeyInfoElement )
+            {
+                com.sun.identity.wsfederation.jaxb.wsse.SecurityTokenReferenceType str =
+                    ((com.sun.identity.wsfederation.jaxb.wsfederation.TokenSigningKeyInfoElement)o)
+                        .getValue().getSecurityTokenReference().getValue();
+                for ( Object o1: str.getAny() )
+                {
+                    // lax any content unmarshals X509Data as the element wrapper, not the raw type
+                    com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType x509Data = null;
+                    if ( o1 instanceof com.sun.identity.wsfederation.jaxb.xmlsig.X509DataElement )
+                    {
+                        x509Data = ((com.sun.identity.wsfederation.jaxb.xmlsig.X509DataElement)o1)
+                            .getValue();
+                    }
+                    else if ( o1 instanceof com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType )
+                    {
+                        x509Data = (com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType)o1;
+                    }
+                    if ( x509Data != null )
+                    {
+                        for ( Object o2:
+                            x509Data.getX509IssuerSerialOrX509SKIOrX509SubjectName())
+                        {
+                            if ( o2 instanceof
+                                com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType.X509Certificate )
+                            {
+                                return ((com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType.X509Certificate)o2)
+                                    .getValue();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
 }

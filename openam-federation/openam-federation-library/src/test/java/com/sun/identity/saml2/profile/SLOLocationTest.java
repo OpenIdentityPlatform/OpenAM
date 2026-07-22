@@ -18,9 +18,12 @@
 package com.sun.identity.saml2.profile;
 
 import static com.sun.identity.saml2.common.SAML2Constants.*;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.jaxb.metadata.SingleLogoutServiceElement;
+import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.*;
 import org.testng.annotations.Test;
 
@@ -76,6 +79,36 @@ public class SLOLocationTest {
         assertThat(result.getValue().getBinding()).isEqualTo(SOAP);
         result = LogoutUtil.getMostAppropriateSLOServiceLocation(endpoints, HTTP_POST);
         assertThat(result.getValue().getBinding()).isEqualTo(SOAP);
+    }
+
+    public void sloServiceLocationFoundForWrappedAndUnwrappedLists() {
+        List<SingleLogoutServiceElement> endpoints = new ArrayList<SingleLogoutServiceElement>();
+        endpoints.add(endpointFor(HTTP_REDIRECT, "redirect"));
+        endpoints.add(endpointFor(SOAP, "soap"));
+
+        // metadata callers pass the element wrappers straight from getSingleLogoutService()
+        assertThat(LogoutUtil.getSLOServiceLocation(endpoints, SOAP)).isEqualTo("soap");
+        assertThat(LogoutUtil.getSLOServiceLocation(endpoints, HTTP_POST)).isNull();
+
+        // the session listeners pass the unwrapped EndpointType list required by doLogout
+        List<EndpointType> unwrapped = endpoints.stream()
+                .map(JAXBElement::getValue).collect(Collectors.toList());
+        assertThat(LogoutUtil.getSLOServiceLocation(unwrapped, SOAP)).isEqualTo("soap");
+        assertThat(LogoutUtil.getSLOServiceLocation(unwrapped, HTTP_POST)).isNull();
+    }
+
+    public void sloResponseServiceLocationFoundForWrappedAndUnwrappedLists() {
+        SingleLogoutServiceElement soap = endpointFor(SOAP, "soap");
+        soap.getValue().setResponseLocation("soap-response");
+        List<SingleLogoutServiceElement> endpoints = new ArrayList<SingleLogoutServiceElement>();
+        endpoints.add(endpointFor(HTTP_REDIRECT, "redirect"));
+        endpoints.add(soap);
+
+        assertThat(LogoutUtil.getSLOResponseServiceLocation(endpoints, SOAP)).isEqualTo("soap-response");
+
+        List<EndpointType> unwrapped = endpoints.stream()
+                .map(JAXBElement::getValue).collect(Collectors.toList());
+        assertThat(LogoutUtil.getSLOResponseServiceLocation(unwrapped, SOAP)).isEqualTo("soap-response");
     }
 
     private SingleLogoutServiceElement endpointFor(String binding, String location) {

@@ -881,7 +881,7 @@ public class AttributeQueryUtil {
                 List<Object> newValues = new ArrayList<>();
                 for(Iterator<AttributeValueElement> iterV = jaxbValues.iterator(); iterV.hasNext();) {
                     AttributeValueElement jaxbValeu = iterV.next();
-                    Object content = jaxbValeu.getValue();
+                    String content = SAML2Utils.getAttributeValueString(jaxbValeu);
                     if (content != null) {
                         newValues.add(content);
                     }
@@ -1028,7 +1028,7 @@ public class AttributeQueryUtil {
         for(Iterator<AttributeValueElement> iter = attrValuesS.iterator(); iter.hasNext(); ) {
             AttributeValueElement attrValueElem =
                     iter.next();
-            valuesS.add(attrValueElem.getValue());
+            valuesS.add(SAML2Utils.getAttributeValueString(attrValueElem));
         }
 
         try {

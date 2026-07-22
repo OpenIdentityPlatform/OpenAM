@@ -39,6 +39,7 @@ import com.sun.identity.federation.common.FSException;
 import com.sun.identity.federation.common.FSRedirectException;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.message.FSAuthnRequest;
 import com.sun.identity.federation.meta.IDFFMetaException;
 import com.sun.identity.federation.meta.IDFFMetaManager;
@@ -243,8 +244,10 @@ public class FSIDPFinderService extends HttpServlet {
                 IDFFMetaManager metaManager = FSUtils.getIDFFMetaManager();
                 List cotList = null;
                 if (metaManager != null) {
-                    BaseConfigType spConfig = 
-                        metaManager.getSPDescriptorConfig(realm, entityID).getValue();
+                    SPDescriptorConfigElement spConfigElement =
+                        metaManager.getSPDescriptorConfig(realm, entityID);
+                    BaseConfigType spConfig = (spConfigElement == null)
+                        ? null : spConfigElement.getValue();
                     cotList = IDFFMetaUtils.getAttributeValueFromConfig(
                         spConfig, IFSConstants.COT_LIST);
                 }

@@ -472,9 +472,13 @@ public class NameIDMapping {
         RoleDescriptorType roled = null;
 
         if (role.equals(SAML2Constants.SP_ROLE)) {
-            roled = metaManager.getSPSSODescriptor(realm, entityID).getValue();
+            SPSSODescriptorElement spDescriptor =
+                metaManager.getSPSSODescriptor(realm, entityID);
+            roled = (spDescriptor == null) ? null : spDescriptor.getValue();
         } else {
-            roled = metaManager.getIDPSSODescriptor(realm, entityID).getValue();
+            IDPSSODescriptorElement idpDescriptor =
+                metaManager.getIDPSSODescriptor(realm, entityID);
+            roled = (idpDescriptor == null) ? null : idpDescriptor.getValue();
         }
 
         EncInfo encInfo = KeyUtil.getEncInfo(roled, entityID, role);

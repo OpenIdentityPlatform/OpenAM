@@ -4586,4 +4586,33 @@ public class SAML2Utils extends SAML2SDKUtils {
     public static String getSingleValuedSessionProperty(Object session, String propertyName) throws SessionException {
         return SessionManager.getProvider().getProperty(session, propertyName)[0];
     }
+
+    /**
+     * Returns the text value of an unmarshalled SAML attribute value.
+     * <p>
+     * The generated {@code AttributeValueElement} is bound to {@code xs:anyType}, so an unmarshalled
+     * value is a DOM node whose {@code toString()} is not the attribute text; values built
+     * programmatically may carry a plain {@code String} instead. JAXB1 exposed the text content
+     * directly, and callers comparing attribute values still expect strings.
+     *
+     * @param attributeValue an {@code AttributeValueElement}, a {@code JAXBElement} payload, a DOM
+     *        node or a {@code String}; may be {@code null}.
+     * @return the text content of the attribute value, or {@code null} if none.
+     */
+    public static String getAttributeValueString(Object attributeValue) {
+        Object content = attributeValue;
+        while (content instanceof JAXBElement) {
+            content = ((JAXBElement<?>) content).getValue();
+        }
+        if (content == null) {
+            return null;
+        }
+        if (content instanceof String) {
+            return (String) content;
+        }
+        if (content instanceof org.w3c.dom.Node) {
+            return ((org.w3c.dom.Node) content).getTextContent();
+        }
+        return content.toString();
+    }
 }

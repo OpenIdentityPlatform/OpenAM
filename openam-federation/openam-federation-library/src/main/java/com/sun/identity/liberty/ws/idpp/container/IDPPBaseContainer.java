@@ -259,7 +259,12 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
         try {
             DSTMonthDay dstMonthDay =
                  IDPPUtils.getIDPPFactory().createDSTMonthDay();
-            XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(value);
+            // legacy directory values may lack the xs:gMonthDay "--" prefix
+            String monthDay = value.trim();
+            if (monthDay.matches("\\d{2}-\\d{2}")) {
+                monthDay = "--" + monthDay;
+            }
+            XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(monthDay);
             dstMonthDay.setValue(cal);
             return dstMonthDay;
         } catch(Exception e) {
@@ -431,9 +436,12 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
       */
      protected Map getAnalyzedNameMap(Object obj, Map map) throws IDPPException{
         IDPPUtils.debug.message("IDPPBaseContainer:getAnalyzedNameMap:Init");
-        
+
         DSTString fn = null, sn= null, mn= null, pt = null;
-        if(obj != null) { 
+        if(obj instanceof JAXBElement) {
+           obj = ((JAXBElement<?>)obj).getValue();
+        }
+        if(obj != null) {
            if(obj instanceof AnalyzedNameType) {
               AnalyzedNameType analyzedName = (AnalyzedNameType)obj;
               fn = jaxbValue(analyzedName.getFN());

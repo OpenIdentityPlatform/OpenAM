@@ -357,7 +357,8 @@ public class SAML2SingleLogoutHandler implements SingleLogoutHandler {
                 LogoutUtil.doLogout(idpMetaAlias,
                     spEntityID, slosList, null, SAML2Constants.SOAP,
                     relayState, sessIndex[0], pair.getNameID(), request,
-                    response, paramsMap, spConfig.getValue());
+                    response, paramsMap,
+                    (spConfig == null) ? null : spConfig.getValue());
             } catch (SAML2Exception ex) {
                 debug.error("SAML2SLOHandler:handleSOAPSLO.doLogout" , ex);
                 soapFailCount++;

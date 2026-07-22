@@ -48,6 +48,7 @@ import java.util.logging.Level;
 import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorElement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.soap.SOAPException;
 import jakarta.xml.soap.SOAPMessage;
 
@@ -645,13 +646,13 @@ public class LogoutUtil {
                 "Number of single logout services = " +
                 n);
         }
-        SingleLogoutServiceElement slos = null;
+        EndpointType slos = null;
         String location = null;
         String binding = null;
         for (int i=0; i<n; i++) {
-            slos = (SingleLogoutServiceElement)sloList.get(i);
+            slos = toEndpointType(sloList.get(i));
             if (slos != null) {
-                binding = slos.getValue().getBinding();
+                binding = slos.getBinding();
             }
             if (debug.messageEnabled()) {
                 debug.message(
@@ -660,7 +661,7 @@ public class LogoutUtil {
                     binding);
             }
             if ((binding != null) && (binding.equals(desiredBinding))) {
-                location = slos.getValue().getLocation();
+                location = slos.getLocation();
                 if (debug.messageEnabled()) {
                     debug.message(
                         classMethod +
@@ -671,6 +672,18 @@ public class LogoutUtil {
             }
         }
         return location;
+    }
+
+    /**
+     * Normalizes a single logout service list item: callers pass either the metadata element wrappers
+     * ({@code SingleLogoutServiceElement extends JAXBElement<EndpointType>}) or already unwrapped
+     * {@code EndpointType} instances.
+     */
+    private static EndpointType toEndpointType(Object slo) {
+        if (slo instanceof JAXBElement) {
+            return (EndpointType) ((JAXBElement<?>) slo).getValue();
+        }
+        return (EndpointType) slo;
     }
 
     /**
@@ -692,13 +705,13 @@ public class LogoutUtil {
                 "Number of single logout services = " +
                 n);
         }
-        SingleLogoutServiceElement slos = null;
+        EndpointType slos = null;
         String resLocation = null;
         String binding = null;
         for (int i=0; i<n; i++) {
-            slos = (SingleLogoutServiceElement)sloList.get(i);
+            slos = toEndpointType(sloList.get(i));
             if (slos != null) {
-                binding = slos.getValue().getBinding();
+                binding = slos.getBinding();
             }
             if (debug.messageEnabled()) {
                 debug.message(
@@ -707,7 +720,7 @@ public class LogoutUtil {
                     binding);
             }
             if ((binding != null) && (binding.equals(desiredBinding))) {
-                resLocation = slos.getValue().getResponseLocation();
+                resLocation = slos.getResponseLocation();
                 if (debug.messageEnabled()) {
                     debug.message(
                         classMethod +

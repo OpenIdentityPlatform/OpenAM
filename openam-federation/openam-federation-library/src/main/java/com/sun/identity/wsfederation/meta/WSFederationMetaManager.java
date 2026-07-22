@@ -57,12 +57,8 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerEndpointElement;
 import com.sun.identity.wsfederation.jaxb.wsfederation.TokenIssuerNameElement;
-import com.sun.identity.wsfederation.jaxb.wsfederation.TokenSigningKeyInfoElement;
 import com.sun.identity.wsfederation.jaxb.wsfederation.UriNamedClaimTypesOfferedElement;
 import com.sun.identity.wsfederation.logging.LogUtil;
-import com.sun.identity.wsfederation.jaxb.wsse.SecurityTokenReferenceType;
-import com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType;
-import com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType.X509Certificate;
 import jakarta.xml.bind.JAXBElement;
 
 /**
@@ -1357,32 +1353,7 @@ public class WSFederationMetaManager {
      */
     public byte[] getTokenSigningCertificate(FederationElement fed)
     {
-        // Just return first TokenIssuerName in the Federation
-        for ( Object o: fed.getValue().getAny() )
-        {
-            if ( o instanceof TokenSigningKeyInfoElement )
-            {
-                SecurityTokenReferenceType str =
-                    ((TokenSigningKeyInfoElement)o).getValue().getSecurityTokenReference().getValue();
-                for ( Object o1: str.getAny() )
-                {
-                    if ( o1 instanceof X509DataType )
-                    {
-                        for ( Object o2: 
-                            ((X509DataType)o1).
-                            getX509IssuerSerialOrX509SKIOrX509SubjectName())
-                        {
-                            if ( o2 instanceof X509Certificate )
-                            {
-                                return ((X509Certificate)o2).getValue();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        return null;
+        return WSFederationMetaUtils.findTokenSigningCertificate(fed);
     }
     
     /**

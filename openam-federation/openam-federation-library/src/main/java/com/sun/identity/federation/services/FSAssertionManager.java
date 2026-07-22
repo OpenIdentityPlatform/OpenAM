@@ -42,6 +42,7 @@ import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.LogUtil;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.message.FSAssertion;
 import com.sun.identity.federation.message.FSAssertionArtifact;
 import com.sun.identity.federation.message.FSAuthenticationStatement;
@@ -492,8 +493,10 @@ public final class FSAssertionManager {
         if (metaManager != null) {
             BaseConfigType idpConfig = null;
             try {
-                idpConfig = metaManager.getIDPDescriptorConfig(
-                    realm, hostEntityId).getValue();
+                IDPDescriptorConfigElement idpConfigElement =
+                    metaManager.getIDPDescriptorConfig(realm, hostEntityId);
+                idpConfig = (idpConfigElement == null)
+                    ? null : idpConfigElement.getValue();
             } catch (IDFFMetaException e) {
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message(

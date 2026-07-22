@@ -32,6 +32,7 @@
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
@@ -346,18 +347,24 @@ public class IDPPAddressCard extends IDPPBaseContainer {
            } 
 
         } else if(expContext.equals("Nick")
-            || expContext.equals("PostalAddress") 
+            || expContext.equals("PostalAddress")
             || expContext.equals("LComment")
-            || expContext.equals("L") 
+            || expContext.equals("L")
             || expContext.equals("St")
             || expContext.equals("C")
             || expContext.equals("PostalCode") ) {
 
-           if(dataElement == null) {
+           // leaf PP elements have no generated element class: lax content
+           // unmarshals them as JAXBElement<DSTString>
+           Object leafElement = dataElement;
+           if(leafElement instanceof JAXBElement) {
+              leafElement = ((JAXBElement<?>)leafElement).getValue();
+           }
+           if(leafElement == null) {
               entry = modifyEntry(entry, expContext, null);
 
-           } else if(dataElement instanceof DSTString) {
-              DSTString dstString = (DSTString)dataElement;
+           } else if(leafElement instanceof DSTString) {
+              DSTString dstString = (DSTString)leafElement;
               entry =  modifyEntry(entry, expContext, dstString);
 
            } else {

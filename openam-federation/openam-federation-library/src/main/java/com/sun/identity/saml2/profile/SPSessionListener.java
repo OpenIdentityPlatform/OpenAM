@@ -259,6 +259,7 @@ public class SPSessionListener implements SessionListener {
         IDPSSOConfigElement idpConfig = sm.getIDPSSOConfig(realm, nameIdInfoKey.getRemoteEntityID());
 
         LogoutUtil.doLogout(metaAlias, nameIdInfoKey.getRemoteEntityID(), slosList, null, binding, null,
-                fedSession.idpSessionIndex, fedSession.info.getNameID(), null, null, paramsMap, idpConfig.getValue());
+                fedSession.idpSessionIndex, fedSession.info.getNameID(), null, null, paramsMap,
+                (idpConfig == null) ? null : idpConfig.getValue());
     }
 }

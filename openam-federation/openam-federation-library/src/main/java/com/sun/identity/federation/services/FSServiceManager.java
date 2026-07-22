@@ -35,6 +35,8 @@ import com.sun.identity.federation.accountmgmt.FSAccountManager;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.message.FSAuthnRequest;
 import com.sun.identity.federation.message.FSAuthnResponse;
 import com.sun.identity.federation.message.FSFederationTerminationNotification;
@@ -709,13 +711,19 @@ public class FSServiceManager {
                 if (remoteProviderRole.equalsIgnoreCase(IFSConstants.SP)) {
                     remoteDesc = metaManager.getSPDescriptor(
                         realm, remoteEntityId);
-                    remoteConfig = metaManager.getSPDescriptorConfig(
-                        realm, remoteEntityId).getValue();
+                    SPDescriptorConfigElement spConfig =
+                        metaManager.getSPDescriptorConfig(
+                            realm, remoteEntityId);
+                    remoteConfig =
+                        (spConfig == null) ? null : spConfig.getValue();
                 } else {
                     remoteDesc = metaManager.getIDPDescriptor(
                         realm, remoteEntityId);
-                    remoteConfig = metaManager.getIDPDescriptorConfig(
-                        realm, remoteEntityId).getValue();
+                    IDPDescriptorConfigElement idpConfig =
+                        metaManager.getIDPDescriptorConfig(
+                            realm, remoteEntityId);
+                    remoteConfig =
+                        (idpConfig == null) ? null : idpConfig.getValue();
                 }
                 handlerRegistration.setRealm(realm);
                 handlerRegistration.setRemoteEntityId(remoteEntityId);

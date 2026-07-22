@@ -210,7 +210,11 @@ public class FAMClassLoader {
         "com.sun.codemodel.",
         "com.sun.relaxng.",
         "com.sun.xml.xsom.",
-        "org.glassfish.jaxb.",
+        // the bundled 2009-era Metro jars carry their own javax-based JAXB2;
+        // jakarta.xml.bind/org.glassfish.jaxb are NOT in the child jars and
+        // must stay visible from the webapp classloader
+        "com.sun.xml.bind.",
+        "com.sun.xml.bind.v2.",
         "com.sun.xml.messaging.",
         "com.sun.xml.ws.",
         "com.sun.xml.ws.addressing.",
@@ -221,7 +225,7 @@ public class FAMClassLoader {
         "com.sun.xml.wss.",
         "com.sun.xml.security.",
         "com.sun.xml.xwss.",
-        "jakarta.xml.bind.",
+        "javax.xml.bind.",
         "javax.xml.ws.",
         "javax.jws.",
         "javax.jws.soap.",
@@ -249,7 +253,11 @@ public class FAMClassLoader {
         "com.sun.codemodel.",
         "com.sun.relaxng.",
         "com.sun.xml.xsom.",
-        "org.glassfish.jaxb.",
+        // the bundled 2009-era Metro jars carry their own javax-based JAXB2;
+        // jakarta.xml.bind/org.glassfish.jaxb are NOT in the child jars and
+        // must stay visible from the webapp classloader
+        "com.sun.xml.bind.",
+        "com.sun.xml.bind.v2.",
         "com.sun.xml.messaging.",
         "com.sun.xml.ws.",
         "com.sun.xml.ws.addressing.",
@@ -260,7 +268,7 @@ public class FAMClassLoader {
         "com.sun.xml.wss.",
         "com.sun.xml.security.",
         "com.sun.xml.xwss.",
-        "jakarta.xml.bind.",
+        "javax.xml.bind.",
         "javax.xml.ws.",
         "javax.jws.",
         "javax.jws.soap.",
@@ -286,10 +294,10 @@ public class FAMClassLoader {
      * classLoader from loading.
      */
     public static String[] maskedResouces = new String[]{
-        "META-INF/services/jakarta.xml.bind.JAXBContext",
+        "META-INF/services/javax.xml.bind.JAXBContext",
         "META-INF/services",
         "/META-INF/services",
-        "jakarta/xml/bind/",
+        "javax/xml/bind/",
         "com/sun/xml/ws/",
         "com/sun/xml/wss/",
         "com/sun/xml/bind/",
