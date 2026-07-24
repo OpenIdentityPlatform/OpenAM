@@ -96,8 +96,6 @@
     <commons-logging-api.version>1.1</commons-logging-api.version>
     <!--         <esapiport.version>2013-12-04</esapiport.version> -->
     <geoip.version>2.0.0</geoip.version>
-    <jaxb.version>2.2.11</jaxb.version>
-    <jaxb1.version>2.2.5-1</jaxb1.version>
     <jaxrpc-api.version>1.1</jaxrpc-api.version>
     <!--         <jaxrpc-impl.version>1.1.3_01-20160905</jaxrpc-impl.version> -->
     <jaxrpc-impl.version>1.1.3_01</jaxrpc-impl.version>
@@ -1728,6 +1726,16 @@
           <artifactId>netty-tcnative-boringssl-static</artifactId>
           <version>${netty-tcnative-boringssl.version}</version>
         </dependency>
+        <dependency>
+          <groupId>jakarta.xml.bind</groupId>
+          <artifactId>jakarta.xml.bind-api</artifactId>
+          <version>3.0.1</version>
+        </dependency>
+        <dependency>
+          <groupId>org.glassfish.jaxb</groupId>
+          <artifactId>jaxb-runtime</artifactId>
+          <version>3.0.2</version>
+        </dependency>
     </dependencies>
   </dependencyManagement>
   <!-- Build -->
@@ -2155,6 +2163,11 @@
 				<artifactId>jaxb2-maven-plugin</artifactId>
 				<version>3.2.0</version>
 			</plugin>
+            <plugin>
+              <groupId>org.jvnet.jaxb</groupId>
+              <artifactId>jaxb-maven-plugin</artifactId>
+              <version>3.0.2</version>
+            </plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>

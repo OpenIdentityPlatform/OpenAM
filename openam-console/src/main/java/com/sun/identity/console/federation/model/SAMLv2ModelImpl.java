@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.console.federation.model;
@@ -78,7 +78,8 @@ import com.sun.identity.saml2.jaxb.metadata.EncryptionMethodElement;
 import com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.console.federation.SAMLv2AuthContexts;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.xml.security.encryption.XMLCipher;
 import org.forgerock.openam.utils.StringUtils;
@@ -495,24 +496,24 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 
                 // retrieve WantAuthnRequestsSigned
                 map.put(WANT_AUTHN_REQ_SIGNED,returnEmptySetIfValueIsNull(
-                        idpssoDescriptor.isWantAuthnRequestsSigned()));
+                        Boolean.TRUE.equals(idpssoDescriptor.getValue().isWantAuthnRequestsSigned())));
                 
                 //retrieve ArtifactResolutionService
                 map.put(ART_RES_LOCATION, Collections.EMPTY_SET);
                 map.put(ART_RES_INDEX, Collections.EMPTY_SET);
                 map.put(ART_RES_ISDEFAULT, Collections.EMPTY_SET);
                 List artList =
-                        idpssoDescriptor.getArtifactResolutionService();
+                        idpssoDescriptor.getValue().getArtifactResolutionService();
                 if (!artList.isEmpty()) {
                     ArtifactResolutionServiceElement key =
                             (ArtifactResolutionServiceElement)artList.get(0);
                     map.put(ART_RES_LOCATION,
-                            returnEmptySetIfValueIsNull(key.getLocation()));
+                            returnEmptySetIfValueIsNull(key.getValue().getLocation()));
                     map.put(ART_RES_INDEX,
                             returnEmptySetIfValueIsNull(Integer.toString(
-                            key.getIndex())));
+                            key.getValue().getIndex())));
                     map.put(ART_RES_ISDEFAULT,
-                            returnEmptySetIfValueIsNull(key.isIsDefault()));
+                            returnEmptySetIfValueIsNull(Boolean.TRUE.equals(key.getValue().isIsDefault())));
                 }
                 //retrieve SingleLogoutService
                 map.put(SINGLE_LOGOUT_HTTP_LOCATION, Collections.EMPTY_SET);
@@ -523,11 +524,11 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 map.put(SINGLE_LOGOUT_SOAP_LOCATION, Collections.EMPTY_SET);
                 map.put(SINGLE_LOGOUT_DEFAULT, Collections.EMPTY_SET);
                 
-                List logoutList = idpssoDescriptor.getSingleLogoutService();                
+                List logoutList = idpssoDescriptor.getValue().getSingleLogoutService();
                 for (int i=0; i<logoutList.size(); i++) {
                     SingleLogoutServiceElement spslsElem = 
                             (SingleLogoutServiceElement) logoutList.get(i);
-                    String tmp = spslsElem.getBinding();
+                    String tmp = spslsElem.getValue().getBinding();
                     if (i == 0) {
                       map.put(SINGLE_LOGOUT_DEFAULT, 
                               returnEmptySetIfValueIsNull(tmp));
@@ -535,21 +536,21 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     if (tmp.contains(httpRedirect)) {
                         map.put(SINGLE_LOGOUT_HTTP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            spslsElem.getLocation()));
+                            spslsElem.getValue().getLocation()));
                         map.put(SINGLE_LOGOUT_HTTP_RESP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            spslsElem.getResponseLocation()));
+                            spslsElem.getValue().getResponseLocation()));
                     } else if (tmp.contains(httpPost)) {
                         map.put(SLO_POST_LOC,
                             returnEmptySetIfValueIsNull(
-                            spslsElem.getLocation()));
+                            spslsElem.getValue().getLocation()));
                         map.put(SLO_POST_RESPLOC,
                             returnEmptySetIfValueIsNull(
-                            spslsElem.getResponseLocation()));
+                            spslsElem.getValue().getResponseLocation()));
                     } else if (tmp.contains(soap)) {
                         map.put(SINGLE_LOGOUT_SOAP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            spslsElem.getLocation()));
+                            spslsElem.getValue().getLocation()));
                     }
                 }
                 
@@ -562,12 +563,12 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 map.put(MANAGE_NAMEID_SOAP_LOCATION,Collections.EMPTY_SET);
                 map.put(SINGLE_MANAGE_NAMEID_DEFAULT, Collections.EMPTY_SET);
                 List manageNameIdList =
-                        idpssoDescriptor.getManageNameIDService();
+                        idpssoDescriptor.getValue().getManageNameIDService();
                 
                 for (int i=0; i<manageNameIdList.size(); i++) {
                     ManageNameIDServiceElement mniElem = 
                         (ManageNameIDServiceElement) manageNameIdList.get(i);
-                    String tmp = mniElem.getBinding();
+                    String tmp = mniElem.getValue().getBinding();
                     if (i == 0) {
                       map.put(SINGLE_MANAGE_NAMEID_DEFAULT, 
                               returnEmptySetIfValueIsNull(tmp));
@@ -575,71 +576,71 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     if (tmp.contains(httpRedirect)) {
                         map.put(MANAGE_NAMEID_HTTP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            mniElem.getLocation()));
+                            mniElem.getValue().getLocation()));
                         map.put(MANAGE_NAMEID_HTTP_RESP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            mniElem.getResponseLocation()));
+                            mniElem.getValue().getResponseLocation()));
                     } else if (tmp.contains(httpPost)) {
                         map.put(MNI_POST_LOC,
                             returnEmptySetIfValueIsNull(
-                            mniElem.getLocation()));
+                            mniElem.getValue().getLocation()));
                         map.put(MNI_POST_RESPLOC,
                             returnEmptySetIfValueIsNull(
-                            mniElem.getResponseLocation()));
+                            mniElem.getValue().getResponseLocation()));
                     } else if (tmp.contains(soap)) {
                         map.put(MANAGE_NAMEID_SOAP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            mniElem.getLocation()));
+                            mniElem.getValue().getLocation()));
                     }
                 }
                 
                 //retrieve nameid mapping service
                 map.put(NAME_ID_MAPPPING, Collections.EMPTY_SET);
                 List nameIDmappingList =
-                        idpssoDescriptor.getNameIDMappingService();
+                        idpssoDescriptor.getValue().getNameIDMappingService();
                 if (!nameIDmappingList.isEmpty()) {
                     NameIDMappingServiceElement namidElem1 =
                         (NameIDMappingServiceElement)nameIDmappingList.get(0);
                     map.put(NAME_ID_MAPPPING,
                             returnEmptySetIfValueIsNull(
-                            namidElem1.getLocation()));
+                            namidElem1.getValue().getLocation()));
                 }
                 
                 //retrieve nameid format
                 map.put(NAMEID_FORMAT, (OrderedSet) convertListToSet(
-                    idpssoDescriptor.getNameIDFormat()));
+                    idpssoDescriptor.getValue().getNameIDFormat()));
                 
                 //retrieve single sign on service
                 map.put(SINGLE_SIGNON_HTTP_LOCATION, Collections.EMPTY_SET);
                 map.put(SINGLE_SIGNON_SOAP_LOCATION, Collections.EMPTY_SET);
                 map.put(SSO_SOAPS_LOC, Collections.EMPTY_SET);
                 
-                List signonList = idpssoDescriptor.getSingleSignOnService();
+                List signonList = idpssoDescriptor.getValue().getSingleSignOnService();
                 
                 for (int i=0; i<signonList.size(); i++) {
                     SingleSignOnServiceElement signElem = 
                             (SingleSignOnServiceElement) signonList.get(i);
-                    String tmp = signElem.getBinding();
+                    String tmp = signElem.getValue().getBinding();
                     if (tmp.contains(httpRedirect)) {
                         map.put(SINGLE_SIGNON_HTTP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            signElem.getLocation()));
+                            signElem.getValue().getLocation()));
                     } else if (tmp.contains(httpPost)) {
                         map.put(SINGLE_SIGNON_SOAP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            signElem.getLocation()));
+                            signElem.getValue().getLocation()));
                     } else if (tmp.contains(soap)) {
                         map.put(SSO_SOAPS_LOC,
                             returnEmptySetIfValueIsNull(
-                            signElem.getLocation()));
+                            signElem.getValue().getLocation()));
                     }
                 }
                 
                 //retrieve key descriptor encryption details if present
                 map.put(TF_KEY_NAME, Collections.EMPTY_SET);
                 map.put(TF_ALGORITHM, Collections.EMPTY_SET);
-                if (idpssoDescriptor.getKeyDescriptor() != null ) {
-                    getKeyandAlgorithm(idpssoDescriptor, map);
+                if (idpssoDescriptor.getValue().getKeyDescriptor() != null ) {
+                    getKeyandAlgorithm(idpssoDescriptor.getValue(), map);
                 }
             }          
             logEvent("SUCCEED_GET_ENTITY_DESCRIPTOR_ATTR_VALUES", params);
@@ -677,7 +678,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             SAML2MetaManager samlManager = getSAML2MetaManager();
             idpssoConfig = samlManager.getIDPSSOConfig(realm,entityName);
             if (idpssoConfig != null) {
-                BaseConfigType baseConfig = (BaseConfigType)idpssoConfig;
+                BaseConfigType baseConfig = idpssoConfig.getValue();
                 map = SAML2MetaUtils.getAttributes(baseConfig);
             }
             logEvent("SUCCEED_GET_ENTITY_DESCRIPTOR_ATTR_VALUES", params);
@@ -718,13 +719,13 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             if (role.equals(EntityModel.IDENTITY_PROVIDER)) {
                 idpssoConfig = samlManager.getIDPSSOConfig(realm,entityName);
                 if (idpssoConfig != null) {
-                    BaseConfigType baseConfig = (BaseConfigType)idpssoConfig;
+                    BaseConfigType baseConfig = idpssoConfig.getValue();
                     metaAlias = baseConfig.getMetaAlias();
                 }
             } else if (role.equals(EntityModel.SERVICE_PROVIDER)) {
                 spssoConfig = samlManager.getSPSSOConfig(realm,entityName);
                 if (spssoConfig != null) {
-                    BaseConfigType baseConfig = (BaseConfigType)spssoConfig;
+                    BaseConfigType baseConfig = spssoConfig.getValue();
                     metaAlias = baseConfig.getMetaAlias();
                 }
             }
@@ -767,10 +768,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 // retrieve WantAuthnRequestsSigned
                 map.put(IS_AUTHN_REQ_SIGNED,
                         returnEmptySetIfValueIsNull(
-                        spssoDescriptor.isAuthnRequestsSigned()));
+                        Boolean.TRUE.equals(spssoDescriptor.getValue().isAuthnRequestsSigned())));
                 map.put(WANT_ASSERTIONS_SIGNED,
                         returnEmptySetIfValueIsNull(
-                        spssoDescriptor.isWantAssertionsSigned()));
+                        Boolean.TRUE.equals(spssoDescriptor.getValue().isWantAssertionsSigned())));
                 
                 //retrieve SingleLogoutService
                 map.put(SP_SINGLE_LOGOUT_HTTP_LOCATION, Collections.EMPTY_SET);
@@ -780,11 +781,11 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 map.put(SP_SLO_POST_RESPLOC, Collections.EMPTY_SET);
                 map.put(SP_SINGLE_LOGOUT_SOAP_LOCATION, Collections.EMPTY_SET);
                 map.put(SP_LOGOUT_DEFAULT, Collections.EMPTY_SET);
-                List splogoutList = spssoDescriptor.getSingleLogoutService();
+                List splogoutList = spssoDescriptor.getValue().getSingleLogoutService();
                 for (int i=0; i<splogoutList.size(); i++) {
                     SingleLogoutServiceElement spslsElem = 
                             (SingleLogoutServiceElement) splogoutList.get(i);
-                    String tmp = spslsElem.getBinding();
+                    String tmp = spslsElem.getValue().getBinding();
                     if (i == 0) {
                       map.put(SP_LOGOUT_DEFAULT, 
                               returnEmptySetIfValueIsNull(tmp));
@@ -792,20 +793,20 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     if (tmp.contains(httpRedirect)) {
                         map.put(SP_SINGLE_LOGOUT_HTTP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            spslsElem.getLocation()));
+                            spslsElem.getValue().getLocation()));
                         map.put(SP_SINGLE_LOGOUT_HTTP_RESP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            spslsElem.getResponseLocation()));
+                            spslsElem.getValue().getResponseLocation()));
                     } else if (tmp.contains(httpPost)) {
                         map.put(SP_SLO_POST_LOC,
                             returnEmptySetIfValueIsNull(
-                            spslsElem.getLocation()));
+                            spslsElem.getValue().getLocation()));
                         map.put(SP_SLO_POST_RESPLOC,
                             returnEmptySetIfValueIsNull(
-                            spslsElem.getResponseLocation()));
+                            spslsElem.getValue().getResponseLocation()));
                     } else if (tmp.contains(soap)) {
                         map.put(SP_SINGLE_LOGOUT_SOAP_LOCATION,
-                        returnEmptySetIfValueIsNull(spslsElem.getLocation()));
+                        returnEmptySetIfValueIsNull(spslsElem.getValue().getLocation()));
                     }
                 }
                 
@@ -821,46 +822,46 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 map.put(SP_MNI_DEFAULT, Collections.EMPTY_SET);
                         
                 List manageNameIdList =
-                        spssoDescriptor.getManageNameIDService();                
+                        spssoDescriptor.getValue().getManageNameIDService();
                 for (int i=0; i<manageNameIdList.size(); i++) {
                     ManageNameIDServiceElement mniElem = 
                         (ManageNameIDServiceElement) manageNameIdList.get(i);
-                    String tmp = mniElem.getBinding();
+                    String tmp = mniElem.getValue().getBinding();
                     if (i == 0) {
                       map.put(SP_MNI_DEFAULT, 
                               returnEmptySetIfValueIsNull(tmp));
                     }
                     if (tmp.contains(httpRedirect)) {
                         map.put(SP_MANAGE_NAMEID_HTTP_LOCATION,
-                        returnEmptySetIfValueIsNull(mniElem.getLocation()));
+                        returnEmptySetIfValueIsNull(mniElem.getValue().getLocation()));
                         map.put(SP_MANAGE_NAMEID_HTTP_RESP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            mniElem.getResponseLocation()));
+                            mniElem.getValue().getResponseLocation()));
                     } else if (tmp.contains(httpPost)) {
                         map.put(SP_MNI_POST_LOC,
                             returnEmptySetIfValueIsNull(
-                            mniElem.getLocation()));
+                            mniElem.getValue().getLocation()));
                         map.put(SP_MNI_POST_RESPLOC,
                             returnEmptySetIfValueIsNull(
-                            mniElem.getResponseLocation()));
+                            mniElem.getValue().getResponseLocation()));
                     } else if (tmp.contains(soap)) {
                         map.put(SP_MANAGE_NAMEID_SOAP_LOCATION,
-                        returnEmptySetIfValueIsNull(mniElem.getLocation()));
+                        returnEmptySetIfValueIsNull(mniElem.getValue().getLocation()));
                         map.put(SP_MANAGE_NAMEID_SOAP_RESP_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            mniElem.getResponseLocation()));
+                            mniElem.getValue().getResponseLocation()));
                     }
                 }
                 
                 //retrieve nameid format               
-                 map.put(NAMEID_FORMAT, (OrderedSet) convertListToSet(
-                         spssoDescriptor.getNameIDFormat()));
+                 map.put(NAMEID_FORMAT, convertListToSet(
+                         spssoDescriptor.getValue().getNameIDFormat()));
                 
                 //retrieve key descriptor encryption details if present
                 map.put(TF_KEY_NAME, Collections.EMPTY_SET);
                 map.put(TF_ALGORITHM, Collections.EMPTY_SET);
-                if (spssoDescriptor.getKeyDescriptor() != null ) {
-                    getKeyandAlgorithm(spssoDescriptor, map);
+                if (spssoDescriptor.getValue().getKeyDescriptor() != null ) {
+                    getKeyandAlgorithm(spssoDescriptor.getValue(), map);
                 }
             }
             logEvent("SUCCEED_GET_ENTITY_DESCRIPTOR_ATTR_VALUES", params);
@@ -898,7 +899,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             spssoDescriptor = samlManager.getSPSSODescriptor(realm,entityName);
             if (spssoDescriptor != null) {
                 asconsServiceList =
-                        spssoDescriptor.getAssertionConsumerService();
+                        spssoDescriptor.getValue().getAssertionConsumerService();
                 
             }
         } catch (SAML2MetaException e) {
@@ -920,16 +921,8 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
          com.sun.identity.saml2.jaxb.metadata.ObjectFactory objFact = new
                  com.sun.identity.saml2.jaxb.metadata.ObjectFactory();
          AssertionConsumerServiceElement acsElem = null;
-         try {
-             acsElem = objFact.createAssertionConsumerServiceElement();
-             
-         } catch (JAXBException e) {
-             if (debug.warningEnabled()) {
-                 debug.warning("SAMLv2ModelImpl.getAscObject:", e);
-             }
-             throw new AMConsoleException(getErrorString(e));
-         }
-         
+         acsElem = objFact.createAssertionConsumerServiceElement(objFact.createIndexedEndpointType());
+
          return acsElem;
      }
     
@@ -954,7 +947,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             SAML2MetaManager samlManager = getSAML2MetaManager();
             spssoConfig = samlManager.getSPSSOConfig(realm,entityName);
             if (spssoConfig != null) {
-                BaseConfigType baseConfig = (BaseConfigType)spssoConfig;
+                BaseConfigType baseConfig = spssoConfig.getValue();
                 map = SAML2MetaUtils.getAttributes(baseConfig);
             }
             logEvent("SUCCEED_GET_ENTITY_DESCRIPTOR_ATTR_VALUES", params);
@@ -1001,7 +994,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 if (idpStdValues.keySet().contains(WANT_AUTHN_REQ_SIGNED)) {
                     boolean value = setToBoolean(
                             idpStdValues, WANT_AUTHN_REQ_SIGNED);
-                    idpssoDescriptor.setWantAuthnRequestsSigned(value); 
+                    idpssoDescriptor.getValue().setWantAuthnRequestsSigned(value);
                 }
                 
                 // save for Artifact Resolution Service
@@ -1016,28 +1009,27 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                             setToBoolean(idpStdValues, ART_RES_ISDEFAULT);
                     
                     ArtifactResolutionServiceElement elem = null;
-                    
-                    List artList =
-                            idpssoDescriptor.getArtifactResolutionService();
+
+                    List<ArtifactResolutionServiceElement> artList = idpssoDescriptor.getValue().getArtifactResolutionService();
                     if (artList.isEmpty()) {
                         elem = 
-                            objFact.createArtifactResolutionServiceElement();
-                        elem.setBinding(soapBinding);
-                        elem.setLocation("");
-                        elem.setIndex(0);
-                        elem.setIsDefault(false);
-                        idpssoDescriptor.getArtifactResolutionService().add(elem);
+                            objFact.createArtifactResolutionServiceElement(objFact.createIndexedEndpointType());
+                        elem.getValue().setBinding(soapBinding);
+                        elem.getValue().setLocation("");
+                        elem.getValue().setIndex(0);
+                        elem.getValue().setIsDefault(false);
+                        idpssoDescriptor.getValue().getArtifactResolutionService().add(elem);
                         artList =
-                            idpssoDescriptor.getArtifactResolutionService();
+                            idpssoDescriptor.getValue().getArtifactResolutionService();
                     }
                     
-                    elem = (ArtifactResolutionServiceElement)artList.get(0);
-                    elem.setLocation(artLocation);
-                    elem.setIndex(Integer.parseInt(indexValue));
-                    elem.setIsDefault(isDefault);
-                    idpssoDescriptor.
+                    elem = artList.get(0);
+                    elem.getValue().setLocation(artLocation);
+                    elem.getValue().setIndex(Integer.parseInt(indexValue));
+                    elem.getValue().setIsDefault(isDefault);
+                    idpssoDescriptor.getValue().
                             getArtifactResolutionService().clear();
-                    idpssoDescriptor.
+                    idpssoDescriptor.getValue().
                             getArtifactResolutionService().add(elem);
                    
                 }
@@ -1067,7 +1059,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                         }
                     }
                     
-                    List logList = idpssoDescriptor.getSingleLogoutService();
+                    List logList = idpssoDescriptor.getValue().getSingleLogoutService();
                                       
                     if (!logList.isEmpty()) {
                         logList.clear();                        
@@ -1123,7 +1115,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     }
                     
                     List manageNameIdList =
-                            idpssoDescriptor.getManageNameIDService();
+                            idpssoDescriptor.getValue().getManageNameIDService();
                     
                     if (!manageNameIdList.isEmpty()) {
                         manageNameIdList.clear();                        
@@ -1156,30 +1148,30 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                             idpStdValues, NAME_ID_MAPPPING);
                     NameIDMappingServiceElement namidElem1 = null;
                     List nameIDmappingList =
-                            idpssoDescriptor.getNameIDMappingService();
+                            idpssoDescriptor.getValue().getNameIDMappingService();
                     
                     if (nameIDmappingList.isEmpty()) {
                         namidElem1 =
-                                objFact.createNameIDMappingServiceElement();
-                        namidElem1.setBinding(soapBinding);
-                        idpssoDescriptor.getNameIDMappingService().
+                                objFact.createNameIDMappingServiceElement(objFact.createEndpointType());
+                        namidElem1.getValue().setBinding(soapBinding);
+                        idpssoDescriptor.getValue().getNameIDMappingService().
                                 add(namidElem1);
                         nameIDmappingList =
-                                idpssoDescriptor.getNameIDMappingService();
+                                idpssoDescriptor.getValue().getNameIDMappingService();
                     }
                     
                     namidElem1 = 
                         (NameIDMappingServiceElement)nameIDmappingList.get(0);
-                    namidElem1.setLocation(nameIDmappingloc);
-                    idpssoDescriptor.getNameIDMappingService().clear();
-                    idpssoDescriptor.getNameIDMappingService().add(
+                    namidElem1.getValue().setLocation(nameIDmappingloc);
+                    idpssoDescriptor.getValue().getNameIDMappingService().clear();
+                    idpssoDescriptor.getValue().getNameIDMappingService().add(
                             namidElem1);
                     
                 }
                 
                 //save nameid format                
                 if (idpStdValues.keySet().contains(NAMEID_FORMAT)) {
-                    saveNameIdFormat(idpssoDescriptor, idpStdValues);                    
+                    saveNameIdFormat(idpssoDescriptor.getValue(), idpStdValues);
                 }
                 
                 //save for SingleSignOnService
@@ -1192,7 +1184,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                             idpStdValues, SINGLE_SIGNON_SOAP_LOCATION);
                     String ssoSoapLocation = getResult(
                             idpStdValues, SSO_SOAPS_LOC);
-                    List signonList = idpssoDescriptor.getSingleSignOnService();
+                    List signonList = idpssoDescriptor.getValue().getSingleSignOnService();
                     
                     if (!signonList.isEmpty()) {
                         signonList.clear();                        
@@ -1202,9 +1194,9 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                             ssohttpLocation.length() > 0)
                     {
                         SingleSignOnServiceElement slsElemRed = 
-                                objFact.createSingleSignOnServiceElement();  
-                        slsElemRed.setBinding(httpRedirectBinding);
-                        slsElemRed.setLocation(ssohttpLocation);
+                                objFact.createSingleSignOnServiceElement(objFact.createEndpointType());
+                        slsElemRed.getValue().setBinding(httpRedirectBinding);
+                        slsElemRed.getValue().setLocation(ssohttpLocation);
                         signonList.add(slsElemRed);
                     }
                     
@@ -1212,9 +1204,9 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                             ssopostLocation.length() > 0) 
                     {
                         SingleSignOnServiceElement slsElemPost = 
-                                objFact.createSingleSignOnServiceElement();
-                        slsElemPost.setBinding(httpPostBinding);
-                        slsElemPost.setLocation(ssopostLocation);
+                                objFact.createSingleSignOnServiceElement(objFact.createEndpointType());
+                        slsElemPost.getValue().setBinding(httpPostBinding);
+                        slsElemPost.getValue().setLocation(ssopostLocation);
                         signonList.add(slsElemPost);
                     }
                     
@@ -1222,9 +1214,9 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                             ssoSoapLocation.length() > 0) 
                     {
                         SingleSignOnServiceElement slsElemSoap = 
-                                objFact.createSingleSignOnServiceElement();
-                        slsElemSoap.setBinding(soapBinding);
-                        slsElemSoap.setLocation(ssoSoapLocation);
+                                objFact.createSingleSignOnServiceElement(objFact.createEndpointType());
+                        slsElemSoap.getValue().setBinding(soapBinding);
+                        slsElemSoap.getValue().setLocation(ssoSoapLocation);
                         signonList.add(slsElemSoap);
                     }
                 }
@@ -1285,7 +1277,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             IDPSSOConfigElement  idpssoConfig =
                     samlManager.getIDPSSOConfig(realm,entityName);
             if (idpssoConfig != null) {
-                updateBaseConfig(idpssoConfig, idpExtValues, role);
+                updateBaseConfig(idpssoConfig.getValue(), idpExtValues, role);
             }
             
             //saves the attributes by passing the new entityConfig object
@@ -1369,7 +1361,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                         }
                     }
                     
-                    List logList = spssoDescriptor.getSingleLogoutService();
+                    List logList = spssoDescriptor.getValue().getSingleLogoutService();
                                     
                     if (!logList.isEmpty()) {
                         logList.clear();                        
@@ -1427,7 +1419,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     }
                     
                     List manageNameIdList =
-                            spssoDescriptor.getManageNameIDService();
+                            spssoDescriptor.getValue().getManageNameIDService();
                       
                     if (!manageNameIdList.isEmpty()) {
                         manageNameIdList.clear();                        
@@ -1463,7 +1455,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 if (!assertionConsumer.isEmpty() &&  
                         assertionConsumer.size() > 0) {
                     List asconsServiceList =
-                            spssoDescriptor.getAssertionConsumerService();
+                            spssoDescriptor.getValue().getAssertionConsumerService();
                     
                     if (!asconsServiceList.isEmpty()) {
                         asconsServiceList.clear();
@@ -1473,21 +1465,21 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 
                 //save nameid format
                 if (spStdValues.keySet().contains(NAMEID_FORMAT)) {
-                    saveNameIdFormat(spssoDescriptor, spStdValues);                    
+                    saveNameIdFormat(spssoDescriptor.getValue(), spStdValues);
                 }
                 
                 //save AuthnRequestsSigned
                 if (spStdValues.keySet().contains(IS_AUTHN_REQ_SIGNED)) {
                     boolean authnValue = setToBoolean(
                             spStdValues, IS_AUTHN_REQ_SIGNED);
-                    spssoDescriptor.setAuthnRequestsSigned(authnValue);
+                    spssoDescriptor.getValue().setAuthnRequestsSigned(authnValue);
                 }
                 
                 //save WantAssertionsSigned
                 if (spStdValues.keySet().contains(WANT_ASSERTIONS_SIGNED)) {
                     boolean assertValue = setToBoolean(
                             spStdValues, WANT_ASSERTIONS_SIGNED);
-                    spssoDescriptor.setWantAssertionsSigned(assertValue);
+                    spssoDescriptor.getValue().setWantAssertionsSigned(assertValue);
                 }
                 
                 samlManager.setEntityDescriptor(realm, entityDescriptor);
@@ -1546,7 +1538,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             SPSSOConfigElement  spssoConfig = samlManager.getSPSSOConfig(
                     realm,entityName);
             if (spssoConfig != null){
-                updateBaseConfig(spssoConfig, spExtValues, role);
+                updateBaseConfig(spssoConfig.getValue(), spExtValues, role);
             }
             
             //saves the attributes by passing the new entityConfig object
@@ -1611,12 +1603,12 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
 
         for (Iterator it = attrList.iterator(); it.hasNext(); ) {
             AttributeElement avpnew = (AttributeElement)it.next();
-            String name = avpnew.getName();
+            String name = avpnew.getValue().getName();
             if (values.keySet().contains(name)) {
                 Set set = (Set)values.get(name);
                 if (set != null) {
-                    avpnew.getValue().clear();
-                    avpnew.getValue().addAll(set);
+                    avpnew.getValue().getValue().clear();
+                    avpnew.getValue().getValue().addAll(set);
                 }
             }
         }
@@ -1682,10 +1674,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         
         for (Iterator it = attrList.iterator(); it.hasNext(); ) {
             AttributeElement avpnew = (AttributeElement)it.next();
-            String name = avpnew.getName();
+            String name = avpnew.getValue().getName();
             if(name.equals(attributeName)){
-                avpnew.getValue().clear();
-                avpnew.getValue().addAll(list);
+                avpnew.getValue().getValue().clear();
+                avpnew.getValue().getValue().addAll(list);
             }
         }
         
@@ -1706,7 +1698,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 (Set)values.get(NAMEID_FORMAT));
         ssodescriptor.getNameIDFormat().clear();
         for (int i=0; i<listtoSave.size();i++) {
-            ssodescriptor.getNameIDFormat().add(listtoSave.get(i));
+            ssodescriptor.getNameIDFormat().add((String) listtoSave.get(i));
         }
     }
     
@@ -1724,22 +1716,22 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 for (int i=0; i<keyList.size(); i++) {
                     KeyDescriptorElement keyOne =
                             (KeyDescriptorElement)keyList.get(i);
-                    String type = keyOne.getUse();
+                    String type = (keyOne.getValue().getUse() == null) ? null
+                            : keyOne.getValue().getUse().value();
                     if ((type == null) || (type.length() == 0) || 
                         type.equals("encryption")) { 
-                        List encryptMethod = keyOne.getEncryptionMethod();
+                        List encryptMethod = keyOne.getValue().getEncryptionMethod();
                         if (!encryptMethod.isEmpty()) {
                             EncryptionMethodElement encrptElement = 
                             (EncryptionMethodElement)encryptMethod.get(0);
-                            String alg = encrptElement.getAlgorithm();
+                            String alg = encrptElement.getValue().getAlgorithm();
                             String size = null;
-                            List keySizeList = encrptElement.getContent();
+                            List keySizeList = encrptElement.getValue().getContent();
                             if (!keySizeList.isEmpty()) {
                                 for (Iterator itt = keySizeList.listIterator(); 
                                     itt.hasNext(); ) { 
                                     Object encrptType = (Object)itt.next();
-                                    if (encrptType.getClass().getName().
-                                        contains("KeySizeImpl")) {
+                                    if (encrptType instanceof EncryptionMethodType.KeySize) {
                                         EncryptionMethodType.KeySize keysizeElem =
                                             (EncryptionMethodType.KeySize)
                                                 keySizeList.get(0);
@@ -1779,20 +1771,20 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 samlManager.getEntityDescriptor(realm, entityName);
         ObjectFactory objFactory = new ObjectFactory();
         EntityConfigElement entityConfigElement =
-                objFactory.createEntityConfigElement();
-        entityConfigElement.setEntityID(entityName);
+                objFactory.createEntityConfigElement(objFactory.createEntityConfigType());
+        entityConfigElement.getValue().setEntityID(entityName);
         if (location.equals("remote")) {
-            entityConfigElement.setHosted(false);
+            entityConfigElement.getValue().setHosted(false);
         } else {
-            entityConfigElement.setHosted(true);
+            entityConfigElement.getValue().setHosted(true);
         }
-        List configList =
-                entityConfigElement.
+        List<JAXBElement<BaseConfigType>> configList =
+                entityConfigElement.getValue().
                 getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
-        
+
         BaseConfigType baseConfigIDP = null;
         BaseConfigType baseConfigSP = null;
-        BaseConfigType baseConfigAuth = null;        
+        BaseConfigType baseConfigAuth = null;
         AttributeAuthorityDescriptorElement attrauthDescriptor =
                 samlManager.getAttributeAuthorityDescriptor(realm,entityName);
         AuthnAuthorityDescriptorElement authnauthDescriptor  = 
@@ -1811,66 +1803,62 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     realm, entityName);
 
         if (isDualRole(entityDescriptor)) {
-            baseConfigIDP = objFactory.createIDPSSOConfigElement();
-            baseConfigSP = objFactory.createSPSSOConfigElement();
+            baseConfigIDP = objFactory.createBaseConfigType();
+            baseConfigSP = objFactory.createBaseConfigType();
             baseConfigIDP = addAttributeType(extendedMetaIdpMap, baseConfigIDP);
             baseConfigSP = addAttributeType(extendedMetaSpMap, baseConfigSP);
-            configList.add(baseConfigIDP);
-            configList.add(baseConfigSP);
+            configList.add(objFactory.createIDPSSOConfigElement(baseConfigIDP));
+            configList.add(objFactory.createSPSSOConfigElement(baseConfigSP));
         }else if (role.equals(EntityModel.IDENTITY_PROVIDER) ||
                 (idpssoDesc != null)) 
         {
-            baseConfigIDP = objFactory.createIDPSSOConfigElement();
+            baseConfigIDP = objFactory.createBaseConfigType();
             baseConfigIDP = addAttributeType(extendedMetaIdpMap, baseConfigIDP);
-            configList.add(baseConfigIDP);
+            configList.add(objFactory.createIDPSSOConfigElement(baseConfigIDP));
         } else if (role.equals(EntityModel.SERVICE_PROVIDER) || 
                 (spssoDesc  != null)) 
         {
-            baseConfigSP = objFactory.createSPSSOConfigElement();
+            baseConfigSP = objFactory.createBaseConfigType();
             baseConfigSP = addAttributeType(extendedMetaSpMap, baseConfigSP);
-            configList.add(baseConfigSP);
+            configList.add(objFactory.createSPSSOConfigElement(baseConfigSP));
         }
         if (role.equals(EntityModel.SAML_ATTRAUTHORITY) || 
                 (attrauthDescriptor != null))
         {
-            baseConfigAuth =
-                    objFactory.createAttributeAuthorityConfigElement();
+            baseConfigAuth = objFactory.createBaseConfigType();
             baseConfigAuth = addAttributeType(extAttrAuthMap, baseConfigAuth);
-            configList.add(baseConfigAuth);
+            configList.add(objFactory.createAttributeAuthorityConfigElement(baseConfigAuth));
         }
         if (role.equals(EntityModel.SAML_AUTHNAUTHORITY) ||
                 (authnauthDescriptor != null)) 
         {
-            baseConfigAuth =
-                    objFactory.createAuthnAuthorityConfigElement();
+            baseConfigAuth = objFactory.createBaseConfigType();
             baseConfigAuth = addAttributeType(extAuthnAuthMap, baseConfigAuth);
-            configList.add(baseConfigAuth);
+            configList.add(objFactory.createAuthnAuthorityConfigElement(baseConfigAuth));
         }
         if (role.equals(EntityModel.SAML_ATTRQUERY) || 
                 (attrQueryDescriptor != null))
         {
-            baseConfigAuth =
-                    objFactory.createAttributeQueryConfigElement();
+            baseConfigAuth = objFactory.createBaseConfigType();
             baseConfigAuth = addAttributeType(extattrQueryMap, baseConfigAuth);
-            configList.add(baseConfigAuth);
+            configList.add(objFactory.createAttributeQueryConfigElement(baseConfigAuth));
         }
         if (role.equals(EntityModel.POLICY_DECISION_POINT_DESCRIPTOR) ||
                 (xacmlPDPDescriptor != null)) 
         {
-            baseConfigAuth =
-                    objFactory.createXACMLPDPConfigElement();
-            baseConfigAuth = addAttributeType(
-                    xacmlPDPExtendedMeta, baseConfigAuth);
-            configList.add(baseConfigAuth);
+            baseConfigAuth = objFactory.createBaseConfigType();
+
+            baseConfigAuth = addAttributeType(xacmlPDPExtendedMeta, baseConfigAuth);
+            configList.add(objFactory.createXACMLPDPConfigElement(baseConfigAuth));
         }
         if (role.equals(EntityModel.POLICY_ENFORCEMENT_POINT_DESCRIPTOR) ||
                 (xacmlAuthzDescriptor != null)) 
         {
-            baseConfigAuth =
-                    objFactory.createXACMLAuthzDecisionQueryConfigElement();
+            baseConfigAuth = objFactory.createBaseConfigType();
+
             baseConfigAuth = addAttributeType(
                     xacmlPEPExtendedMeta, baseConfigAuth);
-            configList.add(baseConfigAuth);
+            configList.add(objFactory.createXACMLAuthzDecisionQueryConfigElement(baseConfigAuth));
         }
         
         samlManager.setEntityConfig(realm, entityConfigElement);
@@ -1881,10 +1869,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         ObjectFactory objFactory = new ObjectFactory();
         for (Iterator iter = values.keySet().iterator();
         iter.hasNext(); ) {
-            AttributeType avp = objFactory.createAttributeElement();
+            AttributeElement avp = objFactory.createAttributeElement(objFactory.createAttributeType());
             String key = (String)iter.next();
-            avp.setName(key);
-            avp.getValue().addAll(Collections.EMPTY_LIST);
+            avp.getValue().setName(key);
+            avp.getValue().getValue().addAll(Collections.EMPTY_LIST);
             bctype.getAttribute().add(avp);
         }
         return bctype;
@@ -1937,8 +1925,8 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 //ProtocolSupportEnum
                 data.put(ATTR_TXT_PROTOCOL_SUPPORT_ENUM,
                         returnEmptySetIfValueIsNull(
-                        xacmlAuthzDescriptor.getProtocolSupportEnumeration()));
-                if (xacmlAuthzDescriptor.isWantAssertionsSigned()) {
+                        xacmlAuthzDescriptor.getValue().getProtocolSupportEnumeration()));
+                if (Boolean.TRUE.equals(xacmlAuthzDescriptor.getValue().isWantAssertionsSigned())) {
                     data.put(ATTR_WANT_ASSERTION_SIGNED, "true");
                 } else {
                     data.put(ATTR_WANT_ASSERTION_SIGNED, "false");
@@ -1984,18 +1972,18 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 //ProtocolSupportEnum
                 data.put(ATTR_TXT_PROTOCOL_SUPPORT_ENUM,
                         returnEmptySetIfValueIsNull(
-                        xacmlPDPDescriptor.getProtocolSupportEnumeration()));
+                        xacmlPDPDescriptor.getValue().getProtocolSupportEnumeration()));
                 List authzServiceList =
-                        xacmlPDPDescriptor.getXACMLAuthzService();
+                        xacmlPDPDescriptor.getValue().getXACMLAuthzService();
                 if (authzServiceList.size() != 0) {
                     XACMLAuthzServiceElement authzService =
                             (XACMLAuthzServiceElement) authzServiceList.get(0);
                     data.put(ATTR_XACML_AUTHZ_SERVICE_BINDING,
                             returnEmptySetIfValueIsNull(
-                            authzService.getBinding()));
+                            authzService.getValue().getBinding()));
                     data.put(ATTR_XACML_AUTHZ_SERVICE_LOCATION,
                             returnEmptySetIfValueIsNull(
-                            authzService.getLocation()));
+                            authzService.getValue().getLocation()));
                 }
             }
             logEvent("SUCCEED_GET_ENTITY_DESCRIPTOR_ATTR_VALUES", params);
@@ -2039,11 +2027,11 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             
             if (xacmlAuthzConfigElement != null) {
                 data = new HashMap();
-                configList = xacmlAuthzConfigElement.getAttribute();
-                metaAlias = xacmlAuthzConfigElement.getMetaAlias();
+                configList = xacmlAuthzConfigElement.getValue().getAttribute();
+                metaAlias = xacmlAuthzConfigElement.getValue().getMetaAlias();
                 int size = configList.size();
                 for (int i=0; i< size; i++) {
-                    AttributeType atype = (AttributeType) configList.get(i);
+                    AttributeType atype = ((AttributeElement) configList.get(i)).getValue();
                     String name = atype.getName();
                     java.util.List value = atype.getValue();
                     data.put(atype.getName(),
@@ -2100,11 +2088,11 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     realm, entityName);
             if (xacmlPDPConfigElement != null) {
                 data = new HashMap();
-                configList = xacmlPDPConfigElement.getAttribute() ;
-                metaAlias = xacmlPDPConfigElement.getMetaAlias();
+                configList = xacmlPDPConfigElement.getValue().getAttribute() ;
+                metaAlias = xacmlPDPConfigElement.getValue().getMetaAlias();
                 int size = configList.size();
                 for (int i=0; i< size; i++) {
-                    AttributeType atype = (AttributeType) configList.get(i);
+                    AttributeType atype = ((AttributeElement) configList.get(i)).getValue();
                     String name = atype.getName();
                     java.util.List value = atype.getValue();
                     data.put(atype.getName(),
@@ -2160,11 +2148,11 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     entityName);
             
             if (pdpDescriptor != null) {
-                List authzServiceList = pdpDescriptor.getXACMLAuthzService();
+                List authzServiceList = pdpDescriptor.getValue().getXACMLAuthzService();
                 if (authzServiceList.size() != 0) {
                     XACMLAuthzServiceElement authzService =
                             (XACMLAuthzServiceElement)authzServiceList.get(0);
-                    authzService.setLocation((String)AMAdminUtils.getValue(
+                    authzService.getValue().setLocation((String)AMAdminUtils.getValue(
                             (Set)attrValues.get(
                             ATTR_XACML_AUTHZ_SERVICE_LOCATION)));
                 }
@@ -2215,7 +2203,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             if (pdpEntityConfig == null) {
                 throw new AMConsoleException("invalid.xacml.configuration");
             } else {
-                updateBaseConfig(pdpEntityConfig, attrValues, role);
+                updateBaseConfig(pdpEntityConfig.getValue(), attrValues, role);
             }
             
             //saves the attributes by passing the new entityConfig object
@@ -2287,7 +2275,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             if (pepEntityConfig == null) {
                 throw new AMConsoleException("invalid.xacml.configuration");
             } else {
-                updateBaseConfig(pepEntityConfig, attrValues, role);
+                updateBaseConfig(pepEntityConfig.getValue(), attrValues, role);
             }
             
             //saves the attributes by passing the new entityConfig object
@@ -2328,8 +2316,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             SAML2MetaManager  saml2MetaManager = getSAML2MetaManager();
             Map map = new HashMap();
             
-            BaseConfigType  idpConfig=
+            IDPSSOConfigElement idpConfigElement =
                     saml2MetaManager.getIDPSSOConfig(realm, entityName);
+            BaseConfigType  idpConfig = (idpConfigElement != null)
+                    ? idpConfigElement.getValue() : null;
             if (idpConfig != null){
                 map = SAML2MetaUtils.getAttributes(idpConfig) ;
             } else {
@@ -2387,8 +2377,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             SAML2MetaManager  saml2MetaManager = getSAML2MetaManager();
             Map map = new HashMap();
             
-            BaseConfigType  spConfig=
+            SPSSOConfigElement spConfigElement =
                     saml2MetaManager.getSPSSOConfig(realm, entityName);
+            BaseConfigType  spConfig = (spConfigElement != null)
+                    ? spConfigElement.getValue() : null;
             if (spConfig != null){
                 map = SAML2MetaUtils.getAttributes(spConfig) ;
             } else {
@@ -2456,7 +2448,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 throw new AMConsoleException("invalid.config.element");
             } else {
                 updateBaseConfig(
-                        idpDecConfigElement,
+                        idpDecConfigElement.getValue(),
                         IDP_AUTHN_CONTEXT_CLASS_REF_MAPPING,
                         list
                         );
@@ -2512,7 +2504,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             } else {
                 // update sp entity config
                 updateBaseConfig(
-                        spDecConfigElement,
+                        spDecConfigElement.getValue(),
                         SP_AUTHN_CONTEXT_CLASS_REF_MAPPING,
                         list
                         );
@@ -2559,45 +2551,45 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             map.put(ATTR_SEFVICE_LOCATION, Collections.EMPTY_SET);
             if (attrauthDescriptor != null) {
                 List artServiceList =
-                        attrauthDescriptor.getAttributeService();
+                        attrauthDescriptor.getValue().getAttributeService();
                 for (int i = 0; i < artServiceList.size(); i++) {
                     AttributeServiceElement key =
                             (AttributeServiceElement)artServiceList.get(i);
-                    if ((key.getLocation() != null) && 
-                            (key.isSupportsX509Query())) 
+                    if ((key.getValue().getLocation() != null) &&
+                            (Boolean.TRUE.equals(key.getValue().isSupportsX509Query())))
                     {
                         map.put(SUPPORTS_X509, returnEmptySetIfValueIsNull(
-                            key.isSupportsX509Query()));
+                            Boolean.TRUE.equals(key.getValue().isSupportsX509Query())));
                     map.put(ATTR_SEFVICE_LOCATION,
-                            returnEmptySetIfValueIsNull(key.getLocation()));                    
+                            returnEmptySetIfValueIsNull(key.getValue().getLocation()));
                     
-                    } else if ((key.getLocation() != null) && 
-                            (key.getLocation().length()>0)) 
+                    } else if ((key.getValue().getLocation() != null) &&
+                            (key.getValue().getLocation().length()>0))
                     {
                         map.put(ATTR_SEFVICE_DEFAULT_LOCATION,
-                            returnEmptySetIfValueIsNull(key.getLocation()));
+                            returnEmptySetIfValueIsNull(key.getValue().getLocation()));
                     }
                 }
                 
                 map.put(ASSERTION_ID_SAOP_LOC, Collections.EMPTY_SET);
                 map.put(ASSERTION_ID_URI_LOC, Collections.EMPTY_SET);      
                 List assertionIDReqList =
-                        attrauthDescriptor.getAssertionIDRequestService();
+                        attrauthDescriptor.getValue().getAssertionIDRequestService();
                 for (int i = 0; i < assertionIDReqList.size(); i++) {
                     AssertionIDRequestServiceElement elem1 =
                             (AssertionIDRequestServiceElement)
                             assertionIDReqList.get(i);
-                    if (elem1.getBinding().contains("SOAP")) {
+                    if (elem1.getValue().getBinding().contains("SOAP")) {
                         map.put(ASSERTION_ID_SAOP_LOC,
-                        returnEmptySetIfValueIsNull(elem1.getLocation()));                        
-                    } else if (elem1.getBinding().contains("URI")) {
+                        returnEmptySetIfValueIsNull(elem1.getValue().getLocation()));
+                    } else if (elem1.getValue().getBinding().contains("URI")) {
                         map.put(ASSERTION_ID_URI_LOC,
-                        returnEmptySetIfValueIsNull(elem1.getLocation()));
+                        returnEmptySetIfValueIsNull(elem1.getValue().getLocation()));
                     }
                 }                
                 map.put(ATTRIBUTE_PROFILE, Collections.EMPTY_SET);
                 List attrProfileList =
-                        attrauthDescriptor.getAttributeProfile();
+                        attrauthDescriptor.getValue().getAttributeProfile();
                 if (!attrProfileList.isEmpty()) {
                     String key =
                             (String)attrProfileList.get(0);
@@ -2643,7 +2635,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     realm,entityName);
             if (attributeAuthorityConfig != null) {
                 BaseConfigType baseConfig =
-                        (BaseConfigType)attributeAuthorityConfig;
+                        attributeAuthorityConfig.getValue();
                 map = SAML2MetaUtils.getAttributes(baseConfig);
             }
             logEvent("SUCCEED_GET_ATTR_AUTH_ATTR_VALUES", params);
@@ -2684,28 +2676,28 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             if (authnauthDescriptor != null) {                
                 map.put(AUTHN_QUERY_SERVICE, Collections.EMPTY_SET);
                 List authQueryServiceList =
-                        authnauthDescriptor.getAuthnQueryService();
+                        authnauthDescriptor.getValue().getAuthnQueryService();
                 if (!authQueryServiceList.isEmpty()) {
                     AuthnQueryServiceElement key =
                         (AuthnQueryServiceElement)authQueryServiceList.get(0);
                     map.put(AUTHN_QUERY_SERVICE,
-                            returnEmptySetIfValueIsNull(key.getLocation()));
+                            returnEmptySetIfValueIsNull(key.getValue().getLocation()));
                 }
                 
                 map.put(ASSERTION_ID_SAOP_LOC, Collections.EMPTY_SET);
                 map.put(ASSERTION_ID_URI_LOC, Collections.EMPTY_SET);
                 List assertionIDReqList =
-                        authnauthDescriptor.getAssertionIDRequestService();
+                        authnauthDescriptor.getValue().getAssertionIDRequestService();
                 for (int i = 0; i < assertionIDReqList.size(); i++) {
                     AssertionIDRequestServiceElement elem1 =
                             (AssertionIDRequestServiceElement)
                             assertionIDReqList.get(i);
-                    if (elem1.getBinding().contains("SOAP")) {
+                    if (elem1.getValue().getBinding().contains("SOAP")) {
                     map.put(ASSERTION_ID_SAOP_LOC,
-                        returnEmptySetIfValueIsNull(elem1.getLocation()));
-                    } else  if (elem1.getBinding().contains("URI")) {                   
+                        returnEmptySetIfValueIsNull(elem1.getValue().getLocation()));
+                    } else  if (elem1.getValue().getBinding().contains("URI")) {
                     map.put(ASSERTION_ID_URI_LOC,
-                       returnEmptySetIfValueIsNull(elem1.getLocation()));
+                       returnEmptySetIfValueIsNull(elem1.getValue().getLocation()));
                     }
                 }
             }
@@ -2747,7 +2739,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     realm,entityName);
             if (authnAuthorityConfig != null) {
                 BaseConfigType baseConfig =
-                        (BaseConfigType)authnAuthorityConfig;
+                        authnAuthorityConfig.getValue();
                 map = SAML2MetaUtils.getAttributes(baseConfig);
             }
             logEvent("SUCCEED_GET_AUTHN_AUTH_ATTR_VALUES", params);
@@ -2785,8 +2777,8 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             SAML2MetaManager samlManager = getSAML2MetaManager();
             attrQueryDescriptor =
                     samlManager.getAttributeQueryDescriptor(realm,entityName);            
-            map.put(ATTR_NAMEID_FORMAT, (OrderedSet) convertListToSet(
-                    attrQueryDescriptor.getNameIDFormat()));
+            map.put(ATTR_NAMEID_FORMAT, convertListToSet(
+                    attrQueryDescriptor.getValue().getNameIDFormat()));
             
             logEvent("SUCCEED_GET_ATTR_QUERY_ATTR_VALUES", params);
         } catch (SAML2MetaException e) {
@@ -2826,7 +2818,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     realm,entityName);
             if (attrQueryConfig != null) {
                 BaseConfigType baseConfig =
-                        (BaseConfigType)attrQueryConfig;
+                        (BaseConfigType)attrQueryConfig.getValue();
                 map = SAML2MetaUtils.getAttributes(baseConfig);
             }
             logEvent("SUCCEED_GET_ATTR_QUERY_ATTR_VALUES", params);
@@ -2877,26 +2869,26 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                         attrAuthValues, ATTR_SEFVICE_LOCATION);
                 
                 AttributeServiceElement key1 = 
-                        objFact.createAttributeServiceElement();
+                        objFact.createAttributeServiceElement(objFact.createAttributeServiceType());
                 AttributeServiceElement key2 = 
-                        objFact.createAttributeServiceElement();
-                key1.setBinding(soapBinding);
-                key1.setLocation("");
-                key2.setBinding(soapBinding);
-                key2.setSupportsX509Query(false);
-                key2.setLocation("");
+                        objFact.createAttributeServiceElement(objFact.createAttributeServiceType());
+                key1.getValue().setBinding(soapBinding);
+                key1.getValue().setLocation("");
+                key2.getValue().setBinding(soapBinding);
+                key2.getValue().setSupportsX509Query(false);
+                key2.getValue().setLocation("");
                 
                 if (defLocation != null && defLocation.length() > 0) {
-                    key1.setLocation(defLocation);
+                    key1.getValue().setLocation(defLocation);
                 }
                 if (x509Location != null && x509Location.length() > 0) {
-                    key2.setLocation(x509Location);
-                    key2.setSupportsX509Query(is509);
+                    key2.getValue().setLocation(x509Location);
+                    key2.getValue().setSupportsX509Query(is509);
                 }
                 
-                attrauthDescriptor.getAttributeService().clear();
-                attrauthDescriptor.getAttributeService().add(key1);
-                attrauthDescriptor.getAttributeService().add(key2);
+                attrauthDescriptor.getValue().getAttributeService().clear();
+                attrauthDescriptor.getValue().getAttributeService().add(key1);
+                attrauthDescriptor.getValue().getAttributeService().add(key2);
                 
 
                 //save assertion ID request
@@ -2905,36 +2897,36 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 String uriLocation = getResult(
                         attrAuthValues, ASSERTION_ID_URI_LOC);
                 AssertionIDRequestServiceElement elem1 = 
-                        objFact.createAssertionIDRequestServiceElement();
+                        objFact.createAssertionIDRequestServiceElement(objFact.createEndpointType());
                 AssertionIDRequestServiceElement elem2 = 
-                        objFact.createAssertionIDRequestServiceElement();
+                        objFact.createAssertionIDRequestServiceElement(objFact.createEndpointType());
                 
-                elem1.setBinding(soapBinding);
-                elem2.setBinding(uriBinding);
+                elem1.getValue().setBinding(soapBinding);
+                elem2.getValue().setBinding(uriBinding);
                 
                 if (soapLocation != null) {
-                elem1.setLocation(soapLocation);
+                elem1.getValue().setLocation(soapLocation);
                 }                
                 if (uriLocation != null) {
-                elem2.setLocation(uriLocation);
+                elem2.getValue().setLocation(uriLocation);
                 }
-                attrauthDescriptor.
+                attrauthDescriptor.getValue().
                        getAssertionIDRequestService().clear();
-                    attrauthDescriptor.
+                    attrauthDescriptor.getValue().
                        getAssertionIDRequestService().add(elem1);
-                    attrauthDescriptor.
+                    attrauthDescriptor.getValue().
                        getAssertionIDRequestService().add(elem2);
                 
                 //save attribute profile
                 String attrProfile = getResult(
                         attrAuthValues, ATTRIBUTE_PROFILE);
                 List attrProfileList =
-                        attrauthDescriptor.getAttributeProfile();
+                        attrauthDescriptor.getValue().getAttributeProfile();
                 
                 if (!attrProfileList.isEmpty()) {                    
-                    attrauthDescriptor.getAttributeProfile().clear();
+                    attrauthDescriptor.getValue().getAttributeProfile().clear();
             }
-                    attrauthDescriptor.getAttributeProfile().
+                    attrauthDescriptor.getValue().getAttributeProfile().
                        add(attrProfile);
                     
               
@@ -2951,13 +2943,6 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
-        } catch (JAXBException e) {
-            debug.warning("SAMLv2ModelImpl.setStdAttributeAuthorityValues:", e);
-            String strError = getErrorString(e);
-            String[] paramsEx =
-            {realm, entityName, "SAMLv2", "AttribAuthority-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ATTR_AUTH_ATTR_VALUES",
-                    paramsEx);
         }
     }
     
@@ -2994,7 +2979,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     samlManager.getAttributeAuthorityConfig(
                     realm,entityName);
             if (attributeAuthorityConfig != null) {
-                updateBaseConfig(attributeAuthorityConfig, 
+                updateBaseConfig(attributeAuthorityConfig.getValue(),
                         attrAuthExtValues,role);
             }
             
@@ -3054,15 +3039,15 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                         authnAuthValues, AUTHN_QUERY_SERVICE);
                 //save query service
                 List authQueryServiceList =
-                        authnauthDescriptor.getAuthnQueryService();
+                        authnauthDescriptor.getValue().getAuthnQueryService();
                 if (!authQueryServiceList.isEmpty()) {
-                    authnauthDescriptor.getAuthnQueryService().clear();
+                    authnauthDescriptor.getValue().getAuthnQueryService().clear();
                 }
                 AuthnQueryServiceElement key =
-                        objFact.createAuthnQueryServiceElement();
-                key.setBinding(soapBinding);
-                key.setLocation(queryService);
-                authnauthDescriptor.getAuthnQueryService().add(key);
+                        objFact.createAuthnQueryServiceElement(objFact.createEndpointType());
+                key.getValue().setBinding(soapBinding);
+                key.getValue().setLocation(queryService);
+                authnauthDescriptor.getValue().getAuthnQueryService().add(key);
                 
                 //save assertion ID request
                 String soapLocation = getResult(
@@ -3070,26 +3055,26 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 String uriLocation = getResult(
                         authnAuthValues, ASSERTION_ID_URI_LOC);
                 List assertionIDReqList =
-                        authnauthDescriptor.getAssertionIDRequestService();
+                        authnauthDescriptor.getValue().getAssertionIDRequestService();
                 if (!assertionIDReqList.isEmpty()) {
                     assertionIDReqList.clear();
                 }
                 AssertionIDRequestServiceElement elem1 =
-                        objFact.createAssertionIDRequestServiceElement();
-                elem1.setBinding(soapBinding);
+                        objFact.createAssertionIDRequestServiceElement(objFact.createEndpointType());
+                elem1.getValue().setBinding(soapBinding);
                 AssertionIDRequestServiceElement elem2 =
-                        objFact.createAssertionIDRequestServiceElement();
-                elem2.setBinding(uriBinding);
+                        objFact.createAssertionIDRequestServiceElement(objFact.createEndpointType());
+                elem2.getValue().setBinding(uriBinding);
                 
                 if (soapLocation != null) {
-                    elem1.setLocation(soapLocation);
+                    elem1.getValue().setLocation(soapLocation);
                 }
                 if (uriLocation != null) {
-                    elem2.setLocation(uriLocation);
+                    elem2.getValue().setLocation(uriLocation);
                 }
-                authnauthDescriptor.
+                authnauthDescriptor.getValue().
                         getAssertionIDRequestService().add(elem1);
-                authnauthDescriptor.
+                authnauthDescriptor.getValue().
                         getAssertionIDRequestService().add(elem2);
                 
                 samlManager.setEntityDescriptor(realm, entityDescriptor);
@@ -3104,13 +3089,6 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
             logEvent("FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES",
                     paramsEx);
             throw new AMConsoleException(strError);
-        } catch (JAXBException e) {
-            debug.warning("SAMLv2ModelImpl.setStdAttributeAuthorityValues:", e);
-            String strError = getErrorString(e);
-            String[] paramsEx =
-            {realm, entityName, "SAMLv2", "AttribAuthority-Std", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_AUTHN_AUTH_ATTR_VALUES",
-                    paramsEx);
         }
     }
     
@@ -3149,7 +3127,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     samlManager.getAuthnAuthorityConfig(
                     realm,entityName);
             if (authnAuthorityConfig != null) {
-                updateBaseConfig(authnAuthorityConfig, 
+                updateBaseConfig(authnAuthorityConfig.getValue(),
                         authnAuthExtValues, role);
             }
             
@@ -3206,16 +3184,16 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                 
                 //save nameid format
                 List NameIdFormatList =
-                        attrQueryDescriptor.getNameIDFormat();
+                        attrQueryDescriptor.getValue().getNameIDFormat();
                 if (!NameIdFormatList.isEmpty()) {
-                    attrQueryDescriptor.getNameIDFormat().clear();
+                    attrQueryDescriptor.getValue().getNameIDFormat().clear();
                 }
                 List listtoSave = convertSetToList(
                         (Set)attrQueryValues.get(ATTR_NAMEID_FORMAT));
                 Iterator itt = listtoSave.listIterator();
                 while (itt.hasNext()) {
                     String name =(String) itt.next();
-                    attrQueryDescriptor.getNameIDFormat().add(name);
+                    attrQueryDescriptor.getValue().getNameIDFormat().add(name);
                 }
                 
                 samlManager.setEntityDescriptor(realm, entityDescriptor);
@@ -3269,7 +3247,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     samlManager.getAttributeQueryConfig(
                     realm,entityName);
             if (attrQueryConfig != null) {
-                updateBaseConfig(attrQueryConfig, attrQueryExtValues, role);
+                updateBaseConfig(attrQueryConfig.getValue(), attrQueryExtValues, role);
             }
             
             //saves the attributes by passing the new entityConfig object
@@ -3368,7 +3346,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                     realm,entityName);
             if (atffilConfig != null) {
                 BaseConfigType baseConfig =
-                        (BaseConfigType)atffilConfig;
+                        atffilConfig.getValue();
                 map = SAML2MetaUtils.getAttributes(baseConfig);
                 Iterator it = map.entrySet().iterator();
                 while (it.hasNext()) {
@@ -3494,10 +3472,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     ) throws JAXBException {
         if (lohttpLocation != null && lohttpLocation.length() > 0) {
             SingleLogoutServiceElement slsElemRed = 
-                    objFact.createSingleLogoutServiceElement();   
-            slsElemRed.setBinding(httpRedirectBinding);
-            slsElemRed.setLocation(lohttpLocation);
-            slsElemRed.setResponseLocation(lohttpRespLocation);
+                    objFact.createSingleLogoutServiceElement(objFact.createEndpointType());
+            slsElemRed.getValue().setBinding(httpRedirectBinding);
+            slsElemRed.getValue().setLocation(lohttpLocation);
+            slsElemRed.getValue().setResponseLocation(lohttpRespLocation);
             logList.add(slsElemRed);
         }
     }
@@ -3519,10 +3497,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     ) throws JAXBException {
         if (postLocation != null && postLocation.length() > 0) {
             SingleLogoutServiceElement slsElemPost =
-                    objFact.createSingleLogoutServiceElement();
-            slsElemPost.setBinding(httpPostBinding);
-            slsElemPost.setLocation(postLocation);
-            slsElemPost.setResponseLocation(postRespLocation);
+                    objFact.createSingleLogoutServiceElement(objFact.createEndpointType());
+            slsElemPost.getValue().setBinding(httpPostBinding);
+            slsElemPost.getValue().setLocation(postLocation);
+            slsElemPost.getValue().setResponseLocation(postRespLocation);
             logList.add(slsElemPost);
         }
     }
@@ -3542,9 +3520,9 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     ) throws JAXBException {
         if (losoapLocation != null && losoapLocation.length() > 0) {
             SingleLogoutServiceElement slsElemSoap =
-                    objFact.createSingleLogoutServiceElement();
-            slsElemSoap.setBinding(soapBinding);
-            slsElemSoap.setLocation(losoapLocation);
+                    objFact.createSingleLogoutServiceElement(objFact.createEndpointType());
+            slsElemSoap.getValue().setBinding(soapBinding);
+            slsElemSoap.getValue().setLocation(losoapLocation);
             logList.add(slsElemSoap);
         }
     }
@@ -3566,10 +3544,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
    ) throws JAXBException {
         if (mnihttpLocation != null && mnihttpLocation.length() > 0) {
             ManageNameIDServiceElement slsElemRed = 
-                    objFact.createManageNameIDServiceElement();
-            slsElemRed.setBinding(httpRedirectBinding);
-            slsElemRed.setLocation(mnihttpLocation);
-            slsElemRed.setResponseLocation(mnihttpRespLocation);
+                    objFact.createManageNameIDServiceElement(objFact.createEndpointType());
+            slsElemRed.getValue().setBinding(httpRedirectBinding);
+            slsElemRed.getValue().setLocation(mnihttpLocation);
+            slsElemRed.getValue().setResponseLocation(mnihttpRespLocation);
             manageNameIdList.add(slsElemRed);
         }
     }
@@ -3591,10 +3569,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
    ) throws JAXBException {
         if (mnipostLocation != null && mnipostLocation.length() > 0) {
             ManageNameIDServiceElement slsElemPost =
-                    objFact.createManageNameIDServiceElement();
-            slsElemPost.setBinding(httpPostBinding);
-            slsElemPost.setLocation(mnipostLocation);
-            slsElemPost.setResponseLocation(mnipostRespLocation);
+                    objFact.createManageNameIDServiceElement(objFact.createEndpointType());
+            slsElemPost.getValue().setBinding(httpPostBinding);
+            slsElemPost.getValue().setLocation(mnipostLocation);
+            slsElemPost.getValue().setResponseLocation(mnipostRespLocation);
             manageNameIdList.add(slsElemPost);
         }
     }
@@ -3614,9 +3592,9 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     ) throws JAXBException {
         if (mnisoapLocation != null && mnisoapLocation.length() > 0) {
             ManageNameIDServiceElement slsElemSoap =
-                    objFact.createManageNameIDServiceElement();
-            slsElemSoap.setBinding(soapBinding);
-            slsElemSoap.setLocation(mnisoapLocation);
+                    objFact.createManageNameIDServiceElement(objFact.createEndpointType());
+            slsElemSoap.getValue().setBinding(soapBinding);
+            slsElemSoap.getValue().setLocation(mnisoapLocation);
             manageNameIdList.add(slsElemSoap);
         }
     }
@@ -3638,10 +3616,10 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     ) throws JAXBException {
         if (mnisoapLocation != null && mnisoapLocation.length() > 0) {
             ManageNameIDServiceElement slsElemSoap =
-                    objFact.createManageNameIDServiceElement();
-            slsElemSoap.setBinding(soapBinding);
-            slsElemSoap.setLocation(mnisoapLocation);
-            slsElemSoap.setResponseLocation(mnirespLoaction);
+                    objFact.createManageNameIDServiceElement(objFact.createEndpointType());
+            slsElemSoap.getValue().setBinding(soapBinding);
+            slsElemSoap.getValue().setLocation(mnisoapLocation);
+            slsElemSoap.getValue().setResponseLocation(mnirespLoaction);
             manageNameIdList.add(slsElemSoap);
         }
     }

@@ -23,18 +23,23 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDFFCOTUtils.java,v 1.6 2009/10/28 23:58:57 exu Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.federation.meta;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import com.sun.identity.cot.COTConstants;
-import com.sun.identity.federation.jaxb.entityconfig.AffiliationDescriptorConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.jaxb.entityconfig.ObjectFactory;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.liberty.ws.meta.jaxb.EntityDescriptorElement;
 import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
@@ -94,39 +99,43 @@ public class IDFFCOTUtils {
             atype.setName(COT_LIST);
             atype.getValue().add(cotName);
             // add to entityConfig
-            entityConfig = objFactory.createEntityConfigElement();
-            entityConfig.setEntityID(entityID);
-            entityConfig.setHosted(false);
+            entityConfig = objFactory.createEntityConfigElement(objFactory.createEntityConfigType());
+            entityConfig.getValue().setEntityID(entityID);
+            entityConfig.getValue().setHosted(false);
             // Decide which role EntityDescriptorElement includes
             // It could have one sp and one idp.
             if (IDFFMetaUtils.getSPDescriptor(entityDesc) != null) {
-                IDFFCOTUtils = objFactory.createSPDescriptorConfigElement();
-                IDFFCOTUtils.getAttribute().add(atype);
-                entityConfig.getSPDescriptorConfig().add(IDFFCOTUtils);
+                IDFFCOTUtils = new BaseConfigType() {};
+                IDFFCOTUtils.getAttribute().add(objFactory.createAttributeElement(atype));
+                entityConfig.getValue().getSPDescriptorConfig().add(
+                        objFactory.createSPDescriptorConfigElement(IDFFCOTUtils));
             }
             if (IDFFMetaUtils.getIDPDescriptor(entityDesc) != null) {
-                IDFFCOTUtils = objFactory.createIDPDescriptorConfigElement();
-                IDFFCOTUtils.getAttribute().add(atype);
-                entityConfig.getIDPDescriptorConfig().add(IDFFCOTUtils);
+                IDFFCOTUtils = new BaseConfigType() {};
+                IDFFCOTUtils.getAttribute().add(objFactory.createAttributeElement(atype));
+                entityConfig.getValue().getIDPDescriptorConfig().add(
+                        objFactory.createIDPDescriptorConfigElement(IDFFCOTUtils));
             }
-            if (entityDesc.getAffiliationDescriptor() != null) {
-                IDFFCOTUtils = 
-                    objFactory.createAffiliationDescriptorConfigElement();
-                IDFFCOTUtils.getAttribute().add(atype);
-                entityConfig.setAffiliationDescriptorConfig(IDFFCOTUtils);
+            if (entityDesc.getValue().getAffiliationDescriptor() != null) {
+                IDFFCOTUtils =
+                        new BaseConfigType() {};
+                IDFFCOTUtils.getAttribute().add(objFactory.createAttributeElement(atype));
+                entityConfig.getValue().setAffiliationDescriptorConfig(
+                        objFactory.createAffiliationDescriptorConfigElement(IDFFCOTUtils));
             }
             idffMetaMgr.setEntityConfig(realm, entityConfig);
         } else {
             // update the sp and idp entity config
-            List spConfigList = entityConfig.getSPDescriptorConfig();
-            List idpConfigList = entityConfig.getIDPDescriptorConfig();
+            List<SPDescriptorConfigElement> spConfigList = entityConfig.getValue().getSPDescriptorConfig();
+            List<IDPDescriptorConfigElement> idpConfigList = entityConfig.getValue().getIDPDescriptorConfig();
             updateCOTAttrInConfig(
                 realm,spConfigList,cotName,entityConfig,objFactory,idffMetaMgr);
             updateCOTAttrInConfig(
                 realm, idpConfigList,cotName,entityConfig,objFactory,
                 idffMetaMgr);
-            BaseConfigType affiConfig = 
-                entityConfig.getAffiliationDescriptorConfig();
+            BaseConfigType affiConfig =
+                (entityConfig.getValue().getAffiliationDescriptorConfig() == null) ? null
+                : entityConfig.getValue().getAffiliationDescriptorConfig().getValue();
             if (affiConfig != null) {
                 List affiConfigList = new ArrayList();
                 affiConfigList.add(affiConfig);
@@ -164,14 +173,15 @@ public class IDFFCOTUtils {
         EntityConfigElement entityConfig =
                 idffMetaMgr.getEntityConfig(realm, entityID);
         if (entityConfig != null) {
-            List spConfigList = entityConfig.getSPDescriptorConfig();
-            List idpConfigList = entityConfig.getIDPDescriptorConfig();
+            List<SPDescriptorConfigElement> spConfigList = entityConfig.getValue().getSPDescriptorConfig();
+            List<IDPDescriptorConfigElement> idpConfigList = entityConfig.getValue().getIDPDescriptorConfig();
             removeCOTNameFromConfig(realm, spConfigList,cotName,
                     entityConfig,idffMetaMgr);
             removeCOTNameFromConfig(realm, idpConfigList,cotName,
                     entityConfig,idffMetaMgr);
-            BaseConfigType affiConfig = 
-                entityConfig.getAffiliationDescriptorConfig();
+            BaseConfigType affiConfig =
+                (entityConfig.getValue().getAffiliationDescriptorConfig() == null) ? null
+                : entityConfig.getValue().getAffiliationDescriptorConfig().getValue();
             if (affiConfig != null) {
                 List affiConfigList = new ArrayList();
                 affiConfigList.add(affiConfig);
@@ -216,10 +226,10 @@ public class IDFFCOTUtils {
             throws IDFFMetaException,JAXBException {
         boolean foundCOT = false;
         for (Iterator iter = configList.iterator(); iter.hasNext();) {
-            BaseConfigType bConfig = (BaseConfigType)iter.next();
+            BaseConfigType bConfig = getBaseConfig(iter.next());
             List list = bConfig.getAttribute();
             for (Iterator iter2 = list.iterator(); iter2.hasNext();) {
-                AttributeType avp = (AttributeType)iter2.next();
+                AttributeType avp = ((AttributeElement)iter2.next()).getValue();
                 if (avp.getName().trim().equalsIgnoreCase(COT_LIST)) {
                     foundCOT = true;
                     List avpl = avp.getValue();
@@ -235,7 +245,7 @@ public class IDFFCOTUtils {
                 AttributeType atype = objFactory.createAttributeType();
                 atype.setName(COT_LIST);
                 atype.getValue().add(cotName);
-                list.add(atype);
+                list.add(objFactory.createAttributeElement(atype));
                 idffMetaMgr.setEntityConfig(realm, entityConfig);
             }
         }
@@ -253,10 +263,10 @@ public class IDFFCOTUtils {
             IDFFMetaManager idffMetaMgr)
             throws IDFFMetaException {
         for (Iterator iter = configList.iterator(); iter.hasNext();) {
-            BaseConfigType bConfig = (BaseConfigType)iter.next();
+            BaseConfigType bConfig = getBaseConfig(iter.next());
             List list = bConfig.getAttribute();
             for (Iterator iter2 = list.iterator(); iter2.hasNext();) {
-                AttributeType avp = (AttributeType)iter2.next();
+                AttributeType avp = ((AttributeElement)iter2.next()).getValue();
                 if (avp.getName().trim().equalsIgnoreCase(COT_LIST)) {
                     List avpl = avp.getValue();
                     if (avpl != null && !avpl.isEmpty() &&
@@ -268,5 +278,18 @@ public class IDFFCOTUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Unwraps a descriptor config list entry to its {@link BaseConfigType}.
+     * The SP/IDP descriptor config lists hold {@code JAXBElement} wrappers
+     * (e.g. {@code SPDescriptorConfigElement}), while the affiliation config
+     * is passed in unwrapped, so both shapes are handled here.
+     */
+    private static BaseConfigType getBaseConfig(Object item) {
+        if (item instanceof JAXBElement) {
+            return (BaseConfigType) ((JAXBElement) item).getValue();
+        }
+        return (BaseConfigType) item;
     }
 }

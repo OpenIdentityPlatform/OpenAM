@@ -25,7 +25,7 @@
  * $Id: FSLogoutUtil.java,v 1.12 2008/11/10 22:56:58 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.logout;
@@ -1037,12 +1037,12 @@ public class FSLogoutUtil {
                     IFSConstants.IDP.equalsIgnoreCase(hostedRole))
                 {
                     hostedConfig = metaManager.getIDPDescriptorConfig(
-                        realm, hostedEntityId);
+                        realm, hostedEntityId).getValue();
                } else if (hostedEntityId != null &&
                     IFSConstants.SP.equalsIgnoreCase(hostedRole))
                 {
                     hostedConfig = metaManager.getSPDescriptorConfig(
-                        realm, hostedEntityId);
+                        realm, hostedEntityId).getValue();
                 }
                 retURL = FSServiceUtils.getLogoutDonePageURL(
                     request, hostedConfig, providerAlias);

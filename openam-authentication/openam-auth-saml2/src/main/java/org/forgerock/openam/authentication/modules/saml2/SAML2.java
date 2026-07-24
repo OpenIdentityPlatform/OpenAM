@@ -13,7 +13,7 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions copyright 2019 Open Source Solution Technology Corporation
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -222,23 +222,23 @@ public class SAML2 extends AMLoginModule {
                     bundle.getString("samlLocalConfigFailed"));
         }
 
-        List<SingleSignOnServiceElement> ssoServiceList = idpsso.getSingleSignOnService();
+        List<SingleSignOnServiceElement> ssoServiceList = idpsso.getValue().getSingleSignOnService();
         final SingleSignOnServiceElement endPoint = SPSSOFederate
                 .getSingleSignOnServiceEndpoint(ssoServiceList, reqBinding);
 
-        if (endPoint == null || StringUtils.isEmpty(endPoint.getLocation())) {
+        if (endPoint == null || StringUtils.isEmpty(endPoint.getValue().getLocation())) {
             throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotfound"));
         }
         if (reqBinding == null) {
             SAML2Utils.debug.message("SAML2 :: initiateSAMLLoginAtIDP() reqBinding is null using endpoint  binding: {}",
-                    endPoint.getBinding());
-            reqBinding = endPoint.getBinding();
+                    endPoint.getValue().getBinding());
+            reqBinding = endPoint.getValue().getBinding();
             if (reqBinding == null) {
                 throw new SAML2Exception(SAML2Utils.bundle.getString("UnableTofindBinding"));
             }
         }
 
-        String ssoURL = endPoint.getLocation();
+        String ssoURL = endPoint.getValue().getLocation();
         SAML2Utils.debug.message("SAML2 :: initiateSAMLLoginAtIDP()  ssoURL : {}", ssoURL);
 
         final List extensionsList = SPSSOFederate.getExtensionsList(spEntityID, realm);
@@ -619,7 +619,7 @@ public class SAML2 extends AMLoginModule {
         final EncryptedID encId = assertionSubject.getEncryptedID();
         final String spName = metaManager.getEntityByMetaAlias(metaAlias);
         final SPSSOConfigElement spssoconfig = metaManager.getSPSSOConfig(realm, spName);
-        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig.getValue());
 
         NameID nameId = assertionSubject.getNameID();
 
@@ -670,7 +670,7 @@ public class SAML2 extends AMLoginModule {
                         SAML2Constants.WANT_ASSERTION_ENCRYPTED));
         final boolean needAttributeEncrypted =
                 SPACSUtils.getNeedAttributeEncrypted(needAssertionEncrypted, spssoconfig);
-        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig.getValue());
         final List<Attribute> attrs = SPACSUtils.getAttrs(assertion, needAttributeEncrypted, decryptionKeys);
 
         final SPAttributeMapper attrMapper = SAML2Utils.getSPAttributeMapper(realm, spName);

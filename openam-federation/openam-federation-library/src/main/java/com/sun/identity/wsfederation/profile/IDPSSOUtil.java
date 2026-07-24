@@ -24,7 +24,7 @@
  *
  * $Id: IDPSSOUtil.java,v 1.3 2009/10/28 23:58:59 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -85,7 +85,7 @@ public class IDPSSOUtil {
                 IDPSSOConfigElement config = 
                     WSFederationUtils.getMetaManager().getIDPSSOConfig(
                         realm, hostEntityId);
-                authUrl = WSFederationMetaUtils.getAttribute(config, 
+                authUrl = WSFederationMetaUtils.getAttribute(config.getValue(),
                     SAML2Constants.AUTH_URL);
             } catch (WSFederationMetaException sme) {
                 if (debug.messageEnabled()) {
@@ -143,14 +143,14 @@ public class IDPSSOUtil {
         {
             // Check that wreply is registered on this SP
             // Just return first TokenIssuerEndpoint in the Federation
-            for ( Object o: sp.getAny() )
+            for ( Object o: sp.getValue().getAny() )
             {
                 if ( o instanceof TokenIssuerEndpointElement )
                 {
                     try {
                         URL replyUrl = new URL(wreply);
                         URL thisUrl = new URL(
-                          ((TokenIssuerEndpointElement)o).getAddress().
+                          ((TokenIssuerEndpointElement)o).getValue().getAddress().
                           getValue());
                         if ( replyUrl.equals(thisUrl))
                             return wreply;

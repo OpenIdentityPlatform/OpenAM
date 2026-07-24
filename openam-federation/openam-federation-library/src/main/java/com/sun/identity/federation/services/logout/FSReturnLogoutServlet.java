@@ -184,11 +184,11 @@ public class FSReturnLogoutServlet extends HttpServlet {
             hostedEntityId = metaManager.getEntityIDByMetaAlias(providerAlias);
             if (hostedRole != null) {
                 if (hostedRole.equalsIgnoreCase(IFSConstants.IDP)) {
-                    hostedConfig = metaManager.getIDPDescriptorConfig(
-                        realm, hostedEntityId);
+                    hostedConfig = IDFFMetaUtils.unwrap(metaManager.getIDPDescriptorConfig(
+                        realm, hostedEntityId));
                 } else if (hostedRole.equalsIgnoreCase(IFSConstants.SP)) {
-                    hostedConfig = metaManager.getSPDescriptorConfig(
-                        realm, hostedEntityId);
+                    hostedConfig = IDFFMetaUtils.unwrap(metaManager.getSPDescriptorConfig(
+                        realm, hostedEntityId));
                 }
             }
             if (hostedConfig == null) {

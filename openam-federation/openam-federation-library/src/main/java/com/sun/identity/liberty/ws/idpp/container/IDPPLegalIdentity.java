@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPPLegalIdentity.java,v 1.2 2008/06/25 05:47:16 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  * Portions Copyrighted 2026 3A Systems, LLC
  */
@@ -30,7 +32,8 @@
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -67,23 +70,23 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
 
          IDPPUtils.debug.message("IDPPLegalIdentity:getContainerObject:Init");
          try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
-             LegalIdentityElement lIdentity = 
-                  IDPPUtils.getIDPPFactory().createLegalIdentityElement();
+             PPType ppType = IDPPUtils.getIDPPFactory().createPPType();
+             LegalIdentityType lIdentity = IDPPUtils.getIDPPFactory().createLegalIdentityType();
+
              String value = CollectionHelper.getMapAttr(userMap, 
              getAttributeMapper().getDSAttribute(
              IDPPConstants.LEGAL_NAME_ELEMENT).toLowerCase());
 
              if(value != null) {
                 DSTString dstString = getDSTString(value);
-                lIdentity.setLegalName(dstString);
+                lIdentity.setLegalName(IDPPUtils.getIDPPFactory().createLegalNameElement(dstString));
              }
              value = CollectionHelper.getMapAttr(
                 userMap, getAttributeMapper().getDSAttribute(
              IDPPConstants.DOB_ELEMENT).toLowerCase());
              if(value != null) {
                 DSTDate date = getDSTDate(value);
-                lIdentity.setDOB(date);
+                lIdentity.setDOB(IDPPUtils.getIDPPFactory().createDOBElement(date));
              }
 
              value = CollectionHelper.getMapAttr(
@@ -91,19 +94,20 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
              IDPPConstants.GENDER_ELEMENT).toLowerCase());
              if(value != null) {
                 DSTURI gender = getDSTURI(value);
-                lIdentity.setGender(gender);
+                lIdentity.setGender(IDPPUtils.getIDPPFactory().createGenderElement(gender));
              }
              value = CollectionHelper.getMapAttr(
                 userMap, getAttributeMapper().getDSAttribute(
              IDPPConstants.MARITAL_STATUS_ELEMENT).toLowerCase());
              if(value != null) {
                 DSTURI mStatus = getDSTURI(value);
-                lIdentity.setMaritalStatus(mStatus);
+                lIdentity.setMaritalStatus(IDPPUtils.getIDPPFactory().createMaritalStatusElement(mStatus));
              }
 
-             AltIDType altID = getAltID(userMap);
-             if(altID != null) {
-                List list = new ArrayList(); 
+             AltIDType altIDValue = getAltID(userMap);
+             if(altIDValue != null) {
+                AltIDElement altID = IDPPUtils.getIDPPFactory().createAltIDElement(altIDValue);
+                List<AltIDElement> list = new ArrayList<>();
                 list.add(altID);
                 lIdentity.getAltID().addAll(list);
              }
@@ -116,14 +120,10 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
              AnalyzedNameType analyzedName = getAnalyzedName(userMap); 
              if(analyzedName != null) {
                 lIdentity.setAnalyzedName(analyzedName);
-             } 
-             ppType.setLegalIdentity(lIdentity);
+             }
+             LegalIdentityElement lIdentityElement = IDPPUtils.getIDPPFactory().createLegalIdentityElement(lIdentity);
+             ppType.setLegalIdentity(lIdentityElement);
              return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPContainers:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
          } catch (IDPPException ie) {
               IDPPUtils.debug.error("IDPPContainers:getContainerObject:" +
               "Error while creating legal identity.", ie);
@@ -140,36 +140,30 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
      private AltIDType getAltID(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPLegalIdentity:getAltID:Init");
         AltIDType altID = null;
-        try {
-            altID = IDPPUtils.getIDPPFactory().createAltIDType();
-            String altIDType = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-            IDPPConstants.ALT_ID_TYPE_ELEMENT).toLowerCase());
+         altID = IDPPUtils.getIDPPFactory().createAltIDType();
+         String altIDType = CollectionHelper.getMapAttr(
+             userMap, getAttributeMapper().getDSAttribute(
+         IDPPConstants.ALT_ID_TYPE_ELEMENT).toLowerCase());
 
-            if(altIDType != null) {
-               DSTURI uri = getDSTURI(altIDType);
-               altID.setIDType(uri);
-            }
+         if(altIDType != null) {
+            DSTURI uri = getDSTURI(altIDType);
+            altID.setIDType(uri);
+         }
 
-            String altIDValue = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-            IDPPConstants.ALT_ID_VALUE_ELEMENT).toLowerCase());
+         String altIDValue = CollectionHelper.getMapAttr(
+             userMap, getAttributeMapper().getDSAttribute(
+         IDPPConstants.ALT_ID_VALUE_ELEMENT).toLowerCase());
 
-            if(altIDValue != null) {
-               DSTString str = getDSTString(altIDValue);
-               altID.setIDValue(str);
-            }
+         if(altIDValue != null) {
+            DSTString str = getDSTString(altIDValue);
+            altID.setIDValue(IDPPUtils.getIDPPFactory().createIDValueElement(str));
+         }
 
-            if(altIDType != null && altIDValue != null) {
-               return altID;
-            }
+         if(altIDType != null && altIDValue != null) {
+            return altID;
+         }
 
-            return null;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("IDPPContainers:getAltID: JAXB failure", je);
-            throw new IDPPException(
-            IDPPUtils.bundle.getString("jaxbFailure"));
-        }
+         return null;
      }
 
      /**
@@ -181,32 +175,26 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
      private VATType getVAT(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPLegalIdentity:getVATType:Init");
         VATType vType = null;
-        try {
-            vType = IDPPUtils.getIDPPFactory().createVATType();
-            String value = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-                    IDPPConstants.ID_TYPE_ELEMENT).toLowerCase());
-            if(value != null) {
-               DSTURI uri = getDSTURI(value);
-               vType.setIDType(uri);
-            }
-            value = CollectionHelper.getMapAttr(
-                userMap, getAttributeMapper().getDSAttribute(
-                    IDPPConstants.ID_VALUE_ELEMENT).toLowerCase());
-            if(value != null) {
-               DSTString str = getDSTString(value);
-               vType.setIDValue(str);
-            } else {
-               IDPPUtils.debug.message("IDPPContainers:getVAT: VAT value" +
-                "is not configured in legal dentity");
-               return null;
-            }
-            return vType;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error("IDPPContainers:getVAT: JAXB failure", je);
-            throw new IDPPException(
-            IDPPUtils.bundle.getString("jaxbFailure"));
-        }
+         vType = IDPPUtils.getIDPPFactory().createVATType();
+         String value = CollectionHelper.getMapAttr(
+             userMap, getAttributeMapper().getDSAttribute(
+                 IDPPConstants.ID_TYPE_ELEMENT).toLowerCase());
+         if(value != null) {
+            DSTURI uri = getDSTURI(value);
+            vType.setIDType(uri);
+         }
+         value = CollectionHelper.getMapAttr(
+             userMap, getAttributeMapper().getDSAttribute(
+                 IDPPConstants.ID_VALUE_ELEMENT).toLowerCase());
+         if(value != null) {
+            DSTString str = getDSTString(value);
+            vType.setIDValue(IDPPUtils.getIDPPFactory().createIDValueElement(str));
+         } else {
+            IDPPUtils.debug.message("IDPPContainers:getVAT: VAT value" +
+             "is not configured in legal dentity");
+            return null;
+         }
+         return vType;
      }
 
      /**
@@ -373,7 +361,7 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
 
                       String idTypeKey = null;
                       String idValueKey = null;
-                      DSTString idValue = (DSTString)dataElement;
+                      DSTString idValue = ((IDValueElement)dataElement).getValue();
                     
                       if(select.indexOf("AltID") != -1) {
                          idTypeKey = getAttributeMapper().getDSAttribute(
@@ -462,15 +450,18 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
         DSTDate dob = null;
         DSTString lName = null;
         if(obj != null) {
+           if(obj instanceof JAXBElement) {
+              obj = ((JAXBElement<?>)obj).getValue();
+           }
            if(obj instanceof LegalIdentityType) {
               LegalIdentityType lType = (LegalIdentityType)obj;
               analyzedName = lType.getAnalyzedName();
               vat = lType.getVAT();
               altIDs = lType.getAltID();
-              dob = lType.getDOB();
-              mStatus = lType.getMaritalStatus();
-              gender = lType.getGender();
-              lName = lType.getLegalName();
+              dob = jaxbValue(lType.getDOB());
+              mStatus = jaxbValue(lType.getMaritalStatus());
+              gender = jaxbValue(lType.getGender());
+              lName = jaxbValue(lType.getLegalName());
            } else {
               throw new IDPPException(
               IDPPUtils.bundle.getString("invalid Element"));
@@ -502,9 +493,11 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
            for(int i= 0; i < size; i++) {
                Object dataElement = dataObject.get(i);
                if(dataElement instanceof AltIDElement) {
-                  AltIDType altID = (AltIDType)dataElement;
-                  altIDType = altID.getIDType(); 
-                  altIDValue = altID.getIDValue();
+                  AltIDType altID = ((AltIDElement)dataElement).getValue();
+                  altIDType = altID.getIDType();
+                  if(altID.getIDValue() != null) {
+                     altIDValue = altID.getIDValue().getValue();
+                  }
                } else {
                   throw new IDPPException(
                   IDPPUtils.bundle.getString("invalid Element"));
@@ -527,10 +520,15 @@ public class IDPPLegalIdentity extends IDPPBaseContainer {
         DSTURI idType = null;
         DSTString idValue = null;
         if(obj != null) {
+           if(obj instanceof JAXBElement) {
+              obj = ((JAXBElement<?>)obj).getValue();
+           }
            if(obj instanceof VATType) {
               VATType vType = (VATType)obj;
               idType = vType.getIDType();
-              idValue = vType.getIDValue();
+              if(vType.getIDValue() != null) {
+                 idValue = vType.getIDValue().getValue();
+              }
            } else {
               throw new IDPPException(
               IDPPUtils.bundle.getString("invalid Element"));

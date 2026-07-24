@@ -24,7 +24,7 @@
  *
  * $Id: FSAuthnDecisionHandler.java,v 1.4 2008/06/25 05:46:53 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -97,7 +97,7 @@ public class FSAuthnDecisionHandler {
             if (entityConfig == null) {
                 return;
             }
-            Map attributes = IDFFMetaUtils.getAttributes(entityConfig);
+            Map attributes = IDFFMetaUtils.getAttributes(entityConfig.getValue());
             List mappings = (List) attributes.get(
                 IFSConstants.IDP_AUTHNCONTEXT_MAPPING);
             if (mappings != null && !mappings.isEmpty()) {
