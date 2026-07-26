@@ -114,9 +114,10 @@ test.describe("OpenAM XUI - Login flow", () => {
 
     // ── 7. Assert the SSO session cookie carries a SameSite attribute ───────
     // GHSA-fpmh-vx4h-xc33: the iPlanetDirectoryPro SSO cookie ships with a SameSite attribute by
-    // default so it is not sent on cross-site requests. It is intentionally NOT HttpOnly: the XUI
-    // reads it from document.cookie (SessionToken.jsm / AMConfig.js / AuthNService.js) to track the
-    // session and set REST headers, so enabling HttpOnly by default would break XUI console login.
+    // default so it is not sent on cross-site requests. The check below only asserts the SameSite
+    // attribute; whether the cookie is HttpOnly is governed by com.sun.identity.cookie.httponly (on
+    // by default, and fully supported by the XUI). HttpOnly behaviour is covered by the xui-httponly
+    // spec.
     const cookies = await page.context().cookies();
     const ssoCookie = cookies.find((c) => c.name === "iPlanetDirectoryPro");
     expect(ssoCookie, "iPlanetDirectoryPro SSO cookie should be set").toBeTruthy();

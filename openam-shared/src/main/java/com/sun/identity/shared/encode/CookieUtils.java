@@ -65,10 +65,8 @@ public class CookieUtils {
         (SystemPropertiesManager.get(Constants.AM_COOKIE_SECURE).
             equalsIgnoreCase("true"));
 
-    static boolean cookieHttpOnly = 
-        (SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY) != null) &&
-        (SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY).
-            equalsIgnoreCase("true"));
+    static boolean cookieHttpOnly =
+        SystemPropertiesManager.getAsBoolean(Constants.AM_COOKIE_HTTPONLY, true);
 
     static boolean httpOnlyAllowTokenInBody =
         SystemPropertiesManager.getAsBoolean(Constants.AM_COOKIE_HTTPONLY_ALLOW_TOKEN_IN_BODY, false);
@@ -169,8 +167,12 @@ public class CookieUtils {
     }
 
     /**
-     * Returns property value of "com.sun.identity.cookie.httponly"
-     * 
+     * Returns property value of "com.sun.identity.cookie.httponly".
+     * <p>
+     * Defaults to {@code true} when the property is not set: OpenAM marks its cookies
+     * {@code HttpOnly} out of the box. Set the property to {@code false} to opt out (for example for
+     * integrations that read the SSO token from {@code document.cookie} in the browser).
+     *
      * @return the property value of "com.sun.identity.cookie.httponly"
      */
     public static boolean isCookieHttpOnly() {
