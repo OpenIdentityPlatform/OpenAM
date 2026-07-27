@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenID;
 
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.BeforeMethod;
@@ -146,6 +147,81 @@ public class CsrfProtectionTest {
 
         // then the unprefixed cookie is honoured so the degraded path keeps working
         assertThat(csrf.isCsrfAttack(request)).isFalse();
+    }
+
+    /** {@code toString()} cannot be stubbed on a mock, so the session id is supplied by a real implementation. */
+    private void givenSessionId(final String tokenId) {
+        when(ssoToken.getTokenID()).thenReturn(new SSOTokenID() {
+            @Override
+            public String toString() {
+                return tokenId;
+            }
+        });
+    }
+
+    /**
+     * The documented flow for non-browser clients: authenticate at {@literal /json/authenticate}, then submit the
+     * returned {@code tokenId} as {@code csrf}. No consent page fetch, no cookie jar.
+     */
+    @Test
+    public void shouldAcceptSessionIdAsCsrfValue() throws Exception {
+        // given a client that never rendered the consent page, so no token was ever minted
+        when(ssoToken.getProperty(CsrfProtection.CSRF_SESSION_PROPERTY)).thenReturn(null);
+        givenSessionId("AQIC5wM2LY4Sfcy-the-session-id");
+        when(request.getParameter("csrf")).thenReturn("AQIC5wM2LY4Sfcy-the-session-id");
+
+        // then submitting its own session id is accepted
+        assertThat(csrfProtection.isCsrfAttack(request)).isFalse();
+    }
+
+    @Test
+    public void shouldRejectSomeoneElsesSessionId() throws Exception {
+        when(ssoToken.getProperty(CsrfProtection.CSRF_SESSION_PROPERTY)).thenReturn(null);
+        givenSessionId("the-callers-session-id");
+        when(request.getParameter("csrf")).thenReturn("a-different-session-id");
+
+        assertThat(csrfProtection.isCsrfAttack(request)).isTrue();
+    }
+
+    /**
+     * The pre-16.1.1 implementation dereferenced the session unconditionally. An unauthenticated POST must be
+     * rejected, not answered with a NullPointerException.
+     */
+    @Test
+    public void shouldRejectWhenThereIsNoSession() {
+        when(sessionValidator.getResourceOwnerSession(request)).thenReturn(null);
+        when(request.getParameter("csrf")).thenReturn("anything");
+
+        assertThat(csrfProtection.isCsrfAttack(request)).isTrue();
+    }
+
+    @Test
+    public void shouldRejectWhenSessionHasNoTokenId() throws Exception {
+        when(ssoToken.getProperty(CsrfProtection.CSRF_SESSION_PROPERTY)).thenReturn(null);
+        when(ssoToken.getTokenID()).thenReturn(null);
+        when(request.getParameter("csrf")).thenReturn("anything");
+
+        assertThat(csrfProtection.isCsrfAttack(request)).isTrue();
+    }
+
+    /**
+     * Minting a token for the consent page does not make it the only accepted value. Both the token and the
+     * session id are accepted, and nothing else is. The session-id branch is deliberately not disabled once a
+     * token exists, because the server cannot tell which of the two a legitimate caller is holding.
+     */
+    @Test
+    public void shouldAcceptEitherTokenOrSessionIdAndNothingElse() throws Exception {
+        givenSessionId("the-session-id");
+        when(ssoToken.getProperty(CsrfProtection.CSRF_SESSION_PROPERTY)).thenReturn("the-minted-token");
+
+        when(request.getParameter("csrf")).thenReturn("the-minted-token");
+        assertThat(csrfProtection.isCsrfAttack(request)).isFalse();
+
+        when(request.getParameter("csrf")).thenReturn("the-session-id");
+        assertThat(csrfProtection.isCsrfAttack(request)).isFalse();
+
+        when(request.getParameter("csrf")).thenReturn("neither-of-them");
+        assertThat(csrfProtection.isCsrfAttack(request)).isTrue();
     }
 }
 

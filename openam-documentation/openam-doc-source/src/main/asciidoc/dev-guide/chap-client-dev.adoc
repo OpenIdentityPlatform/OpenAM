@@ -5105,9 +5105,11 @@ You must provide the __Saved Consent Attribute Name__ property with a profile at
 For more information on setting this property in the OAuth2 Provider service, see xref:../reference/chap-config-ref.adoc#oauth2-provider-configuration["OAuth2 Provider"] in the __Reference__.
 
 `csrf`::
-Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the SSO token of the resource owner giving consent.
+Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the SSO token of the resource owner giving consent. Send it in the request body rather than the query string, so that the session id is not recorded in access logs or `Referer` headers.
 
 Duplicating the cookie value helps prevent against Cross-Site Request Forgery (CSRF) attacks.
+
+If you render the OpenAM consent page rather than posting the decision directly, use the dedicated token OpenAM generated for the request instead, available as `pageData.oauth2Data.csrf`. For details of both forms, see xref:../admin-guide/chap-oauth2.adoc#oauth2-endpoints["OpenAM OAuth 2.0 Endpoints"] in the __Administration Guide__.
 
 ====
 
@@ -5473,9 +5475,11 @@ Must be `token`.
 To allow client access, specify `allow`. Any other value will deny consent.
 
 `csrf`::
-Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the SSO token of the user granting access.
+Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the SSO token of the user granting access. Send it in the request body rather than the query string, so that the session id is not recorded in access logs or `Referer` headers.
 +
 Duplicating the cookie value helps prevent against Cross-Site Request Forgery (CSRF) attacks.
++
+If you render the OpenAM consent page rather than posting the decision directly, use the dedicated token OpenAM generated for the request instead, available as `pageData.oauth2Data.csrf`.
 
 --
 +
