@@ -143,26 +143,28 @@ test.beforeAll(async ({ request }) => {
 
 let accessToken;
 
+// PKCE is mandatory for these clients: they are public and authenticate with "none", so OpenAM rejects an
+// authorization request without code_challenge before it reaches consent handling.
+function generateVerifier(length = 64) {
+    const array = new Uint32Array(length);
+    crypto.getRandomValues(array);
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+    return Array.from(array, x => chars[x % chars.length]).join('');
+}
+
+async function generateChallenge(verifier) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+
+    return btoa(String.fromCharCode(...new Uint8Array(hash)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+}
+
 test.describe("OAuth Service test", () => {
   test("Should receive an auth code and exchange it to access token", async ({ request }) => {
-
-      function generateVerifier(length = 64) {
-          const array = new Uint32Array(length);
-          crypto.getRandomValues(array);
-          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-          return Array.from(array, x => chars[x % chars.length]).join('');
-      }
-
-      async function generateChallenge(verifier) {
-          const encoder = new TextEncoder();
-          const data = encoder.encode(verifier);
-          const hash = await crypto.subtle.digest('SHA-256', data);
-          
-          return btoa(String.fromCharCode(...new Uint8Array(hash)))
-              .replace(/\+/g, '-')
-              .replace(/\//g, '_')
-              .replace(/=+$/, '');
-      }
 
       const demoToken = await getAuthToken(request, USERNAME, PASSWORD);
 
@@ -255,52 +257,54 @@ test.describe("OAuth Service test", () => {
 test.describe("OAuth2 consent posted directly by a non-browser client", () => {
 
   /**
-   * Authenticates and confirms consent really is required for this client: the GET returns the consent page
-   * instead of redirecting with a code. That precondition also proves the client's redirect URI, scope and
-   * response type are configured as this suite expects, so the rejection tests below cannot go green because
-   * of a stale client left behind by another run.
+   * The authorization request parameters, shared by the GET that renders the consent page and the POST that
+   * carries the decision. Both must describe the same request, including the PKCE challenge: the request
+   * validators run before the csrf check, so an incomplete POST fails with a redirect long before the csrf
+   * value is looked at.
    */
-  async function startConsentFlow(request) {
-    const demoToken = await getAuthToken(request, USERNAME, PASSWORD);
-
-    const consentPage = await request.get(`${OPENAM_BASE}/oauth2/realms/${REALM}/authorize`, {
-      headers: {
-        "iPlanetDirectoryPro": demoToken,
-      },
-      params: {
-        response_type: "code",
-        client_id: CONSENT_CLIENT_ID,
-        redirect_uri: REDIRECT_URI,
-        scope: SCOPE,
-        state: CONSENT_STATE,
-      },
-      maxRedirects: 0,
-    });
-
-    expect(consentPage.status()).toBe(200);
-    return demoToken;
-  }
-
-  function consentDecision(extra) {
+  function authorizeRequest(challenge, extra) {
     return {
       response_type: "code",
       client_id: CONSENT_CLIENT_ID,
       redirect_uri: REDIRECT_URI,
       scope: SCOPE,
       state: CONSENT_STATE,
-      decision: "allow",
+      code_challenge: challenge,
+      code_challenge_method: "S256",
       ...extra,
     };
   }
 
+  /**
+   * Authenticates and confirms consent really is required for this client: the GET returns the consent page
+   * instead of redirecting with a code. That precondition also proves the client's redirect URI, scope,
+   * response type and PKCE requirements are satisfied, so the rejection tests below cannot go green on a 400
+   * that has nothing to do with the csrf value.
+   */
+  async function startConsentFlow(request) {
+    const demoToken = await getAuthToken(request, USERNAME, PASSWORD);
+    const challenge = await generateChallenge(generateVerifier());
+
+    const consentPage = await request.get(`${OPENAM_BASE}/oauth2/realms/${REALM}/authorize`, {
+      headers: {
+        "iPlanetDirectoryPro": demoToken,
+      },
+      params: authorizeRequest(challenge),
+      maxRedirects: 0,
+    });
+
+    expect(consentPage.status()).toBe(200);
+    return { demoToken, challenge };
+  }
+
   test("Should accept the session id as the csrf value", async ({ request }) => {
-    const demoToken = await startConsentFlow(request);
+    const { demoToken, challenge } = await startConsentFlow(request);
 
     const response = await request.post(`${OPENAM_BASE}/oauth2/realms/${REALM}/authorize`, {
       headers: {
         "iPlanetDirectoryPro": demoToken,
       },
-      form: consentDecision({ csrf: demoToken }),
+      form: authorizeRequest(challenge, { decision: "allow", csrf: demoToken }),
       maxRedirects: 0,
     });
 
@@ -312,13 +316,13 @@ test.describe("OAuth2 consent posted directly by a non-browser client", () => {
   });
 
   test("Should reject the consent decision when csrf is missing", async ({ request }) => {
-    const demoToken = await startConsentFlow(request);
+    const { demoToken, challenge } = await startConsentFlow(request);
 
     const response = await request.post(`${OPENAM_BASE}/oauth2/realms/${REALM}/authorize`, {
       headers: {
         "iPlanetDirectoryPro": demoToken,
       },
-      form: consentDecision({}),
+      form: authorizeRequest(challenge, { decision: "allow" }),
       maxRedirects: 0,
     });
 
@@ -326,13 +330,13 @@ test.describe("OAuth2 consent posted directly by a non-browser client", () => {
   });
 
   test("Should reject a csrf value that is not the caller's session", async ({ request }) => {
-    const demoToken = await startConsentFlow(request);
+    const { demoToken, challenge } = await startConsentFlow(request);
 
     const response = await request.post(`${OPENAM_BASE}/oauth2/realms/${REALM}/authorize`, {
       headers: {
         "iPlanetDirectoryPro": demoToken,
       },
-      form: consentDecision({ csrf: "not-the-session-id" }),
+      form: authorizeRequest(challenge, { decision: "allow", csrf: "not-the-session-id" }),
       maxRedirects: 0,
     });
 
