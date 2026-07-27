@@ -25,6 +25,46 @@ export async function getAdminToken(request) {
     return getAuthToken(request, ADMIN_USER, ADMIN_PASS)
 }
 
+/**
+ * Ensures the OAuth2 provider service exists in the realm, creating it with the given scopes if not.
+ * Safe to call from several spec files at once: a create that loses the race counts as success.
+ */
+export async function ensureOAuth2ServiceExists(adminToken, request, realm, scopes) {
+  const url = `${OPENAM_BASE}/json/realms/${realm}/realm-config/services/oauth-oidc`;
+  const headers = {
+    "iPlanetDirectoryPro": adminToken,
+    "Accept-API-Version": "protocol=1.0,resource=1.0",
+  };
+
+  const response = await request.get(url, { headers });
+  if (response.ok()) {
+    console.log("OAuth2 service already exists");
+    return;
+  }
+  if (response.status() !== 404) {
+    throw new Error(`Failed to check OAuth2 service: ${response.statusText()}`);
+  }
+
+  const createResponse = await request.post(`${url}?_action=create`, {
+    headers: { ...headers, "Content-Type": "application/json" },
+    data: {
+      advancedOAuth2Config: {
+        clientsCanSkipConsent: true,
+        supportedScopes: scopes,
+        defaultScopes: scopes,
+      },
+    },
+  });
+
+  if (createResponse.ok()) {
+    console.log("OAuth2 service created successfully");
+    return;
+  }
+  if (!(await request.get(url, { headers })).ok()) {
+    throw new Error(`Failed to create OAuth2 service: ${createResponse.statusText()}`);
+  }
+}
+
 export async function getAuthToken(request, username, password) {
   const resp = await request.post(`${OPENAM_BASE}/json/authenticate`, {
     headers: { 

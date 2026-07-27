@@ -236,6 +236,9 @@ A dedicated, random anti-CSRF token bound to the authorization request and gener
 +
 Because the token is independent of the SSO cookie, the SSO cookie can be marked `HttpOnly`. For stateful sessions the token is stored as a protected session property; for stateless sessions a double-submit cookie (`__Host-oauth2_csrf`, or `oauth2_csrf` on plain HTTP) is used.
 
++
+Clients that do not render the consent page obtain the token by sending `Accept: application/json` on the `GET /oauth2/authorize` request: when consent is required OpenAM returns the consent details, including `csrf`, as JSON instead of the consent page. A wildcard such as `*/*` is not treated as a request for JSON, so existing clients are unaffected. See xref:../dev-guide/chap-client-dev.adoc#rest-api-oauth2-client-endpoints["OAuth 2.0 Client and Resource Server Endpoints"] in the __Developer's Guide__.
+
 ====
 
 Example:

@@ -19,6 +19,10 @@ package org.forgerock.oauth2.restlet;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Set;
 
 import org.forgerock.oauth2.core.AuthorizationService;
@@ -36,8 +40,14 @@ import org.forgerock.oauth2.core.exceptions.OAuth2ProviderNotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerAuthenticationRequired;
 import org.forgerock.oauth2.core.exceptions.ResourceOwnerConsentRequired;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
+import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.xui.XUIState;
+import org.restlet.data.Dimension;
+import org.restlet.data.MediaType;
+import org.restlet.data.Preference;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
@@ -60,6 +70,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
     private final OAuth2Representation representation;
     private final Set<AuthorizeRequestHook> hooks;
     private final RedirectUriResolver redirectUriResolver;
+    private final JacksonRepresentationFactory jacksonRepresentationFactory;
 
 
     /**
@@ -75,7 +86,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
             ExceptionHandler exceptionHandler, OAuth2Representation representation, Set<AuthorizeRequestHook> hooks,
             XUIState xuiState, @Named("OAuth2Router") Router router, BaseURLProviderFactory baseURLProviderFactory,
             RedirectUriResolver redirectUriResolver, ResourceOwnerSessionValidator resourceOwnerSessionValidator,
-            CsrfProtection csrfProtection) {
+            CsrfProtection csrfProtection, JacksonRepresentationFactory jacksonRepresentationFactory) {
         super(router, baseURLProviderFactory, xuiState, resourceOwnerSessionValidator, csrfProtection);
         this.requestFactory = requestFactory;
         this.authorizationService = authorizationService;
@@ -83,6 +94,7 @@ public class AuthorizeResource extends ConsentRequiredResource {
         this.representation = representation;
         this.hooks = hooks;
         this.redirectUriResolver = redirectUriResolver;
+        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
     }
 
     /**
@@ -125,9 +137,17 @@ public class AuthorizeResource extends ConsentRequiredResource {
             throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
                     request.<String>getParameter("redirect_uri"), request.<String>getParameter("state"));
         } catch (ResourceOwnerAuthenticationRequired e) {
+            if (wantsJson()) {
+                // A redirect to the login page is not actionable by a non-browser client.
+                throw new OAuth2RestletException(401, "login_required", e.getMessage(),
+                        request.<String>getParameter("state"));
+            }
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(),
                     e.getRedirectUri().toString(), null);
         } catch (ResourceOwnerConsentRequired e) {
+            if (wantsJson()) {
+                return consentRepresentation(e, request);
+            }
             return representation.getRepresentation(getContext(), request, "authorize.ftl",
                     getDataModel(e, request));
         } catch (InvalidClientException e) {
@@ -207,12 +227,127 @@ public class AuthorizeResource extends ConsentRequiredResource {
     }
 
     /**
+     * Whether this request asked for the JSON consent representation rather than the HTML consent page.
+     *
+     * @return {@code true} if JSON was explicitly preferred.
+     */
+    private boolean wantsJson() {
+        return prefersJson(getRequest().getClientInfo().getAcceptedMediaTypes());
+    }
+
+    /**
+     * Builds the JSON consent representation, refusing to hand the CSRF token to another origin.
+     *
+     * <p>The OAuth2 endpoints are covered by the CORS filter, which echoes the caller's {@code Origin} with
+     * {@code Access-Control-Allow-Credentials} when so configured. Without this check a deployment that
+     * allows credentialed CORS would let any page read the token and then forge a consent decision.</p>
+     *
+     * @param consentRequired The details for requesting consent.
+     * @param request The OAuth2 request.
+     * @return The JSON consent representation.
+     * @throws OAuth2RestletException If the request came from a foreign origin.
+     */
+    private Representation consentRepresentation(ResourceOwnerConsentRequired consentRequired, OAuth2Request request)
+            throws OAuth2RestletException {
+        if (isForeignOrigin(request)) {
+            logger.debug("Refusing to serve the JSON consent representation to a foreign origin");
+            throw new OAuth2RestletException(403, "access_denied", "Cross-origin consent requests are not allowed",
+                    request.<String>getParameter("state"));
+        }
+        // The representation now depends on the Accept header; Restlet renders this as "Vary: Accept".
+        getResponse().getDimensions().add(Dimension.MEDIA_TYPE);
+        return jacksonRepresentationFactory.create(getConsentModel(consentRequired, request).asMap());
+    }
+
+    /**
+     * Whether the request carries an {@code Origin} that is not this deployment's own. Requests without the
+     * header - non-browser clients, and top-level navigations - are not cross-origin.
+     *
+     * <p>Extracted as a seam so the branch can be unit-tested without static mocking.</p>
+     *
+     * @param request The OAuth2 request.
+     * @return {@code true} if the request originates from another origin.
+     */
+    protected boolean isForeignOrigin(OAuth2Request request) {
+        final HttpServletRequest servletRequest = ServletUtils.getRequest(getRequest());
+        final String origin = servletRequest == null ? null : servletRequest.getHeader("Origin");
+        if (StringUtils.isBlank(origin)) {
+            return false;
+        }
+        return !sameOrigin(origin, baseURLProviderFactory.get(request.<String>getParameter("realm"))
+                .getRootURL(servletRequest));
+    }
+
+    /**
+     * Compares an {@code Origin} header against a deployment URL on scheme, host and port.
+     *
+     * @param origin The value of the {@code Origin} header.
+     * @param baseUrl The deployment's root URL.
+     * @return {@code true} if both denote the same origin.
+     */
+    static boolean sameOrigin(String origin, String baseUrl) {
+        try {
+            final URI actual = new URI(origin);
+            final URI expected = new URI(baseUrl);
+            return actual.getScheme() != null && actual.getScheme().equalsIgnoreCase(expected.getScheme())
+                    && actual.getHost() != null && actual.getHost().equalsIgnoreCase(expected.getHost())
+                    && effectivePort(actual) == effectivePort(expected);
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
+    private static int effectivePort(URI uri) {
+        if (uri.getPort() != -1) {
+            return uri.getPort();
+        }
+        return "https".equalsIgnoreCase(uri.getScheme()) ? 443 : 80;
+    }
+
+    /**
+     * Decides whether JSON was explicitly preferred over HTML. Only an exact {@code application/json} entry
+     * counts, and it has to outrank everything that can carry HTML. A client that expresses no preference
+     * between the two - a bare {@code *&#47;*} (curl's default), or a library default such as
+     * {@code application/json, text/plain, *&#47;*} - keeps getting the consent page, so existing clients
+     * that scrape it are unaffected.
+     *
+     * @param accepted The accepted media types, in any order.
+     * @return {@code true} if JSON was named explicitly and is preferred over HTML.
+     */
+    static boolean prefersJson(List<Preference<MediaType>> accepted) {
+        float json = 0f;
+        float html = 0f;
+        for (Preference<MediaType> preference : accepted) {
+            final MediaType mediaType = preference.getMetadata();
+            if (MediaType.APPLICATION_JSON.equals(mediaType, true)) {
+                json = Math.max(json, preference.getQuality());
+            } else if (mediaType.includes(MediaType.TEXT_HTML, true)) {
+                html = Math.max(html, preference.getQuality());
+            }
+        }
+        return json > 0f && json > html;
+    }
+
+    /**
      * Handles any exception that is thrown when processing a OAuth2 authorization request.
+     *
+     * <p>Errors that carry a redirect uri keep being reported by redirecting to the client, as RFC 6749
+     * 4.1.2.1 requires. The rest are rendered as the error page, or as JSON if that is what was asked for.</p>
      *
      * @param throwable The throwable.
      */
     @Override
     protected void doCatch(Throwable throwable) {
+        if (wantsJson() && !hasRedirectUri(throwable)) {
+            exceptionHandler.handle(throwable, getResponse());
+            return;
+        }
         exceptionHandler.handle(throwable, getContext(), getRequest(), getResponse());
+    }
+
+    private static boolean hasRedirectUri(Throwable throwable) {
+        final Throwable cause = throwable instanceof OAuth2RestletException ? throwable : throwable.getCause();
+        return cause instanceof OAuth2RestletException
+                && StringUtils.isNotBlank(((OAuth2RestletException) cause).getRedirectUri());
     }
 }

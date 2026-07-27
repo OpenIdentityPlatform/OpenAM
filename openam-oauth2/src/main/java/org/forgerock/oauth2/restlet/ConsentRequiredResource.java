@@ -107,6 +107,89 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
         return data;
     }
 
+    /**
+     * Gets the consent details as JSON, for clients that drive the consent flow programmatically instead of
+     * rendering the consent page. Carries the same information as {@link #getDataModel}, but unencoded and
+     * without the presentation-specific fields.
+     *
+     * <p>Mints the CSRF token, so it must be called at most once per request - exactly like
+     * {@link #getDataModel}, and on a mutually exclusive branch from it.</p>
+     *
+     * @param consentRequired The details for requesting consent.
+     * @param request The OAuth2 request.
+     * @return The consent model.
+     */
+    protected JsonValue getConsentModel(ResourceOwnerConsentRequired consentRequired, OAuth2Request request) {
+        final Reference resRef = getRequest().getResourceRef();
+        final String query = resRef.getQuery();
+        // Relative, exactly like the consent form's action: the caller resolves it against the URL it just
+        // requested, which is what works behind a reverse proxy.
+        final String target = StringUtils.isBlank(query) ? resRef.getPath() : resRef.getPath() + "?" + query;
+
+        final JsonValue model = json(object(
+                field("csrf", csrfProtection.createCsrfToken(request)),
+                field("target", target),
+                field("client_id", request.<String>getParameter(OAuth2Constants.Params.CLIENT_ID)),
+                field("client_name", consentRequired.getClientName()),
+                field("client_description", consentRequired.getClientDescription()),
+                field("user_name", consentRequired.getUserDisplayName()),
+                field("user_code", request.<String>getParameter(OAuth2Constants.DeviceCode.USER_CODE)),
+                field("save_consent_enabled", consentRequired.isSaveConsentEnabled())));
+        model.asMap().putAll(rawScopesAndClaims(consentRequired).asMap());
+        return model;
+    }
+
+    /**
+     * Builds the requested scopes and claims for the JSON consent representation. Unlike
+     * {@link #addDisplayScopesAndClaims} the values are left raw: HTML encoding is a concern of the consent
+     * page, and would corrupt the values for an API client.
+     *
+     * <p>Claims that belong to a requested scope are nested under it; the remainder are listed separately.
+     * Values are rendered as text, matching what the consent page displays.</p>
+     *
+     * @param consentRequired The details for requesting consent.
+     * @return An object holding a {@code scopes} and a {@code claims} array.
+     */
+    static JsonValue rawScopesAndClaims(ResourceOwnerConsentRequired consentRequired) {
+        final JsonValue scopes = json(array());
+        final Set<String> consumedClaims = new HashSet<>();
+        final Map<String, List<String>> compositeScopes = consentRequired.getClaims().getCompositeScopes();
+        final Map<String, String> claimDescriptions = consentRequired.getClaimDescriptions();
+        final Map<String, Object> claimValues = new LinkedHashMap<>(consentRequired.getClaims().getValues());
+
+        for (Map.Entry<String, String> scope : consentRequired.getScopeDescriptions().entrySet()) {
+            final JsonValue claims = json(array());
+            final List<String> scopeClaims = compositeScopes.get(scope.getKey());
+            if (scopeClaims != null) {
+                for (String claim : scopeClaims) {
+                    if (claimValues.get(claim) != null) {
+                        claims.add(rawClaim(claim, claimDescriptions, claimValues).getObject());
+                        consumedClaims.add(claim);
+                    }
+                }
+            }
+            scopes.add(object(
+                    field("name", scope.getKey()),
+                    field("description", scope.getValue()),
+                    field("claims", claims.getObject())));
+        }
+
+        claimValues.keySet().removeAll(consumedClaims);
+        final JsonValue remainingClaims = json(array());
+        for (String claim : claimValues.keySet()) {
+            remainingClaims.add(rawClaim(claim, claimDescriptions, claimValues).getObject());
+        }
+
+        return json(object(field("scopes", scopes.getObject()), field("claims", remainingClaims.getObject())));
+    }
+
+    private static JsonValue rawClaim(String claim, Map<String, String> descriptions, Map<String, Object> values) {
+        return json(object(
+                field("name", claim),
+                field("description", descriptions.get(claim)),
+                field("value", values.get(claim).toString())));
+    }
+
     private void addDisplayScopesAndClaims(ResourceOwnerConsentRequired consentRequired, Map<String, Object> data) {
         JsonValue scopes = json(array());
         List<String> scopeNames = new ArrayList<>();

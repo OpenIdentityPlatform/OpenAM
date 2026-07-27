@@ -15,59 +15,13 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
+import { OPENAM_BASE, ensureOAuth2ServiceExists, getAdminToken, getAuthToken, PASSWORD, USERNAME }
+  from "../common/openam-commons.mjs";
 
 const REALM = "root";
 const CLIENT_ID = "test_client_app";
 const SCOPE="profile"
 const REDIRECT_URI="http://app.invalid/cb"
-/**
- * Ensures the OAuth2 service exists in the OpenAM instance.
- * Creates it with default configuration if it doesn't exist.
- */
-async function ensureOAuth2ServiceExists(adminToken, request) {
-  const response = await request.get(`${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/oauth-oidc`,
-    {
-      headers: {
-        "iPlanetDirectoryPro": adminToken,
-        "Accept-API-Version": "protocol=1.0,resource=1.0",
-      },
-    }
-  );
-
-  if (response.status() === 404) {
-    // OAuth2 service doesn't exist, create it
-    const createResponse = await request.post(`${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/oauth-oidc?_action=create`,
-      {
-        headers: {
-          "iPlanetDirectoryPro": adminToken,
-          "Content-Type": "application/json",
-          "Accept-API-Version": "protocol=1.0,resource=1.0",
-        },
-        data: {
-          advancedOAuth2Config: {
-            clientsCanSkipConsent: true,
-            supportedScopes: [SCOPE],
-            defaultScopes: [SCOPE],
-          },
-        },
-      }
-    );
-
-    if (!createResponse.ok()) {
-      throw new Error(
-        `Failed to create OAuth2 service: ${createResponse.statusText()}`
-      );
-    }
-    console.log("OAuth2 service created successfully");
-  } else if (!response.ok()) {
-    throw new Error(
-      `Failed to check OAuth2 service: ${createResponse.statusText()}`
-    );
-  } else {
-    console.log("OAuth2 service already exists");
-  }
-}
 
 /**
  * Ensures an OAuth2 client application exists in the OpenAM instance.
@@ -132,7 +86,7 @@ test.beforeAll(async ({ request }) => {
     test.skip("Skipping: ADMIN_TOKEN not set");
 
   }
-  await ensureOAuth2ServiceExists(adminToken, request);
+  await ensureOAuth2ServiceExists(adminToken, request, REALM, [SCOPE]);
   await ensureOAuth2ClientExists(adminToken, request);
 });
 
