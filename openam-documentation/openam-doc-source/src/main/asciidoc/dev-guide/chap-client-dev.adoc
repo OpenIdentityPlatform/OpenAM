@@ -512,6 +512,12 @@ The `/json/authenticate` endpoint does not support the CRUDPAQ verbs and therefo
 
 The simplest user name/password authentication returns a `tokenId` that applications can present as a cookie value for other operations that require authentication. The type of `tokenId` returned varies depending on whether stateless sessions are enabled in the realm to which the user authenticates:
 
+[NOTE]
+====
+When the server is configured with HttpOnly session cookies (`com.sun.identity.cookie.httponly=true`), the token is delivered only through the `Set-Cookie` header and `tokenId` is __not__ returned in the response body shown in these examples. Clients that rely on reading `tokenId` from the body should either use the automatically sent cookie instead, or ask the server administrator to set `org.openidentityplatform.openam.httponly.allowTokenInBody` to `true`. See xref:../reference/chap-config-ref.adoc#chap-config-ref["Configuration Reference"] in the __Reference__.
+====
+
+
 * If stateless sessions are not enabled, the `tokenId` is an OpenAM SSO token.
 
 * If stateless sessions are enabled, the `tokenId` is an OpenAM SSO token that includes an encoded OpenAM session.
