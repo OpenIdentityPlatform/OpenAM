@@ -281,7 +281,20 @@ public class AuthXMLRequest {
      */
     public void setPrincipal(String className,String principalValue) {
         try {
-            Class clName = Class.forName(className);
+            // className is read from the /authservice (PLL) request XML, so it must not be
+            // resolved with side effects. Load the class without running its static
+            // initializers and verify it is a Principal BEFORE instantiating it: the
+            // (Principal) cast below is evaluated only after newInstance() has already run
+            // the class's static initializer and constructor, so the cast is not a control.
+            // Same hardening as AuthXMLUtils.createCustomCallback
+            // (GHSA-wg5r-wc3x-39vc / CVE-2026-62379).
+            Class clName = Class.forName(className, false,
+                AuthXMLRequest.class.getClassLoader());
+            if (!Principal.class.isAssignableFrom(clName)) {
+                debug.error("AuthXMLRequest.setPrincipal : class " + className
+                    + " is not a java.security.Principal implementation");
+                return;
+            }
             principal = (Principal) clName.newInstance();
         } catch (ClassNotFoundException ce) {
             //debug.error("Error creating class instance " , e); 
