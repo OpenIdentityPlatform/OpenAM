@@ -281,13 +281,14 @@ public class AuthXMLRequest {
      */
     public void setPrincipal(String className,String principalValue) {
         try {
-            // className is read from the /authservice (PLL) request XML, so it must not be
-            // resolved with side effects. Load the class without running its static
-            // initializers and verify it is a Principal BEFORE instantiating it: the
-            // (Principal) cast below is evaluated only after newInstance() has already run
-            // the class's static initializer and constructor, so the cast is not a control.
-            // Same hardening as AuthXMLUtils.createCustomCallback
-            // (GHSA-wg5r-wc3x-39vc / CVE-2026-62379).
+            // Nothing in the tree reaches this today: setPrincipal has no in-tree callers and
+            // AuthXMLTags.PRINCIPAL is declared but never parsed into it. It is public API on a
+            // request object, though, so it is held to the same contract as
+            // AuthXMLUtils.createCustomCallback after GHSA-wg5r-wc3x-39vc / CVE-2026-62379.
+            // Load the class without running its static initializers and verify it is a
+            // Principal BEFORE instantiating it: the (Principal) cast below is evaluated only
+            // after newInstance() has already run the class's static initializer and
+            // constructor, so the cast is not a control.
             Class clName = Class.forName(className, false,
                 AuthXMLRequest.class.getClassLoader());
             if (!Principal.class.isAssignableFrom(clName)) {
