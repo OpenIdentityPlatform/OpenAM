@@ -82,9 +82,10 @@ public class IT_SetupWithOpenDJ extends CargoBaseTest {
     private void testOpenAmInstallation(String openamUrl, Integer opendjPort) throws Exception {
         driver.get(openamUrl);
 
-        //wait for setup page is loaded
-        waitForElement(By.id("pushConfigDialog_c"));
-        WebElement createLink = driver.findElement(By.id("CreateNewConf"));
+        //wait until the "Create New Configuration" link is ready to click: renderWizard()
+        //removes the "disabled" class and attaches the click handler in the same render callback,
+        //once the wizard fragment has finished loading. Clicking before that is a no-op.
+        WebElement createLink = waitForElement(By.cssSelector("a#CreateNewConf:not(.disabled)"));
         createLink.click();
 
         //wait for licence check

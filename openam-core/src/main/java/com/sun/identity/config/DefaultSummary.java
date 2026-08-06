@@ -25,12 +25,11 @@
  * $Id: DefaultSummary.java,v 1.13 2009/01/05 23:17:09 veiming Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.config;
 
-import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.HttpServletRequestWrapper;
@@ -39,17 +38,12 @@ import com.sun.identity.setup.SetupConstants;
 import jakarta.servlet.http.HttpServletRequest;
 
 import com.sun.identity.shared.Constants;
-import org.openidentityplatform.openam.click.control.ActionLink;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 
-public class DefaultSummary extends ProtectedPage {
-    
-    public ActionLink createConfig = 
-        new ActionLink("createDefaultConfig", this, "createDefaultConfig");
-    
-    public void onInit() {
-        super.onInit();
-    }
-    
+public class DefaultSummary extends ProtectedSetupPage {
+
+    @ConfiguratorAction
     public boolean createDefaultConfig() {
         HttpServletRequest req = getContext().getRequest();
         HttpServletRequestWrapper request = 
@@ -134,7 +128,6 @@ public class DefaultSummary extends ProtectedPage {
             debug.error("DefaultSummary.createDefaultConfig()", e);
         }
         writeToResponse( ((responseString!=null)?responseString:"") );
-        setPath(null);
         return false;
     }
 }

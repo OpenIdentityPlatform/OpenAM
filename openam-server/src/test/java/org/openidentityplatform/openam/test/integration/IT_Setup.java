@@ -38,9 +38,10 @@ public class IT_Setup extends CargoBaseTest {
 
         driver.get(openamUrl);
 
-        //wait for setup page is loaded
-        waitForElement(By.id("pushConfigDialog_c"));
-        WebElement createDefaultLink = driver.findElement(By.id("DemoConfiguration"));
+        //wait until the "Default Configuration" link is ready to click: renderDefaultSummary()
+        //removes the "disabled" class and attaches the click handler in the same render callback,
+        //once the defaultSummary fragment has finished loading. Clicking before that is a no-op.
+        WebElement createDefaultLink = waitForElement(By.cssSelector("a#DemoConfiguration:not(.disabled)"));
         createDefaultLink.click();
 
         //wait for licence check
