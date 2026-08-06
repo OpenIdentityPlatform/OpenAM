@@ -1,0 +1,44 @@
+<!--
+  ~ The contents of this file are subject to the terms of the Common Development and
+  ~ Distribution License (the License). You may not use this file except in compliance with the
+  ~ License.
+  ~
+  ~ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  ~ specific language governing permission and limitations under the License.
+  ~
+  ~ When distributing Covered Software, include this CDDL Header Notice in each file and include
+  ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
+  ~ information: "Portions copyright [year] [name of copyright owner]".
+  ~
+  ~ Copyright 2026 3A Systems, LLC.
+  -->
+<!--
+  SP metadata that deliberately OMITS every optional boolean attribute
+  (WantAssertionsSigned, AuthnRequestsSigned on SPSSODescriptor and isDefault on
+  the AssertionConsumerService entries). Under JAXB 3 these map to nullable
+  Boolean getters that return null when the attribute is absent, so this fixture
+  guards the migration against auto-unboxing NullPointerExceptions on core SSO
+  paths that previously saw a primitive false.
+-->
+<EntityDescriptor
+        xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+        entityID="https://sp.example.com/no-optional-booleans">
+    <SPSSODescriptor
+            protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <SingleLogoutService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                Location="https://sp.example.com/SPSloRedirect/metaAlias/sp"/>
+        <NameIDFormat>
+            urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+        </NameIDFormat>
+        <AssertionConsumerService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                Location="https://sp.example.com/AssertionConsumer/metaAlias/sp"
+                index="0"/>
+        <AssertionConsumerService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+                Location="https://sp.example.com/Artifact/metaAlias/sp"
+                index="1"/>
+    </SPSSODescriptor>
+</EntityDescriptor>

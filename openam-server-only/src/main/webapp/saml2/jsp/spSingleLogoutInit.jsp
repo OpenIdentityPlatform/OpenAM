@@ -25,6 +25,7 @@
    $Id: spSingleLogoutInit.jsp,v 1.13 2009/10/15 00:01:11 exu Exp $
 
    Portions Copyrighted 2012-2016 ForgeRock AS.
+   Portions Copyrighted 2026 3A Systems LLC.
 --%>
 
 <%@ page import="com.sun.identity.plugin.session.SessionManager" %>
@@ -150,7 +151,7 @@
                 SPSSOConfigElement spConfig = 
                     manager.getSPSSOConfig("/", spEntityID);
                 if (spConfig != null) {
-                    metaAlias = spConfig.getMetaAlias();
+                    metaAlias = spConfig.getValue().getMetaAlias();
                 }
             } 
         }

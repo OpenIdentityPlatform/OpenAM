@@ -24,7 +24,7 @@
  *
  * $Id: Message.java,v 1.3 2008/06/25 05:47:22 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -47,10 +47,10 @@ import org.w3c.dom.NodeList;
 
 import java.util.List;
 import jakarta.xml.soap.SOAPMessage;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import com.sun.identity.liberty.ws.common.wsse.BinarySecurityToken;
 import com.sun.identity.liberty.ws.common.wsse.WSSEConstants;

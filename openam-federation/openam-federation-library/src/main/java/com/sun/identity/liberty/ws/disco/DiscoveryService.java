@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DiscoveryService.java,v 1.5 2008/12/05 00:18:30 exu Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  * Portions Copyrighted 2026 3A Systems, LLC
  */
@@ -38,7 +40,9 @@ import java.util.Set;
 import java.util.Collection;
 import java.util.logging.Level;
 
-import javax.xml.bind.JAXBException;
+import com.sun.identity.liberty.ws.disco.plugins.jaxb.DiscoEntryElement;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import org.w3c.dom.*;
 
 import com.sun.identity.shared.xml.XMLUtils;
@@ -167,12 +171,18 @@ public final class DiscoveryService implements RequestHandler {
         }
 
         Object body = bodies.iterator().next();
-        if (body instanceof QueryType) {
+        if(!(body instanceof JAXBElement)) {
+            DiscoUtils.debug.error("DiscoService.processRequest: SOAPBody "
+                    + "is not a Disco message.");
+            throw new Exception(DiscoUtils.bundle.getString("bodyNotDisco"));
+        }
+        JAXBElement<?> jaxbElement = (JAXBElement<?>)body;
+        if (jaxbElement.getValue() instanceof QueryType) {
             message.setSOAPBody(
-                lookup((QueryType) body, request));
-        } else if (body instanceof ModifyType)        {
+                lookup((QueryType) jaxbElement.getValue(), request));
+        } else if (jaxbElement.getValue() instanceof ModifyType)        {
             message.setSOAPBody(
-                Utils.convertJAXBToElement(update((ModifyType) body,request)));
+                Utils.convertJAXBToElement(update((ModifyType) jaxbElement.getValue(),request)));
         } else {
             DiscoUtils.debug.error("DiscoService.processRequest: SOAPBody "
                         + "is not a Disco message.");
@@ -261,9 +271,9 @@ public final class DiscoveryService implements RequestHandler {
                 resp.toString(), null).getDocumentElement();
         }
 
-        Map discoEntriesMap = entryHandler.getDiscoEntries(userDN,
+        Map<String, DiscoEntryElement> discoEntriesMap = entryHandler.getDiscoEntries(userDN,
                                         query.getRequestedServiceType());
-        Collection results = discoEntriesMap.values();
+        Collection<DiscoEntryElement> results = discoEntriesMap.values();
 
         Map returnMap = null;
         if (results.size() == 0) {
@@ -340,16 +350,11 @@ public final class DiscoveryService implements RequestHandler {
         DiscoUtils.debug.message("in update.");
         ModifyResponseElement resp = null;
         StatusType status = null;
-        try {
-            resp =
-                DiscoUtils.getDiscoFactory().createModifyResponseElement();
-            status = DiscoUtils.getDiscoFactory().createStatusType();
-            resp.setStatus(status);
-        } catch (JAXBException je) {
-            DiscoUtils.debug.error("DiscoService.update: couldn't form "
-                + "ModifyResponse.");
-            throw je;
-        }
+        resp =
+            DiscoUtils.getDiscoFactory().createModifyResponseElement(
+                    DiscoUtils.getDiscoFactory().createModifyResponseType());
+        status = DiscoUtils.getDiscoFactory().createStatusType();
+        resp.getValue().setStatus(DiscoUtils.getDiscoFactory().createStatusElement(status));
 
         String providerID = DiscoServiceManager.getDiscoProviderID();
         String resourceID = null;
@@ -437,7 +442,7 @@ public final class DiscoveryService implements RequestHandler {
             List entryIds = (List) results.get(
                                         DiscoEntryHandler.NEW_ENTRY_IDS);
             if ((entryIds != null) && (entryIds.size() != 0)) {
-                resp.getNewEntryIDs().addAll(entryIds);
+                resp.getValue().getNewEntryIDs().addAll(entryIds);
             }
             String[] data = { logMsg };
             LogUtil.access(Level.INFO,
@@ -484,8 +489,8 @@ public final class DiscoveryService implements RequestHandler {
                 }
                 if (!authorizer.isAuthorized(message.getToken(),
                                 DiscoConstants.ACTION_UPDATE,
-                                ((InsertEntryType) entryMap.get(entryID)).
-                                                        getResourceOffering(),
+                                ((DiscoEntryElement) entryMap.get(entryID)).getValue()
+                                                        .getResourceOffering().getValue(),
                                 env))
                 {
                     DiscoUtils.debug.error("DiscoveryService.isUpdateAllowed: "
@@ -508,7 +513,7 @@ public final class DiscoveryService implements RequestHandler {
                 }
                 if (!authorizer.isAuthorized(message.getToken(),
                         DiscoConstants.ACTION_UPDATE,
-                        ((InsertEntryType) j.next()).getResourceOffering(),
+                        ((InsertEntryType) j.next()).getResourceOffering().getValue(),
                         env))
                 {
                     DiscoUtils.debug.error("DiscoveryService.isUpdateAllowed: "
@@ -521,7 +526,7 @@ public final class DiscoveryService implements RequestHandler {
         return true;
     }
 
-    private String getResourceID(EncryptedResourceIDType encryptResID,
+    private String getResourceID(EncryptedResourceIDElement encryptResID,
                                 String providerID)
     {
         if ((encryptResID == null) || (providerID == null)) {

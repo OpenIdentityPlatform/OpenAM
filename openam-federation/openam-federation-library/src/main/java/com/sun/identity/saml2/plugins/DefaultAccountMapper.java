@@ -25,6 +25,7 @@
  * $Id: DefaultAccountMapper.java,v 1.4 2008/06/25 05:47:50 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.plugins;
 
@@ -207,9 +208,9 @@ public class DefaultAccountMapper {
 
     protected final BaseConfigType getSSOConfig(String realm, String entityID) throws SAML2MetaException {
         if (IDP.equals(role)) {
-            return metaManager.getIDPSSOConfig(realm, entityID);
+            return metaManager.getIDPSSOConfig(realm, entityID).getValue();
         } else {
-            return metaManager.getSPSSOConfig(realm, entityID);
+            return metaManager.getSPSSOConfig(realm, entityID).getValue();
         }
     }
 }

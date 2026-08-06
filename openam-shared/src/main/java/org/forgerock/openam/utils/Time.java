@@ -19,6 +19,7 @@ package org.forgerock.openam.utils;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.ServiceLoader;
@@ -27,6 +28,10 @@ import java.util.TimeZone;
 import org.forgerock.util.time.TimeService;
 import org.joda.time.DateTimeUtils;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 /**
  * The source of all time-based information in OpenAM.
@@ -42,6 +47,24 @@ public enum Time implements DateTimeUtils.MillisProvider {
     INSTANCE;
 
     private final TimeService timeService;
+
+    /**
+     * Lazy holder for the shared {@link DatatypeFactory}. Creating a factory is comparatively
+     * expensive and the instance is safe for concurrent {@code newXMLGregorianCalendar} calls, so
+     * it is created once. Deferring creation until the first {@code getXMLGregorianCalendarInstance}
+     * call keeps it off the {@code Time} class-initialization path (which nearly every code path
+     * touches), avoiding surprises from the JAXP factory lookup at class-load time.
+     */
+    private static final class DatatypeFactoryHolder {
+        static final DatatypeFactory INSTANCE;
+        static {
+            try {
+                INSTANCE = DatatypeFactory.newInstance();
+            } catch (DatatypeConfigurationException e) {
+                throw new ExceptionInInitializerError(e);
+            }
+        }
+    }
 
     Time() {
         Iterator<TimeService> services = ServiceLoader.load(TimeService.class).iterator();
@@ -147,5 +170,23 @@ public enum Time implements DateTimeUtils.MillisProvider {
     private static Calendar setCalendarTime(Calendar calendar) {
         calendar.setTimeInMillis(currentTimeMillis());
         return calendar;
+    }
+
+    public static XMLGregorianCalendar getXMLGregorianCalendarInstance() throws DatatypeConfigurationException {
+
+        Calendar calendar = getCalendarInstance();
+
+        GregorianCalendar gCalendar = new GregorianCalendar();
+        gCalendar.setTime(calendar.getTime());
+        gCalendar.setTimeZone(calendar.getTimeZone());
+
+        return DatatypeFactoryHolder.INSTANCE.newXMLGregorianCalendar(gCalendar);
+    }
+
+    public static XMLGregorianCalendar getXMLGregorianCalendarInstance(Date date) throws DatatypeConfigurationException {
+        GregorianCalendar gCalendar = new GregorianCalendar();
+        gCalendar.setTime(date);
+
+        return DatatypeFactoryHolder.INSTANCE.newXMLGregorianCalendar(gCalendar);
     }
 }

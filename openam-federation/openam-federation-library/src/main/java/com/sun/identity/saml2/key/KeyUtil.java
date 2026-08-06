@@ -25,6 +25,7 @@
  * $Id: KeyUtil.java,v 1.10 2009/08/28 23:42:14 exu Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.key;
 
@@ -42,6 +43,9 @@ import java.security.cert.X509Certificate;
 import java.util.Set;
 
 import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.saml2.jaxb.metadata.EncryptionMethodElement;
+import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.KeyTypes;
 import org.apache.xml.security.encryption.XMLCipher;
 
 import com.sun.identity.common.SystemConfigurationUtil;
@@ -224,7 +228,7 @@ public class KeyUtil {
             );
             return null;
         }
-        List<KeyDescriptorType> keyDescriptors = getKeyDescriptors(roleDescriptor, SAML2Constants.SIGNING);
+        List<KeyDescriptorElement> keyDescriptors = getKeyDescriptors(roleDescriptor, SAML2Constants.SIGNING);
         if (keyDescriptors.isEmpty()) {
             SAML2SDKUtils.debug.error(
                 classMethod+
@@ -234,7 +238,7 @@ public class KeyUtil {
             return certificates;
         }
 
-        for (KeyDescriptorType keyDescriptor : keyDescriptors) {
+        for (KeyDescriptorElement keyDescriptor : keyDescriptors) {
             certificates.add(getCert(keyDescriptor));
         }
         if (certificates.isEmpty()) {
@@ -288,7 +292,7 @@ public class KeyUtil {
             );
             return null;
         }
-        KeyDescriptorType kd =
+        KeyDescriptorElement kd =
             getKeyDescriptor(roled, SAML2Constants.ENCRYPTION);
         if (kd == null) {
             SAML2SDKUtils.debug.error(
@@ -307,12 +311,12 @@ public class KeyUtil {
             );
             return null;
         }
-        List emList = kd.getEncryptionMethod();
+        List<EncryptionMethodElement> emList = kd.getValue().getEncryptionMethod();
         EncryptionMethodType em = null;
         String algorithm = null;
         int keySize = 0;
         if (emList != null && !emList.isEmpty()) {            
-            em = (EncryptionMethodType)emList.get(0);
+            em = emList.get(0).getValue();
             if (em != null) {
                 algorithm = em.getAlgorithm();
                 List cList = em.getContent();
@@ -353,16 +357,16 @@ public class KeyUtil {
      * @param usage Type of the {@link KeyDescriptorType}s to be retrieved. Its value is "encryption" or "signing".
      * @return {@link KeyDescriptorType}s in {@link RoleDescriptorType} that matched the usage type.
      */
-    public static List<KeyDescriptorType> getKeyDescriptors(RoleDescriptorType roleDescriptor, String usage) {
-        List<KeyDescriptorType> keyDescriptors = roleDescriptor.getKeyDescriptor();
-        List<KeyDescriptorType> matches = new ArrayList<>(keyDescriptors.size());
-        List<KeyDescriptorType> keyDescriptorsWithoutUsage = new ArrayList<>(keyDescriptors.size());
+    public static List<KeyDescriptorElement> getKeyDescriptors(RoleDescriptorType roleDescriptor, String usage) {
+        List<KeyDescriptorElement> keyDescriptors = roleDescriptor.getKeyDescriptor();
+        List<KeyDescriptorElement> matches = new ArrayList<>(keyDescriptors.size());
+        List<KeyDescriptorElement> keyDescriptorsWithoutUsage = new ArrayList<>(keyDescriptors.size());
 
-        for (KeyDescriptorType keyDescriptor : keyDescriptors) {
-            String use = keyDescriptor.getUse();
-            if (StringUtils.isBlank(use)) {
+        for (KeyDescriptorElement keyDescriptor : keyDescriptors) {
+            KeyTypes use = keyDescriptor.getValue().getUse();
+            if (use == null || StringUtils.isBlank(use.value())) {
                 keyDescriptorsWithoutUsage.add(keyDescriptor);
-            } else if (use.trim().toLowerCase().equals(usage)) {
+            } else if (use.value().trim().toLowerCase().equals(usage)) {
                 matches.add(keyDescriptor);
             }
         }
@@ -381,11 +385,11 @@ public class KeyUtil {
      * @return KeyDescriptorType in <code>RoleDescriptorType</code> that matched
      *                the usage type.
      */
-    public static KeyDescriptorType getKeyDescriptor(
+    public static KeyDescriptorElement getKeyDescriptor(
         RoleDescriptorType roled,
         String usage
     ) {
-        final List<KeyDescriptorType> keyDescriptors = getKeyDescriptors(roled, usage);
+        final List<KeyDescriptorElement> keyDescriptors = getKeyDescriptors(roled, usage);
         return CollectionUtils.getFirstItem(keyDescriptors, null);
     }
 
@@ -396,11 +400,11 @@ public class KeyUtil {
      *                <code>null</code> if no certificate is included.
      */
     public static java.security.cert.X509Certificate getCert(
-        KeyDescriptorType kd
+            KeyDescriptorElement kd
     ) {
 
         String classMethod = "KeyUtil.getCert: ";
-        KeyInfoType ki = kd.getKeyInfo();
+        KeyInfoType ki = kd.getValue().getKeyInfo();
         if (ki == null) {
             SAML2SDKUtils.debug.error(classMethod +
                     "No KeyInfo.");
@@ -421,7 +425,7 @@ public class KeyUtil {
             return null;
         }
         //iterate and search the X509Certificate node
-        it = data.getX509IssuerSerialOrX509SKIOrX509SubjectName().iterator();
+        it = data.getValue().getX509IssuerSerialOrX509SKIOrX509SubjectName().iterator();
         com.sun.identity.saml2.jaxb.xmlsig.X509DataType.X509Certificate cert = null;
         while ((cert == null) && it.hasNext()) {
             Object content = it.next();
@@ -471,7 +475,7 @@ public class KeyUtil {
      */
     public static Set<X509Certificate> getPEPVerificationCerts(XACMLAuthzDecisionQueryDescriptorElement pepDescriptor,
             String entityID) {
-        return getVerificationCerts(pepDescriptor, entityID, SAML2Constants.PEP_ROLE);
+        return getVerificationCerts(pepDescriptor.getValue(), entityID, SAML2Constants.PEP_ROLE);
     }
 
     /**
@@ -513,7 +517,7 @@ public class KeyUtil {
             );
             return null;
         }
-        KeyDescriptorType kd = getKeyDescriptor(pepDesc,SAML2Constants.ENCRYPTION);
+        KeyDescriptorElement kd = getKeyDescriptor(pepDesc.getValue(), SAML2Constants.ENCRYPTION);
         if (kd == null) {
             SAML2SDKUtils.debug.error(
                 classMethod+
@@ -533,7 +537,7 @@ public class KeyUtil {
      * @param role the role of the entity . Value can be PEP or PDP.
      * @return <code>EncInfo</code> the encryption info.
      */
-    private static EncInfo getEncryptionInfo(KeyDescriptorType kd,
+    private static EncInfo getEncryptionInfo(KeyDescriptorElement kd,
                                              String entityID, String role) {
         String classMethod = "KeyUtil:getEncryptionInfo:";
         java.security.cert.X509Certificate cert = getCert(kd);
@@ -545,12 +549,12 @@ public class KeyUtil {
             );
             return null;
         }
-        List emList = kd.getEncryptionMethod();
+        List<EncryptionMethodElement> emList = kd.getValue().getEncryptionMethod();
         EncryptionMethodType em = null;
         String algorithm = null;
         int keySize = 0;
         if (emList != null && !emList.isEmpty()) {            
-            em = (EncryptionMethodType)emList.get(0);
+            em = emList.get(0).getValue();
             if (em != null) {
                 algorithm = em.getAlgorithm();
                 List cList = em.getContent();
@@ -586,7 +590,7 @@ public class KeyUtil {
      */
     public static Set<X509Certificate> getPDPVerificationCerts(XACMLPDPDescriptorElement pdpDescriptor,
             String entityID) {
-        return getVerificationCerts(pdpDescriptor, entityID, SAML2Constants.PDP_ROLE);
+        return getVerificationCerts(pdpDescriptor.getValue(), entityID, SAML2Constants.PDP_ROLE);
     }
 
     /**

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDFFMetaManager.java,v 1.9 2009/10/28 23:58:57 exu Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 
@@ -58,7 +60,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * The <code>IDFFMetaManager</code> provides methods to manage the Service and
@@ -163,7 +165,7 @@ public class IDFFMetaManager {
             LogUtil.error(Level.INFO, LogUtil.NULL_ENTITY_DESCRIPTOR, null);
             throw new IDFFMetaException("nullEntityDescriptor",null);
         } else {
-            entityId = entityDescriptor.getProviderID();
+            entityId = entityDescriptor.getValue().getProviderID();
             if (entityId == null) {
                 debug.error(classMethod + "Entity ID is null");
                 LogUtil.error(Level.INFO, LogUtil.NULL_ENTITY_ID, null);
@@ -179,13 +181,13 @@ public class IDFFMetaManager {
             realm,entityId);
         
         if (descriptor != null) {
-            List idps = descriptor.getIDPDescriptor();
+            List<IDPDescriptorType> idps = descriptor.getValue().getIDPDescriptor();
             boolean hasIDP = (idps != null) && !idps.isEmpty();
-            List sps = descriptor.getSPDescriptor();
+            List<SPDescriptorType> sps = descriptor.getValue().getSPDescriptor();
             boolean hasSP = (sps != null) && !sps.isEmpty();
             
-            List newIDPs = entityDescriptor.getIDPDescriptor();
-            List newSPs = entityDescriptor.getSPDescriptor();
+            List<IDPDescriptorType> newIDPs = entityDescriptor.getValue().getIDPDescriptor();
+            List<SPDescriptorType> newSPs = entityDescriptor.getValue().getSPDescriptor();
             
             if ((newIDPs != null) && !newIDPs.isEmpty() && hasIDP) {
                 LogUtil.error(Level.INFO, LogUtil.SET_ENTITY_FAILED, args);
@@ -317,7 +319,7 @@ public class IDFFMetaManager {
     throws IDFFMetaException {
         String classMethod = "IDFFMetaManager:setEntityDescriptor";
         if (entityDescriptor != null) {
-            String entityID = entityDescriptor.getProviderID();
+            String entityID = entityDescriptor.getValue().getProviderID();
             if ((realm == null) || (realm.length() == 0)) {
                 realm = ROOT_REALM;
             }
@@ -506,7 +508,7 @@ public class IDFFMetaManager {
         EntityDescriptorElement entityDescriptor =
                 getEntityDescriptor(realm, entityID);
         if (entityDescriptor != null) {
-            affiliationDescriptor = entityDescriptor.getAffiliationDescriptor();
+            affiliationDescriptor = entityDescriptor.getValue().getAffiliationDescriptor();
         }
         return affiliationDescriptor;
     }
@@ -528,7 +530,7 @@ public class IDFFMetaManager {
             LogUtil.error(Level.INFO, LogUtil.NULL_ENTITY_CONFIG, null);
             throw new IDFFMetaException("nullEntityConfig",null);
         } else {
-            entityID = entityConfig.getEntityID();
+            entityID = entityConfig.getValue().getEntityID();
             if (entityID == null) {
                 LogUtil.error(Level.INFO, LogUtil.NULL_ENTITY_ID, null);
                 debug.error( classMethod + "entity ID is null");
@@ -676,7 +678,7 @@ public class IDFFMetaManager {
     throws IDFFMetaException {
         String classMethod = "IDFFMetaManager:setEntityConfig";
         if (entityConfig != null) {
-            String entityID = entityConfig.getEntityID();
+            String entityID = entityConfig.getValue().getEntityID();
             if ((realm == null) || (realm.length() == 0)) {
                 realm = ROOT_REALM;
             }
@@ -783,7 +785,7 @@ public class IDFFMetaManager {
         if (entityConfig != null) {
             affiliationDesConfig =
                     (AffiliationDescriptorConfigElement)
-                    entityConfig.getAffiliationDescriptorConfig();
+                    entityConfig.getValue().getAffiliationDescriptorConfig();
         }
         return affiliationDesConfig;
     }
@@ -832,7 +834,7 @@ public class IDFFMetaManager {
                     String entityID = (String) entityIterator.next();
                     EntityConfigElement entityConfig =
                             getEntityConfig(realm, entityID);
-                    if (entityConfig != null && entityConfig.isHosted()) {
+                    if (entityConfig != null && Boolean.TRUE.equals(entityConfig.getValue().isHosted())) {
                         hostedEntityList.add(entityID);
                     }
                 }
@@ -867,7 +869,7 @@ public class IDFFMetaManager {
                     String entityID = (String) entityIterator.next();
                     EntityConfigElement entityConfig =
                             getEntityConfig(realm, entityID);
-                    if (entityConfig != null && !entityConfig.isHosted()) {
+                    if (entityConfig != null && !Boolean.TRUE.equals(entityConfig.getValue().isHosted())) {
                         remoteEntityList.add(entityID);
                     }
                 }
@@ -998,12 +1000,12 @@ public class IDFFMetaManager {
             SPDescriptorConfigElement spConfig =
                     getSPDescriptorConfig(realm, entityID);
             if (spConfig != null) {
-                isTrusted = isSameCircleOfTrust(spConfig,realm, entityID);
+                isTrusted = isSameCircleOfTrust(spConfig.getValue(),realm, entityID);
             } else {
                 IDPDescriptorConfigElement idpConfig =
                         getIDPDescriptorConfig(realm, entityID);
                 if (idpConfig != null) {
-                    isTrusted = isSameCircleOfTrust(idpConfig,realm, entityID);
+                    isTrusted = isSameCircleOfTrust(idpConfig.getValue(),realm, entityID);
                 }
             }
         } catch (IDFFMetaException ide) {
@@ -1202,7 +1204,7 @@ public class IDFFMetaManager {
                 SPDescriptorConfigElement spconfig =
                         getSPDescriptorConfig(realm, tmpId);
                 if (spconfig != null) {
-                    String tmpMetaAlias = spconfig.getMetaAlias();
+                    String tmpMetaAlias = spconfig.getValue().getMetaAlias();
                     if (tmpMetaAlias != null && tmpMetaAlias.length() > 0) {
                         if (metaAlias.equals(tmpMetaAlias)) {
                             // remember this and continue to process others,
@@ -1224,7 +1226,7 @@ public class IDFFMetaManager {
                 IDPDescriptorConfigElement idpconfig =
                         getIDPDescriptorConfig(realm, tmpId);
                 if (idpconfig != null) {
-                    String tmpMetaAlias = idpconfig.getMetaAlias();
+                    String tmpMetaAlias = idpconfig.getValue().getMetaAlias();
                     if (tmpMetaAlias != null && tmpMetaAlias.length() > 0) {
                         if (metaAlias.equals(tmpMetaAlias)) {
                             // remember this and continue to process others,
@@ -1460,13 +1462,13 @@ public class IDFFMetaManager {
         IDPDescriptorConfigElement idpConfig =
                 getIDPDescriptorConfig(realm, entityID);
         if (idpConfig !=null) {
-            addToCircleOfTrust(idpConfig, realm, entityID);
+            addToCircleOfTrust(idpConfig.getValue(), realm, entityID);
         }
         
         SPDescriptorConfigElement spConfig = getSPDescriptorConfig(
             realm, entityID);
         if (spConfig != null) {
-            addToCircleOfTrust(spConfig,realm, entityID);
+            addToCircleOfTrust(spConfig.getValue(),realm, entityID);
         }
     }
     
@@ -1482,19 +1484,19 @@ public class IDFFMetaManager {
         IDPDescriptorConfigElement idpConfig =
                 getIDPDescriptorConfig(realm, entityID);
         if (idpConfig != null) {
-            removeFromCircleOfTrust(idpConfig, realm, entityID);
+            removeFromCircleOfTrust(idpConfig.getValue(), realm, entityID);
         }
         
         SPDescriptorConfigElement spConfig = getSPDescriptorConfig(
             realm, entityID);
         if (spConfig != null) {
-            removeFromCircleOfTrust(spConfig, realm, entityID);
+            removeFromCircleOfTrust(spConfig.getValue(), realm, entityID);
         }
 
         AffiliationDescriptorConfigElement affiConfig = 
             getAffiliationDescriptorConfig(realm, entityID);
         if (affiConfig != null) {
-            removeFromCircleOfTrust(affiConfig, realm, entityID);
+            removeFromCircleOfTrust(affiConfig.getValue(), realm, entityID);
         }
     }
 }

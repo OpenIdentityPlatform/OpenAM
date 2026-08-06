@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -24,7 +25,7 @@ import com.sun.identity.entitlement.xacml3.core.AttributeValue;
 import com.sun.identity.entitlement.xacml3.core.EffectType;
 import com.sun.identity.entitlement.xacml3.core.ObjectFactory;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

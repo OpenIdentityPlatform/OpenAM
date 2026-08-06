@@ -12,14 +12,20 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems, LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 
 package com.sun.identity.saml2.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sun.identity.saml2.jaxb.assertion.AttributeElement;
+import com.sun.identity.saml2.jaxb.assertion.AttributeValueElement;
+import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
+import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.shared.encode.URLEncDec;
+import jakarta.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.Test;
 
@@ -74,5 +80,38 @@ public class SAML2UtilsTest {
         assertThat(mappedAttributes).containsEntry("name3", "\"static cn=value\"");
         assertThat(mappedAttributes).containsEntry("urn:oasis:names:tc:SAML:2.0:attrname-format:uri|urn:mace:dir:attribute-def:name4", "value");
         assertThat(mappedAttributes).containsEntry("urn:oasis:names:tc:SAML:2.0:attrname-format:uri|name5", "\"static value\"");
+    }
+
+    @Test
+    public void getAttributeValueStringExtractsTextFromUnmarshalledValues() throws Exception {
+        String authnContext = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
+        String xml = "<mdattr:EntityAttributes"
+                + " xmlns:mdattr=\"urn:oasis:names:tc:SAML:metadata:attribute\""
+                + " xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">"
+                + "<saml:Attribute Name=\"idp-authncontext\""
+                + " NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified\">"
+                + "<saml:AttributeValue>" + authnContext + "</saml:AttributeValue>"
+                + "</saml:Attribute>"
+                + "</mdattr:EntityAttributes>";
+
+        EntityAttributesElement eael = (EntityAttributesElement) SAML2MetaUtils.convertStringToJAXB(xml);
+        AttributeElement attribute = (AttributeElement) eael.getValue().getAttributeOrAssertion().get(0);
+        AttributeValueElement value = (AttributeValueElement) attribute.getValue().getAttributeValue().get(0);
+
+        // the anyType-bound payload is a DOM node after unmarshalling; the helper must
+        // still return the text content the pre-JAXB3 code exposed directly
+        assertThat(SAML2Utils.getAttributeValueString(value)).isEqualTo(authnContext);
+    }
+
+    @Test
+    public void getAttributeValueStringHandlesPlainPayloads() {
+        assertThat(SAML2Utils.getAttributeValueString(null)).isNull();
+
+        QName name = new QName("urn:oasis:names:tc:SAML:2.0:assertion", "AttributeValue");
+        JAXBElement<Object> plain = new JAXBElement<>(name, Object.class, "plain-value");
+        assertThat(SAML2Utils.getAttributeValueString(plain)).isEqualTo("plain-value");
+
+        JAXBElement<Object> empty = new JAXBElement<>(name, Object.class, null);
+        assertThat(SAML2Utils.getAttributeValueString(empty)).isNull();
     }
 }

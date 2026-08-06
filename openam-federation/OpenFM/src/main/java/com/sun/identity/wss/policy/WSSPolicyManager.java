@@ -23,12 +23,14 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: WSSPolicyManager.java,v 1.2 2009/12/19 00:09:41 asyhuang Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.wss.policy;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Iterator;
@@ -55,16 +57,14 @@ import com.sun.identity.wsfederation.jaxb.wsspolicy.TripleDesElement;
 import com.sun.identity.wsfederation.jaxb.wsspolicy.LayoutElement;
 import com.sun.identity.wsfederation.jaxb.wsspolicy.ProtectionTokenElement;
 import com.sun.identity.wsfederation.jaxb.wsspolicy.KerberosTokenElement;
-import com.sun.identity.wsfederation.jaxb.wsspolicy.
-        WssKerberosV5ApReqToken11Element;
+import com.sun.identity.wsfederation.jaxb.wsspolicy.WssKerberosV5ApReqToken11Element;
 import com.sun.identity.wsfederation.jaxb.wsspolicy.SignedPartsElement;
 import com.sun.identity.wsfederation.jaxb.wsspolicy.EncryptedPartsElement;
 import com.sun.identity.wsfederation.jaxb.wsspolicy.HeaderType;
 import com.sun.identity.wsfederation.jaxb.wsspolicy.IssuedTokenElement;
 import com.sun.identity.wsfederation.jaxb.wsaddr.EndpointReferenceElement;
 import com.sun.identity.wsfederation.jaxb.wsaddr.AttributedURIType;
-import com.sun.identity.wsfederation.jaxb.wsspolicy.
-        RequestSecurityTokenTemplateType;
+import com.sun.identity.wsfederation.jaxb.wsspolicy.RequestSecurityTokenTemplateType;
 import com.sun.identity.wss.provider.ProviderConfig;
 import com.sun.identity.wss.security.SecurityMechanism;
 import com.sun.identity.wss.security.WSSConstants;
@@ -118,7 +118,7 @@ public class WSSPolicyManager {
         try {
             PolicyElement policyElement = wsPolicyFactory.createPolicyElement();           
             ExactlyOneElement exactlyOneElement = 
-                    wsPolicyFactory.createExactlyOneElement();
+                    wsPolicyFactory.createExactlyOneElement(wsPolicyFactory.createOperatorContentType());
             //TODO - Need to add a config in the WSP config and then create the
             // issued token policy.
             boolean useIssuedTokenPolicy = false;
@@ -129,14 +129,14 @@ public class WSSPolicyManager {
             }
             for (Iterator iter = securityMech.iterator(); iter.hasNext();) {
                 String secMech = (String)iter.next();
-                AllElement allElement = wsPolicyFactory.createAllElement();                
+                AllElement allElement = wsPolicyFactory.createAllElement(wsPolicyFactory.createOperatorContentType());
                 if(SecurityMechanism.WSS_NULL_KERBEROS_TOKEN_URI.equals(
                         secMech)) {
                    SymmetricBindingElement sbe =
-                         wssPolicyFactory.createSymmetricBindingElement();
+                         wssPolicyFactory.createSymmetricBindingElement(wssPolicyFactory.createNestedPolicyType());
                    PolicyElement policyElement1 = 
                            wsPolicyFactory.createPolicyElement();
-                   sbe.setPolicy(policyElement1);
+                   sbe.getValue().setPolicy(policyElement1);
                    ProtectionTokenElement pte = 
                            createProtectionTokenElement(secMech);
                    policyElement1.getPolicyOrAllOrExactlyOne().add(pte);
@@ -152,17 +152,17 @@ public class WSSPolicyManager {
                    policyElement1.getPolicyOrAllOrExactlyOne().add(
                            createLayoutElement());
                    policyElement1.getPolicyOrAllOrExactlyOne().add(
-                        wssPolicyFactory.createIncludeTimestampElement());
+                        wssPolicyFactory.createIncludeTimestamp(wssPolicyFactory.createQNameAssertionType()));
                    policyElement1.getPolicyOrAllOrExactlyOne().add(
                        wssPolicyFactory.
-                       createOnlySignEntireHeadersAndBodyElement());
-                   allElement.getPolicyOrAllOrExactlyOne().add(sbe);
+                       createOnlySignEntireHeadersAndBody(wssPolicyFactory.createQNameAssertionType()));
+                   allElement.getValue().getPolicyOrAllOrExactlyOne().add(sbe);
                 } else if (useIssuedTokenPolicy) {
                    AsymmetricBindingElement abe =
-                      wssPolicyFactory.createAsymmetricBindingElement();
+                      wssPolicyFactory.createAsymmetricBindingElement(wssPolicyFactory.createNestedPolicyType());
                    PolicyElement policyElement1 = 
                            wsPolicyFactory.createPolicyElement();
-                   abe.setPolicy(policyElement1);
+                   abe.getValue().setPolicy(policyElement1);
                  
                    IssuedTokenElement ite = createIssuedTokenElement();
                    policyElement1.getPolicyOrAllOrExactlyOne().add(ite);
@@ -179,20 +179,20 @@ public class WSSPolicyManager {
                    policyElement1.getPolicyOrAllOrExactlyOne().add(
                            createLayoutElement());
                    policyElement1.getPolicyOrAllOrExactlyOne().add(
-                        wssPolicyFactory.createIncludeTimestampElement());
+                        wssPolicyFactory.createIncludeTimestamp(wssPolicyFactory.createQNameAssertionType()));
                    policyElement1.getPolicyOrAllOrExactlyOne().add(
                        wssPolicyFactory.
-                       createOnlySignEntireHeadersAndBodyElement());
-                   allElement.getPolicyOrAllOrExactlyOne().add(abe);
-                   exactlyOneElement.getPolicyOrAllOrExactlyOne().add(
+                       createOnlySignEntireHeadersAndBody(wssPolicyFactory.createQNameAssertionType()));
+                   allElement.getValue().getPolicyOrAllOrExactlyOne().add(abe);
+                   exactlyOneElement.getValue().getPolicyOrAllOrExactlyOne().add(
                            allElement);
                    break;
                 } else {
                    AsymmetricBindingElement abe =
-                      wssPolicyFactory.createAsymmetricBindingElement();
+                      wssPolicyFactory.createAsymmetricBindingElement(wssPolicyFactory.createNestedPolicyType());
                    PolicyElement policyElement1 = 
                            wsPolicyFactory.createPolicyElement();
-                   abe.setPolicy(policyElement1);
+                   abe.getValue().setPolicy(policyElement1);
                  
                    InitiatorTokenElement ite = 
                            createInitiatorTokenElement(secMech);
@@ -211,13 +211,13 @@ public class WSSPolicyManager {
                    policyElement1.getPolicyOrAllOrExactlyOne().add(
                            createLayoutElement());
                    policyElement1.getPolicyOrAllOrExactlyOne().add(
-                        wssPolicyFactory.createIncludeTimestampElement());
+                        wssPolicyFactory.createIncludeTimestamp(wssPolicyFactory.createQNameAssertionType()));
                    policyElement1.getPolicyOrAllOrExactlyOne().add(
                        wssPolicyFactory.
-                       createOnlySignEntireHeadersAndBodyElement());
-                   allElement.getPolicyOrAllOrExactlyOne().add(abe);
+                       createOnlySignEntireHeadersAndBody(wssPolicyFactory.createQNameAssertionType()));
+                   allElement.getValue().getPolicyOrAllOrExactlyOne().add(abe);
                 }
-                exactlyOneElement.getPolicyOrAllOrExactlyOne().add(allElement);
+                exactlyOneElement.getValue().getPolicyOrAllOrExactlyOne().add(allElement);
             
             }
             policyElement.getPolicyOrAllOrExactlyOne().add(exactlyOneElement);
@@ -248,24 +248,24 @@ public class WSSPolicyManager {
         try {
             PolicyElement policyElement = wsPolicyFactory.createPolicyElement();           
             ExactlyOneElement exactlyOneElement = 
-                    wsPolicyFactory.createExactlyOneElement();
-            AllElement allElement = wsPolicyFactory.createAllElement();
+                    wsPolicyFactory.createExactlyOneElement(wsPolicyFactory.createOperatorContentType());
+            AllElement allElement = wsPolicyFactory.createAllElement(wsPolicyFactory.createOperatorContentType());
             
             policyElement.getPolicyOrAllOrExactlyOne().add(exactlyOneElement);
             
             if(providerConfig.isRequestSignEnabled()) {
                SignedPartsElement signedParts = 
-                    wssPolicyFactory.createSignedPartsElement();
-               signedParts.setBody(wssPolicyFactory.createEmptyType());
-               allElement.getPolicyOrAllOrExactlyOne().add(signedParts);
+                    wssPolicyFactory.createSignedPartsElement(wssPolicyFactory.createSePartsType());
+               signedParts.getValue().setBody(wssPolicyFactory.createEmptyType());
+               allElement.getValue().getPolicyOrAllOrExactlyOne().add(signedParts);
             }
             
             if(providerConfig.isRequestEncryptEnabled() ||
                     providerConfig.isRequestHeaderEncryptEnabled()) {
                EncryptedPartsElement encryptedParts = 
-                       wssPolicyFactory.createEncryptedPartsElement();
+                       wssPolicyFactory.createEncryptedPartsElement(wssPolicyFactory.createSePartsType());
                if(providerConfig.isRequestEncryptEnabled()) {
-                  encryptedParts.setBody(wssPolicyFactory.createEmptyType());
+                  encryptedParts.getValue().setBody(wssPolicyFactory.createEmptyType());
                }
                if(providerConfig.isRequestHeaderEncryptEnabled()) {
                   HeaderType headerType = 
@@ -273,11 +273,11 @@ public class WSSPolicyManager {
                   headerType.setName(
                           new QName(WSSConstants.WSSE_SECURITY_LNAME));
                   headerType.setNamespace(WSSConstants.WSSE11_NS);
-                  encryptedParts.getHeader().add(headerType);
+                  encryptedParts.getValue().getHeader().add(headerType);
                }
-               allElement.getPolicyOrAllOrExactlyOne().add(encryptedParts);
+               allElement.getValue().getPolicyOrAllOrExactlyOne().add(encryptedParts);
             }
-            exactlyOneElement.getPolicyOrAllOrExactlyOne().add(allElement);
+            exactlyOneElement.getValue().getPolicyOrAllOrExactlyOne().add(allElement);
             return WSSPolicyUtils.convertJAXBToString(policyElement);
         } catch (JAXBException je) {
             WSSUtils.debug.error("WSSPolicyManager.getInputPolicy: " +
@@ -302,25 +302,25 @@ public class WSSPolicyManager {
         try {
             PolicyElement policyElement = wsPolicyFactory.createPolicyElement();           
             ExactlyOneElement exactlyOneElement = 
-                    wsPolicyFactory.createExactlyOneElement();
-            AllElement allElement = wsPolicyFactory.createAllElement();
+                    wsPolicyFactory.createExactlyOneElement(wsPolicyFactory.createOperatorContentType());
+            AllElement allElement = wsPolicyFactory.createAllElement(wsPolicyFactory.createOperatorContentType());
             
             policyElement.getPolicyOrAllOrExactlyOne().add(exactlyOneElement);
            
             if(providerConfig.isResponseSignEnabled()) {
                SignedPartsElement signedParts = 
-                    wssPolicyFactory.createSignedPartsElement();
-               signedParts.setBody(wssPolicyFactory.createEmptyType());
-               allElement.getPolicyOrAllOrExactlyOne().add(signedParts);
+                    wssPolicyFactory.createSignedPartsElement(wssPolicyFactory.createSePartsType());
+               signedParts.getValue().setBody(wssPolicyFactory.createEmptyType());
+               allElement.getValue().getPolicyOrAllOrExactlyOne().add(signedParts);
             }
             
             if(providerConfig.isResponseEncryptEnabled()) {
                EncryptedPartsElement encryptedParts = 
-                       wssPolicyFactory.createEncryptedPartsElement();
-               encryptedParts.setBody(wssPolicyFactory.createEmptyType());
-               allElement.getPolicyOrAllOrExactlyOne().add(encryptedParts);
+                       wssPolicyFactory.createEncryptedPartsElement(wssPolicyFactory.createSePartsType());
+               encryptedParts.getValue().setBody(wssPolicyFactory.createEmptyType());
+               allElement.getValue().getPolicyOrAllOrExactlyOne().add(encryptedParts);
             }
-            exactlyOneElement.getPolicyOrAllOrExactlyOne().add(allElement);
+            exactlyOneElement.getValue().getPolicyOrAllOrExactlyOne().add(allElement);
             return WSSPolicyUtils.convertJAXBToString(policyElement);
         } catch (JAXBException je) {
             WSSUtils.debug.error("WSSPolicyManager.geOutputPolicy: " +
@@ -367,251 +367,215 @@ public class WSSPolicyManager {
 
     private InitiatorTokenElement createInitiatorTokenElement(
             String secMech) throws WSSPolicyException {
-        
-        try {
-            InitiatorTokenElement ite = 
-                    wssPolicyFactory.createInitiatorTokenElement();
-            PolicyElement policyElement1 = 
+
+        InitiatorTokenElement ite =
+                wssPolicyFactory.createInitiatorTokenElement(wssPolicyFactory.createNestedPolicyType());
+        PolicyElement policyElement1 =
+                wsPolicyFactory.createPolicyElement();
+        ite.getValue().setPolicy(policyElement1);
+        if(SecurityMechanism.WSS_NULL_X509_TOKEN_URI.equals(secMech)) {
+           X509TokenElement x509Token =
+                wssPolicyFactory.createX509TokenElement(wssPolicyFactory.createTokenAssertionType());
+           x509Token.getValue().setIncludeToken(INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
+           policyElement1.getPolicyOrAllOrExactlyOne().add(x509Token);
+
+           PolicyElement policyElement2 =
+                   wsPolicyFactory.createPolicyElement();
+           x509Token.getValue().getAny().add(policyElement2);
+
+           WssX509V3Token10Element wssX509v3TokenElement =
+                wssPolicyFactory.createWssX509V3Token10Element(wssPolicyFactory.createQNameAssertionType());
+           policyElement2.getPolicyOrAllOrExactlyOne().add(
+                   wssX509v3TokenElement);
+        }  else if(SecurityMechanism.WSS_NULL_USERNAME_TOKEN_URI.
+                equals(secMech)) {
+           UsernameTokenElement userNameTokenElement =
+                   wssPolicyFactory.createUsernameTokenElement(wssPolicyFactory.createTokenAssertionType());
+           userNameTokenElement.getValue().setIncludeToken(
+                   INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
+           policyElement1.getPolicyOrAllOrExactlyOne().add(
+                   userNameTokenElement);
+
+           PolicyElement policyElement2 =
+                   wsPolicyFactory.createPolicyElement();
+           userNameTokenElement.getValue().getAny().add(policyElement2);
+
+           WssUsernameToken10Element wssUserTokenElement =
+                   wssPolicyFactory.createWssUsernameToken10Element(wssPolicyFactory.createQNameAssertionType());
+           policyElement2.getPolicyOrAllOrExactlyOne().add(
+                   wssUserTokenElement);
+        } else if(SecurityMechanism.WSS_NULL_SAML2_HK_URI.equals(secMech)||
+                SecurityMechanism.WSS_NULL_SAML2_SV_URI.equals(secMech)) {
+            SamlTokenElement samlTokenElement =
+                    wssPolicyFactory.createSamlTokenElement(wssPolicyFactory.createTokenAssertionType());
+            samlTokenElement.getValue().setIncludeToken(
+                    INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
+            policyElement1.getPolicyOrAllOrExactlyOne().add(
+                    samlTokenElement);
+
+            PolicyElement policyElement2 =
                     wsPolicyFactory.createPolicyElement();
-            ite.setPolicy(policyElement1);
-            if(SecurityMechanism.WSS_NULL_X509_TOKEN_URI.equals(secMech)) {
-               X509TokenElement x509Token = 
-                    wssPolicyFactory.createX509TokenElement();
-               x509Token.setIncludeToken(INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
-               policyElement1.getPolicyOrAllOrExactlyOne().add(x509Token);
-               
-               PolicyElement policyElement2 = 
-                       wsPolicyFactory.createPolicyElement();
-               x509Token.getAny().add(policyElement2);
-            
-               WssX509V3Token10Element wssX509v3TokenElement = 
-                    wssPolicyFactory.createWssX509V3Token10Element();
-               policyElement2.getPolicyOrAllOrExactlyOne().add(
-                       wssX509v3TokenElement);
-            }  else if(SecurityMechanism.WSS_NULL_USERNAME_TOKEN_URI.
-                    equals(secMech)) {
-               UsernameTokenElement userNameTokenElement = 
-                       wssPolicyFactory.createUsernameTokenElement();
-               userNameTokenElement.setIncludeToken(
-                       INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
-               policyElement1.getPolicyOrAllOrExactlyOne().add(
-                       userNameTokenElement);
-               
-               PolicyElement policyElement2 = 
-                       wsPolicyFactory.createPolicyElement();
-               userNameTokenElement.getAny().add(policyElement2);
-            
-               WssUsernameToken10Element wssUserTokenElement = 
-                       wssPolicyFactory.createWssUsernameToken10Element();               
-               policyElement2.getPolicyOrAllOrExactlyOne().add(
-                       wssUserTokenElement);               
-            } else if(SecurityMechanism.WSS_NULL_SAML2_HK_URI.equals(secMech)||
-                    SecurityMechanism.WSS_NULL_SAML2_SV_URI.equals(secMech)) {
-                SamlTokenElement samlTokenElement = 
-                        wssPolicyFactory.createSamlTokenElement();
-                samlTokenElement.setIncludeToken(
-                        INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
-                policyElement1.getPolicyOrAllOrExactlyOne().add(
-                        samlTokenElement);
-                
-                PolicyElement policyElement2 = 
-                        wsPolicyFactory.createPolicyElement();
-                samlTokenElement.getAny().add(policyElement2);
-               
-                WssSamlV20Token11Element wssSaml20TokenElement =
-                wssPolicyFactory.createWssSamlV20Token11Element();
-                policyElement2.getPolicyOrAllOrExactlyOne().add(
-                       wssSaml20TokenElement);
-                
-            } else if(SecurityMechanism.WSS_NULL_SAML_HK_URI.equals(secMech)||
-                    SecurityMechanism.WSS_NULL_SAML_SV_URI.equals(secMech)) {
-                SamlTokenElement samlTokenElement = 
-                        wssPolicyFactory.createSamlTokenElement();
-                samlTokenElement.setIncludeToken(
-                        INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
-                policyElement1.getPolicyOrAllOrExactlyOne().add(
-                        samlTokenElement);
-                                
-                PolicyElement policyElement2 = 
-                        wsPolicyFactory.createPolicyElement();
-                samlTokenElement.getAny().add(policyElement2);
-               
-                WssSamlV11Token11Element wssSaml11TokenElement =
-                wssPolicyFactory.createWssSamlV11Token11Element();
-                policyElement2.getPolicyOrAllOrExactlyOne().add(
-                       wssSaml11TokenElement);
-                
-            }
-            
-            return ite;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createInitiateTokenElement: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
+            samlTokenElement.getValue().getAny().add(policyElement2);
+
+            WssSamlV20Token11Element wssSaml20TokenElement =
+            wssPolicyFactory.createWssSamlV20Token11Element(wssPolicyFactory.createQNameAssertionType());
+            policyElement2.getPolicyOrAllOrExactlyOne().add(
+                   wssSaml20TokenElement);
+
+        } else if(SecurityMechanism.WSS_NULL_SAML_HK_URI.equals(secMech)||
+                SecurityMechanism.WSS_NULL_SAML_SV_URI.equals(secMech)) {
+            SamlTokenElement samlTokenElement =
+                    wssPolicyFactory.createSamlTokenElement(wssPolicyFactory.createTokenAssertionType());
+            samlTokenElement.getValue().setIncludeToken(
+                    INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
+            policyElement1.getPolicyOrAllOrExactlyOne().add(
+                    samlTokenElement);
+
+            PolicyElement policyElement2 =
+                    wsPolicyFactory.createPolicyElement();
+            samlTokenElement.getValue().getAny().add(policyElement2);
+
+            WssSamlV11Token11Element wssSaml11TokenElement =
+            wssPolicyFactory.createWssSamlV11Token11Element(wssPolicyFactory.createQNameAssertionType());
+            policyElement2.getPolicyOrAllOrExactlyOne().add(
+                   wssSaml11TokenElement);
+
         }
-        
+
+        return ite;
+
     }
     
     private RecipientTokenElement createRecipientTokenElement() 
             throws WSSPolicyException {
-        
-        try {
-            RecipientTokenElement rte = 
-                    wssPolicyFactory.createRecipientTokenElement();
-            PolicyElement policyElement1 = 
-                    wsPolicyFactory.createPolicyElement();
-            rte.setPolicy(policyElement1);
-            X509TokenElement x509Token = 
-                    wssPolicyFactory.createX509TokenElement();
-            x509Token.setIncludeToken(INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
-            policyElement1.getPolicyOrAllOrExactlyOne().add(x509Token);
-               
-            PolicyElement policyElement2 = 
-                    wsPolicyFactory.createPolicyElement();
-            x509Token.getAny().add(policyElement2);
-            
-            WssX509V3Token10Element wssX509v3TokenElement = 
-                    wssPolicyFactory.createWssX509V3Token10Element();
-            policyElement2.getPolicyOrAllOrExactlyOne().add(
-                       wssX509v3TokenElement);
-            return rte;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createRecipientTokenElement:"
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
-        }
+
+        RecipientTokenElement rte =
+                wssPolicyFactory.createRecipientTokenElement(wssPolicyFactory.createNestedPolicyType());
+        PolicyElement policyElement1 =
+                wsPolicyFactory.createPolicyElement();
+        rte.getValue().setPolicy(policyElement1);
+        X509TokenElement x509Token =
+                wssPolicyFactory.createX509TokenElement(wssPolicyFactory.createTokenAssertionType());
+        x509Token.getValue().setIncludeToken(INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
+        policyElement1.getPolicyOrAllOrExactlyOne().add(x509Token);
+
+        PolicyElement policyElement2 =
+                wsPolicyFactory.createPolicyElement();
+        x509Token.getValue().getAny().add(policyElement2);
+
+        WssX509V3Token10Element wssX509v3TokenElement =
+                wssPolicyFactory.createWssX509V3Token10Element(wssPolicyFactory.createQNameAssertionType());
+        policyElement2.getPolicyOrAllOrExactlyOne().add(
+                   wssX509v3TokenElement);
+        return rte;
     }
     
     private AlgorithmSuiteElement createAlgorithmSuiteElement(
             ProviderConfig config) throws WSSPolicyException {
-        
-        try {
-            AlgorithmSuiteElement ase = 
-                    wssPolicyFactory.createAlgorithmSuiteElement();
-            PolicyElement policyElement1 = 
-                    wsPolicyFactory.createPolicyElement();            
-            ase.setPolicy(policyElement1);
-            String encAlg = config.getEncryptionAlgorithm();
-            int keyStrength = config.getEncryptionStrength();
-            if("AES".equals(encAlg)) {
-               if(keyStrength == 128) {
-                  Basic128Element basic128Element = 
-                    wssPolicyFactory.createBasic128Element();
-                  policyElement1.getPolicyOrAllOrExactlyOne().add(
-                          basic128Element);
-               } else if (keyStrength == 192) {
-                  Basic192Element basic192Element = 
-                          wssPolicyFactory.createBasic192Element();
-                  policyElement1.getPolicyOrAllOrExactlyOne().add(
-                          basic192Element);
-               } else if (keyStrength == 256) {
-                  Basic256Element basic256Element = 
-                          wssPolicyFactory.createBasic256Element();
-                  policyElement1.getPolicyOrAllOrExactlyOne().add(
-                          basic256Element);                  
-               } else {
-                  if(WSSUtils.debug.warningEnabled()) {
-                     WSSUtils.debug.warning("WSSPolicyManager.create" +
-                          "AlgorithmSuite: Invalid key strenghth for AES" +
-                          keyStrength); 
-                  }
-               }
-            } else if ("DESede".equals(encAlg)) {
-                TripleDesElement tripleDesElement = 
-                        wssPolicyFactory.createTripleDesElement();
-                policyElement1.getPolicyOrAllOrExactlyOne().add(
-                        tripleDesElement);
-            } else {
-               return null; 
-            }
-            return ase;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createAlgorithmSuite: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
+
+        AlgorithmSuiteElement ase =
+                wssPolicyFactory.createAlgorithmSuiteElement(wssPolicyFactory.createNestedPolicyType());
+        PolicyElement policyElement1 =
+                wsPolicyFactory.createPolicyElement();
+        ase.getValue().setPolicy(policyElement1);
+        String encAlg = config.getEncryptionAlgorithm();
+        int keyStrength = config.getEncryptionStrength();
+        if("AES".equals(encAlg)) {
+           if(keyStrength == 128) {
+              Basic128Element basic128Element =
+                wssPolicyFactory.createBasic128Element(wssPolicyFactory.createQNameAssertionType());
+              policyElement1.getPolicyOrAllOrExactlyOne().add(
+                      basic128Element);
+           } else if (keyStrength == 192) {
+              Basic192Element basic192Element =
+                      wssPolicyFactory.createBasic192Element(wssPolicyFactory.createQNameAssertionType());
+              policyElement1.getPolicyOrAllOrExactlyOne().add(
+                      basic192Element);
+           } else if (keyStrength == 256) {
+              Basic256Element basic256Element =
+                      wssPolicyFactory.createBasic256Element(wssPolicyFactory.createQNameAssertionType());
+              policyElement1.getPolicyOrAllOrExactlyOne().add(
+                      basic256Element);
+           } else {
+              if(WSSUtils.debug.warningEnabled()) {
+                 WSSUtils.debug.warning("WSSPolicyManager.create" +
+                      "AlgorithmSuite: Invalid key strenghth for AES" +
+                      keyStrength);
+              }
+           }
+        } else if ("DESede".equals(encAlg)) {
+            TripleDesElement tripleDesElement =
+                    wssPolicyFactory.createTripleDesElement(wssPolicyFactory.createQNameAssertionType());
+            policyElement1.getPolicyOrAllOrExactlyOne().add(
+                    tripleDesElement);
+        } else {
+           return null;
         }
+        return ase;
     }
     
     private LayoutElement createLayoutElement() throws WSSPolicyException {
-        try {
-            LayoutElement le = 
-                    wssPolicyFactory.createLayoutElement();
-            PolicyElement policyElement1 = 
-                    wsPolicyFactory.createPolicyElement();            
-            le.setPolicy(policyElement1);
-            policyElement1.getPolicyOrAllOrExactlyOne().add(
-                    wssPolicyFactory.createLaxElement());
-            return le;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createLayout: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
-        }
-        
+        LayoutElement le =
+                wssPolicyFactory.createLayoutElement(wssPolicyFactory.createNestedPolicyType());
+        PolicyElement policyElement1 =
+                wsPolicyFactory.createPolicyElement();
+        le.getValue().setPolicy(policyElement1);
+        policyElement1.getPolicyOrAllOrExactlyOne().add(
+                wssPolicyFactory.createLax(wssPolicyFactory.createQNameAssertionType()));
+        return le;
+
     }
        
     
     private ProtectionTokenElement createProtectionTokenElement(
             String secMech) throws WSSPolicyException {
-        
-        try {
-            ProtectionTokenElement protectionElement =
-                    wssPolicyFactory.createProtectionTokenElement();
-            PolicyElement policyElement1 = 
-                    wsPolicyFactory.createPolicyElement();
-            protectionElement.setPolicy(policyElement1);
-            
-            if(SecurityMechanism.WSS_NULL_KERBEROS_TOKEN_URI.equals(secMech)) {
-               KerberosTokenElement kerberosTokenElement =
-                    wssPolicyFactory.createKerberosTokenElement();
-               kerberosTokenElement.setIncludeToken(
-                    INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
-               policyElement1.getPolicyOrAllOrExactlyOne().add(
-                    kerberosTokenElement);
-            
-               PolicyElement policyElement2 = 
-                       wsPolicyFactory.createPolicyElement();
-               kerberosTokenElement.getAny().add(policyElement2);
-            
-               WssKerberosV5ApReqToken11Element wssKrbElement = 
-                    wssPolicyFactory.createWssKerberosV5ApReqToken11Element();
-               policyElement2.getPolicyOrAllOrExactlyOne().add(
-                       wssKrbElement);
-            }
-            
-            return protectionElement;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createProtectionToken: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
+
+        ProtectionTokenElement protectionElement =
+                wssPolicyFactory.createProtectionTokenElement(wssPolicyFactory.createNestedPolicyType());
+        PolicyElement policyElement1 =
+                wsPolicyFactory.createPolicyElement();
+        protectionElement.getValue().setPolicy(policyElement1);
+
+        if(SecurityMechanism.WSS_NULL_KERBEROS_TOKEN_URI.equals(secMech)) {
+           KerberosTokenElement kerberosTokenElement =
+                wssPolicyFactory.createKerberosTokenElement(wssPolicyFactory.createTokenAssertionType());
+           kerberosTokenElement.getValue().setIncludeToken(
+                INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
+           policyElement1.getPolicyOrAllOrExactlyOne().add(
+                kerberosTokenElement);
+
+           PolicyElement policyElement2 =
+                   wsPolicyFactory.createPolicyElement();
+           kerberosTokenElement.getValue().getAny().add(policyElement2);
+
+           WssKerberosV5ApReqToken11Element wssKrbElement =
+                wssPolicyFactory.createWssKerberosV5ApReqToken11Element(wssPolicyFactory.createQNameAssertionType());
+           policyElement2.getPolicyOrAllOrExactlyOne().add(
+                   wssKrbElement);
         }
+
+        return protectionElement;
     }
     
     private IssuedTokenElement createIssuedTokenElement() 
             throws WSSPolicyException {
-        
-        try {
-            IssuedTokenElement issuedTokenElement =
-                    wssPolicyFactory.createIssuedTokenElement();
-            issuedTokenElement.setIncludeToken(
-                    INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
-            EndpointReferenceElement epr = 
-                    wsAddressingFactory.createEndpointReferenceElement();
-            AttributedURIType uriType = 
-                    wsAddressingFactory.createAttributedURIType();            
-            uriType.setValue("SunSTS");
-            epr.setAddress(uriType);
-            issuedTokenElement.setIssuer(epr);
-            RequestSecurityTokenTemplateType rstTemplate = 
-                    wssPolicyFactory.createRequestSecurityTokenTemplateType();
-            issuedTokenElement.setRequestSecurityTokenTemplate(rstTemplate);
-            return issuedTokenElement;
-        } catch (JAXBException je) {
-            WSSUtils.debug.error("WSSPolicyManager.createIssuedTokenElement: "
-                    +  " JAXB Exception ");
-            throw new WSSPolicyException (je.getMessage());
-        }
-        
+
+        IssuedTokenElement issuedTokenElement =
+                wssPolicyFactory.createIssuedTokenElement(wssPolicyFactory.createIssuedTokenType());
+        issuedTokenElement.getValue().setIncludeToken(
+                INCLUDE_TOKEN_ALWAYS_TO_RECIPIENT);
+        EndpointReferenceElement epr =
+                wsAddressingFactory.createEndpointReferenceElement(wsAddressingFactory.createEndpointReferenceType());
+        AttributedURIType uriType =
+                wsAddressingFactory.createAttributedURIType();
+        uriType.setValue("SunSTS");
+        epr.getValue().setAddress(uriType);
+        issuedTokenElement.getValue().setIssuer(epr.getValue());
+        RequestSecurityTokenTemplateType rstTemplate =
+                wssPolicyFactory.createRequestSecurityTokenTemplateType();
+        issuedTokenElement.getValue().setRequestSecurityTokenTemplate(rstTemplate);
+        return issuedTokenElement;
+
     }
 
     private ProviderConfig getSTSConfig() throws WSSPolicyException {

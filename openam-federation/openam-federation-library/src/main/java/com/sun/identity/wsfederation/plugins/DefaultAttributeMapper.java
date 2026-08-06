@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DefaultAttributeMapper.java,v 1.4 2009/10/28 23:58:59 exu Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  * Portions Copyrighted 2026 3A Systems, LLC
  */
@@ -37,6 +39,8 @@ import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.wsfederation.common.WSFederationException;
 import com.sun.identity.wsfederation.common.WSFederationUtils;
 import com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.wsfederation.jaxb.entityconfig.SPSSOConfigElement;
+import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 
@@ -95,11 +99,17 @@ public class DefaultAttributeMapper {
         try {
             BaseConfigType config = null;
             if(role.equals(SP)) {
-               config = WSFederationUtils.getMetaManager().getSPSSOConfig(
+               SPSSOConfigElement configElt = WSFederationUtils.getMetaManager().getSPSSOConfig(
                    realm, hostEntityID);
+               if(configElt != null) {
+                  config = configElt.getValue();
+               }
             } else {
-               config = WSFederationUtils.getMetaManager().getIDPSSOConfig(
+               IDPSSOConfigElement configElt = WSFederationUtils.getMetaManager().getIDPSSOConfig(
                    realm, hostEntityID);
+               if(configElt != null) {
+                  config = configElt.getValue();
+               }
             }
 
             if(config == null) {

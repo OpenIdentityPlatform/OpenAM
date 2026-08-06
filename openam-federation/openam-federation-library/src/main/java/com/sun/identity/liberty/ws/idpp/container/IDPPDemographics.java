@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPPDemographics.java,v 1.2 2008/06/25 05:47:16 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  * Portions Copyrighted 2026 3A Systems, LLC
  */
@@ -30,7 +32,8 @@
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -68,57 +71,54 @@ public class IDPPDemographics extends IDPPBaseContainer {
 
          IDPPUtils.debug.message("IDPPDemographics:getContainerObject:Init");
 
-         try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
-             DemographicsElement de = 
-                  IDPPUtils.getIDPPFactory().createDemographicsElement();
+         PPType ppType = IDPPUtils.getIDPPFactory().createPPType();
+         DemographicsElement de =
+              IDPPUtils.getIDPPFactory().createDemographicsElement(
+                      IDPPUtils.getIDPPFactory().createDemographicsType());
 
-             String displayLang = CollectionHelper.getMapAttr(userMap, 
-               getAttributeMapper().getDSAttribute(
-               IDPPConstants.DEMO_GRAPHICS_DISPLAY_LANG_ELEMENT).toLowerCase());
+         String displayLang = CollectionHelper.getMapAttr(userMap,
+           getAttributeMapper().getDSAttribute(
+           IDPPConstants.DEMO_GRAPHICS_DISPLAY_LANG_ELEMENT).toLowerCase());
 
-             if(displayLang != null) {
-                de.setDisplayLanguage(getDSTString(displayLang));
-             }
-
-             Set languages = (Set)userMap.get(
-                getAttributeMapper().getDSAttribute(
-                IDPPConstants.DEMO_GRAPHICS_LANGUAGE_ELEMENT).toLowerCase());
-             Iterator iter = languages.iterator();
-             while(iter.hasNext()) {
-                de.getLanguage().add(getDSTString((String)iter.next()));
-             }
-
-             String birthDay = CollectionHelper.getMapAttr(userMap, 
-               getAttributeMapper().getDSAttribute(
-               IDPPConstants.DEMO_GRAPHICS_BIRTH_DAY_ELEMENT).toLowerCase());
-             if(birthDay != null) {
-                de.setBirthday(getDSTMonthDay(birthDay));
-             }
-
-             String age = CollectionHelper.getMapAttr(userMap,
-              getAttributeMapper().getDSAttribute(
-              IDPPConstants.DEMO_GRAPHICS_AGE_ELEMENT).toLowerCase());
-             if(age != null) {
-                de.setAge(getDSTInteger(age));
-             }
-
-             String timeZone = CollectionHelper.getMapAttr(userMap,
-                 getAttributeMapper().getDSAttribute(
-                 IDPPConstants.DEMO_GRAPHICS_TIME_ZONE_ELEMENT).toLowerCase());
-             if(timeZone != null) {
-                de.setTimeZone(getDSTString(timeZone));
-             }
-
-             ppType.setDemographics(de);
-
-             return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPDemographics:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
+         if(displayLang != null) {
+            de.getValue().setDisplayLanguage(
+                    IDPPUtils.getIDPPFactory().createDisplayLanguageElement(getDSTString(displayLang)));
          }
+
+         Set languages = (Set)userMap.get(
+            getAttributeMapper().getDSAttribute(
+            IDPPConstants.DEMO_GRAPHICS_LANGUAGE_ELEMENT).toLowerCase());
+         Iterator iter = languages.iterator();
+         while(iter.hasNext()) {
+            de.getValue().getLanguage().add(
+                    IDPPUtils.getIDPPFactory().createLanguageElement(getDSTString((String)iter.next())));
+         }
+
+         String birthDay = CollectionHelper.getMapAttr(userMap,
+           getAttributeMapper().getDSAttribute(
+           IDPPConstants.DEMO_GRAPHICS_BIRTH_DAY_ELEMENT).toLowerCase());
+         if(birthDay != null) {
+            de.getValue().setBirthday(
+                    IDPPUtils.getIDPPFactory().createBirthdayElement(getDSTMonthDay(birthDay)));
+         }
+
+         String age = CollectionHelper.getMapAttr(userMap,
+          getAttributeMapper().getDSAttribute(
+          IDPPConstants.DEMO_GRAPHICS_AGE_ELEMENT).toLowerCase());
+         if(age != null) {
+            de.getValue().setAge(IDPPUtils.getIDPPFactory().createAgeElement(getDSTInteger(age)));
+         }
+
+         String timeZone = CollectionHelper.getMapAttr(userMap,
+             getAttributeMapper().getDSAttribute(
+             IDPPConstants.DEMO_GRAPHICS_TIME_ZONE_ELEMENT).toLowerCase());
+         if(timeZone != null) {
+            de.getValue().setTimeZone(getDSTString(timeZone));
+         }
+
+         ppType.setDemographics(de);
+
+         return ppType;
      }
 
      /**
@@ -272,15 +272,18 @@ public class IDPPDemographics extends IDPPBaseContainer {
         DSTString displayLang = null; 
         DSTInteger age = null; 
         DSTMonthDay  birthDay = null;
-        List languages = null;
+        List<LanguageElement> languages = null;
         DSTString timeZone = null;
          
         if(obj != null) {
+           if(obj instanceof JAXBElement) {
+              obj = ((JAXBElement<?>)obj).getValue();
+           }
            if(obj instanceof DemographicsType) {
               DemographicsType demoGraphs = (DemographicsType)obj;
-              displayLang = demoGraphs.getDisplayLanguage();
-              age = demoGraphs.getAge();
-              birthDay = demoGraphs.getBirthday();
+              displayLang = jaxbValue(demoGraphs.getDisplayLanguage());
+              age = jaxbValue(demoGraphs.getAge());
+              birthDay = jaxbValue(demoGraphs.getBirthday());
               languages = demoGraphs.getLanguage();
               timeZone = demoGraphs.getTimeZone();
            } else {

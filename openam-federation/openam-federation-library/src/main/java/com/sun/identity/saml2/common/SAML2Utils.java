@@ -139,6 +139,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.soap.MimeHeader;
 import jakarta.xml.soap.MimeHeaders;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
@@ -433,7 +434,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 throw new SAML2Exception(sme);
             }
             if (idpSSODescriptor != null) {
-                Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(idpSSODescriptor, idpEntityId,
+                Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(idpSSODescriptor.getValue(), idpEntityId,
                         SAML2Constants.IDP_ROLE);
                 if (CollectionUtils.isEmpty(verificationCerts) || !response.isSignatureValid(verificationCerts)) {
                     debug.error(method + "Response is not signed or signature is not valid.");
@@ -472,7 +473,7 @@ public class SAML2Utils extends SAML2SDKUtils {
         Set<PrivateKey> decryptionKeys;
         List<EncryptedAssertion> encAssertions = response.getEncryptedAssertion();
         if (encAssertions != null) {
-            decryptionKeys = KeyUtil.getDecryptionKeys(spConfig);
+            decryptionKeys = KeyUtil.getDecryptionKeys(spConfig.getValue());
             for (EncryptedAssertion encAssertion : encAssertions) {
                 Assertion assertion = encAssertion.decrypt(decryptionKeys);
                 if (assertions == null) {
@@ -491,7 +492,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             throw new SAML2Exception(SAML2Utils.bundle.getString("missingAssertion"));
         }
 
-        boolean wantAssertionsSigned = spDesc.isWantAssertionsSigned();
+        boolean wantAssertionsSigned = Boolean.TRUE.equals(spDesc.getValue().isWantAssertionsSigned());
         if (debug.messageEnabled()) {
             debug.message(method + "wantAssertionsSigned is :" + wantAssertionsSigned);
         }
@@ -552,7 +553,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 if (verificationCerts == null) {
                     idp = saml2MetaManager.getIDPSSODescriptor(
                             orgName, idpEntityId);
-                    verificationCerts = KeyUtil.getVerificationCerts(idp, idpEntityId, SAML2Constants.IDP_ROLE);
+                    verificationCerts = KeyUtil.getVerificationCerts(unwrap(idp), idpEntityId, SAML2Constants.IDP_ROLE);
                 }
                 if (CollectionUtils.isEmpty(verificationCerts) || !assertion.isSignatureValid(verificationCerts)) {
                     debug.error(method +
@@ -568,7 +569,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             } else {
                 allAssertionsSigned = false;
             }
-            List authnStmts = assertion.getAuthnStatements();
+            List<AuthnStatement> authnStmts = assertion.getAuthnStatements();
             if (authnStmts != null && !authnStmts.isEmpty()) {
                 Subject subject = assertion.getSubject();
                 if (subject == null) {
@@ -798,9 +799,9 @@ public class SAML2Utils extends SAML2SDKUtils {
             throw new SAML2Exception(bundle.getString("missingRecipient"));
         }
         boolean foundMatch = false;
-        for (Object o : spDesc.getAssertionConsumerService()) {
+        for (Object o : spDesc.getValue().getAssertionConsumerService()) {
             AssertionConsumerServiceElement acs = (AssertionConsumerServiceElement) o;
-            if (recipient.equals(acs.getLocation())) {
+            if (recipient.equals(acs.getValue().getLocation())) {
                 foundMatch = true;
                 break;
             }
@@ -1000,7 +1001,7 @@ public class SAML2Utils extends SAML2SDKUtils {
         if (config == null) {
             return null;
         }
-        Map attrs = SAML2MetaUtils.getAttributes(config);
+        Map attrs = SAML2MetaUtils.getAttributes(config.getValue());
         List value = (List) attrs.get(attrName);
         if (value != null && value.size() != 0) {
             result = ((String) value.iterator().next()).trim();
@@ -2190,21 +2191,21 @@ public class SAML2Utils extends SAML2SDKUtils {
         try {
             BaseConfigType config = null;
             if (entityRole.equalsIgnoreCase(SAML2Constants.SP_ROLE)) {
-                config = saml2MetaManager.getSPSSOConfig(realm, hostEntityId);
+                config = unwrap(saml2MetaManager.getSPSSOConfig(realm, hostEntityId));
             } else if (entityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
-                config = saml2MetaManager.getIDPSSOConfig(realm, hostEntityId);
+                config = unwrap(saml2MetaManager.getIDPSSOConfig(realm, hostEntityId));
             } else if (entityRole.equalsIgnoreCase(
                     SAML2Constants.ATTR_AUTH_ROLE)) {
-                config = saml2MetaManager.getAttributeAuthorityConfig(realm,
-                        hostEntityId);
+                config = unwrap(saml2MetaManager.getAttributeAuthorityConfig(realm,
+                        hostEntityId));
             } else if (entityRole.equalsIgnoreCase(
                     SAML2Constants.AUTHN_AUTH_ROLE)) {
-                config = saml2MetaManager.getAuthnAuthorityConfig(realm,
-                        hostEntityId);
+                config = unwrap(saml2MetaManager.getAuthnAuthorityConfig(realm,
+                        hostEntityId));
             } else if (entityRole.equalsIgnoreCase(
                     SAML2Constants.ATTR_QUERY_ROLE)) {
-                config = saml2MetaManager.getAttributeQueryConfig(realm,
-                        hostEntityId);
+                config = unwrap(saml2MetaManager.getAttributeQueryConfig(realm,
+                        hostEntityId));
             }
 
             if (config == null) {
@@ -2219,6 +2220,16 @@ public class SAML2Utils extends SAML2SDKUtils {
             debug.message("get SSOConfig failed:", e);
         }
         return null;
+    }
+
+    /**
+     * Returns the value contained in the given JAXB element, or {@code null}
+     * if the element itself is {@code null}. The metadata/config lookups
+     * return {@code null} when the requested role or config is absent, so
+     * this guards against a {@code NullPointerException} on {@code getValue()}.
+     */
+    private static <T> T unwrap(JAXBElement<? extends T> element) {
+        return (element == null) ? null : element.getValue();
     }
 
     /**
@@ -2402,11 +2413,11 @@ public class SAML2Utils extends SAML2SDKUtils {
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
             SPSSODescriptorElement spSSODesc =
                     saml2MetaManager.getSPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(spSSODesc, remoteEntity, SAML2Constants.SP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(spSSODesc.getValue(), remoteEntity, SAML2Constants.SP_ROLE);
         } else {
             IDPSSODescriptorElement idpSSODesc =
                     saml2MetaManager.getIDPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, remoteEntity, SAML2Constants.IDP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc.getValue(), remoteEntity, SAML2Constants.IDP_ROLE);
         }
 
         if (debug.messageEnabled()) {
@@ -2638,7 +2649,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                     saml2MetaManager.getSPSSOConfig(realm, spEntityID);
             Map spConfigAttrsMap = null;
             if (spEntityCfg != null) {
-                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg);
+                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg.getValue());
                 List cotList = (List) spConfigAttrsMap.get("cotlist");
                 String cotListStr = (String) cotList.iterator().next();
                 CircleOfTrustDescriptor cotDesc =
@@ -3215,7 +3226,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                 if (spConfig == null) {
                     return null;
                 }
-                attrs = SAML2MetaUtils.getAttributes(spConfig);
+                attrs = SAML2MetaUtils.getAttributes(spConfig.getValue());
             } else {
                 idpConfig =
                         saml2MetaManager.getIDPSSOConfig(realm, entityId);
@@ -3223,7 +3234,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                     debug.message("SAML2Utils.getSAEAttrs: idpconfig is null");
                     return null;
                 }
-                attrs = SAML2MetaUtils.getAttributes(idpConfig);
+                attrs = SAML2MetaUtils.getAttributes(idpConfig.getValue());
             }
 
             if (attrs == null) {
@@ -3414,14 +3425,14 @@ public class SAML2Utils extends SAML2SDKUtils {
                 pepConfig = saml2MetaManager.getPolicyEnforcementPointConfig(
                         realm, entityID);
                 if (pepConfig != null) {
-                    attrs = SAML2MetaUtils.getAttributes(pepConfig);
+                    attrs = SAML2MetaUtils.getAttributes(pepConfig.getValue());
                 }
             } else {
                 pdpConfig =
                         saml2MetaManager.getPolicyDecisionPointConfig(realm,
                                 entityID);
                 if (pdpConfig != null) {
-                    attrs = SAML2MetaUtils.getAttributes(pdpConfig);
+                    attrs = SAML2MetaUtils.getAttributes(pdpConfig.getValue());
                 }
             }
 
@@ -3553,9 +3564,9 @@ public class SAML2Utils extends SAML2SDKUtils {
         try {
             BaseConfigType config = null;
             if (role.equals(SAML2Constants.SP_ROLE)) {
-                config = saml2MetaManager.getSPSSOConfig(realm, hostEntityID);
+                config = unwrap(saml2MetaManager.getSPSSOConfig(realm, hostEntityID));
             } else if (role.equals(SAML2Constants.IDP_ROLE)) {
-                config = saml2MetaManager.getIDPSSOConfig(realm, hostEntityID);
+                config = unwrap(saml2MetaManager.getIDPSSOConfig(realm, hostEntityID));
             }
 
 
@@ -3707,12 +3718,12 @@ public class SAML2Utils extends SAML2SDKUtils {
                                             SPSSODescriptorElement spsso, IDPSSODescriptorElement idpsso)
             throws SAML2Exception {
 
-        List spNameIDFormatList = spsso.getNameIDFormat();
+        List spNameIDFormatList = spsso.getValue().getNameIDFormat();
 
         List idpNameIDFormatList = null;
         // idpsso is null for ECP case
         if (idpsso != null) {
-            idpNameIDFormatList = idpsso.getNameIDFormat();
+            idpNameIDFormatList = idpsso.getValue().getNameIDFormat();
         }
 
         if ((nameIDFormat == null) || (nameIDFormat.length() == 0)) {
@@ -4085,18 +4096,18 @@ public class SAML2Utils extends SAML2SDKUtils {
         try {
             SPSSODescriptorElement spDescriptor =
                     saml2MetaManager.getSPSSODescriptor(realm, spEntityID);
-            List services = null;
+            List<? extends JAXBElement<? extends EndpointType>> services = null;
             if (SAML2Constants.ACS_SERVICE.equals(profile)) {
-                services = spDescriptor.getAssertionConsumerService();
+                services = spDescriptor.getValue().getAssertionConsumerService();
             } else if (SAML2Constants.SLO_SERVICE.equals(profile)) {
-                services = spDescriptor.getSingleLogoutService();
+                services = spDescriptor.getValue().getSingleLogoutService();
             } else if (SAML2Constants.MNI_SERVICE.equals(profile)) {
-                services = spDescriptor.getManageNameIDService();
+                services = spDescriptor.getValue().getManageNameIDService();
             }
             if ((services != null) && (!services.isEmpty())) {
-                Iterator iter = services.iterator();
+                Iterator<? extends JAXBElement<? extends EndpointType>> iter = services.iterator();
                 while (iter.hasNext()) {
-                    EndpointType endpoint = (EndpointType) iter.next();
+                    EndpointType endpoint = iter.next().getValue();
                     if (binding.equals(endpoint.getBinding())) {
                         return true;
                     }
@@ -4128,30 +4139,30 @@ public class SAML2Utils extends SAML2SDKUtils {
         try {
             IDPSSODescriptorElement idpDescriptor =
                     saml2MetaManager.getIDPSSODescriptor(realm, idpEntityID);
-            List services = null;
+            List<? extends JAXBElement<? extends EndpointType>> services = null;
             if (SAML2Constants.SSO_SERVICE.equals(profile)) {
-                services = idpDescriptor.getSingleSignOnService();
+                services = idpDescriptor.getValue().getSingleSignOnService();
             } else if (SAML2Constants.NAMEID_MAPPING_SERVICE.equals(profile)) {
-                services = idpDescriptor.getNameIDMappingService();
+                services = idpDescriptor.getValue().getNameIDMappingService();
             } else if (
                     SAML2Constants.ASSERTION_ID_REQUEST_SERVICE.equals(profile)) {
                 services = saml2MetaManager.
-                        getAuthnAuthorityDescriptor(realm, idpEntityID).
+                        getAuthnAuthorityDescriptor(realm, idpEntityID).getValue().
                         getAssertionIDRequestService();
             } else if (
                     SAML2Constants.ARTIFACT_RESOLUTION_SERVICE.equals(profile)) {
-                services = idpDescriptor.getArtifactResolutionService();
+                services = idpDescriptor.getValue().getArtifactResolutionService();
             } else if (
                     SAML2Constants.SLO_SERVICE.equals(profile)) {
-                services = idpDescriptor.getSingleLogoutService();
+                services = idpDescriptor.getValue().getSingleLogoutService();
             } else if (
                     SAML2Constants.MNI_SERVICE.equals(profile)) {
-                services = idpDescriptor.getManageNameIDService();
+                services = idpDescriptor.getValue().getManageNameIDService();
             }
             if ((services != null) && (!services.isEmpty())) {
-                Iterator iter = services.iterator();
+                Iterator<? extends JAXBElement<? extends EndpointType>> iter = services.iterator();
                 while (iter.hasNext()) {
-                    EndpointType endpoint = (EndpointType) iter.next();
+                    EndpointType endpoint = iter.next().getValue();
                     if (binding.equals(endpoint.getBinding())) {
                         return true;
                     }
@@ -4574,5 +4585,34 @@ public class SAML2Utils extends SAML2SDKUtils {
      */
     public static String getSingleValuedSessionProperty(Object session, String propertyName) throws SessionException {
         return SessionManager.getProvider().getProperty(session, propertyName)[0];
+    }
+
+    /**
+     * Returns the text value of an unmarshalled SAML attribute value.
+     * <p>
+     * The generated {@code AttributeValueElement} is bound to {@code xs:anyType}, so an unmarshalled
+     * value is a DOM node whose {@code toString()} is not the attribute text; values built
+     * programmatically may carry a plain {@code String} instead. JAXB1 exposed the text content
+     * directly, and callers comparing attribute values still expect strings.
+     *
+     * @param attributeValue an {@code AttributeValueElement}, a {@code JAXBElement} payload, a DOM
+     *        node or a {@code String}; may be {@code null}.
+     * @return the text content of the attribute value, or {@code null} if none.
+     */
+    public static String getAttributeValueString(Object attributeValue) {
+        Object content = attributeValue;
+        while (content instanceof JAXBElement) {
+            content = ((JAXBElement<?>) content).getValue();
+        }
+        if (content == null) {
+            return null;
+        }
+        if (content instanceof String) {
+            return (String) content;
+        }
+        if (content instanceof org.w3c.dom.Node) {
+            return ((org.w3c.dom.Node) content).getTextContent();
+        }
+        return content.toString();
     }
 }

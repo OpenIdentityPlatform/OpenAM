@@ -24,7 +24,7 @@
  *
  * $Id: WSFederationSingleLogoutHandler.java,v 1.4 2009/10/28 23:58:57 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.multiprotocol;
@@ -222,7 +222,7 @@ public class WSFederationSingleLogoutHandler implements SingleLogoutHandler {
                     }
                     IDPSSOConfigElement config =
                         metaManager.getIDPSSOConfig(realm, idpId);
-                    return config.getMetaAlias();
+                    return config.getValue().getMetaAlias();
                 }
             }
         } catch (Exception e) {

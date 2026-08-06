@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FedletConfigurationImpl.java,v 1.5 2010/01/26 21:31:59 madan_ranganath Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -54,7 +56,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -278,7 +280,7 @@ public class FedletConfigurationImpl implements ConfigurationInstance {
         try {
             Object obj = SAML2MetaUtils.convertStringToJAXB(metaXML);
             if (obj instanceof EntityDescriptorElement) {
-                return ((EntityDescriptorElement) obj).getEntityID();
+                return ((EntityDescriptorElement) obj).getValue().getEntityID();
             }
         } catch (JAXBException jaxbe) {
             debug.error("FedletConfigImpl.getEntityID: " + metaXML, jaxbe);

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPPCommonName.java,v 1.2 2008/06/25 05:47:15 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  * Portions Copyrighted 2026 3A Systems, LLC
  */
@@ -30,7 +32,8 @@
 package com.sun.identity.liberty.ws.idpp.container;
 
 import com.sun.identity.shared.datastruct.CollectionHelper;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -68,9 +71,10 @@ public class IDPPCommonName extends IDPPBaseContainer {
 
          IDPPUtils.debug.message("IDPPContainers:getContainerObject:Init");
          try {
-             PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
+             PPType ppType = IDPPUtils.getIDPPFactory().createPPType();
              CommonNameElement ce = 
-                   IDPPUtils.getIDPPFactory().createCommonNameElement();
+                   IDPPUtils.getIDPPFactory().createCommonNameElement(
+                           IDPPUtils.getIDPPFactory().createCommonNameType());
 
              String cn = CollectionHelper.getMapAttr(
                 userMap, getAttributeMapper().getDSAttribute(
@@ -78,7 +82,7 @@ public class IDPPCommonName extends IDPPBaseContainer {
 
              if(cn != null) {
                 DSTString dstString = getDSTString(cn);
-                ce.setCN(dstString);
+                ce.getValue().setCN(IDPPUtils.getIDPPFactory().createCNElement(dstString));
              }
 
              Set altCNs = (Set)userMap.get(getAttributeMapper().getDSAttribute(
@@ -87,20 +91,15 @@ public class IDPPCommonName extends IDPPBaseContainer {
                  Iterator iter = altCNs.iterator();
                  while(iter.hasNext()) {
                      DSTString dstString = getDSTString((String)iter.next());
-                     ce.getAltCN().add(dstString);
+                     ce.getValue().getAltCN().add(dstString);
                  }
              }
 
              AnalyzedNameType analyzedName = getAnalyzedName(userMap); 
-             ce.setAnalyzedName(analyzedName);
+             ce.getValue().setAnalyzedName(analyzedName);
 
              ppType.setCommonName(ce);
              return ppType;
-         } catch (JAXBException je) {
-             IDPPUtils.debug.error(
-              "IDPPContainers:getContainerObject: JAXB failure", je); 
-              throw new IDPPException(
-              IDPPUtils.bundle.getString("jaxbFailure"));
          } catch (IDPPException ie) {
               IDPPUtils.debug.error("IDPPContainers:getContainerObject:" +
               "Error while creating common name.", ie);
@@ -264,10 +263,13 @@ public class IDPPCommonName extends IDPPBaseContainer {
         DSTString cn = null;
         List altCNs = null;
         if(obj != null) {
+           if(obj instanceof JAXBElement) {
+              obj = ((JAXBElement<?>)obj).getValue();
+           }
            if(obj instanceof CommonNameType) {
               CommonNameType cnType = (CommonNameType)obj;
               analyzedName = cnType.getAnalyzedName();
-              cn = cnType.getCN();
+              cn = jaxbValue(cnType.getCN());
               altCNs = cnType.getAltCN();
            } else {
               throw new IDPPException(

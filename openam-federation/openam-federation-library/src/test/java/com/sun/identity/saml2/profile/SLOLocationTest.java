@@ -12,14 +12,18 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ * 
+ * Portions copyright 2026 3A Systems LLC
  */
 package com.sun.identity.saml2.profile;
 
 import static com.sun.identity.saml2.common.SAML2Constants.*;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.jaxb.metadata.SingleLogoutServiceElement;
-import com.sun.identity.saml2.jaxb.metadata.impl.SingleLogoutServiceElementImpl;
+import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.*;
 import org.testng.annotations.Test;
 
@@ -32,11 +36,11 @@ public class SLOLocationTest {
         endpoints.add(endpointFor(HTTP_POST, "post"));
         endpoints.add(endpointFor(SOAP, "soap"));
         SingleLogoutServiceElement result = LogoutUtil.getMostAppropriateSLOServiceLocation(endpoints, HTTP_REDIRECT);
-        assertThat(result.getBinding()).isEqualTo(HTTP_REDIRECT);
+        assertThat(result.getValue().getBinding()).isEqualTo(HTTP_REDIRECT);
         result = LogoutUtil.getMostAppropriateSLOServiceLocation(endpoints, HTTP_POST);
-        assertThat(result.getBinding()).isEqualTo(HTTP_POST);
+        assertThat(result.getValue().getBinding()).isEqualTo(HTTP_POST);
         result = LogoutUtil.getMostAppropriateSLOServiceLocation(endpoints, SOAP);
-        assertThat(result.getBinding()).isEqualTo(SOAP);
+        assertThat(result.getValue().getBinding()).isEqualTo(SOAP);
     }
 
     public void asynchronousBindingIsPreferredOverSynchronous() {
@@ -44,10 +48,10 @@ public class SLOLocationTest {
         endpoints.add(endpointFor(HTTP_POST, "post"));
         endpoints.add(endpointFor(SOAP, "soap"));
         SingleLogoutServiceElement result = LogoutUtil.getMostAppropriateSLOServiceLocation(endpoints, HTTP_REDIRECT);
-        assertThat(result.getBinding()).isEqualTo(HTTP_POST);
+        assertThat(result.getValue().getBinding()).isEqualTo(HTTP_POST);
         endpoints.set(0, endpointFor(HTTP_REDIRECT, "redirect"));
         result = LogoutUtil.getMostAppropriateSLOServiceLocation(endpoints, HTTP_POST);
-        assertThat(result.getBinding()).isEqualTo(HTTP_REDIRECT);
+        assertThat(result.getValue().getBinding()).isEqualTo(HTTP_REDIRECT);
     }
 
     public void asynchronousBindingsAreNotReturnedWhenRequestingSynchronous() {
@@ -72,15 +76,49 @@ public class SLOLocationTest {
         List<SingleLogoutServiceElement> endpoints = new ArrayList<SingleLogoutServiceElement>();
         endpoints.add(endpointFor(SOAP, "soap"));
         SingleLogoutServiceElement result = LogoutUtil.getMostAppropriateSLOServiceLocation(endpoints, HTTP_REDIRECT);
-        assertThat(result.getBinding()).isEqualTo(SOAP);
+        assertThat(result.getValue().getBinding()).isEqualTo(SOAP);
         result = LogoutUtil.getMostAppropriateSLOServiceLocation(endpoints, HTTP_POST);
-        assertThat(result.getBinding()).isEqualTo(SOAP);
+        assertThat(result.getValue().getBinding()).isEqualTo(SOAP);
+    }
+
+    public void sloServiceLocationFoundForWrappedAndUnwrappedLists() {
+        List<SingleLogoutServiceElement> endpoints = new ArrayList<SingleLogoutServiceElement>();
+        endpoints.add(endpointFor(HTTP_REDIRECT, "redirect"));
+        endpoints.add(endpointFor(SOAP, "soap"));
+
+        // metadata callers pass the element wrappers straight from getSingleLogoutService()
+        assertThat(LogoutUtil.getSLOServiceLocation(endpoints, SOAP)).isEqualTo("soap");
+        assertThat(LogoutUtil.getSLOServiceLocation(endpoints, HTTP_POST)).isNull();
+
+        // the session listeners pass the unwrapped EndpointType list required by doLogout
+        List<EndpointType> unwrapped = endpoints.stream()
+                .map(JAXBElement::getValue).collect(Collectors.toList());
+        assertThat(LogoutUtil.getSLOServiceLocation(unwrapped, SOAP)).isEqualTo("soap");
+        assertThat(LogoutUtil.getSLOServiceLocation(unwrapped, HTTP_POST)).isNull();
+    }
+
+    public void sloResponseServiceLocationFoundForWrappedAndUnwrappedLists() {
+        SingleLogoutServiceElement soap = endpointFor(SOAP, "soap");
+        soap.getValue().setResponseLocation("soap-response");
+        List<SingleLogoutServiceElement> endpoints = new ArrayList<SingleLogoutServiceElement>();
+        endpoints.add(endpointFor(HTTP_REDIRECT, "redirect"));
+        endpoints.add(soap);
+
+        assertThat(LogoutUtil.getSLOResponseServiceLocation(endpoints, SOAP)).isEqualTo("soap-response");
+
+        List<EndpointType> unwrapped = endpoints.stream()
+                .map(JAXBElement::getValue).collect(Collectors.toList());
+        assertThat(LogoutUtil.getSLOResponseServiceLocation(unwrapped, SOAP)).isEqualTo("soap-response");
     }
 
     private SingleLogoutServiceElement endpointFor(String binding, String location) {
-        SingleLogoutServiceElement ret = new SingleLogoutServiceElementImpl();
-        ret.setBinding(binding);
-        ret.setLocation(location);
+
+        com.sun.identity.saml2.jaxb.metadata.ObjectFactory of
+                = new com.sun.identity.saml2.jaxb.metadata.ObjectFactory();
+
+        SingleLogoutServiceElement ret = of.createSingleLogoutServiceElement(of.createEndpointType());
+        ret.getValue().setBinding(binding);
+        ret.getValue().setLocation(location);
         return ret;
     }
 }

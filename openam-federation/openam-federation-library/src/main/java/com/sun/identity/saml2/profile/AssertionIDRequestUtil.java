@@ -72,6 +72,7 @@ import com.sun.identity.saml2.jaxb.metadata.AssertionIDRequestServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.AuthnAuthorityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.RoleDescriptorType;
+import jakarta.xml.bind.JAXBElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
@@ -402,14 +403,14 @@ public class AssertionIDRequestUtil {
         RoleDescriptorType roled = null;
         try {
             if (SAML2Constants.IDP_ROLE.equals(role)) {
-                roled = metaManager.getIDPSSODescriptor(realm,
-                    samlAuthorityEntityID);
+                roled = unwrap(metaManager.getIDPSSODescriptor(realm,
+                    samlAuthorityEntityID));
             } else if (SAML2Constants.AUTHN_AUTH_ROLE.equals(role)) {
-                roled = metaManager.getAuthnAuthorityDescriptor(realm,
-                    samlAuthorityEntityID);
+                roled = unwrap(metaManager.getAuthnAuthorityDescriptor(realm,
+                    samlAuthorityEntityID));
             } else if (SAML2Constants.ATTR_AUTH_ROLE.equals(role)) {
-                roled = metaManager.getAttributeAuthorityDescriptor(realm,
-                    samlAuthorityEntityID);
+                roled = unwrap(metaManager.getAttributeAuthorityDescriptor(realm,
+                    samlAuthorityEntityID));
             }
         } catch (SAML2MetaException sme) {
             SAML2Utils.debug.error("AssertionIDRequestUtil." +
@@ -503,8 +504,8 @@ public class AssertionIDRequestUtil {
                     throw new SAML2Exception(SAML2Utils.bundle.getString(
                         "idpNotFound"));
                 }
-                aIDReqServices = idpd.getAssertionIDRequestService();
-                roled = idpd;
+                aIDReqServices = idpd.getValue().getAssertionIDRequestService();
+                roled = idpd.getValue();
             } else if (role.equals(SAML2Constants.AUTHN_AUTH_ROLE)) {
                 AuthnAuthorityDescriptorElement attrd =
                     metaManager.getAuthnAuthorityDescriptor(realm,
@@ -513,8 +514,8 @@ public class AssertionIDRequestUtil {
                     throw new SAML2Exception(SAML2Utils.bundle.getString(
                         "authnAuthorityNotFound"));
                 }
-                aIDReqServices = attrd.getAssertionIDRequestService();
-                roled = attrd;
+                aIDReqServices = attrd.getValue().getAssertionIDRequestService();
+                roled = attrd.getValue();
             } else if (role.equals(SAML2Constants.ATTR_AUTH_ROLE)) {
                 AttributeAuthorityDescriptorElement aad =
                     metaManager.getAttributeAuthorityDescriptor(realm,
@@ -523,8 +524,8 @@ public class AssertionIDRequestUtil {
                     throw new SAML2Exception(SAML2Utils.bundle.getString(
                         "attrAuthorityNotFound"));
                 }
-                aIDReqServices = aad.getAssertionIDRequestService();
-                roled = aad;
+                aIDReqServices = aad.getValue().getAssertionIDRequestService();
+                roled = aad.getValue();
             } else {
                 throw new SAML2Exception(SAML2Utils.bundle.getString(
                     "unsupportedRole"));
@@ -549,8 +550,8 @@ public class AssertionIDRequestUtil {
         for(Iterator iter = aIDReqServices.iterator(); iter.hasNext(); ) {
             AssertionIDRequestServiceElement aIDReqService =
                 (AssertionIDRequestServiceElement)iter.next();
-            if (binding.equalsIgnoreCase(aIDReqService.getBinding())) {
-                location.append(aIDReqService.getLocation());
+            if (binding.equalsIgnoreCase(aIDReqService.getValue().getBinding())) {
+                location.append(aIDReqService.getValue().getLocation());
                 break;
             }
         }
@@ -603,7 +604,7 @@ public class AssertionIDRequestUtil {
                 "assertionIDRequestIssuerNotFound"));
         }
 
-        Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(spSSODesc, requestedEntityID,
+        Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(spSSODesc.getValue(), requestedEntityID,
                 SAML2Constants.SP_ROLE);
 
         if (!verificationCerts.isEmpty()) {
@@ -646,20 +647,30 @@ public class AssertionIDRequestUtil {
         }
     }
 
+    /**
+     * Returns the value contained in the given JAXB element, or {@code null}
+     * if the element itself is {@code null}. The metadata lookups return
+     * {@code null} when the requested role descriptor is absent, so this
+     * guards against a {@code NullPointerException} on {@code getValue()}.
+     */
+    private static <T> T unwrap(JAXBElement<? extends T> element) {
+        return (element == null) ? null : element.getValue();
+    }
+
     private static String fillInBasicAuthInfo(String location, String realm,
         String samlAuthorityEntityID, String role) {
 
         BaseConfigType config = null;
         try {
             if (role.equals(SAML2Constants.IDP_ROLE)) {
-                config = metaManager.getIDPSSOConfig(realm,
-                    samlAuthorityEntityID);
+                config = unwrap(metaManager.getIDPSSOConfig(realm,
+                    samlAuthorityEntityID));
             } else if (role.equals(SAML2Constants.AUTHN_AUTH_ROLE)) {
-                config = metaManager.getAuthnAuthorityConfig(realm,
-                    samlAuthorityEntityID);
+                config = unwrap(metaManager.getAuthnAuthorityConfig(realm,
+                    samlAuthorityEntityID));
             } else if (role.equals(SAML2Constants.ATTR_AUTH_ROLE)) {
-                config = metaManager.getAttributeAuthorityConfig(realm,
-                    samlAuthorityEntityID);
+                config = unwrap(metaManager.getAttributeAuthorityConfig(realm,
+                    samlAuthorityEntityID));
             }
         } catch (SAML2MetaException sme) {
             if (SAML2Utils.debug.messageEnabled()) {

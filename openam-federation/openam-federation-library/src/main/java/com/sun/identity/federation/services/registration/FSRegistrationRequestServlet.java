@@ -178,14 +178,14 @@ public class FSRegistrationRequestServlet extends HttpServlet {
                 hostedProviderDesc =
                     metaManager.getIDPDescriptor(realm, hostedEntityId);
                 hostedConfig = 
-                    metaManager.getIDPDescriptorConfig(realm, hostedEntityId);
+                    metaManager.getIDPDescriptorConfig(realm, hostedEntityId).getValue();
             } else if (hostedProviderRole != null &&
                 hostedProviderRole.equalsIgnoreCase(IFSConstants.SP))
             {
                 hostedProviderDesc = 
                     metaManager.getSPDescriptor(realm, hostedEntityId);
                 hostedConfig = 
-                    metaManager.getSPDescriptorConfig(realm, hostedEntityId);
+                    metaManager.getSPDescriptorConfig(realm, hostedEntityId).getValue();
             }
             if (hostedProviderDesc == null) {
                 throw new IDFFMetaException((String) null);

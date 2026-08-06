@@ -197,7 +197,9 @@ public abstract class DSTRequestHandler implements RequestHandler {
                    (EncryptedResourceIDType)resourceIDType;
           try {
               Document encDoc = XMLUtils.newDocument();
-                  DiscoUtils.getDiscoMarshaller().marshal(encID, encDoc);
+              // the raw type has no @XmlRootElement; marshal via its element wrapper
+              DiscoUtils.getDiscoMarshaller().marshal(
+                  DiscoUtils.getDiscoFactory().createEncryptedResourceIDElement(encID), encDoc);
 
               if(DSTUtils.debug.messageEnabled()) {
                  DSTUtils.debug.message("PPRequestHandler.getResourceID:" +
