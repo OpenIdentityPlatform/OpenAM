@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.upgrade.steps;
@@ -59,7 +60,7 @@ public class UpgradeServiceUtils {
      * @return A map of service name to the service DOM models.
      * @throws UpgradeException When the service XML cannot be loaded.
      */
-    static Map<String, Document> getServiceDefinitions(SSOToken token) throws UpgradeException {
+    public static Map<String, Document> getServiceDefinitions(SSOToken token) throws UpgradeException {
         List<String> serviceNames = new ArrayList<>();
         serviceNames.addAll(UpgradeUtils.getPropertyValues(SetupConstants.PROPERTY_FILENAME,
                 SetupConstants.SERVICE_NAMES));

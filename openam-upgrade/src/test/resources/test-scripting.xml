@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+
+  Copyright 2026 3A Systems, LLC.
+-->
+<ServicesConfiguration>
+    <Service name="ScriptingService" version="1.0">
+        <Configuration>
+            <GlobalConfiguration>
+                <SubConfiguration name="OIDC_CLAIMS" id="scriptContext">
+                    <AttributeValuePair>
+                        <Attribute name="defaultScript"/>
+                        <Value>36863ffb-40ec-48b9-94b1-9a99f71cc3b5</Value>
+                    </AttributeValuePair>
+                    <SubConfiguration name="engineConfiguration" id="engineConfiguration">
+                        <AttributeValuePair>
+                            <Attribute name="whiteList"/>
+                            <Value>java.lang.String</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+                <SubConfiguration name="OAUTH2_ACCESS_TOKEN_MODIFICATION" id="scriptContext">
+                    <AttributeValuePair>
+                        <Attribute name="defaultScript"/>
+                        <Value>d22f9a0c-426a-4466-b95e-d0f125b0d5fa</Value>
+                    </AttributeValuePair>
+                    <SubConfiguration name="engineConfiguration"/>
+                </SubConfiguration>
+                <SubConfiguration name="globalScripts" id="globalScripts">
+                    <SubConfiguration name="36863ffb-40ec-48b9-94b1-9a99f71cc3b5" id="globalScript">
+                        <AttributeValuePair>
+                            <Attribute name="name"/>
+                            <Value>OIDC Claims Script</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="context"/>
+                            <Value>OIDC_CLAIMS</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="language"/>
+                            <Value>GROOVY</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="script"/>
+                            <Value>// OIDC claims script</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                    <SubConfiguration name="d22f9a0c-426a-4466-b95e-d0f125b0d5fa" id="globalScript">
+                        <AttributeValuePair>
+                            <Attribute name="name"/>
+                            <Value>OAuth2 Access Token Modification Script</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="description"/>
+                            <Value>Default global script for OAuth2 Access Token Modification</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="context"/>
+                            <Value>OAUTH2_ACCESS_TOKEN_MODIFICATION</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="language"/>
+                            <Value>GROOVY</Value>
+                        </AttributeValuePair>
+                        <AttributeValuePair>
+                            <Attribute name="script"/>
+                            <Value>// access token modification script</Value>
+                        </AttributeValuePair>
+                    </SubConfiguration>
+                </SubConfiguration>
+            </GlobalConfiguration>
+        </Configuration>
+    </Service>
+</ServicesConfiguration>
