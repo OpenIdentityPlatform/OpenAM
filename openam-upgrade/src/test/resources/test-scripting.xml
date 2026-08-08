@@ -35,13 +35,7 @@
                         <Attribute name="defaultScript"/>
                         <Value>d22f9a0c-426a-4466-b95e-d0f125b0d5fa</Value>
                     </AttributeValuePair>
-                    <SubConfiguration name="engineConfiguration" id="engineConfiguration">
-                        <AttributeValuePair>
-                            <Attribute name="whiteList"/>
-                            <Value>java.lang.Boolean</Value>
-                            <Value>java.lang.String</Value>
-                        </AttributeValuePair>
-                    </SubConfiguration>
+                    <SubConfiguration name="engineConfiguration"/>
                 </SubConfiguration>
                 <SubConfiguration name="globalScripts" id="globalScripts">
                     <SubConfiguration name="36863ffb-40ec-48b9-94b1-9a99f71cc3b5" id="globalScript">

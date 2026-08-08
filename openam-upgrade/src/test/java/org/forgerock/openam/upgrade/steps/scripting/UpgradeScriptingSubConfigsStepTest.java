@@ -75,6 +75,10 @@ public class UpgradeScriptingSubConfigsStepTest {
         when(existingContextConfig.getSubConfig(ENGINE_CONFIGURATION)).thenReturn(existingEngineConfig);
         when(globalConfig.getSubConfig(GLOBAL_SCRIPTS)).thenReturn(globalScriptsConfig);
         when(globalScriptsConfig.getSubConfig(EXISTING_SCRIPT_ID)).thenReturn(existingScriptConfig);
+        when(existingContextConfig.exists()).thenReturn(true);
+        when(existingEngineConfig.exists()).thenReturn(true);
+        when(globalScriptsConfig.exists()).thenReturn(true);
+        when(existingScriptConfig.exists()).thenReturn(true);
 
         PrivilegedAction<SSOToken> adminTokenAction = mock(PrivilegedAction.class);
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
@@ -90,9 +94,10 @@ public class UpgradeScriptingSubConfigsStepTest {
         upgradeStep.initialize();
 
         assertThat(upgradeStep.isApplicable()).isTrue();
-        assertThat(upgradeStep.getShortReport("-")).isEqualTo("New Scripting Service configurations (2)-");
+        assertThat(upgradeStep.getShortReport("-")).isEqualTo("New Scripting Service configurations (3)-");
         assertThat(upgradeStep.getDetailedReport("-"))
                 .contains(NEW_CONTEXT)
+                .contains(NEW_CONTEXT + "/" + ENGINE_CONFIGURATION)
                 .contains(GLOBAL_SCRIPTS + "/" + NEW_SCRIPT_ID);
 
         upgradeStep.perform();
@@ -101,11 +106,12 @@ public class UpgradeScriptingSubConfigsStepTest {
         verify(globalConfig).addSubConfig(eq(NEW_CONTEXT), eq("scriptContext"), eq(0), contextAttributes.capture());
         assertThat(contextAttributes.getValue()).containsEntry("defaultScript", singleton(NEW_SCRIPT_ID));
 
+        // The service definition declares the new engine configuration as an empty element without an id,
+        // so the id falls back to the name and the attribute map is empty.
         ArgumentCaptor<Map<String, Set<String>>> engineAttributes = ArgumentCaptor.forClass(Map.class);
         verify(createdContextConfig).addSubConfig(eq(ENGINE_CONFIGURATION), eq(ENGINE_CONFIGURATION), eq(0),
                 engineAttributes.capture());
-        assertThat(engineAttributes.getValue().get("whiteList"))
-                .containsExactlyInAnyOrder("java.lang.Boolean", "java.lang.String");
+        assertThat(engineAttributes.getValue()).isEmpty();
 
         ArgumentCaptor<Map<String, Set<String>>> scriptAttributes = ArgumentCaptor.forClass(Map.class);
         verify(globalScriptsConfig).addSubConfig(eq(NEW_SCRIPT_ID), eq("globalScript"), eq(0),
@@ -120,11 +126,33 @@ public class UpgradeScriptingSubConfigsStepTest {
     }
 
     @Test
+    public void addsEngineConfigurationWhenContextExistsWithoutIt() throws Exception {
+        // For an absent entry whose name matches its sub-schema name (engineConfiguration), getSubConfig
+        // returns a non-null config wrapping a non-existent SMSEntry instead of null, e.g. after a manual
+        // ssoadm workaround created the context but not its engine configuration.
+        when(existingEngineConfig.exists()).thenReturn(false);
+        stubNewContextAndScriptAsExisting();
+
+        upgradeStep.initialize();
+
+        assertThat(upgradeStep.isApplicable()).isTrue();
+        assertThat(upgradeStep.getShortReport("-")).isEqualTo("New Scripting Service configurations (1)-");
+        assertThat(upgradeStep.getDetailedReport("-")).contains(EXISTING_CONTEXT + "/" + ENGINE_CONFIGURATION);
+
+        upgradeStep.perform();
+
+        ArgumentCaptor<Map<String, Set<String>>> engineAttributes = ArgumentCaptor.forClass(Map.class);
+        verify(existingContextConfig).addSubConfig(eq(ENGINE_CONFIGURATION), eq(ENGINE_CONFIGURATION), eq(0),
+                engineAttributes.capture());
+        assertThat(engineAttributes.getValue()).containsEntry("whiteList", singleton("java.lang.String"));
+
+        verify(globalConfig, never()).addSubConfig(anyString(), anyString(), anyInt(), any(Map.class));
+        verify(globalScriptsConfig, never()).addSubConfig(anyString(), anyString(), anyInt(), any(Map.class));
+    }
+
+    @Test
     public void doesNothingWhenAllSubConfigsExist() throws Exception {
-        ServiceConfig newContextConfig = mock(ServiceConfig.class);
-        when(globalConfig.getSubConfig(NEW_CONTEXT)).thenReturn(newContextConfig);
-        when(newContextConfig.getSubConfig(ENGINE_CONFIGURATION)).thenReturn(mock(ServiceConfig.class));
-        when(globalScriptsConfig.getSubConfig(NEW_SCRIPT_ID)).thenReturn(mock(ServiceConfig.class));
+        ServiceConfig newContextConfig = stubNewContextAndScriptAsExisting();
 
         upgradeStep.initialize();
 
@@ -136,6 +164,19 @@ public class UpgradeScriptingSubConfigsStepTest {
         verify(globalConfig, never()).addSubConfig(anyString(), anyString(), anyInt(), any(Map.class));
         verify(globalScriptsConfig, never()).addSubConfig(anyString(), anyString(), anyInt(), any(Map.class));
         verify(newContextConfig, never()).addSubConfig(anyString(), anyString(), anyInt(), any(Map.class));
+    }
+
+    private ServiceConfig stubNewContextAndScriptAsExisting() throws Exception {
+        ServiceConfig newContextConfig = mock(ServiceConfig.class);
+        ServiceConfig newEngineConfig = mock(ServiceConfig.class);
+        ServiceConfig newScriptConfig = mock(ServiceConfig.class);
+        when(globalConfig.getSubConfig(NEW_CONTEXT)).thenReturn(newContextConfig);
+        when(newContextConfig.getSubConfig(ENGINE_CONFIGURATION)).thenReturn(newEngineConfig);
+        when(globalScriptsConfig.getSubConfig(NEW_SCRIPT_ID)).thenReturn(newScriptConfig);
+        when(newContextConfig.exists()).thenReturn(true);
+        when(newEngineConfig.exists()).thenReturn(true);
+        when(newScriptConfig.exists()).thenReturn(true);
+        return newContextConfig;
     }
 
     /**

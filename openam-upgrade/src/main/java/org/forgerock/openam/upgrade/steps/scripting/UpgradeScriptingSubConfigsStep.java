@@ -58,6 +58,10 @@ import com.sun.identity.sm.ServiceNotFoundException;
  * are added to it. New script contexts are only registered by the SMS when the whole service is new, so instances
  * upgraded from a version that already contained the Scripting Service would otherwise be left without the
  * configuration for contexts introduced in later versions (see OPENAM issue #1103).
+ * <p>
+ * The step only creates missing sub-configurations; attributes of existing sub-configurations are never
+ * reconciled with the service definition, so changes to e.g. an existing engine configuration whitelist do not
+ * reach upgraded instances.
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
 public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
@@ -72,6 +76,11 @@ public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
     private static final String AUDIT_NEW_SUB_CONFIG_START = "upgrade.scripting.subconfigs.new.start";
 
     private final List<MissingSubConfig> missingSubConfigs = new ArrayList<>();
+    /**
+     * Display names of every sub-configuration that will be created, including descendants of the missing nodes.
+     * Only used for reporting; {@link #perform()} creates descendants by recursing into the missing nodes.
+     */
+    private final List<String> reportedSubConfigs = new ArrayList<>();
 
     @Inject
     public UpgradeScriptingSubConfigsStep(PrivilegedAction<SSOToken> adminTokenAction,
@@ -102,7 +111,16 @@ public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
     }
 
     private Node getGlobalConfigurationNode(Document scriptingDocument) {
-        return scriptingDocument.getElementsByTagName(SMSUtils.GLOBAL_CONFIG).item(0);
+        for (Iterator it = XMLUtils.getChildNodes(scriptingDocument.getDocumentElement(), SMSUtils.SERVICE).iterator();
+                it.hasNext();) {
+            Node serviceNode = (Node) it.next();
+            if (SCRIPTING_SERVICE_NAME.equals(XMLUtils.getNodeAttributeValue(serviceNode, NAME))) {
+                Node configurationNode = XMLUtils.getChildNode(serviceNode, SMSUtils.CONFIGURATION);
+                return configurationNode == null ? null : XMLUtils.getChildNode(configurationNode,
+                        SMSUtils.GLOBAL_CONFIG);
+            }
+        }
+        return null;
     }
 
     private void captureMissingSubConfigs(Node parentNode, ServiceConfig parentConfig, List<String> parentPath)
@@ -110,14 +128,27 @@ public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
         for (Iterator it = XMLUtils.getChildNodes(parentNode, SMSUtils.SUB_CONFIG).iterator(); it.hasNext();) {
             Node node = (Node) it.next();
             String name = XMLUtils.getNodeAttributeValue(node, NAME);
+            // For an absent entry getSubConfig may return a non-null config wrapping a non-existent SMSEntry
+            // when the sub-config name matches a sub-schema name (e.g. engineConfiguration, globalScripts),
+            // so presence must be determined via ServiceConfig#exists.
             ServiceConfig existingConfig = parentConfig.getSubConfig(name);
-            if (existingConfig == null) {
-                missingSubConfigs.add(new MissingSubConfig(new ArrayList<>(parentPath), name, node));
+            if (!SMSUtils.serviceExists(existingConfig)) {
+                MissingSubConfig missing = new MissingSubConfig(new ArrayList<>(parentPath), name, node);
+                missingSubConfigs.add(missing);
+                reportSubConfigTree(missing.getDisplayName(), node);
             } else {
                 parentPath.add(name);
                 captureMissingSubConfigs(node, existingConfig, parentPath);
                 parentPath.remove(parentPath.size() - 1);
             }
+        }
+    }
+
+    private void reportSubConfigTree(String displayName, Node node) {
+        reportedSubConfigs.add(displayName);
+        for (Iterator it = XMLUtils.getChildNodes(node, SMSUtils.SUB_CONFIG).iterator(); it.hasNext();) {
+            Node child = (Node) it.next();
+            reportSubConfigTree(displayName + '/' + XMLUtils.getNodeAttributeValue(child, NAME), child);
         }
     }
 
@@ -135,11 +166,22 @@ public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
                 ServiceConfig parentConfig = globalConfig;
                 for (String parentName : missing.parentPath) {
                     parentConfig = parentConfig.getSubConfig(parentName);
+                    if (parentConfig == null) {
+                        throw new UpgradeException("Missing parent configuration for " + missing.getDisplayName());
+                    }
                 }
-                addSubConfig(parentConfig, missing.node);
+                // The missing list was captured in initialize(); the entry may have been created since.
+                if (SMSUtils.serviceExists(parentConfig.getSubConfig(missing.name))) {
+                    DEBUG.message("Scripting Service configuration {} already exists, skipping", missing.name);
+                } else {
+                    addSubConfig(parentConfig, missing.node);
+                }
                 UpgradeProgress.reportEnd("upgrade.success");
             }
-        } catch (SMSException | SSOException e) {
+        } catch (UpgradeException e) {
+            UpgradeProgress.reportEnd("upgrade.failed");
+            throw e;
+        } catch (Exception e) {
             UpgradeProgress.reportEnd("upgrade.failed");
             DEBUG.error("An error occurred while adding missing Scripting Service configurations", e);
             throw new UpgradeException("Unable to add missing Scripting Service configurations", e);
@@ -170,8 +212,8 @@ public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
     @Override
     public String getShortReport(String delimiter) {
         StringBuilder sb = new StringBuilder();
-        if (!missingSubConfigs.isEmpty()) {
-            sb.append(MessageFormat.format(BUNDLE.getString(AUDIT_NEW_SUB_CONFIGS), missingSubConfigs.size()));
+        if (!reportedSubConfigs.isEmpty()) {
+            sb.append(MessageFormat.format(BUNDLE.getString(AUDIT_NEW_SUB_CONFIGS), reportedSubConfigs.size()));
             sb.append(delimiter);
         }
         return sb.toString();
@@ -183,9 +225,9 @@ public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
         tags.put(LF, delimiter);
 
         StringBuilder sb = new StringBuilder();
-        for (MissingSubConfig missing : missingSubConfigs) {
+        for (String displayName : reportedSubConfigs) {
             sb.append(INDENT);
-            sb.append(MessageFormat.format(BUNDLE.getString(AUDIT_NEW_SUB_CONFIG), missing.getDisplayName()));
+            sb.append(MessageFormat.format(BUNDLE.getString(AUDIT_NEW_SUB_CONFIG), displayName));
             sb.append(delimiter);
         }
         tags.put("%REPORT_DATA%", sb.toString());
