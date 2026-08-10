@@ -44,8 +44,8 @@ public class ScriptingServiceHelperTest {
     @Test
     public void addsNewChoiceValuesPreservingConfiguredDefault() throws Exception {
         AttributeSchemaImpl upgraded = helper.upgradeAttribute(
-                attributeSchema(OLD_CHOICE_VALUES, "OIDC_CLAIMS"),
-                attributeSchema(NEW_CHOICE_VALUES, "POLICY_CONDITION"));
+                globalAttributeSchema(OLD_CHOICE_VALUES, "OIDC_CLAIMS"),
+                globalAttributeSchema(NEW_CHOICE_VALUES, "POLICY_CONDITION"));
 
         assertThat(upgraded).isNotNull();
         assertThat(upgraded.getChoiceValues()).contains("OAUTH2_ACCESS_TOKEN_MODIFICATION");
@@ -55,26 +55,60 @@ public class ScriptingServiceHelperTest {
     @Test
     public void returnsNullWhenChoiceValuesAreUnchanged() throws Exception {
         assertThat(helper.upgradeAttribute(
-                attributeSchema(NEW_CHOICE_VALUES, "OIDC_CLAIMS"),
-                attributeSchema(NEW_CHOICE_VALUES, "POLICY_CONDITION"))).isNull();
+                globalAttributeSchema(NEW_CHOICE_VALUES, "OIDC_CLAIMS"),
+                globalAttributeSchema(NEW_CHOICE_VALUES, "POLICY_CONDITION"))).isNull();
     }
 
     @Test
     public void usesBundledDefaultWhenNoDefaultIsConfigured() throws Exception {
         AttributeSchemaImpl upgraded = helper.upgradeAttribute(
-                attributeSchema(OLD_CHOICE_VALUES, null),
-                attributeSchema(NEW_CHOICE_VALUES, "POLICY_CONDITION"));
+                globalAttributeSchema(OLD_CHOICE_VALUES, null),
+                globalAttributeSchema(NEW_CHOICE_VALUES, "POLICY_CONDITION"));
 
         assertThat(upgraded).isNotNull();
         assertThat(upgraded.getChoiceValues()).contains("OAUTH2_ACCESS_TOKEN_MODIFICATION");
         assertThat(upgraded.getDefaultValues()).containsExactly("POLICY_CONDITION");
     }
 
-    private static AttributeSchemaImpl attributeSchema(String choiceValues, String defaultValue) {
-        String xml = "<AttributeSchema name=\"defaultScriptContext\" type=\"single_choice\" syntax=\"string\">"
+    @Test
+    public void revertsToBundledDefaultWhenConfiguredDefaultIsNoLongerAValidChoice() throws Exception {
+        String oldChoiceValues = OLD_CHOICE_VALUES.replace("</ChoiceValues>",
+                "<ChoiceValue>REMOVED_CONTEXT</ChoiceValue></ChoiceValues>");
+        AttributeSchemaImpl newAttribute = globalAttributeSchema(NEW_CHOICE_VALUES, "POLICY_CONDITION");
+
+        AttributeSchemaImpl upgraded = helper.upgradeAttribute(
+                globalAttributeSchema(oldChoiceValues, "REMOVED_CONTEXT"), newAttribute);
+
+        assertThat(upgraded).isSameAs(newAttribute);
+        assertThat(upgraded.getDefaultValues()).containsExactly("POLICY_CONDITION");
+    }
+
+    @Test
+    public void syncsChoiceValuesOfSingleTypedRealmContextAttribute() throws Exception {
+        // scriptConfiguration.context is type="single", for which AttributeSchemaImpl does not parse
+        // <ChoiceValues>, so the helper must compare the raw schema nodes to detect the change.
+        AttributeSchemaImpl oldAttribute = contextAttributeSchema(OLD_CHOICE_VALUES);
+        AttributeSchemaImpl newAttribute = contextAttributeSchema(NEW_CHOICE_VALUES);
+        assertThat(oldAttribute.getChoiceValues()).isNull();
+        assertThat(newAttribute.getChoiceValues()).isNull();
+
+        assertThat(helper.upgradeAttribute(oldAttribute, newAttribute)).isSameAs(newAttribute);
+        assertThat(helper.upgradeAttribute(newAttribute, contextAttributeSchema(NEW_CHOICE_VALUES))).isNull();
+    }
+
+    private static AttributeSchemaImpl globalAttributeSchema(String choiceValues, String defaultValue) {
+        return parse("<AttributeSchema name=\"defaultScriptContext\" type=\"single_choice\" syntax=\"string\">"
                 + choiceValues
                 + (defaultValue == null ? "" : "<DefaultValues><Value>" + defaultValue + "</Value></DefaultValues>")
-                + "</AttributeSchema>";
+                + "</AttributeSchema>");
+    }
+
+    private static AttributeSchemaImpl contextAttributeSchema(String choiceValues) {
+        return parse("<AttributeSchema name=\"context\" type=\"single\" syntax=\"string\">"
+                + choiceValues + "</AttributeSchema>");
+    }
+
+    private static AttributeSchemaImpl parse(String xml) {
         Node node = XMLUtils.toDOMDocument(xml, null).getDocumentElement();
         return new TestAttributeSchemaImpl(node);
     }

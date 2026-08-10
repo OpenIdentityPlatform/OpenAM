@@ -61,12 +61,15 @@ import com.sun.identity.sm.ServiceNotFoundException;
  * <p>
  * The step only creates missing sub-configurations; attributes of existing sub-configurations are never
  * reconciled with the service definition, so changes to e.g. an existing engine configuration whitelist do not
- * reach upgraded instances.
+ * reach upgraded instances. It also cannot create a missing single-instance sub-configuration (such as the whole
+ * {@code globalScripts} node) under a parent that already has other children, because the SMS rejects such an
+ * add; all such nodes have existed since OpenAM 13, so this is not reachable on supported upgrade paths.
  */
 @UpgradeStepInfo(dependsOn = "org.forgerock.openam.upgrade.steps.UpgradeServiceSchemaStep")
 public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
 
     private static final String SCRIPTING_SERVICE_NAME = "ScriptingService";
+    private static final String GLOBAL_SCRIPTS = "globalScripts";
     private static final String NAME = "name";
     private static final String ID = "id";
     private static final String PRIORITY = "priority";
@@ -102,12 +105,32 @@ public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
                 return;
             }
             captureMissingSubConfigs(globalConfigNode, globalConfig, new ArrayList<String>());
+            moveGlobalScriptsFirst();
         } catch (ServiceNotFoundException e) {
             DEBUG.message("Scripting service not found. Nothing to upgrade", e);
-        } catch (SMSException | SSOException e) {
+        } catch (UpgradeException e) {
+            throw e;
+        } catch (Exception e) {
             DEBUG.error("An error occurred while looking for missing Scripting Service configurations", e);
             throw new UpgradeException("Unable to detect missing Scripting Service configurations", e);
         }
+    }
+
+    /**
+     * Create missing entries under {@code globalScripts} before the script contexts that reference them via
+     * {@code defaultScript}, so that a failure part-way through {@link #perform()} cannot leave a context
+     * pointing at a script that does not exist yet.
+     */
+    private void moveGlobalScriptsFirst() {
+        List<MissingSubConfig> globalScripts = new ArrayList<>(missingSubConfigs.size());
+        List<MissingSubConfig> others = new ArrayList<>(missingSubConfigs.size());
+        for (MissingSubConfig missing : missingSubConfigs) {
+            String root = missing.parentPath.isEmpty() ? missing.name : missing.parentPath.get(0);
+            (GLOBAL_SCRIPTS.equals(root) ? globalScripts : others).add(missing);
+        }
+        missingSubConfigs.clear();
+        missingSubConfigs.addAll(globalScripts);
+        missingSubConfigs.addAll(others);
     }
 
     private Node getGlobalConfigurationNode(Document scriptingDocument) {
@@ -203,6 +226,9 @@ public class UpgradeScriptingSubConfigsStep extends AbstractUpgradeStep {
         Iterator children = XMLUtils.getChildNodes(node, SMSUtils.SUB_CONFIG).iterator();
         if (children.hasNext()) {
             ServiceConfig createdConfig = parentConfig.getSubConfig(name);
+            if (createdConfig == null) {
+                throw new SMSException("Unable to read newly created Scripting Service configuration " + name);
+            }
             while (children.hasNext()) {
                 addSubConfig(createdConfig, (Node) children.next());
             }
