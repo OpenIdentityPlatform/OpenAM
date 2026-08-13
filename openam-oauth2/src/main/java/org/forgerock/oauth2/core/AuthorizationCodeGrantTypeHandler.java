@@ -103,6 +103,9 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
             throw new InvalidRequestException("Authorization code doesn't exist.");
         }
 
+        // Restore session from OAuth2Request
+        request.setSession(authorizationCode.getSessionId());
+
         final String codeVerifier = request.getParameter(OAuth2Constants.Custom.CODE_VERIFIER);
 
         // RFC 7636 §4.6: if the code was issued with a code_challenge,

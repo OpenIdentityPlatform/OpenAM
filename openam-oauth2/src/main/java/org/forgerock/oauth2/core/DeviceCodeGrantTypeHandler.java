@@ -17,6 +17,7 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.Utils.joinScope;
 import static org.forgerock.openam.oauth2.OAuth2Constants.DeviceCode.DEVICE_CODE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
@@ -42,6 +43,9 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuth2UrisFactory;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.iplanet.sso.SSOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,17 +61,19 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
     private final ClientRegistrationStore clientRegistrationStore;
     private final ClientAuthenticationFailureFactory failureFactory;
     private final GrantTypeAccessTokenGenerator accessTokenGenerator;
+    private final SSOTokenManager ssoTokenManager;
 
     @Inject
     public DeviceCodeGrantTypeHandler(OAuth2ProviderSettingsFactory providerSettingsFactory,
             ClientAuthenticator clientAuthenticator, TokenStore tokenStore,
             ClientRegistrationStore clientRegistrationStore, ClientAuthenticationFailureFactory failureFactory,
-            OAuth2UrisFactory urisFactory, GrantTypeAccessTokenGenerator accessTokenGenerator) {
+            OAuth2UrisFactory urisFactory, GrantTypeAccessTokenGenerator accessTokenGenerator, SSOTokenManager ssoTokenManager) {
         super(providerSettingsFactory, urisFactory, clientAuthenticator);
         this.tokenStore = tokenStore;
         this.clientRegistrationStore = clientRegistrationStore;
         this.failureFactory = failureFactory;
         this.accessTokenGenerator = accessTokenGenerator;
+        this.ssoTokenManager = ssoTokenManager;
     }
 
     @Override
@@ -85,13 +91,14 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
 
         String clientId = client.getClientId();
         DeviceCode deviceCode = tokenStore.readDeviceCode(clientId, code, request);
-
+        
         if (deviceCode == null ||
                 !clientId.equals(deviceCode.getClientId()) ||
                 !request.getParameter(REALM).equals(deviceCode.getRealm())) {
             throw new AuthorizationDeclinedException();
         }
 
+        AccessToken accessToken;
         try {
             if (deviceCode.isAuthorized()) {
                 String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
@@ -99,8 +106,56 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
                 String resourceOwnerId = deviceCode.getResourceOwnerId();
                 String validatedClaims = providerSettings.validateRequestedClaims(
                         deviceCode.getStringProperty(OAuth2Constants.Custom.CLAIMS));
-                return generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, scope,
+                final String nonce = deviceCode.getNonce();
+
+                // Retore Session
+                String sessionId = deviceCode.getSessionId();
+                
+                SSOToken token = null;
+                                
+                if (sessionId != null) {
+                	try {
+                        token = ssoTokenManager.createSSOToken(sessionId);
+
+                        if (ssoTokenManager.isValidToken(token)) {
+                            request.setSession(sessionId);
+
+                        } else {
+                            logger.warn("Stored session is no longer valid");
+                        }
+                    } catch (SSOException e) {
+                        logger.warn("Unable to restore session {}", sessionId, e);
+                    }
+                }
+                
+                accessToken = generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, scope,
                         validatedClaims, request);
+                
+
+                accessToken.addExtraData(
+                        OAuth2Constants.Custom.NONCE,
+                        nonce);
+                
+
+                if (token != null && ssoTokenManager.isValidToken(token)) {
+                    accessToken.addExtraData(
+                        OAuth2Constants.Custom.SSO_TOKEN_ID,
+                        sessionId
+                    );
+                } else {
+                    logger.warn("Stored session is no longer valid");
+                }
+                
+                
+                providerSettings.additionalDataToReturnFromTokenEndpoint(
+                        accessToken,
+                        request);
+
+                accessToken.addExtraData(
+                        OAuth2Constants.Custom.SSO_TOKEN_ID,
+                        null);
+
+                return accessToken;
             }
 
             if (deviceCode.getExpiryTime() < currentTimeMillis()) {

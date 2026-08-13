@@ -897,7 +897,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             Integer maxAge, String claims, OAuth2Request request, String codeChallenge, String codeChallengeMethod)
             throws ServerException, NotFoundException {
 
-        logger.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
+        logger.message("DefaultOAuthTokenStoreImpl::Creating Device code");
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String deviceCode = UUID.randomUUID().toString();
