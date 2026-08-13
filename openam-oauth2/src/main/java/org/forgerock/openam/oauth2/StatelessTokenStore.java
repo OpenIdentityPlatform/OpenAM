@@ -896,15 +896,12 @@ public class StatelessTokenStore implements TokenStore {
             return false;
         }
         
-        logger.message("SessionId: " + sessionId);
-        
-
         try {
             SSOTokenManager ssoTokenManager = SSOTokenManager.getInstance();
             SSOToken token = ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(sessionId);
 
             if (token == null) {
-                logger.message("Ignoring expired or invalid session: " + sessionId);
+            	
                 return false;
             }
 
@@ -924,7 +921,7 @@ public class StatelessTokenStore implements TokenStore {
             return true;
 
         } catch (SSOException | IdRepoException e) {
-            logger.message("Ignoring expired or invalid session: " + sessionId, e);
+            logger.message("Ignoring expired or invalid session: ", e);
             return false;
         }
     }
