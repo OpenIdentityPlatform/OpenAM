@@ -1520,7 +1520,7 @@ Associated with the servlet named `TaskServle`t. While the associated `TaskServl
 Associated with the servlet named `AgentConfigurationServlet`. The associated `AgentConfigurationServlet` class is called by the `amAccessControl.xml` file, which suggests that it can be configured from the console from Realms > __Realm Name__ > Agents. It is rarely used otherwise. any URL entered prior to login defaults to the standard login page.
 
 `/ccversion/*`::
-Associated with the servlet named `click-servlet`. There is no associated `click-servlet.java` or `ClickServlet.java` file.
+Associated with the servlet named `VersionServlet`. The associated `VersionServlet.java` file forwards every request to `/WEB-INF/jsp/Version.jsp`, which renders the console version window.
 
 `/federation/*`::
 Associated with the servlet named `FSServlet`. While the associated `FSServlet.java` file is rarely used, the URL prior to login defaults to the standard login page.

@@ -25,54 +25,45 @@
  * $Id: Options.java,v 1.7 2009/01/05 23:17:09 veiming Exp $
  *
  * Portions Copyrighted 2011-2015 ForgeRock AS.
- * Portions Copyrighted 2026 3A Systems, LLC
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.config;
 
-import com.sun.identity.config.util.TemplatedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
-import org.openidentityplatform.openam.click.control.ActionLink;
 import org.forgerock.openam.upgrade.VersionUtils;
+import org.openidentityplatform.openam.config.servlet.SetupPage;
 
-public class Options extends TemplatedPage {
+public class Options extends SetupPage {
 
-    public ActionLink createConfigLink = new ActionLink("upgradeLink", this, "upgrade" );
-    public ActionLink testUrlLink = new ActionLink("coexistLink", this, "coexist" );
-    public ActionLink pushConfigLink = new ActionLink("olderUpgradeLink", this, "olderUpgrade" );
+    // Unlike the wizard/summary pages, this has no onSecurityCheck() override: the old Options
+    // extended TemplatedPage (not ProtectedPage), so it stayed reachable even once OpenAM is
+    // configured - that's how a completed install reaches the upgrade-options branch below.
+    // SetupPage's default onSecurityCheck() (always true) already matches that.
 
-    protected boolean upgrade = false;
-    protected boolean upgradeCompleted = false;
-    protected boolean isOpenDS1x = false;
-    protected boolean debugOn = false;
-    
-    private java.util.Locale configLocale = null;
-    
-    protected String getTitle() {
-        return isNewInstall() ? "configuration.options.title" : "upgrade.title";
-    }
+    @Override
+    public void onInit() {
+        super.onInit();
 
-    public void doInit() {
-        upgrade = !isNewInstall();
-        upgradeCompleted = AMSetupServlet.isUpgradeCompleted();
+        boolean upgrade = !isNewInstall();
+        addModel("upgrade", Boolean.valueOf(upgrade));
+
+        boolean upgradeCompleted = AMSetupServlet.isUpgradeCompleted();
         addModel("upgradeCompleted", Boolean.valueOf(upgradeCompleted));
-        addModel( "upgrade", Boolean.valueOf( upgrade ) );
 
         if (upgrade) {
-             addModel("currentVersion", VersionUtils.getCurrentVersion());
+            addModel("currentVersion", VersionUtils.getCurrentVersion());
         }
 
-        isOpenDS1x = EmbeddedOpenDS.isOpenDSVer1Installed();
+        boolean isOpenDS1x = EmbeddedOpenDS.isOpenDSVer1Installed();
         addModel("isOpenDS1x", Boolean.valueOf(isOpenDS1x));
 
         if (isOpenDS1x) {
             addModel("odsdir", AMSetupServlet.getBaseDir());
         }
-        
-        debugOn = getContext().getRequest().getParameter( "debug" ) != null;
-        
-        if (debugOn) {
+
+        if (getContext().getRequest().getParameter("debug") != null) {
             AMSetupServlet.enableDebug();
         }
     }

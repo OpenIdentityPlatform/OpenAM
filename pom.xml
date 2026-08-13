@@ -87,7 +87,6 @@
     <restlet.version>2.4.4</restlet.version>
     <powermock.version>2.0.9</powermock.version>
 <!--     <slf4j.version>1.7.25</slf4j.version> -->
-    <click.version>2.3.0</click.version>
     <commons-beanutils.version>1.11.0</commons-beanutils.version>
     <commons-collections.version>3.2.2</commons-collections.version>
     <commons-digester.version>2.1</commons-digester.version>
@@ -1959,7 +1958,7 @@
 			  	<failOnWarnings>true</failOnWarnings>
                 <notimestamp>true</notimestamp>
                 <excludePackageNames>
-                  org.apache.click;org.openidentityplatform.openam.click;org.openidentityplatform.openam.velocity;*.taglib*;*.taglib
+                  *.taglib*;*.taglib
                 </excludePackageNames>
                 <!--
                   A handful of legacy classes reference JDK-internal packages (sun.security.*,

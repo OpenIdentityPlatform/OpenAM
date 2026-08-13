@@ -358,8 +358,8 @@
     </servlet>
 
     <servlet>
-        <servlet-name>click-servlet</servlet-name>
-        <servlet-class>org.openidentityplatform.openam.click.ClickServlet</servlet-class>
+        <servlet-name>configurator-servlet</servlet-name>
+        <servlet-class>org.openidentityplatform.openam.config.servlet.ConfiguratorServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -747,7 +747,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>click-servlet</servlet-name>
+        <servlet-name>configurator-servlet</servlet-name>
         <url-pattern>*.htm</url-pattern>
     </servlet-mapping>
 
