@@ -249,15 +249,9 @@ public class StatelessTokenStore implements TokenStore {
             authModules = authCode.getAuthModules();
             acr = authCode.getAuthenticationContextClassReference();
 
-            logger.message("AuthorizationCode authModules = " + authModules);
-            logger.message("AuthorizationCode acr = " + acr);
-
         } else if (deviceCode != null) {
             authModules = deviceCode.getAuthModules();
             acr = deviceCode.getAcrValues();
-
-            logger.message("DeviceCode authModules = " + authModules);
-            logger.message("DeviceCode acr = " + acr);
 
         } else {
             RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
@@ -266,8 +260,6 @@ public class StatelessTokenStore implements TokenStore {
                 authModules = currentRefreshToken.getAuthModules();
                 acr = currentRefreshToken.getAuthenticationContextClassReference();
 
-                logger.message("RefreshToken authModules = " + authModules);
-                logger.message("RefreshToken acr = " + acr);
             }
         }
         
@@ -289,11 +281,9 @@ public class StatelessTokenStore implements TokenStore {
         accessTokenContext.put(GRANT_TYPE, grantType);
         if (acr != null) {
             accessTokenContext.put(ACR, acr);
-            logger.message("setting DeviceCode acr acctoken context = " + acr);
         }
         if (authModules != null) {
             accessTokenContext.put("amr", authModules);
-            logger.message("setting DeviceCode authModules acctoken context = " + authModules);
         }
 
         Map<String, Object> modifiedClaims = accessTokenModifier.getModifiedClaims(request, realm, resourceOwnerId,
