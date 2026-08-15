@@ -202,6 +202,7 @@ public class StatelessTokenStore implements TokenStore {
         
         AuthorizationCode authCode = request.getToken(AuthorizationCode.class);
         DeviceCode deviceCode = request.getToken(DeviceCode.class);
+        RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
         String sessionId = null;
         
         if (authCode != null) {
@@ -222,6 +223,7 @@ public class StatelessTokenStore implements TokenStore {
                 .nbf(newDate(currentTime.getMillis()))
                 .iss(oAuth2UrisFactory.get(request).getIssuer())
                 .claim(SCOPE,  org.apache.commons.lang.StringUtils.join(scope, " "))
+                .claim("realm_access", realmAccess)
                 .claim(CLAIMS, claims)
                 .claim(REALM, realm)
                 .claim(NONCE, nonce)
@@ -232,10 +234,6 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
                 .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString())
                 .claim(AUTH_TIME, authTime);
-
-        if (realmAccess.containsKey("roles")) {
-            claimsSetBuilder.claim("realm_access", realmAccess);
-        }
         
         // Propagate authentication context (acr) and authentication modules (amr) into the
         // stateless JWT access token, mirroring the behaviour of createRefreshToken. The values
@@ -245,28 +243,28 @@ public class StatelessTokenStore implements TokenStore {
         String authModules = null;
         String acr = null;
 
+
         if (authCode != null) {
             authModules = authCode.getAuthModules();
             acr = authCode.getAuthenticationContextClassReference();
-
         } else if (deviceCode != null) {
             authModules = deviceCode.getAuthModules();
             acr = deviceCode.getAcrValues();
+        }
 
-        } else {
-            RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
-
-            if (currentRefreshToken != null) {
-                authModules = currentRefreshToken.getAuthModules();
-                acr = currentRefreshToken.getAuthenticationContextClassReference();
-
-            }
+        if (currentRefreshToken != null) {
+        	
+            authModules = currentRefreshToken.getAuthModules();
+            acr = currentRefreshToken.getAuthenticationContextClassReference();
+          
         }
         
         if (authModules != null) {
+        	
             claimsSetBuilder.claim(AUTH_MODULES, authModules);
         }
         if (acr != null) {
+        	
             claimsSetBuilder.claim(ACR, acr);
         }
 
@@ -543,6 +541,8 @@ public class StatelessTokenStore implements TokenStore {
         for(org.forgerock.oauth2.core.Token token : request.getTokens()) {
         	if(token instanceof AuthorizationCode) {
         		claimsSetBuilder.claim(NONCE, ((AuthorizationCode)token).getNonce());
+        	} else if(token instanceof DeviceCode) {
+        		claimsSetBuilder.claim(NONCE, ((DeviceCode)token).getNonce());
         	}
         }
         
@@ -550,15 +550,21 @@ public class StatelessTokenStore implements TokenStore {
         String authModules = null;
         String acr = null;
         AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
+        DeviceCode deviceCode = request.getToken(DeviceCode.class);
+        RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
+        
         if (authorizationCode != null) {
             authModules = authorizationCode.getAuthModules();
             acr = authorizationCode.getAuthenticationContextClassReference();
+        } else if (deviceCode != null) {
+            authModules = deviceCode.getAuthModules();
+            acr = deviceCode.getAcrValues();
         }
 
-        RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
         if (currentRefreshToken != null) {
             authModules = currentRefreshToken.getAuthModules();
             acr = currentRefreshToken.getAuthenticationContextClassReference();
+          
         }
 
         if (authModules != null) {
