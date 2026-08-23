@@ -17,7 +17,6 @@
 
 package org.forgerock.openam.oauth2;
 
-import static com.sun.identity.shared.DateUtils.stringToDate;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
@@ -92,6 +91,8 @@ import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.OAuth2Constants.ProofOfPossession;
+import org.forgerock.openam.oauth2.OAuth2Constants.TokenEndpoint;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.StringUtils;
@@ -100,6 +101,7 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.util.encode.Base64;
 import org.forgerock.util.query.QueryFilter;
 import org.joda.time.Duration;
+import org.restlet.Request;
 
 /**
  * Stateless implementation of the OAuth2 Token Store.
@@ -206,11 +208,19 @@ public class StatelessTokenStore implements TokenStore {
         String sessionId = null;
         
         if (authCode != null) {
-            validateSessionAndLoadRoles(authCode.getSessionId(), realmAccess);
-        }
-
-        if (sessionId == null && deviceCode != null) {
-            validateSessionAndLoadRoles(deviceCode.getSessionId(), realmAccess);
+        	sessionId = authCode.getSessionId();
+            if (StringUtils.isNotBlank(sessionId)) {
+                try {
+                    final SSOTokenManager ssoTokenManager = SSOTokenManager.getInstance();
+                    final SSOToken token = ssoTokenManager.createSSOToken(sessionId);
+                    AMIdentity identity = IdUtils.getIdentity(token);
+                    Set<AMIdentity> memberships = identity.getMemberships(IdType.GROUP);
+                    Set<String> roles = memberships.stream().map(m -> m.getName()).collect(Collectors.toSet());;
+                    realmAccess.put("roles", roles);
+                } catch (SSOException | IdRepoException e) {
+                    logger.error("Error retrieving session from AuthorizationCode", e);
+                }
+            }
         }
         
         String jwtId = UUID.randomUUID().toString();
@@ -244,20 +254,24 @@ public class StatelessTokenStore implements TokenStore {
         String acr = null;
 
 
-        if (authCode != null) {
-            authModules = authCode.getAuthModules();
-            acr = authCode.getAuthenticationContextClassReference();
-        } else if (deviceCode != null) {
-            authModules = deviceCode.getAuthModules();
-            acr = deviceCode.getAcrValues();
-        } else if (currentRefreshToken != null) {
+        if (TokenEndpoint.REFRESH_TOKEN.equals(grantType) && currentRefreshToken != null) {
             authModules = currentRefreshToken.getAuthModules();
             acr = currentRefreshToken.getAuthenticationContextClassReference();
+
+        } else if (TokenEndpoint.DEVICE_CODE.equals(grantType) && deviceCode != null) {
+            authModules = deviceCode.getAuthModules();
+            acr = deviceCode.getAcrValues();
+
+        } else if (authCode != null) {
+            authModules = authCode.getAuthModules();
+            acr = authCode.getAuthenticationContextClassReference();
         }
+        
+        
         
         if (authModules != null) {
         	
-            claimsSetBuilder.claim(AUTH_MODULES, authModules);
+        	claimsSetBuilder.claim("amr", getAMRFromAuthModules(authModules, providerSettings));
         }
         if (acr != null) {
         	
@@ -277,7 +291,7 @@ public class StatelessTokenStore implements TokenStore {
             accessTokenContext.put(ACR, acr);
         }
         if (authModules != null) {
-            accessTokenContext.put("amr", authModules);
+            accessTokenContext.put("amr", getAMRFromAuthModules(authModules, providerSettings));
         }
 
         Map<String, Object> modifiedClaims = accessTokenModifier.getModifiedClaims(request, realm, resourceOwnerId,
@@ -549,19 +563,22 @@ public class StatelessTokenStore implements TokenStore {
         DeviceCode deviceCode = request.getToken(DeviceCode.class);
         RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
         
-        if (authorizationCode != null) {
-            authModules = authorizationCode.getAuthModules();
-            acr = authorizationCode.getAuthenticationContextClassReference();
-        } else if (deviceCode != null) {
+        if (TokenEndpoint.REFRESH_TOKEN.equals(grantType) && currentRefreshToken != null) {
+            authModules = currentRefreshToken.getAuthModules();
+            acr = currentRefreshToken.getAuthenticationContextClassReference();
+
+        } else if (TokenEndpoint.DEVICE_CODE.equals(grantType) && deviceCode != null) {
             authModules = deviceCode.getAuthModules();
             acr = deviceCode.getAcrValues();
-        } else if (currentRefreshToken != null) {
-            authModules = currentRefreshToken.getAuthModules();
-            acr = currentRefreshToken.getAuthenticationContextClassReference(); 
+
+        } else if (authorizationCode != null) {
+            authModules = authorizationCode.getAuthModules();
+            acr = authorizationCode.getAuthenticationContextClassReference();
         }
+        
 
         if (authModules != null) {
-            claimsSetBuilder.claim(AUTH_MODULES, authModules);
+            claimsSetBuilder.claim("amr", getAMRFromAuthModules(authModules, providerSettings));
         }
         if (acr != null) {
             claimsSetBuilder.claim(ACR, acr);
@@ -584,7 +601,7 @@ public class StatelessTokenStore implements TokenStore {
             refreshTokenContext.put(ACR, acr);
         }
         if (authModules != null) {
-            refreshTokenContext.put("amr", authModules);
+            refreshTokenContext.put("amr", getAMRFromAuthModules(authModules, providerSettings));
         }
         Map<String, Object> modifiedRefreshClaims = accessTokenModifier.getModifiedClaims(request, realm,
                 resourceOwnerId, clientId, scope, refreshTokenContext);
@@ -874,6 +891,39 @@ public class StatelessTokenStore implements TokenStore {
             throw new NotFoundException(e.getMessage());
         }
     }
+    
+    private String getAuthModulesFromSSOToken(OAuth2Request request) {
+        String authModules = null;
+        try {
+        	final SSOTokenManager ssoTokenManager = SSOTokenManager.getInstance();
+            SSOToken token = ssoTokenManager.createSSOToken(ServletUtils.getRequest(request.<Request>getRequest()));
+            if (token != null) {
+                authModules = token.getProperty(ISAuthConstants.AUTH_TYPE);
+            }
+        } catch (SSOException e) {
+            logger.warning("Could not get list of auth modules from authentication", e);
+        }
+        return authModules;
+    }
+    
+    private List<String> getAMRFromAuthModules(String authModules, OAuth2ProviderSettings providerSettings) throws ServerException {
+        List<String> amr = null;
+
+        if (authModules != null) {
+            Map<String, String> amrMappings = providerSettings.getAMRAuthModuleMappings();
+            if (!amrMappings.isEmpty()) {
+                amr = new ArrayList<String>();
+                List<String> modulesUsed = Arrays.asList(authModules.split("\\|"));
+                for (Map.Entry<String, String> amrToModuleMapping : amrMappings.entrySet()) {
+                    if (modulesUsed.contains(amrToModuleMapping.getValue())) {
+                        amr.add(amrToModuleMapping.getKey());
+                    }
+                }
+            }
+        }
+
+        return amr;
+    }
 
     private JsonValue convertToken(StatelessToken token) {
         Map<String, Object> map = new HashMap<>();
@@ -888,42 +938,5 @@ public class StatelessTokenStore implements TokenStore {
         map.put(SCOPE, token.getScope());
         return json(map);
     }
-    
-    private boolean validateSessionAndLoadRoles(String sessionId, Map<String, Set<String>> realmAccess) {
-
-        if (StringUtils.isBlank(sessionId)) {
-            return false;
-        }
-        
-        try {
-            SSOTokenManager ssoTokenManager = SSOTokenManager.getInstance();
-            SSOToken token = ssoTokenManager.retrieveValidTokenWithoutResettingIdleTime(sessionId);
-
-            if (token == null) {
-            	
-                return false;
-            }
-
-
-            AMIdentity identity = IdUtils.getIdentity(token);
-            
-            
-            Set<AMIdentity> memberships = identity.getMemberships(IdType.GROUP);
-            
-            
-            Set<String> roles = memberships.stream()
-                    .map(m -> m.getName())
-                    .collect(Collectors.toSet());
-
-            realmAccess.put("roles", roles);
-
-            return true;
-
-        } catch (SSOException | IdRepoException e) {
-            logger.message("Ignoring expired or invalid session: ", e);
-            return false;
-        }
-    }
-    
     
 }
