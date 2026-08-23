@@ -250,13 +250,9 @@ public class StatelessTokenStore implements TokenStore {
         } else if (deviceCode != null) {
             authModules = deviceCode.getAuthModules();
             acr = deviceCode.getAcrValues();
-        }
-
-        if (currentRefreshToken != null) {
-        	
+        } else if (currentRefreshToken != null) {
             authModules = currentRefreshToken.getAuthModules();
             acr = currentRefreshToken.getAuthenticationContextClassReference();
-          
         }
         
         if (authModules != null) {
@@ -559,12 +555,9 @@ public class StatelessTokenStore implements TokenStore {
         } else if (deviceCode != null) {
             authModules = deviceCode.getAuthModules();
             acr = deviceCode.getAcrValues();
-        }
-
-        if (currentRefreshToken != null) {
+        } else if (currentRefreshToken != null) {
             authModules = currentRefreshToken.getAuthModules();
-            acr = currentRefreshToken.getAuthenticationContextClassReference();
-          
+            acr = currentRefreshToken.getAuthenticationContextClassReference(); 
         }
 
         if (authModules != null) {
