@@ -407,6 +407,8 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         String authModules;
         if (request.getToken(AuthorizationCode.class) != null) {
             authModules = request.getToken(AuthorizationCode.class).getAuthModules();
+        } else if (request.getToken(DeviceCode.class) != null) {
+            authModules = request.getToken(DeviceCode.class).getAuthModules();
         } else if (request.getToken(RefreshToken.class) != null) {
             authModules = request.getToken(RefreshToken.class).getAuthModules();
         } else {
@@ -432,6 +434,8 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     private String getAuthenticationContextClassReference(OAuth2Request request) {
         if (request.getToken(AuthorizationCode.class) != null) {
             return request.getToken(AuthorizationCode.class).getAuthenticationContextClassReference();
+        } else if(request.getToken(DeviceCode.class) != null){
+        	return request.getToken(DeviceCode.class).getAcrValues();
         } else if (request.getToken(RefreshToken.class) != null) {
             return request.getToken(RefreshToken.class).getAuthenticationContextClassReference();
         } else {
