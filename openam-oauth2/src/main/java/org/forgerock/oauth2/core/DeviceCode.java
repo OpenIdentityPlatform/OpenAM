@@ -18,8 +18,6 @@ package org.forgerock.oauth2.core;
 
 import static org.forgerock.json.JsonValueFunctions.setOf;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
-import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.SSO_TOKEN_ID;
-import static org.forgerock.openam.oauth2.OAuth2Constants.JWTTokenParams.ACR;
 import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.openam.utils.Time.*;
 
@@ -50,7 +48,6 @@ public class DeviceCode extends JsonValue implements Token {
      * @param token The JsonValue of the token.
      * @throws InvalidGrantException If the given token is not an Authorization Code token.
      */
-
     public DeviceCode(JsonValue token) throws InvalidGrantException {
         super(token);
         if (!OAuth2Constants.DeviceCode.DEVICE_CODE.equals(getTokenName()) || getTokenId() == null ||
@@ -365,23 +362,6 @@ public class DeviceCode extends JsonValue implements Token {
         return Boolean.valueOf(getStringProperty("AUTHORIZED"));
     }
 
-    
-    /**
-     * Sets the session id of the authenticating session.
-     * The session id.
-     */
-    public void setSessionId(String sessionId) {
-        setStringProperty(SSO_TOKEN_ID, sessionId);
-    }
-
-    /**
-     * Gets the session id of the authenticating session.
-     *
-     * @return The session id.
-     */
-    public String getSessionId() {
-        return getStringProperty(SSO_TOKEN_ID);
-    }
 
     /**
      * {@inheritDoc}
