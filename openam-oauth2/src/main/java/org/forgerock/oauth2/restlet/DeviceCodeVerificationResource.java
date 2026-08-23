@@ -178,7 +178,6 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                         if (token != null) {
                         	populateAuthenticationInfo(deviceCode, token);
                         }
-                        
                         deviceCode.setResourceOwnerId(resourceOwner.getId());
                         deviceCode.setAuthorized(true);
                         tokenStore.updateDeviceCode(deviceCode, request);
@@ -322,8 +321,6 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         if (token == null) {
             return;
         }
-
-        deviceCode.setSessionId(token.getTokenID().toString());
 
         try {
             deviceCode.setAuthModules(token.getProperty(ISAuthConstants.AUTH_TYPE));
