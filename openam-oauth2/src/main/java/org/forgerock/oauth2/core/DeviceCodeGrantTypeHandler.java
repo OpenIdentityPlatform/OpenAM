@@ -17,7 +17,6 @@
 
 package org.forgerock.oauth2.core;
 
-import static org.forgerock.oauth2.core.Utils.joinScope;
 import static org.forgerock.openam.oauth2.OAuth2Constants.DeviceCode.DEVICE_CODE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.StringUtils.isEmpty;
@@ -43,9 +42,6 @@ import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnauthorizedClientException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.openam.oauth2.OAuth2UrisFactory;
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
-import com.iplanet.sso.SSOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,19 +57,17 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
     private final ClientRegistrationStore clientRegistrationStore;
     private final ClientAuthenticationFailureFactory failureFactory;
     private final GrantTypeAccessTokenGenerator accessTokenGenerator;
-    private final SSOTokenManager ssoTokenManager;
 
     @Inject
     public DeviceCodeGrantTypeHandler(OAuth2ProviderSettingsFactory providerSettingsFactory,
             ClientAuthenticator clientAuthenticator, TokenStore tokenStore,
             ClientRegistrationStore clientRegistrationStore, ClientAuthenticationFailureFactory failureFactory,
-            OAuth2UrisFactory urisFactory, GrantTypeAccessTokenGenerator accessTokenGenerator, SSOTokenManager ssoTokenManager) {
+            OAuth2UrisFactory urisFactory, GrantTypeAccessTokenGenerator accessTokenGenerator) {
         super(providerSettingsFactory, urisFactory, clientAuthenticator);
         this.tokenStore = tokenStore;
         this.clientRegistrationStore = clientRegistrationStore;
         this.failureFactory = failureFactory;
         this.accessTokenGenerator = accessTokenGenerator;
-        this.ssoTokenManager = ssoTokenManager;
     }
 
     @Override
@@ -108,52 +102,12 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
                         deviceCode.getStringProperty(OAuth2Constants.Custom.CLAIMS));
                 final String nonce = deviceCode.getNonce();
 
-                // Retore Session
-                String sessionId = deviceCode.getSessionId();
-                
-                SSOToken token = null;
-                                
-                if (sessionId != null) {
-                	try {
-                        token = ssoTokenManager.createSSOToken(sessionId);
-
-                        if (ssoTokenManager.isValidToken(token)) {
-                            request.setSession(sessionId);
-
-                        } else {
-                            logger.warn("Stored session is no longer valid");
-                        }
-                    } catch (SSOException e) {
-                        logger.warn("Unable to restore session {}", sessionId, e);
-                    }
-                }
-                
                 accessToken = generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, scope,
-                        validatedClaims, request);
-                
-
-                accessToken.addExtraData(
-                        OAuth2Constants.Custom.NONCE,
-                        nonce);
-                
-
-                if (token != null && ssoTokenManager.isValidToken(token)) {
-                    accessToken.addExtraData(
-                        OAuth2Constants.Custom.SSO_TOKEN_ID,
-                        sessionId
-                    );
-                } else {
-                    logger.warn("Stored session is no longer valid");
-                }
-                
+                        validatedClaims, nonce, request);
                 
                 providerSettings.additionalDataToReturnFromTokenEndpoint(
                         accessToken,
                         request);
-
-                accessToken.addExtraData(
-                        OAuth2Constants.Custom.SSO_TOKEN_ID,
-                        null);
 
                 return accessToken;
             }
@@ -185,9 +139,9 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
     }
 
     private AccessToken generateAccessToken(OAuth2ProviderSettings providerSettings, String grantType, String clientId,
-            String resourceOwnerId, Set<String> scope, String validatedClaims, OAuth2Request request)
+            String resourceOwnerId, Set<String> scope, String validatedClaims, String nonce, OAuth2Request request)
             throws ServerException, NotFoundException {
         return accessTokenGenerator.generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, null,
-                scope, validatedClaims, null, null, request);
+                scope, validatedClaims, null, nonce, request);
     }
 }
