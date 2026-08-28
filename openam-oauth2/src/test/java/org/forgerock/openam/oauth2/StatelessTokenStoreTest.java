@@ -17,7 +17,6 @@
 package org.forgerock.openam.oauth2;
 
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -146,11 +145,6 @@ public final class StatelessTokenStoreTest {
         // Given
         givenBaseProviderSettings();
         given(utils.getConfirmationKey(request)).willReturn(null);
-        
-        Map<String, String> amrMappings = new HashMap<>();
-        amrMappings.put("amr1", "DataStore");
-        
-        given(settings.getAMRAuthModuleMappings()).willReturn(amrMappings);
 
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
         given(authorizationCode.getAuthModules()).willReturn("DataStore");
@@ -164,7 +158,7 @@ public final class StatelessTokenStoreTest {
 
         // Then
         assertThat(token.getTokenInfo().get("acr")).isEqualTo("urn:mace:incommon:iap:silver");
-        assertThat(token.getTokenInfo().get("amr")).isEqualTo(singletonList("amr1"));
+        assertThat(token.getTokenInfo().get("authModules")).isEqualTo("DataStore");
     }
 
     @Test
@@ -173,11 +167,6 @@ public final class StatelessTokenStoreTest {
         givenBaseProviderSettings();
         given(utils.getConfirmationKey(request)).willReturn(null);
 
-        Map<String, String> amrMappings = new HashMap<>();
-        amrMappings.put("amr2", "LDAP");
-
-        given(settings.getAMRAuthModuleMappings()).willReturn(amrMappings);
-        
         RefreshToken currentRefreshToken = mock(RefreshToken.class);
         given(currentRefreshToken.getAuthModules()).willReturn("LDAP");
         given(currentRefreshToken.getAuthenticationContextClassReference()).willReturn("urn:mace:incommon:iap:bronze");
@@ -189,7 +178,7 @@ public final class StatelessTokenStoreTest {
 
         // Then
         assertThat(token.getTokenInfo().get("acr")).isEqualTo("urn:mace:incommon:iap:bronze");
-        assertThat(token.getTokenInfo().get("amr")).isEqualTo(singletonList("amr2"));
+        assertThat(token.getTokenInfo().get("authModules")).isEqualTo("LDAP");
     }
 
     @Test
@@ -197,12 +186,6 @@ public final class StatelessTokenStoreTest {
         // Given
         givenBaseProviderSettings();
         given(utils.getConfirmationKey(request)).willReturn(null);
-        
-        Map<String, String> amrMappings = new HashMap<>();
-        amrMappings.put("amr1", "DataStore");
-        amrMappings.put("amr2", "LDAP");
-        
-        given(settings.getAMRAuthModuleMappings()).willReturn(amrMappings);
 
         AuthorizationCode authorizationCode = mock(AuthorizationCode.class);
         given(authorizationCode.getAuthModules()).willReturn("DataStore");
@@ -221,7 +204,7 @@ public final class StatelessTokenStoreTest {
 
         // Then
         assertThat(token.getTokenInfo().get("acr")).isEqualTo("acr-from-refresh");
-        assertThat(token.getTokenInfo().get("amr")).isEqualTo(singletonList("amr2"));
+        assertThat(token.getTokenInfo().get("authModules")).isEqualTo("LDAP");
     }
 
     @Test
@@ -236,6 +219,7 @@ public final class StatelessTokenStoreTest {
 
         // Then
         assertThat(token.getTokenInfo()).doesNotContainKey("acr");
+        assertThat(token.getTokenInfo()).doesNotContainKey("authModules");
     }
 
     @Test
