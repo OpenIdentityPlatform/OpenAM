@@ -126,7 +126,7 @@ public class DeviceCode extends JsonValue implements Token {
     
     /**
      * Get the auth modules string.
-     * @return The pipe-separated list of auth modules.
+     * @return list of auth modules.
      */
     public String getAuthModules() {
         return getStringProperty(AUTH_MODULES);
