@@ -172,15 +172,8 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                     }
                     if (consentGiven) {
 
-                        ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
-                        deviceCode.setAcrValues(getAuthenticationContextClassReferenceFromRequest(request));
-                        SSOToken token = resourceOwnerSessionValidator.getResourceOwnerSession(request);
-                        if (token != null) {
-                        	populateAuthenticationInfo(deviceCode, token);
-                        }
-                        deviceCode.setResourceOwnerId(resourceOwner.getId());
-                        deviceCode.setAuthorized(true);
-                        tokenStore.updateDeviceCode(deviceCode, request);
+                    	authorizeAndUpdateDeviceCode(deviceCode,request);
+                        
                     } else {
                         tokenStore.deleteDeviceCode(deviceCode.getClientId(), deviceCode.getDeviceCode(), request);
                     }
@@ -188,15 +181,8 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                     authorizationService.authorize(request);
                 }
             } else {
-                ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
-                deviceCode.setAcrValues(getAuthenticationContextClassReferenceFromRequest(request));
-                SSOToken token = resourceOwnerSessionValidator.getResourceOwnerSession(request);
-                if (token != null) {
-                	populateAuthenticationInfo(deviceCode, token);
-                }
-                deviceCode.setResourceOwnerId(resourceOwner.getId());
-                deviceCode.setAuthorized(true);
-                tokenStore.updateDeviceCode(deviceCode, request);
+            	
+            	authorizeAndUpdateDeviceCode(deviceCode,request);
             }
             
         } catch (IllegalArgumentException e) {
@@ -317,16 +303,24 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     }
     
     
-    private void populateAuthenticationInfo(DeviceCode deviceCode, SSOToken token) {
-        if (token == null) {
-            return;
-        }
+    private void authorizeAndUpdateDeviceCode(DeviceCode deviceCode, OAuth2Request request) throws OAuth2Exception {
 
-        try {
-            deviceCode.setAuthModules(token.getProperty(ISAuthConstants.AUTH_TYPE));
-        } catch (SSOException e) {
-            logger.warn("Could not get list of auth modules from authentication", e);
+        ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
+        deviceCode.setAcrValues(getAuthenticationContextClassReferenceFromRequest(request));
+        SSOToken token = resourceOwnerSessionValidator.getResourceOwnerSession(request);
+
+        if (token != null) {
+
+            try {
+            	deviceCode.setAuthModules(token.getProperty(ISAuthConstants.AUTH_TYPE));
+            } catch (SSOException e) {
+                logger.warn("Could not get list of auth modules from authentication", e);
+            }
         }
+        
+        deviceCode.setResourceOwnerId(resourceOwner.getId());
+        deviceCode.setAuthorized(true);
+        tokenStore.updateDeviceCode(deviceCode, request);
     }
     
     private String getAuthenticationContextClassReferenceFromRequest(OAuth2Request request) {
