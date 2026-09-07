@@ -37,14 +37,12 @@ import ognl.OgnlOps;
 
 import org.openidentityplatform.openam.click.Control;
 import org.openidentityplatform.openam.click.Page;
-import org.apache.click.control.Button;
+import org.openidentityplatform.openam.click.control.Button;
 import org.openidentityplatform.openam.click.control.Container;
 import org.openidentityplatform.openam.click.control.Field;
-import org.apache.click.control.FieldSet;
 import org.openidentityplatform.openam.click.control.Form;
-import org.apache.click.control.Label;
-import org.apache.click.service.LogService;
-import org.apache.click.util.ClickUtils;
+import org.openidentityplatform.openam.click.control.Label;
+import org.openidentityplatform.openam.click.service.LogService;
 import org.apache.click.util.HtmlStringBuffer;
 import org.apache.click.util.PropertyUtils;
 import org.apache.commons.lang.ClassUtils;
@@ -114,7 +112,7 @@ public class ContainerUtils {
         }
 
         if (fieldList.isEmpty()) {
-            LogService logService = org.apache.click.util.ClickUtils.getLogService();
+            LogService logService = ClickUtils.getLogService();
             if (logService.isDebugEnabled()) {
                 String containerClassName =
                         ClassUtils.getShortClassName(container.getClass());
@@ -137,7 +135,7 @@ public class ContainerUtils {
             return;
         }
 
-        LogService logService = org.apache.click.util.ClickUtils.getLogService();
+        LogService logService = ClickUtils.getLogService();
 
         Set<String> properties = getObjectPropertyNames(object);
         Map<?, ?> ognlContext = Ognl.createDefaultContext(
@@ -235,7 +233,7 @@ public class ContainerUtils {
         }
 
         if (fieldList.isEmpty()) {
-            LogService logService = org.apache.click.util.ClickUtils.getLogService();
+            LogService logService = ClickUtils.getLogService();
             if (logService.isDebugEnabled()) {
                 String containerClassName =
                         ClassUtils.getShortClassName(container.getClass());
@@ -261,7 +259,7 @@ public class ContainerUtils {
 
         Set<String> properties = getObjectPropertyNames(object);
 
-        LogService logService = org.apache.click.util.ClickUtils.getLogService();
+        LogService logService = ClickUtils.getLogService();
 
         for (Field field : fieldList) {
 
@@ -434,7 +432,7 @@ public class ContainerUtils {
     /**
      * Return the list of Fields for the given Container, recursively including
      * any Fields contained in child containers. The list of returned fields
-     * will exclude any <code>Button</code> and <code>FieldSet</code> fields.
+     * will exclude any <code>Button</code> fields.
      *
      * @param container the container to obtain the fields from
      * @return the list of contained fields
@@ -452,7 +450,7 @@ public class ContainerUtils {
     /**
      * Return the list of hidden Fields for the given Container, recursively including
      * any Fields contained in child containers. The list of returned fields
-     * will exclude any <code>Button</code>, <code>FieldSet</code> and <code>Label</code>
+     * will exclude any <code>Button</code> and <code>Label</code>
      * fields.
      *
      * @param container the container to obtain the fields from
@@ -472,7 +470,7 @@ public class ContainerUtils {
      * Return the list of input Fields (TextField, Select, Radio, Checkbox etc).
      * for the given Container, recursively including any Fields contained in
      * child containers. The list of returned fields will exclude any
-     * <code>Button</code>, <code>FieldSet</code> and <code>Label</code> fields.
+     * <code>Button</code> and <code>Label</code> fields.
      *
      * @param container the container to obtain the fields from
      * @return the list of contained fields
@@ -902,7 +900,7 @@ public class ContainerUtils {
                                      String path) {
 
         // Find the getter for property
-        String getterName = org.apache.click.util.ClickUtils.toGetterName(property);
+        String getterName = ClickUtils.toGetterName(property);
 
         Method method = null;
         Class<?> sourceClass = object.getClass();
@@ -913,7 +911,7 @@ public class ContainerUtils {
         }
 
         if (method == null) {
-            String isGetterName = org.apache.click.util.ClickUtils.toIsGetterName(property);
+            String isGetterName = ClickUtils.toIsGetterName(property);
             try {
                 method = sourceClass.getMethod(isGetterName, (Class[]) null);
             } catch (Exception e) {
@@ -973,7 +971,7 @@ public class ContainerUtils {
         Method method = null;
 
         // Find the setter for property
-        String setterName = org.apache.click.util.ClickUtils.toSetterName(property);
+        String setterName = ClickUtils.toSetterName(property);
 
         Class<?> sourceClass = source.getClass();
         Class<?>[] classArgs = { targetClass };
@@ -1050,7 +1048,7 @@ public class ContainerUtils {
      */
     private static void copyFieldsToMap(List<Field> fieldList, Map<String, Object> map) {
 
-        LogService logService = org.apache.click.util.ClickUtils.getLogService();
+        LogService logService = ClickUtils.getLogService();
 
         String objectClassname = map.getClass().getName();
         objectClassname =
@@ -1086,7 +1084,7 @@ public class ContainerUtils {
      */
     private static void copyMapToFields(Map<String, Object> map, List<Field> fieldList) {
 
-        LogService logService = org.apache.click.util.ClickUtils.getLogService();
+        LogService logService = ClickUtils.getLogService();
 
         String objectClassname = map.getClass().getName();
         objectClassname =
@@ -1167,7 +1165,7 @@ public class ContainerUtils {
      * Add input fields (TextField, TextArea, Select, Radio, Checkbox etc.) for
      * the given Container to the specified field list, recursively including
      * any Fields contained in child containers. The list of returned fields
-     * will exclude any <code>Button</code>, <code>FieldSet</code> and <code>Label</code>
+     * will exclude any <code>Button</code> and <code>Label</code>
      * fields.
      *
      * @param container the container to obtain the fields from
@@ -1181,8 +1179,8 @@ public class ContainerUtils {
                 continue;
 
             } else if (control instanceof Container) {
-                // Include fields but skip fieldSets
-                if (control instanceof Field && !(control instanceof FieldSet)) {
+                // Include fields that are containers
+                if (control instanceof Field) {
                     fields.add((Field) control);
                 }
                 Container childContainer = (Container) control;
@@ -1197,8 +1195,8 @@ public class ContainerUtils {
     /**
      * Add hidden fields for the given Container to the specified field list,
      * recursively including any Fields contained in child containers. The list
-     * of returned fields will exclude any <code>Button</code>, <code>FieldSet</code>
-     * and <code>Label</code> fields.
+     * of returned fields will exclude any <code>Button</code> and
+     * <code>Label</code> fields.
      *
      * @param container the container to obtain the hidden fields from
      * @param fields the list of contained fields
@@ -1211,8 +1209,8 @@ public class ContainerUtils {
                 continue;
 
             } else if (control instanceof Container) {
-                // Include fields but skip fieldSets
-                if (control instanceof Field && !(control instanceof FieldSet)) {
+                // Include fields that are containers
+                if (control instanceof Field) {
                     Field field = (Field) control;
                     if (field.isHidden()) {
                         fields.add((Field) control);
@@ -1234,7 +1232,7 @@ public class ContainerUtils {
     /**
      * Add fields for the container to the specified field list, recursively
      * including any Fields contained in child containers. The list
-     * of returned fields will exclude any <code>Button</code> and <code>FieldSet</code>
+     * of returned fields will exclude any <code>Button</code>
      * fields.
      *
      * @param container the container to obtain the fields from
@@ -1248,8 +1246,8 @@ public class ContainerUtils {
                 continue;
 
             } else if (control instanceof Container) {
-                // Include fields but skip fieldSets
-                if (control instanceof Field && !(control instanceof FieldSet)) {
+                // Include fields that are containers
+                if (control instanceof Field) {
                     fields.add((Field) control);
                 }
                 Container childContainer = (Container) control;

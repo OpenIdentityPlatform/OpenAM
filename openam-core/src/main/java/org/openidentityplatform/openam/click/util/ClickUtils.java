@@ -65,7 +65,7 @@ import org.openidentityplatform.openam.click.ActionResult;
 import org.apache.click.Stateful;
 import org.openidentityplatform.openam.click.control.AbstractControl;
 import org.openidentityplatform.openam.click.control.AbstractLink;
-import org.apache.click.control.ActionLink;
+import org.openidentityplatform.openam.click.control.ActionLink;
 import org.openidentityplatform.openam.click.control.Container;
 import org.openidentityplatform.openam.click.control.Field;
 import org.openidentityplatform.openam.click.control.Form;
@@ -534,11 +534,11 @@ public class ClickUtils {
             }
 
         } catch (IOException ex) {
-            org.apache.click.util.ClickUtils.getLogService().error(ex.getMessage(), ex);
+            getLogService().error(ex.getMessage(), ex);
 
         } finally {
-            org.apache.click.util.ClickUtils.close(gos);
-            org.apache.click.util.ClickUtils.close(os);
+            close(gos);
+            close(os);
         }
     }
 
@@ -1151,7 +1151,7 @@ public class ClickUtils {
                 servletContext.getResourceAsStream(DEFAULT_APP_CONFIG);
 
         if (inputStream == null) {
-            inputStream = org.apache.click.util.ClickUtils.getResourceAsStream("/click.xml", org.apache.click.util.ClickUtils.class);
+            inputStream = getResourceAsStream("/click.xml", ClickUtils.class);
             if (inputStream == null) {
                 String msg =
                         "could not find click app configuration file: "
@@ -1187,7 +1187,7 @@ public class ClickUtils {
                             + " editing your web.xml and setting the load-on-startup to 0:\n\n"
                             + " <servlet>\n"
                             + "   <servlet-name>ClickServlet</servlet-name>\n"
-                            + "   <servlet-class>org.apache.click.ClickServlet</servlet-class>\n"
+                            + "   <servlet-class>org.openidentityplatform.openam.click.ClickServlet</servlet-class>\n"
                             + "   <load-on-startup>0</load-on-startup>\n"
                             + " </servlet>\n";
 
@@ -1410,7 +1410,7 @@ public class ClickUtils {
      *
      *   <li>if control.getName() is set do the following:
      *     <ol>
-     *       <li>if the control is of type {@link org.apache.click.control.ActionLink},
+     *       <li>if the control is of type {@link org.openidentityplatform.openam.click.control.ActionLink},
      *       it's "<code>class</code>" attribute selector will be returned. For example:
      *       <code>a[class=red]</code>. <b>Please note:</b> if the link class attribute is
      *       not set, the class attribute will be set to its name, prefixed with
@@ -1570,7 +1570,7 @@ public class ClickUtils {
 
             if (!destinationFile.exists()) {
                 InputStream inputStream =
-                        getResourceAsStream(resource, org.apache.click.util.ClickUtils.class);
+                        getResourceAsStream(resource, ClickUtils.class);
 
                 if (inputStream != null) {
                     FileOutputStream fos = null;
@@ -1676,7 +1676,7 @@ public class ClickUtils {
         String descriptorFile = packageName + "/" + controlName + ".files";
         logService.debug("Use deployment descriptor file:" + descriptorFile);
 
-        InputStream is = getResourceAsStream(descriptorFile, org.apache.click.util.ClickUtils.class);
+        InputStream is = getResourceAsStream(descriptorFile, ClickUtils.class);
         List fileList = IOUtils.readLines(is);
         if (fileList == null || fileList.isEmpty()) {
             logService.info("there are no files to deploy for control " + controlClass.getName());
@@ -2194,8 +2194,8 @@ public class ClickUtils {
 
     /**
      * Return the list of Fields for the given Form, including any Fields
-     * contained in FieldSets. The list of returned fields will exclude any
-     * <code>Button</code>, <code>FieldSet</code> or <code>Label</code> fields.
+     * contained in child containers. The list of returned fields will exclude
+     * any <code>Button</code> or <code>Label</code> fields.
      *
      * @param form the form to obtain the fields from
      * @return the list of contained form fields
@@ -3072,7 +3072,7 @@ public class ClickUtils {
         for (int i = 0; i < container.getControls().size(); i++) {
             Control control = container.getControls().get(i);
             if (control instanceof Container) {
-                // Include fields but skip fieldSets
+                // Include fields that are containers
                 if (control instanceof Field) {
                     Field field = (Field) control;
                     bindField(field, context);
