@@ -25,13 +25,14 @@
  * $Id: UserProfileServlet.java,v 1.3 2008/06/25 05:41:09 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.samples.clientsdk;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import java.io.PrintWriter;
@@ -80,7 +81,8 @@ public class UserProfileServlet extends SampleBase {
             return;
         }
         
-        out.println("<br><h3>Username:</h3> " + username);
+        // The user name is a request parameter reflected into the page: escape it.
+        out.println("<br><h3>Username:</h3> " + XMLUtils.escapeSpecialCharacters(username));
         
         try {
             // Authenticate the user and obtain SSO Token

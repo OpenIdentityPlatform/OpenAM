@@ -25,13 +25,14 @@
  * $Id: ServiceConfigServlet.java,v 1.3 2008/06/25 05:41:09 qcheng Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.samples.clientsdk;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.io.IOException;
@@ -83,8 +84,9 @@ public class ServiceConfigServlet extends SampleBase {
             return;
         }
         
-        out.println("<h3>ServiceName:</h3> " + servicename);
-        out.println("<br><h3>Username:</h3> " + username);
+        // Request parameters are reflected into the page: escape them.
+        out.println("<h3>ServiceName:</h3> " + XMLUtils.escapeSpecialCharacters(servicename));
+        out.println("<br><h3>Username:</h3> " + XMLUtils.escapeSpecialCharacters(username));
         
         try {
             AuthContext lc = authenticate(orgname, username, password, out);
