@@ -66,6 +66,21 @@ public class AuthInterceptor implements HandlerInterceptor {
         this.tokenCache = tokenCache;
     }
 
+    /**
+     * Renders a session id or access token for log output. Only a short prefix is
+     * kept: a token written to a log file is enough to hijack the session it
+     * represents, so the raw value must never reach the logs.
+     */
+    static String maskToken(String token) {
+        if (token == null) {
+            return "null";
+        }
+        if (token.length() <= 8) {
+            return "***";
+        }
+        return token.substring(0, 4) + "***";
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if(openAMConfig.useOAuthForAuthentication()) {
@@ -125,7 +140,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 return true;
             }
             log.info("preHandleUsernamePassword: token {} is about to expire in {} s (attempt {}/{})",
-                    token, seconds, attempt + 1, MAX_TOKEN_RESOLUTION_ATTEMPTS);
+                    maskToken(token), seconds, attempt + 1, MAX_TOKEN_RESOLUTION_ATTEMPTS);
             tokenCache.invalidate(LOGIN_PASSWORD_TOKEN_KEY);
             token = getUserNamePasswordToken();
             tokenCache.put(LOGIN_PASSWORD_TOKEN_KEY, token);
@@ -165,7 +180,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 request.setAttribute("tokenId", token);
                 return true;
             }
-            log.info("preHandleOAuth: token {} is about to expire in {} s", token, seconds);
+            log.info("preHandleOAuth: token {} is about to expire in {} s", maskToken(token), seconds);
             tokenCache.invalidate(accessToken);
             token = getTokenIdFromAccessToken(accessToken);
             tokenCache.put(accessToken, token);
@@ -190,7 +205,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             if(response.containsKey("name")) {
                 return true;
             } else {
-                log.warn("got invalid response: {} for access token: {}", response, accessToken);
+                log.warn("got invalid response: {} for access token: {}", response, maskToken(accessToken));
                 return false;
             }
         } catch (Exception e) {

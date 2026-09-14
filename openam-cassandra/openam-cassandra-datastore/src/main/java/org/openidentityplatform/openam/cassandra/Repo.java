@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.cassandra;
@@ -434,7 +435,8 @@ public class Repo extends IdRepo {
 		}catch (IdRepoException e) {
 			throw e;
 		}catch(Throwable e){
-			logger.error("setAttributes {} {} {} {}",type,name,attributes_in,isAdd,e.getMessage());
+			// Log attribute names only: the values may include userPassword.
+			logger.error("setAttributes {} {} {} {}: {}",type,name,attributes_in.keySet(),isAdd,e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
@@ -442,7 +444,7 @@ public class Repo extends IdRepo {
 	@Override
 	public void setBinaryAttributes(SSOToken token, IdType type, String name,Map<String, byte[][]> attributes, boolean isAdd) throws IdRepoException, SSOException {
 		//validate(type, IdOperation.EDIT);
-		logger.warn("unsupported setBinaryAttributes {} {} {} {}",type,name,attributes,isAdd);
+		logger.warn("unsupported setBinaryAttributes {} {} {} {}",type,name,attributes.keySet(),isAdd);
 		throw new IdRepoUnsupportedOpException("unsupported setBinaryAttributes");
 	}
 
