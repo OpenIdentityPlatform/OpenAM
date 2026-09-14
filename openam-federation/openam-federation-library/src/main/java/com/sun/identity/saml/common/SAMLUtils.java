@@ -63,6 +63,7 @@ import com.sun.identity.common.SystemTimerPool;
 import com.sun.identity.common.TaskRunnable;
 import com.sun.identity.common.TimerPool;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.encode.Base64;
 
@@ -745,7 +746,7 @@ public class SAMLUtils  extends SAMLUtilsCommon {
         // postYN() only validates host, port and path of the target: the query
         // string is caller-supplied, so it must not be able to close the attribute.
         out.println("<FORM METHOD=\"POST\" ACTION=\""
-            + XMLUtils.escapeSpecialCharacters(targeturl) + "\">");
+            + StringEscapeUtils.escapeHtml4(targeturl) + "\">");
         if (assertion != null) {
             it = assertion.iterator();
             while (it.hasNext()) {
