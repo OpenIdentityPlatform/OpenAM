@@ -742,7 +742,10 @@ public class SAMLUtils  extends SAMLUtilsCommon {
             }
             out.println("</P>\n");
         }
-        out.println("<FORM METHOD=\"POST\" ACTION=\"" + targeturl + "\">");
+        // postYN() only validates host, port and path of the target: the query
+        // string is caller-supplied, so it must not be able to close the attribute.
+        out.println("<FORM METHOD=\"POST\" ACTION=\""
+            + XMLUtils.escapeSpecialCharacters(targeturl) + "\">");
         if (assertion != null) {
             it = assertion.iterator();
             while (it.hasNext()) {

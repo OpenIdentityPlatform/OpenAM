@@ -358,6 +358,16 @@ public class FSUtils {
             } else {      
                 String resource = newUrl.substring(
                     index + deploymentURI.length());
+                // The target comes from the request (goto/RelayState). A forward
+                // bypasses the web.xml filters and can reach /WEB-INF, so hand
+                // anything that is not a plain in-app path back to the container
+                // as a redirect instead.
+                if (!ForwardPathValidator.isSafeForwardPath(resource)) {
+                    FSUtils.debug.warning("FSUtils.forwardRequest: refusing to "
+                        + "forward to " + resource + "; redirecting instead");
+                    response.sendRedirect(newUrl);
+                    return;
+                }
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message(
                         "FSUtils.forwardRequest: Forwarding to :" + resource);

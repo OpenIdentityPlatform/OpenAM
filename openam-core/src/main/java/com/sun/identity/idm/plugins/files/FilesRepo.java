@@ -25,6 +25,7 @@
  * $Id: FilesRepo.java,v 1.22 2008/07/02 17:21:21 kenwho Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.idm.plugins.files;
 
@@ -1510,7 +1511,18 @@ public class FilesRepo extends IdRepo {
 
     }
 
-    File constructFile(String rootDir, IdType type, String name) {
+    File constructFile(String rootDir, IdType type, String name)
+            throws IdRepoException {
+        // The identity name becomes the file name: it must stay a single path
+        // component, or an identity could be created, read or deleted anywhere
+        // the server can write.
+        if (name == null || name.isEmpty() || name.equals(".") || name.equals("..")
+                || name.indexOf('/') != -1 || name.indexOf('\\') != -1
+                || name.indexOf('\0') != -1) {
+            debug.error("FilesRepo.constructFile: invalid identity name: " + name);
+            throw new IdRepoException(IdRepoBundle.getString(IdRepoErrorCode.ILLEGAL_ARGUMENTS),
+                    IdRepoErrorCode.ILLEGAL_ARGUMENTS);
+        }
         // Construct file name
         File root = new File(rootDir);
         File subDir = new File(root, type.getName());
@@ -1709,13 +1721,24 @@ public class FilesRepo extends IdRepo {
         // Default constructor
         FileRepoFileFilter(String p) {
             if (p != null && p.length() != 0 && !p.equals("*")) {
-                // Replace "*" with ".*"
+                // "*" is the only wildcard; everything between wildcards is a
+                // literal, so quote it rather than letting the search pattern
+                // be interpreted as a regular expression.
+                StringBuilder regex = new StringBuilder();
+                int from = 0;
                 int idx = p.indexOf('*');
                 while (idx != -1) {
-                    p = p.substring(0, idx) + ".*" + p.substring(idx + 1);
-                    idx = p.indexOf('*', idx + 2);
+                    if (idx > from) {
+                        regex.append(Pattern.quote(p.substring(from, idx)));
+                    }
+                    regex.append(".*");
+                    from = idx + 1;
+                    idx = p.indexOf('*', from);
                 }
-                pattern = Pattern.compile(p.toLowerCase());
+                if (from < p.length()) {
+                    regex.append(Pattern.quote(p.substring(from)));
+                }
+                pattern = Pattern.compile(regex.toString(), Pattern.CASE_INSENSITIVE);
             }
         }
 
