@@ -32,7 +32,6 @@ package com.sun.identity.samples.clientsdk;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdUtils;
 import java.io.PrintWriter;
@@ -43,6 +42,7 @@ import java.util.Set;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * Sample program that show user profile.
@@ -82,7 +82,7 @@ public class UserProfileServlet extends SampleBase {
         }
         
         // The user name is a request parameter reflected into the page: escape it.
-        out.println("<br><h3>Username:</h3> " + XMLUtils.escapeSpecialCharacters(username));
+        out.println("<br><h3>Username:</h3> " + StringEscapeUtils.escapeHtml4(username));
         
         try {
             // Authenticate the user and obtain SSO Token

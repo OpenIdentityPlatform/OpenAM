@@ -32,7 +32,6 @@ package com.sun.identity.samples.clientsdk;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
-import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchemaManager;
 import java.io.IOException;
@@ -40,6 +39,7 @@ import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * Sample program that lists service configurations.
@@ -85,8 +85,8 @@ public class ServiceConfigServlet extends SampleBase {
         }
         
         // Request parameters are reflected into the page: escape them.
-        out.println("<h3>ServiceName:</h3> " + XMLUtils.escapeSpecialCharacters(servicename));
-        out.println("<br><h3>Username:</h3> " + XMLUtils.escapeSpecialCharacters(username));
+        out.println("<h3>ServiceName:</h3> " + StringEscapeUtils.escapeHtml4(servicename));
+        out.println("<br><h3>Username:</h3> " + StringEscapeUtils.escapeHtml4(username));
         
         try {
             AuthContext lc = authenticate(orgname, username, password, out);
