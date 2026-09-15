@@ -121,7 +121,7 @@
     <h2database.version>2.2.220</h2database.version>
     <activemq.version>5.16.8</activemq.version>
     <jakarta.inject.version>2.0.1</jakarta.inject.version>
-    <jetty.jspc.version>9.4.0.M0</jetty.jspc.version>
+    <jetty.jspc.version>11.0.24</jetty.jspc.version>
     <amazon.sns.version>1.10.72</amazon.sns.version>
     <jakarta.websocket-api.version>2.0.0</jakarta.websocket-api.version>
     <openam.version>OpenAM ${project.version}</openam.version>

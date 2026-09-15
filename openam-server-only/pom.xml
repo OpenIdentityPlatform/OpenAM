@@ -523,9 +523,17 @@
                                     <goal>jspc</goal>
                                 </goals>
                                 <configuration>
-                                    <!-- Exclude JSPs with known compilation issues: -->
-                                    <excludes>**/ButtonFrame.jsp,**/Masthead.jsp,**/Version.jsp,
-                                        **/userconsole.jsp</excludes>
+                                    <!-- Validation only: never let generated servlets reach the war. -->
+                                    <useProvidedScope>true</useProvidedScope>
+                                    <mergeFragment>false</mergeFragment>
+                                    <keepSources>true</keepSources>
+                                    <generatedClasses>${project.build.directory}/jspc</generatedClasses>
+                                    <sourceVersion>${maven.compiler.source}</sourceVersion>
+                                    <targetVersion>${maven.compiler.target}</targetVersion>
+                                    <!-- These two pages bind JATO view beans that live in
+                                         openam-console, which is not on this module's classpath. -->
+                                    <excludes>**/com_sun_web_ui/jsp/version/ButtonFrame.jsp,
+                                        **/com_sun_web_ui/jsp/version/Masthead.jsp</excludes>
                                 </configuration>
                             </execution>
                         </executions>
