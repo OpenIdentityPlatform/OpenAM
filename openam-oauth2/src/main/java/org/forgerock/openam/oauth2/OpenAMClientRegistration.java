@@ -94,6 +94,9 @@ import com.sun.identity.shared.encode.Base64;
  */
 public class OpenAMClientRegistration implements OpenIdConnectClientRegistration {
 
+    /** Default of com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg in AgentService.xml. */
+    private static final String ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT = "HS256";
+
     private static final String DELIMITER = "\\|";
 
     /** Read/connect timeouts (ms) used when fetching a client's {@code jwks_uri}.
@@ -512,10 +515,11 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         } catch (Exception e) {
             throw Utils.createException(OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG, e, logger);
         }
-        if (set.iterator().hasNext()){
-            return set.iterator().next();
-        }
-        return null;
+        // AgentsRepo reads agent attributes without schema defaults, so a client created through
+        // the realm-config REST endpoint or ssoadm may have nothing persisted here. Fall back to
+        // the same default the schema, the console and dynamic registration use.
+        final String algorithm = CollectionUtils.getFirstItem(set);
+        return StringUtils.isEmpty(algorithm) ? ID_TOKEN_SIGNED_RESPONSE_ALG_DEFAULT : algorithm;
     }
 
     @Override
@@ -652,7 +656,16 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
 
     @Override
     public boolean verifyJwtIdentity(final OAuth2Jwt jwt) {
-        final JwsAlgorithm signatureAlgorithm = JwsAlgorithm.valueOf(getIDTokenSignedResponseAlgorithm());
+        // The JWT is either a client assertion (client_secret_jwt, private_key_jwt, jwt-bearer)
+        // signed by the client, or an ID token this server issued. In both cases the JWS header
+        // states how it was signed; id_token_signed_response_alg only describes the ID tokens we
+        // issue and says nothing about how the client signs its assertions. HMAC verification
+        // uses the client secret only and the asymmetric branch uses the client's public keys
+        // only, so the header cannot steer one key type into the other's verifier.
+        final JwsAlgorithm signatureAlgorithm = jwt.getSignedJwt().getHeader().getAlgorithm();
+        if (signatureAlgorithm == null || signatureAlgorithm.getAlgorithmType() == JwsAlgorithmType.NONE) {
+            return false;
+        }
         if (signatureAlgorithm.getAlgorithmType() == JwsAlgorithmType.HMAC) {
             return verifyJwtBySharedSecret(jwt);
         } else {
@@ -677,8 +690,13 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     }
 
     private boolean verifyJwtBySharedSecret(final OAuth2Jwt jwt) {
+        final String clientSecret = getClientSecret();
+        if (StringUtils.isEmpty(clientSecret)) {
+            // A public client has no secret to verify an HMAC assertion with.
+            return false;
+        }
         final String issuer = jwt.getSignedJwt().getClaimsSet().getIssuer();
-        OpenIdResolver resolver = new SharedSecretOpenIdResolverImpl(issuer, getClientSecret());
+        OpenIdResolver resolver = new SharedSecretOpenIdResolverImpl(issuer, clientSecret);
         try {
             resolver.validateIdentity(jwt.getSignedJwt());
             return jwt.isContentValid() && jwt.isIntendedForAudience(getClientId());
