@@ -61,6 +61,21 @@ Starting with this release the SAML 2.0 and ID-FF IDP discovery reader and write
 If your common-domain discovery deployment hosts service providers on a different host than OpenAM, add their return URLs to this property before promoting the upgrade. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
 ====
 
+[IMPORTANT]
+====
+Starting with this release the legacy Liberty ID-FF (Liberty Alliance 1.x) SOAP endpoint (`/SOAPReceiver/*`, served by `FSSOAPReceiver`) is *disabled by default* as part of the GHSA-qcqm-7432-wg7r hardening. Existing deployments that actively use Liberty ID-FF federation must explicitly opt in by setting the advanced server property `com.sun.identity.federation.services.soap.enabled=true`. The kill-switch disables the whole endpoint, including ID-FF browser-artifact single sign-on and LECP, not only the state-changing operations. In a multi-server site set this property on *every* server: cross-node single logout forwards the logout SOAP message to a peer server's own `/SOAPReceiver`, so a node where the endpoint is still disabled would reject the forwarded request with HTTP 404 and single logout would fail.
+
+Also starting with this release, inbound ID-FF state-changing and disclosure operations (federation termination, name registration, single logout, and name-identifier mapping) require a verified XML signature by default (`com.sun.identity.federation.services.requireSignature`, default `true`), even when message signing is otherwise optional. This applies to the SOAP binding *and* to the HTTP-Redirect binding endpoints `/ProcessTermination/*`, `/ProcessLogout/*`, and `/ProcessRegistration/*`, which are reachable without authentication and act on the user named by an opaque handle in the request. Unlike the SOAP endpoint, the redirect binding is not disabled by default, so this change affects any deployment that uses ID-FF over the redirect binding.
+
+*Enable message signing along with it.* OpenAM signs its own outbound ID-FF messages only when `XMLSigningOn` is enabled, and that setting is `false` on a stock installation. If you leave `com.sun.identity.federation.services.requireSignature` at its default without enabling signing, OpenAM's own single logout, federation termination, and name registration messages are sent unsigned and rejected by the receiving provider. Before promoting the upgrade, either:
+
+* set `XMLSigningOn` to `true` under the `sunFAMIDFFConfiguration` service (advanced server property `com.sun.identity.federation.services.signingOn`) and configure a signing certificate alias on every participating hosted provider, with the matching certificate published in the metadata each partner consumes. This setting is now read for each operation, so changing it takes effect without restarting the server; in earlier releases it was cached at startup and a restart was required; or
+
+* set `com.sun.identity.federation.services.requireSignature=false` to restore the previous, insecure behaviour if your federation partners do not sign ID-FF messages.
+
+See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====

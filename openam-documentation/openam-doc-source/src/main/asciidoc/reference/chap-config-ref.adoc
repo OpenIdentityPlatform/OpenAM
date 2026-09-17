@@ -2174,6 +2174,13 @@ Default: No user attributes are protected.
 The Liberty ID-WSF SOAP endpoints (`/Liberty/*` and `/WSPRedirectHandler/*`) are disabled by default. To enable them, set the advanced server property `com.sun.identity.liberty.enabled` to `true`. Two additional advanced properties (`com.sun.identity.liberty.soap.sensitiveHandlers` and `com.sun.identity.liberty.allowAnonymousWSC`) control how anonymous and null-family authentication is handled by sensitive Liberty handlers (IDPP, Discovery, AuthnSvc, Interaction). See xref:#servers-advanced-configuration["Advanced"].
 ====
 
+[NOTE]
+====
+The Liberty ID-FF SOAP endpoint (`/SOAPReceiver/*`, served by `FSSOAPReceiver`) is disabled by default. To enable it, set the advanced server property `com.sun.identity.federation.services.soap.enabled` to `true`. This kill-switch covers the whole endpoint, including ID-FF browser-artifact single sign-on and LECP, not only the state-changing operations.
+
+Independently of that kill-switch, inbound ID-FF state-changing and disclosure operations (federation termination, name registration, single logout, and name-identifier mapping) require a verified XML signature unless `com.sun.identity.federation.services.requireSignature` is set to `false` (not recommended). That requirement applies to both the SOAP binding and the HTTP-Redirect binding (`/ProcessTermination/*`, `/ProcessLogout/*`, and `/ProcessRegistration/*`), and OpenAM only signs its own outbound ID-FF messages when `XMLSigningOn` is enabled. See xref:#servers-advanced-configuration["Advanced"].
+====
+
 --
 `ssoadm` service name: `sunFAMIDFFConfiguration`
 
@@ -5634,6 +5641,27 @@ If `true`, then OpenAM is using protection against cookie hijacking.
 
 +
 Default: `false`
+
+`com.sun.identity.federation.services.soap.enabled`::
+Master kill-switch for the legacy Liberty ID-FF (Liberty Alliance 1.x) SOAP endpoint (`/SOAPReceiver/*` served by `FSSOAPReceiver`).
+
++
+When `false` (the default), every request to this endpoint is rejected with HTTP 404. Liberty ID-FF is a legacy federation protocol and this endpoint is reachable without authentication, so it is disabled unless a deployment actively uses ID-FF federation. The kill-switch covers every operation served by the endpoint, including ID-FF browser-artifact single sign-on and LECP. The property is read on every request, so the endpoint can be enabled or disabled without restarting OpenAM.
+
++
+Default: `false`
+
+`com.sun.identity.federation.services.requireSignature`::
+Controls whether inbound Liberty ID-FF requests for state-changing or disclosure operations (federation termination, name registration, single logout, and name-identifier mapping) must carry a verified XML signature. Applies to both the SOAP binding (`/SOAPReceiver/*`) and the HTTP-Redirect binding (`/ProcessTermination/*`, `/ProcessLogout/*`, and `/ProcessRegistration/*`). These endpoints are reachable without authentication and act on the user named by an opaque handle in the request, so the signature is what identifies the caller.
+
++
+When `true` (the default), unsigned requests for these operations are rejected even when message signing is otherwise optional or off (see `XMLSigningOn` under `sunFAMIDFFConfiguration`, exposed as `com.sun.identity.federation.services.signingOn`). Because OpenAM only signs its own outbound ID-FF messages when that setting is enabled, a deployment that leaves this property at its default must also enable `XMLSigningOn` and configure a signing certificate on every participating provider; otherwise OpenAM's own single logout, federation termination, and name registration messages are rejected by the receiving provider. Set this property to `false` only to restore the legacy (insecure) behaviour required by deployments whose federation partners do not sign ID-FF messages.
+
++
+Only the exact value `false` disables the requirement; any other value, including a malformed one, leaves it enabled.
+
++
+Default: `true`
 
 `com.sun.identity.jss.donotInstallAtHighestPriority`::
 Whether JSS should take priority over other providers.

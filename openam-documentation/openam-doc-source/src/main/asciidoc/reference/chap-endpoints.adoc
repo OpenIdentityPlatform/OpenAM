@@ -1387,6 +1387,8 @@ Used by a servlet named `consentHandler`. Associated with the `com.sun.identity.
 
 `/ProcessLogout/*`::
 Used by a servlet named `ProcessLogout`. Associated with the `FSProcessLogoutServlet` class. It is designed to handle single logout requests related to Kantara/Liberty ID-FF processes.
++
+A logout request received from a remote provider is processed without a local session, so it must carry a verified XML signature unless the advanced server property `com.sun.identity.federation.services.requireSignature` is set to `false`. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the server configuration reference.
 
 `/ReturnLogout/*`::
 Used by a servlet named `ReturnLogout`. Associated with the `FSReturnLogoutServlet` class. It is designed to handle single logout responses related to Kantara/Liberty ID-FF processes. (Note the subtle difference with the `ProcessLogout` endpoint which handles logout requests.)
@@ -1405,12 +1407,16 @@ Used by a servlet named `AssertionConsumerService`. Associated with the `FSAsser
 
 `/SOAPReceiver/*`::
 Used by a servlet named `SOAPReceiver`. Associated with the `FSSOAPReceiver` class. SOAP endpoint that handles federation and specifies a URI to the SP.
++
+This endpoint is disabled by default and returns HTTP 404 for every request unless the advanced server property `com.sun.identity.federation.services.soap.enabled` is set to `true`. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the server configuration reference.
 
 `/federation-terminate`::
 Used by a servlet named `FederationTerminationServlet`. Associated with the `FSTerminationInitiationServlet.java` file, used to initiate termination of a federation connection. The IDP will send the termination request to the associated URL.
 
 `/ProcessTermination/*`::
 Used by a servlet named `ProcessTermination`. Associated with the `FSTerminationRequestServlet` class. The associated `.java` file is used when a request is received by a remote SP.
++
+This endpoint is unauthenticated and defederates the user named in the request, so the request must carry a verified XML signature unless the advanced server property `com.sun.identity.federation.services.requireSignature` is set to `false`. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the server configuration reference.
 
 `/ReturnTermination/*`::
 Used by a servlet named `ReturnTermination`. Associated with the `FSTerminationReturnServlet` class. The associated `.java` file is used to define a URL used by an IP to send termination responses.
@@ -1420,6 +1426,8 @@ Used by a servlet named `InitiateRegistration`. Associated with the `FSRegistrat
 
 `/ProcessRegistration/*`::
 Used by a servlet named `ProcessRegistration`. Associated with the `FSRegistrationRequestServlet` class. Processes registration requests from remote SPs.
++
+This endpoint is unauthenticated and rewrites the name identifier of the user named in the request, so the request must carry a verified XML signature unless the advanced server property `com.sun.identity.federation.services.requireSignature` is set to `false`. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the server configuration reference.
 
 `/ReturnRegistration/*`::
 Used by a servlet named `ReturnRegistration`. Associated with the `SRegistrationReturnServlet` class. Defines a URL for IDPs to send registration responses.
