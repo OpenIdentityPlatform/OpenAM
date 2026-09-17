@@ -21,6 +21,7 @@ import static org.forgerock.json.JsonValue.*;
 import static org.forgerock.json.resource.ResourceException.*;
 import static org.forgerock.json.resource.Responses.*;
 import static org.forgerock.openam.core.rest.IdentityRestUtils.*;
+import static org.forgerock.openam.core.rest.SelfServiceNotification.*;
 import static org.forgerock.openam.core.rest.UserAttributeInfo.*;
 import static org.forgerock.openam.rest.RestUtils.*;
 import static org.forgerock.openam.utils.Time.*;
@@ -128,13 +129,15 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
 
     private final String objectType;
 
-    private ServiceConfigManager mailmgr;
-    private ServiceConfig mailscm;
-    private Map<String, Set<String>> mailattrs;
+    /**
+     * The manager the Email Service configuration of a realm is read through, or null in a running server, where
+     * one is created per request. Only a test injects one, and the configuration it carries is per realm and per
+     * request, so nothing derived from it is ever held in a field: this class is bound as a singleton and serves
+     * every realm at once.
+     */
+    private final ServiceConfigManager mailmgr;
 
     final static String MAIL_IMPL_CLASS = "forgerockMailServerImplClassName";
-    final static String MAIL_SUBJECT = "forgerockEmailServiceSMTPSubject";
-    final static String MAIL_MESSAGE = "forgerockEmailServiceSMTPMessage";
 
     final static String UNIVERSAL_ID = "universalid";
     final static String MAIL = "mail";
@@ -161,7 +164,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     public IdentityResourceV1(String objectType, MailServerLoader mailServerLoader,
             IdentityServicesImpl identityServices, CoreWrapper coreWrapper, RestSecurityProvider restSecurityProvider,
             ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
-        this(objectType, null, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
+        this(objectType, null, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
                 configHandler, uiRolePredicates);
     }
 
@@ -183,12 +186,11 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     }
 
     // Constructor used for testing...
-    IdentityResourceV1(String objectType, ServiceConfigManager mailmgr, ServiceConfig mailscm,
+    IdentityResourceV1(String objectType, ServiceConfigManager mailmgr,
             MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
             RestSecurityProvider restSecurityProvider, ConsoleConfigHandler configHandler, Set<UiRolePredicate> uiRolePredicates) {
         this.objectType = objectType;
         this.mailmgr = mailmgr;
-        this.mailscm = mailscm;
         this.mailServerLoader = mailServerLoader;
         this.identityServices = identityServices;
         this.coreWrapper = coreWrapper;
@@ -303,14 +305,13 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             HttpContext header = context.asContext(HttpContext.class);
             StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(header.getPath());
 
+            warnIfRequestCarriesNotificationText(jVal, realm);
+
             // Get the email address provided from registration page
             emailAddress = jVal.get(EMAIL).asString();
             if (StringUtils.isBlank(emailAddress)){
                 throw new BadRequestException("Email not provided");
             }
-
-            String subject = jVal.get("subject").asString();
-            String message = jVal.get("message").asString();
 
             // Retrieve email registration token life time
             Long tokenLifeTime = restSecurity.getSelfRegTLT();
@@ -342,11 +343,11 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                     .toString();
 
             // Send Registration
-            sendNotification(emailAddress, subject, message, realm, confirmationLink);
+            sendNotification(emailAddress, realm, confirmationLink);
 
             if (debug.messageEnabled()) {
-                debug.message("IdentityResource.createRegistrationEmail() :: Sent notification to={} with subject={}. "
-                                + "In realm={} for token ID={}", emailAddress, subject, realm, tokenID);
+                debug.message("IdentityResource.createRegistrationEmail() :: Sent notification to={} "
+                                + "in realm={} for token ID={}", emailAddress, realm, tokenID);
             }
 
             return newResultPromise(newActionResponse(result));
@@ -363,20 +364,27 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
     }
 
     /**
-     * Sends email notification to end user
+     * Sends email notification to end user.
+     *
+     * The subject and the message are taken from the Email Service configuration of the realm and never from the
+     * request, so that an anonymous caller of the forgotPassword or register actions cannot choose the wording of
+     * a mail the server sends out under its own From address.
+     *
      * @param to Resource receiving notification
-     * @param subject Notification subject
-     * @param message Notification Message
+     * @param realm The realm whose Email Service the wording of the mail is taken from
      * @param confirmationLink Confirmation Link to be sent
-     * @throws Exception when message cannot be sent
+     * @throws ResourceException when message cannot be sent
      */
-    private void sendNotification(String to, String subject, String message,
-                                  String realm, String confirmationLink) throws ResourceException {
+    private void sendNotification(String to, String realm, String confirmationLink) throws ResourceException {
 
+        // Held in locals rather than in fields: this class is a singleton serving every realm at once, so a field
+        // written here would be read by a concurrent call for another realm.
+        Map<String, Set<String>> mailattrs;
         try {
-            mailmgr = new ServiceConfigManager(RestUtils.getToken(),
-                    MailServerImpl.SERVICE_NAME, MailServerImpl.SERVICE_VERSION);
-            mailscm = mailmgr.getOrganizationConfig(realm,null);
+            ServiceConfigManager configManager = mailmgr != null ? mailmgr
+                    : new ServiceConfigManager(RestUtils.getToken(),
+                            MailServerImpl.SERVICE_NAME, MailServerImpl.SERVICE_VERSION);
+            ServiceConfig mailscm = configManager.getOrganizationConfig(realm, null);
             mailattrs = mailscm.getAttributes();
 
         } catch (SMSException smse) {
@@ -400,7 +408,11 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
         }
 
         // Get MailServer Implementation class
-        String attr = mailattrs.get(MAIL_IMPL_CLASS).iterator().next();
+        String attr = CollectionHelper.getMapAttr(mailattrs, MAIL_IMPL_CLASS);
+        if (attr == null) {
+            debug.error("{} :: the Email Service of realm {} carries no {}", SEND_NOTIF_TAG, realm, MAIL_IMPL_CLASS);
+            throw new InternalServerErrorException("No " + MAIL_IMPL_CLASS + " configured for realm " + realm);
+        }
         MailServer mailServer;
         try {
             mailServer = mailServerLoader.load(attr, realm);
@@ -409,31 +421,9 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
             throw new InternalServerErrorException("Failed to load mail server implementation: " + attr, e);
         }
 
-        try {
-            // Check if subject has not  been included
-            if (StringUtils.isBlank(subject)){
-                // Use default email service subject
-                subject = mailattrs.get(MAIL_SUBJECT).iterator().next();
-            }
-        } catch (Exception e) {
-            if (debug.warningEnabled()) {
-                debug.warning("{} no subject found ", SEND_NOTIF_TAG, e);
-            }
-            subject = "";
-        }
-        try {
-            // Check if Custom Message has been included
-            if (StringUtils.isBlank(message)){
-                // Use default email service message
-                message = mailattrs.get(MAIL_MESSAGE).iterator().next();
-            }
-            message = message + System.getProperty("line.separator") + confirmationLink;
-        } catch (Exception e) {
-            if (debug.warningEnabled()) {
-                debug.warning("{} no message found", SEND_NOTIF_TAG , e);
-            }
-            message = confirmationLink;
-        }
+        // Both the subject and the body come from the Email Service of the realm, never from the request.
+        String subject = notificationSubject(mailattrs, realm);
+        String message = notificationMessage(mailattrs, realm, confirmationLink);
 
         // Send the emails via the implementation class
         try {
@@ -661,6 +651,8 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 throw getException(UNAVAILABLE, "Forgot password is not accessible.");
             }
 
+            warnIfRequestCarriesNotificationText(jsonBody, realm);
+
             // Generate Admin Token
             SSOToken adminToken = getSSOToken(RestUtils.getToken().getTokenID().toString());
 
@@ -708,9 +700,6 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                 HttpContext header = context.asContext(HttpContext.class);
                 StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(header.getPath());
 
-                String subject = jsonBody.get("subject").asString();
-                String message = jsonBody.get("message").asString();
-
                 // Retrieve email registration token life time
                 if (restSecurity == null) {
                     if (debug.warningEnabled()) {
@@ -747,7 +736,7 @@ public final class IdentityResourceV1 implements CollectionResourceProvider {
                         .toString();
 
                 // Send Registration
-                sendNotification(email, subject, message, realm, confirmationLink);
+                sendNotification(email, realm, confirmationLink);
 
                 String principalName = PrincipalRestUtils.getPrincipalNameFromServerContext(context);
 
