@@ -25,6 +25,7 @@
  * $Id: RealmUtils.java,v 1.2 2008/06/25 05:42:16 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.utils;
@@ -76,6 +77,48 @@ public final class RealmUtils {
         if (path.startsWith(parentPath)) {
             path = path.substring(parentPath.length());
             return path.startsWith("/");
+        }
+        return false;
+    }
+
+    /**
+     * Determines whether a realm is the same realm as, or a sub realm of, another realm.
+     *
+     * <p>Neither realm may contain a {@literal ..} path segment: this method compares realm paths literally,
+     * so a path that has to be resolved before it names a realm cannot be decided here and is refused instead.</p>
+     *
+     * @param parentRealm Fully qualified realm the {@literal realm} is compared against.
+     * @param realm Fully qualified realm to test.
+     * @return {@code true} if {@literal realm} is {@literal parentRealm} itself or one of its sub realms,
+     *         {@code false} otherwise, including when either realm is null, blank, or contains a {@literal ..}
+     *         path segment.
+     */
+    public static boolean isSameOrSubRealm(String parentRealm, String realm) {
+        if (StringUtils.isBlank(parentRealm) || StringUtils.isBlank(realm)
+                || containsParentPathSegment(parentRealm) || containsParentPathSegment(realm)) {
+            return false;
+        }
+        String parent = cleanRealm(parentRealm.trim());
+        String child = cleanRealm(realm.trim());
+        return parent.equalsIgnoreCase(child) || isParentRealm(parent, child);
+    }
+
+    /**
+     * Determines whether a realm path contains a {@literal ..} path segment, i.e. whether it has to be resolved
+     * before it names a realm. A realm named {@literal ..} does not exist, while a realm name that merely
+     * contains two dots, such as {@literal a..b}, is a legitimate name and is not reported by this method.
+     *
+     * @param realm Realm path to test. May be {@code null}.
+     * @return {@code true} if any path segment of {@literal realm} is {@literal ..}.
+     */
+    public static boolean containsParentPathSegment(String realm) {
+        if (realm == null) {
+            return false;
+        }
+        for (String segment : realm.split("/")) {
+            if ("..".equals(segment.trim())) {
+                return true;
+            }
         }
         return false;
     }

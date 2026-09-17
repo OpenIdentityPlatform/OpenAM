@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions copyright 2023 3A Systems LLC
+ * Portions copyright 2023-2026 3A Systems LLC
 */
 package org.forgerock.openam.session;
 
@@ -70,6 +70,12 @@ public class SessionConstants {
 
     public static final String ENABLE_POLLING_PROPERTY =
             "com.iplanet.am.session.client.polling.enable";
+
+    /**
+     * The error code the session service reports when the caller may not perform the requested operation, for
+     * example when the sessions of a realm are listed by a caller that has not been delegated that realm.
+     */
+    public static final String NO_PRIVILEGE_ERROR_CODE = "noPrivilege";
 
     /**
      * The name of the JSON field which describes the session's username.

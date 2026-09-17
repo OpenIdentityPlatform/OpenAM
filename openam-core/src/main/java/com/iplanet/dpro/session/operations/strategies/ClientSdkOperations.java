@@ -145,7 +145,7 @@ public class ClientSdkOperations implements SessionOperations {
     }
 
     @Override
-    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) {
+    public Collection<PartialSession> getMatchingSessions(Session caller, CrestQuery crestQuery) {
         throw new UnsupportedOperationException("Querying sessions is currently not supported with the ClientSDK");
     }
 

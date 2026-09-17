@@ -164,7 +164,7 @@ public class SessionChangeAuthorizer {
     void checkPermissionToDestroySession(final Session requester, final SessionID sessionId,
                                          final String sessionClientDomain) throws SessionException {
         if (!hasPermissionToDestroySession(requester, sessionId, sessionClientDomain)) {
-            throw new SessionException(SessionBundle.rbName, "noPrivilege", null);
+            throw new SessionException(SessionBundle.rbName, SessionConstants.NO_PRIVILEGE_ERROR_CODE, null);
         }
     }
 

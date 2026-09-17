@@ -12,13 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest.session;
 
 import static org.forgerock.json.JsonValue.*;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +39,6 @@ import com.sun.identity.sm.DNMapper;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.Request;
 import org.forgerock.json.resource.http.HttpContext;
-import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
@@ -64,21 +63,17 @@ public class SessionResourceUtil {
     public static final String SESSION_INFO_USER_ID = "UserId";
 
     private final SSOTokenManager ssoTokenManager;
-    private final SessionQueryManager queryManager;
     private final WebtopNamingQuery webtopNamingQuery;
 
     /**
      * Creates an instance of the SessionResourceUtil
      *
      * @param ssoTokenManager An instance of the SSOTokenManager.
-     * @param sessionQueryManager An instance of the SessionQueryManager. Must not null.
      * @param webtopNamingQuery An Instance of the WebtopNamingQuery.
      */
     @Inject
-    public SessionResourceUtil(final SSOTokenManager ssoTokenManager,
-            final SessionQueryManager sessionQueryManager, final WebtopNamingQuery webtopNamingQuery) {
+    public SessionResourceUtil(final SSOTokenManager ssoTokenManager, final WebtopNamingQuery webtopNamingQuery) {
         this.ssoTokenManager = ssoTokenManager;
-        this.queryManager = sessionQueryManager;
         this.webtopNamingQuery = webtopNamingQuery;
     }
 
@@ -123,31 +118,6 @@ public class SessionResourceUtil {
             LOGGER.error("SessionResource.getAllServerIds() :: WebtopNaming throw irrecoverable error.");
             throw new IllegalStateException("Cannot recover from this error", e);
         }
-    }
-
-    /**
-     * @param serverId Server to query.
-     * @return A non null collection of SessionInfos from the named server.
-     */
-    public Collection<SessionInfo> generateNamedServerSession(String serverId) {
-        List<String> serverList = Arrays.asList(new String[]{serverId});
-        Collection<SessionInfo> sessions = queryManager.getAllSessions(serverList);
-        if (LOGGER.messageEnabled()) {
-            LOGGER.message("SessionResource.generateNmaedServerSession :: retrieved session list for server, " +
-                    serverId);
-        }
-        return sessions;
-    }
-
-    /**
-     * @return A non null collection of SessionInfo instances queried across all servers.
-     */
-    public Collection<SessionInfo> generateAllSessions() {
-        Collection<SessionInfo> sessions = queryManager.getAllSessions(getAllServerIds());
-        if (LOGGER.messageEnabled()) {
-            LOGGER.message("SessionResource.generateNmaedServerSession :: retrieved session list for all servers.");
-        }
-        return sessions;
     }
 
     /**

@@ -105,13 +105,15 @@ public class StatelessOperations implements SessionOperations {
      * sessions even when the request was initiated using a stateless session.
      * Since stateless sessions are not tracked by OpenAM, it is not possible to query for them.
      *
+     * @param caller {@inheritDoc}
      * @param crestQuery {@inheritDoc}
      * @return {@inheritDoc}
      * @throws SessionException {@inheritDoc}
      */
     @Override
-    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
-        return localOperations.getMatchingSessions(crestQuery);
+    public Collection<PartialSession> getMatchingSessions(Session caller, CrestQuery crestQuery)
+            throws SessionException {
+        return localOperations.getMatchingSessions(caller, crestQuery);
     }
 
     @Override

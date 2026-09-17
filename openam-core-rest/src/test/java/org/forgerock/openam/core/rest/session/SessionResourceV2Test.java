@@ -25,45 +25,64 @@ import static org.forgerock.openam.core.rest.session.SessionResourceUtil.*;
 import static org.forgerock.openam.core.rest.session.SessionResourceV2.REFRESH_ACTION_ID;
 import static org.forgerock.openam.session.SessionConstants.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.service.SessionService;
+import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResourceHandler;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResourceResponse;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
-import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
+import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.core.realms.RealmTestHelper;
 import org.forgerock.openam.dpro.session.PartialSession.Builder;
 import org.forgerock.openam.dpro.session.PartialSessionFactory;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
+import org.forgerock.openam.utils.CrestQuery;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
+import org.forgerock.util.query.QueryFilter;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class SessionResourceV2Test {
 
     private static final String REALM_PATH = "/example/com";
+    private static final JsonPointer REALM_FIELD = new JsonPointer("realm");
 
     private SSOTokenContext mockContext = mock(SSOTokenContext.class);
 
@@ -76,23 +95,26 @@ public class SessionResourceV2Test {
     private SessionPropertyWhitelist sessionPropertyWhitelist;
     private SessionService sessionService;
     private PartialSessionFactory partialSessionFactory;
+    private RealmTestHelper realmTestHelper;
 
     private SessionResourceV2 sessionResource;
 
     @BeforeMethod
     public void setUp() throws Exception {
 
-        SessionQueryManager sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
         sessionPropertyWhitelist = mock(SessionPropertyWhitelist.class);
+
+        realmTestHelper = new RealmTestHelper();
+        realmTestHelper.setupRealmClass();
 
         amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
 
         sessionService = mock(SessionService.class);
         partialSessionFactory = mock(PartialSessionFactory.class);
 
-        sessionResourceUtil = new SessionResourceUtil(ssoTokenManager, sessionQueryManager, null) {
+        sessionResourceUtil = new SessionResourceUtil(ssoTokenManager, null) {
             @Override
             public AMIdentity getIdentity(SSOToken ssoToken) throws IdRepoException, SSOException {
                 return amIdentity;
@@ -106,6 +128,11 @@ public class SessionResourceV2Test {
         sessionResource = new SessionResourceV2(ssoTokenManager, authUtilsWrapper,
                 sessionResourceUtil, sessionPropertyWhitelist, sessionService, partialSessionFactory);
         given(mockContext.getCallerSSOToken()).willReturn(ssoToken);
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        realmTestHelper.tearDownRealmClass();
     }
 
     @Test
@@ -360,8 +387,207 @@ public class SessionResourceV2Test {
     }
 
     @Test
+    public void queryShouldRefuseAFilterRealmOutsideTheRealmOfTheRequest() throws Exception {
+        //given
+        Context context = new RealmContext(mockContext, realmTestHelper.mockRealm("realmA"));
+
+        //when
+        Promise<QueryResponse, ResourceException> promise = queryRealm(context, "/realmB");
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(ForbiddenException.class);
+        verify(sessionService, never()).getMatchingSessions(any(Session.class), any(CrestQuery.class));
+    }
+
+    @Test
+    public void queryShouldRefuseTheTopLevelRealmWhenTheRequestIsMadeAgainstASubRealm() throws Exception {
+        //given
+        Context context = new RealmContext(mockContext, realmTestHelper.mockRealm("realmA"));
+
+        //when
+        Promise<QueryResponse, ResourceException> promise = queryRealm(context, "/");
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(ForbiddenException.class);
+        verify(sessionService, never()).getMatchingSessions(any(Session.class), any(CrestQuery.class));
+    }
+
+    @Test
+    public void queryShouldAcceptTheRealmOfTheRequest() throws Exception {
+        //given
+        Context context = new RealmContext(mockContext, realmTestHelper.mockRealm("realmA"));
+        Session callerSession = givenACaller();
+        givenTheSessionServiceReturnsASession();
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
+
+        //when
+        Promise<QueryResponse, ResourceException> promise = queryRealm(context, "/realmA", handler);
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).succeeded();
+        verify(handler).handleResource(any(ResourceResponse.class));
+        verify(sessionService).getMatchingSessions(eq(callerSession), any(CrestQuery.class));
+    }
+
+    @Test
+    public void queryShouldAcceptASubRealmOfTheRealmOfTheRequest() throws Exception {
+        //given the console queries a realm through the root realm endpoint
+        Context context = new RealmContext(mockContext, Realm.root());
+        Session callerSession = givenACaller();
+        givenTheSessionServiceReturnsASession();
+
+        //when
+        Promise<QueryResponse, ResourceException> promise = queryRealm(context, "/realmA");
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).succeeded();
+        verify(sessionService).getMatchingSessions(eq(callerSession), any(CrestQuery.class));
+    }
+
+    @Test
+    public void queryShouldRefuseAFilterWithoutARealm() throws Exception {
+        //given
+        Context context = new RealmContext(mockContext, Realm.root());
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryFilter()).willReturn(QueryFilter.equalTo(new JsonPointer("username"), "demo"));
+
+        //when
+        Promise<QueryResponse, ResourceException> promise =
+                sessionResource.queryCollection(context, request, mock(QueryResourceHandler.class));
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(BadRequestException.class);
+        verify(sessionService, never()).getMatchingSessions(any(Session.class), any(CrestQuery.class));
+    }
+
+    @Test
+    public void queryShouldRefuseAFilterNamingMoreThanOneRealm() throws Exception {
+        //given
+        Context context = new RealmContext(mockContext, Realm.root());
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryFilter()).willReturn(QueryFilter.and(
+                QueryFilter.equalTo(REALM_FIELD, "/realmA"),
+                QueryFilter.equalTo(REALM_FIELD, "/realmB")));
+
+        //when
+        Promise<QueryResponse, ResourceException> promise =
+                sessionResource.queryCollection(context, request, mock(QueryResourceHandler.class));
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(BadRequestException.class);
+        verify(sessionService, never()).getMatchingSessions(any(Session.class), any(CrestQuery.class));
+    }
+
+    @Test
+    public void queryShouldRefuseAFilterRealmWithAParentPathSegment() throws Exception {
+        //given a realm which would name another realm once the '..' segment is resolved
+        Context context = new RealmContext(mockContext, realmTestHelper.mockRealm("realmA"));
+
+        //when
+        Promise<QueryResponse, ResourceException> promise = queryRealm(context, "/realmA/../realmB");
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(BadRequestException.class);
+        verify(sessionService, never()).getMatchingSessions(any(Session.class), any(CrestQuery.class));
+    }
+
+    @Test
+    public void queryShouldRefuseAFilterTypeTheSessionQueryDoesNotSupport() throws Exception {
+        //given a filter the session query cannot be built from
+        Context context = new RealmContext(mockContext, Realm.root());
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryFilter()).willReturn(QueryFilter.or(
+                QueryFilter.equalTo(REALM_FIELD, "/realmA"),
+                QueryFilter.equalTo(REALM_FIELD, "/realmB")));
+
+        //when
+        Promise<QueryResponse, ResourceException> promise =
+                sessionResource.queryCollection(context, request, mock(QueryResourceHandler.class));
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(BadRequestException.class);
+        verify(sessionService, never()).getMatchingSessions(any(Session.class), any(CrestQuery.class));
+    }
+
+    @Test
+    public void queryShouldRefuseARequestWithoutARealmInItsContext() throws Exception {
+        //given a context the realm of the request cannot be read from
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryFilter()).willReturn(QueryFilter.equalTo(REALM_FIELD, "/realmA"));
+
+        //when
+        Promise<QueryResponse, ResourceException> promise =
+                sessionResource.queryCollection(mockContext, request, mock(QueryResourceHandler.class));
+
+        //then the request is refused rather than answered as if it were made against the top level realm
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(InternalServerErrorException.class);
+        verify(sessionService, never()).getMatchingSessions(any(Session.class), any(CrestQuery.class));
+    }
+
+    @Test
+    public void queryShouldReportTheSessionServiceRefusalAsForbidden() throws Exception {
+        //given the session service checks the realm against the caller as well
+        Context context = new RealmContext(mockContext, realmTestHelper.mockRealm("realmA"));
+        givenACaller();
+        given(sessionService.getMatchingSessions(any(Session.class), any(CrestQuery.class)))
+                .willThrow(new SessionException(SessionBundle.rbName, NO_PRIVILEGE_ERROR_CODE, null));
+
+        //when
+        Promise<QueryResponse, ResourceException> promise = queryRealm(context, "/realmA");
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void queryShouldReportAnyOtherSessionFailureAsAServerError() throws Exception {
+        //given
+        Context context = new RealmContext(mockContext, realmTestHelper.mockRealm("realmA"));
+        givenACaller();
+        given(sessionService.getMatchingSessions(any(Session.class), any(CrestQuery.class)))
+                .willThrow(new SessionException("the CTS is unavailable"));
+
+        //when
+        Promise<QueryResponse, ResourceException> promise = queryRealm(context, "/realmA");
+
+        //then
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(InternalServerErrorException.class);
+    }
+
+    @Test
     public void shouldFailIfAnnotationsAreNotValid() {
         ApiAnnotationAssert.assertThat(SessionResourceV2.class).hasValidAnnotations();
+    }
+
+    private Session givenACaller() {
+        Session callerSession = mock(Session.class);
+        given(mockContext.getCallerSession()).willReturn(callerSession);
+        return callerSession;
+    }
+
+    private void givenTheSessionServiceReturnsASession() throws Exception {
+        given(sessionService.getMatchingSessions(any(Session.class), any(CrestQuery.class))).willReturn(
+                Arrays.asList(new Builder().username("demo").realm("/realmA").build()));
+    }
+
+    private Promise<QueryResponse, ResourceException> queryRealm(Context context, String realm) {
+        return queryRealm(context, realm, mock(QueryResourceHandler.class));
+    }
+
+    private Promise<QueryResponse, ResourceException> queryRealm(Context context, String realm,
+            QueryResourceHandler handler) {
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryFilter()).willReturn(QueryFilter.equalTo(REALM_FIELD, realm));
+        return sessionResource.queryCollection(context, request, handler);
     }
 
     private Map<String, String> setUpSessionProperties() throws SSOException {
