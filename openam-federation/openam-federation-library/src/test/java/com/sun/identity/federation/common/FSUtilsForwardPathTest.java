@@ -85,8 +85,15 @@ public class FSUtilsForwardPathTest {
             {BASE + "//WEB-INF/web.xml"},
             {BASE + "/./WEB-INF/web.xml"},
             {BASE + "/WEB-INF;x/web.xml"},
+            {BASE + "/;x/WEB-INF/web.xml"},
+            {BASE + "/.;x/WEB-INF/web.xml"},
             {BASE + "/%2e/WEB-INF/web.xml"},
             {BASE + "/WEB-INF#/x"},
+            // ";param" is stripped on the raw string, encoded slash included.
+            {BASE + "/;%2Fjunk/WEB-INF/web.xml"},
+            {BASE + "/;jsessionid=1%2Fa/WEB-INF/web.xml"},
+            // request.getRequestDispatcher() drops the fragment: /x/.. -> /
+            {BASE + "/x/..#"},
         };
     }
 

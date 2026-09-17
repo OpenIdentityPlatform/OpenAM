@@ -36,6 +36,7 @@ public class ForwardPathValidatorTest {
             {"/console//base/AMAdminFrame"},  // collapses to an ordinary path
             {"/./console/base/AMAdminFrame"},
             {"/console/base;jsessionid=1/AMAdminFrame"},
+            {"/console;x%2Fy/base/AMAdminFrame"}, // the parameter goes, encoded slash and all
             {"/XUI/#login/"},                 // the container drops the fragment: /XUI/
         };
     }
@@ -82,16 +83,28 @@ public class ForwardPathValidatorTest {
             {"/./WEB-INF/web.xml"},
             {"/WEB-INF;x/web.xml"},
             {"/;/WEB-INF/web.xml"},
+            {"/;x/WEB-INF/web.xml"},
+            {"/.;x/WEB-INF/web.xml"},
             {"/%2e/WEB-INF/web.xml"},
             {"/WEB-INF/"},
             {"/WEB-INF/./web.xml"},
+            // The container strips ";param" on the raw string up to the next raw
+            // "/", before it decodes: an encoded slash inside the parameter goes
+            // with it, and the rest collapses to /WEB-INF/web.xml.
+            {"/;%2Fjunk/WEB-INF/web.xml"},
+            {"/;jsessionid=1%2Fa/WEB-INF/web.xml"},
+            {"/;x%2Fjunk/WEB-INF/web.xml"},
+            {"/;%2Fa%2Fb/WEB-INF/web.xml"},
             // request.getRequestDispatcher() drops a fragment before mapping.
             {"/WEB-INF#/x"},
             {"/WEB-INF/web.xml#x"},
+            {"/x/..#"},                       // ".." once the fragment is gone
+            {"/..#"},
             {"/x#/../WEB-INF/web.xml"},       // a ServletContext dispatcher keeps the fragment
             // An escape that decodes to a URL delimiter is never a plain in-app path.
             {"/WEB-INF%3fx/web.xml"},
             {"/WEB-INF%23/web.xml"},
+            {"/x%3by/WEB-INF/web.xml"},
             {"/x/\u007f.jsp"},
             {"/x/%7f.jsp"},
             {"/x/%c0%ae%c0%ae/WEB-INF/web.xml"},  // overlong UTF-8 is not a path
@@ -116,6 +129,7 @@ public class ForwardPathValidatorTest {
             {"/myrealm/sp"},
             {"/my-realm/my_sp.1"},
             {"/my%20realm/sp"},               // raw request URI form of "/my realm/sp"
+            {"/idp;x/sp"},                    // a path parameter is stripped, not traversed
         };
     }
 
@@ -129,6 +143,8 @@ public class ForwardPathValidatorTest {
             {"\\..\\..\\WEB-INF\\web.xml"},
             {"/idp\0"},
             {"/idp?x=/../WEB-INF"},
+            {"/..?"},                         // the container cuts the path at '?': a whole ".."
+            {"/idp/..?x=1"},
             {"/%2e%2e/%2e%2e/WEB-INF/web.xml"},
             {"/idp/..%2f..%2fWEB-INF/web.xml"},
             {"/%252e%252e/%252e%252e/WEB-INF/web.xml"},

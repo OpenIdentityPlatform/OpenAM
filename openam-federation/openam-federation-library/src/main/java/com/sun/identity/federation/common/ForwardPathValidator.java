@@ -29,12 +29,16 @@ import java.util.Locale;
  * filters declared in {@code web.xml}, so a path an end user controls must never
  * be allowed to climb out of the location the code intends to dispatch to.
  * <p>
- * The container percent-decodes a dispatcher path once more and then collapses
- * it ({@code //}, {@code /./}, {@code ;params}) before it maps it (Tomcat:
- * {@code dispatchersUseEncodedPaths}, on by default), so every check runs on the
- * decoded form as well as on the raw one, and the reserved-directory check reads
- * the collapsed path. An escape that decodes to a URL delimiter ({@code %25},
- * {@code %3F}, {@code %23}) or to something that is not UTF-8 is refused
+ * The container processes a dispatcher path in a fixed order before it maps it
+ * (Tomcat {@code ApplicationContext.getRequestDispatcher}, with
+ * {@code dispatchersUseEncodedPaths} on by default): the query string is cut,
+ * {@code ;params} are stripped from the raw string (each {@code ;} up to the
+ * next raw {@code /}), the rest is percent-decoded once, and {@code //} and
+ * {@code /./} are collapsed. The checks here follow that order: traversal is
+ * refused in the raw form and again in the decoded form, and the
+ * reserved-directory check reads the stripped, decoded, collapsed path. An
+ * escape that decodes to a URL delimiter ({@code %25}, {@code %3F},
+ * {@code %23}, {@code %3B}) or to something that is not UTF-8 is refused
  * outright: no in-app path of the product carries one.
  */
 public final class ForwardPathValidator {
@@ -62,11 +66,16 @@ public final class ForwardPathValidator {
             return false;
         }
         // HttpServletRequest.getRequestDispatcher() drops a fragment before it
-        // maps the path, so the reserved-directory check has to see that form
-        // too; a ServletContext dispatcher keeps it, which the traversal checks
-        // above already cover.
-        int fragment = resolved.indexOf('#');
-        return fragment == -1 || !isReserved(collapse(resolved.substring(0, fragment)));
+        // maps the path, so that form has to pass every check as well (a
+        // trailing "..#" segment is ".." once the fragment is gone); a
+        // ServletContext dispatcher keeps the fragment, which the checks
+        // above cover.
+        int fragment = uri.indexOf('#');
+        if (fragment != -1) {
+            String withoutFragment = resolve(uri.substring(0, fragment));
+            return withoutFragment != null && !isReserved(withoutFragment);
+        }
+        return true;
     }
 
     private static boolean isReserved(String collapsedPath) {
@@ -83,20 +92,28 @@ public final class ForwardPathValidator {
      * @return {@code true} if the alias contains no traversal
      */
     public static boolean isSafeMetaAlias(String metaAlias) {
-        return metaAlias != null && !metaAlias.isEmpty() && resolve(metaAlias) != null;
+        // The container cuts the dispatcher path at the first '?', so a '?'
+        // in the alias would end the path early and turn a trailing ".." that
+        // precedes it into a whole segment; an alias never carries one.
+        return metaAlias != null && !metaAlias.isEmpty() && metaAlias.indexOf('?') == -1
+                && resolve(metaAlias) != null;
     }
 
     /**
-     * The path as the container will map it - decoded once and collapsed - or
-     * {@code null} when it must not be dispatched to: traversal, a backslash or a
-     * control character in either the raw or the decoded form, or an escape that
-     * is malformed, not UTF-8, or decodes to a URL delimiter.
+     * The path as the container will map it - path parameters stripped, decoded
+     * once, collapsed - or {@code null} when it must not be dispatched to:
+     * traversal, a backslash or a control character in either the raw or the
+     * decoded form, or an escape that is malformed, not UTF-8, or decodes to a
+     * URL delimiter.
      */
     private static String resolve(String value) {
         if (containsTraversal(value)) {
             return null;
         }
-        String decoded = decodeOnce(value);
+        // The container strips ";param" on the raw string, up to the next raw
+        // '/', before it decodes: an encoded slash inside a parameter goes with
+        // the parameter and never becomes a separator.
+        String decoded = decodeOnce(stripPathParams(value));
         if (decoded == null || containsTraversal(decoded)) {
             return null;
         }
@@ -104,17 +121,36 @@ public final class ForwardPathValidator {
     }
 
     /**
-     * Collapses a path the way the container does before mapping it: {@code ;params}
-     * stripped from each segment, empty and {@code .} segments dropped. {@code ..}
-     * never reaches here.
+     * Drops every {@code ;param} the way the container does on the raw path:
+     * from each {@code ;} up to the next {@code /}.
+     */
+    private static String stripPathParams(String path) {
+        if (path.indexOf(';') == -1) {
+            return path;
+        }
+        StringBuilder stripped = new StringBuilder(path.length());
+        int pos = 0;
+        while (pos < path.length()) {
+            int semicolon = path.indexOf(';', pos);
+            if (semicolon == -1) {
+                stripped.append(path, pos, path.length());
+                break;
+            }
+            stripped.append(path, pos, semicolon);
+            int slash = path.indexOf('/', semicolon);
+            pos = slash == -1 ? path.length() : slash;
+        }
+        return stripped.toString();
+    }
+
+    /**
+     * Collapses a decoded, parameter-free path the way the container normalises
+     * it before mapping: empty and {@code .} segments dropped. {@code ..} never
+     * reaches here.
      */
     private static String collapse(String path) {
         StringBuilder collapsed = new StringBuilder(path.length());
         for (String segment : path.split("/", -1)) {
-            int semicolon = segment.indexOf(';');
-            if (semicolon != -1) {
-                segment = segment.substring(0, semicolon);
-            }
             if (!segment.isEmpty() && !segment.equals(".")) {
                 collapsed.append('/').append(segment);
             }
@@ -130,11 +166,6 @@ public final class ForwardPathValidator {
             }
         }
         for (String segment : value.split("/", -1)) {
-            // The container strips ";param" from each segment before normalising.
-            int semicolon = segment.indexOf(';');
-            if (semicolon != -1) {
-                segment = segment.substring(0, semicolon);
-            }
             if (segment.equals("..")) {
                 return true;
             }
@@ -147,7 +178,7 @@ public final class ForwardPathValidator {
      * a path: {@code %XX} with two ASCII hex digits only, {@code +} left alone.
      *
      * @return the decoded value, or {@code null} if an escape is malformed, is
-     *  not valid UTF-8, or decodes to {@code %}, {@code ?} or {@code #}
+     *  not valid UTF-8, or decodes to {@code %}, {@code ?}, {@code #} or {@code ;}
      */
     private static String decodeOnce(String value) {
         if (value.indexOf('%') == -1) {
@@ -176,7 +207,7 @@ public final class ForwardPathValidator {
                     return null;
                 }
                 int b = (hi << 4) | lo;
-                if (b == '%' || b == '?' || b == '#') {
+                if (b == '%' || b == '?' || b == '#' || b == ';') {
                     // A second encoding layer, or a delimiter the container would
                     // map literally: never a plain in-app path.
                     return null;
