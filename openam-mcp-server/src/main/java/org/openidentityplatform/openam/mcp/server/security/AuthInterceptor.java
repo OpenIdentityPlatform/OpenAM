@@ -32,9 +32,13 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -67,18 +71,22 @@ public class AuthInterceptor implements HandlerInterceptor {
     }
 
     /**
-     * Renders a session id or access token for log output. Only a short prefix is
-     * kept: a token written to a log file is enough to hijack the session it
-     * represents, so the raw value must never reach the logs.
+     * Renders a session id or access token for log output as a short SHA-256
+     * digest. A token written to a log file is enough to hijack the session it
+     * represents, so the raw value must never reach the logs; a prefix would not
+     * do either, because every session id starts with the same "AQIC" header.
+     * The digest still lets an operator holding the token match its log lines.
      */
     static String maskToken(String token) {
         if (token == null) {
             return "null";
         }
-        if (token.length() <= 8) {
-            return "***";
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8));
+            return "sha256:" + HexFormat.of().formatHex(digest, 0, 4);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
         }
-        return token.substring(0, 4) + "***";
     }
 
     @Override
@@ -205,7 +213,8 @@ public class AuthInterceptor implements HandlerInterceptor {
             if(response.containsKey("name")) {
                 return true;
             } else {
-                log.warn("got invalid response: {} for access token: {}", response, maskToken(accessToken));
+                // Claim names only: the body carries the user's claims (sub, email, ...).
+                log.warn("got invalid response (claims {}) for access token: {}", response.keySet(), maskToken(accessToken));
                 return false;
             }
         } catch (Exception e) {

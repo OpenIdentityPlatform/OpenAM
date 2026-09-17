@@ -237,10 +237,12 @@ class AuthInterceptorTest {
     }
 
     @Test
-    void maskToken_keepsOnlyAShortPrefix() {
-        assertThat(AuthInterceptor.maskToken("AQIC5wM2LY4SfczntBcXfFoFJwA6zAV2i4fnU8Sd7ao")).isEqualTo("AQIC***");
-        assertThat(AuthInterceptor.maskToken("short")).isEqualTo("***");
-        assertThat(AuthInterceptor.maskToken("")).isEqualTo("***");
+    void maskToken_replacesTheTokenWithAShortDigest() {
+        assertThat(AuthInterceptor.maskToken("AQIC5wM2LY4SfczntBcXfFoFJwA6zAV2i4fnU8Sd7ao")).isEqualTo("sha256:983d2944");
+        // Every session id starts with the same "AQIC" header, so a prefix could not
+        // tell two of them apart; the digest can.
+        assertThat(AuthInterceptor.maskToken("AQIC5wM2LY4Sfczn-expired-session-token")).isEqualTo("sha256:d5989e92");
+        assertThat(AuthInterceptor.maskToken("AQIC5wM2LY4Sfczn-fresh-session-token")).isEqualTo("sha256:b8150354");
         assertThat(AuthInterceptor.maskToken(null)).isEqualTo("null");
     }
 
@@ -261,7 +263,8 @@ class AuthInterceptorTest {
 
         List<String> messages = captureLogs(() -> spy.preHandleUsernamePassword(new MockHttpServletRequest()));
 
-        assertThat(messages).anyMatch(m -> m.contains("about to expire"));
+        assertThat(messages).anyMatch(m -> m.contains(
+                "token " + AuthInterceptor.maskToken(expiredToken) + " is about to expire"));
         assertThat(messages).noneMatch(m -> m.contains(expiredToken));
         assertThat(messages).noneMatch(m -> m.contains(freshToken));
     }
@@ -288,16 +291,18 @@ class AuthInterceptorTest {
             }
         });
 
-        assertThat(messages).anyMatch(m -> m.contains("about to expire"));
+        assertThat(messages).anyMatch(m -> m.contains(
+                "token " + AuthInterceptor.maskToken(expiredToken) + " is about to expire"));
         assertThat(messages).noneMatch(m -> m.contains(expiredToken));
     }
 
     @Test
-    void accessTokenValid_doesNotLogRawAccessToken_onInvalidResponse() {
+    void accessTokenValid_doesNotLogRawAccessTokenOrClaims_onInvalidResponse() {
         String accessToken = "f3c1a9e0-access-token-value";
 
-        // userinfo answers without a "name": the token must be reported as invalid
-        // without echoing it into the log.
+        // userinfo answers without a "name" (a token without the profile scope): the
+        // token must be reported as invalid without echoing it, or the user's
+        // claims, into the log.
         @SuppressWarnings("rawtypes")
         RestClient.RequestHeadersUriSpec uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
@@ -305,12 +310,15 @@ class AuthInterceptorTest {
         doReturn(uriSpec).when(uriSpec).uri(anyString());
         doReturn(uriSpec).when(uriSpec).header(anyString(), any(String[].class));
         doReturn(responseSpec).when(uriSpec).retrieve();
-        doReturn(Map.of("error", "invalid_token")).when(responseSpec).body(any(ParameterizedTypeReference.class));
+        doReturn(Map.of("sub", "demo", "email", "demo@example.com"))
+                .when(responseSpec).body(any(ParameterizedTypeReference.class));
 
         List<String> messages = captureLogs(() -> assertThat(interceptor.accessTokenValid(accessToken)).isFalse());
 
-        assertThat(messages).anyMatch(m -> m.contains("got invalid response"));
+        assertThat(messages).anyMatch(m -> m.contains("got invalid response")
+                && m.contains("email") && m.contains("for access token: " + AuthInterceptor.maskToken(accessToken)));
         assertThat(messages).noneMatch(m -> m.contains(accessToken));
+        assertThat(messages).noneMatch(m -> m.contains("demo@example.com"));
     }
 
     private static List<String> captureLogs(Runnable action) {
@@ -324,6 +332,9 @@ class AuthInterceptorTest {
         } finally {
             logger.detachAppender(appender);
         }
-        return appender.list.stream().map(ILoggingEvent::getFormattedMessage).collect(Collectors.toList());
+        return appender.list.stream()
+                .map(e -> e.getFormattedMessage()
+                        + (e.getThrowableProxy() == null ? "" : " " + e.getThrowableProxy().getMessage()))
+                .collect(Collectors.toList());
     }
 }

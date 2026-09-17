@@ -18,6 +18,7 @@
 package org.openidentityplatform.openam.cassandra;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -64,22 +65,22 @@ import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.hash.Hashing;
 
 public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter {
 	final static Logger logger = LoggerFactory.getLogger(TokenStorageAdapter.class);
 
 	/**
-	 * Renders a token id for log output. The id is a session id or an OAuth2
-	 * token, so only a short prefix is kept: the raw value must never reach the logs.
+	 * Renders a token id for log output as a short SHA-256 digest. The id is a
+	 * session id or an OAuth2 token, so the raw value must never reach the logs;
+	 * a prefix would not do either, because every session id starts with the same
+	 * "AQIC" header. The digest still lets an operator holding the id find its lines.
 	 */
 	static String maskTokenId(String tokenId) {
 		if (tokenId == null) {
 			return "null";
 		}
-		if (tokenId.length() <= 8) {
-			return "***";
-		}
-		return tokenId.substring(0, 4) + "***";
+		return "sha256:" + Hashing.sha256().hashString(tokenId, StandardCharsets.UTF_8).toString().substring(0, 8);
 	}
 
 	private final DataLayerConfiguration cfg;
