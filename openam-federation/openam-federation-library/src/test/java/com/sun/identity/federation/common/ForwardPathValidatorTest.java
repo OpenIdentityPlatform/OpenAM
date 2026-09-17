@@ -33,6 +33,10 @@ public class ForwardPathValidatorTest {
             {"/console/a+b.jsp"},             // '+' is literal in a path
             {"/web-info/page.jsp"},           // only the real WEB-INF directory is reserved
             {"/a/b..c/d"},                    // ".." inside a segment is an ordinary name
+            {"/console//base/AMAdminFrame"},  // collapses to an ordinary path
+            {"/./console/base/AMAdminFrame"},
+            {"/console/base;jsessionid=1/AMAdminFrame"},
+            {"/XUI/#login/"},                 // the container drops the fragment: /XUI/
         };
     }
 
@@ -72,6 +76,25 @@ public class ForwardPathValidatorTest {
             {"/x/%zz.jsp"},
             {"/x/%2"},
             {"/x/100%.jsp"},
+            // The container collapses "//", "/./" and ";params" before mapping,
+            // so the reserved-directory check has to see the collapsed path.
+            {"//WEB-INF/web.xml"},
+            {"/./WEB-INF/web.xml"},
+            {"/WEB-INF;x/web.xml"},
+            {"/;/WEB-INF/web.xml"},
+            {"/%2e/WEB-INF/web.xml"},
+            {"/WEB-INF/"},
+            {"/WEB-INF/./web.xml"},
+            // request.getRequestDispatcher() drops a fragment before mapping.
+            {"/WEB-INF#/x"},
+            {"/WEB-INF/web.xml#x"},
+            {"/x#/../WEB-INF/web.xml"},       // a ServletContext dispatcher keeps the fragment
+            // An escape that decodes to a URL delimiter is never a plain in-app path.
+            {"/WEB-INF%3fx/web.xml"},
+            {"/WEB-INF%23/web.xml"},
+            {"/x/\u007f.jsp"},
+            {"/x/%7f.jsp"},
+            {"/x/%c0%ae%c0%ae/WEB-INF/web.xml"},  // overlong UTF-8 is not a path
         };
     }
 
@@ -111,6 +134,8 @@ public class ForwardPathValidatorTest {
             {"/%252e%252e/%252e%252e/WEB-INF/web.xml"},
             {"/idp%00"},
             {"/idp%zz"},
+            {"/idp#/../../WEB-INF/web.xml"},
+            {"/idp/%c0%ae%c0%ae/WEB-INF/web.xml"},
         };
     }
 

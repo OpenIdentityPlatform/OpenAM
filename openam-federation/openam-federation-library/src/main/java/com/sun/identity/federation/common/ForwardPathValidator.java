@@ -16,6 +16,9 @@
 package com.sun.identity.federation.common;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
@@ -26,11 +29,13 @@ import java.util.Locale;
  * filters declared in {@code web.xml}, so a path an end user controls must never
  * be allowed to climb out of the location the code intends to dispatch to.
  * <p>
- * The container percent-decodes a dispatcher path once more before it normalises
- * it (Tomcat: {@code dispatchersUseEncodedPaths}, on by default), so every check
- * runs on the decoded form as well as on the raw one, and a value that would
- * still carry an escape after that single decode - a second encoding layer - is
- * refused outright: no in-app path of the product needs one.
+ * The container percent-decodes a dispatcher path once more and then collapses
+ * it ({@code //}, {@code /./}, {@code ;params}) before it maps it (Tomcat:
+ * {@code dispatchersUseEncodedPaths}, on by default), so every check runs on the
+ * decoded form as well as on the raw one, and the reserved-directory check reads
+ * the collapsed path. An escape that decodes to a URL delimiter ({@code %25},
+ * {@code %3F}, {@code %23}) or to something that is not UTF-8 is refused
+ * outright: no in-app path of the product carries one.
  */
 public final class ForwardPathValidator {
 
@@ -41,7 +46,7 @@ public final class ForwardPathValidator {
      * Whether {@code path} may be forwarded to as-is: absolute, without {@code ..}
      * segments in its raw or decoded form (path parameters stripped, as the
      * container does), without backslashes, control characters, malformed or
-     * double escapes, and not under a reserved directory.
+     * delimiter escapes, and not under a reserved directory once collapsed.
      *
      * @param path a context-relative path, optionally with a query string
      * @return {@code true} if the path is safe to pass to a request dispatcher
@@ -53,12 +58,21 @@ public final class ForwardPathValidator {
         int query = path.indexOf('?');
         String uri = query == -1 ? path : path.substring(0, query);
         String resolved = resolve(uri);
-        if (resolved == null) {
+        if (resolved == null || isReserved(resolved)) {
             return false;
         }
-        String lower = resolved.toLowerCase(Locale.ROOT);
-        return !(lower.startsWith("/web-inf/") || lower.equals("/web-inf")
-                || lower.startsWith("/meta-inf/") || lower.equals("/meta-inf"));
+        // HttpServletRequest.getRequestDispatcher() drops a fragment before it
+        // maps the path, so the reserved-directory check has to see that form
+        // too; a ServletContext dispatcher keeps it, which the traversal checks
+        // above already cover.
+        int fragment = resolved.indexOf('#');
+        return fragment == -1 || !isReserved(collapse(resolved.substring(0, fragment)));
+    }
+
+    private static boolean isReserved(String collapsedPath) {
+        String lower = collapsedPath.toLowerCase(Locale.ROOT);
+        return lower.startsWith("/web-inf/") || lower.equals("/web-inf")
+                || lower.startsWith("/meta-inf/") || lower.equals("/meta-inf");
     }
 
     /**
@@ -73,20 +87,39 @@ public final class ForwardPathValidator {
     }
 
     /**
-     * The path as the container will resolve it, or {@code null} when it must not
-     * be dispatched to: traversal, a backslash or a control character in either
-     * the raw or the decoded form, or an escape that is malformed or survives the
-     * container's single decode.
+     * The path as the container will map it - decoded once and collapsed - or
+     * {@code null} when it must not be dispatched to: traversal, a backslash or a
+     * control character in either the raw or the decoded form, or an escape that
+     * is malformed, not UTF-8, or decodes to a URL delimiter.
      */
     private static String resolve(String value) {
         if (containsTraversal(value)) {
             return null;
         }
         String decoded = decodeOnce(value);
-        if (decoded == null || decoded.indexOf('%') != -1 || containsTraversal(decoded)) {
+        if (decoded == null || containsTraversal(decoded)) {
             return null;
         }
-        return decoded;
+        return collapse(decoded);
+    }
+
+    /**
+     * Collapses a path the way the container does before mapping it: {@code ;params}
+     * stripped from each segment, empty and {@code .} segments dropped. {@code ..}
+     * never reaches here.
+     */
+    private static String collapse(String path) {
+        StringBuilder collapsed = new StringBuilder(path.length());
+        for (String segment : path.split("/", -1)) {
+            int semicolon = segment.indexOf(';');
+            if (semicolon != -1) {
+                segment = segment.substring(0, semicolon);
+            }
+            if (!segment.isEmpty() && !segment.equals(".")) {
+                collapsed.append('/').append(segment);
+            }
+        }
+        return collapsed.length() == 0 ? "/" : collapsed.toString();
     }
 
     private static boolean containsTraversal(String value) {
@@ -113,7 +146,8 @@ public final class ForwardPathValidator {
      * Percent-decodes {@code value} exactly once, the way the container does for
      * a path: {@code %XX} with two ASCII hex digits only, {@code +} left alone.
      *
-     * @return the decoded value, or {@code null} if an escape is malformed
+     * @return the decoded value, or {@code null} if an escape is malformed, is
+     *  not valid UTF-8, or decodes to {@code %}, {@code ?} or {@code #}
      */
     private static String decodeOnce(String value) {
         if (value.indexOf('%') == -1) {
@@ -130,7 +164,7 @@ public final class ForwardPathValidator {
                 continue;
             }
             // A run of escapes is one byte sequence: a multi-byte character has
-            // to be decoded as a whole or its bytes turn into replacement characters.
+            // to be decoded as a whole.
             bytes.reset();
             while (i < value.length() && value.charAt(i) == '%') {
                 if (i + 2 >= value.length()) {
@@ -141,10 +175,25 @@ public final class ForwardPathValidator {
                 if (hi < 0 || lo < 0) {
                     return null;
                 }
-                bytes.write((hi << 4) | lo);
+                int b = (hi << 4) | lo;
+                if (b == '%' || b == '?' || b == '#') {
+                    // A second encoding layer, or a delimiter the container would
+                    // map literally: never a plain in-app path.
+                    return null;
+                }
+                bytes.write(b);
                 i += 3;
             }
-            decoded.append(new String(bytes.toByteArray(), StandardCharsets.UTF_8));
+            try {
+                decoded.append(StandardCharsets.UTF_8.newDecoder()
+                        .onMalformedInput(CodingErrorAction.REPORT)
+                        .onUnmappableCharacter(CodingErrorAction.REPORT)
+                        .decode(ByteBuffer.wrap(bytes.toByteArray())));
+            } catch (CharacterCodingException e) {
+                // Overlong or truncated sequences: the container would turn them
+                // into replacement characters, never into a path this code means.
+                return null;
+            }
         }
         return decoded.toString();
     }

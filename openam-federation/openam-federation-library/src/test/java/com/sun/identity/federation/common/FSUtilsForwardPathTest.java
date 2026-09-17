@@ -25,8 +25,7 @@ import static org.mockito.Mockito.when;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -43,23 +42,21 @@ public class FSUtilsForwardPathTest {
     private HttpServletRequest request;
     private HttpServletResponse response;
 
-    @BeforeClass
-    public void pinDeploymentUri() {
-        savedDeploymentURI = FSUtils.deploymentURI;
-        FSUtils.deploymentURI = "/openam";
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void restoreDeploymentUri() {
-        FSUtils.deploymentURI = savedDeploymentURI;
-    }
-
     @BeforeMethod
     public void setUp() {
+        // forwardRequest reads the static deployment URI; pinned per test and
+        // restored whatever the outcome.
+        savedDeploymentURI = FSUtils.deploymentURI;
+        FSUtils.deploymentURI = "/openam";
         request = mock(HttpServletRequest.class);
         when(request.getServerName()).thenReturn("sp.example.com");
         when(request.getServerPort()).thenReturn(8080);
         response = mock(HttpServletResponse.class);
+    }
+
+    @AfterMethod(alwaysRun = true)
+    public void restoreDeploymentUri() {
+        FSUtils.deploymentURI = savedDeploymentURI;
     }
 
     @Test
@@ -84,6 +81,12 @@ public class FSUtilsForwardPathTest {
             {BASE + "/x/..%2fWEB-INF/web.xml"},
             {BASE + "/%57EB-INF/web.xml"},
             {BASE + "/x/%zz"},
+            // Forms the container collapses to /WEB-INF/web.xml before mapping.
+            {BASE + "//WEB-INF/web.xml"},
+            {BASE + "/./WEB-INF/web.xml"},
+            {BASE + "/WEB-INF;x/web.xml"},
+            {BASE + "/%2e/WEB-INF/web.xml"},
+            {BASE + "/WEB-INF#/x"},
         };
     }
 
