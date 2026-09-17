@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.operations.strategies;
@@ -116,7 +116,7 @@ public class StatelessOperations implements SessionOperations {
 
     @Override
     public void destroy(final Session requester, final Session session) throws SessionException {
-        sessionChangeAuthorizer.checkPermissionToDestroySession(requester, session.getSessionID());
+        sessionChangeAuthorizer.checkPermissionToDestroySession(requester, session);
         blacklist(session, SessionEventType.DESTROY);
     }
 

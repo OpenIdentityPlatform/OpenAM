@@ -143,7 +143,7 @@ public class LocalOperations implements SessionOperations {
         }
 
         if (internalSessionToDestroy != null) {
-            sessionChangeAuthorizer.checkPermissionToDestroySession(requester, internalSessionToDestroy.getSessionID());
+            sessionChangeAuthorizer.checkPermissionToDestroySession(requester, internalSessionToDestroy);
             destroyInternalSession(internalSessionToDestroy);
         }
     }
