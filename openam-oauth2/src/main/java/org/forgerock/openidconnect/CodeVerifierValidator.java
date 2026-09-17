@@ -12,13 +12,16 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
-* Portions copyright 2025 3A Systems LLC.
+* Portions copyright 2025-2026 3A Systems LLC.
 */
 package org.forgerock.openidconnect;
+
+import java.util.Set;
 
 import jakarta.inject.Inject;
 import org.forgerock.oauth2.core.AuthorizeRequestValidator;
 import org.forgerock.openam.oauth2.OAuth2Constants;
+import org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.OAuth2ProviderSettingsFactory;
 import org.forgerock.oauth2.core.OAuth2Request;
@@ -30,9 +33,12 @@ import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.oauth2.core.exceptions.UnsupportedResponseTypeException;
-import org.forgerock.util.Reject;
 
 import static org.forgerock.oauth2.core.Utils.isEmpty;
+import static org.forgerock.oauth2.core.Utils.isOpenIdConnectFragmentErrorType;
+import static org.forgerock.oauth2.core.Utils.splitResponseType;
+import static org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation.FRAGMENT;
+import static org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation.QUERY;
 
 /**
  * Checks whether Proof Key for Code Exchange is enabled and validates accordingly
@@ -54,28 +60,31 @@ public class CodeVerifierValidator implements AuthorizeRequestValidator {
             InvalidScopeException, NotFoundException {
         final OAuth2ProviderSettings settings = providerSettingsFactory.get(request);
 
-        if (!settings.isCodeVerifierRequired() || !isAuthCodeRequest(request)) {
-            return;
-        } else {
-            Reject.ifTrue(isEmpty(request.<String>getParameter(OAuth2Constants.Custom.CODE_CHALLENGE)),
-                    "Missing parameter, '" + OAuth2Constants.Custom.CODE_CHALLENGE + "'");
+        // response_type is a space delimited set: hybrid flows ("code token", "code id_token",
+        // "code id_token token") issue an authorization code too, so PKCE must apply to them.
+        final Set<String> responseTypes =
+                splitResponseType(request.<String>getParameter(OAuth2Constants.Params.RESPONSE_TYPE));
 
-            String codeChallengeMethod = request.getParameter(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
-
-            if (codeChallengeMethod != null) {
-                Reject.ifFalse(codeChallengeMethod.equals(
-                                OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256) || codeChallengeMethod.equals(
-                                OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_PLAIN),
-                        "Invalid value for " + OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
-            }
-
+        if (!settings.isCodeVerifierRequired() || !responseTypes.contains(OAuth2Constants.Params.CODE)) {
             return;
         }
 
-    }
+        // OpenID Connect Core 3.3.2.6: for response types carrying id_token or token the error
+        // must be returned in the fragment, otherwise the client never sees it.
+        final UrlLocation errorLocation = isOpenIdConnectFragmentErrorType(responseTypes) ? FRAGMENT : QUERY;
 
-    private boolean isAuthCodeRequest(OAuth2Request request) {
-        return request.<String>getParameter(
-                OAuth2Constants.Params.RESPONSE_TYPE).equals(OAuth2Constants.Params.CODE);
+        if (isEmpty(request.<String>getParameter(OAuth2Constants.Custom.CODE_CHALLENGE))) {
+            throw new InvalidRequestException(
+                    "Missing parameter, '" + OAuth2Constants.Custom.CODE_CHALLENGE + "'", errorLocation);
+        }
+
+        final String codeChallengeMethod = request.getParameter(OAuth2Constants.Custom.CODE_CHALLENGE_METHOD);
+
+        if (codeChallengeMethod != null
+                && !OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)
+                && !OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_PLAIN.equals(codeChallengeMethod)) {
+            throw new InvalidRequestException(
+                    "Invalid value for " + OAuth2Constants.Custom.CODE_CHALLENGE_METHOD, errorLocation);
+        }
     }
 }

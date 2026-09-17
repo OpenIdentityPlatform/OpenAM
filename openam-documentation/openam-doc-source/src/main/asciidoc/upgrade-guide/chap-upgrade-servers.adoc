@@ -76,6 +76,15 @@ Also starting with this release, inbound ID-FF state-changing and disclosure ope
 See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
 ====
 
+[IMPORTANT]
+====
+Starting with this release the OAuth 2.0 authorization endpoint applies the OAuth2 Provider property Code Verifier Parameter Required to every request whose `response_type` includes `code`, as part of the GHSA-5p2f-7vcr-6vfh hardening. Previously the OpenID Connect hybrid flows (`code token`, `code id_token`, and `code id_token token`) escaped the check and were issued authorization codes with no `code_challenge` bound to them. That property is *enabled by default*, so hybrid-flow clients that send no `code_challenge` now fail at `/oauth2/authorize`.
+
+The token endpoint fails closed to match: while the property is enabled, an authorization code that carries no `code_challenge` is rejected at `/oauth2/access_token`. Authorization codes issued before the upgrade, or before the property was turned on, therefore stop being redeemable. The exposure lasts at most one authorization code lifetime (the OAuth2 Provider property Authorization Code Lifetime (seconds), 120 by default), so if in-flight codes matter, leave client traffic redirected elsewhere for that long before promoting the upgrade.
+
+Update hybrid-flow clients to send a `code_challenge` at the authorization endpoint and the matching `code_verifier` at the token endpoint, or disable Code Verifier Parameter Required for the realm. Disabling it never relaxes verification for codes that *were* issued with a challenge. See xref:../reference/chap-config-ref.adoc#oauth2-provider-configuration["OAuth2 Provider"] in the __Reference__.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====
