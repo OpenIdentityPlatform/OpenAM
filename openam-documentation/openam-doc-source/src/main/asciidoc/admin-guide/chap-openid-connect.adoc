@@ -389,9 +389,33 @@ As described in xref:#openam-openid-client-registration["OpenID Connect Relying 
 
 [NOTE]
 ======
-When a registration request includes a `sector_identifier_uri`, OpenAM fetches that URL to verify that it lists the client's `redirect_uris`. To prevent server-side request forgery (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-7c7p-4mff-c9vg[GHSA-7c7p-4mff-c9vg, window=\_blank]), the `sector_identifier_uri` must use the `https` scheme and must not resolve to a loopback, link-local (including the cloud metadata range `169.254.0.0/16`), private/site-local, multicast, or other special-purpose address; otherwise registration is rejected with `Invalid sector_identifier_uri requested`. The same rules are applied to the IPv4 address embedded in an IPv6 transition literal, so an internal target cannot be reached through a NAT64, 6to4, Teredo, ISATAP, or IPv4-mapped address either (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-xq25-2x9w-94w9[GHSA-xq25-2x9w-94w9, window=\_blank]). To restore the previous, unrestricted behavior at runtime — for example, when the relying party's file is hosted on an internal address — set the advanced server property `org.openidentityplatform.oauth2.oidc.sector-identifier-uri.allow-any-url` to `true`.
+When a registration request includes a `sector_identifier_uri`, OpenAM fetches that URL to verify that it lists the client's `redirect_uris`. To prevent server-side request forgery (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-7c7p-4mff-c9vg[GHSA-7c7p-4mff-c9vg, window=\_blank]), the `sector_identifier_uri` must use the `https` scheme and must not resolve to a blocked address; otherwise registration is rejected with `Invalid sector_identifier_uri requested`. To restore the previous, unrestricted behavior at runtime — for example, when the relying party's file is hosted on an internal address — set the advanced server property `org.openidentityplatform.oauth2.oidc.sector-identifier-uri.allow-any-url` to `true`.
+
+[#openam-ssrf-blocked-addresses]
+An address is blocked when it is any of the following:
+
+* loopback (`127.0.0.0/8`, `::1`), wildcard (`0.0.0.0`, `::`), link-local (including the cloud metadata range `169.254.0.0/16`, and `fe80::/10`), private/site-local (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `fec0::/10`), unique-local (`fc00::/7`) or multicast;
+* one of the IPv4 special-purpose ranges `0.0.0.0/8`, `100.64.0.0/10` (shared address space, which also holds the `100.100.100.200` cloud metadata endpoint), `192.0.0.0/24`, `192.88.99.0/24`, `198.18.0.0/15`, or `240.0.0.0/4` (which includes the broadcast address `255.255.255.255`);
+* any address in the NAT64 local-use prefix `64:ff9b:1::/48`, which exists only to translate non-global IPv4 and has no legitimate fetch target;
+* an IPv6 transition address — NAT64 Well-Known Prefix (`64:ff9b::/96`), 6to4 (`2002::/16`), Teredo (`2001:0000::/32`), ISATAP (interface identifier `0000:5efe` or `0200:5efe`) or IPv4-mapped/compatible (`::ffff:0:0/96`, `::/96`) — whose embedded IPv4 address falls in any of the ranges above (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-xq25-2x9w-94w9[GHSA-xq25-2x9w-94w9, window=\_blank]).
+
+A host is blocked when __any__ of its resolved addresses is blocked.
 
 If your deployment runs a NAT64 translator with a Network-Specific Prefix rather than the `64:ff9b::/96` Well-Known Prefix, declare the prefix in the advanced server property `org.openidentityplatform.ssrf.nat64-prefixes` so that the addresses translated through it are checked as well. The value is a comma-separated list of `__ipv6-prefix__/__length__` entries with a length of 32, 40, 48, 56, 64, or 96 bits, for example `2001:db8:122:344::/64,2001:db8:1::/48`. A Network-Specific Prefix is chosen from the operator's own address space and is indistinguishable from an ordinary global address, so it cannot be recognized unless it is declared. The property is applied to every URL OpenAM validates, including entitlement listener callbacks, and can only add blocked ranges.
+
+[IMPORTANT]
+========
+`100.64.0.0/10` is used for real service addressing by some container platforms and carrier networks. If your `sector_identifier_uri`, `jwks_uri` or entitlement listener endpoints are hosted in that range — or in any other range in the list above — set the corresponding `allow-any-...` property __before__ upgrading. See also xref:../reference/chap-endpoints.adoc#web-inf-endpoints["WEB-INF Endpoints"] in the __Reference__, where the same address list applies to entitlement listener callbacks.
+========
+======
+
+[NOTE]
+======
+The same restriction applies to `jwks_uri`, which OpenAM fetches when the relying party authenticates with `private_key_jwt` or presents an ID token for validation (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-g7cv-hh35-cc7c[GHSA-g7cv-hh35-cc7c, window=\_blank]). A `jwks_uri` must use the `http` or `https` scheme — `file`, `ftp` and other schemes are refused outright — and must not resolve to one of the blocked addresses listed above; otherwise registration is rejected with `Invalid jwks_uri requested`. The check is repeated when the JWK Set is fetched, so it also applies to relying parties registered before this release or configured through the console or __ssoadm__, and any redirect the JWK Set endpoint returns is validated the same way.
+
+The fetch itself is bounded as well: OpenAM follows at most three redirects (previously up to 20, the `HttpURLConnection` default), reads at most 512 KB of JWK Set document, and gives the whole fetch at most 10 seconds. A JWK Set that cannot be fetched is not retried for one minute, so that a relying party with an unreachable `jwks_uri` cannot turn each incoming request into an outgoing one; changing the OAuth2 provider or client configuration clears that state immediately.
+
+To let a relying party publish its JWK Set on an internal address, set the advanced server property `org.openidentityplatform.oauth2.oidc.jwks-uri.allow-any-address` to `true`; the scheme restriction still applies. Note that a host is rejected when __any__ of its addresses is internal, so a relying party that publishes both a public and a private address — a split-horizon or multi-homed deployment — needs this property as well. If you have such relying parties, set the property before upgrading, so that their authentication does not start failing at the token endpoint.
 ======
 On successful registration, OpenAM responds with information including an access token to allow the relying party subsequently to read and edit its profile:
 

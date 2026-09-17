@@ -762,11 +762,35 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         try {
             OpenIdResolver resolver = ClientJwksResolverCache.get(cacheKey);
             if (resolver == null) {
+                // A fetch that failed a moment ago is not retried on every inbound request: this
+                // method needs no authentication, and a failed fetch caches nothing, so retrying
+                // per request turns an unreachable, blocked or deliberately slow jwks_uri into a
+                // request amplifier (GHSA-g7cv-hh35-cc7c). The client sees the same error either
+                // way.
+                if (ClientJwksResolverCache.isFetchFailureRemembered(cacheKey)) {
+                    logger.warning("Not re-fetching JWKs for client '" + getClientId() + "' from "
+                            + url + ": the previous attempt failed less than "
+                            + ClientJwksResolverCache.FAILURE_TTL_MS + "ms ago");
+                    throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                            "Unable to load JWKs from registered jwks_uri.");
+                }
                 try {
+                    // SsrfSafeJwksHttpClient rather than the stock SimpleHTTPClient that the
+                    // (int, int) constructor would install: the stock one opens whatever URL it is
+                    // given, including file:// and friends, and lets HttpURLConnection chase
+                    // redirects into internal addresses (GHSA-g7cv-hh35-cc7c). Guarding the fetch
+                    // rather than only the registration also covers clients registered before that
+                    // check existed and clients configured through the console, ssoadm or the
+                    // agent REST API — and this method is reachable without authentication, an
+                    // unsigned client_assertion or an id_token at /oauth2/idtokeninfo being enough.
+                    // The resolver holds on to this client for the key reloads it performs when a
+                    // kid is unknown, so those stay guarded too.
                     resolver = ClientJwksResolverCache.putIfAbsent(cacheKey,
                             new JWKOpenIdResolverImpl(boundIssuer, new URL(url),
-                                    JWKS_URI_READ_TIMEOUT_MS, JWKS_URI_CONNECT_TIMEOUT_MS));
+                                    new SsrfSafeJwksHttpClient(JWKS_URI_READ_TIMEOUT_MS,
+                                            JWKS_URI_CONNECT_TIMEOUT_MS)));
                 } catch (FailedToLoadJWKException e) {
+                    ClientJwksResolverCache.rememberFetchFailure(cacheKey);
                     // Log the URL and root-cause server-side; the OAuth2 error response only
                     // carries a generic message so the configured jwks_uri and any
                     // stack-derived detail from e.getMessage() are not echoed back to the
