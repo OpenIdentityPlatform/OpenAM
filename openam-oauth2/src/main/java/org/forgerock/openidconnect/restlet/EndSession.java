@@ -12,28 +12,24 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect.restlet;
 
-import org.forgerock.json.jose.common.JwtReconstruction;
-import org.forgerock.json.jose.jws.SignedJwt;
-import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.oauth2.core.ClientRegistration;
-import org.forgerock.oauth2.core.ClientRegistrationStore;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.OAuth2RequestFactory;
-import org.forgerock.oauth2.core.exceptions.InvalidClientException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.RedirectUriMismatchException;
 import org.forgerock.oauth2.core.exceptions.RelativeRedirectUriException;
 import org.forgerock.oauth2.restlet.ExceptionHandler;
 import org.forgerock.oauth2.restlet.OAuth2RestletException;
 import org.forgerock.openam.utils.StringUtils;
+import org.forgerock.openidconnect.IdTokenHintValidator;
+import org.forgerock.openidconnect.IdTokenHintValidator.VerifiedIdTokenHint;
 import org.forgerock.openidconnect.OpenIDConnectEndSession;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -60,7 +56,7 @@ public class EndSession extends ServerResource {
     private final OAuth2RequestFactory requestFactory;
     private final OpenIDConnectEndSession openIDConnectEndSession;
     private final ExceptionHandler exceptionHandler;
-    private final ClientRegistrationStore clientRegistrationStore;
+    private final IdTokenHintValidator idTokenHintValidator;
 
     /**
      * Constructs a new EndSession.
@@ -68,14 +64,15 @@ public class EndSession extends ServerResource {
      * @param requestFactory An instance of the OAuth2RequestFactory.
      * @param openIDConnectEndSession An instance of the OpenIDConnectEndSession.
      * @param exceptionHandler An instance of the ExceptionHandler.
+     * @param idTokenHintValidator An instance of the IdTokenHintValidator.
      */
     @Inject
     public EndSession(OAuth2RequestFactory requestFactory, OpenIDConnectEndSession openIDConnectEndSession,
-            ExceptionHandler exceptionHandler, ClientRegistrationStore clientRegistrationStore) {
+            ExceptionHandler exceptionHandler, IdTokenHintValidator idTokenHintValidator) {
         this.requestFactory = requestFactory;
         this.openIDConnectEndSession = openIDConnectEndSession;
         this.exceptionHandler = exceptionHandler;
-        this.clientRegistrationStore = clientRegistrationStore;
+        this.idTokenHintValidator = idTokenHintValidator;
     }
 
     /**
@@ -93,14 +90,20 @@ public class EndSession extends ServerResource {
         final String state = request.getParameter(OAuth2Constants.Params.STATE);
 
         try {
+            // GHSA-6f8c-crwq-jqm3: verify the hint before anything is read out of it. Both of the
+            // decisions below - which session to destroy, and whose registered redirect URIs are
+            // acceptable - used to be taken from claims of an unverified JWT, which the caller
+            // could write freely.
+            final VerifiedIdTokenHint hint = idTokenHintValidator.validate(request, idToken);
+
             try {
-                openIDConnectEndSession.endSession(request, idToken);
+                openIDConnectEndSession.endSession(request, hint.getJwt());
             } catch (ServerException e) {
                 this.logger.warn("Error while removing session, possibly already timed out. Skipping...", e);
             }
 
             if (StringUtils.isNotEmpty(redirectUri)) {
-                return handleRedirect(request, idToken, redirectUri, state);
+                return handleRedirect(hint.getClientRegistration(), redirectUri, state);
             }
         } catch (OAuth2Exception e) {
             throw new OAuth2RestletException(e.getStatusCode(), e.getError(), e.getMessage(), null);
@@ -118,11 +121,10 @@ public class EndSession extends ServerResource {
         exceptionHandler.handle(throwable, getResponse());
     }
 
-    private Representation handleRedirect(OAuth2Request request, String idToken, String redirectUri, String state)
-            throws RedirectUriMismatchException, InvalidClientException, 
-            RelativeRedirectUriException, NotFoundException {
+    private Representation handleRedirect(ClientRegistration client, String redirectUri, String state)
+            throws RedirectUriMismatchException, RelativeRedirectUriException {
 
-        validateRedirect(request, idToken, redirectUri);
+        validateRedirect(client, redirectUri);
         Response response = getResponse();
 
 	Reference redirectUrlWithState = new Reference(redirectUri);
@@ -135,15 +137,20 @@ public class EndSession extends ServerResource {
         return response == null ? null : response.getEntity();
     }
 
-    private void validateRedirect(OAuth2Request request, String idToken, String redirectUri)
-            throws InvalidClientException, RedirectUriMismatchException, 
-            RelativeRedirectUriException, NotFoundException {
+    private void validateRedirect(ClientRegistration client, String redirectUri)
+            throws RedirectUriMismatchException, RelativeRedirectUriException {
 
-        SignedJwt jwt = new JwtReconstruction().reconstructJwt(idToken, SignedJwt.class);
-        JwtClaimsSet claims = jwt.getClaimsSet();
-        String clientId = (String) claims.getClaim(OAuth2Constants.JWTTokenParams.AZP);
-        ClientRegistration client = clientRegistrationStore.get(clientId, request);
-        URI requestedUri = URI.create(redirectUri);
+        final URI requestedUri;
+        try {
+            requestedUri = URI.create(redirectUri);
+        } catch (IllegalArgumentException e) {
+            // A post_logout_redirect_uri that is not a URI at all matches nothing the client
+            // registered. Left to propagate this would reach doCatch as a server error, on an
+            // unauthenticated endpoint, after the session has already been ended.
+            logger.warn("The post_logout_redirect_uri supplied to the endSession endpoint is not a URI");
+            logger.debug("The post_logout_redirect_uri supplied to the endSession endpoint is not a URI", e);
+            throw new RedirectUriMismatchException();
+        }
 
         if (!requestedUri.isAbsolute()) {
             throw new RelativeRedirectUriException();
