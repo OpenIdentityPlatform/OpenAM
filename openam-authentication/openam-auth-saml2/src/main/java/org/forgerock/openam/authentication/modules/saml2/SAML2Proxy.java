@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -74,6 +74,12 @@ public final class SAML2Proxy {
     public static final String BAD_REQUEST = "badRequest";
     /**
      * Constant to indicate the Proxy did not find the expected cookie.
+     * <p>
+     * No longer produced. It was only ever reached when the load balancer cookie bounce fired -
+     * which needs a multi server platform and
+     * <code>com.sun.identity.federation.cookieHashRedirectEnabled=true</code>, off by default - and
+     * that case now answers the request instead of failing it. Kept because it is part of the
+     * published error vocabulary and an older server in the same site can still emit it.
      */
     public static final String MISSING_COOKIE = "missingCookie";
     /**
@@ -133,6 +139,29 @@ public final class SAML2Proxy {
     public static void processSamlResponse(HttpServletRequest request, HttpServletResponse response, PrintWriter out)
             throws IOException {
         String url = getUrl(request, response);
+        if (url == null) {
+            // The load balancer cookie bounce has answered the request itself. Writing anything on
+            // top of that replaces the answer the browser was supposed to act on.
+            DEBUG.message("SAML2Proxy: request bounced for the load balancer cookie, nothing left to write");
+            return;
+        }
+        if (response.isCommitted()) {
+            // Anything else that left the response committed has the same consequence: sendRedirect
+            // or a form write on a committed response raises an IllegalStateException over whatever
+            // the client already received.
+            //
+            // It does not cover the response SPACSUtils.getResponse has already answered. That one
+            // calls SAMLUtils.sendError before every SAML2Exception it throws, and in the default
+            // configuration sendError forwards to the relative error page saml2error.jsp, which
+            // ends in response.sendError(sc, msg) - the servlet call, which sets the status and
+            // suspends the response rather than committing it. So isCommitted() is false here and
+            // the error URL getUrl built from that exception still goes out on top of the error
+            // page. (The absolute error URL over HTTP-POST arm renders autosubmittingerror.jsp
+            // instead and does commit, which this guard does catch.) Closing the first arm wants
+            // the same threaded signal the bounce just got, which is a change of its own.
+            DEBUG.message("SAML2Proxy: response already committed, not writing {}", url);
+            return;
+        }
         XUIState xuiState = InjectorHolder.getInstance(XUIState.class);
         if (xuiState.isXUIEnabled()) {
             response.sendRedirect(url);
@@ -141,6 +170,10 @@ public final class SAML2Proxy {
         }
     }
 
+    /**
+     * Builds the URL the browser has to be sent back to, or <code>null</code> when the load balancer
+     * cookie bounce has already answered the request and the caller must not write at all.
+     */
     private static String getUrl(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (request == null || response == null) {
             DEBUG.error("SAML2Proxy: Null request or response");
@@ -155,7 +188,13 @@ public final class SAML2Proxy {
         }
 
         if (FSUtils.needSetLBCookieAndRedirect(request, response, false)) {
-            return getUrlWithError(request, MISSING_COOKIE);
+            // The bounce has answered the request: the POST branch forwarded to the auto submit JSP,
+            // the GET branch issued the redirect to ?redirected=1. This signal has to be threaded
+            // out rather than inferred from response.isCommitted(), because the GET branch does not
+            // necessarily commit - Tomcat's sendRedirect flushes only when the context is configured
+            // to send a redirect body, which it is not by default - and an error URL written after
+            // it would silently replace the redirect the browser was meant to follow.
+            return null;
         }
 
         // get entity id and orgName

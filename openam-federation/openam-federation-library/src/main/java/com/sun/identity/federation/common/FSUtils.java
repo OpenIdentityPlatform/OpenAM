@@ -54,6 +54,7 @@ import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
@@ -552,11 +553,17 @@ public class FSUtils {
     /**
      * Detects if a request simply needs loadbalancer cookies adding and to be redirected to
      * be handled elsewhere.
+     * <p>
+     * Gated on <code>com.sun.identity.federation.cookieHashRedirectEnabled</code>, which is off by
+     * default; see {@link #requireAddCookie} and {@link #requireRedirect} for the rest of the gate.
      *
      * @param request The HTTP request in question.
      * @param response The response associated with the request.
      * @param isIDP Whether this entity is acting as an IDP.
-     * @return false if not, otherwise redirects.
+     * @return <code>false</code> if the caller still owns the response and has to carry on,
+     *     <code>true</code> if the request has been bounced and the caller must return without
+     *     writing anything further. A bounce that failed after committing the response also
+     *     returns <code>true</code>, see {@link #requireStopAfterFailedBounce}.
      */
     public static boolean needSetLBCookieAndRedirect(HttpServletRequest request, HttpServletResponse response,
                                                      boolean isIDP) {
@@ -615,10 +622,51 @@ public class FSUtils {
             }
             return true;
         } catch (IOException ioe) {
-            debug.error("FSUtils.needSetLBCookieAndRedirect: ", ioe);
+            return requireStopAfterFailedBounce(response, ioe);
         } catch (SAML2Exception saml2E) {
-            debug.error("FSUtils.needSetLBCookieAndRedirect: ", saml2E);
+            return requireStopAfterFailedBounce(response, saml2E);
         }
+    }
+
+    /**
+     * Reports whether a failed load balancer cookie bounce has to stop the caller.
+     * <p>
+     * Every caller reads a <code>false</code> from {@link #needSetLBCookieAndRedirect} as "no bounce
+     * was needed, carry on", which is only safe while the response is still untouched. The forward
+     * to the auto submit JSP can fail after the JSP has already written the SAML message and the
+     * container has flushed it - a signed assertion larger than the response buffer plus a client
+     * that aborts is enough. Carrying on from there would consume the one-time-use assertion, mint
+     * a session, and then call <code>sendError</code> or <code>sendRedirect</code> on a committed
+     * response. So once the response is committed the caller is told the request was handled.
+     * <p>
+     * A forward that failed while its output was still buffered leaves the caller in charge, but the
+     * half rendered auto submit form has to go: appending the caller's own page to it would produce
+     * one document carrying both, and the leftover
+     * <code>&lt;body onload="document.forms[0].submit()"&gt;</code> would submit the stale SAML
+     * message. So the buffer is dropped before handing the response back.
+     * <p>
+     * Only the buffer: <code>reset()</code> would also clear the headers, and by this point
+     * {@link #setlbCookie} has already put the load balancer cookie on the response. Dropping that
+     * would send the client away without the cookie the whole bounce exists to deliver, so the
+     * no-cache headers the sink set are left in place as the lesser cost.
+     * <p>
+     * The same limit applies to the GET branch, where the failure came out of
+     * <code>sendRedirect</code>: the status line and <code>Location</code> it had already set stay
+     * on the response, and the servlet API offers no way to remove a header. A caller that carries
+     * on there would have its page discarded by a client following the redirect. Reaching that
+     * needs <code>sendRedirect</code> to throw without committing, which Tomcat does not do unless
+     * the context is configured to send a redirect body.
+     *
+     * @param response The response associated with the request.
+     * @param cause The failure that came out of the forward.
+     * @return <code>true</code> if the response is already committed and the caller must stop.
+     */
+    public static boolean requireStopAfterFailedBounce(HttpServletResponse response, Exception cause) {
+        debug.error("Failed to bounce the request through the auto submitting JSP", cause);
+        if (response.isCommitted()) {
+            return true;
+        }
+        response.resetBuffer();
         return false;
     }
 
@@ -715,40 +763,30 @@ public class FSUtils {
         return loadBalanceCookieValue;
     }
 
+    /**
+     * Forwards to the auto submitting JSP so that the SAML message is re-posted to
+     * <code>targetURL</code>.
+     * <p>
+     * IDFF and SAML2 re-post through the very same <code>autosubmitaccessrights.jsp</code>, so this
+     * is a thin delegation to {@link SAML2Utils#postToTarget} rather than a second implementation:
+     * that JSP renders the values with bare JSP EL, and one sink is what keeps the encoding it
+     * needs from drifting away on one of the two paths.
+     *
+     * @param request The HTTP request in question.
+     * @param response The response associated with the request.
+     * @param SAMLmessageName Name of the SAML message parameter.
+     * @param SAMLmessageValue Value of the SAML message parameter.
+     * @param relayStateName Name of the relay state parameter.
+     * @param relayStateValue Value of the relay state parameter, may be null.
+     * @param targetURL The URL the message is re-posted to.
+     * @throws SAML2Exception if the forward fails.
+     */
     public static void postToTarget(HttpServletRequest request, HttpServletResponse response,
         String SAMLmessageName, String SAMLmessageValue, String relayStateName,
         String relayStateValue, String targetURL) throws SAML2Exception {
 
-        request.setAttribute("TARGET_URL", targetURL);
-        request.setAttribute("SAML_MESSAGE_NAME", SAMLmessageName);
-        request.setAttribute("SAML_MESSAGE_VALUE", SAMLmessageValue);
-        request.setAttribute("RELAY_STATE_NAME", relayStateName);
-        request.setAttribute("RELAY_STATE_VALUE", relayStateValue);
-        request.setAttribute("SAML_POST_KEY", bundle.getString("samlPostKey"));
-
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Cache-Control", "no-cache,no-store");
-
-        try {
-            request.getRequestDispatcher("/saml2/jsp/autosubmitaccessrights.jsp").forward(request, response);
-        } catch (ServletException sE) {
-            handleForwardException(sE);
-        } catch (IOException ioE) {
-            handleForwardException(ioE);
-        }
-    }
-
-    /**
-     * Handles any exception when attempting to forward.
-     *
-     * @param exception
-     *         Thrown and caught exception
-     * @throws SAML2Exception if a SAML2 error occurs
-     *         Single general exception that is thrown on
-     */
-    private static void handleForwardException(Exception exception) throws SAML2Exception {
-        debug.error("Failed to forward to auto submitting JSP", exception);
-        throw new SAML2Exception(bundle.getString("postToTargetFailed"));
+        SAML2Utils.postToTarget(request, response, SAMLmessageName, SAMLmessageValue,
+                relayStateName, relayStateValue, targetURL);
     }
 
 }
