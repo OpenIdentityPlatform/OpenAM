@@ -1515,11 +1515,11 @@ public class FilesRepo extends IdRepo {
             throws IdRepoException {
         // The identity name becomes the file name: it must stay a single path
         // component, or an identity could be created, read or deleted anywhere
-        // the server can write.
-        if (name == null || name.isEmpty() || name.equals(".") || name.equals("..")
-                || name.indexOf('/') != -1 || name.indexOf('\\') != -1
-                || name.indexOf('\0') != -1) {
-            debug.error("FilesRepo.constructFile: invalid identity name: " + name);
+        // the server can write. Control characters are refused too, so a name
+        // cannot forge a log line. The name is caller data and is not logged.
+        if (!isSingleFileName(name)) {
+            debug.error("FilesRepo.constructFile: invalid identity name of type "
+                    + type.getName() + ", length " + (name == null ? 0 : name.length()));
             throw new IdRepoException(IdRepoBundle.getString(IdRepoErrorCode.ILLEGAL_ARGUMENTS),
                     IdRepoErrorCode.ILLEGAL_ARGUMENTS);
         }
@@ -1713,6 +1713,25 @@ public class FilesRepo extends IdRepo {
         return (false);
     }
 
+    /**
+     * Whether an identity name is usable as one file name under the type
+     * directory: not empty, not a dot directory, and free of path separators
+     * (both kinds, so a repository copied between platforms stays valid) and
+     * of control characters.
+     */
+    static boolean isSingleFileName(String name) {
+        if (name == null || name.isEmpty() || name.equals(".") || name.equals("..")) {
+            return false;
+        }
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (c == '/' || c == '\\' || c < ' ' || c == 0x7f) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // File name filter inner class
     class FileRepoFileFilter implements FilenameFilter {
         // Pattern to match
@@ -1738,7 +1757,8 @@ public class FilesRepo extends IdRepo {
                 if (from < p.length()) {
                     regex.append(Pattern.quote(p.substring(from)));
                 }
-                pattern = Pattern.compile(regex.toString(), Pattern.CASE_INSENSITIVE);
+                pattern = Pattern.compile(regex.toString(),
+                    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
             }
         }
 

@@ -15,6 +15,8 @@
  */
 package com.sun.identity.federation.common;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
@@ -23,6 +25,12 @@ import java.util.Locale;
  * it can reach {@code /WEB-INF} and {@code /META-INF}, and it does not run the
  * filters declared in {@code web.xml}, so a path an end user controls must never
  * be allowed to climb out of the location the code intends to dispatch to.
+ * <p>
+ * The container percent-decodes a dispatcher path once more before it normalises
+ * it (Tomcat: {@code dispatchersUseEncodedPaths}, on by default), so every check
+ * runs on the decoded form as well as on the raw one, and a value that would
+ * still carry an escape after that single decode - a second encoding layer - is
+ * refused outright: no in-app path of the product needs one.
  */
 public final class ForwardPathValidator {
 
@@ -31,8 +39,9 @@ public final class ForwardPathValidator {
 
     /**
      * Whether {@code path} may be forwarded to as-is: absolute, without {@code ..}
-     * segments (path parameters stripped, as the container does), without
-     * backslashes or control characters, and not under a reserved directory.
+     * segments in its raw or decoded form (path parameters stripped, as the
+     * container does), without backslashes, control characters, malformed or
+     * double escapes, and not under a reserved directory.
      *
      * @param path a context-relative path, optionally with a query string
      * @return {@code true} if the path is safe to pass to a request dispatcher
@@ -43,10 +52,11 @@ public final class ForwardPathValidator {
         }
         int query = path.indexOf('?');
         String uri = query == -1 ? path : path.substring(0, query);
-        if (containsTraversal(uri)) {
+        String resolved = resolve(uri);
+        if (resolved == null) {
             return false;
         }
-        String lower = uri.toLowerCase(Locale.ROOT);
+        String lower = resolved.toLowerCase(Locale.ROOT);
         return !(lower.startsWith("/web-inf/") || lower.equals("/web-inf")
                 || lower.startsWith("/meta-inf/") || lower.equals("/meta-inf"));
     }
@@ -59,7 +69,24 @@ public final class ForwardPathValidator {
      * @return {@code true} if the alias contains no traversal
      */
     public static boolean isSafeMetaAlias(String metaAlias) {
-        return metaAlias != null && !metaAlias.isEmpty() && !containsTraversal(metaAlias);
+        return metaAlias != null && !metaAlias.isEmpty() && resolve(metaAlias) != null;
+    }
+
+    /**
+     * The path as the container will resolve it, or {@code null} when it must not
+     * be dispatched to: traversal, a backslash or a control character in either
+     * the raw or the decoded form, or an escape that is malformed or survives the
+     * container's single decode.
+     */
+    private static String resolve(String value) {
+        if (containsTraversal(value)) {
+            return null;
+        }
+        String decoded = decodeOnce(value);
+        if (decoded == null || decoded.indexOf('%') != -1 || containsTraversal(decoded)) {
+            return null;
+        }
+        return decoded;
     }
 
     private static boolean containsTraversal(String value) {
@@ -80,5 +107,58 @@ public final class ForwardPathValidator {
             }
         }
         return false;
+    }
+
+    /**
+     * Percent-decodes {@code value} exactly once, the way the container does for
+     * a path: {@code %XX} with two ASCII hex digits only, {@code +} left alone.
+     *
+     * @return the decoded value, or {@code null} if an escape is malformed
+     */
+    private static String decodeOnce(String value) {
+        if (value.indexOf('%') == -1) {
+            return value;
+        }
+        StringBuilder decoded = new StringBuilder(value.length());
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        int i = 0;
+        while (i < value.length()) {
+            char c = value.charAt(i);
+            if (c != '%') {
+                decoded.append(c);
+                i++;
+                continue;
+            }
+            // A run of escapes is one byte sequence: a multi-byte character has
+            // to be decoded as a whole or its bytes turn into replacement characters.
+            bytes.reset();
+            while (i < value.length() && value.charAt(i) == '%') {
+                if (i + 2 >= value.length()) {
+                    return null;
+                }
+                int hi = hexDigit(value.charAt(i + 1));
+                int lo = hexDigit(value.charAt(i + 2));
+                if (hi < 0 || lo < 0) {
+                    return null;
+                }
+                bytes.write((hi << 4) | lo);
+                i += 3;
+            }
+            decoded.append(new String(bytes.toByteArray(), StandardCharsets.UTF_8));
+        }
+        return decoded.toString();
+    }
+
+    private static int hexDigit(char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        if (c >= 'a' && c <= 'f') {
+            return c - 'a' + 10;
+        }
+        if (c >= 'A' && c <= 'F') {
+            return c - 'A' + 10;
+        }
+        return -1;
     }
 }
