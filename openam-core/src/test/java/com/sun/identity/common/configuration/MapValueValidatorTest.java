@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions Copyright 2026 3A Systems, LLC.
 */
 package com.sun.identity.common.configuration;
 
@@ -40,7 +41,16 @@ public class MapValueValidatorTest {
                 {"=ALL", false},
                 {"[]=ALL", false},
                 {"[]=", true},
-                {"[key_and_or_value_contains_=_sign] ==", true}
+                {"[key_and_or_value_contains_=_sign] ==", true},
+                // white space is allowed everywhere, which is why the key is written as one
+                // quantifier that requires a non whitespace character followed by one that
+                // allows anything: both halves have to keep matching what they matched
+                {"[a b]=v", true},
+                {"[ a b ] = v ", true},
+                {"[a ]=v", true},
+                {"[ a]=v", true},
+                // and the first half is what keeps a key of nothing but whitespace out
+                {"[  ]=ALL", false}
         };
     }
 
@@ -79,6 +89,29 @@ public class MapValueValidatorTest {
 
         //then
         assertThat(result).isEqualTo(true);
+    }
+
+    /**
+     * The two quantifiers the key pattern is built from compete for the same characters, so a
+     * key that is never closed made the matcher try every way of splitting the run between
+     * them before failing - quadratic in the length of a value the caller chooses. The JAXRPC
+     * <code>validateServiceAttributes</code> endpoint lets any authenticated caller name this
+     * validator and hand it that value.
+     */
+    @Test
+    public void boundsTheCostOfAnUnterminatedKey() {
+        //given
+        String value = "[" + "a".repeat(64000);
+
+        //when
+        long startedAt = System.nanoTime();
+        boolean result = validator.validate(Collections.singleton(value));
+        long elapsedMillis = (System.nanoTime() - startedAt) / 1000000L;
+
+        //then
+        assertThat(result).isFalse();
+        assertThat(elapsedMillis).as("matching an unterminated key has to be bounded")
+                .isLessThan(5000L);
     }
 
 }
