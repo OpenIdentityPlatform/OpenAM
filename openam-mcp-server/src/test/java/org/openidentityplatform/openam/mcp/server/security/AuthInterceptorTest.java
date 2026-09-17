@@ -321,6 +321,21 @@ class AuthInterceptorTest {
         assertThat(messages).noneMatch(m -> m.contains("demo@example.com"));
     }
 
+    /**
+     * The only warning that attaches an exception: neither the message nor the
+     * exception may carry the session id that could not be checked.
+     */
+    @Test
+    void tokenValidSeconds_doesNotLogRawTokenId_whenOpenAMFails() {
+        String tokenId = "AQIC5wM2LY4Sfczn-failing-session-token";
+        when(restClient.post()).thenThrow(new IllegalStateException("OpenAM unreachable"));
+
+        List<String> messages = captureLogs(() -> assertThat(interceptor.tokenValidSeconds(tokenId)).isEqualTo(-1L));
+
+        assertThat(messages).anyMatch(m -> m.contains("error getting token properties") && m.contains("OpenAM unreachable"));
+        assertThat(messages).noneMatch(m -> m.contains(tokenId));
+    }
+
     private static List<String> captureLogs(Runnable action) {
         ch.qos.logback.classic.Logger logger =
                 (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AuthInterceptor.class);

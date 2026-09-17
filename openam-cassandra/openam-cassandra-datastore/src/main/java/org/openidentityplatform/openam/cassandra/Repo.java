@@ -297,7 +297,7 @@ public class Repo extends IdRepo {
 				}
 			}
 		}catch(Throwable e){
-			logger.error("getAttributes {} {}",type,name,attrNames,e);
+			logger.error("getAttributes {} {} {}",type,name,attrNames,e);
 			throw new IdRepoException(e.getMessage());
 		}
 		return attr;
@@ -471,7 +471,7 @@ public class Repo extends IdRepo {
 			else
 				new ExecuteCallback(profile,session, statement).execute();
 		}catch(Throwable e){
-			logger.error("removeAttributes {} {} {}",type,name,attrNames,e.getMessage());
+			logger.error("removeAttributes {} {} {}: {}",type,name,attrNames,e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
@@ -650,7 +650,7 @@ public class Repo extends IdRepo {
 					}
 					//test result
 					if (filterOp==Repo.AND_MOD && (result.isEmpty())) {
-						logger.debug("break search by empty query {} {}: {}",pattern,avPairs,filterEntry);
+						logger.debug("break search by empty query {} {}: {}",pattern,names(avPairs),filterEntry.getKey());
 						break;
 					}
 				}
@@ -757,7 +757,7 @@ public class Repo extends IdRepo {
 			Map<String, Set<String>> attr=getAttributes(token, type, name, new HashSet<String>(Arrays.asList(new String[]{"serviceName"})));
 			return (attr.containsKey("serviceName"))?attr.get("serviceName"):new HashSet<String>(0);
 		}catch(Throwable e){
-			logger.error("getAssignedServices {} {} {}",type,name,mapOfServicesAndOCs,e.getMessage());
+			logger.error("getAssignedServices {} {} {}: {}",type,name,mapOfServicesAndOCs,e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
