@@ -585,6 +585,28 @@ public class OpenAMClientRegistrationTest {
     }
 
     /**
+     * RSASigningHandler wraps the JDK's "Bad signature length" in JwsVerifyingException, a sibling of
+     * JwsSigningException: a client that rotated to a longer key, or any sender choosing the
+     * signature length, must be invalid_client rather than server_error with a logged stack trace.
+     */
+    @Test
+    public void verifyJwtIdentityReturnsFalseForRsaSignatureOfWrongLength() throws Exception {
+        String clientId = "client1";
+        String kid = UUID.randomUUID().toString();
+        KeyPair registeredKeys = generateRsaKeyPair(2048);
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("jwks"));
+        given(amIdentity.getAttribute(JWKS)).willReturn(singleton(jwks((RSAPublicKey) registeredKeys.getPublic(), kid)));
+
+        KeyPair rotatedKeys = generateRsaKeyPair(3072);
+        SigningHandler signer = new SigningManager().newRsaSigningHandler((RSAPrivateKey) rotatedKeys.getPrivate());
+
+        assertThat(clientRegistration.verifyJwtIdentity(assertion(clientId, signer, JwsAlgorithm.RS256, kid))).isFalse();
+    }
+
+    /**
      * A symmetric key served at jwks_uri reaches an HMAC handler inside the commons resolver, which
      * cannot verify an RS256 assertion; that is invalid_client, not server_error. The resolver is
      * seeded through the cache so the test needs no HTTP server.
@@ -679,8 +701,12 @@ public class OpenAMClientRegistrationTest {
     }
 
     private static KeyPair generateRsaKeyPair() throws Exception {
+        return generateRsaKeyPair(2048);
+    }
+
+    private static KeyPair generateRsaKeyPair(int bits) throws Exception {
         KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
-        gen.initialize(2048);
+        gen.initialize(bits);
         return gen.generateKeyPair();
     }
 

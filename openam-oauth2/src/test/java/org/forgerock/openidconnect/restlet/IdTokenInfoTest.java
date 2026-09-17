@@ -132,6 +132,31 @@ public class IdTokenInfoTest {
         idTokenInfo.validateIdToken(request);
     }
 
+    /**
+     * id_token_signed_response_alg is a free-text attribute; the token store upper-cases it when
+     * issuing, so the same spelling must pass the client-authentication gate here.
+     */
+    @Test
+    public void shouldAcceptLowerCaseConfiguredAlgorithm() throws Exception {
+        given(request.getParameter(OAuth2Constants.JWTTokenParams.ID_TOKEN)).willReturn(idToken());
+        given(clientRegistration.getIDTokenSignedResponseAlgorithm()).willReturn("hs256");
+        given(clientRegistration.verifyIdTokenIdentity(any(OAuth2Jwt.class))).willReturn(true);
+
+        OAuth2Jwt result = idTokenInfo.validateIdToken(request);
+
+        assertThat(result.getSignedJwt().getClaimsSet().getAudience()).containsExactly(CLIENT_ID);
+    }
+
+    @Test(expectedExceptions = BadRequestException.class,
+            expectedExceptionsMessageRegExp = "unsupported id_token_signed_response_alg")
+    public void shouldRejectUnknownConfiguredAlgorithmAsBadRequest() throws Exception {
+        given(request.getParameter(OAuth2Constants.JWTTokenParams.ID_TOKEN)).willReturn(idToken());
+        given(clientRegistration.getIDTokenSignedResponseAlgorithm()).willReturn("not-an-alg");
+        given(clientRegistration.verifyIdTokenIdentity(any(OAuth2Jwt.class))).willReturn(true);
+
+        idTokenInfo.validateIdToken(request);
+    }
+
     private static String idToken() {
         return new JwtBuilderFactory()
                 .jws(new SigningManager().newHmacSigningHandler("secret".getBytes(StandardCharsets.UTF_8)))

@@ -159,7 +159,13 @@ public class IdTokenInfo extends ServerResource {
 
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId,
                 new ValidateIdTokenRequest(request, realm));
-        JwsAlgorithm algorithm = JwsAlgorithm.valueOf(clientRegistration.getIDTokenSignedResponseAlgorithm());
+        // A free-text attribute, upper-cased as the token store does when issuing.
+        final JwsAlgorithm algorithm;
+        try {
+            algorithm = JwsAlgorithm.valueOf(clientRegistration.getIDTokenSignedResponseAlgorithm().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("unsupported id_token_signed_response_alg");
+        }
         boolean requiresClientAuthentication =
                 providerSettingsFactory.get(request).isIdTokenInfoClientAuthenticationEnabled();
 

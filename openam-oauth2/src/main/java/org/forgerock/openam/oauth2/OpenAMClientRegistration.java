@@ -60,7 +60,7 @@ import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolver;
 import org.forgerock.jaspi.modules.openid.resolvers.SharedSecretOpenIdResolverImpl;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
 import org.forgerock.json.jose.exceptions.JweException;
-import org.forgerock.json.jose.exceptions.JwsSigningException;
+import org.forgerock.json.jose.exceptions.JwsException;
 import org.forgerock.json.jose.jwe.EncryptionMethod;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
 import org.forgerock.json.jose.jwk.JWKSet;
@@ -686,9 +686,16 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                     default:
                         return byX509Key(jwt);
                 }
-            } catch (JwsSigningException | IllegalArgumentException e) {
-                // The registered key does not fit the header's alg (RSA key vs. ES256, a symmetric
-                // key served at jwks_uri): the client cannot be verified with what it registered.
+            } catch (JwsException | IllegalArgumentException e) {
+                // Wrong key type, an alg the key cannot verify (RSA key vs. ES256, a symmetric key
+                // served at jwks_uri) or a signature the key cannot even parse (JwsVerifyingException,
+                // RSA: wrong length): the client cannot be verified with what it registered. Message
+                // level, so a client that stops authenticating after a key rotation leaves a trace
+                // without an error and a stack trace per unauthenticated request.
+                if (logger.messageEnabled()) {
+                    logger.message("Client {} assertion with alg {} cannot be verified with its registered key: {}",
+                            getClientId(), signatureAlgorithm, e.toString());
+                }
                 return false;
             } catch (Exception e) {
                 throw Utils.createException("Client Bearer Jwt Public key", e, logger);
