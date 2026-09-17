@@ -13,12 +13,14 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.oauth2.core;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.forgerock.json.jose.common.JwtReconstruction;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jws.handlers.SigningHandler;
 import org.forgerock.util.time.TimeService;
@@ -156,5 +158,20 @@ public class OAuth2Jwt {
      */
     public SignedJwt getSignedJwt() {
         return jwt;
+    }
+
+    /**
+     * Gets the signing algorithm named in the JWS header.
+     *
+     * @return The signing algorithm, or {@code null} if the header names one this server does not
+     * know, which includes the RFC 7518 spelling {@code "none"}: {@code JwsHeader.getAlgorithm()}
+     * is {@code JwsAlgorithm.valueOf(alg)} and only maps the enum's own upper-case names.
+     */
+    public JwsAlgorithm getSigningAlgorithm() {
+        try {
+            return jwt.getHeader().getAlgorithm();
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }

@@ -656,21 +656,26 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
 
     @Override
     public boolean verifyJwtIdentity(final OAuth2Jwt jwt) {
-        // The JWT is either a client assertion (client_secret_jwt, private_key_jwt, jwt-bearer)
-        // signed by the client, or an ID token this server issued. In both cases the JWS header
-        // states how it was signed; id_token_signed_response_alg only describes the ID tokens we
-        // issue and says nothing about how the client signs its assertions. HMAC verification
-        // uses the client secret only and the asymmetric branch uses the client's public keys
-        // only, so the header cannot steer one key type into the other's verifier.
-        final JwsAlgorithm signatureAlgorithm = jwt.getSignedJwt().getHeader().getAlgorithm();
+        // The client signed this JWT (client_secret_jwt, private_key_jwt, jwt-bearer), so the JWS
+        // header states how; id_token_signed_response_alg only describes the ID tokens we issue.
+        // HMAC verification uses the client secret only and the asymmetric branch the client's
+        // registered keys only, so the header cannot steer one key type into the other's verifier.
+        // An algorithm outside the JwsAlgorithm enum (including the wire spelling "none") is null.
+        final JwsAlgorithm signatureAlgorithm = jwt.getSigningAlgorithm();
         if (signatureAlgorithm == null || signatureAlgorithm.getAlgorithmType() == JwsAlgorithmType.NONE) {
             return false;
         }
         if (signatureAlgorithm.getAlgorithmType() == JwsAlgorithmType.HMAC) {
             return verifyJwtBySharedSecret(jwt);
         } else {
+            final Client.PublicKeySelector selector = getClientPublicKeySelector();
+            if (selector == null) {
+                // Nothing registered to verify an asymmetric assertion with: invalid_client, not
+                // server_error, now that any client_id can be sent an assertion with this alg.
+                return false;
+            }
             try {
-                switch (getClientPublicKeySelector()) {
+                switch (selector) {
                     case JWKS:
                         return byJWKs(jwt);
                     case JWKS_URI:
@@ -682,6 +687,14 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                 throw Utils.createException("Client Bearer Jwt Public key", e, logger);
             }
         }
+    }
+
+    @Override
+    public boolean verifyIdTokenIdentity(final OAuth2Jwt idToken) {
+        // We issued the ID token with id_token_signed_response_alg, so the header must say so;
+        // the algorithm, and hence the key the token is verified with, is not the presenter's to pick.
+        final JwsAlgorithm configured = JwsAlgorithm.valueOf(getIDTokenSignedResponseAlgorithm());
+        return idToken.getSigningAlgorithm() == configured && verifyJwtIdentity(idToken);
     }
 
     @Override
@@ -723,7 +736,9 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
 
         final Key key = jwkMap.get(jwt.getSignedJwt().getHeader().getKeyId());
 
-        return key != null && jwt.isValid(getSigningHandlerForKey(key));
+        // Only asymmetric algorithms reach this branch; an oct JWK would be handed to an HMAC
+        // handler, which cannot verify them and would surface as a server error.
+        return key != null && !(key instanceof SecretKey) && jwt.isValid(getSigningHandlerForKey(key));
     }
 
     /**
@@ -832,7 +847,9 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
         } catch (IdRepoException | SSOException e) {
             throw Utils.createException(OAuth2Constants.OAuth2Client.PUBLIC_KEY_SELECTOR, e, logger);
         }
-        return Client.PublicKeySelector.fromString(set.iterator().next());
+        // As with idTokenSignedResponseAlg, the schema default is not applied to a client created
+        // through the realm-config REST endpoint or ssoadm; fromString() is null for an unknown value.
+        return Client.PublicKeySelector.fromString(CollectionUtils.getFirstItem(set));
     }
 
     /**

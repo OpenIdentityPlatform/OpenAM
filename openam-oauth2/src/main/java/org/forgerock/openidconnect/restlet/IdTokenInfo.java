@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect.restlet;
@@ -171,7 +171,7 @@ public class IdTokenInfo extends ServerResource {
             throw new BadRequestException("id_token has expired");
         }
 
-        if (!clientRegistration.verifyJwtIdentity(idToken)) {
+        if (!clientRegistration.verifyIdTokenIdentity(idToken)) {
             throw new BadRequestException("invalid id_token");
         }
 
