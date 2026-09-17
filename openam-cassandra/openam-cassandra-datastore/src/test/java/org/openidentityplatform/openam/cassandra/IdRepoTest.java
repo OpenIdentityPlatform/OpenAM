@@ -13,15 +13,20 @@ package org.openidentityplatform.openam.cassandra;
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 import static org.junit.Assert.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -30,12 +35,17 @@ import javax.security.auth.callback.PasswordCallback;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.IdRepoDuplicateObjectException;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdRepoUnsupportedOpException;
 import com.sun.identity.idm.IdType;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 
 import org.openidentityplatform.openam.cassandra.embedded.Server;
 import org.slf4j.Logger;
@@ -412,5 +422,116 @@ public class IdRepoTest {
 		assertTrue(((updated / 1000) - create) <= 1);
 
 		System.out.println(repo.getAttributes(null, IdType.USER, "9170000000",fields));
+	}
+
+	/**
+	 * Runs {@code call} and returns the lines {@link Repo} logged meanwhile.
+	 * Attribute values may carry userPassword, so a report must name the
+	 * attributes only.
+	 */
+	private static List<String> repoLog(ThrowingRunnable call) throws Throwable {
+		final ch.qos.logback.classic.Logger repoLogger=(ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Repo.class.getName());
+		final ListAppender<ILoggingEvent> appender=new ListAppender<>();
+		appender.start();
+		repoLogger.addAppender(appender);
+		try {
+			call.run();
+		}finally {
+			repoLogger.detachAppender(appender);
+		}
+		return appender.list.stream().map(ILoggingEvent::getFormattedMessage).collect(Collectors.toList());
+	}
+
+	/** Runs {@code call}, which must fail with {@code expected}, and returns what {@link Repo} logged. */
+	private static List<String> repoLogOf(Class<? extends Throwable> expected, ThrowingRunnable call) throws Throwable {
+		return repoLog(() -> assertThrows(expected, call));
+	}
+
+	private static void assertNamesOnly(List<String> log, String operation, String value) {
+		assertTrue(log.toString(), log.stream().anyMatch(m -> m.startsWith(operation) && m.contains("userPassword") && !m.contains("userPassword=")));
+		assertTrue(log.toString(), log.stream().noneMatch(m -> m.contains(value)));
+	}
+
+	@Test
+	public void setAttributes_failure_logs_attribute_names_only() throws Throwable {
+		// a null key cannot enter the case-insensitive map, so the operation fails
+		// before any statement runs
+		final Map<String, Set<String>> param=new HashMap<>();
+		param.put(null, Collections.singleton("x"));
+		param.put("userPassword", Collections.singleton("s3cret"));
+		assertNamesOnly(repoLogOf(IdRepoException.class,
+				() -> repo.setAttributes(null, IdType.USER, "9170000000", param, false)), "setAttributes", "s3cret");
+	}
+
+	@Test
+	public void setBinaryAttributes_logs_attribute_names_only() throws Throwable {
+		final Map<String, byte[][]> param=Collections.singletonMap("userPassword", new byte[][] {"s3cret".getBytes(StandardCharsets.UTF_8)});
+		assertNamesOnly(repoLogOf(IdRepoUnsupportedOpException.class,
+				() -> repo.setBinaryAttributes(null, IdType.USER, "9170000000", param, false)), "unsupported setBinaryAttributes", "[B@");
+	}
+
+	@Test
+	public void assignService_failure_logs_attribute_names_only() throws Throwable {
+		// the immutable map rejects the serviceName the method adds to it
+		final Map<String, Set<String>> param=Collections.singletonMap("userPassword", Collections.singleton("s3cret"));
+		assertNamesOnly(repoLogOf(IdRepoException.class,
+				() -> repo.assignService(null, IdType.USER, "9170000000", "svc", null, param)), "assignService", "s3cret");
+	}
+
+	@Test
+	public void unassignService_failure_logs_attribute_names_only() throws Throwable {
+		final Map<String, Set<String>> param=Collections.singletonMap("userPassword", Collections.singleton("s3cret"));
+		assertNamesOnly(repoLogOf(IdRepoException.class,
+				() -> repo.unassignService(null, IdType.USER, "9170000000", "svc", param)), "unassignService", "s3cret");
+	}
+
+	@Test
+	public void modifyService_failure_logs_attribute_names_only() throws Throwable {
+		final Map<String, Set<String>> param=Collections.singletonMap("userPassword", Collections.singleton("s3cret"));
+		assertNamesOnly(repoLogOf(IdRepoException.class,
+				() -> repo.modifyService(null, IdType.USER, "9170000000", "svc", null, param)), "modifyService", "s3cret");
+	}
+
+	@Test
+	public void search_failure_logs_filter_names_only() throws Throwable {
+		// a null value set fails the filter loop before any statement runs
+		final Map<String, Set<String>> avPairs=new HashMap<>();
+		avPairs.put("mail", null);
+		avPairs.put("userPassword", Collections.singleton("s3cret"));
+		assertNamesOnly(repoLogOf(IdRepoException.class,
+				() -> repo.search(null, IdType.USER, "*", 0, 1, null, true, Repo.AND_MOD, avPairs, false)), "search", "s3cret");
+	}
+
+	@Test
+	public void search_stopped_by_an_empty_and_filter_logs_filter_names_only() throws Throwable {
+		// an AND search whose first filter matches nothing stops early and reports the filters
+		final Map<String, Set<String>> avPairs=new HashMap<>();
+		avPairs.put("cn", Collections.singleton("nobody"));
+		avPairs.put("userPassword", Collections.singleton("s3cret"));
+		assertNamesOnly(repoLog(() -> assertEquals(0,
+				repo.search(null, IdType.USER, "*", 0, 0, null, true, Repo.AND_MOD, avPairs, false).getSearchResults().size())),
+				"break search by empty query", "s3cret");
+	}
+
+	@Test
+	public void removeAttributes_failure_logs_the_reason() throws Throwable {
+		final Set<String> attrNames=new HashSet<String>(Collections.singleton("cn")) {
+			@Override
+			public boolean remove(Object o) {
+				throw new IllegalStateException("boom");
+			}
+		};
+		final List<String> log=repoLogOf(IdRepoException.class,
+				() -> repo.removeAttributes(null, IdType.USER, "9170000000", attrNames));
+		assertTrue(log.toString(), log.stream().anyMatch(m -> m.startsWith("removeAttributes") && m.endsWith("[cn]: boom")));
+	}
+
+	@Test
+	public void getAttributes_failure_logs_the_requested_names() throws Throwable {
+		// a null attribute name fails before any statement runs
+		final Set<String> attrNames=new HashSet<>(Arrays.asList(null, "cn"));
+		final List<String> log=repoLogOf(IdRepoException.class,
+				() -> repo.getAttributes(null, IdType.USER, "9170000000", attrNames));
+		assertTrue(log.toString(), log.stream().anyMatch(m -> m.startsWith("getAttributes") && m.contains("cn")));
 	}
 }
