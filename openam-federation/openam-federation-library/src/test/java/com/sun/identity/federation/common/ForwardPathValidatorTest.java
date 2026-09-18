@@ -122,6 +122,56 @@ public class ForwardPathValidatorTest {
     }
 
     @DataProvider
+    public Object[][] forwardTargets() {
+        return new Object[][] {
+            // {path as received, the form handed to the RequestDispatcher}
+            {"/idpSSOInit.jsp", "/idpSSOInit.jsp"},
+            {"/console/my%20page.jsp", "/console/my page.jsp"},   // decoded once, as the container maps it
+            {"/console/a+b.jsp", "/console/a+b.jsp"},             // '+' stays literal
+            {"/console/a+b%20c.jsp", "/console/a+b c.jsp"},
+            {"/console/base;jsessionid=1/AMAdminFrame", "/console/base/AMAdminFrame"}, // parameter stripped
+            {"/console;x%2Fy/base/AMAdminFrame", "/console/base/AMAdminFrame"},      // encoded slash goes with it
+            {"/console//base/./AMAdminFrame", "/console//base/./AMAdminFrame"},      // the container collapses
+            {"/console/base/", "/console/base/"},                 // a trailing slash is a different mapping
+            {"/a/b..c/d", "/a/b..c/d"},                           // ".." inside a segment is an ordinary name
+            {"/x/.../y", "/x/.../y"},
+            {"/web-info/page.jsp", "/web-info/page.jsp"},
+            {"/UI/Login?goto=%2Fopenam%2Fconsole", "/UI/Login?goto=%2Fopenam%2Fconsole"}, // query kept as given
+            {"/saml2/jsp/idpSSOInit.jsp?metaAlias=%2Fidp&goto=%2F..%2FWEB-INF",
+                "/saml2/jsp/idpSSOInit.jsp?metaAlias=%2Fidp&goto=%2F..%2FWEB-INF"},
+            {"/console/my%20page.jsp?", "/console/my page.jsp?"},
+            {"/XUI/#login/", "/XUI/#login/"},
+        };
+    }
+
+    @Test(dataProvider = "forwardTargets")
+    public void forwardTargetIsTheFormTheContainerMaps(String path, String expected) {
+        assertThat(ForwardPathValidator.forwardTarget(path)).as(path).isEqualTo(expected);
+    }
+
+    @Test(dataProvider = "unsafeForwardPaths")
+    public void forwardTargetIsNullForAnUnsafePath(String path) {
+        assertThat(ForwardPathValidator.forwardTarget(path)).as(path).isNull();
+    }
+
+    @DataProvider
+    public Object[][] reservedSegmentsBelowTheRoot() {
+        return new Object[][] {
+            {"/x/WEB-INF/y.jsp"},
+            {"/x/web-inf/"},
+            {"/x/WEB-INF"},
+            {"/x;a/%57EB-INF/y.jsp"},
+        };
+    }
+
+    @Test(dataProvider = "reservedSegmentsBelowTheRoot")
+    public void forwardTargetRefusesAReservedSegmentAnywhere(String path) {
+        // isSafeForwardPath reserves the directory at the root only; no in-app path carries
+        // the name below it either, and the dispatcher form is refused when one does.
+        assertThat(ForwardPathValidator.forwardTarget(path)).as(path).isNull();
+    }
+
+    @DataProvider
     public Object[][] safeMetaAliases() {
         return new Object[][] {
             {"/idp"},
