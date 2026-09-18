@@ -25,7 +25,7 @@
  * $Id: OAMAdapter.java,v 1.4 2008/08/19 19:11:39 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.plugins;
@@ -275,6 +275,8 @@ public class OAMAdapter extends SAML2ServiceProviderAdapter {
                   System.out.println("User session: " + sessionid);
                   Cookie oamCookie = new Cookie(oamCookieName, sessionid);
                   oamCookie.setDomain(cookieDomain);
+                  oamCookie.setSecure(request.isSecure());
+                  oamCookie.setHttpOnly(true);
                   response.addCookie(oamCookie);
                }
             }
