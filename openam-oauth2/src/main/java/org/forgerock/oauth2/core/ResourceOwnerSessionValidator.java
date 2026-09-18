@@ -199,7 +199,8 @@ public class ResourceOwnerSessionValidator {
                     throw new LoginRequiredException();
                 }
             } else if (OAuth2Constants.TokenEndpoint.PASSWORD.equals(request.getParameter(GRANT_TYPE))
-                    || OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS.equals(request.getParameter(GRANT_TYPE))) {
+                    || OAuth2Constants.TokenEndpoint.CLIENT_CREDENTIALS.equals(request.getParameter(GRANT_TYPE))
+                    || OAuth2Constants.TokenEndpoint.DEVICE_CODE.equals(request.getParameter(GRANT_TYPE))) {
                 // If we're doing password grant type, the SSOToken will have been created and deleted again within
                 // OpenAMResourceOwnerAuthenticator. The request will not have a session, and so the token will have
                 // been null from the attempted creation in L148.

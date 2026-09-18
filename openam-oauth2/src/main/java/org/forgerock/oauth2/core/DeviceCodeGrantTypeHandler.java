@@ -85,36 +85,36 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
 
         String clientId = client.getClientId();
         DeviceCode deviceCode = tokenStore.readDeviceCode(clientId, code, request);
-
+        
         if (deviceCode == null ||
                 !clientId.equals(deviceCode.getClientId()) ||
                 !request.getParameter(REALM).equals(deviceCode.getRealm())) {
             throw new AuthorizationDeclinedException();
         }
+        
+        if (deviceCode.isAuthorized()) {
+            String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
+            Set<String> scope = deviceCode.getScope();
+            String resourceOwnerId = deviceCode.getResourceOwnerId();
+            String validatedClaims = providerSettings.validateRequestedClaims(
+                    deviceCode.getStringProperty(OAuth2Constants.Custom.CLAIMS));
 
-        try {
-            if (deviceCode.isAuthorized()) {
-                String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
-                Set<String> scope = deviceCode.getScope();
-                String resourceOwnerId = deviceCode.getResourceOwnerId();
-                String validatedClaims = providerSettings.validateRequestedClaims(
-                        deviceCode.getStringProperty(OAuth2Constants.Custom.CLAIMS));
-                return generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, scope,
-                        validatedClaims, request);
-            }
+            AccessToken accessToken = generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, scope,
+                    validatedClaims, deviceCode.getNonce(), request);
+            
+            providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken,request);
 
-            if (deviceCode.getExpiryTime() < currentTimeMillis()) {
-                throw new ExpiredTokenException();
-            }
-        } finally {
-            if(deviceCode.isAuthorized() || deviceCode.getExpiryTime() < currentTimeMillis()) {
-                try {
-                    tokenStore.deleteDeviceCode(clientId, code, request);
-                } catch (OAuth2Exception e) {
-                    logger.warn("Could not delete issued/expired device code", e);
-                }
-            }
+            tryDeleteDeviceCode(clientId, code, request);   // only once the response is complete
+            
+            return accessToken;
         }
+
+        
+        // only reachable when not authorized - the branch above returns
+        if (deviceCode.getExpiryTime() < currentTimeMillis()) {
+            throw new ExpiredTokenException();
+        }
+        
 
         try {
             final long lastPollTime = deviceCode.getLastPollTime();
@@ -130,9 +130,17 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
     }
 
     private AccessToken generateAccessToken(OAuth2ProviderSettings providerSettings, String grantType, String clientId,
-            String resourceOwnerId, Set<String> scope, String validatedClaims, OAuth2Request request)
+            String resourceOwnerId, Set<String> scope, String validatedClaims, String nonce, OAuth2Request request)
             throws ServerException, NotFoundException {
         return accessTokenGenerator.generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, null,
-                scope, validatedClaims, null, null, request);
+                scope, validatedClaims, null, nonce, request);
+    }
+    
+    private void tryDeleteDeviceCode(String clientId, String code, OAuth2Request request) {
+        try {
+            tokenStore.deleteDeviceCode(clientId, code, request);
+        } catch (OAuth2Exception e) {
+            logger.warn("Could not delete issued/expired device code", e);
+        }
     }
 }

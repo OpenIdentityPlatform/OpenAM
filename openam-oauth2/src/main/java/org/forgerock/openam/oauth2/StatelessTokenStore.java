@@ -17,7 +17,6 @@
 
 package org.forgerock.openam.oauth2;
 
-import static com.sun.identity.shared.DateUtils.stringToDate;
 import static org.forgerock.json.JsonValue.json;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Bearer.BEARER;
 import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
@@ -34,13 +33,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +48,6 @@ import java.util.stream.Collectors;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.iplanet.ums.IDynamicMembership;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
@@ -92,6 +88,7 @@ import org.forgerock.openam.cts.api.filter.TokenFilterBuilder;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.oauth2.OAuth2Constants.ProofOfPossession;
+import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.forgerock.openam.tokens.CoreTokenField;
 import org.forgerock.openam.utils.RealmNormaliser;
 import org.forgerock.openam.utils.StringUtils;
@@ -100,6 +97,7 @@ import org.forgerock.openidconnect.OpenIdConnectClientRegistrationStore;
 import org.forgerock.util.encode.Base64;
 import org.forgerock.util.query.QueryFilter;
 import org.joda.time.Duration;
+import org.restlet.Request;
 
 /**
  * Stateless implementation of the OAuth2 Token Store.
@@ -201,8 +199,10 @@ public class StatelessTokenStore implements TokenStore {
         //realmAccess.put("roles", new HashSet<>(Arrays.asList( new String[] {"admin", "user"} )));
         
         AuthorizationCode authCode = request.getToken(AuthorizationCode.class);
+        DeviceCode deviceCode = request.getToken(DeviceCode.class);
+
         if (authCode != null) {
-            String sessionId = authCode.getSessionId();
+        	String sessionId = authCode.getSessionId();
             if (StringUtils.isNotBlank(sessionId)) {
                 try {
                     final SSOTokenManager ssoTokenManager = SSOTokenManager.getInstance();
@@ -219,7 +219,7 @@ public class StatelessTokenStore implements TokenStore {
         
         String jwtId = UUID.randomUUID().toString();
         JwtClaimsSetBuilder claimsSetBuilder = jwtBuilder.claims()
-                .jti(jwtId)
+        		.jti(jwtId)
                 .exp(newDate(expiryTime.getMillis()))
                 .aud(Collections.singletonList(clientId))
                 .sub(resourceOwnerId)
@@ -238,7 +238,7 @@ public class StatelessTokenStore implements TokenStore {
                 .claim(AUDIT_TRACKING_ID, UUID.randomUUID().toString())
                 .claim(AUTH_GRANT_ID, refreshToken != null ? refreshToken.getAuthGrantId() : UUID.randomUUID().toString())
                 .claim(AUTH_TIME, authTime);
-
+        
         // Propagate authentication context (acr) and authentication modules (amr) into the
         // stateless JWT access token, mirroring the behaviour of createRefreshToken. The values
         // are sourced from the AuthorizationCode (authorization_code grant) or from the previous
@@ -246,18 +246,25 @@ public class StatelessTokenStore implements TokenStore {
         // the access token payload without an extra /oauth2/tokeninfo round-trip.
         String authModules = null;
         String acr = null;
+
         if (authCode != null) {
             authModules = authCode.getAuthModules();
             acr = authCode.getAuthenticationContextClassReference();
+        } else if (deviceCode != null) {
+            authModules = deviceCode.getAuthModules();
+            acr = deviceCode.getAcrValues();
         }
+        
         RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
         if (currentRefreshToken != null) {
             authModules = currentRefreshToken.getAuthModules();
             acr = currentRefreshToken.getAuthenticationContextClassReference();
         }
-        if (authModules != null) {
-            claimsSetBuilder.claim(AUTH_MODULES, authModules);
+        
+        if (authModules != null){
+             claimsSetBuilder.claim(AUTH_MODULES, authModules);
         }
+        
         if (acr != null) {
             claimsSetBuilder.claim(ACR, acr);
         }
@@ -277,6 +284,7 @@ public class StatelessTokenStore implements TokenStore {
         if (authModules != null) {
             accessTokenContext.put("amr", authModules);
         }
+
         Map<String, Object> modifiedClaims = accessTokenModifier.getModifiedClaims(request, realm, resourceOwnerId,
                 clientId, scope, accessTokenContext);
         for (Map.Entry<String, Object> entry : modifiedClaims.entrySet()) {
@@ -534,22 +542,30 @@ public class StatelessTokenStore implements TokenStore {
         for(org.forgerock.oauth2.core.Token token : request.getTokens()) {
         	if(token instanceof AuthorizationCode) {
         		claimsSetBuilder.claim(NONCE, ((AuthorizationCode)token).getNonce());
+        	} else if(token instanceof DeviceCode) {
+        		claimsSetBuilder.claim(NONCE, ((DeviceCode)token).getNonce());
         	}
         }
+        
+        
         String authModules = null;
         String acr = null;
         AuthorizationCode authorizationCode = request.getToken(AuthorizationCode.class);
+        DeviceCode deviceCode = request.getToken(DeviceCode.class);
         if (authorizationCode != null) {
             authModules = authorizationCode.getAuthModules();
             acr = authorizationCode.getAuthenticationContextClassReference();
+        } else if (deviceCode != null) {
+            authModules = deviceCode.getAuthModules();
+            acr = deviceCode.getAcrValues();
         }
-
+        
         RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
         if (currentRefreshToken != null) {
             authModules = currentRefreshToken.getAuthModules();
             acr = currentRefreshToken.getAuthenticationContextClassReference();
         }
-
+     
         if (authModules != null) {
             claimsSetBuilder.claim(AUTH_MODULES, authModules);
         }
@@ -559,7 +575,7 @@ public class StatelessTokenStore implements TokenStore {
         if (!StringUtils.isBlank(validatedClaims)) {
             claimsSetBuilder.claim(CLAIMS, validatedClaims);
         }
-
+        
         // Run the configured OAuth2 Access Token Modification script (script context
         // OAUTH2_ACCESS_TOKEN_MODIFICATION) and merge any returned claims into the refresh token, so
         // that custom claims survive the refresh cycle.
@@ -878,4 +894,5 @@ public class StatelessTokenStore implements TokenStore {
         map.put(SCOPE, token.getScope());
         return json(map);
     }
+    
 }
