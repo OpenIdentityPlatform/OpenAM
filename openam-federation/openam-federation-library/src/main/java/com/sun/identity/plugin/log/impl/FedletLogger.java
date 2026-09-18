@@ -24,6 +24,7 @@
  *
  * $Id: FedletLogger.java,v 1.3 2008/08/06 17:28:14 exu Exp $
  *
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.plugin.log.impl;
@@ -124,20 +125,32 @@ public class FedletLogger implements com.sun.identity.plugin.log.Logger {
         }
    }
    
-    private static String formatMessage(String messageId, String[] param,
+    static String formatMessage(String messageId, String[] param,
         Object session) {
         if ((param == null) || (param.length == 0)) {
             return messageId;
         } else {
             for (int i = 0; i < param.length; i++) {
-                messageId = messageId + "\n{" + param[i] + "}";
+                messageId = messageId + "\n{" + escapeLineBreaks(param[i]) + "}";
             }
             if (session != null) {
-                messageId = messageId + "\n{" + session.toString() + "}";
+                messageId = messageId + "\n{" + escapeLineBreaks(session.toString()) + "}";
             }
             return messageId;
         }
-    } 
+    }
+
+    /**
+     * Each parameter is written on a braced line of its own; a line break inside one is
+     * request data and is written as the escape it stands for, so it cannot leave the braces
+     * and start a line that reads as another record.
+     */
+    private static String escapeLineBreaks(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replace("\r", "\\r").replace("\n", "\\n");
+    }
     
     /**
      * Logs error messages to the error logs.
