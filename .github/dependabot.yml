@@ -20,6 +20,10 @@ updates:
     schedule:
       interval: "weekly"
     groups:
+      # One pull request per week for all action updates instead of one per action.
       github-actions:
         patterns:
           - "*"
+    labels:
+      - "ci"
+      - "dependencies"
