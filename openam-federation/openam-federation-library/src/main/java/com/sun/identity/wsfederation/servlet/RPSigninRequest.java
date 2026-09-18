@@ -25,7 +25,7 @@
  * $Id: RPSigninRequest.java,v 1.9 2009/11/03 00:48:54 madan_ranganath Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -51,6 +51,7 @@ import com.sun.identity.wsfederation.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement;
 import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
+import org.openidentityplatform.openam.federation.plugins.RealmGotoUrlValidator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -97,12 +98,6 @@ public class RPSigninRequest extends WSFederationAction {
             debug.message(classMethod+"entered method");
         }
 
-        if (wctx == null || wctx.length() == 0){
-            // Exchange reply URL for opaque identifier
-            wctx = (wreply != null && (wreply.length() > 0)) ? 
-                WSFederationUtils.putReplyURL(wreply) : null;
-        }
-
         String spMetaAlias = WSFederationMetaUtils.getMetaAliasByUri(
                                             request.getRequestURI());
 
@@ -112,7 +107,24 @@ public class RPSigninRequest extends WSFederationAction {
         }
 
         String spRealm = SAML2MetaUtils.getRealmByMetaAlias(spMetaAlias);
-        
+
+        if (wctx == null || wctx.length() == 0){
+            if (wreply != null && (wreply.length() > 0)) {
+                // The browser is sent to wreply once the sign-in completes;
+                // the realm's Valid goto URL list decides whether it may be.
+                if (!RealmGotoUrlValidator.isValid(wreply, spRealm)) {
+                    debug.warning(classMethod
+                        + "refusing a wreply outside the realm's valid goto URLs");
+                    throw new WSFederationException(
+                        WSFederationUtils.bundle.getString("invalidWreply"));
+                }
+                // Exchange reply URL for opaque identifier
+                wctx = WSFederationUtils.putReplyURL(wreply);
+            } else {
+                wctx = null;
+            }
+        }
+
         WSFederationMetaManager metaManager = 
             WSFederationUtils.getMetaManager();
         String spEntityId = 
