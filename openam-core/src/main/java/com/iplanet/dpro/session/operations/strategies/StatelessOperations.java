@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.operations.strategies;
@@ -105,18 +105,20 @@ public class StatelessOperations implements SessionOperations {
      * sessions even when the request was initiated using a stateless session.
      * Since stateless sessions are not tracked by OpenAM, it is not possible to query for them.
      *
+     * @param caller {@inheritDoc}
      * @param crestQuery {@inheritDoc}
      * @return {@inheritDoc}
      * @throws SessionException {@inheritDoc}
      */
     @Override
-    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
-        return localOperations.getMatchingSessions(crestQuery);
+    public Collection<PartialSession> getMatchingSessions(Session caller, CrestQuery crestQuery)
+            throws SessionException {
+        return localOperations.getMatchingSessions(caller, crestQuery);
     }
 
     @Override
     public void destroy(final Session requester, final Session session) throws SessionException {
-        sessionChangeAuthorizer.checkPermissionToDestroySession(requester, session.getSessionID());
+        sessionChangeAuthorizer.checkPermissionToDestroySession(requester, session);
         blacklist(session, SessionEventType.DESTROY);
     }
 

@@ -22,6 +22,7 @@ import static org.forgerock.openam.utils.Time.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
@@ -428,23 +429,81 @@ public final class EntitlementUtils {
      * This is so that older systems which used the canonical name to refer to the class to instantiate
      * correctly find their class. This may also fail.
      *
-     * If this fails, we simply return the default: {@link DenyOverride}.
+     * If this fails — the class cannot be loaded, or is not an instantiable {@link EntitlementCombiner}
+     * subtype — we simply return the default: {@link DenyOverride}. Callers that must surface an invalid
+     * name to the caller instead of silently falling back should use
+     * {@link #resolveEntitlementCombiner(String)}.
      *
      * @param name the name used to reference the combiner. Must not be null.
      * @return the class represented by the name
      */
     public static Class<? extends EntitlementCombiner> getEntitlementCombiner(String name) {
         Reject.ifNull(name);
-        Class<? extends EntitlementCombiner> combinerClass = registry.getCombinerType(name);
-        if (combinerClass != null) {
-            return combinerClass;
-        }
         try {
-            return Class.forName(name).asSubclass(EntitlementCombiner.class);
+            return resolveEntitlementCombiner(name);
         } catch (ClassNotFoundException ex) {
             PolicyConstants.DEBUG.error("EntitlementService.getEntitlementCombiner", ex);
         }
         return DenyOverride.class;
+    }
+
+    /**
+     * Strict variant of {@link #getEntitlementCombiner(String)}: resolves a combiner short name via the
+     * {@link org.forgerock.openam.entitlement.EntitlementRegistry}, or a canonical class name via
+     * {@link #resolveExtensionClass(String, Class)}, and throws instead of falling back to
+     * {@link DenyOverride} when the name is rejected. Intended for request-supplied names (e.g. the
+     * Applications REST endpoint), where an invalid name must produce an error rather than silently
+     * configure a different combiner.
+     *
+     * @param name the name used to reference the combiner. Must not be null.
+     * @return the class represented by the name, guaranteed to be an instantiable
+     *         {@link EntitlementCombiner} implementation
+     * @throws ClassNotFoundException if the name matches no registered combiner and cannot be resolved
+     *         to an instantiable {@link EntitlementCombiner} subtype
+     */
+    public static Class<? extends EntitlementCombiner> resolveEntitlementCombiner(String name)
+            throws ClassNotFoundException {
+        Reject.ifNull(name);
+        Class<? extends EntitlementCombiner> combinerClass = registry.getCombinerType(name);
+        if (combinerClass != null) {
+            return combinerClass;
+        }
+        return resolveExtensionClass(name, EntitlementCombiner.class);
+    }
+
+    /**
+     * Safely resolves an attacker- or config-supplied class name into a concrete implementation of an
+     * expected entitlement extension interface (e.g. {@code ISearchIndex}, {@code ISaveIndex},
+     * {@code ResourceName}).
+     * <p>
+     * The class is loaded WITHOUT running its static initializer (the three-argument
+     * {@link Class#forName(String, boolean, ClassLoader)} form with {@code initialize == false}) and is
+     * validated to be an instantiable subtype of {@code expectedType} <em>before</em> it is ever
+     * instantiated by the caller. This prevents loading and instantiating arbitrary classpath classes
+     * with dangerous static-initializer or no-arg-constructor side effects (unsafe reflection, CWE-470).
+     *
+     * @param className the requested implementation class name
+     * @param expectedType the interface the class must implement
+     * @param <T> the expected interface type
+     * @return the validated class, guaranteed to be an instantiable subtype of {@code expectedType}
+     * @throws ClassNotFoundException if the class cannot be loaded, or is not an instantiable subtype of
+     *         {@code expectedType}
+     */
+    public static <T> Class<? extends T> resolveExtensionClass(String className, Class<T> expectedType)
+            throws ClassNotFoundException {
+        final Class<?> clazz;
+        try {
+            clazz = Class.forName(className, false, expectedType.getClassLoader());
+        } catch (LinkageError e) {
+            throw new ClassNotFoundException("Unable to load class " + className, e);
+        }
+        // Modifier.isAbstract is true for interfaces as well as abstract classes, so this one check
+        // rejects every non-instantiable type.
+        if (!expectedType.isAssignableFrom(clazz) || Modifier.isAbstract(clazz.getModifiers())) {
+            throw new ClassNotFoundException(
+                    className + " is not an instantiable " + expectedType.getSimpleName() + " implementation");
+        }
+        return clazz.asSubclass(expectedType);
     }
 
     /**

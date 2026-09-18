@@ -25,9 +25,11 @@
  * $Id: AndCondition.java,v 1.3 2010/01/12 21:29:58 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.entitlement;
 
+import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.utils.CollectionUtils;
 
 import javax.security.auth.Subject;
@@ -73,6 +75,17 @@ public class AndCondition extends LogicalCondition {
      */
     public ConditionDecision evaluate(String realm, Subject subject, String resourceName,
                                       Map<String, Set<String>> environment) throws EntitlementException {
+
+        if (isMemberRejected()) {
+            // A member class name was refused while deserialising this policy, so at least one AND
+            // constraint is missing. Since an empty AND set is satisfied, evaluating the remainder
+            // would silently grant what the stored policy restricts: fail the condition instead.
+            PolicyConstants.DEBUG.error(
+                "AndCondition.evaluate: failing, policy contains a rejected member condition");
+            return ConditionDecision
+                    .newFailureBuilder()
+                    .build();
+        }
 
         Set<EntitlementCondition> conditions = getEConditions();
 

@@ -198,7 +198,7 @@ public class ErrorReport {
 
         if (isProductionMode()) {
             Locale locale = request.getLocale();
-            ResourceBundle bundle = org.apache.click.util.ClickUtils.getBundle("click-control", locale);
+            ResourceBundle bundle = ClickUtils.getBundle("click-control", locale);
             return bundle.getString("production-error-message");
         }
 
@@ -424,7 +424,7 @@ public class ErrorReport {
                 parseMsg = message.substring(startIndex + 1, endIndex);
             }
 
-            parseMsg = org.apache.click.util.ClickUtils.escapeHtml(parseMsg);
+            parseMsg = ClickUtils.escapeHtml(parseMsg);
 
             parseMsg = StringUtils.replace(parseMsg, "...", ", &#160;");
 
@@ -436,7 +436,7 @@ public class ErrorReport {
             String value =
                     (cause.getMessage() != null) ? cause.getMessage() : "null";
 
-            return org.apache.click.util.ClickUtils.escapeHtml(value);
+            return ClickUtils.escapeHtml(value);
         }
     }
 
@@ -590,7 +590,7 @@ public class ErrorReport {
 
                 } else {
                     if (isParseError()) {
-                        buffer.append(org.apache.click.util.ClickUtils.escapeHtml(line));
+                        buffer.append(ClickUtils.escapeHtml(line));
                     } else {
                         buffer.append(getRenderJavaLine(line));
                     }
@@ -604,7 +604,7 @@ public class ErrorReport {
 
         } catch (IOException ioe) {
             buffer.append("Could not load page source: ");
-            buffer.append(org.apache.click.util.ClickUtils.escapeHtml(ioe.toString()));
+            buffer.append(ClickUtils.escapeHtml(ioe.toString()));
         } finally {
             try {
                 sourceReader.close();
@@ -632,7 +632,7 @@ public class ErrorReport {
         HtmlStringBuffer buffer
                 = new HtmlStringBuffer(sw.toString().length() + 80);
         buffer.append("<pre><tt style='font-size:10pt;'>");
-        buffer.append(org.apache.click.util.ClickUtils.escapeHtml(sw.toString().trim()));
+        buffer.append(ClickUtils.escapeHtml(sw.toString().trim()));
         buffer.append("</tt></pre>");
 
         return buffer.toString();
@@ -653,7 +653,7 @@ public class ErrorReport {
             buffer.append(key);
             buffer.append("=");
             if (value != null) {
-                buffer.append(org.apache.click.util.ClickUtils.escapeHtml(value.toString()));
+                buffer.append(ClickUtils.escapeHtml(value.toString()));
             } else {
                 buffer.append("null");
             }

@@ -16,6 +16,8 @@
 
 package org.openidentityplatform.openam.mcp.server.security;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,17 +26,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openidentityplatform.openam.mcp.server.config.OpenAMConfig;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -226,5 +234,122 @@ class AuthInterceptorTest {
         assertThat(result).isTrue();
         assertThat(req.getAttribute("tokenId")).isEqualTo(newToken);
         assertThat(tokenCache.getIfPresent("login-password-token")).isEqualTo(newToken);
+    }
+
+    @Test
+    void maskToken_replacesTheTokenWithAShortDigest() {
+        assertThat(AuthInterceptor.maskToken("AQIC5wM2LY4SfczntBcXfFoFJwA6zAV2i4fnU8Sd7ao")).isEqualTo("sha256:983d2944");
+        // Every session id starts with the same "AQIC" header, so a prefix could not
+        // tell two of them apart; the digest can.
+        assertThat(AuthInterceptor.maskToken("AQIC5wM2LY4Sfczn-expired-session-token")).isEqualTo("sha256:d5989e92");
+        assertThat(AuthInterceptor.maskToken("AQIC5wM2LY4Sfczn-fresh-session-token")).isEqualTo("sha256:b8150354");
+        assertThat(AuthInterceptor.maskToken(null)).isEqualTo("null");
+    }
+
+    /**
+     * A session id or an access token in the log file lets anyone who can read
+     * the logs hijack that session, so the interceptor must never log them raw.
+     */
+    @Test
+    void preHandleUsernamePassword_doesNotLogRawToken_whenRefreshing() throws Exception {
+        String expiredToken = "AQIC5wM2LY4Sfczn-expired-session-token";
+        String freshToken   = "AQIC5wM2LY4Sfczn-fresh-session-token";
+        tokenCache.put("login-password-token", expiredToken);
+
+        AuthInterceptor spy = spy(interceptor);
+        doReturn(1L).when(spy).tokenValidSeconds(expiredToken);
+        doReturn(freshToken).when(spy).getUserNamePasswordToken();
+        doReturn(300L).when(spy).tokenValidSeconds(freshToken);
+
+        List<String> messages = captureLogs(() -> spy.preHandleUsernamePassword(new MockHttpServletRequest()));
+
+        assertThat(messages).anyMatch(m -> m.contains(
+                "token " + AuthInterceptor.maskToken(expiredToken) + " is about to expire"));
+        assertThat(messages).noneMatch(m -> m.contains(expiredToken));
+        assertThat(messages).noneMatch(m -> m.contains(freshToken));
+    }
+
+    @Test
+    void preHandleOAuth_doesNotLogRawSessionToken_whenRefreshing() {
+        String accessToken  = "f3c1a9e0-access-token-value";
+        String expiredToken = "AQIC5wM2LY4Sfczn-expired-session-token";
+        tokenCache.put(accessToken, expiredToken);
+
+        MockHttpServletRequest req = new MockHttpServletRequest();
+        req.addHeader("Authorization", "Bearer " + accessToken);
+
+        AuthInterceptor spy = spy(interceptor);
+        doReturn(true).when(spy).accessTokenValid(accessToken);
+        doReturn(1L).when(spy).tokenValidSeconds(expiredToken);
+
+        List<String> messages = captureLogs(() -> {
+            try {
+                spy.preHandleOAuth(req, new MockHttpServletResponse());
+            } catch (Exception ignored) {
+                // The mocked RestClient cannot mint a new token; the log line
+                // under test is written before that call.
+            }
+        });
+
+        assertThat(messages).anyMatch(m -> m.contains(
+                "token " + AuthInterceptor.maskToken(expiredToken) + " is about to expire"));
+        assertThat(messages).noneMatch(m -> m.contains(expiredToken));
+    }
+
+    @Test
+    void accessTokenValid_doesNotLogRawAccessTokenOrClaims_onInvalidResponse() {
+        String accessToken = "f3c1a9e0-access-token-value";
+
+        // userinfo answers without a "name" (a token without the profile scope): the
+        // token must be reported as invalid without echoing it, or the user's
+        // claims, into the log.
+        @SuppressWarnings("rawtypes")
+        RestClient.RequestHeadersUriSpec uriSpec = mock(RestClient.RequestHeadersUriSpec.class);
+        RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
+        doReturn(uriSpec).when(restClient).get();
+        doReturn(uriSpec).when(uriSpec).uri(anyString());
+        doReturn(uriSpec).when(uriSpec).header(anyString(), any(String[].class));
+        doReturn(responseSpec).when(uriSpec).retrieve();
+        doReturn(Map.of("sub", "demo", "email", "demo@example.com"))
+                .when(responseSpec).body(any(ParameterizedTypeReference.class));
+
+        List<String> messages = captureLogs(() -> assertThat(interceptor.accessTokenValid(accessToken)).isFalse());
+
+        assertThat(messages).anyMatch(m -> m.contains("got invalid response")
+                && m.contains("email") && m.contains("for access token: " + AuthInterceptor.maskToken(accessToken)));
+        assertThat(messages).noneMatch(m -> m.contains(accessToken));
+        assertThat(messages).noneMatch(m -> m.contains("demo@example.com"));
+    }
+
+    /**
+     * The only warning that attaches an exception: neither the message nor the
+     * exception may carry the session id that could not be checked.
+     */
+    @Test
+    void tokenValidSeconds_doesNotLogRawTokenId_whenOpenAMFails() {
+        String tokenId = "AQIC5wM2LY4Sfczn-failing-session-token";
+        when(restClient.post()).thenThrow(new IllegalStateException("OpenAM unreachable"));
+
+        List<String> messages = captureLogs(() -> assertThat(interceptor.tokenValidSeconds(tokenId)).isEqualTo(-1L));
+
+        assertThat(messages).anyMatch(m -> m.contains("error getting token properties") && m.contains("OpenAM unreachable"));
+        assertThat(messages).noneMatch(m -> m.contains(tokenId));
+    }
+
+    private static List<String> captureLogs(Runnable action) {
+        ch.qos.logback.classic.Logger logger =
+                (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(AuthInterceptor.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        try {
+            action.run();
+        } finally {
+            logger.detachAppender(appender);
+        }
+        return appender.list.stream()
+                .map(e -> e.getFormattedMessage()
+                        + (e.getThrowableProxy() == null ? "" : " " + e.getThrowableProxy().getMessage()))
+                .collect(Collectors.toList());
     }
 }

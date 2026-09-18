@@ -27,6 +27,7 @@
 
 /*
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.ConditionDecision;
+import com.sun.identity.entitlement.EntitlementClassResolver;
 import com.sun.identity.entitlement.EntitlementConditionAdaptor;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.policy.PolicyException;
@@ -238,9 +240,16 @@ public class PolicyCondition extends  EntitlementConditionAdaptor {
     @JsonIgnore
     public Condition getPolicyCondition() throws EntitlementException {
         try {
-            Condition cond = Class.forName(className).asSubclass(Condition.class).newInstance();
+            // Resolve without running the target's static initializer and reject any class that is
+            // not an instantiable com.sun.identity.policy Condition BEFORE it is constructed
+            // (unsafe reflection, CWE-470).
+            Condition cond = EntitlementClassResolver.newInstance(className, Condition.class);
             cond.setProperties(properties);
             return cond;
+        } catch (EntitlementClassResolver.RejectedTypeException rte) {
+            // The class is on the classpath but is not an instantiable Condition. Report it as a
+            // type mismatch rather than as a missing class, which would misdirect the administrator.
+            throw new EntitlementException(POLICY_CLASS_CAST_EXCEPTION, new String[]{className, Condition.class.getName()}, rte);
         } catch (ClassNotFoundException cnfe) {
             throw new EntitlementException(UNKNOWN_POLICY_CLASS, new String[]{className}, cnfe);
         } catch (ClassCastException cce) {

@@ -80,6 +80,7 @@ import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.w3c.dom.Node;
@@ -92,8 +93,30 @@ public class FSServiceUtils {
     private static IDFFMetaManager metaManager = null;
     private static MessageFactory fac = null;
     private static List cookieList = null;
-    private static boolean signingOn = false;
-    private static boolean signingOptional = false;
+
+    /**
+     * System property key: whether ID-FF messages are signed and verified.
+     * Three-valued: <code>true</code>, <code>optional</code> (the default) or
+     * <code>false</code>.
+     * <p>
+     * In server mode this resolves through <code>serverAttributeMap</code> to
+     * the <code>XMLSigningOn</code> attribute of the
+     * <code>sunFAMIDFFConfiguration</code> service, so it reflects the current
+     * console setting.
+     */
+    private static final String PROP_SIGNING_ON =
+        "com.sun.identity.federation.services.signingOn";
+
+    /**
+     * System property key: whether inbound ID-FF requests for state-changing /
+     * disclosure operations must carry a verified signature. Applies to both
+     * the SOAP binding (<code>/SOAPReceiver</code>) and the HTTP-Redirect
+     * binding (<code>/ProcessTermination</code>, <code>/ProcessLogout</code>
+     * and <code>/ProcessRegistration</code>).
+     */
+    private static final String PROP_REQUIRE_SIGNATURE =
+        "com.sun.identity.federation.services.requireSignature";
+
     private static final String templatePath =
         Constants.FILE_SEPARATOR + IFSConstants.CONFIG_DIR +
         Constants.FILE_SEPARATOR + IFSConstants.FEDERATION_DIR;
@@ -108,16 +131,34 @@ public class FSServiceUtils {
             ex.printStackTrace ();
         }
 
-        String signing = SystemConfigurationUtil.getProperty(
-            "com.sun.identity.federation.services.signingOn", "optional");
-        if (signing.equalsIgnoreCase(IFSConstants.TRUE)) {
-            signingOn = true;
-        } else if (signing.equalsIgnoreCase(IFSConstants.OPTIONAL)) {
-            signingOptional = true;
-        }
         metaManager = FSUtils.getIDFFMetaManager();
 
     };
+
+    /**
+     * Returns the configured signing mode, normalised for comparison.
+     * <p>
+     * Read on every call rather than cached in a static initialiser: in server
+     * mode the value comes from the <code>XMLSigningOn</code> console setting,
+     * and caching it meant an administrator changing that setting saw no effect
+     * until the server was restarted.
+     * <p>
+     * Note that <code>SystemConfigurationUtil.getProperty(key, default)</code>
+     * substitutes the default only for a null value, not for a blank one, so a
+     * blank entry is normalised here as well; otherwise it would match neither
+     * <code>true</code> nor <code>optional</code> and silently turn signing off.
+     *
+     * @return one of <code>true</code>, <code>optional</code> or
+     *  <code>false</code>; never <code>null</code>.
+     */
+    private static String getSigningMode() {
+        String mode = SystemConfigurationUtil.getProperty(
+            PROP_SIGNING_ON, IFSConstants.OPTIONAL);
+        if (mode == null || mode.trim().length() == 0) {
+            return IFSConstants.OPTIONAL;
+        }
+        return mode.trim();
+    }
 
     // constructor
     private FSServiceUtils () {
@@ -127,23 +168,73 @@ public class FSServiceUtils {
      * Returns <code>true</code> if signing is enabled; otherwise, it will
      * return false. If signing is enabled, all the liberty requests/responses
      * must be signed/verfied.
+     * <p>
+     * Reflects the current <code>XMLSigningOn</code> setting: changing it no
+     * longer requires a restart.
      * @return <code>true</code> if signing is on; otherwise, return
      *  <code>false</code>
      */
     public static boolean isSigningOn () {
-        return signingOn;
+        return IFSConstants.TRUE.equalsIgnoreCase(getSigningMode());
     }
-    
+
+    /**
+     * Returns <code>true</code> when inbound ID-FF requests for state-changing
+     * / disclosure operations (federation termination, name registration,
+     * single logout and name-identifier mapping) MUST carry a verified XML
+     * signature.
+     * <p>
+     * Defaults to <code>true</code> so that the default-off
+     * {@link #isSigningOn signingOn} setting can no longer silently
+     * short-circuit signature verification on these unauthenticated entry
+     * points. Read on every call so the policy can be changed without a
+     * restart.
+     * <p>
+     * Only the exact value <code>false</code> disables enforcement: any other
+     * value, including a malformed one, leaves it on.
+     *
+     * @return <code>true</code> if unsigned sensitive operations must be
+     *  rejected; otherwise <code>false</code>.
+     */
+    private static boolean isSignatureRequired() {
+        // SystemPropertiesManager.get(key, default) falls back to the default
+        // on a null or blank value but returns the raw value otherwise -- it
+        // does NOT trim -- so trim here: without it "false " would parse as
+        // "not false" and, worse, "true " would parse as "not true".
+        String value =
+            SystemPropertiesManager.get(PROP_REQUIRE_SIGNATURE, "true").trim();
+        return !IFSConstants.FALSE.equalsIgnoreCase(value);
+    }
+
+    /**
+     * Returns <code>true</code> when a verified XML signature must be enforced
+     * on inbound ID-FF state-changing / disclosure operations, i.e. when
+     * signing is globally on ({@link #isSigningOn}) or signatures are required
+     * for these operations. This is the single policy predicate used by
+     * <code>FSSOAPReceiver</code> and by the HTTP-Redirect binding servlets so
+     * that every one of these operations gates signature verification
+     * identically.
+     *
+     * @return <code>true</code> if the request signature must be verified;
+     *  otherwise <code>false</code>.
+     */
+    public static boolean isSignatureVerificationRequired() {
+        return isSigningOn() || isSignatureRequired();
+    }
+
     /**
      * Returns <code>true</code> if signing is optional else it will return
-     * <code>false</code>. If signing is optional, sign/verfy 
+     * <code>false</code>. If signing is optional, sign/verfy
      * <code>Response/Assertion</code> only if it is required by the
      * specification.
+     * <p>
+     * Reflects the current <code>XMLSigningOn</code> setting: changing it no
+     * longer requires a restart.
      * @return <code>true</code> if signing is optional; otherwise return
      *  <code>false</code>
      */
     public static boolean isSigningOptional () {
-        return signingOptional;
+        return IFSConstants.OPTIONAL.equalsIgnoreCase(getSigningMode());
     }
     
     /**

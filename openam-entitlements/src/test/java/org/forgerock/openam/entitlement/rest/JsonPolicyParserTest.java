@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.entitlement.rest;
@@ -53,10 +54,14 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.fail;
 import static org.forgerock.json.JsonValue.*;
 
 public class JsonPolicyParserTest {
     private static final String POLICY_NAME = "aPolicy";
+
+    /** Stands in for a member class name that cannot be resolved to an entitlement type. */
+    private static final String UNRESOLVABLE_CLASS = "com.example.NoSuchCondition";
 
     private JsonPolicyParser parser;
 
@@ -715,6 +720,118 @@ public class JsonPolicyParserTest {
                 .isEqualTo(staticAttrName);
         assertThat(result.get(new JsonPointer("resourceAttributes/1/propertyValues")).asList(String.class))
                 .containsOnlyElementsOf(staticAttrValue);
+    }
+
+    @Test
+    public void shouldNotExposeARefusedMemberInTheRestRepresentation() throws Exception {
+        // Given - what the store hands back for a policy whose only member class name was refused
+        // while it was being read (GHSA-573r-mwh6-jw8j). The refusal is kept in the entitlement
+        // state, so the wrapper stays fail-closed for evaluation and for a re-save.
+        AndCondition and = damagedAndCondition();
+        assertThat(and.isMemberRejected()).isTrue();
+        assertThat(and.getState()).contains(UNRESOLVABLE_CLASS);
+
+        Privilege policy = new StubPrivilege();
+        policy.setCondition(and);
+
+        // When
+        JsonValue result = parser.printPolicy(policy);
+
+        // Then - the REST representation binds the wrapper through its members only (getState() is
+        // @JsonIgnore in JsonEntitlementConditionMixin), so it has nowhere to put the refused
+        // member: the read renders an empty AND.
+        assertThat(result.get(new JsonPointer("condition/type")).asString()).isEqualTo("AND");
+        assertThat(result.get(new JsonPointer("condition/conditions")).asList()).isEmpty();
+        assertThat(result.get(new JsonPointer("condition/state"))).isNull();
+    }
+
+    @Test
+    public void shouldRejectARoundTrippedPolicyWhoseLogicalConditionLostEveryMember() throws Exception {
+        // Given - the representation above, written back: this is exactly what policy copy/move
+        // does (read -> rename -> create).
+        Privilege policy = new StubPrivilege();
+        policy.setCondition(damagedAndCondition());
+        JsonValue printed = parser.printPolicy(policy);
+
+        // When
+        try {
+            parser.parsePolicy(POLICY_NAME, buildJson(field("condition", printed.get("condition").getObject())));
+            fail("Expected an emptied logical condition to be refused on write");
+        } catch (EntitlementException ex) {
+            // Then - an emptied logical condition never reaches the store, so it cannot come back
+            // from it as a genuine empty AND, which is satisfied, i.e. an unconditional grant.
+            assertThat(ex.getErrorCode()).isEqualTo(EntitlementException.PROPERTY_VALUE_NOT_DEFINED);
+        }
+    }
+
+    @Test
+    public void shouldRejectAPolicyWhoseNestedLogicalConditionHasNoMembers() throws Exception {
+        // Given - the same thing one level down, where the outer wrapper is well formed
+        JsonValue content = buildJson(field("condition",
+                object(field("type", "AND"),
+                       field("conditions", Collections.singletonList(
+                               object(field("type", "OR"), field("conditions", array())))))));
+
+        // When
+        try {
+            parser.parsePolicy(POLICY_NAME, content);
+            fail("Expected a nested empty logical condition to be refused on write");
+        } catch (EntitlementException ex) {
+            // Then - LogicalCondition.validate() recurses into its members
+            assertThat(ex.getErrorCode()).isEqualTo(EntitlementException.PROPERTY_VALUE_NOT_DEFINED);
+        }
+    }
+
+    @Test(expectedExceptions = EntitlementException.class)
+    public void shouldRejectAPolicyWhoseLogicalSubjectLostEveryMember() throws Exception {
+        // Given - the subject-side counterpart: an emptied AndSubject is satisfied by everyone
+        JsonValue content = buildJson(field("subject",
+                object(field("type", "AND"), field("subjects", array()))));
+
+        // When
+        parser.parsePolicy(POLICY_NAME, content);
+
+        // Then - refused, because an AndSubject with no members is not an identity
+        // (Privilege.validateSubject)
+    }
+
+    @Test
+    public void shouldDropTheRefusedMemberWhenTheRoundTripLeavesASurvivor() throws Exception {
+        // Given - a partially damaged wrapper: one member was refused, one survived
+        AndCondition and = new AndCondition();
+        and.setState("{\"memberECondition\":["
+                + "{\"className\":\"" + OAuth2ScopeCondition.class.getName()
+                + "\",\"state\":\"{\\\"requiredScopes\\\":[\\\"givenName\\\"]}\"},"
+                + "{\"className\":\"" + UNRESOLVABLE_CLASS + "\",\"state\":\"{}\"}]}");
+        assertThat(and.getEConditions()).hasSize(1);
+        assertThat(and.isMemberRejected()).isTrue();
+
+        Privilege policy = new StubPrivilege();
+        policy.setCondition(and);
+
+        // When - read and written back through the REST representation
+        JsonValue printed = parser.printPolicy(policy);
+        Privilege result = parser.parsePolicy(POLICY_NAME,
+                buildJson(field("condition", printed.get("condition").getObject())));
+
+        // Then - known limit of the fix, called out in the release note: the survivor is kept and
+        // the refusal is not, because the representation has no slot for a member whose class could
+        // not be resolved. The write is not refused - a non-empty AND is a legitimate policy - so
+        // the stored policy comes out one conjunct weaker than it was written.
+        AndCondition roundTripped = (AndCondition) result.getCondition();
+        assertThat(roundTripped.getEConditions()).hasSize(1);
+        assertThat(roundTripped.isMemberRejected()).isFalse();
+        assertThat(roundTripped.getState()).doesNotContain(UNRESOLVABLE_CLASS);
+    }
+
+    /**
+     * An {@code AndCondition} as it comes back from the store when its only member's class name was
+     * refused: no members left, the refusal remembered, the refused entry kept in the state.
+     */
+    private AndCondition damagedAndCondition() {
+        AndCondition and = new AndCondition();
+        and.setState("{\"memberECondition\":[{\"className\":\"" + UNRESOLVABLE_CLASS + "\",\"state\":\"{}\"}]}");
+        return and;
     }
 
     private JsonValue buildJson(Map.Entry<String, Object> fieldValue) {

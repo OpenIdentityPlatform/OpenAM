@@ -150,8 +150,15 @@ public class PrivilegeChangeNotifier {
                 // prevents stored SSRF via registered listener URLs (GHSA-g499-5qm8-4grm),
                 // including any already persisted before this fix.
                 if (!isListenerUrlAllowed(url.toString())) {
-                    PolicyConstants.DEBUG.warning(
-                        "PrivilegeChangeNotifier.notify: skipping unsafe listener URL: " + url);
+                    // Logged at error level, not warning: a listener registered before this check
+                    // existed — or before the blocklist grew to cover ranges such as the
+                    // 100.64.0.0/10 shared address space — silently stops receiving notifications,
+                    // and warning is below the default debug level, so the operator would have no
+                    // way of connecting the missing notifications to this decision.
+                    PolicyConstants.DEBUG.error(
+                        "PrivilegeChangeNotifier.notify: skipping unsafe listener URL: " + url
+                        + ". Set " + ALLOW_ANY_LISTENER_URL
+                        + "=true if this endpoint is intentionally on an internal address.");
                     continue;
                 }
                 thrdPool.submit(new Task(adminSubject, url.toString(), json));

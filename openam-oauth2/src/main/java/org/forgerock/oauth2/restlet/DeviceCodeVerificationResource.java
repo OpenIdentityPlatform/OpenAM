@@ -157,7 +157,8 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                 if (StringUtils.isNotEmpty(decision)) {
 
                     if (csrfProtection.isCsrfAttack(request)) {
-                        logger.debug("Session id from consent request does not match users session");
+                        logger.debug("Consent request rejected: csrf parameter matched neither the consent token "
+                                + "nor the resource owner's session id");
                         throw new OAuth2RestletException(400, "bad_request", null, request.<String>getParameter("state"));
                     }
 

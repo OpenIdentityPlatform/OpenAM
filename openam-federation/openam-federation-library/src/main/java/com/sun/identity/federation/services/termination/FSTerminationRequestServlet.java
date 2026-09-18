@@ -290,8 +290,13 @@ public class FSTerminationRequestServlet extends HttpServlet {
             return;
         }
 
+        // This endpoint is unauthenticated and defederates the user named by an
+        // opaque handle in the request, so the signature is what identifies the
+        // caller: verify it unless a deployment has explicitly opted out. Gating
+        // this on isSigningOn() alone let an unsigned request through by
+        // default, since signing is off on a stock install.
         boolean bVerify = true;
-        if (FSServiceUtils.isSigningOn()) {                        
+        if (FSServiceUtils.isSignatureVerificationRequired()) {
             try {
                 if (remoteDesc != null) {
                     FSUtils.debug.message("Calling verifyTerminationSignature");

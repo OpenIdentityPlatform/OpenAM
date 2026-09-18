@@ -25,11 +25,13 @@
  * $Id: ApplicationTypeManager.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entitlement;
 
 import static org.forgerock.openam.entitlement.utils.EntitlementUtils.getEntitlementConfiguration;
+import static org.forgerock.openam.entitlement.utils.EntitlementUtils.resolveExtensionClass;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -135,17 +137,7 @@ public final class ApplicationTypeManager {
             return null;
         }
         try {
-            Class clazz = Class.forName(className);
-            Object o = clazz.newInstance();
-            if (o instanceof ISearchIndex) {
-                return clazz;
-            }
-        } catch (InstantiationException ex) {
-            PolicyConstants.DEBUG.error(
-                "ApplicationTypeManager.getSearchIndex", ex);
-        } catch (IllegalAccessException ex) {
-            PolicyConstants.DEBUG.error(
-                "ApplicationTypeManager.getSearchIndex", ex);
+            return resolveExtensionClass(className, ISearchIndex.class);
         } catch (ClassNotFoundException ex) {
             PolicyConstants.DEBUG.error(
                 "ApplicationTypeManager.getSearchIndex", ex);
@@ -164,17 +156,7 @@ public final class ApplicationTypeManager {
             return null;
         }
         try {
-            Class clazz = Class.forName(className);
-            Object o = clazz.newInstance();
-            if (o instanceof ISaveIndex) {
-                return clazz;
-            }
-        } catch (InstantiationException ex) {
-            PolicyConstants.DEBUG.error(
-                "ApplicationTypeManager.getSaveIndex", ex);
-        } catch (IllegalAccessException ex) {
-            PolicyConstants.DEBUG.error(
-                "ApplicationTypeManager.getSaveIndex", ex);
+            return resolveExtensionClass(className, ISaveIndex.class);
         } catch (ClassNotFoundException ex) {
             PolicyConstants.DEBUG.error(
                 "ApplicationTypeManager.getSaveIndex", ex);
@@ -193,17 +175,7 @@ public final class ApplicationTypeManager {
             return null;
         }
         try {
-            Class clazz = Class.forName(className);
-            Object o = clazz.newInstance();
-            if (o instanceof ResourceName) {
-                return clazz;
-            }
-        } catch (InstantiationException ex) {
-            PolicyConstants.DEBUG.error(
-                "ApplicationTypeManager.getResourceComparator", ex);
-        } catch (IllegalAccessException ex) {
-            PolicyConstants.DEBUG.error(
-                "ApplicationTypeManager.getResourceComparator", ex);
+            return resolveExtensionClass(className, ResourceName.class);
         } catch (ClassNotFoundException ex) {
             PolicyConstants.DEBUG.error(
                 "ApplicationTypeManager.getResourceComparator", ex);

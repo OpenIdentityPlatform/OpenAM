@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.oauth2;
@@ -30,24 +31,40 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.PublicKey;
+import java.security.spec.ECGenParameterSpec;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import org.forgerock.jaspi.modules.openid.resolvers.SharedSecretOpenIdResolverImpl;
 import org.forgerock.jaspi.modules.openid.resolvers.service.OpenIdResolverService;
+import org.forgerock.json.jose.builders.JwsHeaderBuilder;
+import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.jwe.JweAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.SigningManager;
+import org.forgerock.json.jose.jws.handlers.SigningHandler;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
+import org.forgerock.util.encode.Base64url;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeClass;
@@ -327,5 +344,383 @@ public class OpenAMClientRegistrationTest {
     private void setUpAgentToThrowExceptionForAttribute(String attributeName) throws IdRepoException, SSOException {
         given(amIdentity.getAttribute(attributeName))
                 .willThrow(new SSOException("exception!"));
+    }
+
+    // --- #1130: id_token_signed_response_alg default and client-assertion dispatch ----------
+
+    /**
+     * AgentsRepo reads agent attributes without schema defaults, so a client created without
+     * the attribute (realm-config PUT, ssoadm) has no value persisted; the token endpoint then
+     * NPEs. The schema, the console and dynamic registration all default to HS256.
+     */
+    @Test
+    public void idTokenSignedResponseAlgorithmDefaultsToHs256WhenUnset() throws Exception {
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(Collections.<String>emptySet());
+        assertThat(clientRegistration.getIDTokenSignedResponseAlgorithm()).isEqualTo("HS256");
+
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(null);
+        assertThat(clientRegistration.getIDTokenSignedResponseAlgorithm()).isEqualTo("HS256");
+
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("RS256"));
+        assertThat(clientRegistration.getIDTokenSignedResponseAlgorithm()).isEqualTo("RS256");
+    }
+
+    /**
+     * A client_secret_jwt assertion is verified with the client secret whatever algorithm the
+     * client asked for its (outgoing) ID tokens.
+     */
+    @Test
+    public void verifyJwtIdentityUsesClientSecretForHmacAssertionRegardlessOfIdTokenAlg() throws Exception {
+        String clientId = "client1";
+        String secret = "a-client-secret-of-sufficient-length";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton(secret));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("RS256"));
+
+        SigningHandler signer = new SigningManager().newHmacSigningHandler(secret.getBytes(StandardCharsets.UTF_8));
+        OAuth2Jwt assertion = assertion(clientId, signer, JwsAlgorithm.HS256, null);
+
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isTrue();
+
+        SigningHandler wrongSigner = new SigningManager().newHmacSigningHandler("wrong".getBytes(StandardCharsets.UTF_8));
+        assertThat(clientRegistration.verifyJwtIdentity(assertion(clientId, wrongSigner, JwsAlgorithm.HS256, null)))
+                .isFalse();
+    }
+
+    /**
+     * A private_key_jwt assertion is verified with the client's registered public keys whatever
+     * algorithm the client asked for its (outgoing) ID tokens.
+     */
+    @Test
+    public void verifyJwtIdentityUsesPublicKeysForAsymmetricAssertionRegardlessOfIdTokenAlg() throws Exception {
+        String clientId = "client1";
+        KeyPair clientKeys = generateRsaKeyPair();
+        String kid = UUID.randomUUID().toString();
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("unused-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("jwks"));
+        given(amIdentity.getAttribute(JWKS)).willReturn(singleton(jwks((RSAPublicKey) clientKeys.getPublic(), kid)));
+
+        SigningHandler signer = new SigningManager().newRsaSigningHandler((RSAPrivateKey) clientKeys.getPrivate());
+        assertThat(clientRegistration.verifyJwtIdentity(assertion(clientId, signer, JwsAlgorithm.RS256, kid))).isTrue();
+
+        KeyPair otherKeys = generateRsaKeyPair();
+        SigningHandler otherSigner = new SigningManager().newRsaSigningHandler((RSAPrivateKey) otherKeys.getPrivate());
+        assertThat(clientRegistration.verifyJwtIdentity(assertion(clientId, otherSigner, JwsAlgorithm.RS256, kid)))
+                .isFalse();
+    }
+
+    /**
+     * {@code JwsHeader.getAlgorithm()} is {@code JwsAlgorithm.valueOf(alg)}: the RFC spelling
+     * {@code "none"} (or anything outside the enum) throws rather than returning {@code NONE}, so
+     * the assertion is built as a raw compact serialisation, not through the builder, which would
+     * emit the enum name {@code "NONE"} that never occurs on the wire.
+     */
+    @Test
+    public void verifyJwtIdentityRejectsWireAlgNone() throws Exception {
+        String clientId = "client1";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+
+        assertThat(clientRegistration.verifyJwtIdentity(rawAssertion(clientId, "none"))).isFalse();
+    }
+
+    @Test
+    public void verifyJwtIdentityRejectsUnknownAlg() throws Exception {
+        String clientId = "client1";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+
+        assertThat(clientRegistration.verifyJwtIdentity(rawAssertion(clientId, "hs256"))).isFalse();
+    }
+
+    /** A public client has no userpassword at all; an HMAC assertion is invalid_client, not an NPE. */
+    @Test
+    public void verifyJwtIdentityReturnsFalseForHmacAssertionWhenClientHasNoSecret() throws Exception {
+        String clientId = "client1";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        SigningHandler signer = new SigningManager().newHmacSigningHandler("any".getBytes(StandardCharsets.UTF_8));
+        OAuth2Jwt assertion = assertion(clientId, signer, JwsAlgorithm.HS256, null);
+
+        given(amIdentity.getAttribute("userpassword")).willReturn(null);
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+
+        given(amIdentity.getAttribute("userpassword")).willReturn(Collections.<String>emptySet());
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+    }
+
+    /**
+     * AgentsRepo does not apply the schema default of publicKeyLocation either; a client with no
+     * registered key location cannot verify an asymmetric assertion, which is invalid_client rather
+     * than a server_error.
+     */
+    @Test
+    public void verifyJwtIdentityReturnsFalseForAsymmetricAssertionWithoutPublicKeyLocation() throws Exception {
+        String clientId = "client1";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        KeyPair clientKeys = generateRsaKeyPair();
+        SigningHandler signer = new SigningManager().newRsaSigningHandler((RSAPrivateKey) clientKeys.getPrivate());
+        OAuth2Jwt assertion = assertion(clientId, signer, JwsAlgorithm.RS256, "kid");
+
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(null);
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(Collections.<String>emptySet());
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("not-a-selector"));
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+    }
+
+    /**
+     * A symmetric (oct) JWK can never verify an RS/ES-signed assertion; it must not be tried as an
+     * HMAC key. (JWKLookup keys an oct JWK's {@code alg} by the JCA name, hence {@code HmacSHA256}.)
+     */
+    @Test
+    public void verifyJwtIdentityRejectsAsymmetricAssertionAgainstSymmetricJwk() throws Exception {
+        String clientId = "client1";
+        String kid = UUID.randomUUID().toString();
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("jwks"));
+        given(amIdentity.getAttribute(JWKS)).willReturn(singleton("{\"keys\":[{\"kty\":\"oct\",\"alg\":\"HmacSHA256\",\"kid\":\"" + kid
+                + "\",\"k\":\"" + Base64url.encode("a-shared-key-of-sufficient-length".getBytes(StandardCharsets.UTF_8))
+                + "\"}]}"));
+        KeyPair clientKeys = generateRsaKeyPair();
+        SigningHandler signer = new SigningManager().newRsaSigningHandler((RSAPrivateKey) clientKeys.getPrivate());
+
+        assertThat(clientRegistration.verifyJwtIdentity(assertion(clientId, signer, JwsAlgorithm.RS256, kid))).isFalse();
+    }
+
+    /**
+     * An ID token this server issued carries id_token_signed_response_alg in its header; one signed
+     * with any other algorithm is not ours, whatever key it would otherwise verify with.
+     */
+    @Test
+    public void verifyIdTokenIdentityRejectsAlgorithmOtherThanConfigured() throws Exception {
+        String clientId = "client1";
+        String secret = "a-client-secret-of-sufficient-length";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton(secret));
+        SigningHandler signer = new SigningManager().newHmacSigningHandler(secret.getBytes(StandardCharsets.UTF_8));
+        OAuth2Jwt idToken = assertion(clientId, signer, JwsAlgorithm.HS256, null);
+
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        assertThat(clientRegistration.verifyIdTokenIdentity(idToken)).isTrue();
+
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("RS256"));
+        assertThat(clientRegistration.verifyIdTokenIdentity(idToken)).isFalse();
+    }
+
+    @Test
+    public void verifyIdTokenIdentityRejectsWireAlgNone() throws Exception {
+        String clientId = "client1";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+
+        assertThat(clientRegistration.verifyIdTokenIdentity(rawAssertion(clientId, "none"))).isFalse();
+    }
+
+    /**
+     * AgentConfiguration.createAgent persists the schema defaults, so a client created through the
+     * console, ssoadm or /json/agents carries publicKeyLocation=jwks_uri and no jwks_uri. Nothing
+     * registered behind the selector is invalid_client, not server_error with a logged stack trace.
+     */
+    @Test
+    public void verifyJwtIdentityReturnsFalseWhenRegisteredKeyLocationHasNoMaterial() throws Exception {
+        String clientId = "client1";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        KeyPair clientKeys = generateRsaKeyPair();
+        SigningHandler signer = new SigningManager().newRsaSigningHandler((RSAPrivateKey) clientKeys.getPrivate());
+        OAuth2Jwt assertion = assertion(clientId, signer, JwsAlgorithm.RS256, "kid");
+
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("jwks_uri"));
+        given(amIdentity.getAttribute(JWKS_URI)).willReturn(null);
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+        given(amIdentity.getAttribute(JWKS_URI)).willReturn(Collections.<String>emptySet());
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+        given(amIdentity.getAttribute(JWKS_URI)).willReturn(singleton(""));
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("x509"));
+        given(amIdentity.getAttribute(CLIENT_JWT_PUBLIC_KEY)).willReturn(null);
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+        given(amIdentity.getAttribute(CLIENT_JWT_PUBLIC_KEY)).willReturn(singleton(""));
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("jwks"));
+        given(amIdentity.getAttribute(JWKS)).willReturn(null);
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+        given(amIdentity.getAttribute(JWKS)).willReturn(singleton(""));
+        assertThat(clientRegistration.verifyJwtIdentity(assertion)).isFalse();
+    }
+
+    /** A registered key that cannot verify the header's algorithm (RSA key, ES256 header) is invalid_client. */
+    @Test
+    public void verifyJwtIdentityReturnsFalseWhenRegisteredKeyCannotVerifyAlgorithm() throws Exception {
+        String clientId = "client1";
+        String kid = UUID.randomUUID().toString();
+        KeyPair rsaKeys = generateRsaKeyPair();
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("jwks"));
+        given(amIdentity.getAttribute(JWKS)).willReturn(singleton(jwks((RSAPublicKey) rsaKeys.getPublic(), kid)));
+
+        KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+        gen.initialize(new ECGenParameterSpec("secp256r1"));
+        SigningHandler ecSigner = new SigningManager().newEcdsaSigningHandler((ECPrivateKey) gen.generateKeyPair().getPrivate());
+
+        assertThat(clientRegistration.verifyJwtIdentity(assertion(clientId, ecSigner, JwsAlgorithm.ES256, kid))).isFalse();
+    }
+
+    /**
+     * RSASigningHandler wraps the JDK's "Bad signature length" in JwsVerifyingException, a sibling of
+     * JwsSigningException: a client that rotated to a longer key, or any sender choosing the
+     * signature length, must be invalid_client rather than server_error with a logged stack trace.
+     */
+    @Test
+    public void verifyJwtIdentityReturnsFalseForRsaSignatureOfWrongLength() throws Exception {
+        String clientId = "client1";
+        String kid = UUID.randomUUID().toString();
+        KeyPair registeredKeys = generateRsaKeyPair(2048);
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("jwks"));
+        given(amIdentity.getAttribute(JWKS)).willReturn(singleton(jwks((RSAPublicKey) registeredKeys.getPublic(), kid)));
+
+        KeyPair rotatedKeys = generateRsaKeyPair(3072);
+        SigningHandler signer = new SigningManager().newRsaSigningHandler((RSAPrivateKey) rotatedKeys.getPrivate());
+
+        assertThat(clientRegistration.verifyJwtIdentity(assertion(clientId, signer, JwsAlgorithm.RS256, kid))).isFalse();
+    }
+
+    /**
+     * A symmetric key served at jwks_uri reaches an HMAC handler inside the commons resolver, which
+     * cannot verify an RS256 assertion; that is invalid_client, not server_error. The resolver is
+     * seeded through the cache so the test needs no HTTP server.
+     */
+    @Test
+    public void verifyJwtIdentityReturnsFalseForSymmetricKeyBehindJwksUri() throws Exception {
+        String clientId = "client1";
+        String url = "https://jwks.invalid/" + UUID.randomUUID();
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+        given(amIdentity.getAttribute(PUBLIC_KEY_SELECTOR)).willReturn(singleton("jwks_uri"));
+        given(amIdentity.getAttribute(JWKS_URI)).willReturn(singleton(url));
+        KeyPair clientKeys = generateRsaKeyPair();
+        SigningHandler signer = new SigningManager().newRsaSigningHandler((RSAPrivateKey) clientKeys.getPrivate());
+        ClientJwksResolverCache.putIfAbsent(clientId + "|" + url,
+                new SharedSecretOpenIdResolverImpl(clientId, "a-shared-key-of-sufficient-length"));
+        try {
+            assertThat(clientRegistration.verifyJwtIdentity(assertion(clientId, signer, JwsAlgorithm.RS256, "kid")))
+                    .isFalse();
+        } finally {
+            ClientJwksResolverCache.resetForTest();
+        }
+    }
+
+    /**
+     * A header without alg is what JwsHeader.getAlgorithm() maps to NONE, and the enum name "NONE"
+     * is the other spelling that reaches that arm; neither is a signed assertion.
+     */
+    @Test
+    public void verifyJwtIdentityRejectsAssertionWithoutAlgOrWithEnumSpelledNone() throws Exception {
+        String clientId = "client1";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton("a-client-secret"));
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("HS256"));
+
+        assertThat(clientRegistration.verifyJwtIdentity(rawAssertion(clientId, null))).isFalse();
+        assertThat(clientRegistration.verifyJwtIdentity(rawAssertion(clientId, "NONE"))).isFalse();
+    }
+
+    /**
+     * idTokenSignedResponseAlg is a free-text attribute; StatefulTokenStore upper-cases it when
+     * issuing, so the verifier must accept the same spelling, and an unknown value is not ours.
+     */
+    @Test
+    public void verifyIdTokenIdentityNormalisesConfiguredAlgorithmAndRejectsUnknown() throws Exception {
+        String clientId = "client1";
+        String secret = "a-client-secret-of-sufficient-length";
+        given(amIdentity.getName()).willReturn(clientId);
+        given(amIdentity.getAttribute("userpassword")).willReturn(singleton(secret));
+        SigningHandler signer = new SigningManager().newHmacSigningHandler(secret.getBytes(StandardCharsets.UTF_8));
+        OAuth2Jwt idToken = assertion(clientId, signer, JwsAlgorithm.HS256, null);
+
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("hs256"));
+        assertThat(clientRegistration.verifyIdTokenIdentity(idToken)).isTrue();
+
+        given(amIdentity.getAttribute(IDTOKEN_SIGNED_RESPONSE_ALG)).willReturn(singleton("not-an-alg"));
+        assertThat(clientRegistration.verifyIdTokenIdentity(idToken)).isFalse();
+    }
+
+    /**
+     * Compact serialisation with the given literal {@code alg} ({@code null}: no alg member) and an
+     * empty signature part.
+     */
+    private static OAuth2Jwt rawAssertion(String clientId, String alg) {
+        JwtClaimsSet claims = new JwtBuilderFactory().claims()
+                .iss(clientId)
+                .sub(clientId)
+                .aud(Collections.singletonList(clientId))
+                .exp(new Date(System.currentTimeMillis() + 60_000L))
+                .iat(new Date())
+                .build();
+        String headerJson = alg == null ? "{\"typ\":\"JWT\"}" : "{\"typ\":\"JWT\",\"alg\":\"" + alg + "\"}";
+        String header = Base64url.encode(headerJson.getBytes(StandardCharsets.UTF_8));
+        String payload = Base64url.encode(claims.build().getBytes(StandardCharsets.UTF_8));
+        return OAuth2Jwt.create(header + "." + payload + ".");
+    }
+
+    private static OAuth2Jwt assertion(String clientId, SigningHandler signer, JwsAlgorithm alg, String kid) {
+        JwtClaimsSet claims = new JwtBuilderFactory().claims()
+                .iss(clientId)
+                .sub(clientId)
+                .aud(Collections.singletonList(clientId))
+                .exp(new Date(System.currentTimeMillis() + 60_000L))
+                .iat(new Date())
+                .build();
+        JwsHeaderBuilder headers = new JwtBuilderFactory().jws(signer).headers().alg(alg);
+        if (kid != null) {
+            headers = headers.kid(kid);
+        }
+        return OAuth2Jwt.create(headers.done().claims(claims).build());
+    }
+
+    private static KeyPair generateRsaKeyPair() throws Exception {
+        return generateRsaKeyPair(2048);
+    }
+
+    private static KeyPair generateRsaKeyPair(int bits) throws Exception {
+        KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
+        gen.initialize(bits);
+        return gen.generateKeyPair();
+    }
+
+    private static String jwks(RSAPublicKey pk, String kid) {
+        return "{\"keys\":[{\"kty\":\"RSA\",\"use\":\"sig\",\"alg\":\"RS256\",\"kid\":\"" + kid + "\","
+                + "\"n\":\"" + base64UrlUnsigned(pk.getModulus()) + "\","
+                + "\"e\":\"" + base64UrlUnsigned(pk.getPublicExponent()) + "\"}]}";
+    }
+
+    private static String base64UrlUnsigned(java.math.BigInteger bi) {
+        byte[] full = bi.toByteArray();
+        if (full.length > 1 && full[0] == 0) {
+            full = Arrays.copyOfRange(full, 1, full.length);
+        }
+        return java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(full);
     }
 }

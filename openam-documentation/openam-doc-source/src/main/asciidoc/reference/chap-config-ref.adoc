@@ -2174,6 +2174,13 @@ Default: No user attributes are protected.
 The Liberty ID-WSF SOAP endpoints (`/Liberty/*` and `/WSPRedirectHandler/*`) are disabled by default. To enable them, set the advanced server property `com.sun.identity.liberty.enabled` to `true`. Two additional advanced properties (`com.sun.identity.liberty.soap.sensitiveHandlers` and `com.sun.identity.liberty.allowAnonymousWSC`) control how anonymous and null-family authentication is handled by sensitive Liberty handlers (IDPP, Discovery, AuthnSvc, Interaction). See xref:#servers-advanced-configuration["Advanced"].
 ====
 
+[NOTE]
+====
+The Liberty ID-FF SOAP endpoint (`/SOAPReceiver/*`, served by `FSSOAPReceiver`) is disabled by default. To enable it, set the advanced server property `com.sun.identity.federation.services.soap.enabled` to `true`. This kill-switch covers the whole endpoint, including ID-FF browser-artifact single sign-on and LECP, not only the state-changing operations.
+
+Independently of that kill-switch, inbound ID-FF state-changing and disclosure operations (federation termination, name registration, single logout, and name-identifier mapping) require a verified XML signature unless `com.sun.identity.federation.services.requireSignature` is set to `false` (not recommended). That requirement applies to both the SOAP binding and the HTTP-Redirect binding (`/ProcessTermination/*`, `/ProcessLogout/*`, and `/ProcessRegistration/*`), and OpenAM only signs its own outbound ID-FF messages when `XMLSigningOn` is enabled. See xref:#servers-advanced-configuration["Advanced"].
+====
+
 --
 `ssoadm` service name: `sunFAMIDFFConfiguration`
 
@@ -2699,7 +2706,7 @@ If not enabled, if an access token is requested the client must use it to access
 `ssoadm` attribute: `alwaysAddClaimsToToken`
 
 Code Verifier Parameter Required::
-If enabled, every request using the authorization code grant must include a `code_challenge` parameter at the authorization endpoint and a matching `code_verifier` parameter at the token endpoint (Proof Key for Code Exchange, PKCE).
+If enabled, every request whose `response_type` includes `code` must supply a `code_challenge` parameter at the authorization endpoint and a matching `code_verifier` parameter at the token endpoint (Proof Key for Code Exchange, PKCE). Enforcement covers the plain authorization code grant and the OpenID Connect hybrid flows (`code token`, `code id_token`, and `code id_token token`) alike, because every one of them issues an authorization code.
 
 +
 This property is *enabled by default*.
@@ -2709,6 +2716,12 @@ This property is *enabled by default*.
 ====
 Independently of this setting, if an authorization code was issued together with a `code_challenge`, OpenAM always requires and validates the corresponding `code_verifier` when the code is exchanged at the token endpoint, as mandated by link:https://tools.ietf.org/html/rfc7636#section-4.6[RFC 7636 §4.6, window=\_top]. Disabling this property only stops OpenAM from *forcing* all clients to use PKCE; it never relaxes verification for codes that were issued with a challenge. This prevents PKCE downgrade attacks.
 ====
+
++
+If the `code_challenge_method` parameter is omitted, it defaults to `plain`, as specified in link:https://tools.ietf.org/html/rfc7636#section-4.3[RFC 7636 §4.3, window=\_top]. OpenAM supports `plain` and `S256`. While this property is enabled, the authorization endpoint rejects any other value; an explicitly empty value is treated as malformed rather than as an omitted one. Prefer `S256`: link:https://tools.ietf.org/html/rfc7636#section-7.2[RFC 7636 §7.2, window=\_top] states that `plain` SHOULD NOT be used, and retains it only for clients that cannot compute a SHA-256 digest.
+
++
+This property governs the realm's OAuth2 provider. Clients served by an agent provider profile are never forced to use PKCE, whatever this property is set to; a `code_challenge` that such a client does send is still bound to the code and verified at the token endpoint.
 
 +
 For more information, see link:https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange by OAuth Public Clients, window=\_top] - __RFC 7636__.
@@ -5621,7 +5634,10 @@ Default: `3`
 When set to `true`, mark cookies as HttpOnly to prevent scripts and third-party programs from accessing the cookies.
 
 +
-Both the classic UI and the XUI support HttpOnly session cookies. When HttpOnly is enabled, the XUI relies on the automatically sent cookie instead of reading the token from JavaScript, and a successful `/json/authenticate` response delivers the token only through the `Set-Cookie` header (the `tokenId` is, by default, no longer returned in the response body). See `org.openidentityplatform.openam.httponly.allowTokenInBody` to control that behaviour.
+Both the classic UI and the XUI support HttpOnly session cookies. When HttpOnly is enabled, the XUI relies on the automatically sent cookie instead of reading the token from JavaScript, and a successful `/json/authenticate` response delivers the token only through the `Set-Cookie` header (the `tokenId` is, by default, no longer returned in the response body). See `org.openidentityplatform.openam.httponly.allowTokenInBody` to control that behaviour. The OpenID Connect session management OP iframe (`/oauth2/connect/checkSession`) is a known exception: it reads the session cookie from JavaScript to compute the browser state, and so cannot observe the session while HttpOnly is enabled.
+
++
+Changes to this property do not take effect until you restart the OpenAM server.
 
 +
 Default: `true`
@@ -5631,6 +5647,27 @@ If `true`, then OpenAM is using protection against cookie hijacking.
 
 +
 Default: `false`
+
+`com.sun.identity.federation.services.soap.enabled`::
+Master kill-switch for the legacy Liberty ID-FF (Liberty Alliance 1.x) SOAP endpoint (`/SOAPReceiver/*` served by `FSSOAPReceiver`).
+
++
+When `false` (the default), every request to this endpoint is rejected with HTTP 404. Liberty ID-FF is a legacy federation protocol and this endpoint is reachable without authentication, so it is disabled unless a deployment actively uses ID-FF federation. The kill-switch covers every operation served by the endpoint, including ID-FF browser-artifact single sign-on and LECP. The property is read on every request, so the endpoint can be enabled or disabled without restarting OpenAM.
+
++
+Default: `false`
+
+`com.sun.identity.federation.services.requireSignature`::
+Controls whether inbound Liberty ID-FF requests for state-changing or disclosure operations (federation termination, name registration, single logout, and name-identifier mapping) must carry a verified XML signature. Applies to both the SOAP binding (`/SOAPReceiver/*`) and the HTTP-Redirect binding (`/ProcessTermination/*`, `/ProcessLogout/*`, and `/ProcessRegistration/*`). These endpoints are reachable without authentication and act on the user named by an opaque handle in the request, so the signature is what identifies the caller.
+
++
+When `true` (the default), unsigned requests for these operations are rejected even when message signing is otherwise optional or off (see `XMLSigningOn` under `sunFAMIDFFConfiguration`, exposed as `com.sun.identity.federation.services.signingOn`). Because OpenAM only signs its own outbound ID-FF messages when that setting is enabled, a deployment that leaves this property at its default must also enable `XMLSigningOn` and configure a signing certificate on every participating provider; otherwise OpenAM's own single logout, federation termination, and name registration messages are rejected by the receiving provider. Set this property to `false` only to restore the legacy (insecure) behaviour required by deployments whose federation partners do not sign ID-FF messages.
+
++
+Only the exact value `false` disables the requirement; any other value, including a malformed one, leaves it enabled.
+
++
+Default: `true`
 
 `com.sun.identity.jss.donotInstallAtHighestPriority`::
 Whether JSS should take priority over other providers.
@@ -6061,6 +6098,9 @@ Set this property to `true` to keep the legacy behaviour of also returning `toke
 
 +
 When the session cookie is not HttpOnly, `tokenId` is always returned in the response body, regardless of this property.
+
++
+Changes to this property do not take effect until you restart the OpenAM server.
 
 +
 Default: `false`

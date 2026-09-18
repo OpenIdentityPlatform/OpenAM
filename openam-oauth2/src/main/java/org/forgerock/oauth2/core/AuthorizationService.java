@@ -292,7 +292,8 @@ public class AuthorizationService {
         }
 
         if (csrfProtection.isCsrfAttack(request)) {
-            logger.debug("Session id from consent request does not match users session");
+            logger.debug("Consent request rejected: csrf parameter matched neither the consent token nor "
+                    + "the resource owner's session id");
             throw new CsrfException();
         }
 

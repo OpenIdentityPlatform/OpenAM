@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.oauth2;
 
@@ -143,6 +144,11 @@ public class AgentClientRegistration implements OpenIdConnectClientRegistration 
      */
     @Override
     public boolean verifyJwtIdentity(OAuth2Jwt jwt) {
+        return false;
+    }
+
+    @Override
+    public boolean verifyIdTokenIdentity(OAuth2Jwt idToken) {
         return false;
     }
 

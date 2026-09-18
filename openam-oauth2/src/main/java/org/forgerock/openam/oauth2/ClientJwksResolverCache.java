@@ -49,13 +49,36 @@ import org.forgerock.jaspi.modules.openid.resolvers.OpenIdResolver;
  * configuration ({@code OAuth2Provider}). On any configuration change the cache is
  * cleared so that the next request re-fetches the current {@code jwks_uri}.
  *
+ * <p>Fetches that <em>fail</em> are remembered too, for {@link #FAILURE_TTL_MS} — see
+ * {@link #rememberFetchFailure(String)}.
+ *
  * <p>Visible for testing.
  */
 final class ClientJwksResolverCache {
 
     private static final Debug LOGGER = Debug.getInstance("OAuth2Provider");
 
+    /**
+     * How long a failed JWK Set fetch is remembered, in milliseconds.
+     *
+     * <p>Short enough that a relying party whose endpoint was briefly down recovers on its own
+     * without operator action, long enough that a caller cannot use the fetch as a request
+     * amplifier: {@code byJWKsURI} is reachable without authentication (an unsigned
+     * {@code client_assertion}, or an {@code id_token} at {@code /oauth2/idtokeninfo} whose
+     * signature has not been checked yet), and until the fetch succeeds there is nothing in the
+     * positive cache to stop it from being repeated per request — GHSA-g7cv-hh35-cc7c.
+     */
+    static final long FAILURE_TTL_MS = 60_000;
+
+    /**
+     * Ceiling on the number of remembered failures. One entry per registered client that has a
+     * broken or blocked {@code jwks_uri}, so this is generous; it exists so that the negative
+     * cache cannot itself become a memory sink.
+     */
+    private static final int MAX_REMEMBERED_FAILURES = 10_000;
+
     private static final ConcurrentMap<String, OpenIdResolver> CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Long> FAILURES = new ConcurrentHashMap<>();
     private static final AtomicBoolean LISTENER_REGISTERED = new AtomicBoolean(false);
 
     private ClientJwksResolverCache() {
@@ -78,13 +101,46 @@ final class ClientJwksResolverCache {
      */
     static OpenIdResolver putIfAbsent(String cacheKey, OpenIdResolver resolver) {
         ensureListenerRegistered();
+        FAILURES.remove(cacheKey);
         OpenIdResolver existing = CACHE.putIfAbsent(cacheKey, resolver);
         return existing != null ? existing : resolver;
+    }
+
+    /**
+     * Records that fetching the JWK Set for {@code cacheKey} failed, so that the next
+     * {@link #isFetchFailureRemembered(String)} within {@link #FAILURE_TTL_MS} can answer without
+     * another fetch.
+     *
+     * <p>A failed fetch leaves nothing in the positive cache — the resolver constructor throws
+     * before {@link #putIfAbsent(String, OpenIdResolver)} is reached — so without this the
+     * unauthenticated {@code byJWKsURI} path would issue one outbound request per inbound request,
+     * indefinitely, for any client whose {@code jwks_uri} is unreachable, blocked by the SSRF
+     * guard or deliberately slow.
+     */
+    static void rememberFetchFailure(String cacheKey) {
+        boundRememberedFailures();
+        FAILURES.put(cacheKey, System.currentTimeMillis() + FAILURE_TTL_MS);
+    }
+
+    /** Whether a fetch for {@code cacheKey} failed within the last {@link #FAILURE_TTL_MS}. */
+    static boolean isFetchFailureRemembered(String cacheKey) {
+        final Long expiresAt = FAILURES.get(cacheKey);
+        if (expiresAt == null) {
+            return false;
+        }
+        if (System.currentTimeMillis() >= expiresAt) {
+            FAILURES.remove(cacheKey, expiresAt);
+            return false;
+        }
+        return true;
     }
 
     /** Drop everything. Called by the SMS listener on configuration changes. */
     static void invalidateAll() {
         CACHE.clear();
+        // A configuration change is the operator's way of saying "try again now": a jwks_uri that
+        // has just been corrected must not stay blocked for the rest of the failure TTL.
+        FAILURES.clear();
     }
 
     /** Visible for testing. */
@@ -100,7 +156,22 @@ final class ClientJwksResolverCache {
     /** Visible for testing. */
     static void resetForTest() {
         CACHE.clear();
+        FAILURES.clear();
         LISTENER_REGISTERED.set(false);
+    }
+
+    private static void boundRememberedFailures() {
+        if (FAILURES.size() <= MAX_REMEMBERED_FAILURES) {
+            return;
+        }
+        final long now = System.currentTimeMillis();
+        FAILURES.values().removeIf(expiresAt -> expiresAt <= now);
+        if (FAILURES.size() > MAX_REMEMBERED_FAILURES) {
+            // Nothing expired and the map is still over the ceiling. Dropping it is safe in the
+            // only direction that matters: the negative cache is an optimisation, and losing it
+            // means the next request fetches again rather than being wrongly refused.
+            FAILURES.clear();
+        }
     }
 
     private static void ensureListenerRegistered() {

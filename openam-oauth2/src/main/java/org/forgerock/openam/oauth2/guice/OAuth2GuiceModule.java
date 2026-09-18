@@ -124,6 +124,7 @@ import org.forgerock.openam.oauth2.resources.ResourceSetRegistrationEndpoint;
 import org.forgerock.openam.oauth2.resources.ResourceSetStoreFactory;
 import org.forgerock.openam.oauth2.resources.labels.LabelsGuiceModule;
 import org.forgerock.openam.oauth2.validation.ConfirmationKeyValidator;
+import org.forgerock.openam.oauth2.validation.JwksUriValidator;
 import org.forgerock.openam.oauth2.validation.OpenIDConnectURLValidator;
 import org.forgerock.openam.oauth2.validation.SsrfUrlValidator;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
@@ -244,6 +245,7 @@ public class OAuth2GuiceModule extends AbstractModule {
 
         bind(OpenIDConnectURLValidator.class).toInstance(OpenIDConnectURLValidator.getInstance());
         bind(SsrfUrlValidator.class).toInstance(SsrfUrlValidator.getInstance());
+        bind(JwksUriValidator.class).toInstance(JwksUriValidator.getInstance());
         install(new LabelsGuiceModule());
 
         bind(new TypeLiteral<StatelessCheck<Boolean>>() {}).to(DefaultStatelessCheck.class);

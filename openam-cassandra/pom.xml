@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>16.2.0-SNAPSHOT</version>
+        <version>16.1.4-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM Cassandra</name>
@@ -39,7 +39,7 @@
 			<dependency>
 				<groupId>at.yawk.lz4</groupId>
 				<artifactId>lz4-java</artifactId>
-				<version>1.10.1</version>
+				<version>1.11.1</version>
 			</dependency>
 			<dependency>
 			    <groupId>org.xerial.snappy</groupId>

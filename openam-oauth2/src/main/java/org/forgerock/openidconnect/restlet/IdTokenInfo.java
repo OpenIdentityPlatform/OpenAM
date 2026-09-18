@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect.restlet;
@@ -159,7 +159,13 @@ public class IdTokenInfo extends ServerResource {
 
         final OpenIdConnectClientRegistration clientRegistration = clientRegistrationStore.get(clientId,
                 new ValidateIdTokenRequest(request, realm));
-        JwsAlgorithm algorithm = JwsAlgorithm.valueOf(clientRegistration.getIDTokenSignedResponseAlgorithm());
+        // A free-text attribute, upper-cased as the token store does when issuing.
+        final JwsAlgorithm algorithm;
+        try {
+            algorithm = JwsAlgorithm.valueOf(clientRegistration.getIDTokenSignedResponseAlgorithm().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("unsupported id_token_signed_response_alg");
+        }
         boolean requiresClientAuthentication =
                 providerSettingsFactory.get(request).isIdTokenInfoClientAuthenticationEnabled();
 
@@ -171,7 +177,7 @@ public class IdTokenInfo extends ServerResource {
             throw new BadRequestException("id_token has expired");
         }
 
-        if (!clientRegistration.verifyJwtIdentity(idToken)) {
+        if (!clientRegistration.verifyIdTokenIdentity(idToken)) {
             throw new BadRequestException("invalid id_token");
         }
 

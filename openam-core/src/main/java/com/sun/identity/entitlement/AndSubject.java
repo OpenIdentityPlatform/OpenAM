@@ -25,6 +25,7 @@
  * $Id: AndSubject.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement;
@@ -33,6 +34,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.entitlement.PolicyConstants;
 
 /**
  * EntitlementSubject wrapper on a set of EntitlementSubject(s) to provide 
@@ -85,6 +88,15 @@ public class AndSubject extends LogicalSubject {
         String resourceName,
         Map<String, Set<String>> environment
     ) throws EntitlementException {
+        if (isMemberRejected()) {
+            // A member class name was refused while deserialising this policy, so at least one AND
+            // constraint is missing. Since an empty AND set is satisfied, evaluating the remainder
+            // would silently grant what the stored policy restricts: deny instead.
+            PolicyConstants.DEBUG.error(
+                "AndSubject.evaluate: denying, policy contains a rejected member subject");
+            return new SubjectDecision(false, Collections.EMPTY_MAP);
+        }
+
         Set<EntitlementSubject> eSubjects = getESubjects();
 
         if ((eSubjects != null) && !eSubjects.isEmpty()) {

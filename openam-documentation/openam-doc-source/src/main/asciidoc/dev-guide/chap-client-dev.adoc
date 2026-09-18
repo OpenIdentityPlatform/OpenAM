@@ -512,6 +512,12 @@ The `/json/authenticate` endpoint does not support the CRUDPAQ verbs and therefo
 
 The simplest user name/password authentication returns a `tokenId` that applications can present as a cookie value for other operations that require authentication. The type of `tokenId` returned varies depending on whether stateless sessions are enabled in the realm to which the user authenticates:
 
+[NOTE]
+====
+When the server is configured with HttpOnly session cookies (`com.sun.identity.cookie.httponly=true`), the token is delivered only through the `Set-Cookie` header and `tokenId` is __not__ returned in the response body shown in these examples. Clients that rely on reading `tokenId` from the body should either use the automatically sent cookie instead, or ask the server administrator to set `org.openidentityplatform.openam.httponly.allowTokenInBody` to `true`. See xref:../reference/chap-config-ref.adoc#chap-config-ref["Configuration Reference"] in the __Reference__.
+====
+
+
 * If stateless sessions are not enabled, the `tokenId` is an OpenAM SSO token.
 
 * If stateless sessions are enabled, the `tokenId` is an OpenAM SSO token that includes an encoded OpenAM session.
@@ -5105,9 +5111,11 @@ You must provide the __Saved Consent Attribute Name__ property with a profile at
 For more information on setting this property in the OAuth2 Provider service, see xref:../reference/chap-config-ref.adoc#oauth2-provider-configuration["OAuth2 Provider"] in the __Reference__.
 
 `csrf`::
-Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the SSO token of the resource owner giving consent.
+Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the SSO token of the resource owner giving consent. Send it in the request body rather than the query string, so that the session id is not recorded in access logs or `Referer` headers.
 
 Duplicating the cookie value helps prevent against Cross-Site Request Forgery (CSRF) attacks.
+
+If you render the OpenAM consent page rather than posting the decision directly, use the dedicated token OpenAM generated for the request instead, available as `pageData.oauth2Data.csrf`. For details of both forms, see xref:../admin-guide/chap-oauth2.adoc#oauth2-endpoints["OpenAM OAuth 2.0 Endpoints"] in the __Administration Guide__.
 
 ====
 
@@ -5139,7 +5147,7 @@ The `/oauth2/authorize` endpoint can take additional parameters, such as:
 
 * `response_mode=form_post`. Use this parameter to return a self-submitting form that contains the code instead of redirecting to the redirect URL with the code as a string parameter. For more information, see the link:https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html[OAuth 2.0 Form Post Response Mode, window=\_blank] spec.
 
-* `code_challenge`. Use this parameter to protect the authorization code grant with __Proof Key for Code Exchange__ (PKCE). When you send a `code_challenge`, OpenAM binds it to the issued authorization code and always requires the matching `code_verifier` at the token endpoint, regardless of provider settings. To force *all* clients to use PKCE, navigate to Realms > __Realm Name__ > Services > OAuth2 Provider > Advanced and enable the Code Verifier Parameter Required property, which is enabled by default. For more information about the PKCE support, see link:https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange by OAuth Public Clients, window=\_top] - __RFC 7636__.
+* `code_challenge`. Use this parameter to protect the authorization code grant with __Proof Key for Code Exchange__ (PKCE). When you send a `code_challenge`, OpenAM binds it to the issued authorization code and always requires the matching `code_verifier` at the token endpoint, regardless of provider settings. To force *all* clients to use PKCE, navigate to Realms > __Realm Name__ > Services > OAuth2 Provider > Advanced and enable the Code Verifier Parameter Required property, which is enabled by default. That enforcement applies to any request whose `response_type` includes `code`, including the hybrid flows `code token`, `code id_token`, and `code id_token token`. If you omit `code_challenge_method`, it defaults to `plain`; OpenAM also supports `S256`, which RFC 7636 recommends in preference to `plain`. For more information about the PKCE support, see link:https://tools.ietf.org/html/rfc7636[Proof Key for Code Exchange by OAuth Public Clients, window=\_top] - __RFC 7636__.
 --
 
 `/oauth2/access_token`::
@@ -5473,9 +5481,11 @@ Must be `token`.
 To allow client access, specify `allow`. Any other value will deny consent.
 
 `csrf`::
-Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the SSO token of the user granting access.
+Duplicates the contents of the `iPlanetDirectoryPro` cookie, which contains the SSO token of the user granting access. Send it in the request body rather than the query string, so that the session id is not recorded in access logs or `Referer` headers.
 +
 Duplicating the cookie value helps prevent against Cross-Site Request Forgery (CSRF) attacks.
++
+If you render the OpenAM consent page rather than posting the decision directly, use the dedicated token OpenAM generated for the request instead, available as `pageData.oauth2Data.csrf`.
 
 --
 +

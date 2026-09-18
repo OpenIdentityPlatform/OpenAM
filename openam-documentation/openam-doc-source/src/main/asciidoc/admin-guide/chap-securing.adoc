@@ -110,7 +110,13 @@ To configure OpenAM server to use secure cookies, in the OpenAM console, navigat
 +
 HttpOnly cookies are meant to be transmitted only over HTTP and HTTPS, and not through non-HTTP methods, such as JavaScript functions.
 +
-OpenAM marks its cookies `HttpOnly` by default (`com.sun.identity.cookie.httponly=true`, under Configure > Server Defaults > Advanced). The XUI fully supports this mode: it relies on the automatically sent cookie instead of reading the SSO token from JavaScript. In HttpOnly mode the token is delivered only through the `Set-Cookie` header and is, by default, no longer returned in the `/json/authenticate` response body; non-browser or raw-REST integrations that need the token in the body can opt back in with `org.openidentityplatform.openam.httponly.allowTokenInBody=true`. Set `com.sun.identity.cookie.httponly` to `false` to disable HttpOnly cookies entirely.
+OpenAM marks its cookies `HttpOnly` by default (`com.sun.identity.cookie.httponly=true`, under Configure > Server Defaults > Advanced). Both the classic UI and the XUI support HttpOnly session cookies: the XUI relies on the automatically sent cookie instead of reading the token from JavaScript, and the `/json/authenticate` response delivers the token only through the `Set-Cookie` header rather than echoing `tokenId` in the response body. To keep returning `tokenId` in the body as well (for example, for non-browser or raw-REST integrations), set `org.openidentityplatform.openam.httponly.allowTokenInBody` to `true`. Note that doing so re-exposes the token to scripts on the OpenAM origin, so leave it at its default of `false` unless an integration requires it. Set `com.sun.identity.cookie.httponly` to `false` to disable HttpOnly cookies entirely. For both properties, see `com.sun.identity.cookie.httponly` and `org.openidentityplatform.openam.httponly.allowTokenInBody` in xref:../reference/chap-config-ref.adoc#chap-config-ref["Configuration Reference"] in the __Reference__.
++
+Both properties are read once when the server starts, so you must restart the OpenAM server for a change to either of them to take effect.
++
+An HttpOnly session cookie prevents a cross-site scripting flaw on the OpenAM origin from reading a replayable session token, which is why it is enabled by default.
++
+One known limitation applies: the OpenID Connect session management OP iframe (`/oauth2/connect/checkSession`) computes the browser state by reading the session cookie from JavaScript, so it cannot observe the session while `HttpOnly` is enabled.
 +
 To reduce cross-site request forgery (CSRF) exposure, OpenAM also sets a `SameSite` attribute on its cookies. A standard installation ships with `org.openidentityplatform.openam.cookie.samesite=Lax`. You can change this to `Strict` or `None` (the latter requires secure cookies) under Configure > Server Defaults > Security > Cookie.
 

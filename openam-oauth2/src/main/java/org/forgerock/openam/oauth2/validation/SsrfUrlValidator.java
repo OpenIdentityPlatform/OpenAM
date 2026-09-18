@@ -15,11 +15,6 @@
  */
 package org.forgerock.openam.oauth2.validation;
 
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
-
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.validation.ValidatorBase;
 import com.sun.identity.shared.validation.ValidationException;
@@ -32,8 +27,12 @@ import com.sun.identity.shared.validation.ValidationException;
  * Connect specification already mandates for {@code sector_identifier_uri}, and which also
  * rules out {@code file://}, {@code http://}, {@code ftp://}, {@code gopher://} SSRF variants)
  * and none of the host's resolved addresses point at a loopback, wildcard, link-local
- * (incl. cloud metadata {@code 169.254.0.0/16}), private/site-local, multicast or IPv6
- * unique-local address.
+ * (incl. cloud metadata {@code 169.254.0.0/16}), private/site-local, multicast, IPv6 unique-local
+ * or otherwise special-purpose address — including one reachable only through the IPv4 address
+ * embedded in an IPv6 transition literal (NAT64, 6to4, Teredo, ISATAP, IPv4-mapped). The scheme
+ * and address checks are delegated to {@link com.sun.identity.common.SsrfUrlValidator}, the single
+ * shared implementation, whose javadoc lists the blocked set in full; this class only adds the
+ * {@code https}-only requirement and the runtime escape hatch below.
  *
  * <p>The check can be disabled at runtime, without a rebuild, by setting the system property
  * {@link #ALLOW_ANY_URL_PROPERTY} to {@code true} (for the atypical case of a relying party
@@ -79,51 +78,8 @@ public final class SsrfUrlValidator extends ValidatorBase {
     }
 
     private boolean isSafeRemoteUrl(String url) {
-        if (SystemProperties.getAsBoolean(ALLOW_ANY_URL_PROPERTY, false)) {
-            return true;
-        }
-        if (url == null || url.isEmpty()) {
-            return false;
-        }
-        final URL parsed;
-        try {
-            parsed = new URL(url);
-        } catch (MalformedURLException e) {
-            return false;
-        }
-        if (!"https".equalsIgnoreCase(parsed.getProtocol())) {
-            return false;
-        }
-        final String host = parsed.getHost();
-        if (host == null || host.isEmpty()) {
-            return false;
-        }
-        try {
-            final InetAddress[] addresses = InetAddress.getAllByName(host);
-            if (addresses.length == 0) {
-                return false;
-            }
-            for (InetAddress address : addresses) {
-                if (isBlockedAddress(address)) {
-                    return false;
-                }
-            }
-        } catch (UnknownHostException e) {
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean isBlockedAddress(InetAddress address) {
-        if (address.isLoopbackAddress()          // 127.0.0.0/8, ::1
-                || address.isAnyLocalAddress()   // 0.0.0.0, ::
-                || address.isLinkLocalAddress()  // 169.254.0.0/16, fe80::/10
-                || address.isSiteLocalAddress()  // 10/8, 172.16/12, 192.168/16, fec0::/10
-                || address.isMulticastAddress()) {
-            return true;
-        }
-        // IPv6 Unique Local Addresses (fc00::/7) are not reported by isSiteLocalAddress().
-        final byte[] bytes = address.getAddress();
-        return bytes.length == 16 && (bytes[0] & 0xfe) == 0xfc;
+        return SystemProperties.getAsBoolean(ALLOW_ANY_URL_PROPERTY, false)
+                // https only; scheme, host resolution and address blocking live in the shared class.
+                || com.sun.identity.common.SsrfUrlValidator.isSafeRemoteUrl(url, true);
     }
 }
