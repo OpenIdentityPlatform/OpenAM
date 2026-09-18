@@ -74,7 +74,12 @@ public class RestAuthenticationHandlerTest {
     private CoreServicesWrapper coreServicesWrapper;
 
     @BeforeMethod
-    public void setUp() {
+    public void setUp() throws Exception {
+
+        // Establish the token-readable baseline (HttpOnly off) for every test, independent of the
+        // production default of com.sun.identity.cookie.httponly. Tests that exercise HttpOnly mode
+        // opt in explicitly via setCookieHttpOnly(true) and reset it afterwards.
+        setCookieHttpOnly(false);
 
         loginAuthenticator = mock(LoginAuthenticator.class);
         restAuthCallbackHandlerManager = mock(RestAuthCallbackHandlerManager.class);

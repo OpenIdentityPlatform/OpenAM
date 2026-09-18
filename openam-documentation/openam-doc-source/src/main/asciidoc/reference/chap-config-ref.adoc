@@ -5640,7 +5640,7 @@ Both the classic UI and the XUI support HttpOnly session cookies. When HttpOnly 
 Changes to this property do not take effect until you restart the OpenAM server.
 
 +
-Default: `false`
+Default: `true`
 
 `com.sun.identity.enableUniqueSSOTokenCookie`::
 If `true`, then OpenAM is using protection against cookie hijacking.
