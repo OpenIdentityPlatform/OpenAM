@@ -39,6 +39,7 @@ import com.sun.identity.federation.common.FSException;
 import com.sun.identity.federation.common.FSRedirectException;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.message.FSAuthnRequest;
 import com.sun.identity.federation.meta.IDFFMetaException;
 import com.sun.identity.federation.meta.IDFFMetaManager;
@@ -128,8 +129,8 @@ public class FSIDPFinderService extends HttpServlet {
         IDFFMetaManager metaManager = FSUtils.getIDFFMetaManager();
         try {
             if (metaManager != null ) {
-                hostConfig = metaManager.getIDPDescriptorConfig(
-                    realm, entityID);
+                hostConfig = IDFFMetaUtils.unwrap(metaManager.getIDPDescriptorConfig(
+                    realm, entityID));
                 if (hostConfig != null) {
                     hostMetaAlias = hostConfig.getMetaAlias();
                 }
@@ -243,8 +244,10 @@ public class FSIDPFinderService extends HttpServlet {
                 IDFFMetaManager metaManager = FSUtils.getIDFFMetaManager();
                 List cotList = null;
                 if (metaManager != null) {
-                    BaseConfigType spConfig = 
+                    SPDescriptorConfigElement spConfigElement =
                         metaManager.getSPDescriptorConfig(realm, entityID);
+                    BaseConfigType spConfig = (spConfigElement == null)
+                        ? null : spConfigElement.getValue();
                     cotList = IDFFMetaUtils.getAttributeValueFromConfig(
                         spConfig, IFSConstants.COT_LIST);
                 }
@@ -348,7 +351,7 @@ public class FSIDPFinderService extends HttpServlet {
             IDFFMetaManager metaManager = FSUtils.getIDFFMetaManager();
             idpDescriptor = metaManager.getIDPDescriptor(realm, hostProviderID);
             idpConfig = metaManager.getIDPDescriptorConfig(
-                realm, hostProviderID);
+                realm, hostProviderID).getValue();
         } catch (Exception e) {
             FSUtils.debug.error("FSIDPFinderServer.getLoginURL : exception "+
                 "while retrieving meta config", e);

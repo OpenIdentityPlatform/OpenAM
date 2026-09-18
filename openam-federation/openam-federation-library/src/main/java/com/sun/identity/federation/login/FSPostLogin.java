@@ -24,7 +24,7 @@
  *
  * $Id: FSPostLogin.java,v 1.6 2008/07/31 00:55:33 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.login;
@@ -324,13 +324,13 @@ public class FSPostLogin {
                     providerRole.equals(IFSConstants.IDP))
                 {
                     isIDP = true;
-                    hostedConfig = metaManager.getIDPDescriptorConfig(
-                        realm, entityID);
+                    hostedConfig = IDFFMetaUtils.unwrap(metaManager.getIDPDescriptorConfig(
+                        realm, entityID));
                 } else if (providerRole != null &&
                     providerRole.equalsIgnoreCase(IFSConstants.SP))
                 {
-                    hostedConfig = metaManager.getSPDescriptorConfig(
-                        realm, entityID);
+                    hostedConfig = IDFFMetaUtils.unwrap(metaManager.getSPDescriptorConfig(
+                        realm, entityID));
                 }
             } catch (IDFFMetaException ie) {
                 FSUtils.debug.error("FSPostLogin::setMetaInfo: exception:",ie);

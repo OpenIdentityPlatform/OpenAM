@@ -25,7 +25,7 @@
  * $Id: IPSigninRequest.java,v 1.8 2009/10/28 23:59:00 exu Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -280,7 +280,7 @@ public class IPSigninRequest extends WSFederationAction {
             throw new WSFederationException(se);
         }
 
-        String strWantAssertionSigned = WSFederationMetaUtils.getAttribute(spConfig,
+        String strWantAssertionSigned = WSFederationMetaUtils.getAttribute(spConfig.getValue(),
                 WSFederationConstants.WANT_ASSERTION_SIGNED);
         // By default, we want to sign assertions
         boolean wantAssertionSigned = strWantAssertionSigned != null ? Boolean.parseBoolean(strWantAssertionSigned)

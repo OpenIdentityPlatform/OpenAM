@@ -25,7 +25,7 @@
  * $Id: SystemConfigurationUtil.java,v 1.7 2008/08/06 17:26:14 exu Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.common;
@@ -116,7 +116,7 @@ public final class SystemConfigurationUtil implements ConfigurationListener {
      * @return list of server names. 
      * @throws SystemConfigurationException if unable to get the server list.
      */ 
-    public static List getServerList() throws SystemConfigurationException {
+    public static List<String> getServerList() throws SystemConfigurationException {
         if (!platformNamingInitialized) {
             initPlatformNaming();
         }

@@ -25,6 +25,8 @@
 
    $Id: entity-config-schema.xsd,v 1.3 2009/05/04 18:21:06 exu Exp $
 
+   Portions Copyrighted 2026 3A Systems LLC
+
 -->
 
 
@@ -56,7 +58,7 @@
     </complexType>
     <element name="IDPSSOConfig" type="fm:BaseConfigType"/>
     <element name="SPSSOConfig" type="fm:BaseConfigType"/>
-    <complexType name="BaseConfigType" abstract="true">
+    <complexType name="BaseConfigType" abstract="false">
         <sequence>
             <element ref="fm:Attribute" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>

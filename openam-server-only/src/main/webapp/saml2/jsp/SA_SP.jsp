@@ -25,6 +25,7 @@
    $Id: SA_SP.jsp,v 1.8 2009/02/26 23:57:19 exu Exp $
 
    Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2026 3A Systems LLC.
 --%>
 
 <%@ page language="java" 
@@ -163,7 +164,7 @@ org.owasp.esapi.ESAPI"
         // get attr list from configuration
         SPSSOConfigElement spConfig = mm.getSPSSOConfig(realm, spEntityId);
         if (spConfig != null) {
-            Map attrs = SAML2MetaUtils.getAttributes(spConfig);
+            Map attrs = SAML2MetaUtils.getAttributes(spConfig.getValue());
             if (attrs != null) {
                 List value = (List) attrs.get(SAML2Constants.ATTRIBUTE_MAP);
                 if (value != null && !value.isEmpty()) {

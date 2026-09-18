@@ -25,7 +25,7 @@
  * $Id: IDPProxyUtil.java,v 1.18 2009/11/20 21:41:16 exu Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.profile;
@@ -38,6 +38,7 @@ import java.util.logging.Level;
 
 import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import com.sun.identity.saml2.common.SOAPCommunicator;
+import com.sun.identity.saml2.jaxb.metadata.SingleLogoutServiceElement;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.protocol.RequesterID;
 import com.sun.identity.saml2.protocol.impl.RequesterIDImpl;
@@ -74,7 +75,6 @@ import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Scoping;
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
@@ -184,14 +184,14 @@ public class IDPProxyUtil {
         String binding;
         try {
             idpDescriptor = IDPSSOUtil.metaManager.getIDPSSODescriptor(realm, preferredIDP);
-            List<SingleSignOnServiceElement> ssoServiceList = idpDescriptor.getSingleSignOnService();
+            List<SingleSignOnServiceElement> ssoServiceList = idpDescriptor.getValue().getSingleSignOnService();
             SingleSignOnServiceElement endpoint = getMatchingSSOEndpoint(ssoServiceList, originalBinding);
             if (endpoint == null) {
                 SAML2Utils.debug.error(classMethod + "Single Sign-on service is not found for the proxying IDP.");
                 throw new SAML2Exception(SAML2Utils.bundle.getString("ssoServiceNotFoundIDPProxy"));
             }
-            binding = endpoint.getBinding();
-            destination = endpoint.getLocation();
+            binding = endpoint.getValue().getBinding();
+            destination = endpoint.getValue().getLocation();
 
             localDescriptor = IDPSSOUtil.metaManager.getSPSSODescriptor(realm, hostedEntityId);
             localDescriptorConfig = IDPSSOUtil.metaManager.getSPSSOConfig(realm, hostedEntityId);
@@ -219,7 +219,8 @@ public class IDPProxyUtil {
         IDPCache.proxySPAuthnReqCache.put(requestID, authnRequest);
 
 
-        boolean signingNeeded = idpDescriptor.isWantAuthnRequestsSigned() || localDescriptor.isAuthnRequestsSigned();
+        boolean signingNeeded = Boolean.TRUE.equals(idpDescriptor.getValue().isWantAuthnRequestsSigned())
+                || Boolean.TRUE.equals(localDescriptor.getValue().isAuthnRequestsSigned());
 
         // check if relayState is present and get the unique
         // id which will be appended to the SSO URL before
@@ -233,7 +234,7 @@ public class IDPProxyUtil {
         if (binding.equals(SAML2Constants.HTTP_POST)) {
             if (signingNeeded) {
                 String certAlias = SPSSOFederate.getParameter(
-                        SAML2MetaUtils.getAttributes(localDescriptorConfig),
+                        SAML2MetaUtils.getAttributes(localDescriptorConfig.getValue()),
                         SAML2Constants.SIGNING_CERT_ALIAS);
                 SPSSOFederate.signAuthnRequest(certAlias,newAuthnRequest);
             }
@@ -269,7 +270,7 @@ public class IDPProxyUtil {
 
             if (signingNeeded) {
                 String certAlias = SPSSOFederate.getParameter(
-                        SAML2MetaUtils.getAttributes(localDescriptorConfig),
+                        SAML2MetaUtils.getAttributes(localDescriptorConfig.getValue()),
                         SAML2Constants.SIGNING_CERT_ALIAS);
                 String signedQueryStr = SPSSOFederate.signQueryString(
                     queryString.toString(),certAlias);
@@ -314,7 +315,7 @@ public class IDPProxyUtil {
                 preferredEndpoint = endpoint;
                 isFirst = false;
             }
-            if (preferredBinding.equals(endpoint.getBinding())) {
+            if (preferredBinding.equals(endpoint.getValue().getBinding())) {
                 preferredEndpoint = endpoint;
                 break;
             }
@@ -403,7 +404,7 @@ public class IDPProxyUtil {
                 //handling the alwaysIdpProxy case -> the incoming request
                 //did not contained a Scoping field
                 SPSSOConfigElement spConfig = getSPSSOConfigByAuthnRequest(realm, origRequest);
-                Map<String, List<String>> spConfigAttrMap = SAML2MetaUtils.getAttributes(spConfig);
+                Map<String, List<String>> spConfigAttrMap = SAML2MetaUtils.getAttributes(spConfig.getValue());
                 scoping = ProtocolFactory.getInstance().createScoping();
                 String proxyCountParam = SPSSOFederate.getParameter(spConfigAttrMap,
                         SAML2Constants.IDP_PROXY_COUNT);
@@ -479,7 +480,7 @@ public class IDPProxyUtil {
             //let's check if always IdP proxy and IdP Proxy itself is enabled
             spConfig = getSPSSOConfigByAuthnRequest(realm, authnRequest);
             if (spConfig != null) {
-                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spConfig);
+                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spConfig.getValue());
                 Boolean alwaysEnabled = SPSSOFederate.getAttrValueFromMap(
                         spConfigAttrsMap, SAML2Constants.ALWAYS_IDP_PROXY);
                 Boolean proxyEnabled = SPSSOFederate.getAttrValueFromMap(
@@ -508,7 +509,7 @@ public class IDPProxyUtil {
             IDPSSOUtil.metaManager.getSPSSOConfig(realm, 
             authnRequest.getIssuer().getValue());
         if (spConfig != null) {
-            spConfigAttrsMap = SAML2MetaUtils.getAttributes(spConfig);
+            spConfigAttrsMap = SAML2MetaUtils.getAttributes(spConfig.getValue());
         } 
         Boolean enabledString = SPSSOFederate.getAttrValueFromMap(
             spConfigAttrsMap, SAML2Constants.ENABLE_IDP_PROXY);
@@ -672,7 +673,8 @@ public class IDPProxyUtil {
                 String realm = SAML2Utils.getRealm(SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
                 try {
                     String hostEntityId = sm.getEntityByMetaAlias(metaAlias);
-                    Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(sm.getSPSSOConfig(realm, hostEntityId));
+                    Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(
+                            sm.getSPSSOConfig(realm, hostEntityId).getValue());
                     assertion = encryptedAssertions.get(0).decrypt(decryptionKeys);
                 } catch (SAML2Exception ex) {
                     SAML2Utils.debug.error("getNameIDFormat failed decrypting EncryptedAssertion", ex);
@@ -808,7 +810,7 @@ public class IDPProxyUtil {
                 throw new SAML2Exception(
                     SAML2Utils.bundle.getString("metaDataError"));
             }
-            List slosList = idpsso.getSingleLogoutService();
+            List<SingleLogoutServiceElement> slosList = idpsso.getValue().getSingleLogoutService();
             if (slosList == null) {
                 String[] data = {idpEntityID};
                 LogUtil.error(Level.INFO,LogUtil.SLO_NOT_FOUND,data,
@@ -1081,7 +1083,7 @@ public class IDPProxyUtil {
         String logoutAll = request.getParameter(SAML2Constants.LOGOUT_ALL);
         HashMap paramsMap = new HashMap();
         IDPSSOConfigElement config = sm.getIDPSSOConfig(realm, spEntityID);
-        paramsMap.put("metaAlias", config.getMetaAlias());
+        paramsMap.put("metaAlias", config.getValue().getMetaAlias());
         paramsMap.put(SAML2Constants.ROLE, SAML2Constants.IDP_ROLE);
         paramsMap.put(SAML2Constants.BINDING, SAML2Constants.HTTP_REDIRECT);
         paramsMap.put("Destination", request.getParameter("Destination"));

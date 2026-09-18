@@ -24,6 +24,8 @@
  *
  * $Id: UserDiscoEntryHandler.java,v 1.2 2008/06/25 05:49:56 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems LLC.
+ *
  */
 
 package com.sun.identity.liberty.ws.disco.plugins;
@@ -34,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.sun.identity.liberty.ws.disco.common.DiscoConstants;
+import com.sun.identity.liberty.ws.disco.jaxb.QueryType;
+import com.sun.identity.liberty.ws.disco.plugins.jaxb.DiscoEntryElement;
 import com.sun.identity.plugin.datastore.DataStoreProvider;
 import com.sun.identity.plugin.datastore.DataStoreProviderManager;
 
@@ -69,16 +73,16 @@ public class UserDiscoEntryHandler implements DiscoEntryHandler {
      *  List, the <code>entryId</code> attribute of ResourceOffering need to
      *  be set.
      */
-    public Map getDiscoEntries(String userID, List reqServiceTypes) {
+    public Map<String, DiscoEntryElement> getDiscoEntries(String userID, List<QueryType.RequestedServiceType> reqServiceTypes) {
         DiscoEntryHandlerImplUtils.debug.message(
             "in UserDiscoEntryHandler.getDiscoEntries");
-        Map results = new HashMap();
+        Map<String, DiscoEntryElement> results = new HashMap<>();
         try {
             DataStoreProvider store = DataStoreProviderManager.getInstance().
                 getDataStoreProvider(DISCO);
 
             if (DiscoEntryHandlerImplUtils.getUserDiscoEntries(
-                store, userID, USER_ATTR_NAME,results))
+                store, userID, USER_ATTR_NAME, results))
             {
                 // this is the case when the DiscoEntry is set through console
                 // or amadmin, and entryID was not set

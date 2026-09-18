@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -29,6 +30,15 @@
     <description>OpenAM Schemata Components</description>
     <artifactId>openam-schema</artifactId>
     <packaging>pom</packaging>
+
+    <properties>
+        <!-- Schema modules build from XJC/WSDL-generated sources whose Javadoc is neither
+             doclint-clean (e.g. {@link byte[]}) nor warning-free; the repo-wide
+             all,-missing + failOnWarnings policy would fail on this generated code, so
+             skip the (non-essential) Javadoc jar for the generated schema modules. -->
+        <doclint>none</doclint>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
 
     <!-- Child Modules -->
     <modules>

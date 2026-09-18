@@ -12,6 +12,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ * 
+ * Portions copyright 2026 3A Systems LLC
  */
 
 package com.sun.identity.saml2.key;
@@ -22,10 +24,12 @@ import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.jaxb.metadata.*;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.util.List;
+
+import jakarta.xml.bind.JAXBElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 public class KeyUtilTest {
 
@@ -43,10 +47,10 @@ public class KeyUtilTest {
                 XMLUtils.toDOMDocument(ClassLoader.getSystemResourceAsStream(XML_DOCUMENT_TO_LOAD),
                     SAML2Utils.debug), "UTF-8");
         EntityDescriptorElement element = SAML2MetaUtils.getEntityDescriptorElement(idpMetadata);
-        List descriptors = element.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor();
-        for (Object descriptor : descriptors) {
-            if (descriptor instanceof IDPSSODescriptorElement) {
-                KeyDescriptorType type = KeyUtil.getKeyDescriptor((IDPSSODescriptorElement)descriptor, "signing");
+        List<JAXBElement<? extends RoleDescriptorType>> descriptors = element.getValue().getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor();
+        for (JAXBElement<? extends RoleDescriptorType> descriptor : descriptors) {
+            if (descriptor.getValue() instanceof IDPSSODescriptorType) {
+                KeyDescriptorElement type = KeyUtil.getKeyDescriptor(descriptor.getValue(), "signing");
                 Assert.assertNotNull(type);
                 break;
             }

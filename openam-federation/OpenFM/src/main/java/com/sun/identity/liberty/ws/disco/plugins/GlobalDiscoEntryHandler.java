@@ -24,6 +24,8 @@
  *
  * $Id: GlobalDiscoEntryHandler.java,v 1.2 2008/06/25 05:49:56 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems LLC.
+ *
  */
 package com.sun.identity.liberty.ws.disco.plugins;
 
@@ -36,15 +38,15 @@ import java.util.HashSet;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
-import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.liberty.ws.disco.common.DiscoConstants;
 import com.sun.identity.liberty.ws.disco.common.DiscoUtils;
 import com.sun.identity.liberty.ws.disco.DiscoveryException;
+import com.sun.identity.liberty.ws.disco.jaxb.QueryType;
+import com.sun.identity.liberty.ws.disco.plugins.jaxb.DiscoEntryElement;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.common.SystemConfigurationUtil;
 
 /*
  * The class <code>GlobalDiscoEntryHandler</code> provides an
@@ -128,9 +130,9 @@ public class GlobalDiscoEntryHandler implements DiscoEntryHandler {
      *		for this user. For each DiscoEntry element in the List,
      *		the entryId attribute of ResourceOffering need to be set.
      */
-    public Map getDiscoEntries(String userID, List reqServiceTypes) {
+    public Map<String, DiscoEntryElement> getDiscoEntries(String userID, List<QueryType.RequestedServiceType> reqServiceTypes) {
 	DiscoUtils.debug.message("in GlobalDiscoEntryHandler.getDiscoEntries");
-	Map results = new HashMap();
+	Map<String, DiscoEntryElement> results = new HashMap<>();
 	try {
 	    DiscoEntryHandlerImplUtils.getGlobalDiscoEntries(
                      getRealmIdentity(), DYNAMIC_ATTR_NAME, results, userID);

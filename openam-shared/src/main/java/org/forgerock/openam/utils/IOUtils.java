@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.utils;
@@ -289,8 +290,6 @@ public final class IOUtils {
                     "com.sun.identity.console.service.model.SMDiscoEntryData",
                     "com.sun.identity.console.session.model.SMSessionData",
                     "com.sun.identity.shared.datastruct.OrderedSet",
-                    "com.sun.xml.bind.util.ListImpl",
-                    "com.sun.xml.bind.util.ProxyListImpl",
                     "java.lang.Boolean",
                     "java.lang.Integer",
                     "java.lang.Number",

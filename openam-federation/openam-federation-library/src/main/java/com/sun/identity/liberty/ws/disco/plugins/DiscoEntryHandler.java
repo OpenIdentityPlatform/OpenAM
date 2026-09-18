@@ -24,10 +24,15 @@
  *
  * $Id: DiscoEntryHandler.java,v 1.2 2008/06/25 05:47:12 qcheng Exp $
  *
+ * Portions Copyrighted 2026 3A Systems LLC.
+ *
  */
 
 
 package com.sun.identity.liberty.ws.disco.plugins;
+
+import com.sun.identity.liberty.ws.disco.jaxb.QueryType;
+import com.sun.identity.liberty.ws.disco.plugins.jaxb.DiscoEntryElement;
 
 import java.util.Map;
 import java.util.List;
@@ -70,7 +75,7 @@ public interface DiscoEntryHandler {
      *  in the List, the <code>entryId</code> attribute of
      *  <code>ResourceOffering</code> should be set.
      */
-    public Map getDiscoEntries(String userID, List reqServiceTypes); 
+    public Map<String, DiscoEntryElement> getDiscoEntries(String userID, List<QueryType.RequestedServiceType> reqServiceTypes);
 
 
     /**

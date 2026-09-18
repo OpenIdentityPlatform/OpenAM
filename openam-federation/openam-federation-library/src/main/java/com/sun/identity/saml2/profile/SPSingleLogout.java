@@ -25,7 +25,7 @@
  * $Id: SPSingleLogout.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.profile;
@@ -48,6 +48,7 @@ import com.sun.identity.saml2.common.SAML2FailoverUtils;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.metadata.EndpointType;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.logging.LogUtil;
@@ -69,6 +70,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Collectors;
+import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -447,7 +450,8 @@ public class SPSingleLogout {
                 SAML2Utils.bundle.getString("metaDataError"));
         }
 
-        List slosList = idpsso.getSingleLogoutService();
+        List<EndpointType> slosList = idpsso.getValue().getSingleLogoutService().stream()
+                .map(JAXBElement::getValue).collect(Collectors.toList());
         if (slosList == null) {
             String[] data = {nameIdInfoKey.getRemoteEntityID()};
             LogUtil.error(Level.INFO,LogUtil.SLO_NOT_FOUND,data,
@@ -476,7 +480,7 @@ public class SPSingleLogout {
             request,
             response,
             paramsMap,
-            idpConfig);
+            (idpConfig == null) ? null : idpConfig.getValue());
 
         String requestIDStr = requestID.toString();
         if (debug.messageEnabled()) {
@@ -906,7 +910,7 @@ public class SPSingleLogout {
                 SAML2Utils.bundle.getString("metaDataError"));
         }
         
-        List slosList = idpsso.getSingleLogoutService();
+        List slosList = idpsso.getValue().getSingleLogoutService();
         if (slosList == null) {
             String[] data = {idpEntityID};
             LogUtil.error(Level.INFO,LogUtil.SLO_NOT_FOUND,data,
@@ -1191,7 +1195,7 @@ public class SPSingleLogout {
 
                 // get application logout URL 
                 BaseConfigType spConfig = SAML2Utils.getSAML2MetaManager()
-                    .getSPSSOConfig(realm, spEntityID);
+                    .getSPSSOConfig(realm, spEntityID).getValue();
                 List appLogoutURL = (List) SAML2MetaUtils.getAttributes(
                     spConfig).get(SAML2Constants.APP_LOGOUT_URL);
                 if (debug.messageEnabled()) {
@@ -1462,7 +1466,7 @@ public class SPSingleLogout {
         SPSSODescriptorElement spsso, String binding) {
         String location = null;
         if (spsso != null) {
-            List sloList = spsso.getSingleLogoutService();
+            List sloList = spsso.getValue().getSingleLogoutService();
             if (sloList != null && !sloList.isEmpty()) {
                 location = LogoutUtil.getSLOResponseServiceLocation(
                            sloList, binding);

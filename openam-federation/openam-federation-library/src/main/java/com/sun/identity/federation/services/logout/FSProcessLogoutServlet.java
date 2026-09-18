@@ -166,12 +166,12 @@ public class FSProcessLogoutServlet extends HttpServlet {
                     hostedProviderDesc = metaManager.getIDPDescriptor(
                         realm, hostedEntityId);
                     hostedConfig = metaManager.getIDPDescriptorConfig(
-                        realm, hostedEntityId);
+                        realm, hostedEntityId).getValue();
                 } else if (hostedRole.equalsIgnoreCase(IFSConstants.SP)) {
                     hostedProviderDesc = metaManager.getSPDescriptor(
                         realm, hostedEntityId);
                     hostedConfig = metaManager.getSPDescriptorConfig(
-                        realm, hostedEntityId);
+                        realm, hostedEntityId).getValue();
                 }
             }
             if (hostedProviderDesc == null){

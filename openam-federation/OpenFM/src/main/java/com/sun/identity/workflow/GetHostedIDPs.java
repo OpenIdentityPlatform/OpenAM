@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems LLC
  */
 
 package com.sun.identity.workflow;
@@ -68,7 +69,7 @@ public class GetHostedIDPs
                 String entityId = (String) i.next();
                 EntityConfigElement elm = mgr.getEntityConfig(realm, entityId);
                 // elm could be null due to OPENAM-269
-                if (elm != null && elm.isHosted()) {
+                if (elm != null && Boolean.TRUE.equals(elm.getValue().isHosted())) {
                     EntityDescriptorElement desc = mgr.getEntityDescriptor(
                         realm, entityId);
                     if (SAML2MetaUtils.getIDPSSODescriptor(desc) != null) {
