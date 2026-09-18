@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.shared.encode;
@@ -24,7 +24,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.testng.annotations.Test;
 
 import com.sun.identity.shared.Constants;
@@ -52,5 +54,84 @@ public class CookieUtilsTest {
 	    	}))
 	    );
     }
-  
+
+    /** Runs {@code body} with the deployment's Secure/HttpOnly/SameSite cookie settings pinned. */
+    private static void withCookieSettings(boolean secure, boolean httpOnly, String sameSite, Runnable body) {
+        boolean savedSecure = CookieUtils.secureCookie;
+        boolean savedHttpOnly = CookieUtils.cookieHttpOnly;
+        String savedSameSite = CookieUtils.cookieSameSite;
+        try {
+            CookieUtils.secureCookie = secure;
+            CookieUtils.cookieHttpOnly = httpOnly;
+            CookieUtils.cookieSameSite = sameSite;
+            body.run();
+        } finally {
+            CookieUtils.secureCookie = savedSecure;
+            CookieUtils.cookieHttpOnly = savedHttpOnly;
+            CookieUtils.cookieSameSite = savedSameSite;
+        }
+    }
+
+    @Test
+    public void newCookieCarriesTheSecureFlagTheDeploymentConfigures() {
+        withCookieSettings(true, false, null, () ->
+            assertTrue(CookieUtils.newCookie("iPlanetDirectoryPro", "AQIC").getSecure()));
+        withCookieSettings(false, false, null, () ->
+            assertFalse(CookieUtils.newCookie("iPlanetDirectoryPro", "AQIC").getSecure()));
+    }
+
+    /**
+     * HttpOnly used to be applied in addCookieToResponse only, so a cookie handed straight to
+     * response.addCookie went out without it; the cookie now carries it from creation.
+     */
+    @Test
+    public void newCookieCarriesTheHttpOnlyFlagTheDeploymentConfigures() {
+        withCookieSettings(false, true, null, () ->
+            assertTrue(CookieUtils.newCookie("iPlanetDirectoryPro", "AQIC").isHttpOnly()));
+        withCookieSettings(false, false, null, () ->
+            assertFalse(CookieUtils.newCookie("iPlanetDirectoryPro", "AQIC").isHttpOnly()));
+    }
+
+    @Test
+    public void addCookieToResponseSetsHttpOnlyOnTheServletCookie() {
+        withCookieSettings(false, true, null, () -> {
+            HttpServletResponse response = mock(HttpServletResponse.class);
+            Cookie cookie = new Cookie("iPlanetDirectoryPro", "AQIC");
+
+            CookieUtils.addCookieToResponse(response, cookie);
+
+            assertTrue(cookie.isHttpOnly());
+            verify(response).addCookie(cookie);
+            verify(response, never()).addHeader(anyString(), anyString());
+        });
+    }
+
+    @Test
+    public void addCookieToResponseLeavesHttpOnlyAloneWhenNotConfigured() {
+        withCookieSettings(false, false, null, () -> {
+            HttpServletResponse response = mock(HttpServletResponse.class);
+            Cookie cookie = new Cookie("iPlanetDirectoryPro", "AQIC");
+
+            CookieUtils.addCookieToResponse(response, cookie);
+
+            assertFalse(cookie.isHttpOnly());
+            verify(response).addCookie(cookie);
+        });
+    }
+
+    /** With SameSite configured the cookie goes out as a hand-built header, flags included. */
+    @Test
+    public void addCookieToResponseWritesTheHeaderItselfWhenSameSiteIsConfigured() {
+        withCookieSettings(true, true, "Strict", () -> {
+            HttpServletResponse response = mock(HttpServletResponse.class);
+            Cookie cookie = new Cookie("iPlanetDirectoryPro", "AQIC");
+            cookie.setPath("/");
+
+            CookieUtils.addCookieToResponse(response, cookie);
+
+            verify(response, never()).addCookie(any(Cookie.class));
+            verify(response).addHeader(eq("Set-Cookie"),
+                    eq("iPlanetDirectoryPro=AQIC;path=/;secure;httponly;SameSite=Strict"));
+        });
+    }
 }
