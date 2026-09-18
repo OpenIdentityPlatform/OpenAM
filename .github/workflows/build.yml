@@ -22,6 +22,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build-maven:
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -75,6 +77,8 @@ jobs:
           openam-distribution/openam-distribution-docker/Dockerfile*
   build-docker:
     needs: build-maven
+    permissions:
+      contents: read
     runs-on: 'ubuntu-latest'
     services:
       registry:
@@ -93,7 +97,7 @@ jobs:
           echo "release_version=$git_version_last" >> $GITHUB_ENV
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v6
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: |
             localhost:5000/${{ github.repository }}
@@ -101,16 +105,16 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ env.release_version }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
         with:
           driver-opts: network=host
       - name: Prepare Dockerfile
         shell: bash
         run: sed -i -E '/^#COPY openam-(server|distribution)\//s/^#//' ./openam-distribution/openam-distribution-docker/Dockerfile
       - name: Build image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         continue-on-error: true
         with:
           context: .

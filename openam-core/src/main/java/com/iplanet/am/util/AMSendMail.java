@@ -231,6 +231,8 @@ public class AMSendMail {
         moduleProps.put("mail.smtp.socketFactory.port", port);
         if (ssl) {
             moduleProps.put("mail.smtp.ssl.enable", "true");
+            // The certificate has to be the SMTP host's, not merely one the JVM trusts.
+            moduleProps.put("mail.smtp.ssl.checkserveridentity", "true");
         }
         moduleProps.put("mail.smtp.socketFactory.fallback", "false");
 
