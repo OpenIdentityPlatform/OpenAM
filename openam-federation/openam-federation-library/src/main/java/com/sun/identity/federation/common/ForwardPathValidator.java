@@ -16,6 +16,7 @@
 package com.sun.identity.federation.common;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
@@ -76,6 +77,46 @@ public final class ForwardPathValidator {
             return withoutFragment != null && !isReserved(withoutFragment);
         }
         return true;
+    }
+
+    /**
+     * The path to hand to a {@code RequestDispatcher} for {@code path}, or {@code null} when
+     * {@code path} must not be dispatched to. The result is the form the container maps -
+     * path parameters stripped and percent-escapes decoded once, {@code +} kept literal - with
+     * the query string as it was given.
+     * <p>
+     * Beyond {@link #isSafeForwardPath} the dispatcher form is refused when it carries a
+     * {@code WEB-INF} segment anywhere, not only at the root: no in-app path of the product
+     * does. The decoded form is derived and re-checked here in the shape static analysis
+     * recognises as a sanitised forward target, so the checks read as a repetition of what
+     * {@code isSafeForwardPath} established.
+     *
+     * @param path a context-relative path, optionally with a query string
+     * @return the path to dispatch to, or {@code null} if it is not a plain in-app path
+     */
+    public static String forwardTarget(String path) {
+        if (!isSafeForwardPath(path)) {
+            return null;
+        }
+        int query = path.indexOf('?');
+        String uri = query == -1 ? path : path.substring(0, query);
+        // isSafeForwardPath refused every escape that decodes to a delimiter, %25 included,
+        // so one round decodes everything; '+' is protected from URLDecoder's form decoding.
+        String decoded = stripPathParams(uri).replace("+", "%2B");
+        try {
+            while (decoded.contains("%")) {
+                decoded = URLDecoder.decode(decoded, StandardCharsets.UTF_8);
+            }
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+        // Only a segment that is exactly ".." is traversal; every other segment becomes "x".
+        String dotSegments = decoded.replaceAll("(?<=^|/)(?!\\.\\.(?=/|$))[^/]+", "x");
+        if ((decoded + "/").toUpperCase(Locale.ROOT).contains("/WEB-INF/")
+                || dotSegments.contains("..")) {
+            return null;
+        }
+        return query == -1 ? decoded : decoded + "?" + path.substring(query + 1);
     }
 
     private static boolean isReserved(String collapsedPath) {
