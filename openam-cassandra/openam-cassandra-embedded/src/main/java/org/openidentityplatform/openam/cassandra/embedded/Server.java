@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package org.openidentityplatform.openam.cassandra.embedded;
@@ -19,9 +20,14 @@ package org.openidentityplatform.openam.cassandra.embedded;
 import java.io.Closeable;
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.EnumSet;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -45,6 +51,23 @@ public class Server implements Runnable, Closeable {
 	final private ExecutorService executor = Executors.newSingleThreadExecutor();
 	private CassandraDaemon cassandraDaemon;
 	    
+	/**
+	 * The storage directory, created if it does not exist. It defaults to a fixed name under the
+	 * shared temporary directory so that the embedded store survives a restart, which is why it
+	 * is closed to every account but the server's own where the file system can express that.
+	 */
+	public static Path privateDirectory(Path path) throws java.io.IOException {
+		if (!FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+			return Files.createDirectories(path);
+		}
+		final EnumSet<PosixFilePermission> ownerOnly = EnumSet.of(PosixFilePermission.OWNER_READ,
+				PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE);
+		Files.createDirectories(path, PosixFilePermissions.asFileAttribute(ownerOnly));
+		// createDirectories applies the attribute only to what it creates.
+		Files.setPosixFilePermissions(path, ownerOnly);
+		return path;
+	}
+
 	public void run() {
 		try {
 			//check for external cassandra settings
@@ -54,7 +77,7 @@ public class Server implements Runnable, Closeable {
 			
 			//config
 			final File path=new File(System.getProperty("cassandra.storagedir",System.getProperty("java.io.tmpdir")+File.separator+"embeddedCassandra"));
-			path.mkdirs();
+			privateDirectory(path.toPath());
 	        System.setProperty("cassandra-foreground", "true");
 	        System.setProperty("cassandra.storagedir", path.getPath());
 	        //prepare default keystore

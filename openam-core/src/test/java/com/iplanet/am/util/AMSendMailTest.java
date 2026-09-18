@@ -206,6 +206,15 @@ public class AMSendMailTest extends PowerMockTestCase {
         assertThat(serialized).contains("attacker@example.org");
     }
 
+    /** An SSL connection to the SMTP host has to check that the certificate is the host's, not just any valid one. */
+    @Test
+    public void shouldCheckTheServerIdentityOnAnSslConnection() throws Exception {
+        new AMSendMail().postMail(new String[] {TO}, "Password Reset", BODY, FROM, "text/plain",
+                "UTF-8", "smtp.example.com", "465", "openam", "secret", true);
+
+        assertThat(sentMessage().getSession().getProperty("mail.smtp.ssl.checkserveridentity")).isEqualTo("true");
+    }
+
     /**
      * The recipient is the one field of a self service registration the anonymous caller still fills in himself.
      * A break outside the quotes is rejected by the address parser, but one in the quoted display name goes

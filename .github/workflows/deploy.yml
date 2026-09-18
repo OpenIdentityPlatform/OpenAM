@@ -12,6 +12,9 @@ concurrency:
 jobs:
   deploy-maven:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event=='push'}}
+    # contents: write - the docs are pushed to the wiki with github.token
+    permissions:
+      contents: write
     runs-on: 'ubuntu-latest'
     steps:
       - name: Print github context
