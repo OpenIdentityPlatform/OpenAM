@@ -1933,9 +1933,8 @@ public class ClickServlet extends HttpServlet {
      * which allows the JavaScript that initiated the Ajax request to handle
      * the error as appropriate.
      * <p>
-     * If Click is running in <code>development</code> modes the exception stackTrace
-     * will be rendered, in <code>production</code> modes an error message is
-     * rendered.
+     * A fixed error message is rendered whatever the application mode; the
+     * exception itself is logged.
      * <p>
      * Below is an example error response:
      *
@@ -1968,11 +1967,9 @@ public class ClickServlet extends HttpServlet {
                 // TODO: use an ErrorReport instance instead?
                 writer.write("<div id='errorReport' class='errorReport'>\n");
 
-                if (configService.isProductionMode() || configService.isProfileMode()) {
-                    writer.write("The application encountered an unexpected error.");
-                } else {
-                    exception.printStackTrace(writer);
-                }
+                // The exception is logged below; whatever the application mode, neither
+                // its stack trace nor its message is for the browser.
+                writer.write("The application encountered an unexpected error.");
 
                 writer.write("\n</div>");
             } finally {
