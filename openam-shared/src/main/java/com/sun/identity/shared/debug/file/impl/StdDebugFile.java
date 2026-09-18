@@ -12,17 +12,16 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.shared.debug.file.impl;
 
 import static org.forgerock.openam.utils.Time.*;
 
-import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.file.DebugFile;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -49,18 +48,7 @@ public class StdDebugFile implements DebugFile {
 
     @Override
     public void writeIt(String prefix, String msg, Throwable th) throws IOException {
-        StringBuilder buf = new StringBuilder(prefix);
-        buf.append('\n');
-        buf.append(msg);
-        if (th != null) {
-            buf.append('\n');
-            StringWriter stBuf = new StringWriter(DebugConstants.MAX_BUFFER_SIZE_EXCEPTION);
-            PrintWriter stackStream = new PrintWriter(stBuf);
-            th.printStackTrace(stackStream);
-            stackStream.flush();
-            buf.append(stBuf.toString());
-        }
-        stdoutWriter.println(buf.toString());
+        stdoutWriter.println(DebugRecordFormat.format(prefix, msg, th));
     }
 
     /**
@@ -72,13 +60,9 @@ public class StdDebugFile implements DebugFile {
      */
     public static void printError(String debugName, String message, Throwable ex) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss:SSS a zzz");
-        String prefix = debugName + ":" + dateFormat.format(newDate()) + ": " + Thread.currentThread().toString() +
-                "\n";
+        String prefix = debugName + ":" + dateFormat.format(newDate()) + ": " + Thread.currentThread().toString();
 
-        System.err.println(prefix + message);
-        if (ex != null) {
-            ex.printStackTrace(System.err);
-        }
+        System.err.println(DebugRecordFormat.format(prefix, message, ex));
     }
 
 }
