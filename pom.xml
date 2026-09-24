@@ -115,7 +115,7 @@
     <FastInfoset.version>2006-26-09</FastInfoset.version>
     <jsr173_api.version>2004-30-01</jsr173_api.version>
     <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
-    <freemarker.version>2.3.31</freemarker.version>
+    <freemarker.version>2.3.35</freemarker.version>
     <java-ipv6.version>0.17</java-ipv6.version>
     <hikaricp.version>2.4.1</hikaricp.version>
     <h2database.version>2.2.220</h2database.version>
