@@ -25,9 +25,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -118,24 +121,57 @@ public class AuthInterceptor implements HandlerInterceptor {
     }
 
     String getUserNamePasswordToken() {
-        Map<String, String> tokenResponse = openAMRestClient.post().uri("/json/authenticate")
+        ResponseEntity<Map<String, String>> tokenResponse = openAMRestClient.post().uri("/json/authenticate")
                 .header("X-OpenAM-Username", openAMConfig.username())
                 .header("X-OpenAM-Password", openAMConfig.password())
                 .retrieve()
-                .body(new ParameterizedTypeReference<>() {
+                .toEntity(new ParameterizedTypeReference<>() {
                 });
-        return tokenResponse.get("tokenId");
+        return extractSessionToken(tokenResponse);
     }
 
-    private String getTokenIdFromAccessToken(String accessToken) {
-        Map<String, String> tokenResponse = openAMRestClient.post()
+    String getTokenIdFromAccessToken(String accessToken) {
+        ResponseEntity<Map<String, String>> tokenResponse = openAMRestClient.post()
                 .uri("/json/authenticate?authIndexType=service&authIndexValue=".concat(openAMConfig.oidcAuthChain()))
                 .header(openAMConfig.oidcAuthHeader(), accessToken)
                 .body("{}")
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .body(new ParameterizedTypeReference<>() {});
-        return tokenResponse.get("tokenId");
+                .toEntity(new ParameterizedTypeReference<>() {});
+        return extractSessionToken(tokenResponse);
+    }
+
+    /**
+     * Takes the SSO token out of a {@code /json/authenticate} response. OpenAM
+     * returns it as {@code tokenId} in the body only while the session cookie is not
+     * HttpOnly (or {@code org.openidentityplatform.openam.httponly.allowTokenInBody}
+     * is set); with HttpOnly on, the default, the token comes only as the session
+     * cookie, named like {@link OpenAMConfig#tokenHeader()}. Of several such
+     * cookies the last non-empty one wins, so a clearing (empty) cookie cannot
+     * replace the token.
+     */
+    String extractSessionToken(ResponseEntity<Map<String, String>> response) {
+        Map<String, String> body = response.getBody();
+        if (body != null && StringUtils.hasText(body.get("tokenId"))) {
+            return body.get("tokenId");
+        }
+        String cookieName = openAMConfig.tokenHeader();
+        String token = null;
+        for (String setCookie : response.getHeaders().getOrEmpty(HttpHeaders.SET_COOKIE)) {
+            String pair = setCookie.split(";", 2)[0];
+            int eq = pair.indexOf('=');
+            if (eq > 0 && pair.substring(0, eq).trim().equals(cookieName)) {
+                String value = pair.substring(eq + 1).trim();
+                if (!value.isEmpty()) {
+                    token = value;
+                }
+            }
+        }
+        if (token == null) {
+            throw new IllegalStateException("OpenAM authentication response carries neither a tokenId "
+                    + "in the body nor a non-empty " + cookieName + " cookie");
+        }
+        return token;
     }
 
     boolean preHandleUsernamePassword(HttpServletRequest request) {
