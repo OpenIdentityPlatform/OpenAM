@@ -13,9 +13,9 @@ export default defineConfig({
     react(),
     dts({
       include: ['src/lib/**/*'],
-      outDir: 'target/lib',
+      outDirs: 'target/lib',
       insertTypesEntry: true,
-      rollupTypes: true,
+      bundleTypes: true,
       tsconfigPath: resolve(__dirname, "tsconfig.lib.json"),
     }),
   ],

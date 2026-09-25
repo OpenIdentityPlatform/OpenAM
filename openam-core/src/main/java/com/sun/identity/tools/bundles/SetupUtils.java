@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.tools.bundles;
 
@@ -453,8 +454,10 @@ public class SetupUtils implements SetupConstants{
             CopyUtils.copyFile(srcFile, destFile, tokens, true, false);
         }
         if (! currentOS.equals(WINDOWS)) {
-            Process proc = Runtime.getRuntime().exec("/bin/chmod -R +x " +
-                toDir.getName());
+            // Pass the directory as a separate argument so a name containing
+            // whitespace is not split into extra chmod operands.
+            Process proc = Runtime.getRuntime().exec(new String[] {
+                "/bin/chmod", "-R", "+x", toDir.getName()});
             try {
                 if (proc.waitFor() != 0) {
                     System.out.println(bundle.getString("message.info." +

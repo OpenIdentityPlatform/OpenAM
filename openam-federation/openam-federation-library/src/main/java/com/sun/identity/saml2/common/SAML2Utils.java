@@ -3660,16 +3660,48 @@ public class SAML2Utils extends SAML2SDKUtils {
         return attribute;
     }
 
+    /**
+     * Forwards to <code>autosubmitaccessrights.jsp</code> so that the browser re-posts the SAML
+     * message to <code>targetURL</code>.
+     * <p>
+     * The JSP renders every attribute set here with JSP EL, which does not escape, and it renders
+     * them inside <code>value</code> and <code>action</code> attributes - so they are encoded with
+     * <code>encodeForHTMLAttribute</code>, the same encoder {@code SAMLPOSTProfileServlet} and
+     * {@code SAML2Proxy} use when they hand build this very form. Encoding happens exactly once:
+     * the browser HTML decodes the attribute before re-posting it, so a second layer of escaping
+     * anywhere downstream would corrupt a Base64 SAML message ('+', '/' and '=' all sit outside the
+     * ESAPI immune sets).
+     * <p>
+     * Encoding is the whole defence for <code>TARGET_URL</code>, and it does not constrain the
+     * scheme. That is safe where the caller builds the target from
+     * <code>request.getRequestURL()</code>, as the load balancer cookie bounce does. Callers that
+     * pass an endpoint out of entity metadata instead - SLO, SSO and attribute query locations -
+     * are trusting whoever administers that metadata not to put a <code>javascript:</code> URL in
+     * the form action, since <code>encodeForHTMLAttribute</code> leaves the scheme intact.
+     *
+     * @param request The HTTP request in question.
+     * @param response The response associated with the request.
+     * @param SAMLmessageName Name of the SAML message parameter.
+     * @param SAMLmessageValue Value of the SAML message parameter.
+     * @param relayStateName Name of the relay state parameter.
+     * @param relayStateValue Value of the relay state parameter, may be null.
+     * @param targetURL The URL the message is re-posted to.
+     * @throws SAML2Exception if the forward fails.
+     */
     public static void postToTarget(HttpServletRequest request, HttpServletResponse response,
                                     String SAMLmessageName, String SAMLmessageValue, String relayStateName,
                                     String relayStateValue, String targetURL) throws SAML2Exception {
 
-        request.setAttribute("TARGET_URL", ESAPI.encoder().encodeForHTML(targetURL));
-        request.setAttribute("SAML_MESSAGE_NAME", ESAPI.encoder().encodeForHTML(SAMLmessageName));
-        request.setAttribute("SAML_MESSAGE_VALUE", ESAPI.encoder().encodeForHTML(SAMLmessageValue));
-        request.setAttribute("RELAY_STATE_NAME", ESAPI.encoder().encodeForHTML(relayStateName));
-        request.setAttribute("RELAY_STATE_VALUE", ESAPI.encoder().encodeForHTML(relayStateValue));
-        request.setAttribute("SAML_POST_KEY", bundle.getString("samlPostKey"));
+        request.setAttribute("TARGET_URL", ESAPI.encoder().encodeForHTMLAttribute(targetURL));
+        request.setAttribute("SAML_MESSAGE_NAME", ESAPI.encoder().encodeForHTMLAttribute(SAMLmessageName));
+        request.setAttribute("SAML_MESSAGE_VALUE", ESAPI.encoder().encodeForHTMLAttribute(SAMLmessageValue));
+        request.setAttribute("RELAY_STATE_NAME", ESAPI.encoder().encodeForHTMLAttribute(relayStateName));
+        request.setAttribute("RELAY_STATE_VALUE", ESAPI.encoder().encodeForHTMLAttribute(relayStateValue));
+        // The submit label comes from the frozen libSAML2 bundle rather than from the request, but
+        // it is rendered by the same bare EL as the rest, so it is encoded like the rest. Leaving
+        // one attribute unencoded is what lets the sink drift back apart.
+        request.setAttribute("SAML_POST_KEY",
+                ESAPI.encoder().encodeForHTMLAttribute(bundle.getString("samlPostKey")));
 
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache,no-store");

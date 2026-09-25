@@ -26,7 +26,7 @@
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 package com.iplanet.am.util;
 
@@ -54,6 +54,39 @@ public class AMSendMail {
     public AMSendMail() {
         props.put("mail.smtp.host", SystemProperties.get(Constants.AM_SMTP_HOST, "localhost"));
         props.put("mail.smtp.port", SystemProperties.get(Constants.SM_SMTP_PORT, "25"));
+    }
+
+    /**
+     * Replaces the control characters of an e-mail header value with spaces, the tab excepted.
+     *
+     * An RFC 5322 header is a single logical line, so a CR or an LF left in a value ends the header and lets
+     * everything after it be read as a header of its own - a Bcc, a Reply-To or, with an empty line, the message
+     * body. Jakarta Mail folds the Subject of such a value into a continuation line instead, but only while the
+     * default mail.mime.foldtext setting is in force, and it does not fold the Content-Type at all: a CR or an LF
+     * inside a quoted parameter of it is written out as it came. An address is no safer: the quoted display name
+     * of one carries a break through the parser untouched. The characters are therefore taken out here rather
+     * than relying on the library.
+     *
+     * The other control characters go the same way. They do not end a header, but a NUL truncates the header
+     * block at some agents, which comes to the same thing.
+     *
+     * A mail server implementation of its own, plugged in through forgerockMailServerImplClassName, does not go
+     * through this class; it is public so that such an implementation can sanitise the values it sets itself.
+     *
+     * @param value The header value to sanitise, may be null
+     * @return The value with every control character other than the tab replaced by a space, or null if the value
+     *         was null
+     */
+    public static String sanitizeHeaderValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        StringBuilder sanitized = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char character = value.charAt(i);
+            sanitized.append(character < ' ' && character != '\t' ? ' ' : character);
+        }
+        return sanitized.toString();
     }
 
     /**
@@ -115,25 +148,26 @@ public class AMSendMail {
         MimeMessage msg = new MimeMessage(session);
 
         // set the from and to address
-        InternetAddress addressFrom = new InternetAddress(from);
+        InternetAddress addressFrom = new InternetAddress(sanitizeHeaderValue(from));
         msg.setFrom(addressFrom);
 
         InternetAddress[] addressTo = new InternetAddress[recipients.length];
 
         for (int i = 0; i < recipients.length; i++) {
-            addressTo[i] = new InternetAddress(recipients[i]);
+            addressTo[i] = new InternetAddress(sanitizeHeaderValue(recipients[i]));
         }
 
         msg.setRecipients(Message.RecipientType.TO, addressTo);
 
         // Setting the Subject and Content Type
+        subject = sanitizeHeaderValue(subject);
         if (charset == null) {
             msg.setSubject(subject);
-            msg.setContent(message, mimeType);
+            msg.setContent(message, sanitizeHeaderValue(mimeType));
         } else {
             charset = BrowserEncoding.mapHttp2JavaCharset(charset);
             msg.setSubject(subject, charset);
-            msg.setContent(message, mimeType + "; charset=" + charset);
+            msg.setContent(message, sanitizeHeaderValue(mimeType + "; charset=" + charset));
         }
 
         // Transport the message now
@@ -219,25 +253,26 @@ public class AMSendMail {
             throw new MessagingException("the 'Email From Address' configuration is empty, please check your email " +
                                                  "service configuration");
         }
-        InternetAddress addressFrom = new InternetAddress(from);
+        InternetAddress addressFrom = new InternetAddress(sanitizeHeaderValue(from));
         msg.setFrom(addressFrom);
 
         InternetAddress[] addressTo = new InternetAddress[recipients.length];
 
         for (int i = 0; i < recipients.length; i++) {
-            addressTo[i] = new InternetAddress(recipients[i]);
+            addressTo[i] = new InternetAddress(sanitizeHeaderValue(recipients[i]));
         }
 
         msg.setRecipients(Message.RecipientType.TO, addressTo);
 
         // Setting the Subject and Content Type
+        subject = sanitizeHeaderValue(subject);
         if (charset == null) {
             msg.setSubject(subject);
-            msg.setContent(message, mimeType);
+            msg.setContent(message, sanitizeHeaderValue(mimeType));
         } else {
             charset = BrowserEncoding.mapHttp2JavaCharset(charset);
             msg.setSubject(subject, charset);
-            msg.setContent(message, mimeType + "; charset=" + charset);
+            msg.setContent(message, sanitizeHeaderValue(mimeType + "; charset=" + charset));
         }
 
         // Transport the message now

@@ -25,6 +25,7 @@
  * $Id: NotCondition.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  *
  * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement;
@@ -95,28 +96,58 @@ public class NotCondition extends LogicalCondition {
      */
     @Override
     public void setState(String state) {
+        JSONObject memberCondition = null;
         try {
             JSONObject jo = new JSONObject(state);
             setState(jo);
             pConditionName = (jo.has("pConditionName")) ?
                 jo.optString("pConditionName") : null;
 
-            JSONObject memberCondition = jo.optJSONObject("memberECondition");
+            clearMemberRejection();
+            memberCondition = jo.optJSONObject("memberECondition");
             if (memberCondition != null) {
                 String className = memberCondition.getString("className");
-                Class cl = Class.forName(className);
-                eCondition = (EntitlementCondition)cl.newInstance();
-                eCondition.setState(memberCondition.getString("state"));
+                EntitlementCondition member = EntitlementClassResolver.newInstance(
+                    className, EntitlementCondition.class);
+                member.setState(memberCondition.getString("state"));
+                // Assign only once the member has been fully applied, the way
+                // LogicalCondition.setState adds to its set only after the member's own setState
+                // returned. A half-applied member left in the field is what toJSONObject() writes
+                // back out in place of the refused declaration, so a re-save would hand the next
+                // load an intact policy - and an enclosing NOT would negate its failure into a
+                // grant.
+                eCondition = member;
             }
         } catch (InstantiationException ex) {
             PolicyConstants.DEBUG.error("NotCondition.setState", ex);
+            rejectMember(memberCondition);
         } catch (IllegalAccessException ex) {
             PolicyConstants.DEBUG.error("NotCondition.setState", ex);
+            rejectMember(memberCondition);
         } catch (ClassNotFoundException ex) {
             PolicyConstants.DEBUG.error("NotCondition.setState", ex);
+            rejectMember(memberCondition);
         } catch (JSONException ex) {
             PolicyConstants.DEBUG.error("NotCondition.setState", ex);
+            // Only when the state did declare a member: a state string that fails to parse before
+            // the member is even read is not a rejected member.
+            if (memberCondition != null) {
+                rejectMember(memberCondition);
+            }
         }
+    }
+
+    /**
+     * Records the refusal and drops whatever the failed load left in the member field - a partly
+     * initialised instance, or the member of an earlier successful {@code setState} on this same
+     * object. Either would be written back out by {@link #toJSONObject()} instead of the refused
+     * declaration, which is the one thing the refusal must survive.
+     *
+     * @param rejectedMember the declaration that could not be turned into a member.
+     */
+    private void rejectMember(JSONObject rejectedMember) {
+        eCondition = null;
+        markMemberRejected(rejectedMember);
     }
 
     /**
@@ -153,6 +184,17 @@ public class NotCondition extends LogicalCondition {
             return new ConditionDecision(false, Collections.EMPTY_MAP);
         }
 
+        if (hasRejectedMemberInSubtree()) {
+            // A member class name was refused somewhere below, so the nested condition is an
+            // incomplete representation of the stored policy and fails closed. Negating that
+            // failure here would hand back exactly the grant the refusal was meant to withhold.
+            PolicyConstants.DEBUG.error(
+                "NotCondition.evaluate: failing, nested policy member condition was rejected");
+            return ConditionDecision
+                    .newFailureBuilder()
+                    .build();
+        }
+
         ConditionDecision decision = eCondition.evaluate(realm, subject, resourceName, environment);
 
         return ConditionDecision
@@ -168,6 +210,7 @@ public class NotCondition extends LogicalCondition {
      */
     public void setECondition(EntitlementCondition eCondition) {
         this.eCondition = eCondition;
+        clearMemberRejection();
     }
 
     /**
@@ -190,6 +233,7 @@ public class NotCondition extends LogicalCondition {
         Reject.ifTrue(eConditions.size() > 1 || eConditions.size() < 1);
 
         eCondition = eConditions.iterator().next();
+        clearMemberRejection();
     }
 
     /**
@@ -205,6 +249,23 @@ public class NotCondition extends LogicalCondition {
         }
 
         return Collections.singleton(eCondition);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * A <code>NotCondition</code> with no member at all counts as damaged too, not only one whose
+     * member {@link #setState(String)} refused. Its own {@link #evaluate} already fails on the
+     * missing member, but an enclosing <code>NotCondition</code> would negate that failure into a
+     * grant. The two are indistinguishable from the outside anyway: a policy stored by a version
+     * that dropped the refused member instead of re-emitting it comes back with the member simply
+     * absent, and a <code>NOT</code> without a member is not a policy statement that
+     * {@link #validate()} accepts in the first place.
+     */
+    @Override
+    @JsonIgnore
+    public boolean hasRejectedMemberInSubtree() {
+        return (eCondition == null) || super.hasRejectedMemberInSubtree();
     }
 
     /**
@@ -245,8 +306,14 @@ public class NotCondition extends LogicalCondition {
             subjo.put("className", eCondition.getClass().getName());
             subjo.put("state", eCondition.getState());
             jo.put("memberECondition", subjo);
+        } else if (!getRejectedMembers().isEmpty()) {
+            // Write the refused member back out unchanged, so that storing this object again keeps
+            // the policy as it was written: without it a re-save would emit a NOT with no member at
+            // all, losing the refused class name and, with it, the record that this policy is
+            // damaged. NotCondition holds a single member, so there is at most one entry.
+            jo.put("memberECondition", getRejectedMembers().get(0));
         }
-        
+
         return jo;
     }
 

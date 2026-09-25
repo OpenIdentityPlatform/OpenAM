@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam-documentation</artifactId>
-        <version>16.2.0-SNAPSHOT</version>
+        <version>16.1.4-SNAPSHOT</version>
     </parent>
     <artifactId>openam-doc-services-ref</artifactId>
     <name>OpenAM documentation reference guide generator</name>
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.21.2</version>
+            <version>1.23.1</version>
         </dependency>
     </dependencies>
     <build>

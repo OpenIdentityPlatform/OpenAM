@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect.ssoprovider;
@@ -202,7 +202,32 @@ public class OpenIdConnectSSOProviderTest {
         given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
         claimsSet.addAudience(clientId);
         given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
-        given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(false);
+        given(mockClient.verifyIdTokenIdentity(mockJwt)).willReturn(false);
+
+        // When
+        ssoProvider.createSSOToken(tokenId);
+
+        // Then - exception
+    }
+
+    /**
+     * The id_token was issued by this server for the client, so it is checked as an ID token
+     * (header alg must be the client's id_token_signed_response_alg), not as a client assertion.
+     */
+    @Test(expectedExceptions = SSOException.class, expectedExceptionsMessageRegExp = "invalid id_token")
+    public void shouldNotAcceptIdTokenVerifiedOnlyAsClientAssertion() throws Exception {
+        // Given
+        String tokenId = "a jwt signed with a key the client may use for assertions";
+        String clientId = "client_id";
+        given(mockTokenParser.parse(tokenId)).willReturn(mockJwt);
+        given(mockJwt.isExpired()).willReturn(false);
+        given(mockProviderSettingsFactory.getRealmProviderSettings("/")).willReturn(mockProviderSettings);
+        given(mockProviderSettings.isOpenIDConnectSSOProviderEnabled()).willReturn(true);
+        claimsSet.addAudience(clientId);
+        claimsSet.setClaim(OPS, "session identifier");
+        given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
+        given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
+        given(mockClient.verifyIdTokenIdentity(mockJwt)).willReturn(false);
 
         // When
         ssoProvider.createSSOToken(tokenId);
@@ -222,7 +247,7 @@ public class OpenIdConnectSSOProviderTest {
         claimsSet.addAudience(clientId);
         // no OPS claim
         given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
-        given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
+        given(mockClient.verifyIdTokenIdentity(mockJwt)).willReturn(true);
 
         // When
         ssoProvider.createSSOToken(tokenId);
@@ -243,7 +268,7 @@ public class OpenIdConnectSSOProviderTest {
         claimsSet.addAudience(clientId);
         claimsSet.setClaim(OPS, ops);
         given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
-        given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
+        given(mockClient.verifyIdTokenIdentity(mockJwt)).willReturn(true);
         given(mockTokenStore.read(ops)).willReturn(null);
 
         // When
@@ -266,7 +291,7 @@ public class OpenIdConnectSSOProviderTest {
         claimsSet.addAudience(clientId);
         claimsSet.setClaim(OPS, ops);
         given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
-        given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
+        given(mockClient.verifyIdTokenIdentity(mockJwt)).willReturn(true);
         given(mockTokenStore.read(ops)).willReturn(token);
 
         // When
@@ -290,7 +315,7 @@ public class OpenIdConnectSSOProviderTest {
         claimsSet.addAudience(clientId);
         claimsSet.setClaim(OPS, ops);
         given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
-        given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
+        given(mockClient.verifyIdTokenIdentity(mockJwt)).willReturn(true);
         given(mockTokenStore.read(ops)).willReturn(json(object(field(LEGACY_OPS, asList(sessionId)))));
         given(mockTokenManager.createSSOToken(sessionId)).willReturn(mockSsoToken);
 
@@ -315,7 +340,7 @@ public class OpenIdConnectSSOProviderTest {
         claimsSet.addAudience(clientId);
         claimsSet.setClaim(SSOTOKEN, sessionId);
         given(mockClientStore.get(clientId, "/", null)).willReturn(mockClient);
-        given(mockClient.verifyJwtIdentity(mockJwt)).willReturn(true);
+        given(mockClient.verifyIdTokenIdentity(mockJwt)).willReturn(true);
         given(mockTokenManager.createSSOToken(sessionId)).willReturn(mockSsoToken);
 
         // When

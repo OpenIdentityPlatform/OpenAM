@@ -54,6 +54,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
 import org.forgerock.util.annotations.VisibleForTesting;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1324,15 +1325,9 @@ public class XACMLPrivilegeUtils {
         String trimmed = className.trim();
         Object ob = null;
         try {
-            // Load WITHOUT initialising so a malicious class's static initialisers cannot run
-            // before the type check; only real entitlement types may be instantiated.
-            Class<?> cla = Class.forName(trimmed, false, XACMLPrivilegeUtils.class.getClassLoader());
-            if (!expectedType.isAssignableFrom(cla)) {
-                PrivilegeManager.debug.error("XACMLPrivilegeUtils.createDefaultObject(),"
-                        + "rejected disallowed class: " + trimmed);
-                return null;
-            }
-            ob = cla.newInstance();
+            // Shared guard: loads WITHOUT initialising and rejects anything that is not an
+            // instantiable subtype of expectedType before instantiation (unsafe reflection, CWE-470).
+            ob = EntitlementUtils.resolveExtensionClass(trimmed, expectedType).newInstance();
         } catch (ClassNotFoundException e) {
             PrivilegeManager.debug.error("XACMLPrivilegeUtils.createDefaultObject(),"
                     + "hit exception", e);

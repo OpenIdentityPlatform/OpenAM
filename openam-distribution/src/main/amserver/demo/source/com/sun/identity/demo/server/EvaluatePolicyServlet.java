@@ -22,7 +22,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted 2025 3A Systems LLC
+ * Portions Copyrighted 2025-2026 3A Systems LLC
  *
  * $Id: EvaluatePolicyServlet.java,v 1.2 2008/06/25 05:40:25 qcheng Exp $
  *
@@ -44,13 +44,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.sun.identity.shared.debug.Debug;
 //import com.iplanet.am.util.Debug;
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.am.util.XMLUtils;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 
 import com.sun.identity.shared.Constants;
 import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.policy.PolicyDecision;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 public class EvaluatePolicyServlet extends HttpServlet {
     
@@ -154,16 +155,19 @@ public class EvaluatePolicyServlet extends HttpServlet {
                 PolicyDecision pd = pe.getPolicyDecision(ssoToken, resource, 
                     actions, null);
                 boolean allowed = pe.isAllowed(ssoToken, resource, "GET", null);
+                // The resource is a request parameter reflected into the page.
+                String escapedResource =
+                    StringEscapeUtils.escapeHtml4(resource);
                 StringBuffer message = new StringBuffer("<pre>");
-                message.append("isAllowed() for ").append(resource).
+                message.append("isAllowed() for ").append(escapedResource).
                 append(" action:GET is:   ");
                 message = message.append(allowed);
                 message.append(NEWLINE);
                 message.append(NEWLINE);
-                message.append("getPolicyDecision() for ").append(resource).
+                message.append("getPolicyDecision() for ").append(escapedResource).
                     append(" action:GET is:");
                 message.append(NEWLINE);
-                message.append(XMLUtils.escapeSpecialCharacters(pd.toXML()));
+                message.append(StringEscapeUtils.escapeHtml4(pd.toXML()));
                 message.append("</pre>");
                 sendResponse(response, message.toString());
             }

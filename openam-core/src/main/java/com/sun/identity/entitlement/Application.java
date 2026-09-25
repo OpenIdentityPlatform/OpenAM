@@ -25,6 +25,7 @@
  * $Id: Application.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
  *
  * Portions copyright 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 package com.sun.identity.entitlement;
 
@@ -289,6 +290,10 @@ public class Application implements Cloneable {
      */
     public void setSaveIndex(Class saveIndex) throws InstantiationException,
         IllegalAccessException {
+        if (saveIndex != null && !ISaveIndex.class.isAssignableFrom(saveIndex)) {
+            throw new InstantiationException(
+                "Refusing to instantiate " + saveIndex.getName() + " - not an ISaveIndex implementation");
+        }
         this.saveIndex = saveIndex;
         if (saveIndex != null) {
             saveIndexInstance = (ISaveIndex) saveIndex.newInstance();
@@ -304,6 +309,10 @@ public class Application implements Cloneable {
      */
     public void setSearchIndex(Class searchIndex) throws InstantiationException,
         IllegalAccessException {
+        if (searchIndex != null && !ISearchIndex.class.isAssignableFrom(searchIndex)) {
+            throw new InstantiationException(
+                "Refusing to instantiate " + searchIndex.getName() + " - not an ISearchIndex implementation");
+        }
         this.searchIndex = searchIndex;
         if (searchIndex != null) {
             searchIndexInstance = (ISearchIndex) searchIndex.newInstance();
@@ -336,8 +345,12 @@ public class Application implements Cloneable {
      *
      * @param resourceComparator resource comparator.
      */
-    public void setResourceComparator(Class resourceComparator) 
+    public void setResourceComparator(Class resourceComparator)
         throws InstantiationException, IllegalAccessException {
+        if (resourceComparator != null && !ResourceName.class.isAssignableFrom(resourceComparator)) {
+            throw new InstantiationException(
+                "Refusing to instantiate " + resourceComparator.getName() + " - not a ResourceName implementation");
+        }
         this.resourceComparator = resourceComparator;
         if (resourceComparator != null) {
             resourceComparatorInstance = (ResourceName) resourceComparator.

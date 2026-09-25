@@ -25,7 +25,7 @@
  * $Id: ServiceConfigServlet.java,v 1.3 2008/06/25 05:41:09 qcheng Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.samples.clientsdk;
@@ -39,6 +39,7 @@ import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * Sample program that lists service configurations.
@@ -83,8 +84,9 @@ public class ServiceConfigServlet extends SampleBase {
             return;
         }
         
-        out.println("<h3>ServiceName:</h3> " + servicename);
-        out.println("<br><h3>Username:</h3> " + username);
+        // Request parameters are reflected into the page: escape them.
+        out.println("<h3>ServiceName:</h3> " + StringEscapeUtils.escapeHtml4(servicename));
+        out.println("<br><h3>Username:</h3> " + StringEscapeUtils.escapeHtml4(username));
         
         try {
             AuthContext lc = authenticate(orgname, username, password, out);

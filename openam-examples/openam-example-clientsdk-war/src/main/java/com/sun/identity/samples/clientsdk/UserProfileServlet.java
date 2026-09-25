@@ -25,7 +25,7 @@
  * $Id: UserProfileServlet.java,v 1.3 2008/06/25 05:41:09 qcheng Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.samples.clientsdk;
@@ -42,6 +42,7 @@ import java.util.Set;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /**
  * Sample program that show user profile.
@@ -80,7 +81,8 @@ public class UserProfileServlet extends SampleBase {
             return;
         }
         
-        out.println("<br><h3>Username:</h3> " + username);
+        // The user name is a request parameter reflected into the page: escape it.
+        out.println("<br><h3>Username:</h3> " + StringEscapeUtils.escapeHtml4(username));
         
         try {
             // Authenticate the user and obtain SSO Token

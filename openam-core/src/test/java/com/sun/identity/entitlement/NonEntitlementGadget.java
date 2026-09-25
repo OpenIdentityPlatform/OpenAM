@@ -11,27 +11,25 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013-2015 ForgeRock AS.
+ * Copyright 2026 3A Systems, LLC.
  */
 
-package org.forgerock.openam.core.rest.session.query;
-
-import org.forgerock.openam.core.rest.session.query.impl.RemoteSessionQuery;
+package com.sun.identity.entitlement;
 
 /**
- * SessionQueryFactory provides a means of generating SessionQueryTypes based on the server id that is provided.
- *
- * @since 11.0.0
+ * A gadget class that is neither an {@link EntitlementSubject} nor an {@link EntitlementCondition}.
+ * It stands in for the "arbitrary classpath class with an exploitable static initializer / no-arg
+ * constructor" that the unsafe-reflection vulnerability would instantiate. Both its static
+ * initializer and its constructor flip a flag on {@link GadgetProbe}; a correct resolver must run
+ * neither.
  */
-public class SessionQueryFactory {
+class NonEntitlementGadget {
 
-    /**
-     * Implementation is currently hard-coded to return the RemoteSessionQuery.
-     *
-     * @param serverId Non null server id.
-     * @return A non null SessionQueryType based on the id.
-     */
-    public SessionQueryType getSessionQueryType(String serverId) {
-        return new RemoteSessionQuery(serverId);
+    static {
+        GadgetProbe.staticInitialised = true;
+    }
+
+    public NonEntitlementGadget() {
+        GadgetProbe.constructed = true;
     }
 }

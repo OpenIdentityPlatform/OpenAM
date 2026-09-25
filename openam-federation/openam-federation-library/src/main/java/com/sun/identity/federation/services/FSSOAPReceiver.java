@@ -70,7 +70,9 @@ import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.common.*;
 import com.sun.identity.saml.protocol.*;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.forgerock.openam.utils.ClientUtils;
 import java.io.ByteArrayOutputStream;
 import java.net.*;
 import java.security.cert.X509Certificate;
@@ -104,6 +106,44 @@ public class FSSOAPReceiver extends HttpServlet {
     private static FSSOAPService soapService;
     private static final String MESSAGE = "message";
     private static final String USERID = "userID";
+
+    /**
+     * System property: master kill-switch for the legacy Liberty ID-FF
+     * (Liberty Alliance 1.x) SOAP receiver. When set to anything other than
+     * "true" (the default), <code>/SOAPReceiver/*</code> rejects every request
+     * with HTTP 404. ID-FF is a legacy federation protocol and this endpoint is
+     * reachable without authentication, so it is disabled unless a deployment
+     * explicitly opts in.
+     *
+     * Override:  -Dcom.sun.identity.federation.services.soap.enabled=true
+     */
+    private static final String PROP_IDFF_SOAP_ENABLED =
+        "com.sun.identity.federation.services.soap.enabled";
+
+    /**
+     * Returns <code>true</code> only when the legacy ID-FF SOAP receiver has
+     * been explicitly enabled. Read on every request so that the property can
+     * be flipped without a restart.
+     */
+    private static boolean isIDFFSOAPEnabled() {
+        // default = false: legacy endpoint is OFF unless explicitly enabled.
+        // SystemPropertiesManager.get(key, default) falls back to the default
+        // on a null or blank value but returns the raw value otherwise -- it
+        // does NOT trim -- so trim here, or "true " would leave the endpoint
+        // disabled for an operator who believes they enabled it.
+        return IFSConstants.TRUE.equalsIgnoreCase(
+            SystemPropertiesManager.get(PROP_IDFF_SOAP_ENABLED, "false").trim());
+    }
+
+    /**
+     * Strips CR/LF and other control characters from a value taken off the
+     * request before it is written to the debug log, so that attacker-supplied
+     * data cannot forge additional log entries. Entity IDs are URLs, so they
+     * are left otherwise intact to keep the log readable.
+     */
+    private static String forLog(String value) {
+        return (value == null) ? null : value.replaceAll("\\p{Cntrl}", "_");
+    }
 
     /**
      * Initializes the servlet.
@@ -142,6 +182,20 @@ public class FSSOAPReceiver extends HttpServlet {
         throws jakarta.servlet.ServletException, java.io.IOException
     {
         FSUtils.debug.message("FSSOAPReceiver.doPost: Called");
+
+        // Master kill-switch: the legacy, unauthenticated ID-FF SOAP receiver
+        // is OFF unless explicitly enabled. Read per-request so it can be
+        // flipped without a restart.
+        if (!isIDFFSOAPEnabled()) {
+            if (FSUtils.debug.warningEnabled()) {
+                FSUtils.debug.warning("FSSOAPReceiver.doPost: Liberty ID-FF "
+                    + "SOAP endpoint disabled (" + PROP_IDFF_SOAP_ENABLED
+                    + "=false). Rejecting request from "
+                    + forLog(ClientUtils.getClientIPAddress(request)));
+            }
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         FSUtils.checkHTTPRequestLength(request);
 
@@ -566,8 +620,26 @@ public class FSSOAPReceiver extends HttpServlet {
                     metaManager.getIDPDescriptorConfig(realm, hostedEntityId);
                 FSNameIdentifierMappingRequest mappingRequest =
                     new FSNameIdentifierMappingRequest(elt);
-                if (FSServiceUtils.isSigningOn()) {
-                    String remoteEntityId = mappingRequest.getProviderID();
+                String remoteEntityId = mappingRequest.getProviderID();
+                // Reject a request that names a provider outside the circle of
+                // trust: this unauthenticated read must at least be scoped to a
+                // known COT partner (mirrors the check performed on the other
+                // ID-FF SOAP operations).
+                if (!metaManager.isTrustedProvider(
+                    realm, hostedEntityId, remoteEntityId))
+                {
+                    FSUtils.debug.error("FSSOAPReceiver: NameIdentifierMapping"
+                        + "Request from provider not in trusted list: "
+                        + forLog(remoteEntityId) + " (client "
+                        + forLog(ClientUtils.getClientIPAddress(request))
+                        + ")");
+                    returnSOAPMessage(
+                        soapService.formSOAPError(
+                            "Server", "cannotProcessRequest", null),
+                        response);
+                    return;
+                }
+                if (FSServiceUtils.isSignatureVerificationRequired()) {
                     ProviderDescriptorType remoteDesc =
                         getRemoteProviderDescriptor(
                             //hostedProviderDesc.getProviderRole(),
@@ -575,12 +647,21 @@ public class FSSOAPReceiver extends HttpServlet {
                             remoteEntityId,
                             realm);
                     if (remoteDesc == null) {
+                        returnSOAPMessage(
+                            soapService.formSOAPError(
+                                "Server", "cannotProcessRequest", null),
+                            response);
                         return;
                     }
+                    // remoteDesc is the remote SP descriptor (this operation is
+                    // always served by a hosted IDP), so look the verification
+                    // certificate up in the SP role: KeyUtil caches it under
+                    // "<entityID>|<role>" and an idp/sp mismatch would poison
+                    // the cache for an entity that has both roles.
                     if (verifyRequestSignature(
-                        elt, message, 
+                        elt, message,
                         KeyUtil.getVerificationCert(
-                            remoteDesc, remoteEntityId, true)))
+                            remoteDesc, remoteEntityId, false)))
                     {
                         if (FSUtils.debug.messageEnabled()) {
                             FSUtils.debug.message(
@@ -622,13 +703,30 @@ public class FSSOAPReceiver extends HttpServlet {
                 }
                 FSNameIdentifierMappingResponse mappingResponse = new
                     FSNameIdentifierMappingResponse(hostedEntityId,
-                                                    inResponseTo, 
+                                                    inResponseTo,
                                                     status,
                                                     nameIdentifier);
-                if (FSServiceUtils.isSigningOn()) {
-                    String certAlias = 
+                // Sign the response whenever a verified signature is required
+                // on the request, so a signed exchange is not answered with an
+                // unsigned response.
+                if (FSServiceUtils.isSignatureVerificationRequired()) {
+                    String certAlias =
                         IDFFMetaUtils.getFirstAttributeValueFromConfig(
                             hostedConfig, IFSConstants.SIGNING_CERT_ALIAS);
+                    if (certAlias == null || certAlias.length() == 0) {
+                        // Without a hosted signing alias signXML would throw
+                        // and surface as an opaque 500; report the missing
+                        // configuration instead.
+                        FSUtils.debug.error("FSSOAPReceiver: cannot sign Name "
+                            + "Identifier Mapping Response, hosted provider "
+                            + forLog(hostedEntityId) + " has no "
+                            + IFSConstants.SIGNING_CERT_ALIAS + " configured");
+                        returnSOAPMessage(
+                            soapService.formSOAPError(
+                                "Server", "cannotProcessRequest", null),
+                            response);
+                        return;
+                    }
                     mappingResponse.signXML(certAlias);
                 }
                 SOAPMessage retMessage =
@@ -948,8 +1046,8 @@ public class FSSOAPReceiver extends HttpServlet {
             X509Certificate cert = KeyUtil.getVerificationCert(
                 remoteDesc, remoteEntityId, isIDP);
 
-            if (!FSServiceUtils.isSigningOn() ||
-                verifyRequestSignature(elt, msg, cert)) 
+            if (!FSServiceUtils.isSignatureVerificationRequired() ||
+                verifyRequestSignature(elt, msg, cert))
             {
                 FSUtils.debug.message(
                     "Registration Signature successfully passed");
@@ -1071,8 +1169,8 @@ public class FSSOAPReceiver extends HttpServlet {
             X509Certificate cert = KeyUtil.getVerificationCert(
                 remoteDesc, remoteEntityId, true);
             
-            if (!FSServiceUtils.isSigningOn() ||
-                verifyRequestSignature(elt, terminationMsg, cert)) 
+            if (!FSServiceUtils.isSignatureVerificationRequired() ||
+                verifyRequestSignature(elt, terminationMsg, cert))
             {
                 FSUtils.debug.message(
                     "Termination Signature successfully verified");
@@ -1180,8 +1278,8 @@ public class FSSOAPReceiver extends HttpServlet {
             X509Certificate remoteCert = KeyUtil.getVerificationCert(
                 remoteDesc, remoteEntityId, isIDP);
 
-            if (!FSServiceUtils.isSigningOn() || 
-                verifyRequestSignature(elt, msgLogout, remoteCert)) 
+            if (!FSServiceUtils.isSignatureVerificationRequired() ||
+                verifyRequestSignature(elt, msgLogout, remoteCert))
             {
                 FSUtils.debug.message("Logout Signature successfully verified");
                 if (providerAlias == null || providerAlias.length() < 1) {

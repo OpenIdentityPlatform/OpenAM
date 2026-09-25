@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect.ssoprovider;
@@ -260,7 +260,7 @@ public class OpenIdConnectSSOProvider implements SSOProviderPlugin {
                 throw new SSOException(e);
             }
 
-            if (!clientRegistration.verifyJwtIdentity(idToken)) {
+            if (!clientRegistration.verifyIdTokenIdentity(idToken)) {
                 throw new SSOException("invalid id_token");
             }
 

@@ -32,6 +32,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.testng.AssertJUnit.*;
 
+import com.google.inject.Module;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -41,6 +42,7 @@ import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
+import java.lang.annotation.Annotation;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,6 +53,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.assertj.core.api.Assertions;
+import org.forgerock.guice.core.GuiceModuleLoader;
+import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.http.session.Session;
 import org.forgerock.http.session.SessionContext;
 import org.forgerock.json.JsonValue;
@@ -62,12 +67,14 @@ import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResponse;
 import org.forgerock.json.resource.QueryResourceHandler;
 import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResourceResponse;
+import org.forgerock.json.resource.test.assertj.AssertJQueryResponseAssert;
 import org.forgerock.openam.authentication.service.AuthUtilsWrapper;
 import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.core.realms.RealmTestHelper;
-import org.forgerock.openam.core.rest.session.query.SessionQueryManager;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
@@ -79,7 +86,9 @@ import org.forgerock.services.context.Context;
 import org.forgerock.services.context.RootContext;
 import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.Promise;
+import org.mockito.ArgumentCaptor;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -105,9 +114,26 @@ public class SessionResourceTest {
 
 
 
+    /**
+     * {@link #setUp()} constructs a real {@link AMIdentity}, whose constructor asks {@link org.forgerock.guice.core.InjectorHolder}
+     * for a {@code RepoAuditorFactory}. If this class is the first in the fork to touch the injector holder, the holder builds
+     * the injector from the modules of the running server, which cannot be built on this test classpath, and the holder
+     * class then stays broken for every later test in the same JVM. Ask for an injector built from no modules instead,
+     * the way {@code IdentityResourceNotificationTest} does; the loader is only consulted while the first injector of the
+     * JVM is built, so this is a no-op when another class got there first.
+     */
+    @BeforeClass
+    public void setupGuiceModuleLoader() {
+        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
+            @Override
+            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> moduleAnnotation) {
+                return Collections.emptySet();
+            }
+        });
+    }
+
     @BeforeMethod
     public void setUp() throws Exception {
-        SessionQueryManager sessionQueryManager = mock(SessionQueryManager.class);
         ssoTokenManager = mock(SSOTokenManager.class);
         authUtilsWrapper = mock(AuthUtilsWrapper.class);
         propertyWhitelist = mock(SessionPropertyWhitelist.class);
@@ -132,7 +158,7 @@ public class SessionResourceTest {
         final List<String> list = Arrays.asList(badger, weasel);
         given(webtopNamingQuery.getAllServerIDs()).willReturn(list);
 
-        sessionResourceUtil = spy(new SessionResourceUtil(ssoTokenManager, sessionQueryManager, webtopNamingQuery) {
+        sessionResourceUtil = spy(new SessionResourceUtil(ssoTokenManager, webtopNamingQuery) {
 
             @Override
             public Collection<String> getAllServerIds() {return list; }
@@ -184,52 +210,57 @@ public class SessionResourceTest {
     }
 
     @Test
-    public void shouldUseSessionQueryManagerForAllSessionsQuery() {
-        // Given
-        String badger = "badger";
-        String weasel = "weasel";
-
-        SessionQueryManager mockManager = mock(SessionQueryManager.class);
+    public void shouldRefuseTheAllSessionsQuery() throws Exception {
+        // Given the query which listed the sessions of every realm to any caller of this endpoint
         QueryRequest request = mock(QueryRequest.class);
         given(request.getQueryId()).willReturn(SessionResource.KEYWORD_ALL);
         QueryResourceHandler handler = mock(QueryResourceHandler.class);
 
-        SessionResourceUtil sessionResourceUtil = spy(new SessionResourceUtil(null, mockManager, null));
-        List<String> list = Arrays.asList(badger, weasel);
-        doReturn(list).when(sessionResourceUtil).getAllServerIds();
-        SessionResource resource = new SessionResource(null, null, null, sessionResourceUtil);
-
-
         // When
-        resource.queryCollection(null, request, handler);
+        Promise<QueryResponse, ResourceException> promise =
+                sessionResource.queryCollection(realmContext, request, handler);
 
         // Then
-        List<String> result = Arrays.asList(badger, weasel);
-        verify(mockManager, times(1)).getAllSessions(result);
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(NotSupportedException.class);
+        verify(handler, times(0)).handleResource(any(ResourceResponse.class));
+        verify(sessionResourceUtil, times(0)).getAllServerIds();
     }
 
     @Test
-    public void shouldQueryNamedServerInServerMode() {
+    public void shouldRefuseTheNamedServerSessionsQuery() throws Exception {
         // Given
-        String badger = "badger";
-
-        SessionQueryManager mockManager = mock(SessionQueryManager.class);
-        QueryResourceHandler mockHandler = mock(QueryResourceHandler.class);
         QueryRequest request = mock(QueryRequest.class);
-        given(request.getQueryId()).willReturn(badger);
-
-
-        SessionResourceUtil sessionResourceUtil = spy(new SessionResourceUtil(null, mockManager, null));
-        SessionResource resource = new SessionResource(null, null, null, sessionResourceUtil);
+        given(request.getQueryId()).willReturn("badger");
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
 
         // When
-        resource.queryCollection(null, request, mockHandler);
+        Promise<QueryResponse, ResourceException> promise =
+                sessionResource.queryCollection(realmContext, request, handler);
 
         // Then
-        verify(sessionResourceUtil, times(0)).getAllServerIds();
+        AssertJQueryResponseAssert.assertThat(promise).failedWithException()
+                .isInstanceOf(NotSupportedException.class);
+        verify(handler, times(0)).handleResource(any(ResourceResponse.class));
+    }
 
-        List<String> result = Collections.singletonList(badger);
-        verify(mockManager, times(1)).getAllSessions(result);
+    @Test
+    public void shouldStillListTheServersOfTheDeployment() throws Exception {
+        // Given
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryId()).willReturn(SessionResource.KEYWORD_LIST);
+        QueryResourceHandler handler = mock(QueryResourceHandler.class);
+
+        // When
+        Promise<QueryResponse, ResourceException> promise =
+                sessionResource.queryCollection(realmContext, request, handler);
+
+        // Then
+        AssertJQueryResponseAssert.assertThat(promise).succeeded();
+        ArgumentCaptor<ResourceResponse> captor = ArgumentCaptor.forClass(ResourceResponse.class);
+        verify(handler, times(1)).handleResource(captor.capture());
+        Assertions.assertThat(captor.getValue().getContent().asList(String.class))
+                .containsExactly("badger", "weasel");
     }
 
     @Test

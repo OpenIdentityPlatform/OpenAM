@@ -25,6 +25,7 @@
  * $Id: FilesRepo.java,v 1.22 2008/07/02 17:21:21 kenwho Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.idm.plugins.files;
 
@@ -1510,7 +1511,18 @@ public class FilesRepo extends IdRepo {
 
     }
 
-    File constructFile(String rootDir, IdType type, String name) {
+    File constructFile(String rootDir, IdType type, String name)
+            throws IdRepoException {
+        // The identity name becomes the file name: it must stay a single path
+        // component, or an identity could be created, read or deleted anywhere
+        // the server can write. Control characters are refused too, so a name
+        // cannot forge a log line. The name is caller data and is not logged.
+        if (!isSingleFileName(name)) {
+            debug.error("FilesRepo.constructFile: invalid identity name of type "
+                    + type.getName() + ", length " + (name == null ? 0 : name.length()));
+            throw new IdRepoException(IdRepoBundle.getString(IdRepoErrorCode.ILLEGAL_ARGUMENTS),
+                    IdRepoErrorCode.ILLEGAL_ARGUMENTS);
+        }
         // Construct file name
         File root = new File(rootDir);
         File subDir = new File(root, type.getName());
@@ -1701,6 +1713,25 @@ public class FilesRepo extends IdRepo {
         return (false);
     }
 
+    /**
+     * Whether an identity name is usable as one file name under the type
+     * directory: not empty, not a dot directory, and free of path separators
+     * (both kinds, so a repository copied between platforms stays valid) and
+     * of control characters.
+     */
+    static boolean isSingleFileName(String name) {
+        if (name == null || name.isEmpty() || name.equals(".") || name.equals("..")) {
+            return false;
+        }
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (c == '/' || c == '\\' || c < ' ' || c == 0x7f) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // File name filter inner class
     class FileRepoFileFilter implements FilenameFilter {
         // Pattern to match
@@ -1709,13 +1740,25 @@ public class FilesRepo extends IdRepo {
         // Default constructor
         FileRepoFileFilter(String p) {
             if (p != null && p.length() != 0 && !p.equals("*")) {
-                // Replace "*" with ".*"
+                // "*" is the only wildcard; everything between wildcards is a
+                // literal, so quote it rather than letting the search pattern
+                // be interpreted as a regular expression.
+                StringBuilder regex = new StringBuilder();
+                int from = 0;
                 int idx = p.indexOf('*');
                 while (idx != -1) {
-                    p = p.substring(0, idx) + ".*" + p.substring(idx + 1);
-                    idx = p.indexOf('*', idx + 2);
+                    if (idx > from) {
+                        regex.append(Pattern.quote(p.substring(from, idx)));
+                    }
+                    regex.append(".*");
+                    from = idx + 1;
+                    idx = p.indexOf('*', from);
                 }
-                pattern = Pattern.compile(p.toLowerCase());
+                if (from < p.length()) {
+                    regex.append(Pattern.quote(p.substring(from)));
+                }
+                pattern = Pattern.compile(regex.toString(),
+                    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
             }
         }
 
