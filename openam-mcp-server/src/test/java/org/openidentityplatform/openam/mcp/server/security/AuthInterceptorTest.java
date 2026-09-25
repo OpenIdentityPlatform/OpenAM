@@ -28,8 +28,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.openidentityplatform.openam.mcp.server.config.OpenAMConfig;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
@@ -38,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
@@ -48,6 +54,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @ExtendWith(MockitoExtension.class)
 class AuthInterceptorTest {
@@ -334,6 +344,92 @@ class AuthInterceptorTest {
 
         assertThat(messages).anyMatch(m -> m.contains("error getting token properties") && m.contains("OpenAM unreachable"));
         assertThat(messages).noneMatch(m -> m.contains(tokenId));
+    }
+
+    /**
+     * With HttpOnly session cookies (the OpenAM default) /json/authenticate does not
+     * echo the tokenId in the body; the token arrives only as the session cookie.
+     */
+    @Test
+    void getUserNamePasswordToken_readsSessionCookie_whenBodyHasNoTokenId() {
+        when(openAMConfig.username()).thenReturn("amadmin");
+        when(openAMConfig.password()).thenReturn("passw0rd");
+        when(openAMConfig.tokenHeader()).thenReturn("iPlanetDirectoryPro");
+        RestClient.Builder builder = RestClient.builder().baseUrl("http://openam.example.org/openam");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(requestTo("http://openam.example.org/openam/json/authenticate"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header("X-OpenAM-Username", "amadmin"))
+                .andRespond(withSuccess("{\"successUrl\":\"/openam/console\",\"realm\":\"/\"}", MediaType.APPLICATION_JSON)
+                        .headers(setCookies(
+                                "iPlanetDirectoryPro=AQIC5wM2LY4Sfczn-cookie-token; Path=/; HttpOnly",
+                                "amlbcookie=01; Path=/")));
+
+        String token = new AuthInterceptor(builder.build(), openAMConfig, tokenCache).getUserNamePasswordToken();
+
+        assertThat(token).isEqualTo("AQIC5wM2LY4Sfczn-cookie-token");
+        server.verify();
+    }
+
+    @Test
+    void getTokenIdFromAccessToken_readsSessionCookie_whenBodyHasNoTokenId() {
+        when(openAMConfig.oidcAuthChain()).thenReturn("oidc");
+        when(openAMConfig.oidcAuthHeader()).thenReturn("oidc_id_token");
+        when(openAMConfig.tokenHeader()).thenReturn("iPlanetDirectoryPro");
+        RestClient.Builder builder = RestClient.builder().baseUrl("http://openam.example.org/openam");
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(requestTo("http://openam.example.org/openam/json/authenticate?authIndexType=service&authIndexValue=oidc"))
+                .andExpect(header("oidc_id_token", "f3c1a9e0-access-token-value"))
+                .andRespond(withSuccess("{\"successUrl\":\"/openam/console\",\"realm\":\"/\"}", MediaType.APPLICATION_JSON)
+                        .headers(setCookies("iPlanetDirectoryPro=AQIC5wM2LY4Sfczn-oauth-token; Path=/; HttpOnly")));
+
+        String token = new AuthInterceptor(builder.build(), openAMConfig, tokenCache)
+                .getTokenIdFromAccessToken("f3c1a9e0-access-token-value");
+
+        assertThat(token).isEqualTo("AQIC5wM2LY4Sfczn-oauth-token");
+        server.verify();
+    }
+
+    @Test
+    void extractSessionToken_prefersTokenIdInBody() {
+        ResponseEntity<Map<String, String>> response = ResponseEntity.ok()
+                .headers(setCookies("iPlanetDirectoryPro=AQIC5wM2LY4Sfczn-cookie-token; Path=/"))
+                .body(Map.of("tokenId", "AQIC5wM2LY4Sfczn-body-token"));
+
+        assertThat(interceptor.extractSessionToken(response)).isEqualTo("AQIC5wM2LY4Sfczn-body-token");
+    }
+
+    @Test
+    void extractSessionToken_ignoresClearingCookie() {
+        when(openAMConfig.tokenHeader()).thenReturn("iPlanetDirectoryPro");
+        ResponseEntity<Map<String, String>> response = ResponseEntity.ok()
+                .headers(setCookies(
+                        "iPlanetDirectoryPro=AQIC5wM2LY4Sfczn-cookie-token; Path=/; HttpOnly",
+                        "iPlanetDirectoryPro=; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/",
+                        "iPlanetDirectoryProExtra=other; Path=/"))
+                .body(Map.of("successUrl", "/openam/console"));
+
+        assertThat(interceptor.extractSessionToken(response)).isEqualTo("AQIC5wM2LY4Sfczn-cookie-token");
+    }
+
+    @Test
+    void extractSessionToken_failsClearly_whenNoTokenAnywhere() {
+        when(openAMConfig.tokenHeader()).thenReturn("iPlanetDirectoryPro");
+        ResponseEntity<Map<String, String>> response = ResponseEntity.ok()
+                .headers(setCookies("iPlanetDirectoryPro=; Path=/"))
+                .body(Map.of("successUrl", "/openam/console"));
+
+        assertThatThrownBy(() -> interceptor.extractSessionToken(response))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("iPlanetDirectoryPro");
+    }
+
+    private static HttpHeaders setCookies(String... cookies) {
+        HttpHeaders headers = new HttpHeaders();
+        for (String cookie : cookies) {
+            headers.add(HttpHeaders.SET_COOKIE, cookie);
+        }
+        return headers;
     }
 
     private static List<String> captureLogs(Runnable action) {
