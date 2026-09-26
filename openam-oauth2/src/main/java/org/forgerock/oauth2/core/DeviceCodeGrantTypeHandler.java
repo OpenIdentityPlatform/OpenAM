@@ -112,6 +112,7 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
         
         // only reachable when not authorized - the branch above returns
         if (deviceCode.getExpiryTime() < currentTimeMillis()) {
+        	tryDeleteDeviceCode(clientId, code, request);
             throw new ExpiredTokenException();
         }
         
