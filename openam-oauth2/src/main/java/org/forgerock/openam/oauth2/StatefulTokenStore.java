@@ -647,6 +647,13 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             authModules = token.getAuthModules();
             acr = token.getAuthenticationContextClassReference();
         }
+        
+        DeviceCode deviceCode = request.getToken(DeviceCode.class);
+        if(deviceCode != null) {
+        	authModules = deviceCode.getAuthModules();
+        	acr = deviceCode.getAcrValues();
+        }
+        
 
         RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
         if (currentRefreshToken != null) {
