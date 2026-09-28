@@ -64,7 +64,7 @@ public class CookieUtils {
             equalsIgnoreCase("true"));
 
     static boolean cookieHttpOnly =
-        SystemPropertiesManager.getAsBoolean(Constants.AM_COOKIE_HTTPONLY, true);
+        isHttpOnlyEnabled(SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY));
 
     static boolean httpOnlyAllowTokenInBody =
         SystemPropertiesManager.getAsBoolean(Constants.AM_COOKIE_HTTPONLY_ALLOW_TOKEN_IN_BODY, false);
@@ -164,6 +164,19 @@ public class CookieUtils {
      */
     public static boolean isCookieHttpOnly() {
         return cookieHttpOnly;
+    }
+
+    /**
+     * Interprets a value of "com.sun.identity.cookie.httponly". Only {@code false} (in any case,
+     * surrounding whitespace ignored) turns {@code HttpOnly} off; an unset, empty or unrecognised
+     * value keeps it on. The IDP discovery {@code CookieUtils} applies the same rule, so the
+     * {@code _saml_idp} and session cookies agree on every value.
+     *
+     * @param value the property value, may be {@code null}.
+     * @return {@code false} only if the value is {@code false}.
+     */
+    public static boolean isHttpOnlyEnabled(String value) {
+        return value == null || !"false".equalsIgnoreCase(value.trim());
     }
 
     /**

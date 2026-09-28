@@ -18,6 +18,7 @@
 
 package org.forgerock.openam.sts.token.validator.disp;
 
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
 
@@ -34,9 +35,9 @@ public interface TokenAuthenticationRequestDispatcher<T> {
      *                   parameters for the targeted authN module. This reference can be null.
      * @param token The token which will be dispatched to the OpenAM authN context.
      * @return The state corresponding to a successful invocation. Produced by the OpenAM rest-authN context.
-     * Includes the OpenAM session id.
+     * Includes the OpenAM session id, in the body or, with an HttpOnly session cookie, in a Set-Cookie header.
      * @throws org.forgerock.openam.sts.TokenValidationException if an error occurred in the invocation, or if a non-200
      * result is returned.
      */
-    String dispatch(URL url, AuthTargetMapping.AuthTarget authTarget, T token) throws TokenValidationException;
+    HttpURLConnectionWrapper.ConnectionResult dispatch(URL url, AuthTargetMapping.AuthTarget authTarget, T token) throws TokenValidationException;
 }

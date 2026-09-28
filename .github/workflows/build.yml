@@ -188,7 +188,7 @@ jobs:
 
           echo "Test IDP authentication"
 
-          ADMIN_TOKEN=$(docker exec openam-idp bash -c \
+          ADMIN_TOKEN=$(docker exec openam-idp bash -o pipefail -c \
           'curl -sf -D - -o /dev/null \
             --request POST \
             --header "Content-Type: application/json" \

@@ -12,14 +12,23 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.selfservice.config.flows;
 
 import static org.forgerock.selfservice.stages.CommonStateFields.USER_FIELD;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
@@ -27,23 +36,48 @@ import org.forgerock.selfservice.core.ProcessContext;
 import org.forgerock.selfservice.core.ProgressStage;
 import org.forgerock.selfservice.core.StageResponse;
 import org.forgerock.selfservice.core.util.RequirementsBuilder;
+import org.forgerock.services.context.AttributesContext;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.Reject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.AuthContext.Status;
+import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.shared.encode.CookieUtils;
 
 
 /**
  * Auto logic stage attempts to authenticate the registered
  * user and submits the SSO token to the success additions.
+ * <p>
+ * With an HttpOnly session cookie the browser cannot set the cookie from the SSO token, so the stage sets it
+ * on the response itself, as {@code /json/authenticate} does, and leaves the SSO token out of the success
+ * additions unless {@code org.openidentityplatform.openam.httponly.allowTokenInBody} is set.
  *
  * @since 13.5.0
  */
 final class AutoLoginStage implements ProgressStage<AutoLoginStageConfig> {
 
     private static final Logger logger = LoggerFactory.getLogger(AutoLoginStage.class);
+
+    /**
+     * Sets the session cookie carrying an SSO token on the response to the request.
+     */
+    interface SessionCookieSetter {
+        void setSessionCookie(Context requestContext, String ssoToken);
+    }
+
+    private final SessionCookieSetter sessionCookieSetter;
+
+    AutoLoginStage() {
+        this(AutoLoginStage::addSessionCookie);
+    }
+
+    AutoLoginStage(SessionCookieSetter sessionCookieSetter) {
+        this.sessionCookieSetter = sessionCookieSetter;
+    }
 
     @Override
     public JsonValue gatherInitialRequirements(ProcessContext context,
@@ -91,8 +125,43 @@ final class AutoLoginStage implements ProgressStage<AutoLoginStageConfig> {
         String ssoToken = authContext.getSSOToken().getTokenID().toString();
         String gotoUrl = authContext.getSuccessURL();
 
-        context.putSuccessAddition("tokenId", ssoToken);
+        putSessionInSuccessAdditions(context, ssoToken, gotoUrl);
+    }
+
+    void putSessionInSuccessAdditions(ProcessContext context, String ssoToken, String gotoUrl) {
+        if (CookieUtils.isCookieHttpOnly()) {
+            sessionCookieSetter.setSessionCookie(context.getRequestContext(), ssoToken);
+            if (CookieUtils.isHttpOnlyAllowTokenInBody()) {
+                context.putSuccessAddition("tokenId", ssoToken);
+            }
+        } else {
+            context.putSuccessAddition("tokenId", ssoToken);
+        }
         context.putSuccessAddition("successUrl", gotoUrl);
+    }
+
+    /*
+    Sets the session cookie the way CoreServicesWrapper#setAuthCookie does for /json/authenticate: one cookie per
+    configured cookie domain matching the request, on the servlet response the request came in with.
+     */
+    private static void addSessionCookie(Context requestContext, String ssoToken) {
+        Map<String, Object> attributes = requestContext.asContext(AttributesContext.class).getAttributes();
+        HttpServletRequest request = (HttpServletRequest) attributes.get(HttpServletRequest.class.getName());
+        HttpServletResponse response = (HttpServletResponse) attributes.get(HttpServletResponse.class.getName());
+        if (request == null || response == null) {
+            throw new IllegalStateException("No HTTP request and response to set the session cookie on");
+        }
+        Set<String> domains = AuthClientUtils.getCookieDomainsForRequest(request);
+        if (domains.isEmpty()) {
+            domains = Collections.singleton(null);
+        }
+        for (String domain : domains) {
+            Cookie cookie = AuthClientUtils.createCookie(ssoToken, domain);
+            if (CookieUtils.isCookieSecure()) {
+                cookie.setSecure(true);
+            }
+            CookieUtils.addCookieToResponse(response, cookie);
+        }
     }
 
     private void handleCallbacks(Callback[] callbacks, JsonValue user) throws AutoLoginException {

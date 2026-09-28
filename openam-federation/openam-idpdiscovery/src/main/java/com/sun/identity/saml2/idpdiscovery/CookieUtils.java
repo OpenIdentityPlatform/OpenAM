@@ -63,7 +63,7 @@ public class CookieUtils {
         SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_SECURE).
            equalsIgnoreCase("true"));
 
-    static boolean cookieHttpOnly = !"false".equalsIgnoreCase(
+    static boolean cookieHttpOnly = isHttpOnlyEnabled(
         SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_HTTPONLY));
 
     static String cookieSameSite = SystemPropertiesManager.get(
@@ -118,6 +118,18 @@ public class CookieUtils {
      */
     public static boolean isCookieHttpOnly() {
         return cookieHttpOnly;
+    }
+
+    /**
+     * Interprets a value of "com.sun.identity.cookie.httponly" with the same rule as
+     * {@code com.sun.identity.shared.encode.CookieUtils#isHttpOnlyEnabled(String)}: only
+     * {@code false} (in any case, surrounding whitespace ignored) turns {@code HttpOnly} off.
+     *
+     * @param value the property value, may be {@code null}.
+     * @return {@code false} only if the value is {@code false}.
+     */
+    static boolean isHttpOnlyEnabled(String value) {
+        return value == null || !"false".equalsIgnoreCase(value.trim());
     }
 
     /**

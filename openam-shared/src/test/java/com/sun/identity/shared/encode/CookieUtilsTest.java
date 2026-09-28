@@ -27,6 +27,7 @@ import java.util.Set;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.sun.identity.shared.Constants;
@@ -133,5 +134,25 @@ public class CookieUtilsTest {
             verify(response).addHeader(eq("Set-Cookie"),
                     eq("iPlanetDirectoryPro=AQIC;path=/;secure;httponly;SameSite=Strict"));
         });
+    }
+
+    @DataProvider
+    public Object[][] httpOnlyValues() {
+        return new Object[][] {
+            {null, true},
+            {"", true},
+            {"true", true},
+            {"TRUE", true},
+            {"yes", true},
+            {"1", true},
+            {"false", false},
+            {"FALSE", false},
+            {" false ", false},
+        };
+    }
+
+    @Test(dataProvider = "httpOnlyValues")
+    public void onlyFalseTurnsHttpOnlyOff(String value, boolean expected) {
+        assertEquals(CookieUtils.isHttpOnlyEnabled(value), expected);
     }
 }
