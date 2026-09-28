@@ -5640,6 +5640,9 @@ When set to `true`, mark cookies as HttpOnly to prevent scripts and third-party 
 Both the classic UI and the XUI support HttpOnly session cookies. When HttpOnly is enabled, the XUI relies on the automatically sent cookie instead of reading the token from JavaScript, and a successful `/json/authenticate` response delivers the token only through the `Set-Cookie` header (the `tokenId` is, by default, no longer returned in the response body). See `org.openidentityplatform.openam.httponly.allowTokenInBody` to control that behaviour. The OpenID Connect session management OP iframe (`/oauth2/connect/checkSession`) is a known exception: it reads the session cookie from JavaScript to compute the browser state, and so cannot observe the session while HttpOnly is enabled.
 
 +
+Only the value `false` (in any letter case) disables HttpOnly cookies; an empty or any other value leaves them enabled.
+
++
 Changes to this property do not take effect until you restart the OpenAM server.
 
 +

@@ -35,6 +35,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -148,7 +149,7 @@ public class AuthInterceptor implements HandlerInterceptor {
      * is set); with HttpOnly on, the default, the token comes only as the session
      * cookie, named like {@link OpenAMConfig#tokenHeader()}. Of several such
      * cookies the last non-empty one wins, so a clearing (empty) cookie cannot
-     * replace the token.
+     * replace the token. A URL-encoded cookie value is decoded.
      */
     String extractSessionToken(ResponseEntity<Map<String, String>> response) {
         Map<String, String> body = response.getBody();
@@ -162,6 +163,11 @@ public class AuthInterceptor implements HandlerInterceptor {
             int eq = pair.indexOf('=');
             if (eq > 0 && pair.substring(0, eq).trim().equals(cookieName)) {
                 String value = pair.substring(eq + 1).trim();
+                if (value.indexOf('%') >= 0) {
+                    // com.iplanet.am.cookie.encode=true URL-encodes the cookie value; a raw session
+                    // id never contains '%', so only an encoded value is decoded
+                    value = URLDecoder.decode(value, StandardCharsets.UTF_8);
+                }
                 if (!value.isEmpty()) {
                     token = value;
                 }
