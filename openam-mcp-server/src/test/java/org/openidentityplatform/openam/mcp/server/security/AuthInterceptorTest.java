@@ -48,6 +48,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -392,6 +393,9 @@ class AuthInterceptorTest {
 
     @Test
     void extractSessionToken_prefersTokenIdInBody() {
+        // lenient: the body wins, so a correct implementation never reads the cookie name; the stub
+        // is there to let a cookie-first implementation find the cookie and fail this test
+        lenient().when(openAMConfig.tokenHeader()).thenReturn("iPlanetDirectoryPro");
         ResponseEntity<Map<String, String>> response = ResponseEntity.ok()
                 .headers(setCookies("iPlanetDirectoryPro=AQIC5wM2LY4Sfczn-cookie-token; Path=/"))
                 .body(Map.of("tokenId", "AQIC5wM2LY4Sfczn-body-token"));
@@ -410,6 +414,31 @@ class AuthInterceptorTest {
                 .body(Map.of("successUrl", "/openam/console"));
 
         assertThat(interceptor.extractSessionToken(response)).isEqualTo("AQIC5wM2LY4Sfczn-cookie-token");
+    }
+
+    @Test
+    void extractSessionToken_lastNonEmptyCookieWins() {
+        when(openAMConfig.tokenHeader()).thenReturn("iPlanetDirectoryPro");
+        ResponseEntity<Map<String, String>> response = ResponseEntity.ok()
+                .headers(setCookies(
+                        "iPlanetDirectoryPro=AQIC5wM2LY4Sfczn-old-token; Path=/",
+                        "iPlanetDirectoryPro=AQIC5wM2LY4Sfczn-new-token; Path=/; HttpOnly",
+                        "iPlanetDirectoryPro=; Expires=Thu, 01-Jan-1970 00:00:10 GMT; Path=/"))
+                .body(Map.of("successUrl", "/openam/console"));
+
+        assertThat(interceptor.extractSessionToken(response)).isEqualTo("AQIC5wM2LY4Sfczn-new-token");
+    }
+
+    @Test
+    void extractSessionToken_decodesUrlEncodedCookie() {
+        // com.iplanet.am.cookie.encode=true with c66Encode=false: the session id keeps its "=@#",
+        // which the cookie carries URL-encoded while the body would carry it raw
+        when(openAMConfig.tokenHeader()).thenReturn("iPlanetDirectoryPro");
+        ResponseEntity<Map<String, String>> response = ResponseEntity.ok()
+                .headers(setCookies("iPlanetDirectoryPro=AQIC5wM2LY4Sfczn%3D%40AAJTSQACMDE%23; Path=/; HttpOnly"))
+                .body(Map.of("successUrl", "/openam/console"));
+
+        assertThat(interceptor.extractSessionToken(response)).isEqualTo("AQIC5wM2LY4Sfczn=@AAJTSQACMDE#");
     }
 
     @Test
