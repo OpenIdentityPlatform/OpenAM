@@ -76,6 +76,10 @@ jobs:
   build-docker:
     needs: build-maven
     runs-on: 'ubuntu-latest'
+    permissions:
+      contents: read
+      # upload the Trivy scan of the built image to code scanning
+      security-events: write
     services:
       registry:
         image: registry:2
@@ -490,3 +494,26 @@ jobs:
           http://openam3.example.org:8080/openam/json/authenticate | grep tokenId'
 
           docker inspect --format="{{json .State.Health.Status}}" test-openam3 | grep -q \"healthy\"
+
+      - name: Scan image for vulnerabilities (Trivy)
+        # trivy resolves the image from the local Docker daemon, so only the runner's
+        # linux/amd64 manifest is scanned; cache: false keeps the ~1GB trivy DBs from
+        # evicting the m2-repository caches out of the repo's 10GB actions-cache quota
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.OPENAM_IMAGE }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          limit-severities-for-sarif: true
+          ignore-unfixed: true
+          scanners: vuln
+          cache: false
+      - name: Upload Trivy report to GitHub Security
+        uses: github/codeql-action/upload-sarif@v4
+        # upload even if a preceding step failed, but not without a report to upload
+        if: ${{ always() && hashFiles('trivy-results.sarif') != '' }}
+        with:
+          sarif_file: trivy-results.sarif
+          # distinct from the docker-scan.yml category, which tracks the published image
+          category: trivy-build
