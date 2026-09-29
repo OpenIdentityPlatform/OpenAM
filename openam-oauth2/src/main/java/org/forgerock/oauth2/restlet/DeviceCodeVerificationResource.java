@@ -18,6 +18,7 @@ package org.forgerock.oauth2.restlet;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.CLIENT_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -142,7 +143,9 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
             return getTemplateRepresentation(FORM, request, "not_found");
         }
 
-        if (deviceCode == null || deviceCode.isIssued()) {
+        // An expired code, or one that has already been approved, is treated as an unknown user code
+        if (deviceCode == null || deviceCode.isIssued() || deviceCode.isAuthorized()
+                || deviceCode.getExpiryTime() < currentTimeMillis()) {
             return getTemplateRepresentation(FORM, request, "not_found");
         }
 

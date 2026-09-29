@@ -137,6 +137,7 @@ public class DeviceCodeGrantTypeHandlerTest {
         given(deviceCode.getClientId()).willReturn("CLIENT_ID");
         given(deviceCode.getRealm()).willReturn("/REALM");
         given(deviceCode.isAuthorized()).willReturn(true);
+        given(deviceCode.getExpiryTime()).willReturn(currentTimeMillis() + 10000);
         given(deviceCode.getScope()).willReturn(scope);
         given(deviceCode.getResourceOwnerId()).willReturn("RESOURCE_OWNER");
         given(deviceCode.getNonce()).willReturn("NONCE");
@@ -171,8 +172,8 @@ public class DeviceCodeGrantTypeHandlerTest {
         assertEquals(actualAccessToken, accessToken);
     }
 
-    @Test(expectedExceptions = ExpiredTokenException.class)
-    public void handleShouldThrowExpiredTokenExceptionWhenDeviceCodeHasExpired()
+    @Test
+    public void handleShouldThrowExpiredTokenExceptionAndDeleteDeviceCodeWhenDeviceCodeHasExpired()
             throws Exception {
 
         // Given
@@ -194,10 +195,47 @@ public class DeviceCodeGrantTypeHandlerTest {
         given(deviceCode.getExpiryTime()).willReturn(currentTimeMillis() - 100);
 
         // When
-        grantTypeHandler.handle(request, client, providerSettings);
+        try {
+            grantTypeHandler.handle(request, client, providerSettings);
+            fail("Expected ExpiredTokenException");
+        } catch (ExpiredTokenException e) {
+            // Then
+            verify(tokenStore).deleteDeviceCode("CLIENT_ID", "DEVICE_CODE", request);
+        }
+    }
 
-        // Then
-        // Expect ExpiredTokenException
+    @Test
+    public void handleShouldNotIssueAccessTokenWhenAuthorizedDeviceCodeHasExpired()
+            throws Exception {
+
+        // Given
+        OAuth2Request request = mock(OAuth2Request.class);
+        ClientRegistration client = mock(ClientRegistration.class);
+        DeviceCode deviceCode = mock(DeviceCode.class);
+
+        given(request.getParameter(DEVICE_CODE)).willReturn("DEVICE_CODE");
+        given(request.getParameter(REALM)).willReturn("/REALM");
+
+        given(client.getClientId()).willReturn("CLIENT_ID");
+
+        given(tokenStore.readDeviceCode("CLIENT_ID", "DEVICE_CODE", request))
+                .willReturn(deviceCode);
+
+        given(deviceCode.getClientId()).willReturn("CLIENT_ID");
+        given(deviceCode.getRealm()).willReturn("/REALM");
+        given(deviceCode.isAuthorized()).willReturn(true);
+        given(deviceCode.getResourceOwnerId()).willReturn("RESOURCE_OWNER");
+        given(deviceCode.getExpiryTime()).willReturn(currentTimeMillis() - 100);
+
+        // When
+        try {
+            grantTypeHandler.handle(request, client, providerSettings);
+            fail("Expected ExpiredTokenException");
+        } catch (ExpiredTokenException e) {
+            // Then
+            verifyZeroInteractions(accessTokenGenerator);
+            verify(tokenStore).deleteDeviceCode("CLIENT_ID", "DEVICE_CODE", request);
+        }
     }
 
     @Test
@@ -259,6 +297,7 @@ public class DeviceCodeGrantTypeHandlerTest {
         given(deviceCode.getClientId()).willReturn("CLIENT_ID");
         given(deviceCode.getRealm()).willReturn("/REALM");
         given(deviceCode.isAuthorized()).willReturn(true);
+        given(deviceCode.getExpiryTime()).willReturn(currentTimeMillis() + 10000);
         given(deviceCode.getScope()).willReturn(scope);
         given(deviceCode.getResourceOwnerId()).willReturn("RESOURCE_OWNER");
 
