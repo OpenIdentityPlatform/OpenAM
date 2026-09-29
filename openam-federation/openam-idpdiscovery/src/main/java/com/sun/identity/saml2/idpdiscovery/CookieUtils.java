@@ -517,9 +517,8 @@ public class CookieUtils {
 
         // The servlet Cookie has no SameSite attribute, and an HttpOnly cookie
         // keeps the hand-built header it has always had: the container's cookie
-        // processor rejects a domain with a leading dot (".example.com") and the
-        // space-separated value of an unencoded preferred-IdP list, both of which
-        // this WAR can be configured to produce.
+        // processor rejects cookie domains this WAR can be configured with, such
+        // as one with a port ("example.com:8443").
         StringBuffer sb = new StringBuffer(150);
         sb.append(cookie.getName()).append("=").append(cookie.getValue());
         String path = cookie.getPath();

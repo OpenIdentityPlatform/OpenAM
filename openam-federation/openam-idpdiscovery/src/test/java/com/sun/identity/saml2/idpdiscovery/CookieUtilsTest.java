@@ -151,7 +151,7 @@ public class CookieUtilsTest {
 
     /**
      * HttpOnly without SameSite still goes out as a hand-built header: the container's cookie
-     * processor would reject a configured domain such as ".example.com".
+     * processor would reject a configured domain such as "example.com:8443".
      */
     @Test
     public void addCookieToResponseWritesTheHeaderItselfWhenHttpOnlyIsConfigured() {
@@ -159,12 +159,12 @@ public class CookieUtilsTest {
             HttpServletResponse response = mock(HttpServletResponse.class);
             Cookie cookie = new Cookie("_saml_idp", "aWRw");
             cookie.setPath("/");
-            cookie.setDomain(".example.com");
+            cookie.setDomain("example.com:8443");
 
             CookieUtils.addCookieToResponse(response, cookie);
 
             verify(response, never()).addCookie(any(Cookie.class));
-            verify(response).addHeader(eq("SET-COOKIE"), eq("_saml_idp=aWRw;path=/;domain=.example.com;httponly"));
+            verify(response).addHeader(eq("SET-COOKIE"), eq("_saml_idp=aWRw;path=/;domain=example.com:8443;httponly"));
         });
     }
 
@@ -186,6 +186,15 @@ public class CookieUtilsTest {
     @Test
     public void aLeadingDotDomainIsAcceptedByTheContainer() {
         Cookie cookie = CookieUtils.newCookie("_saml_idp", "aWRw", -1, "/", ".example.com");
+
+        String header = new Rfc6265CookieProcessor().generateHeader(cookie, null);
+
+        assertTrue(header.contains("Domain=example.com"), header);
+    }
+
+    @Test
+    public void aDomainWithoutALeadingDotIsSetAsItIs() {
+        Cookie cookie = CookieUtils.newCookie("_saml_idp", "aWRw", -1, "/", "example.com");
 
         String header = new Rfc6265CookieProcessor().generateHeader(cookie, null);
 
