@@ -26,12 +26,12 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
       - name: Set up Java for publishing to Maven Central Repository OSS
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           java-version: ${{ github.event.workflow_run.head_branch == 'sustaining/15.2.x' && '8' || '11'}}
           distribution: 'zulu'
@@ -77,7 +77,7 @@ jobs:
             target/checkout/openam-server/target/*.war
             target/checkout/openam-server-only/target/*.war
             target/checkout/openam-distribution/openam-distribution-docker/target/Dockerfile*
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         continue-on-error: true
         with:
           repository: ${{ github.repository }}.wiki
@@ -100,7 +100,7 @@ jobs:
           git push --quiet --force
           git push --quiet --force origin ${{ github.event.inputs.releaseVersion }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         continue-on-error: true
         with:
           repository: OpenIdentityPlatform/doc.openidentityplatform.org
@@ -125,7 +125,7 @@ jobs:
     needs:
       - release-maven
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.inputs.releaseVersion }}
           fetch-depth: 1
