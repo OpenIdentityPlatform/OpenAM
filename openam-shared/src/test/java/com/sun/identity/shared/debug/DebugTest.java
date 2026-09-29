@@ -12,10 +12,14 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.shared.debug;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -111,6 +115,22 @@ public class DebugTest extends DebugTestTemplate {
 
         // then
         checkLogFileStatus(true, "wildcardTest");
+    }
+
+    /** A line break carried in a logged value continues the record indented in the debug file. */
+    @Test
+    public void shouldContinueALineBreakInTheMessageIndented() throws Exception {
+        // given
+        initializeProvider(DEBUG_CONFIG_FOR_TEST);
+        IDebug debug = provider.getInstance(logName);
+
+        // when
+        debug.error("user\n" + logName + ":01/01/2026 00:00:00:000 AM UTC: Thread[main,5,main]\nforged", null);
+
+        // then
+        String log = new String(Files.readAllBytes(Paths.get(debugDirectory, logName)), StandardCharsets.UTF_8);
+        Assert.assertTrue(log.contains("ERROR: user\n    " + logName + ":01/01/2026"), log);
+        Assert.assertTrue(log.contains("\n    forged"), log);
     }
 
 }

@@ -40,8 +40,15 @@ public class DebugRecordFormatTest {
 
     @Test
     public void everyKindOfLineBreakIsAContinuation() {
-        assertThat(DebugRecordFormat.format(PREFIX, "a\r\nb\rc d ef", null))
-                .isEqualTo(PREFIX + "\na\n    b\n    c\n    d\n    e\n    f");
+        assertThat(DebugRecordFormat.format(PREFIX, "a\r\nb\rc\u2028d\u2029e\u0085f\u000Bg\fh", null))
+                .isEqualTo(PREFIX + "\na\n    b\n    c\n    d\n    e\n    f\n    g\n    h");
+    }
+
+    /** The prefix carries the transaction id, which can be taken from a request header. */
+    @Test
+    public void aLineBreakInThePrefixIsWrittenAsASpace() {
+        assertThat(DebugRecordFormat.format("amAuth: TransactionId[a\u0085forged\r\nb]", "failed", null))
+                .isEqualTo("amAuth: TransactionId[a forged b]\nfailed");
     }
 
     @Test

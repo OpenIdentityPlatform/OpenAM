@@ -143,13 +143,39 @@ public class FedletLogger implements com.sun.identity.plugin.log.Logger {
     /**
      * Each parameter is written on a braced line of its own; a line break inside one is
      * request data and is written as the escape it stands for, so it cannot leave the braces
-     * and start a line that reads as another record.
+     * and start a line that reads as another record. Every character {@code \R} matches counts
+     * as a line break, as it does for the debug file; a backslash is escaped too, so that an
+     * escape cannot be told from the same text logged as it is.
      */
     private static String escapeLineBreaks(String value) {
         if (value == null) {
             return null;
         }
-        return value.replace("\r", "\\r").replace("\n", "\\n");
+        StringBuilder out = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+            case '\\':
+                out.append("\\\\");
+                break;
+            case '\r':
+                out.append("\\r");
+                break;
+            case '\n':
+                out.append("\\n");
+                break;
+            case '\u000B':
+            case '\f':
+            case '\u0085':
+            case '\u2028':
+            case '\u2029':
+                out.append(String.format("\\u%04X", (int) c));
+                break;
+            default:
+                out.append(c);
+            }
+        }
+        return out.toString();
     }
     
     /**

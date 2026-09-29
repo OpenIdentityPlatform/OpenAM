@@ -32,9 +32,17 @@ public class StdDebugFile implements DebugFile {
 
     private static final StdDebugFile INSTANCE = new StdDebugFile();
 
-    private PrintWriter stdoutWriter = new PrintWriter(System.out, true);
+    private final PrintWriter stdoutWriter;
 
     private StdDebugFile() {
+        this(new PrintWriter(System.out, true));
+    }
+
+    /**
+     * @param stdoutWriter where the records are written; the tests pass their own
+     */
+    StdDebugFile(PrintWriter stdoutWriter) {
+        this.stdoutWriter = stdoutWriter;
     }
 
     /**

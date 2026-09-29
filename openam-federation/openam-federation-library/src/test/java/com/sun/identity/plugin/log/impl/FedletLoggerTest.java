@@ -34,6 +34,27 @@ public class FedletLoggerTest {
                 .isEqualTo("LOGIN_FAILED\n{alice\\r\\nSEVERE: forged\\rx\\ny}");
     }
 
+    /** The session is the assertion's principal name, request data like the parameters. */
+    @Test
+    public void aLineBreakInTheSessionIsWrittenAsAnEscape() {
+        assertThat(FedletLogger.formatMessage("LOGIN_FAILED", new String[] {"alice"}, "bob\nSEVERE: forged"))
+                .isEqualTo("LOGIN_FAILED\n{alice}\n{bob\\nSEVERE: forged}");
+    }
+
+    @Test
+    public void everyKindOfLineBreakIsWrittenAsAnEscape() {
+        assertThat(FedletLogger.formatMessage("LOGIN_FAILED",
+                new String[] {"a\u0085b\u2028c\u2029d\u000Be\ff"}, null))
+                .isEqualTo("LOGIN_FAILED\n{a\\u0085b\\u2028c\\u2029d\\u000Be\\u000Cf}");
+    }
+
+    /** Otherwise a literal backslash-n in a value and a line break would be logged alike. */
+    @Test
+    public void aBackslashIsEscapedToo() {
+        assertThat(FedletLogger.formatMessage("LOGIN_FAILED", new String[] {"a\\nb", "a\nb"}, null))
+                .isEqualTo("LOGIN_FAILED\n{a\\\\nb}\n{a\\nb}");
+    }
+
     @Test
     public void aMessageWithoutParametersIsTheMessageId() {
         assertThat(FedletLogger.formatMessage("LOGIN_SUCCESS", null, null)).isEqualTo("LOGIN_SUCCESS");

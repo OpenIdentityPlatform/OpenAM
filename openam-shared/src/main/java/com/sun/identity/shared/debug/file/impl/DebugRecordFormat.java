@@ -23,11 +23,13 @@ import com.sun.identity.shared.debug.DebugConstants;
 
 /**
  * Lays out one debug record: the prefix line, the message, and the stack trace if there is
- * one. A record is told from the next by its prefix line starting at column 0, so nothing
- * that is logged may start a line there: every line break inside the message and every
- * line of the stack trace (an exception's message is logged data too) continues the record
- * indented. A single-line message, the usual case, is written exactly as it always was, and
- * a multi-line dump stays readable, indented.
+ * one. A record is told from the next by its prefix line starting at column 0, followed by
+ * the first line of the message, also at column 0; nothing else that is logged may start a
+ * line there: every line break inside the message and every line of the stack trace (an
+ * exception's message is logged data too) continues the record indented, and a line break
+ * inside the prefix (the transaction id can come from a request header) is written as a
+ * space. A single-line message, the usual case, is written exactly as it always was, and a
+ * multi-line dump stays readable, indented.
  * <p>
  * This is what keeps a value taken from a request - a user name, a RelayState, a SAML
  * attribute - from forging a record of its own, whether it reaches the debug file through
@@ -38,7 +40,7 @@ public final class DebugRecordFormat {
     /** What every continued line is indented with. */
     static final String CONTINUATION = "    ";
 
-    private static final Pattern LINE_BREAK = Pattern.compile("\r\n|[\r\n  ]");
+    private static final Pattern LINE_BREAK = Pattern.compile("\\R");
 
     private DebugRecordFormat() {
     }
@@ -50,7 +52,7 @@ public final class DebugRecordFormat {
      * @return the record, without a trailing line break
      */
     public static String format(String prefix, String msg, Throwable th) {
-        StringBuilder buf = new StringBuilder(prefix);
+        StringBuilder buf = new StringBuilder(LINE_BREAK.matcher(prefix).replaceAll(" "));
         buf.append('\n');
         buf.append(continued(String.valueOf(msg), false));
         if (th != null) {
