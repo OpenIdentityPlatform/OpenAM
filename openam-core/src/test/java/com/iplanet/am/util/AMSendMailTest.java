@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 
+import com.sun.identity.shared.Constants;
+
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Transport;
@@ -42,7 +44,7 @@ import org.testng.annotations.Test;
  * The tests drive the two {@code postMail} overloads that build a message, against a mocked transport, so that they
  * cover the sanitising the methods themselves do rather than a model of it.
  */
-@PrepareForTest({ Transport.class, AMSendMail.class, BrowserEncoding.class })
+@PrepareForTest({ Transport.class, AMSendMail.class, BrowserEncoding.class, SystemProperties.class })
 // G11NSettings, which the charset mapping of BrowserEncoding is built on, needs a running server.
 @SuppressStaticInitializationFor("com.iplanet.am.util.BrowserEncoding")
 public class AMSendMailTest extends PowerMockTestCase {
@@ -213,6 +215,22 @@ public class AMSendMailTest extends PowerMockTestCase {
                 "UTF-8", "smtp.example.com", "465", "openam", "secret", true);
 
         assertThat(sentMessage().getSession().getProperty("mail.smtp.ssl.checkserveridentity")).isEqualTo("true");
+    }
+
+    /**
+     * A deployment whose SMTP host is not named in its certificate - an IP address, a short name, a relay alias -
+     * can turn the check off again rather than lose all its mail.
+     */
+    @Test
+    public void shouldLeaveTheServerIdentityUncheckedWhenTheDeploymentTurnsItOff() throws Exception {
+        PowerMockito.spy(SystemProperties.class);
+        PowerMockito.doReturn(false).when(SystemProperties.class, "getAsBoolean",
+                Constants.AM_SMTP_CHECK_SERVER_IDENTITY, true);
+
+        new AMSendMail().postMail(new String[] {TO}, "Password Reset", BODY, FROM, "text/plain",
+                "UTF-8", "10.0.0.25", "465", "openam", "secret", true);
+
+        assertThat(sentMessage().getSession().getProperty("mail.smtp.ssl.checkserveridentity")).isEqualTo("false");
     }
 
     /**

@@ -16,6 +16,15 @@
  */
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
+
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,9 +50,13 @@ public class ServerTest {
 	}
 	
 	@Test
-	public void start_test() throws  IdRepoException{
+	public void start_test() throws  IdRepoException, IOException{
 		
 		cassandra=new Server();
 		cassandra.run();
+		// run() is what closes the storage directory to other accounts, not only privateDirectory.
+		assumeTrue(FileSystems.getDefault().supportedFileAttributeViews().contains("posix"));
+		assertEquals(PosixFilePermissions.fromString("rwx------"),
+				Files.getPosixFilePermissions(Paths.get(System.getProperty("cassandra.storagedir"))));
 	}
 }

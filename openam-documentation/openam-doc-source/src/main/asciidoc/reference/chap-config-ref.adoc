@@ -1904,6 +1904,9 @@ Specifies whether to connect to the SMTP mail server using SSL.
 Default: use SSL (`true`)
 
 +
+Over SSL, the server certificate has to name the mail server host; see `org.openidentityplatform.openam.smtp.checkServerIdentity` in xref:#servers-advanced-configuration["Advanced"].
+
++
 `ssoadm` attribute: `forgerockEmailServiceSMTPSSLEnabled`
 
 Email From Address::
@@ -6116,6 +6119,21 @@ Specify a semicolon-separated list of URL patterns, using `*` as a wildcard, for
 
 +
 Default: empty (only relative and same-origin redirect URLs are allowed)
+
+`org.openidentityplatform.openam.smtp.checkServerIdentity`::
+Controls whether OpenAM checks, when it connects to an SMTP mail server over SSL, that the server certificate names the configured mail server host.
+
++
+By default (`true`), a certificate that the JVM trusts but that is issued for another host is rejected, and sending mail fails with `Can't verify identity of server`. This affects every mail OpenAM sends over SSL: password reset, account lockout notification, the Email Service, and one-time passwords sent by email. Earlier releases did not perform this check.
+
++
+To pass the check, configure the mail server host as a name the certificate carries in its subject alternative names or common name. A host given as an IP address matches an IP address subject alternative name only when the JVM is started with `--add-exports java.base/sun.security.util=ALL-UNNAMED`, as the OpenAM Docker image is; otherwise use a host name.
+
++
+Set this property to `false` to accept any certificate the JVM trusts, as earlier releases did, for example while a mail relay's certificate is being reissued.
+
++
+Default: `true`
 
 `securidHelper.ports`::
 Port on which SecurID daemon listens.

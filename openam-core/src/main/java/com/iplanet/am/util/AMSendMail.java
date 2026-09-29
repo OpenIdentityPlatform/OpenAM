@@ -231,8 +231,10 @@ public class AMSendMail {
         moduleProps.put("mail.smtp.socketFactory.port", port);
         if (ssl) {
             moduleProps.put("mail.smtp.ssl.enable", "true");
-            // The certificate has to be the SMTP host's, not merely one the JVM trusts.
-            moduleProps.put("mail.smtp.ssl.checkserveridentity", "true");
+            // The certificate has to be the SMTP host's, not merely one the JVM trusts, unless the
+            // deployment turns the check off for a host its certificate does not name.
+            moduleProps.put("mail.smtp.ssl.checkserveridentity", String.valueOf(
+                    SystemProperties.getAsBoolean(Constants.AM_SMTP_CHECK_SERVER_IDENTITY, true)));
         }
         moduleProps.put("mail.smtp.socketFactory.fallback", "false");
 
