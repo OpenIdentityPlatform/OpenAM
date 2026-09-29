@@ -127,8 +127,8 @@ public class HttpURLConnectionWrapperFactory {
 
         /*
         Reads the headers by index rather than through getHeaderFields(), which returns the values of a repeated header
-        in reverse order. Note that HttpURLConnection hides HttpOnly cookies from these calls when a JVM-wide
-        CookieHandler is installed; OpenAM installs none.
+        in reverse order on JDK 11 and 17. Note that HttpURLConnection hides HttpOnly cookies from these calls when a
+        JVM-wide CookieHandler is installed; OpenAM installs none.
          */
         private List<String> getSetCookieHeaders() {
             List<String> setCookieHeaders = new ArrayList<>();
