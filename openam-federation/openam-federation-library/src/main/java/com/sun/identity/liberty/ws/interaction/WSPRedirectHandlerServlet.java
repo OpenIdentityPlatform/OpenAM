@@ -490,23 +490,20 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
             debug.error(
                     "WSPRedirectHandlerServlet.sendInteractionRequestPage():"
                     + "catching JAXBException =", je);
-            showErrorPage(httpRequest, httpResponse, 
-                    "Error creating JAXBObject:"
-                    + je.getMessage());
+            showErrorPage(httpRequest, httpResponse,
+                    "Error creating JAXBObject.");
         } catch (ParserConfigurationException pce) {
             debug.error(
                     "WSPRedirectHandlerServlet.sendInteractionRequestPage():"
                     + "catching ParserConfigurationException =", pce);
-            showErrorPage(httpRequest, httpResponse, 
-                    "Error creating interaction request page:"
-                    + pce.getMessage());
+            showErrorPage(httpRequest, httpResponse,
+                    "Error creating interaction request page.");
         } catch (TransformerException tce) {
             debug.error(
                     "WSPRedirectHandlerServlet.sendInteractionRequestPage():"
                     + "catching TransformerException =", tce);
-            showErrorPage(httpRequest, httpResponse, 
-                    "Error creating interaction request page:"
-                    + tce.getMessage());
+            showErrorPage(httpRequest, httpResponse,
+                    "Error creating interaction request page.");
         }
     }
 
@@ -595,9 +592,8 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
             debug.error(
                     "WSPRedirectHandlerServlet.sendInteractionResponsePage():"
                     + "catching JAXBException =", je);
-            showErrorPage(httpRequest, httpResponse, 
-                    "Error createing JAXBObject:"
-                    + je.getMessage());
+            showErrorPage(httpRequest, httpResponse,
+                    "Error creating JAXBObject.");
         } catch (Exception e) {
             debug.error(
                     "WSPRedirectHandlerServlet.sendInteractionResponsePage():"
