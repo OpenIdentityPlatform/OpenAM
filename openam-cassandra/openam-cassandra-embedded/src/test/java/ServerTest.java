@@ -38,7 +38,12 @@ public class ServerTest {
 	static Server cassandra;
 	
 	@BeforeClass
-	public static void init() throws  IdRepoException{
+	public static void init() throws  IdRepoException, IOException{
+		// A storage directory that does not exist yet, so the assertion sees what run() creates rather than what
+		// an earlier run left behind; under target, so that the data the daemon writes goes with mvn clean.
+		Files.createDirectories(Paths.get("target"));
+		System.setProperty("cassandra.storagedir", Files.createTempDirectory(Paths.get("target"), "server-test")
+				.resolve("embeddedCassandra").toAbsolutePath().toString());
 		System.setProperty("datastax-java-driver.advanced.auth-provider.class","PlainTextAuthProvider");
 		System.setProperty("datastax-java-driver.advanced.auth-provider.username","cassandra");
 		System.setProperty("datastax-java-driver.advanced.auth-provider.password","cassandra");

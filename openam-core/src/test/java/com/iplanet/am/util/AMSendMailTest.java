@@ -224,13 +224,30 @@ public class AMSendMailTest extends PowerMockTestCase {
     @Test
     public void shouldLeaveTheServerIdentityUncheckedWhenTheDeploymentTurnsItOff() throws Exception {
         PowerMockito.spy(SystemProperties.class);
-        PowerMockito.doReturn(false).when(SystemProperties.class, "getAsBoolean",
-                Constants.AM_SMTP_CHECK_SERVER_IDENTITY, true);
+        PowerMockito.doReturn("false").when(SystemProperties.class, "get",
+                Constants.AM_SMTP_CHECK_SERVER_IDENTITY);
 
         new AMSendMail().postMail(new String[] {TO}, "Password Reset", BODY, FROM, "text/plain",
                 "UTF-8", "10.0.0.25", "465", "openam", "secret", true);
 
         assertThat(sentMessage().getSession().getProperty("mail.smtp.ssl.checkserveridentity")).isEqualTo("false");
+    }
+
+    /**
+     * The server property validator accepts an empty value, so an Advanced tab entry left blank reaches the check as
+     * "". Only an explicit "false" turns it off: anything else keeps it, rather than quietly accepting any certificate
+     * the JVM trusts while mail keeps flowing.
+     */
+    @Test
+    public void shouldKeepTheServerIdentityCheckForAnEmptyValue() throws Exception {
+        PowerMockito.spy(SystemProperties.class);
+        PowerMockito.doReturn("").when(SystemProperties.class, "get",
+                Constants.AM_SMTP_CHECK_SERVER_IDENTITY);
+
+        new AMSendMail().postMail(new String[] {TO}, "Password Reset", BODY, FROM, "text/plain",
+                "UTF-8", "smtp.example.com", "465", "openam", "secret", true);
+
+        assertThat(sentMessage().getSession().getProperty("mail.smtp.ssl.checkserveridentity")).isEqualTo("true");
     }
 
     /**
