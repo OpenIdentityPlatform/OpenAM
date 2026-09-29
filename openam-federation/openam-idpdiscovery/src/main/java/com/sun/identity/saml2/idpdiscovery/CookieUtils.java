@@ -368,8 +368,16 @@ public class CookieUtils {
             cookie.setDomain(domain);
         }
 
-        cookie.setSecure(isCookieSecure());
-            
+        // The flags are set from creation so that a cookie handed straight to
+        // response.addCookie carries them as well as one that goes through
+        // addCookieToResponse.
+        if (isCookieSecure()) {
+            cookie.setSecure(true);
+        }
+        if (isCookieHttpOnly()) {
+            cookie.setHttpOnly(true);
+        }
+
         return cookie;
     }
     
@@ -489,8 +497,11 @@ public class CookieUtils {
             return;
         }
 
-        // Once JavaEE6 is available, the following code can be simplified
-        // to be one line response.addCookie(cookie)
+        // The servlet Cookie has no SameSite attribute, and an HttpOnly cookie
+        // keeps the hand-built header it has always had: the container's cookie
+        // processor rejects a domain with a leading dot (".example.com") and the
+        // space-separated value of an unencoded preferred-IdP list, both of which
+        // this WAR can be configured to produce.
         StringBuffer sb = new StringBuffer(150);
         sb.append(cookie.getName()).append("=").append(cookie.getValue());
         String path = cookie.getPath();

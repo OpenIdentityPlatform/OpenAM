@@ -15,12 +15,19 @@
  */
 package com.sun.identity.saml2.idpdiscovery;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -87,5 +94,87 @@ public class CookieUtilsTest {
     public void rejectsNullAndEmpty() {
         assertFalse(CookieUtils.isRedirectUrlValid(request, null));
         assertFalse(CookieUtils.isRedirectUrlValid(request, "   "));
+    }
+
+    /** Runs {@code body} with the deployment's Secure/HttpOnly/SameSite cookie settings pinned. */
+    private static void withCookieSettings(boolean secure, boolean httpOnly, String sameSite, Runnable body) {
+        boolean savedSecure = CookieUtils.secureCookie;
+        boolean savedHttpOnly = CookieUtils.cookieHttpOnly;
+        String savedSameSite = CookieUtils.cookieSameSite;
+        try {
+            CookieUtils.secureCookie = secure;
+            CookieUtils.cookieHttpOnly = httpOnly;
+            CookieUtils.cookieSameSite = sameSite;
+            body.run();
+        } finally {
+            CookieUtils.secureCookie = savedSecure;
+            CookieUtils.cookieHttpOnly = savedHttpOnly;
+            CookieUtils.cookieSameSite = savedSameSite;
+        }
+    }
+
+    @Test
+    public void newCookieCarriesTheSecureFlagTheDeploymentConfigures() {
+        withCookieSettings(true, false, null, () ->
+            assertTrue(CookieUtils.newCookie("_saml_idp", "aWRw").getSecure()));
+        withCookieSettings(false, false, null, () ->
+            assertFalse(CookieUtils.newCookie("_saml_idp", "aWRw").getSecure()));
+    }
+
+    @Test
+    public void newCookieCarriesTheHttpOnlyFlagTheDeploymentConfigures() {
+        withCookieSettings(false, true, null, () ->
+            assertTrue(CookieUtils.newCookie("_saml_idp", "aWRw").isHttpOnly()));
+        withCookieSettings(false, false, null, () ->
+            assertFalse(CookieUtils.newCookie("_saml_idp", "aWRw").isHttpOnly()));
+    }
+
+    /** Neither HttpOnly nor SameSite configured: the cookie goes through the servlet API untouched. */
+    @Test
+    public void addCookieToResponseLeavesHttpOnlyAloneWhenNotConfigured() {
+        withCookieSettings(false, false, null, () -> {
+            HttpServletResponse response = mock(HttpServletResponse.class);
+            Cookie cookie = new Cookie("_saml_idp", "aWRw");
+
+            CookieUtils.addCookieToResponse(response, cookie);
+
+            assertFalse(cookie.isHttpOnly());
+            verify(response).addCookie(cookie);
+            verify(response, never()).addHeader(anyString(), anyString());
+        });
+    }
+
+    /**
+     * HttpOnly without SameSite still goes out as a hand-built header: the container's cookie
+     * processor would reject a configured domain such as ".example.com".
+     */
+    @Test
+    public void addCookieToResponseWritesTheHeaderItselfWhenHttpOnlyIsConfigured() {
+        withCookieSettings(false, true, null, () -> {
+            HttpServletResponse response = mock(HttpServletResponse.class);
+            Cookie cookie = new Cookie("_saml_idp", "aWRw");
+            cookie.setPath("/");
+            cookie.setDomain(".example.com");
+
+            CookieUtils.addCookieToResponse(response, cookie);
+
+            verify(response, never()).addCookie(any(Cookie.class));
+            verify(response).addHeader(eq("SET-COOKIE"), eq("_saml_idp=aWRw;path=/;domain=.example.com;httponly"));
+        });
+    }
+
+    /** With SameSite configured the cookie goes out as a hand-built header, flags included. */
+    @Test
+    public void addCookieToResponseWritesTheHeaderItselfWhenSameSiteIsConfigured() {
+        withCookieSettings(true, true, "Lax", () -> {
+            HttpServletResponse response = mock(HttpServletResponse.class);
+            Cookie cookie = new Cookie("_saml_idp", "aWRw");
+            cookie.setPath("/");
+
+            CookieUtils.addCookieToResponse(response, cookie);
+
+            verify(response, never()).addCookie(any(Cookie.class));
+            verify(response).addHeader(eq("SET-COOKIE"), eq("_saml_idp=aWRw;path=/;secure;httponly;SameSite=Lax"));
+        });
     }
 }
