@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -91,7 +91,13 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
                 !request.getParameter(REALM).equals(deviceCode.getRealm())) {
             throw new AuthorizationDeclinedException();
         }
-        
+
+        // RFC 8628 section 3.5: an expired device code gets expired_token even if the user has approved it
+        if (deviceCode.getExpiryTime() < currentTimeMillis()) {
+            tryDeleteDeviceCode(clientId, code, request);
+            throw new ExpiredTokenException();
+        }
+
         if (deviceCode.isAuthorized()) {
             String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
             Set<String> scope = deviceCode.getScope();
@@ -108,14 +114,6 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
             
             return accessToken;
         }
-
-        
-        // only reachable when not authorized - the branch above returns
-        if (deviceCode.getExpiryTime() < currentTimeMillis()) {
-        	tryDeleteDeviceCode(clientId, code, request);
-            throw new ExpiredTokenException();
-        }
-        
 
         try {
             final long lastPollTime = deviceCode.getLastPollTime();
