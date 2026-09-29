@@ -78,6 +78,10 @@ public class CookieUtils {
         SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_ENCODE).
            equalsIgnoreCase("true"));
 
+    // The preferred IdP list separator as it is written in an unencoded cookie.
+    // A base64 IdP never contains '%', so it cannot be mistaken for part of one.
+    private static final String ESCAPED_SEPARATOR = "%20";
+
     private static int defAge = -1;
     public static Debug debug = Debug.getInstance("libIDPDiscovery");
     // IDP Discovery Resource bundle
@@ -219,6 +223,9 @@ public class CookieUtils {
                 // Bea, IBM
                 if (cookieEncoding && (cookieValue != null)) {
                     cookieValue= URLEncDec.decode(cookieValue);
+                } else if (cookieValue != null) {
+                    cookieValue = cookieValue.replace(ESCAPED_SEPARATOR,
+                        IDPDiscoveryConstants.PREFERRED_COOKIE_SEPERATOR);
                 }
             } else {
                 debug.message("No Cookie is in the request");
@@ -353,7 +360,13 @@ public class CookieUtils {
         if (cookieEncoding) {
             cookie = new Cookie(name, URLEncDec.encode(value));
         } else {
-            cookie = new Cookie(name, value);
+            // RFC 6265 allows no space in a cookie value, and the container
+            // refuses to write or to read one. The separator of the preferred
+            // IdP list is escaped: it is the list's only character outside the
+            // cookie octets, since the IdPs themselves are base64.
+            cookie = new Cookie(name, value == null ? null : value.replace(
+                IDPDiscoveryConstants.PREFERRED_COOKIE_SEPERATOR,
+                ESCAPED_SEPARATOR));
         }
 
         cookie.setMaxAge(maxAge);
@@ -364,6 +377,11 @@ public class CookieUtils {
             cookie.setPath("/");
         }
             
+        // A leading dot is ignored by RFC 6265 (5.2.3) and refused by the
+        // container, so ".example.com" is set as "example.com".
+        if ((domain != null) && domain.startsWith(".")) {
+            domain = domain.substring(1);
+        }
         if ((domain != null) && (domain.length() > 0)) {
             cookie.setDomain(domain);
         }

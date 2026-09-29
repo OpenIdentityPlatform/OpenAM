@@ -51,6 +51,29 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <!-- The container's RFC 6265 cookie processor, to check the preferred-IdP cookie against it -->
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.48</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- tomcat-embed-core carries the Servlet 6.0 API its cookie processor calls;
+                         the Servlet 5.0 API this module compiles against would shadow it -->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>jakarta.servlet:jakarta.servlet-api</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 
