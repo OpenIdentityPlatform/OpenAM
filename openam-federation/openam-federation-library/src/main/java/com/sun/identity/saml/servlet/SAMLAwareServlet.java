@@ -43,6 +43,7 @@ import com.sun.identity.saml.common.SAMLException;
 import com.sun.identity.saml.common.SAMLServiceManager;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.protocol.AssertionArtifact;
+import org.openidentityplatform.openam.federation.plugins.RealmGotoUrlValidator;
 
 import java.io.IOException;
 
@@ -341,7 +342,20 @@ public class SAMLAwareServlet extends HttpServlet {
         Map attrMap = null;
         try {
             Map sessionAttr = SAMLUtils.processArtifact(arti, targeturl);
-            Object token = SAMLUtils.generateSession(request, 
+            // TARGET comes from the request and is redirected to below; the
+            // realm's Valid goto URL list decides whether it may be, before
+            // any session is created for it.
+            if (!RealmGotoUrlValidator.isValid(targeturl,
+                    (String) sessionAttr.get(SessionProvider.REALM))) {
+                SAMLUtils.debug.warning("SAMLAwareServlet.ArtifactHandler: "
+                    + "refusing a TARGET outside the realm's valid goto URLs");
+                SAMLUtils.sendError(request, response,
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "invalidTargetSite",
+                    SAMLUtils.bundle.getString("invalidTargetSite"));
+                return;
+            }
+            Object token = SAMLUtils.generateSession(request,
                 response, sessionAttr);
         } catch (Exception ex) {
             SAMLUtils.debug.error("generateSession: ", ex); 
