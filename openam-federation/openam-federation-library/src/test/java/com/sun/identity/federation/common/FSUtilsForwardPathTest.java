@@ -70,6 +70,20 @@ public class FSUtilsForwardPathTest {
         verify(response, never()).sendError(anyInt());
     }
 
+    @Test
+    public void dispatchesTheFormTheContainerMaps() throws Exception {
+        // Path parameters stripped and escapes decoded once, the query string as given.
+        RequestDispatcher dispatcher = mock(RequestDispatcher.class);
+        when(request.getRequestDispatcher("/console/my page.jsp?goto=%2Fopenam%2Fconsole"))
+            .thenReturn(dispatcher);
+
+        FSUtils.forwardRequest(request, response,
+            BASE + "/console;x%2Fy/my%20page.jsp?goto=%2Fopenam%2Fconsole");
+
+        verify(dispatcher).forward(request, response);
+        verify(response, never()).sendError(anyInt());
+    }
+
     @DataProvider
     public Object[][] traversingTargets() {
         return new Object[][] {

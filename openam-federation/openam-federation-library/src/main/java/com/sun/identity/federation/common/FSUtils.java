@@ -361,8 +361,10 @@ public class FSUtils {
                     index + deploymentURI.length());
                 // The target comes from the request (goto/RelayState). A forward
                 // bypasses the web.xml filters and can reach /WEB-INF, so refuse
-                // anything that is not a plain in-app path.
-                if (!ForwardPathValidator.isSafeForwardPath(resource)) {
+                // anything that is not a plain in-app path and dispatch the form
+                // the container maps.
+                String dispatchPath = ForwardPathValidator.forwardTarget(resource);
+                if (dispatchPath == null) {
                     FSUtils.debug.warning("FSUtils.forwardRequest: refusing to "
                         + "forward to a path with traversal or a reserved "
                         + "directory");
@@ -371,16 +373,16 @@ public class FSUtils {
                 }
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message(
-                        "FSUtils.forwardRequest: Forwarding to :" + resource);
-                }  
-                RequestDispatcher dispatcher = 
-                    request.getRequestDispatcher(resource);
+                        "FSUtils.forwardRequest: Forwarding to :" + dispatchPath);
+                }
+                RequestDispatcher dispatcher =
+                    request.getRequestDispatcher(dispatchPath);
                 try {
                     dispatcher.forward(request, response);
                 } catch (Exception e) {
                     FSUtils.debug.error("FSUtils.forwardRequest: Exception "
                         + "occured while trying to forward to resource:" +
-                        resource , e);
+                        dispatchPath, e);
                 }
             } 
         } catch (Exception ex) {

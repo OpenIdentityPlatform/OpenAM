@@ -72,4 +72,27 @@ public class JAXRPCRequestFilterTest {
         assertNull(JAXRPCRequestFilter.getCurrentRequest(),
                 "request must be cleared once the filter chain completes");
     }
+
+    @Test
+    public void nestedDispatchRestoresTheOuterRequestOnExit() throws Exception {
+        // The filter is mapped for FORWARD and INCLUDE dispatches as well, so a nested
+        // dispatch into /jaxrpc/* re-enters it on the same thread; the outer request
+        // must be bound again once the nested chain returns.
+        HttpServletRequest outer = mock(HttpServletRequest.class);
+        HttpServletRequest inner = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        JAXRPCRequestFilter filter = new JAXRPCRequestFilter();
+        final HttpServletRequest[] seen = new HttpServletRequest[2];
+        FilterChain outerChain = (req, res) -> {
+            filter.doFilter(inner, res, (r, s) -> seen[0] = JAXRPCRequestFilter.getCurrentRequest());
+            seen[1] = JAXRPCRequestFilter.getCurrentRequest();
+        };
+
+        filter.doFilter(outer, response, outerChain);
+
+        assertSame(seen[0], inner, "the nested request must be bound during the nested chain");
+        assertSame(seen[1], outer, "the outer request must be bound again after the nested chain");
+        assertNull(JAXRPCRequestFilter.getCurrentRequest(),
+                "nothing must stay bound once the outer chain completes");
+    }
 }

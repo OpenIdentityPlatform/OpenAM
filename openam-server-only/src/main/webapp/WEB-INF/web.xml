@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2012-2016 ForgeRock AS.
+ * Portions Copyright 2017-2026 3A Systems, LLC.
+-->
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
     <display-name>OpenAM Services</display-name>
@@ -226,21 +242,45 @@
         <url-pattern>/oauth2/*</url-pattern>
     </filter-mapping>
 
+    <!-- A filter-mapping that names no <dispatcher> applies to REQUEST only, so a
+         RequestDispatcher forward or include, an async dispatch or an error-page dispatch
+         reaches the endpoint with the filter skipped. Naming any type replaces that default,
+         so the security filters below list every type. -->
     <filter-mapping>
         <filter-name>AuthNFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
+        <dispatcher>ERROR</dispatcher>
     </filter-mapping>
     <filter-mapping>
         <filter-name>JAXRPCRequestFilter</filter-name>
         <url-pattern>/jaxrpc/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
+        <dispatcher>ERROR</dispatcher>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AuthZFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
+        <dispatcher>ERROR</dispatcher>
     </filter-mapping>
     <filter-mapping>
         <filter-name>NotificationsWebSocketFilter</filter-name>
         <url-pattern>/notifications</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
+        <dispatcher>ERROR</dispatcher>
     </filter-mapping>
 
     <!-- filter mapping -->
