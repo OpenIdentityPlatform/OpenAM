@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -20,10 +20,7 @@ package com.sun.identity.setup;
 import static org.forgerock.openam.utils.IOUtils.closeIfNotNull;
 import static org.forgerock.openam.utils.IOUtils.readStream;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLHandshakeException;
-import javax.net.ssl.SSLSession;
 import jakarta.servlet.ServletContext;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -54,7 +51,6 @@ import com.sun.identity.shared.encode.Base64;
 public final class AMSetupUtils {
 
     private static final Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
-    private static final String HTTPS = "https";
     private static final String RANDOM_STRING_ALGORITHM = "SHA1PRNG";
 
     private AMSetupUtils() {
@@ -228,18 +224,13 @@ public final class AMSetupUtils {
         }
     }
 
-    private static HttpURLConnection openConnection(String urlString) throws IOException {
-        URL url = new URL(urlString);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        if (url.getProtocol().equals(HTTPS)) {
-            HttpsURLConnection sslConnection = (HttpsURLConnection) connection;
-            sslConnection.setHostnameVerifier(new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            });
-        }
-        return connection;
+    /**
+     * Opens a connection to the remote server. The admin password is posted over it, so an
+     * HTTPS connection keeps the JDK's host name verification: the certificate has to be the
+     * host's, not merely one the JVM trusts.
+     */
+    static HttpURLConnection openConnection(String urlString) throws IOException {
+        return (HttpURLConnection) new URL(urlString).openConnection();
     }
 
     private static void writeToConnection(URLConnection connection, String data) throws IOException {

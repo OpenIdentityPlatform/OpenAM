@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 
+import com.sun.identity.shared.Constants;
+
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Transport;
@@ -42,7 +44,7 @@ import org.testng.annotations.Test;
  * The tests drive the two {@code postMail} overloads that build a message, against a mocked transport, so that they
  * cover the sanitising the methods themselves do rather than a model of it.
  */
-@PrepareForTest({ Transport.class, AMSendMail.class, BrowserEncoding.class })
+@PrepareForTest({ Transport.class, AMSendMail.class, BrowserEncoding.class, SystemProperties.class })
 // G11NSettings, which the charset mapping of BrowserEncoding is built on, needs a running server.
 @SuppressStaticInitializationFor("com.iplanet.am.util.BrowserEncoding")
 public class AMSendMailTest extends PowerMockTestCase {
@@ -204,6 +206,48 @@ public class AMSendMailTest extends PowerMockTestCase {
         assertThat(countHeader(serialized, "Bcc:")).isZero();
         assertThat(countHeader(serialized, "Subject:")).isEqualTo(1);
         assertThat(serialized).contains("attacker@example.org");
+    }
+
+    /** An SSL connection to the SMTP host has to check that the certificate is the host's, not just any valid one. */
+    @Test
+    public void shouldCheckTheServerIdentityOnAnSslConnection() throws Exception {
+        new AMSendMail().postMail(new String[] {TO}, "Password Reset", BODY, FROM, "text/plain",
+                "UTF-8", "smtp.example.com", "465", "openam", "secret", true);
+
+        assertThat(sentMessage().getSession().getProperty("mail.smtp.ssl.checkserveridentity")).isEqualTo("true");
+    }
+
+    /**
+     * A deployment whose SMTP host is not named in its certificate - an IP address, a short name, a relay alias -
+     * can turn the check off again rather than lose all its mail.
+     */
+    @Test
+    public void shouldLeaveTheServerIdentityUncheckedWhenTheDeploymentTurnsItOff() throws Exception {
+        PowerMockito.spy(SystemProperties.class);
+        PowerMockito.doReturn("false").when(SystemProperties.class, "get",
+                Constants.AM_SMTP_CHECK_SERVER_IDENTITY);
+
+        new AMSendMail().postMail(new String[] {TO}, "Password Reset", BODY, FROM, "text/plain",
+                "UTF-8", "10.0.0.25", "465", "openam", "secret", true);
+
+        assertThat(sentMessage().getSession().getProperty("mail.smtp.ssl.checkserveridentity")).isEqualTo("false");
+    }
+
+    /**
+     * The server property validator accepts an empty value, so an Advanced tab entry left blank reaches the check as
+     * "". Only an explicit "false" turns it off: anything else keeps it, rather than quietly accepting any certificate
+     * the JVM trusts while mail keeps flowing.
+     */
+    @Test
+    public void shouldKeepTheServerIdentityCheckForAnEmptyValue() throws Exception {
+        PowerMockito.spy(SystemProperties.class);
+        PowerMockito.doReturn("").when(SystemProperties.class, "get",
+                Constants.AM_SMTP_CHECK_SERVER_IDENTITY);
+
+        new AMSendMail().postMail(new String[] {TO}, "Password Reset", BODY, FROM, "text/plain",
+                "UTF-8", "smtp.example.com", "465", "openam", "secret", true);
+
+        assertThat(sentMessage().getSession().getProperty("mail.smtp.ssl.checkserveridentity")).isEqualTo("true");
     }
 
     /**

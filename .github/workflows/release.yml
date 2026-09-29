@@ -16,6 +16,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   release-maven:
+    # contents: write - release:prepare pushes the tag, the GitHub release is created
+    # and the docs are pushed to the wiki, all with github.token
+    permissions:
+      contents: write
     runs-on: 'ubuntu-latest'
     steps:
       - name: Print github context
@@ -56,7 +60,7 @@ jobs:
         if: ${{ env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!='' }}
         run: mvn --batch-mode -Darguments="-Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}" -DsignTag=true -DtagNameFormat="${{ github.event.inputs.releaseVersion }}" -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} release:prepare clean release:perform --file pom.xml
       - name: Release on GitHub
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           name: ${{ github.event.inputs.releaseVersion }}
           tag_name: ${{ github.event.inputs.releaseVersion }}
@@ -113,6 +117,10 @@ jobs:
           git push --quiet --force origin ${TAG_NAME}
 
   release-docker:
+    # packages: write - the image is pushed to GHCR with GITHUB_TOKEN
+    permissions:
+      contents: read
+      packages: write
     runs-on: 'ubuntu-latest'
     needs:
       - release-maven
@@ -124,7 +132,7 @@ jobs:
           submodules: recursive
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v6
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: |
             ${{ github.repository }}
@@ -133,22 +141,22 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ github.event.inputs.releaseVersion }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - name: Login to DockerHub
-        uses: docker/login-action@v4
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Login to GHCR
-        uses: docker/login-action@v4
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         continue-on-error: true
         with:
           context: ./openam-distribution/openam-distribution-docker
