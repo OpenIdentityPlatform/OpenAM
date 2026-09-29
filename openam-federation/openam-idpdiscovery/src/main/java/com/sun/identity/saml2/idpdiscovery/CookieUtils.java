@@ -492,15 +492,16 @@ public class CookieUtils {
         if (cookie == null) {
             return;
         }
-        if (getCookieSameSite() == null) {
-            if (isCookieHttpOnly()) {
-                cookie.setHttpOnly(true);
-            }
+        if (!isCookieHttpOnly() && getCookieSameSite() == null) {
             response.addCookie(cookie);
             return;
         }
 
-        // The servlet Cookie has no SameSite attribute: write the header by hand.
+        // The servlet Cookie has no SameSite attribute, and an HttpOnly cookie
+        // keeps the hand-built header it has always had: the container's cookie
+        // processor rejects a domain with a leading dot (".example.com") and the
+        // space-separated value of an unencoded preferred-IdP list, both of which
+        // this WAR can be configured to produce.
         StringBuffer sb = new StringBuffer(150);
         sb.append(cookie.getName()).append("=").append(cookie.getValue());
         String path = cookie.getPath();

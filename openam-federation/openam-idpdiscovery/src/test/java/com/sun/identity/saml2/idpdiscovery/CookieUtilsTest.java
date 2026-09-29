@@ -129,18 +129,37 @@ public class CookieUtilsTest {
             assertFalse(CookieUtils.newCookie("_saml_idp", "aWRw").isHttpOnly()));
     }
 
-    /** Without SameSite the cookie goes through the servlet API, HttpOnly set on the cookie itself. */
+    /** Neither HttpOnly nor SameSite configured: the cookie goes through the servlet API untouched. */
     @Test
-    public void addCookieToResponseSetsHttpOnlyOnTheServletCookie() {
-        withCookieSettings(false, true, null, () -> {
+    public void addCookieToResponseLeavesHttpOnlyAloneWhenNotConfigured() {
+        withCookieSettings(false, false, null, () -> {
             HttpServletResponse response = mock(HttpServletResponse.class);
             Cookie cookie = new Cookie("_saml_idp", "aWRw");
 
             CookieUtils.addCookieToResponse(response, cookie);
 
-            assertTrue(cookie.isHttpOnly());
+            assertFalse(cookie.isHttpOnly());
             verify(response).addCookie(cookie);
             verify(response, never()).addHeader(anyString(), anyString());
+        });
+    }
+
+    /**
+     * HttpOnly without SameSite still goes out as a hand-built header: the container's cookie
+     * processor would reject a configured domain such as ".example.com".
+     */
+    @Test
+    public void addCookieToResponseWritesTheHeaderItselfWhenHttpOnlyIsConfigured() {
+        withCookieSettings(false, true, null, () -> {
+            HttpServletResponse response = mock(HttpServletResponse.class);
+            Cookie cookie = new Cookie("_saml_idp", "aWRw");
+            cookie.setPath("/");
+            cookie.setDomain(".example.com");
+
+            CookieUtils.addCookieToResponse(response, cookie);
+
+            verify(response, never()).addCookie(any(Cookie.class));
+            verify(response).addHeader(eq("SET-COOKIE"), eq("_saml_idp=aWRw;path=/;domain=.example.com;httponly"));
         });
     }
 
