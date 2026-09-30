@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -735,7 +735,7 @@ This example pulls everything together (except security considerations), using O
 
 . On the OpenAM server that will be configured as an OAuth 2.0 client, set up an OpenAM policy agent and policy in the Top Level Realm, `/`, to protect resources.
 +
-See the link:../../../openam-web-policy-agents/web-users-guide/#web-users-guide[Web Policy Agent User's Guide, window=\_blank] or the link:../../../openam-jee-policy-agents/jee-users-guide/#jee-users-guide[Java EE Policy Agent User's Guide, window=\_blank] for instructions on installing a policy agent. This example relies on the Apache Tomcat Java EE policy agent, configured to protect resources in Apache Tomcat (Tomcat) at `\http://www.example.com:8080/`.
+See the xref:../web-users-guide/index.adoc[Web Policy Agent User's Guide] or the xref:../jee-users-guide/index.adoc[Java EE Policy Agent User's Guide] for instructions on installing a policy agent. This example relies on the Apache Tomcat Java EE policy agent, configured to protect resources in Apache Tomcat (Tomcat) at `\http://www.example.com:8080/`.
 +
 The policies for this example protect the Tomcat examples under `\http://www.example.com:8080/examples/`, allowing GET and POST operations by all authenticated users. For more information, see xref:chap-authz-policy.adoc#chap-authz-policy["Defining Authorization Policies"].
 +

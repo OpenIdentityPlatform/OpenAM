@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -79,7 +79,7 @@ For example, you can set URI patterns with wildcards in the OpenAM console using
    /css/-*-
    /*.jsp?locale=*
 ----
-For more information on wildcard usage, see link:../../../openam/13/admin-guide/#wildcard-syntax[Wildcard Usage, window=\_blank].
+For more information on wildcard usage, see xref:../admin-guide/chap-authz-policy.adoc#policy-patterns-wildcards[Specifying Resource Patterns with Wildcards].
 
 The Java EE policy agent also supports a Not-Enforced Client IP List, which specifies the client IP addresses that can be excluded from authentication and authorization. This property lets administrators access the web site from a certain IP address, or gives a search engine access to the web resources.
 
@@ -147,6 +147,6 @@ OpenAM's CDSSO solves this cross-domain problem and is best implemented in envir
 
 The Java EE policy agent works with an OpenAM component called a `CDCServlet` that generates a self-submitting form containing the valid session token from one domain. The form gets auto-submitted to the policy agent endpoint via a POST operation. The policy agent processes the request and extracts the session ID, which is again validated by OpenAM. If validation is successful, the policy agent sets the cookie in alternate domain. The client can then access a resource in that domain.
 
-For more details, see link:../../../openam/13/admin-guide/#chap-cdsso[Configuring Cross Domain Single Sign-On, window=\_blank].
+For more details, see xref:../admin-guide/chap-cdsso.adoc#chap-cdsso[Configuring Cross-Domain Single Sign-On].
 
 

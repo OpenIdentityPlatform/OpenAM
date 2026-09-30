@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -75,7 +75,7 @@ OpenAM only redirects a user if the `goto` and `gotoOnFail` URL matches any of t
 
 To set the Valid `goto` URL Resources, use the OpenAM console, and navigate to Realms > __Realm Name__ > Services. Click Add, select Validation Service, and then add one or more valid `goto` URLs.
 
-You can use the "*" wildcard to define resources, where "*" matches all characters except "?". For example, you can use the wildcards, such as `\https://website.example.com/*` or `\https://website.example.com/*?*`. For more specific patterns, use resource names with wildcards as described in the procedure, link:../../../docs/openam/13/admin-guide/#configure-valid-goto-url-resources[Configuring Valid goto URL Resources, window=\_blank].
+You can use the "*" wildcard to define resources, where "*" matches all characters except "?". For example, you can use the wildcards, such as `\https://website.example.com/*` or `\https://website.example.com/*?*`. For more specific patterns, use resource names with wildcards as described in the procedure, xref:../admin-guide/chap-auth-services.adoc#configure-valid-goto-url-resources[Configuring Valid goto URL Resources].
 
 --
 

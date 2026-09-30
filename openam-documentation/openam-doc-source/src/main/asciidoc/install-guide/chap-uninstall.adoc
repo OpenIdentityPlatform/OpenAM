@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -23,7 +23,7 @@
 [#chap-uninstall]
 == Removing OpenAM Software
 
-This chapter shows you how to uninstall OpenAM core software. See the link:../../../openam-web-policy-agents/web-users-guide/#web-users-guide[OpenAM Web Policy Agent User's Guide, window=\_blank], or the link:../../../openam-jee-policy-agents/jee-users-guide/#jee-users-guide[OpenAM Java EE Policy Agent User's Guide, window=\_blank] for instructions on removing OpenAM agents.
+This chapter shows you how to uninstall OpenAM core software. See the xref:../web-users-guide/index.adoc[OpenAM Web Policy Agent User's Guide], or the xref:../jee-users-guide/index.adoc[OpenAM Java EE Policy Agent User's Guide] for instructions on removing OpenAM agents.
 
 [#uninstall-OpenAM-core]
 .To Remove OpenAM Core Software

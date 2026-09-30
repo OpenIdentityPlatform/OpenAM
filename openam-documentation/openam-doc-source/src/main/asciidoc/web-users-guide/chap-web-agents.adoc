@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -194,7 +194,7 @@ You can create a policy agent profile in OpenAM using the `ssoadm` command-line 
 
 The following procedure demonstrates creating a policy agent profile using the `ssoadm` command:
 
-. Make sure the `ssoadm` command is installed. See link:../../../docs/openam/13/install-guide/#install-openam-admin-tools["To Set Up Administration Tools", window=\_blank] in the __OpenAM Installation Guide__.
+. Make sure the `ssoadm` command is installed. See xref:../install-guide/chap-install-tools.adoc#install-openam-admin-tools[To Set Up Administration Tools] in the __OpenAM Installation Guide__.
 
 . Determine the list of properties to set in the agent profile.
 +

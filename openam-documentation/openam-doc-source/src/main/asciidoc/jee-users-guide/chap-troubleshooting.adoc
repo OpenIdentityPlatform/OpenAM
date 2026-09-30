@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -35,7 +35,7 @@ After setting up the container where you run OpenAM to use HTTPS, get the certif
 
 Copy the certificate file to the system where you plan to install the policy agent. Import the certificate into a trust store that you will use during policy agent installation. If you import the certificate into the default trust store for the Java platform, then the `agentadmin` command can recognize it without additional configuration.
 
-Export and import of self-signed certificates is demonstrated in the __Administration Guide__ chapter on link:../../../openam/13/admin-guide/#chap-certs-keystores[Managing Certificates, window=\_blank].
+Export and import of self-signed certificates is demonstrated in the __Administration Guide__ chapter on xref:../admin-guide/chap-certs-keystores.adoc#chap-certs-keystores[Managing Certificates and Keystores].
 
 --
 
