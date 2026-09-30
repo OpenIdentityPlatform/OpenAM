@@ -97,9 +97,22 @@ jobs:
               - '**/node_modules/**'
               - '**/test-output/**'
               - 'openam-ui/openam-ui-ria/src/main/js/libs/**'
+              # Unmodified third-party libraries served by openam-server-only:
+              # YUI 2.3.0, the Sun Web UI (Lockhart) scripts and Bluff 0.3.6.2.
+              # The com_sun_web_ui JSPs carry OpenAM changes and stay analysed.
+              - 'openam-server-only/src/main/webapp/assets/lib/yui/**'
+              - 'openam-server-only/src/main/webapp/com_sun_web_ui/js/**'
+              - 'openam-server-only/src/main/webapp/js/Bluff-0.3.6.2/**'
               # .NET build output (generated AssemblyInfo, compiled artifacts).
               - '**/obj/**'
               - '**/bin/**'
+            query-filters:
+              # The JavaScript extractor parses script blocks of JSPs and Velocity
+              # templates, and scripts injected into XML, as plain JavaScript, so
+              # every <%= %>, #if or &lt; is reported as a syntax error. The
+              # extractor skips a block it cannot parse either way.
+              - exclude:
+                  id: js/syntax-error
 
       # --- Manual build (only used when build-mode is 'manual') -------------
       # - name: Set up JDK 11
