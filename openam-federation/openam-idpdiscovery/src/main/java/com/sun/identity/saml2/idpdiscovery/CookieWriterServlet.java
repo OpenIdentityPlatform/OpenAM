@@ -278,7 +278,15 @@ public class CookieWriterServlet extends HttpServlet {
                     "/",
                     domain
                 );
-	    CookieUtils.addCookieToResponse(response,idpListCookie);
+            try {
+                CookieUtils.addCookieToResponse(response, idpListCookie);
+            } catch (IllegalArgumentException e) {
+                // The container refused the cookie, e.g. for a domain it
+                // does not accept. Setting the preferred IdP is done behind
+                // the screens, so the user still goes on to the RelayState.
+                CookieUtils.debug.error(classMethod +
+                    "The preferred IDP cookie could not be set.", e);
+            }
             if(isValidReturn) {
                 if (CookieUtils.debug.messageEnabled()) {
                     CookieUtils.debug.message(
