@@ -55,7 +55,7 @@
             <!-- The container's RFC 6265 cookie processor, to check the preferred-IdP cookie against it -->
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>10.1.48</version>
+            <version>10.1.59</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
