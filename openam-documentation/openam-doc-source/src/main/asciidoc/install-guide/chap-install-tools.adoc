@@ -67,7 +67,7 @@ $ mkdir -p /path/to/openam-tools/admin
 . Unpack the tools:
 +
 
-[source, console]
+[source, console, subs="attributes+"]
 ----
 $ cd /path/to/openam-tools/admin
 $ unzip ~/Downloads/openam/SSOAdminTools-{openam-version}.zip
@@ -149,12 +149,6 @@ $ tail -2 /path/to/openam-tools/admin/openam/bin/ssoadm
     -D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.jks" \
     com.sun.identity.cli.CommandManager "$@"
 ----
-+
-
-[NOTE]
-======
-In non-production environments, you can configure the `ssoadm` command to trust all server certificates. For more information, see link:https://backstage.forgerock.com/knowledge/kb/book/b88592244#trust[Q. How do I configure ssoadm to trust all certificates?, window=\_top] in the __ForgeRock Knowledge Base__.
-======
 
 . (Optional)  If you use IBM Java, add `-D"amCryptoDescriptor.provider=IBMJCE"` and `-D"amKeyGenDescriptor.provider=IBMJCE"` options to the `ssoadm` or `ssoadm.bat` script before using the script.
 +
@@ -306,7 +300,7 @@ DS_DIRMGRPASSWD=password
 When the OpenAM server `.war` file is deployed and running, you can configure it by using the tool with the properties file.
 +
 
-[source, console]
+[source, console, subs="attributes+"]
 ----
 $ java -jar openam-configurator-tool-{openam-version}.jar --file config.properties
 Checking license acceptance...License terms accepted.

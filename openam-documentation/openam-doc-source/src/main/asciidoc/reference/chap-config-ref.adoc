@@ -3297,7 +3297,6 @@ Use the ForgeRock Backstage website to provision values for the following Simple
 
 * SNS Client Region
 
-For information on provisioning the credentials required by the Push Notification Service, see link:https://backstage.forgerock.com/knowledge/kb/article/a47604373[How do I set up AM/OpenAM Push Notification Service credentials, window=\_blank] in the __BackStage Help Knowledge Base__.
 --
 `ssoadm` service name: `PushNotificationService`
 
@@ -4330,7 +4329,7 @@ Outgoing Email Body::
 Customizes the user self-registration email body text.
 
 +
-Default: `en|<h2>Click on this <a href="%link%">link </a> to register.</h2>`
+Default: `+en|<h2>Click on this <a href="%link%">link </a> to register.</h2>+`
 
 +
 `ssoadm` attribute: `selfServiceUserRegistrationEmailBody`
@@ -4455,7 +4454,7 @@ Outgoing Email Body::
 Customizes the forgotten password email body text.
 
 +
-Default: `en|<h2>Click on this <a href="%link%"> link</a> to reset your password.</h2>`
+Default: `+en|<h2>Click on this <a href="%link%"> link</a> to reset your password.</h2>+`
 
 +
 `ssoadm` attribute: `selfServiceForgottenPasswordEmailBody`

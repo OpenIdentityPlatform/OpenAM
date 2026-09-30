@@ -1287,10 +1287,6 @@ The following settings define settings for access to certificates and private ke
 
 Other sections in this guide explain how to configure a Fedlet for signing and encryption including how to work with the keystores that these settings reference, and how to specify public key certificates in standard SAML v2.0 metadata. When working with a Java Fedlet, see the section on xref:#fedlet-signing-encryption["Enabling Signing and Encryption in a Fedlet"].
 
-[TIP]
-======
-Although this section focuses on Java Fedlets, if you are working with a .NET Fedlet see link:https://backstage.forgerock.com/knowledge/kb/article/a99870342[How do I use Fedlets in .NET applications in OpenAM (All versions)?, window=\_blank] in the __ForgeRock Knowledge Base__.
-======
 
 `com.sun.identity.saml.xmlsig.keystore`::
 This sets the path to the keystore file that holds public key certificates of IDPs and key pairs for the Fedlet.

@@ -276,16 +276,13 @@ Default: 900 seconds.
 
 .. In the Outgoing Email Subject field, enter the Subject line of your email in the New Value field, and then click Add.
 +
-The subject line format is `lang|subject-text`, where `lang` is the ISO-639 language code, such as `en` for English, `fr` for French, and others. For example, the subject line values could be: *`en|Registration Email`
-* and *`fr|Inscription E-mail`
-*.
+The subject line format is `lang|subject-text`, where `lang` is the ISO-639 language code, such as `en` for English, `fr` for French, and others. For example, the subject line values could be: `en|Registration Email` and `fr|Inscription E-mail`.
 
 .. In the Outgoing Email Body field, enter the text of your email in the New Value field, and then click Add.
 +
 The email body text format is `lang|email-text`, where `lang` is the ISO-639 language code. Note that email body text must be all on one line and can contain any HTML tags within the body of the text.
 +
-For example, the email body text could be: *`en|Thank you for registration to our site! Click <a href="%link%">here</a> to register to the site.`
-*
+For example, the email body text could be: `+en|Thank you for registration to our site! Click <a href="%link%">here</a> to register to the site.+`
 
 
 . In the Valid Creation Attributes field, enter the user attributes the user can set during the user self-registration. The attributes are based on the OpenAM identity repository.
@@ -337,15 +334,13 @@ Default: 900 seconds.
 
 .. In the Outgoing Email Subject field, enter the subject line of your email in the New Value field, and then click Add.
 +
-The subject line format is `lang|subject-text`, where `lang` is the ISO-639 language code, such as `en` for English, `fr` for French, and others. For example, the subject line value could be: *`en|Forgotten Password Email`
-*.
+The subject line format is `lang|subject-text`, where `lang` is the ISO-639 language code, such as `en` for English, `fr` for French, and others. For example, the subject line value could be: `en|Forgotten Password Email`.
 
 .. In the Outgoing Email Body field, enter the text of your email in the New Value field, and then click Add.
 +
 The email body text format is `lang|email-text`, where `lang` is the ISO-639 language code. Note that email body text must be all on one line and can contain any HTML tags within the body of the text.
 +
-For example, the email body text could be: *`en|Thank you for request! Click <a href="%link%">here</a> to reset your password.`
-*
+For example, the email body text could be: `+en|Thank you for request! Click <a href="%link%">here</a> to reset your password.+`
 
 
 . Under Advanced Configuration, change the default Forgotten Password Confirmation Email URL for your deployment. The default is: `\http://openam.example.com:8080/openam/XUI/#passwordReset/`.
@@ -385,8 +380,7 @@ Default: 900 seconds.
 
 .. In the Outgoing Email Subject field, enter the subject line of your email in the New Value field, and then click Add.
 +
-The subject Line format is `lang|subject-text`, where `lang` is the ISO 639 language code, such as `en` for English, `fr` for French, and others. For example, the subject line value could be: *`en|Forgotten username email`
-*.
+The subject Line format is `lang|subject-text`, where `lang` is the ISO 639 language code, such as `en` for English, `fr` for French, and others. For example, the subject line value could be: `en|Forgotten username email`.
 
 .. In the Outgoing Email Body field, enter the text of your email in the New Value field, and then click Add.
 +
