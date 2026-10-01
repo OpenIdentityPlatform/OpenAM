@@ -61,4 +61,19 @@ public final class LDAPUtilsTest {
         // Then
         assertThat(validationResult).isFalse();
     }
+
+    @Test
+    public void testIsDNWithEqualsInValue() throws Exception {
+        // Given
+        String candidateDN =
+                "ou=https://accounts.google.com/o/saml2?idpid=12345,"
+                        + "ou=default,ou=OrganizationConfig,ou=1.0,"
+                        + "ou=sunFMSAML2MetadataService,ou=services,dc=openam,dc=org";
+
+        // When
+        boolean validationResult = LDAPUtils.isDN(candidateDN);
+
+        // Then
+        assertThat(validationResult).isTrue();
+    }
 }
