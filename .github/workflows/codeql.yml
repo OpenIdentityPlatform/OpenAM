@@ -104,8 +104,11 @@ jobs:
               - 'openam-server-only/src/main/webapp/com_sun_web_ui/js/**'
               - 'openam-server-only/src/main/webapp/js/Bluff-0.3.6.2/**'
               # JAXB 1.0.6 classes generated in 2012 and committed, with a copy
-              # of its com.sun.xml.bind runtime. They yield about 50,000 of the
-              # 59,000 Java results; a SARIF upload may carry at most 25,000.
+              # of its com.sun.xml.bind runtime. They yield about 44,500 of the
+              # 58,900 Java results; a SARIF upload may carry at most 25,000.
+              # Of an accepted upload Code scanning keeps the top 5,000 results
+              # by severity: every error and warning of the remaining ~14,400
+              # is kept, only recommendation-level results are dropped.
               - 'openam-schema/openam-liberty-schema/src/main/java/**'
               - 'openam-schema/openam-saml2-schema/src/main/java/**'
               - 'openam-schema/openam-wsfederation-schema/src/main/java/**'
