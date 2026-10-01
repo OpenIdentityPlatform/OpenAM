@@ -46,11 +46,11 @@ Several sections in this chapter reference STS code examples. The following proc
 
 . If you have not already done so, download and build the STS samples.
 +
-For information on downloading and building OpenAM sample source code, see link:https://backstage.forgerock.com/knowledge/kb/article/a47487197[How do I access and build the sample code provided for OpenAM 12.x, 13.x and AM (All versions)?, window=\_blank] in the __Knowledge Base__.
+The OpenAM sample source code is in the link:https://github.com/OpenIdentityPlatform/OpenAM/tree/master/openam-samples[openam-samples, window=\_blank] directory of the OpenAM source code on GitHub.
 
 . Check out the `master` branch of the OpenAM source.
 +
-You can find the STS code examples under `/path/to/openam-samples-external/sts-example-code`.
+You can find the STS code examples under `/path/to/openam-source/openam-samples/sts-example-code`.
 
 ====
 
