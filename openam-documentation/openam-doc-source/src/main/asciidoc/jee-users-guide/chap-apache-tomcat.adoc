@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -28,7 +28,7 @@ This chapter covers installation of the policy agent for Apache Tomcat.
 [#before-tomcat-agent-install]
 === Before You Install
 
-Make sure OpenAM is installed and running, and that you can contact OpenAM from the system running the policy agent. Next, create a profile for your policy agent as described in xref:../jee-users-guide/chap-jee-agent-config.adoc#create-agent-profiles[Creating Agent Profiles]. To protect resources with the agent, create at least one policy as described in link:../../../openam/admin-guide/chap-cdsso[Configuring Policies, window=\_blank] in the __OpenAM Administration Guide__. Consider creating a simple policy, such as a policy that allows only authenticated users to access your resources in order to test your policy agent after installation.
+Make sure OpenAM is installed and running, and that you can contact OpenAM from the system running the policy agent. Next, create a profile for your policy agent as described in xref:../jee-users-guide/chap-jee-agent-config.adoc#create-agent-profiles[Creating Agent Profiles]. To protect resources with the agent, create at least one policy as described in xref:../admin-guide/chap-authz-policy.adoc#configure-policies-with-console[Configuring Policies] in the __OpenAM Administration Guide__. Consider creating a simple policy, such as a policy that allows only authenticated users to access your resources in order to test your policy agent after installation.
 
 You must install Apache Tomcat before you install the policy agent, and you must stop the server during installation.
 
@@ -149,11 +149,11 @@ com.iplanet.am.server.port=8080
 com.iplanet.am.services.deploymentDescriptor=/openam
 ----
 
-Adjust configuration parameters to your needs according to xref:./chap-jee-agent-config.adoc#configure-j2ee-policy-agent[Configuring Java EE Policy Agent Properties]
+Adjust configuration parameters to your needs according to xref:chap-jee-agent-config.adoc#configure-j2ee-policy-agent[Configuring Java EE Policy Agent Properties]
 
 [NOTE]
 ======
-If the agent is in a different domain than the server, refer to the __Administration Guide__ procedure, link:../../../openam/admin-guide/chap-cdsso[Configuring Cross-Domain Single Sign On, window=\_blank].
+If the agent is in a different domain than the server, refer to the __Administration Guide__ procedure, xref:../admin-guide/chap-cdsso.adoc#chap-cdsso[Configuring Cross-Domain Single Sign-On].
 ======
 
 --

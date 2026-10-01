@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -34,7 +34,7 @@ This section describes the prerequisite steps you should take before installing 
 
 * Create a profile for your policy agent as described in link:../web-users-guide/index.html#chap-web-agents[Configuring Web Policy Agent Profiles].
 
-* Create at least one policy in OpenAM to protect resources with the agent, as described in the section on link:../../../docs/openam/13/admin-guide/#configure-authz-policy[Configuring Policies, window=\_blank]. Consider creating a simple policy, such as a policy that allows only authenticated users to access your resources. This allows you to test your policy agent after installation.
+* Create at least one policy in OpenAM to protect resources with the agent, as described in the section on xref:../admin-guide/chap-authz-policy.adoc#configure-policies-with-console[Configuring Policies]. Consider creating a simple policy, such as a policy that allows only authenticated users to access your resources. This allows you to test your policy agent after installation.
 
 * If the OpenAM server you will be connecting to uses SSL, you must install OpenSSL on the agent machine.
 +
@@ -47,7 +47,7 @@ Ensure the OpenSSL libraries `libeay32.dll` and `ssleay32.dll` are available in 
 image::images/iis-application-development-role.png[]
 
 
-* See the OpenAM __Installation Guide__ section, link:../../../docs/openam/13/install-guide/#download-openam-software[Obtaining OpenAM Software, window=\_blank] to determine which version of the agent to download, and download the agent. Also, verify the checksum of the file you download against the checksum posted on the download page.
+* See the OpenAM __Installation Guide__ section, xref:../install-guide/chap-prepare-install.adoc#download-openam-software[Obtaining OpenAM Software] to determine which version of the agent to download, and download the agent. Also, verify the checksum of the file you download against the checksum posted on the download page.
 +
 Unzip the file in the directory where you plan to install the web policy agent. The agent you install stores its configuration and logs under this directory.
 +
@@ -652,7 +652,7 @@ Setting the User ID Parameter Type to `LDAP` causes the policy agent to request 
 
 . In the OpenAM console, navigate to Realms > __Realm Name__ > Agents > Web > __Agent Name__ > Advanced > Microsoft IIS Server, then set Authentication Type to `basic`, and then click Save.
 
-. (Optional)  To access Microsoft Office from SharePoint pages, configure OpenAM to persist the authentication cookie. For details, see "link:../../../docs/openam/13/admin-guide/#persistent-cookie[Hints for the Persistent Cookie Module, window=\_blank]" in the __OpenAM Administration Guide__.
+. (Optional)  To access Microsoft Office from SharePoint pages, configure OpenAM to persist the authentication cookie. For details, see "xref:../admin-guide/chap-auth-services.adoc#persistent-cookie[Hints for the Persistent Cookie Module]" in the __OpenAM Administration Guide__.
 
 ====
 
