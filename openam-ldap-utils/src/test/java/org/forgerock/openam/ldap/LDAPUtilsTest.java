@@ -12,11 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.ldap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.forgerock.opendj.ldap.DN;
 import org.testng.annotations.Test;
 
 /**
@@ -60,5 +62,89 @@ public final class LDAPUtilsTest {
 
         // Then
         assertThat(validationResult).isFalse();
+    }
+
+    @Test
+    public void testIsDNWithEqualsInValue() throws Exception {
+        // Given
+        String candidateDN =
+                "ou=https://accounts.google.com/o/saml2?idpid=12345,"
+                        + "ou=default,ou=OrganizationConfig,ou=1.0,"
+                        + "ou=sunFMSAML2MetadataService,ou=services,dc=openam,dc=org";
+
+        // When
+        DN dn = LDAPUtils.newDN(candidateDN);
+
+        // Then
+        assertThat(LDAPUtils.isDN(candidateDN)).isTrue();
+        assertThat(dn.size()).isEqualTo(8);
+        assertThat(LDAPUtils.rdnValueFromDn(dn)).isEqualTo("https://accounts.google.com/o/saml2?idpid=12345");
+        assertThat(LDAPUtils.isDN("cn=a+sn=b=c,ou=d=e+l=f=g")).isTrue();
+        assertThat(LDAPUtils.isDN("ou=https://accounts.google.com/o/saml2?idpid\\=12345,dc=x")).isTrue();
+        assertThat(LDAPUtils.isDN("ou=a\\=b,dc=x")).isTrue();
+    }
+
+    @Test
+    public void testIsDNWithLeadingEqualsInValue() throws Exception {
+        // A base64 name with "==" padding must not be taken for a DN whose value is "="
+        assertThat(LDAPUtils.isDN("kUqG8Yb9X1Iu0wlN5u3D7w==")).isFalse();
+        assertThat(LDAPUtils.isDN("cn= =a,dc=x")).isFalse();
+        assertThat(LDAPUtils.isDN("ou=a,dc==x")).isFalse();
+        assertThat(LDAPUtils.isDN("ou=a+cn==x,dc=x")).isFalse();
+        assertThat(LDAPUtils.isDN("ou=a,dc=x+cn==x")).isFalse();
+        // A leading '=' is still accepted when escaped
+        assertThat(LDAPUtils.isDN("cn=\\=a,dc=x")).isTrue();
+        assertThat(LDAPUtils.isDN("ou=a,dc=\\=x")).isTrue();
+        assertThat(LDAPUtils.isDN("ou=a+cn=\\=x,dc=x")).isTrue();
+        assertThat(LDAPUtils.isDN("ou=a,dc=x+cn=\\=x")).isTrue();
+    }
+
+    @Test
+    public void testIsDNWithNonLeadingSharpInValue() throws Exception {
+        // Given
+        String candidateDN = "ou=https://idp.example.com/metadata#v1,dc=openam,dc=org";
+
+        // When
+        DN dn = LDAPUtils.newDN(candidateDN);
+
+        // Then
+        assertThat(LDAPUtils.isDN(candidateDN)).isTrue();
+        assertThat(dn.size()).isEqualTo(3);
+        assertThat(LDAPUtils.rdnValueFromDn(dn)).isEqualTo("https://idp.example.com/metadata#v1");
+        assertThat(LDAPUtils.isDN("ou=a#,dc=x")).isTrue();
+        assertThat(LDAPUtils.isDN("cn=a#b+sn=c#d,ou=e#f+l=g#h")).isTrue();
+    }
+
+    @Test
+    public void testIsDNWithEscapedSharpRoundTrip() throws Exception {
+        // Given
+        String candidateDN = "ou=https://idp.example.com/metadata\\#v1,dc=openam,dc=org";
+
+        // When
+        String serialised = DN.valueOf(candidateDN).toString();
+
+        // Then
+        assertThat(LDAPUtils.isDN(candidateDN)).isTrue();
+        assertThat(serialised).isEqualTo("ou=https://idp.example.com/metadata#v1,dc=openam,dc=org");
+        assertThat(LDAPUtils.isDN(serialised)).isTrue();
+    }
+
+    @Test
+    public void testNewDNWithLeadingSharpInValue() throws Exception {
+        // A leading '#' starts a hexstring, so "#x" must be rejected by the pre-check, not by DN.valueOf
+        assertThat(LDAPUtils.newDN("ou=#04024869,dc=x").size()).isEqualTo(2);
+        assertThat(LDAPUtils.newDN("ou=#x,dc=x").isRootDN()).isTrue();
+        // DN.valueOf skips spaces after '=', so the '#' that follows them is still a leading one
+        assertThat(LDAPUtils.newDN("ou= #x,dc=x").isRootDN()).isTrue();
+        assertThat(LDAPUtils.newDN("ou= a#x,dc=x").size()).isEqualTo(2);
+        assertThat(LDAPUtils.newDN("ou=a,dc=#x").isRootDN()).isTrue();
+        assertThat(LDAPUtils.newDN("ou=a+cn=#x,dc=x").isRootDN()).isTrue();
+        assertThat(LDAPUtils.newDN("ou=a,dc=x+cn=#x").isRootDN()).isTrue();
+        assertThat(LDAPUtils.newDN("ou=a,dc= #x").isRootDN()).isTrue();
+        assertThat(LDAPUtils.newDN("ou=a+cn= #x,dc=x").isRootDN()).isTrue();
+        assertThat(LDAPUtils.newDN("ou=a,dc=x+cn= #x").isRootDN()).isTrue();
+        assertThat(LDAPUtils.newDN("ou= a,dc= b").size()).isEqualTo(2);
+        assertThat(LDAPUtils.newDN("ou=a+cn= b,dc=x").size()).isEqualTo(2);
+        assertThat(LDAPUtils.newDN("ou=a,dc=x+cn= b").size()).isEqualTo(2);
     }
 }
