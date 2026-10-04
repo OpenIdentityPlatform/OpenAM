@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.rest.token.validator.disp;
@@ -50,7 +50,7 @@ public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthen
     }
 
     @Override
-    public String dispatch(URL url, AuthTargetMapping.AuthTarget target, OpenIdConnectIdToken token) throws TokenValidationException {
+    public HttpURLConnectionWrapper.ConnectionResult dispatch(URL url, AuthTargetMapping.AuthTarget target, OpenIdConnectIdToken token) throws TokenValidationException {
         if (target == null) {
             throw new TokenValidationException(org.forgerock.json.resource.ResourceException.BAD_REQUEST,
                     "When validatating OIDC tokens, an AuthTarget needs to be configured with a Map containing a String " +
@@ -79,7 +79,7 @@ public class OpenIdConnectAuthenticationRequestDispatcher implements TokenAuthen
                 throw new TokenValidationException(responseCode, "Non-200 response from posting OIDC token " +
                         "to rest authN: " + connectionResult.getResult());
             } else {
-                return connectionResult.getResult();
+                return connectionResult;
             }
         } catch (IOException e) {
             throw new TokenValidationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,
