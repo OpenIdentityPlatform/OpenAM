@@ -24,7 +24,7 @@
  * pointed at .work/krb5.conf and .work/krb5cc by KRB5_CONFIG and KRB5CCNAME.
  *
  * Requires MIT Kerberos client tools (Debian/Ubuntu package krb5-user); skipped without them.
- * Runs before HttpOnly mode is enabled: the curl case reads tokenId from the response body.
+ * Runs before HttpOnly mode is enabled: once #1170 is fixed, the curl case reads tokenId from the response body.
  *
  * /UI/Login is not covered: with the XUI enabled (the default) XUIFilter redirects it to the XUI.
  */
@@ -59,9 +59,12 @@ const BOOTSTRAP_ENV = {
 // RestAuthCallbackHandlerManager converts every callback to JSON and
 // RestAuthHttpCallbackHandler.convertToJson rejects the HttpCallback. The browser resends the XUI
 // request with the header after the 401 challenge, so the XUI hits the same error.
-// Drop test.fail() once the endpoint is fixed.
+// The curl and XUI cases assert that 400. Once the endpoint is fixed they turn red: assert the session instead.
 const REST_NEGOTIATE_BUG = "/json/authenticate rejects a Negotiate header with 400: "
   + "https://github.com/OpenIdentityPlatform/OpenAM/issues/1170";
+// A request without the Authorization header gets the module's 401 first, so only one with the header
+// reaches this message.
+const HTTP_CALLBACK_REJECTED = "HttpCallback Authorization Header must be specified in the initial request";
 
 const SEL = {
   usernameInput: "#idToken1",
@@ -95,8 +98,8 @@ function runBootstrap(args = [], options = {}) {
   return execFileSync("bash", [BOOTSTRAP_SCRIPT, ...args], { env: BOOTSTRAP_ENV, ...options });
 }
 
-function authenticateUrl(module) {
-  return `${OPENAM_BASE}/json/authenticate?authIndexType=module&authIndexValue=${encodeURIComponent(module)}`;
+function authenticateUrl(indexValue, indexType = "module") {
+  return `${OPENAM_BASE}/json/authenticate?authIndexType=${indexType}&authIndexValue=${encodeURIComponent(indexValue)}`;
 }
 
 /**
@@ -148,6 +151,12 @@ test.beforeAll(() => {
   try {
     runBootstrap([], { stdio: "inherit", timeout: 540_000 });
   } catch (err) {
+    // A failed beforeAll skips afterEach, and afterAll removes the KDC container: print its logs now.
+    try {
+      console.log(runBootstrap(["logs"], { encoding: "utf-8", timeout: 60_000 }));
+    } catch (logsErr) {
+      console.log(`bootstrap.sh logs failed: ${logsErr.message}`);
+    }
     throw new Error(`${BOOTSTRAP_SCRIPT} exited with code ${err.status}: ${err.message}`);
   }
   krb = JSON.parse(readFileSync(resolve(WORK_DIR, "kerberos.json"), "utf-8"));
@@ -197,9 +206,7 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     expect(await idFromSession(page.request, tokenId)).toBe(krb.user.toLowerCase());
   });
 
-  test("REST: curl --negotiate gets a session from /json/authenticate", async ({ request }) => {
-    test.fail(true, REST_NEGOTIATE_BUG);
-
+  test("REST: curl --negotiate is rejected with 400 until #1170 is fixed", async () => {
     const output = execFileSync("curl", [
       "-sS", "--negotiate", "-u", ":",
       "-H", "Content-Type: application/json",
@@ -213,27 +220,38 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     const status = output.slice(separator + 1);
     console.log(`/json/authenticate answered ${status}: ${body}`);
 
-    expect(status, "authentication with the Kerberos ticket should succeed").toBe("200");
-    const tokenId = JSON.parse(body).tokenId;
-    expect(tokenId, "the response should carry tokenId").toBeTruthy();
-    expect(await idFromSession(request, tokenId)).toBe(krb.user.toLowerCase());
+    // #1170: when this turns red, assert 200, tokenId and the session from idFromSession instead.
+    expect(status, REST_NEGOTIATE_BUG).toBe("400");
+    expect(body, "the 400 should come from curl's Negotiate header").toContain(HTTP_CALLBACK_REJECTED);
   });
 
-  test("XUI: the browser logs in through Negotiate without a login form", async ({ page }) => {
-    test.fail(true, REST_NEGOTIATE_BUG);
-
+  test("XUI: the Negotiate login is rejected with 400 until #1170 is fixed", async ({ page }) => {
     page.on("response", (resp) => {
       if (new URL(resp.url()).pathname.endsWith("/authenticate")) {
         console.log(`XUI ${resp.request().method()} ${resp.url()} answered ${resp.status()}`);
       }
     });
+    // The browser answers the 401 challenge in its network stack: the page sees only the resent request.
+    const login = page.waitForResponse((resp) => resp.request().method() === "POST"
+      && new URL(resp.url()).pathname.endsWith("/authenticate"));
     await page.goto(`${OPENAM_BASE}/XUI/#login/&authIndexType=module`
       + `&authIndexValue=${encodeURIComponent(krb.module)}`);
-    await expect.poll(() => idFromSession(page.request), { timeout: 30_000 }).toBe(krb.user.toLowerCase());
-    await expect(page.locator(SEL.passwordInput), "no login form should be shown").toHaveCount(0);
+    const resp = await login;
+    // #1170: when this turns red, poll idFromSession for the user and assert that no login form is shown instead.
+    expect(resp.status(), REST_NEGOTIATE_BUG).toBe(400);
+    expect(await resp.text(), "the 400 should come from the browser's Negotiate header")
+      .toContain(HTTP_CALLBACK_REJECTED);
   });
 
-  test("fallback: without a ticket the chain continues to the DataStore form", async () => {
+  test("fallback: without a ticket the chain continues to the DataStore form", async ({ request }) => {
+    // The chain must start with the Kerberos module's challenge, or the DataStore form below proves nothing.
+    const start = await request.post(authenticateUrl(krb.chain, "service"), {
+      headers: { "Accept-API-Version": "resource=2.0, protocol=1.0" },
+      data: {},
+    });
+    expect(start.status(), "the chain should start with the Negotiate challenge").toBe(401);
+    expect(start.headers()["www-authenticate"]).toBe("Negotiate");
+
     // No allowlist and no credential cache: the browser cannot answer the Negotiate challenge,
     // the XUI reports http-auth-failed, the Kerberos module is ignored and DataStore asks for a password.
     const noCache = `FILE:${resolve(WORK_DIR, "no-such-krb5cc")}`;

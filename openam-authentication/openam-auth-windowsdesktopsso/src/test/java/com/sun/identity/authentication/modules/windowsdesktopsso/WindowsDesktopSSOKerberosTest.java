@@ -225,7 +225,7 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
 
         @Override
         protected void createUpdateKrb5ConfigFile() {
-            // Keep Kerby's krb5.conf: the module would replace "kdc = localhost:<port>" with two KDCs.
+            // Keep Kerby's krb5.conf: the module would rewrite "kdc = localhost:<port>" as "kdc=localhost", port 88.
         }
     }
 }
