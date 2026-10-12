@@ -310,6 +310,8 @@ jobs:
           npm init -y
           npm install @playwright/test
           npx playwright install chromium --with-deps
+          # MIT Kerberos client for the Kerberos spec (kinit, klist); libgssapi_krb5 is already on the runner
+          sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends krb5-user gettext-base
           npx playwright test --reporter=list
 
       - name: Enable HttpOnly session cookie on OpenAM IDP and restart

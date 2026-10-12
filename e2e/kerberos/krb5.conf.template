@@ -1,0 +1,15 @@
+[libdefaults]
+  default_realm = ${KRB_REALM}
+  dns_lookup_kdc = false
+  dns_lookup_realm = false
+  dns_canonicalize_hostname = false
+  rdns = false
+  udp_preference_limit = 1
+
+[realms]
+  ${KRB_REALM} = {
+    kdc = ${KRB_KDC_CLIENT_ADDR}
+  }
+
+[domain_realm]
+  ${KRB_SPN_HOST} = ${KRB_REALM}
