@@ -50,8 +50,16 @@ EOF
 : > /etc/krb5kdc/kadm5.acl
 
 kdb5_util create -s -r "$KRB_REALM" -P "$KRB_KDC_ADMIN_PASSWORD"
-kadmin.local -r "$KRB_REALM" -q "addprinc -pw $KRB_PASSWORD $KRB_USER@$KRB_REALM"
+# kadmin.local splits the query into words itself: quote the password, doubling any '"' in it.
+kadmin.local -r "$KRB_REALM" -q "addprinc -pw \"${KRB_PASSWORD//\"/\"\"}\" $KRB_USER@$KRB_REALM"
 kadmin.local -r "$KRB_REALM" -q "addprinc -randkey $KRB_SPN@$KRB_REALM"
+# kadmin.local exits with 0 even when the query fails.
+for principal in "$KRB_USER@$KRB_REALM" "$KRB_SPN@$KRB_REALM"; do
+    if ! kadmin.local -r "$KRB_REALM" -q "getprinc $principal" 2>/dev/null | grep -Fx "Principal: $principal" >/dev/null; then
+        echo "Principal $principal was not created" >&2
+        exit 1
+    fi
+done
 # Export under a temporary name so that a reader never sees a partly written keytab.
 kadmin.local -r "$KRB_REALM" -q "ktadd -k /keytabs/http.keytab.tmp $KRB_SPN@$KRB_REALM"
 mv /keytabs/http.keytab.tmp /keytabs/http.keytab

@@ -73,16 +73,9 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { OPENAM_BASE, USERNAME, PASSWORD, ADMIN_USER, ADMIN_PASS } from "../common/openam-commons.mjs";
-
-// XUI / LESS-based OpenAM login form selectors
-const SEL = {
-    usernameInput: "#idToken1",
-    passwordInput: "#idToken2",
-    // The submit button id varies between XUI builds (loginButton / loginButton_0 / none),
-    // so match by submit type as the working SAML spec does.
-    loginButton: "#loginButton, input[type=\"submit\"], button[type=\"submit\"]",
-};
+import {
+    OPENAM_BASE, USERNAME, PASSWORD, ADMIN_USER, ADMIN_PASS, XUI_LOGIN, submitXuiLogin, idFromSession,
+} from "../common/openam-commons.mjs";
 
 // Optional hard expectation for the CI matrix ("true" | "false" | undefined)
 const EXPECT_HTTPONLY = process.env.EXPECT_COOKIE_HTTPONLY;
@@ -98,22 +91,8 @@ async function getServerInfo(request) {
 /** Log in through the XUI login form and wait until the user leaves the #login route. */
 async function loginViaXui(page, user, pass) {
     await page.goto(`${OPENAM_BASE}/XUI/#login/`);
-    await expect(page.locator(SEL.usernameInput)).toBeVisible({ timeout: 20_000 });
-    await page.fill(SEL.usernameInput, user);
-    await page.fill(SEL.passwordInput, pass);
-    await page.locator(SEL.loginButton).first().click();
+    await submitXuiLogin(page, user, pass);
     await page.waitForURL((url) => !url.hash.startsWith("#login"), { timeout: 30_000 });
-}
-
-/** Resolve the username of the active session from the (auto-sent) session cookie. */
-async function idFromSession(request) {
-    const resp = await request.post(`${OPENAM_BASE}/json/users?_action=idFromSession`, {
-        headers: { "Accept-API-Version": "protocol=1.0,resource=2.0" },
-    });
-    if (!resp.ok()) {
-        return null;
-    }
-    return (await resp.json()).id;
 }
 
 test.describe("OpenAM XUI - HttpOnly session cookie", () => {
@@ -131,10 +110,7 @@ test.describe("OpenAM XUI - HttpOnly session cookie", () => {
 
         // ── 2. Log in through the XUI login form ────────────────────────────────
         await page.goto(`${OPENAM_BASE}/XUI/#login/`);
-        await expect(page.locator(SEL.usernameInput)).toBeVisible({ timeout: 20_000 });
-        await page.fill(SEL.usernameInput, USERNAME);
-        await page.fill(SEL.passwordInput, PASSWORD);
-        await page.locator(SEL.loginButton).first().click();
+        await submitXuiLogin(page, USERNAME, PASSWORD);
 
         // ── 3. XUI must consider the user logged in (leaves the #login route) ────
         await page.waitForURL((url) => !url.hash.startsWith("#login"), { timeout: 30_000 });
@@ -198,7 +174,7 @@ test.describe("OpenAM XUI - HttpOnly session cookie", () => {
         // ── 3. The user must still be logged in (not bounced back to #login) ─────
         await page.waitForLoadState("networkidle");
         expect(page.url(), "reload must not redirect to the login page").not.toContain("#login");
-        await expect(page.locator(SEL.usernameInput), "login form must not be shown after reload")
+        await expect(page.locator(XUI_LOGIN.usernameInput), "login form must not be shown after reload")
             .toHaveCount(0);
 
         // ── 4. The session is still resolvable after the reload ─────────────────

@@ -35,7 +35,7 @@ import { readFileSync } from "fs";
 import { createServer } from "http";
 import { resolve } from "path";
 import { fileURLToPath } from "url";
-import { OPENAM_BASE, USERNAME, PASSWORD } from "../common/openam-commons.mjs";
+import { OPENAM_BASE, USERNAME, PASSWORD, submitXuiLogin, idFromSession } from "../common/openam-commons.mjs";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
@@ -65,12 +65,6 @@ const REST_NEGOTIATE_BUG = "/json/authenticate rejects a Negotiate header with 4
 // A request without the Authorization header gets the module's 401 first, so only one with the header
 // reaches this message.
 const HTTP_CALLBACK_REJECTED = "HttpCallback Authorization Header must be specified in the initial request";
-
-const SEL = {
-  usernameInput: "#idToken1",
-  passwordInput: "#idToken2",
-  loginButton: "#loginButton, input[type=\"submit\"], button[type=\"submit\"]",
-};
 
 // The browser may answer Negotiate challenges from the OpenAM host only.
 test.use({
@@ -105,7 +99,7 @@ function authenticateUrl(indexValue, indexType = "module") {
 /**
  * Let the browser answer a Negotiate challenge from a local server on the OpenAM host name and
  * return the Authorization header it sent. The port is not part of the SPN, so the token is for the
- * OpenAM service principal.
+ * OpenAM service principal. Skips the test when the OpenAM host name is not an address of this machine.
  */
 async function negotiateHeaderFromBrowser(page) {
   let authorization;
@@ -118,7 +112,14 @@ async function negotiateHeaderFromBrowser(page) {
       res.end();
     }
   });
-  await new Promise((listening) => server.listen(0, "127.0.0.1", listening));
+  // On the address the OpenAM host name resolves to, which is where the browser connects.
+  try {
+    await new Promise((listening, failed) => server.once("error", failed).listen(0, OPENAM_HOST, listening));
+  } catch (err) {
+    test.skip(err.code === "EADDRNOTAVAIL", `${OPENAM_HOST} resolves to ${err.address}, not to this machine: `
+      + "the browser cannot reach a local server on that name");
+    throw err;
+  }
   try {
     await page.goto(`http://${OPENAM_HOST}:${server.address().port}/`);
   } finally {
@@ -126,19 +127,6 @@ async function negotiateHeaderFromBrowser(page) {
     server.close();
   }
   return authorization;
-}
-
-/** Resolve the username of the active session from the session cookie or the given token. */
-async function idFromSession(request, tokenId) {
-  const headers = { "Accept-API-Version": "protocol=1.0,resource=2.0" };
-  if (tokenId) {
-    headers.iPlanetDirectoryPro = tokenId;
-  }
-  const resp = await request.post(`${OPENAM_BASE}/json/users?_action=idFromSession`, { headers });
-  if (!resp.ok()) {
-    return null;
-  }
-  return String((await resp.json()).id).toLowerCase();
 }
 
 test.beforeAll(() => {
@@ -203,7 +191,7 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     expect(finish.status(), await finish.text()).toBe(200);
     // tokenId is absent in HttpOnly mode; the session cookie set by the response is used then.
     const { tokenId } = await finish.json();
-    expect(await idFromSession(page.request, tokenId)).toBe(krb.user.toLowerCase());
+    expect(String(await idFromSession(page.request, tokenId)).toLowerCase()).toBe(krb.user.toLowerCase());
   });
 
   test("REST: curl --negotiate is rejected with 400 until #1170 is fixed", async () => {
@@ -259,11 +247,9 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     try {
       const page = await browser.newPage();
       await page.goto(`${OPENAM_BASE}/XUI/#login/&service=${encodeURIComponent(krb.chain)}`);
-      await expect(page.locator(SEL.usernameInput)).toBeVisible({ timeout: 30_000 });
-      await page.fill(SEL.usernameInput, USERNAME);
-      await page.fill(SEL.passwordInput, PASSWORD);
-      await page.locator(SEL.loginButton).first().click();
-      await expect.poll(() => idFromSession(page.request), { timeout: 30_000 }).toBe(USERNAME.toLowerCase());
+      await submitXuiLogin(page, USERNAME, PASSWORD);
+      await expect.poll(async () => String(await idFromSession(page.request)).toLowerCase(), { timeout: 30_000 })
+        .toBe(USERNAME.toLowerCase());
     } finally {
       await browser.close();
     }

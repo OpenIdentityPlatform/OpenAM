@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2026 3A Systems LLC.
+ * Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.authentication.modules.windowsdesktopsso;
@@ -116,6 +116,19 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
     }
 
     @Test
+    public void secondRequestUsesCachedServiceLogin() throws Exception {
+        TestModule first = newModule("cached", negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options());
+        assertEquals(first.process(null, ISAuthConstants.LOGIN_START), ISAuthConstants.LOGIN_SUCCEED);
+        assertEquals(first.serviceLogins, 1);
+
+        // As every request after the first one to a module instance: the service subject comes from the cache.
+        TestModule second = newModule("cached", negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options());
+        assertEquals(second.process(null, ISAuthConstants.LOGIN_START), ISAuthConstants.LOGIN_SUCCEED);
+        assertEquals(second.serviceLogins, 0, "the second request should not log the service in again");
+        assertEquals(second.getPrincipal().getName(), USER);
+    }
+
+    @Test
     public void returnRealmKeepsRealmInUserName() throws Exception {
         Map<String, Object> options = options();
         options.put(ATTR_PREFIX + "returnRealm", Collections.singleton("true"));
@@ -141,9 +154,12 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         options.put(ATTR_PREFIX + "kerberos-realms-trusted", Collections.singleton("OTHER.COM"));
         TestModule module = newModule("untrustedRealm", negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options);
 
-        // The "untrustedToken" AuthLoginException is thrown inside Subject.doAs, and process() rethrows only a
-        // wrapped GSSException, so the module ignores the token instead of failing.
-        assertEquals(module.process(null, ISAuthConstants.LOGIN_START), ISAuthConstants.LOGIN_IGNORE);
+        // #1174: the "untrustedToken" AuthLoginException is thrown inside Subject.doAs, and process() rethrows only a
+        // wrapped GSSException, so the module ignores the token instead of failing. Once #1174 is fixed this turns
+        // red: expect an AuthLoginException with the "untrustedToken" error code instead.
+        assertEquals(module.process(null, ISAuthConstants.LOGIN_START), ISAuthConstants.LOGIN_IGNORE,
+                "the module ignores an untrusted token instead of failing: "
+                        + "https://github.com/OpenIdentityPlatform/OpenAM/issues/1174");
         assertNull(module.getPrincipal());
     }
 
@@ -202,6 +218,7 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
     private static final class TestModule extends WindowsDesktopSSO {
         private final HttpServletRequest request;
         private int moduleAuthLevel;
+        private int serviceLogins;
 
         TestModule(HttpServletRequest request) {
             this.request = request;
@@ -223,9 +240,11 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
             return true;
         }
 
+        /** Called once per service login of the module in krb5.conf mode, the default. */
         @Override
         protected void createUpdateKrb5ConfigFile() {
             // Keep Kerby's krb5.conf: the module would rewrite "kdc = localhost:<port>" as "kdc=localhost", port 88.
+            serviceLogins++;
         }
     }
 }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2026 3A Systems LLC.
+ * Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.authentication.modules.windowsdesktopsso;
@@ -22,6 +22,7 @@ import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
+import sun.security.krb5.Config;
 
 import javax.security.auth.Subject;
 import javax.security.auth.login.AppConfigurationEntry;
@@ -40,8 +41,9 @@ import java.util.Map;
  * Not part of the PowerMock test class: PowerMock routes that class's calls to JDK classes through reflection,
  * which fails for JDK packages that the surefire argLine does not open, such as java.nio.file.
  * <p>
- * Changes JVM-wide state while running: {@code java.security.krb5.conf} points at the KDC's krb5.conf, and the
- * global JAAS configuration has the client entry. {@link #stop()} restores both.
+ * Changes JVM-wide state while running: {@code java.security.krb5.conf} points at the KDC's krb5.conf, the JDK caches
+ * that krb5.conf, and the global JAAS configuration has the client entry. {@link #stop()} restores the properties and
+ * the JAAS configuration and reloads the JDK's krb5.conf.
  */
 final class KerberosTestRealm {
 
@@ -52,8 +54,10 @@ final class KerberosTestRealm {
             "java.security.krb5.kdc", "java.security.auth.login.config"};
 
     private final Map<String, String> savedProperties = new HashMap<>();
+    private Configuration savedConfiguration;
     private File workDir;
     private SimpleKdcServer kdc;
+    private LoginContext clientLogin;
     private Subject client;
 
     /**
@@ -68,6 +72,8 @@ final class KerberosTestRealm {
         for (String name : SYSTEM_PROPERTIES) {
             savedProperties.put(name, System.getProperty(name));
         }
+        // Creates the default configuration if none is installed yet, so the one restored by stop() is that default.
+        savedConfiguration = Configuration.getConfiguration();
         workDir = Files.createTempDirectory("kerberos-test-realm").toFile();
         kdc = new SimpleKdcServer();
         kdc.setWorkDir(workDir);
@@ -84,9 +90,9 @@ final class KerberosTestRealm {
         // The default JAAS configuration cannot be created once java.security.auth.login.config names a missing
         // file, as the "/dev/null" set by the module does on Windows. A configuration set here is used instead.
         Configuration.setConfiguration(new ClientConfiguration(user, exportKeytab(user)));
-        LoginContext login = new LoginContext(CLIENT_LOGIN);
-        login.login();
-        client = login.getSubject();
+        clientLogin = new LoginContext(CLIENT_LOGIN);
+        clientLogin.login();
+        client = clientLogin.getSubject();
     }
 
     /**
@@ -124,9 +130,10 @@ final class KerberosTestRealm {
     }
 
     /**
-     * Stops the KDC and restores the JAAS configuration and the system properties.
+     * Stops the KDC, logs the user out, restores the JAAS configuration and the system properties and reloads the
+     * JDK's krb5.conf.
      *
-     * @throws Exception if the KDC does not stop.
+     * @throws Exception if the KDC does not stop, the user cannot be logged out or krb5.conf cannot be reloaded.
      */
     void stop() throws Exception {
         try {
@@ -134,7 +141,7 @@ final class KerberosTestRealm {
                 kdc.stop();
             }
         } finally {
-            Configuration.setConfiguration(null);
+            Configuration.setConfiguration(savedConfiguration);
             for (Map.Entry<String, String> property : savedProperties.entrySet()) {
                 if (property.getValue() == null) {
                     System.clearProperty(property.getKey());
@@ -143,6 +150,11 @@ final class KerberosTestRealm {
                 }
             }
             FileUtils.deleteQuietly(workDir);
+            // Drops Kerby's realm and KDC port, which later Kerberos code in this JVM would otherwise still use.
+            Config.refresh();
+            if (clientLogin != null) {
+                clientLogin.logout();
+            }
         }
     }
 
