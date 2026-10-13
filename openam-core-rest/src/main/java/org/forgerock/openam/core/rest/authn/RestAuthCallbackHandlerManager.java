@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.inject.Singleton;
+import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
@@ -91,6 +92,9 @@ public class RestAuthCallbackHandlerManager {
      * headers and request or the headers and request do not contain the required information the method returns
      * false.
      *
+     * If the Callbacks contain an HttpCallback, its header decides the outcome instead, see
+     * {@link #handleHttpCallbacksInternally(HttpServletRequest, HttpServletResponse, Callback[])}.
+     *
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse from the request.
      * @param callbacks The Callbacks to update with their required values from the headers and request.
@@ -101,12 +105,54 @@ public class RestAuthCallbackHandlerManager {
             throws RestAuthException {
 
         for (Callback callback : callbacks) {
+            if (callback instanceof HttpCallback) {
+                return handleHttpCallbacksInternally(request, response, callbacks);
+            }
+        }
+
+        for (Callback callback : callbacks) {
 
             RestAuthCallbackHandler restAuthCallbackHandler =
                     restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(callback.getClass());
 
             if (!restAuthCallbackHandler.updateCallbackFromRequest(request, response, callback)) {
                 return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Updates Callbacks that include an HttpCallback. An HttpCallback has no JSON representation, so the header it
+     * names decides the outcome, as in the legacy login page: if the header is missing, the HttpCallback handler
+     * answers with a challenge; if it is present, the Callbacks are submitted. The other Callbacks (such as the
+     * script fallback of WindowsDesktopSSO) are filled from the headers and request as far as possible and are
+     * submitted as they are.
+     *
+     * @param request The HttpServletRequest from the request.
+     * @param response The HttpServletResponse from the request.
+     * @param callbacks The Callbacks to update, at least one of which is an HttpCallback.
+     * @return Whether or not the Callbacks were successfully updated.
+     */
+    private boolean handleHttpCallbacksInternally(HttpServletRequest request,
+            HttpServletResponse response, Callback[] callbacks)
+            throws RestAuthException {
+
+        for (Callback callback : callbacks) {
+            if (callback instanceof HttpCallback) {
+                RestAuthCallbackHandler restAuthCallbackHandler =
+                        restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(callback.getClass());
+                if (!restAuthCallbackHandler.updateCallbackFromRequest(request, response, callback)) {
+                    return false;
+                }
+            }
+        }
+
+        for (Callback callback : callbacks) {
+            if (!(callback instanceof HttpCallback)) {
+                restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(callback.getClass())
+                        .updateCallbackFromRequest(request, response, callback);
             }
         }
 

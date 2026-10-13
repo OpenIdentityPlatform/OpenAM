@@ -17,6 +17,8 @@
 
 package org.forgerock.openam.core.rest.authn;
 
+import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
+import com.sun.identity.authentication.spi.HttpCallback;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.core.rest.authn.callbackhandlers.RestAuthCallbackHandler;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
@@ -26,6 +28,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -290,5 +293,77 @@ public class RestAuthCallbackHandlerManagerTest {
 
         //Then
         fail();
+    }
+
+    @Test
+    public void shouldSubmitCallbacksWhenHttpCallbackHeaderIsPresentAndScriptCannotBeFilled()
+            throws RestAuthException {
+
+        //Given
+        RestAuthCallbackHandlerManager manager =
+                new RestAuthCallbackHandlerManager(RestAuthCallbackHandlerFactory.getInstance());
+        HttpServletRequest request = postRequest();
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpCallback httpCallback = new HttpCallback("Authorization", "WWW-Authenticate:Negotiate", "401");
+        ScriptTextOutputCallback script = new ScriptTextOutputCallback("p.set('skipKerberos', 'true');");
+        given(request.getHeader("Authorization")).willReturn("Negotiate YIIB");
+
+        //When
+        JsonValue jsonCallbacks = manager.handleCallbacks(request, response, new Callback[]{httpCallback, script});
+
+        //Then
+        assertEquals(jsonCallbacks.size(), 0);
+        assertEquals(httpCallback.getAuthorization(), "Negotiate YIIB");
+    }
+
+    @Test
+    public void shouldChallengeWhenHttpCallbackFollowsCallbackThatCannotBeFilled() throws RestAuthException {
+
+        //Given
+        RestAuthCallbackHandlerManager manager =
+                new RestAuthCallbackHandlerManager(RestAuthCallbackHandlerFactory.getInstance());
+        HttpServletRequest request = postRequest();
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpCallback httpCallback = new HttpCallback("Authorization", "WWW-Authenticate:Negotiate", "401");
+        ScriptTextOutputCallback script = new ScriptTextOutputCallback("p.set('skipKerberos', 'true');");
+
+        //When
+        try {
+            manager.handleCallbacks(request, response, new Callback[]{script, httpCallback});
+            fail("Expected a 401 challenge for the missing Authorization header");
+        } catch (RestAuthResponseException e) {
+            //Then
+            assertEquals(e.getStatusCode(), 401);
+            assertEquals(e.getResponseHeaders().get("WWW-Authenticate"), "Negotiate");
+        }
+    }
+
+    @Test
+    public void shouldFillOtherCallbacksFromRequestWhenHttpCallbackHeaderIsPresent() throws RestAuthException {
+
+        //Given
+        RestAuthCallbackHandlerManager manager =
+                new RestAuthCallbackHandlerManager(RestAuthCallbackHandlerFactory.getInstance());
+        HttpServletRequest request = postRequest();
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpCallback httpCallback = new HttpCallback("Authorization", "WWW-Authenticate:Negotiate", "401");
+        NameCallback nameCallback = new NameCallback("User Name:");
+        ScriptTextOutputCallback script = new ScriptTextOutputCallback("p.set('skipKerberos', 'true');");
+        given(request.getHeader("Authorization")).willReturn("Negotiate YIIB");
+        given(request.getHeader("X-OpenAM-Username")).willReturn("demo");
+
+        //When
+        JsonValue jsonCallbacks = manager.handleCallbacks(request, response,
+                new Callback[]{httpCallback, nameCallback, script});
+
+        //Then
+        assertEquals(jsonCallbacks.size(), 0);
+        assertEquals(nameCallback.getName(), "demo");
+    }
+
+    private HttpServletRequest postRequest() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        given(request.getMethod()).willReturn("POST");
+        return request;
     }
 }
