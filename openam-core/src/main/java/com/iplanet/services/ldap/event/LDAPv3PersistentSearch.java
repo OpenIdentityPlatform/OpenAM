@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.iplanet.services.ldap.event;
@@ -54,6 +55,7 @@ import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldap.responses.SearchResultReference;
 import org.forgerock.util.annotations.VisibleForTesting;
+import org.forgerock.util.promise.ExceptionHandler;
 
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimerPool;
@@ -224,6 +226,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         //cache, while PS was stopped, those gets cleared out and we start with a clean cache.
         clearCaches();
         futureResult = conn.searchAsync(searchRequest, null, new PersistentSearchResultHandler());
+        futureResult.thenOnException(new PersistentSearchExceptionHandler());
     }
 
     /**
@@ -363,6 +366,24 @@ public abstract class LDAPv3PersistentSearch<T, H> {
             return true;
         }
 
+    }
+
+    /**
+     * Restarts the persistent search once the directory terminates it, e.g. because the connection was lost.
+     */
+    private class PersistentSearchExceptionHandler implements ExceptionHandler<LdapException> {
+
+        @Override
+        public void handleException(LdapException error) {
+            if (!shutdown) {
+                DEBUG.error("An error occurred while executing persistent search", error);
+                DEBUG.message("Restarting persistent search. Some changes may have been missed in the interim.");
+                clearCaches();
+                restartSearch();
+            } else {
+                DEBUG.message("Persistent search has been cancelled", error);
+            }
+        }
     }
 
     private class RetryTask extends GeneralTaskRunnable {

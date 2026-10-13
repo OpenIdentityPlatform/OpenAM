@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions Copyright 2026 3A Systems, LLC.
 */
 package org.forgerock.openam.sm.datalayer.impl.ldap;
 
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.forgerock.openam.cts.continuous.ChangeType;
 import org.forgerock.openam.cts.continuous.ContinuousQuery;
@@ -44,6 +46,7 @@ public class CTSDJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<Continuo
         implements ContinuousQuery {
 
     private final SearchResultEntryHandler resultEntryHandler = new PSearchResultEntryHandler();
+    private final AtomicBoolean searchStarted = new AtomicBoolean(false);
 
     /**
      * Generate a new CTSDJLDAPv3PersistentSearch, providing the connection factory to use to produce
@@ -63,6 +66,10 @@ public class CTSDJLDAPv3PersistentSearch extends LDAPv3PersistentSearch<Continuo
 
     @Override
     protected void clearCaches() {
+        // The first call comes from the initial start of the search, when no change can have been missed yet.
+        if (searchStarted.compareAndSet(false, true)) {
+            return;
+        }
         for (ContinuousQueryListener listener : getListeners().keySet()) {
             listener.connectionLost();
         }
