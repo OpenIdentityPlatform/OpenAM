@@ -25,7 +25,7 @@
  * $Id: SMAdapter.java,v 1.4 2008/08/19 19:11:41 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.plugins;
@@ -356,6 +356,8 @@ public class SMAdapter extends SAML2ServiceProviderAdapter {
 
             Cookie smCookie = new Cookie(smCookieName, sd.spec);
             smCookie.setDomain(cookieDomain);
+            smCookie.setSecure(request.isSecure());
+            smCookie.setHttpOnly(true);
             response.addCookie(smCookie);
             return false;   
         } catch (Exception ex) {

@@ -974,7 +974,7 @@ Accessible as an option to the Discovery Service for a specific user. To edit an
 [#console-web-services-jsp-endpoints]
 === Web Services Console JSP Endpoints
 
-Web services include endpoints in the `console/webservices` subdirectory. You can use them to define legacy options for services, such as the Liberty Identity Federation Framework (ID-FF). As such, these endpoints may be less essential to your implementation of OpenAM. For more information, see the link:http://www.forgerock.org/security_advisory2.html[OpenAM Wiki on Web Services, window=\_blank].
+Web services include endpoints in the `console/webservices` subdirectory. You can use them to define legacy options for services, such as the Liberty Identity Federation Framework (ID-FF). As such, these endpoints may be less essential to your implementation of OpenAM.
 --
 
 `WSAuthNServices.jsp`::
@@ -1038,7 +1038,7 @@ This simple endpoint includes a redirection of the ServiceURI, and specifies Ope
 This endpoint is called with the `PWResetInvalidURLViewBean` class, when a module servlet gets an invalid URL.
 
 `PWResetQuestion.jsp`::
-Starts the password reset process by prompting for the User ID. For more information on the process, see the method for the associated `PWResetQuestionModel`, available from the link:http://download.forgerock.org/downloads/openam/javadocs/internal/com/sun/identity/password/ui/model/PWResetQuestionModel.html[Interface PWResetQuestionModel specification page, window=\_blank].
+Starts the password reset process by prompting for the User ID. For more information on the process, see the methods of the associated `com.sun.identity.password.ui.model.PWResetQuestionModel` interface.
 
 `PWResetSuccess.jsp`::
 Specifies the endpoint that is called when an account password is successfully reset.
@@ -1236,7 +1236,7 @@ Used with the servlet named `GatewayServlet`. Associated with the `Gateway.java`
 The associated `.java` file is associated with session failover.
 
 `/sessionservice, /profileservice, /policyservice, /namingservice, /loggingservice, /authservice, /notificationservice`::
-All of these endpoints are associated with link:http://www.forgerock.org/security_advisory1.html[OpenAM Security Advisory #201203, window=\_blank]. As suggested in the advisory, if you are using OpenAM version 9.5.4 or 10.0.0, you should be sure to apply the updates required to upgrade your systems to versions 9.5.5 or 10.0.1 (or higher).
+All of these endpoints are associated with OpenAM Security Advisory #201203. As suggested in the advisory, if you are using OpenAM version 9.5.4 or 10.0.0, you should be sure to apply the updates required to upgrade your systems to versions 9.5.5 or 10.0.1 (or higher).
 
 `/jaxrpc/*, /identityservices/*`::
 These endpoints provide information on configured web services, including the port name, status, URL, and implementation class. Both endpoints show the same data. The IdentityServices servlet name points to the following description: "Web Service Endpoint - Identity Services".

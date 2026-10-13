@@ -36,8 +36,6 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -94,17 +92,6 @@ public class CookieUtils {
     private static int defAge = -1;
 
     static Debug debug = Debug.getInstance("amCookieUtils");
-    private static final Method setHttpOnlyMethod;
-
-    static {
-        Method method = null;
-        try {
-            method = Cookie.class.getMethod("setHttpOnly", boolean.class);
-        } catch (NoSuchMethodException nsme) {
-            debug.message("This is not a Java EE 6+ container, Cookie#setHttpOnly(boolean) is not available");
-        }
-        setHttpOnlyMethod = method;
-    }
 
     /**
      * Gets property value of "com.iplanet.am.cookie.name"
@@ -409,7 +396,15 @@ public class CookieUtils {
             cookie.setDomain(domain);
         }
 
-        cookie.setSecure(isCookieSecure());
+        // The flags are set from creation so that a cookie handed straight to
+        // response.addCookie carries them as well as one that goes through
+        // addCookieToResponse.
+        if (isCookieSecure()) {
+            cookie.setSecure(true);
+        }
+        if (isCookieHttpOnly()) {
+            cookie.setHttpOnly(true);
+        }
 
         return cookie;
     }
@@ -441,22 +436,14 @@ public class CookieUtils {
         if (response==null || cookie == null) {
             return;
         }
-        if (!isCookieHttpOnly() && getCookieSameSite() == null) {
+        if (getCookieSameSite() == null) {
+            if (isCookieHttpOnly()) {
+                cookie.setHttpOnly(true);
+            }
             response.addCookie(cookie);
             return;
         }
-
-        if (setHttpOnlyMethod != null && getCookieSameSite() == null) {
-            try {
-                setHttpOnlyMethod.invoke(cookie, true);
-                response.addCookie(cookie);
-                return;
-            } catch (IllegalAccessException iae) {
-                debug.warning("IllegalAccessException while trying to add HttpOnly cookie: " + iae.getMessage());
-            } catch (InvocationTargetException ite) {
-                debug.error("An error occurred while trying to add HttpOnly cookie", ite);
-            }
-        }
+        // The servlet Cookie has no SameSite attribute: write the header by hand.
 
         StringBuilder sb = new StringBuilder(150);
         sb.append(cookie.getName()).append("=").append(cookie.getValue());

@@ -1118,7 +1118,7 @@ $ ./ldapsearch --hostname openam.example.com --port 1389 --bindDN "cn=Directory 
 . Repeat these steps for all appropriate OpenDJ instances.
 
 ====
-For additional information, see link:https://backstage.forgerock.com/knowledge/kb/article/a97304600[How do I prevent anonymous access in DS/OpenDJ (All version), window=\_blank] in the __ForgeRock Knowledge Base__.
+For additional information, see link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-privileges-acis#access-control-disable-anonymous[ACI: Disable Anonymous Access, window=\_blank] in the OpenDJ __Administration Guide__.
 
 
 

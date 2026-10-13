@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -225,7 +225,7 @@ When installing the policy agent with the `--custom-install` option, the system 
 [#configure-web-policy-agent]
 === Configuring Web Policy Agent Properties
 
-When you create a web policy agent profile and install the agent, you can choose to store the agent configuration centrally and configure the agent through OpenAM console. Alternatively, you can choose to store the agent configuration locally and configure the agent by changing values in the properties file. For information on the properties used in a centralized configuration, and the corresponding properties for use in a local configuration file where applicable, see link:../../../openam-web-policy-agents/web-users-guide/#configure-web-policy-agent[Configuring Web Policy Agent Properties, window=\_blank] in the __OpenAM Web Policy Agent User's Guide__.
+When you create a web policy agent profile and install the agent, you can choose to store the agent configuration centrally and configure the agent through OpenAM console. Alternatively, you can choose to store the agent configuration locally and configure the agent by changing values in the properties file. For information on the properties used in a centralized configuration, and the corresponding properties for use in a local configuration file where applicable, see xref:../web-users-guide/chap-web-agents.adoc#configure-web-policy-agent[Configuring Web Policy Agent Properties] in the __OpenAM Web Policy Agent User's Guide__.
 
 
 [#configure-j2ee-policy-agent]

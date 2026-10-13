@@ -25,7 +25,7 @@
  * $Id: CDCServlet.java,v 1.13 2009/11/13 23:43:17 dknab Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.iplanet.services.cdc;
 
@@ -672,8 +672,8 @@ public class CDCServlet extends HttpServlet {
                  * Reset the cookie value to null, to avoid continous loop
                  * when a load balancer is used.
                  */
-                authCookie.setValue("");
-                response.addCookie(authCookie);
+                CookieUtils.addCookieToResponse(response, CookieUtils.newCookie(
+                    authURLCookieName, "", 0, "/", authURLCookieDomain));
                 response.sendRedirect(redirectURL.toString());
             }
             

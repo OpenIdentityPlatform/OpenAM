@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -322,6 +322,8 @@ Run the image:
 ----
 docker run -it --name apache_agent -p 8000:80 -h www.example.com --shm-size 2G --network openam-quickstart  apache_agent
 ----
+
+====
 
 
 [#try-it-out]

@@ -18,6 +18,7 @@ package org.forgerock.oauth2.restlet;
 
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.CLIENT_ID;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.SCOPE;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import org.forgerock.oauth2.core.AuthorizationService;
 import org.forgerock.oauth2.core.ClientRegistration;
@@ -71,6 +73,7 @@ import org.restlet.resource.Post;
 import org.restlet.routing.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.sun.identity.authentication.util.ISAuthConstants;
 
 /**
  * A restlet resource for user codes
@@ -128,6 +131,7 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     @Post
     public Representation verify(Representation body) throws ServerException, NotFoundException,
             InvalidGrantException, OAuth2RestletException {
+    	
         final Request restletRequest = getRequest();
         OAuth2Request request = requestFactory.create(restletRequest);
 
@@ -139,7 +143,9 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
             return getTemplateRepresentation(FORM, request, "not_found");
         }
 
-        if (deviceCode == null || deviceCode.isIssued()) {
+        // An expired code, or one that has already been approved, is treated as an unknown user code
+        if (deviceCode == null || deviceCode.isIssued() || deviceCode.isAuthorized()
+                || deviceCode.getExpiryTime() < currentTimeMillis()) {
             return getTemplateRepresentation(FORM, request, "not_found");
         }
 
@@ -168,10 +174,9 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                         saveConsent(request);
                     }
                     if (consentGiven) {
-                        ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
-                        deviceCode.setResourceOwnerId(resourceOwner.getId());
-                        deviceCode.setAuthorized(true);
-                        tokenStore.updateDeviceCode(deviceCode, request);
+
+                    	authorizeAndUpdateDeviceCode(deviceCode,request);
+                        
                     } else {
                         tokenStore.deleteDeviceCode(deviceCode.getClientId(), deviceCode.getDeviceCode(), request);
                     }
@@ -179,11 +184,10 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                     authorizationService.authorize(request);
                 }
             } else {
-                ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
-                deviceCode.setResourceOwnerId(resourceOwner.getId());
-                deviceCode.setAuthorized(true);
-                tokenStore.updateDeviceCode(deviceCode, request);
+            	
+            	authorizeAndUpdateDeviceCode(deviceCode,request);
             }
+            
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("client_id")) {
                 throw new OAuth2RestletException(400, "invalid_request", e.getMessage(),
@@ -299,5 +303,30 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     @Override
     protected void doCatch(Throwable throwable) {
         exceptionHandler.handle(throwable, getContext(), getRequest(), getResponse());
+    }
+    
+    
+    private void authorizeAndUpdateDeviceCode(DeviceCode deviceCode, OAuth2Request request) throws OAuth2Exception {
+
+        ResourceOwner resourceOwner = resourceOwnerSessionValidator.validate(request);
+        deviceCode.setAcrValues(getAuthenticationContextClassReferenceFromRequest(request));
+        SSOToken token = resourceOwnerSessionValidator.getResourceOwnerSession(request);
+
+        if (token != null) {
+
+            try {
+            	deviceCode.setAuthModules(token.getProperty(ISAuthConstants.AUTH_TYPE));
+            } catch (SSOException e) {
+                logger.warn("Could not get list of auth modules from authentication", e);
+            }
+        }
+        
+        deviceCode.setResourceOwnerId(resourceOwner.getId());
+        deviceCode.setAuthorized(true);
+        tokenStore.updateDeviceCode(deviceCode, request);
+    }
+    
+    private String getAuthenticationContextClassReferenceFromRequest(OAuth2Request request) {
+        return (String) request.getRequest().getAttributes().get(OAuth2Constants.JWTTokenParams.ACR);
     }
 }

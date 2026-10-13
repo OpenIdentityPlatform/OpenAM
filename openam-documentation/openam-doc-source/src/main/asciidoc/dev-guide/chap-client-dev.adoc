@@ -9055,7 +9055,7 @@ The sample web application deploys in your container to show you the client SDK 
 . Deploy the .war in your Java web application container such as Apache Tomcat or JBoss.
 +
 
-[source, console]
+[source, console, subs="attributes+"]
 ----
 $ cp ExampleClientSDK-WAR-{openam-version}.war /path/to/tomcat/webapps/client.war
 ----

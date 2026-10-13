@@ -973,5 +973,12 @@
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-cassandra-cts</artifactId>
         </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

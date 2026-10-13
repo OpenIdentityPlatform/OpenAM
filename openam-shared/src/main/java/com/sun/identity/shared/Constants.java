@@ -394,6 +394,14 @@ public interface Constants {
     static final String SM_SMTP_PORT = "com.iplanet.am.smtpport";
 
     /**
+     * Property string controlling whether an SSL connection to the SMTP host checks that the server
+     * certificate names that host. Defaults to {@code true}; {@code false} accepts any certificate the
+     * JVM trusts, as earlier releases did.
+     */
+    static final String AM_SMTP_CHECK_SERVER_IDENTITY =
+            "org.openidentityplatform.openam.smtp.checkServerIdentity";
+
+    /**
      * Property string for CDSSO cookie domain.
      */
     static final String SERVICES_CDSSO_COOKIE_DOMAIN =

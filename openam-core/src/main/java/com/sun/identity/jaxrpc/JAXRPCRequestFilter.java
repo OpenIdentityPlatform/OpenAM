@@ -126,16 +126,22 @@ public class JAXRPCRequestFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        boolean bound = false;
-        if (request instanceof HttpServletRequest) {
-            CURRENT_REQUEST.set((HttpServletRequest) request);
-            bound = true;
+        if (!(request instanceof HttpServletRequest)) {
+            chain.doFilter(request, response);
+            return;
         }
+        // The filter is mapped for FORWARD and INCLUDE dispatches as well, so a nested
+        // dispatch into /jaxrpc/* re-enters it on the same thread: restore the outer binding
+        // on exit rather than clearing it.
+        HttpServletRequest previous = CURRENT_REQUEST.get();
+        CURRENT_REQUEST.set((HttpServletRequest) request);
         try {
             chain.doFilter(request, response);
         } finally {
-            if (bound) {
+            if (previous == null) {
                 CURRENT_REQUEST.remove();
+            } else {
+                CURRENT_REQUEST.set(previous);
             }
         }
     }

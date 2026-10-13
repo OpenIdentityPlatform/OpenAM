@@ -1904,6 +1904,9 @@ Specifies whether to connect to the SMTP mail server using SSL.
 Default: use SSL (`true`)
 
 +
+Over SSL, the server certificate has to name the mail server host; see `org.openidentityplatform.openam.smtp.checkServerIdentity` in xref:#servers-advanced-configuration["Advanced"].
+
++
 `ssoadm` attribute: `forgerockEmailServiceSMTPSSLEnabled`
 
 Email From Address::
@@ -3294,7 +3297,6 @@ Use the ForgeRock Backstage website to provision values for the following Simple
 
 * SNS Client Region
 
-For information on provisioning the credentials required by the Push Notification Service, see link:https://backstage.forgerock.com/knowledge/kb/article/a47604373[How do I set up AM/OpenAM Push Notification Service credentials, window=\_blank] in the __BackStage Help Knowledge Base__.
 --
 `ssoadm` service name: `PushNotificationService`
 
@@ -4327,7 +4329,7 @@ Outgoing Email Body::
 Customizes the user self-registration email body text.
 
 +
-Default: `en|<h2>Click on this <a href="%link%">link </a> to register.</h2>`
+Default: `+en|<h2>Click on this <a href="%link%">link </a> to register.</h2>+`
 
 +
 `ssoadm` attribute: `selfServiceUserRegistrationEmailBody`
@@ -4452,7 +4454,7 @@ Outgoing Email Body::
 Customizes the forgotten password email body text.
 
 +
-Default: `en|<h2>Click on this <a href="%link%"> link</a> to reset your password.</h2>`
+Default: `+en|<h2>Click on this <a href="%link%"> link</a> to reset your password.</h2>+`
 
 +
 `ssoadm` attribute: `selfServiceForgottenPasswordEmailBody`
@@ -6116,6 +6118,21 @@ Specify a semicolon-separated list of URL patterns, using `*` as a wildcard, for
 
 +
 Default: empty (only relative and same-origin redirect URLs are allowed)
+
+`org.openidentityplatform.openam.smtp.checkServerIdentity`::
+Controls whether OpenAM checks, when it connects to an SMTP mail server over SSL, that the server certificate names the configured mail server host.
+
++
+By default (`true`), a certificate that the JVM trusts but that is issued for another host is rejected, and sending mail fails with `Can't verify identity of server`. This affects every mail OpenAM sends over SSL: password reset, account lockout notification, the Email Service, and one-time passwords sent by email. Earlier releases did not perform this check.
+
++
+To pass the check, configure the mail server host as a name the certificate carries in its subject alternative names or common name. A host given as an IP address matches an IP address subject alternative name on Java 11 as is, and on Java 16 and later only when the JVM is started with `--add-exports java.base/sun.security.util=ALL-UNNAMED`, as the OpenAM Docker image is; otherwise use a host name.
+
++
+Set this property to `false` to accept any certificate the JVM trusts, as earlier releases did, for example while a mail relay's certificate is being reissued. Only `false` turns the check off; an empty or any other value keeps it.
+
++
+Default: `true`
 
 `securidHelper.ports`::
 Port on which SecurID daemon listens.

@@ -26,6 +26,7 @@
  */
 /*
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 using System;
@@ -275,16 +276,16 @@ namespace Sun.Identity.Saml2
             HttpRequest request = context.Request;
 
             // Check if a saml response was received...
-            if (string.IsNullOrEmpty(request[Saml2Constants.ResponseParameter])
-                && string.IsNullOrEmpty(request[Saml2Constants.ArtifactParameter]))
+            if (string.IsNullOrEmpty(GetBindingParameter(request, Saml2Constants.ResponseParameter))
+                && string.IsNullOrEmpty(GetBindingParameter(request, Saml2Constants.ArtifactParameter)))
             {
                 throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityNoSamlResponseReceived);
             }
 
             // Obtain AuthnResponse object from either HTTP-POST or HTTP-Artifact
-            if (request[Saml2Constants.ResponseParameter] != null)
+            if (GetBindingParameter(request, Saml2Constants.ResponseParameter) != null)
             {
-                string samlResponse = Saml2Utils.ConvertFromBase64(request[Saml2Constants.ResponseParameter]);
+                string samlResponse = Saml2Utils.ConvertFromBase64(GetBindingParameter(request, Saml2Constants.ResponseParameter));
                 authnResponse = new AuthnResponse(samlResponse);
 
                 XmlDocument xmlDoc = (XmlDocument)authnResponse.XmlDom;
@@ -292,9 +293,9 @@ namespace Sun.Identity.Saml2
                 logMessage.Append("AuthnResponse:\r\n").Append(xmlDoc.OuterXml);
                 FedletLogger.Info(logMessage.ToString());
             }
-            else if (request[Saml2Constants.ArtifactParameter] != null)
+            else if (GetBindingParameter(request, Saml2Constants.ArtifactParameter) != null)
             {
-                Artifact artifact = new Artifact(request[Saml2Constants.ArtifactParameter]);
+                Artifact artifact = new Artifact(GetBindingParameter(request, Saml2Constants.ArtifactParameter));
                 artifactResponse = this.GetArtifactResponse(artifact);
                 authnResponse = artifactResponse.AuthnResponse;
 
@@ -357,14 +358,14 @@ namespace Sun.Identity.Saml2
             // Obtain the LogoutRequest object...
             if (request.HttpMethod == "GET")
             {
-                samlRequest = Saml2Utils.ConvertFromBase64Decompress(request[Saml2Constants.RequestParameter]);
+                samlRequest = Saml2Utils.ConvertFromBase64Decompress(GetBindingParameter(request, Saml2Constants.RequestParameter));
             }
             else if (request.HttpMethod == "POST")
             {
                 // something posted...check if soap vs form post
-                if (!String.IsNullOrEmpty(request[Saml2Constants.RequestParameter]))
+                if (!String.IsNullOrEmpty(GetBindingParameter(request, Saml2Constants.RequestParameter)))
                 {
-                    samlRequest = Saml2Utils.ConvertFromBase64(request[Saml2Constants.RequestParameter]);
+                    samlRequest = Saml2Utils.ConvertFromBase64(GetBindingParameter(request, Saml2Constants.RequestParameter));
                 }
                 else
                 {
@@ -441,7 +442,7 @@ namespace Sun.Identity.Saml2
             HttpRequest request = context.Request;
 
             // Check if a saml response was received...
-            if (String.IsNullOrEmpty(request[Saml2Constants.ResponseParameter]))
+            if (String.IsNullOrEmpty(GetBindingParameter(request, Saml2Constants.ResponseParameter)))
             {
                 throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityNoSamlResponseReceived);
             }
@@ -449,12 +450,12 @@ namespace Sun.Identity.Saml2
             // Obtain the LogoutRequest object...
             if (request.HttpMethod == "GET")
             {
-                string samlResponse = Saml2Utils.ConvertFromBase64Decompress(request[Saml2Constants.ResponseParameter]);
+                string samlResponse = Saml2Utils.ConvertFromBase64Decompress(GetBindingParameter(request, Saml2Constants.ResponseParameter));
                 logoutResponse = new LogoutResponse(samlResponse);
             }
             else
             {
-                string samlResponse = Saml2Utils.ConvertFromBase64(request[Saml2Constants.ResponseParameter]);
+                string samlResponse = Saml2Utils.ConvertFromBase64(GetBindingParameter(request, Saml2Constants.ResponseParameter));
                 logoutResponse = new LogoutResponse(samlResponse);
             }
 
@@ -1678,6 +1679,19 @@ namespace Sun.Identity.Saml2
         #endregion
 
         #region Static Private Methods
+
+        /// <summary>
+        /// Gets a SAML message parameter from where its binding carries it: the form of a
+        /// POST, the query string of a GET. The request's own indexer would also consult
+        /// cookies and server variables, which no SAML binding uses.
+        /// </summary>
+        /// <param name="request">The current request.</param>
+        /// <param name="name">The parameter name, for example SAMLResponse.</param>
+        /// <returns>The parameter value, or null if the request does not carry it.</returns>
+        private static string GetBindingParameter(HttpRequest request, string name)
+        {
+            return request.HttpMethod == "POST" ? request.Form[name] : request.QueryString[name];
+        }
 
         /// <summary>
         /// Checks the time condition of the given AuthnResponse.

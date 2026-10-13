@@ -107,7 +107,9 @@ public class UserProfileServlet extends SampleBase {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace(out);
+            // The exception goes to the server log; the page only says that the request failed.
+            log("request failed", e);
+            out.println("The request failed. See the server log for the cause.");
             out.println("</body></html>");
         }
     }

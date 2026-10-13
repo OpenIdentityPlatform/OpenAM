@@ -407,6 +407,8 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
         String authModules;
         if (request.getToken(AuthorizationCode.class) != null) {
             authModules = request.getToken(AuthorizationCode.class).getAuthModules();
+        } else if (request.getToken(DeviceCode.class) != null) {
+            authModules = request.getToken(DeviceCode.class).getAuthModules();
         } else if (request.getToken(RefreshToken.class) != null) {
             authModules = request.getToken(RefreshToken.class).getAuthModules();
         } else {
@@ -432,6 +434,8 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
     private String getAuthenticationContextClassReference(OAuth2Request request) {
         if (request.getToken(AuthorizationCode.class) != null) {
             return request.getToken(AuthorizationCode.class).getAuthenticationContextClassReference();
+        } else if(request.getToken(DeviceCode.class) != null){
+        	return request.getToken(DeviceCode.class).getAcrValues();
         } else if (request.getToken(RefreshToken.class) != null) {
             return request.getToken(RefreshToken.class).getAuthenticationContextClassReference();
         } else {
@@ -643,6 +647,13 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             authModules = token.getAuthModules();
             acr = token.getAuthenticationContextClassReference();
         }
+        
+        DeviceCode deviceCode = request.getToken(DeviceCode.class);
+        if(deviceCode != null) {
+        	authModules = deviceCode.getAuthModules();
+        	acr = deviceCode.getAcrValues();
+        }
+        
 
         RefreshToken currentRefreshToken = request.getToken(RefreshToken.class);
         if (currentRefreshToken != null) {
@@ -897,7 +908,7 @@ public class StatefulTokenStore implements OpenIdConnectTokenStore {
             Integer maxAge, String claims, OAuth2Request request, String codeChallenge, String codeChallengeMethod)
             throws ServerException, NotFoundException {
 
-        logger.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
+        logger.message("DefaultOAuthTokenStoreImpl::Creating Device code");
 
         final OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);
         final String deviceCode = UUID.randomUUID().toString();
