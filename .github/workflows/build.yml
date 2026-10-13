@@ -302,14 +302,23 @@ jobs:
         with:
           sparse-checkout: e2e
 
-      - name: UI Smoke Tests (Playwright) - HttpOnly disabled
-        env:
-          EXPECT_COOKIE_HTTPONLY: "false"
+      - name: Install Playwright
         run: |
           cd e2e
           npm init -y
           npm install @playwright/test
           npx playwright install chromium --with-deps
+
+      # MIT Kerberos client for the Kerberos spec (kinit, klist); libgssapi_krb5 is already on the runner.
+      # No apt-get update: playwright install --with-deps has just run it.
+      - name: Install MIT Kerberos client
+        run: sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends krb5-user gettext-base
+
+      - name: UI Smoke Tests (Playwright) - HttpOnly disabled
+        env:
+          EXPECT_COOKIE_HTTPONLY: "false"
+        run: |
+          cd e2e
           npx playwright test --reporter=list
 
       - name: Enable HttpOnly session cookie on OpenAM IDP and restart
@@ -349,6 +358,8 @@ jobs:
         shell: bash
         run: |
           docker stop openam-idp opendj-idp opendj-sp openam-sp
+          # The Kerberos spec removes its KDC in afterAll; this covers a run that did not get there.
+          docker rm -f openam-kdc >/dev/null 2>&1 || true
           docker network rm test-openam
 
       - name: Docker multi-server test

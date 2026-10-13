@@ -105,6 +105,7 @@
     <jsr311-api.version>1.1.1</jsr311-api.version>
     <jstl.version>2.0.0</jstl.version>
     <mockito.version>2.23.4</mockito.version>
+    <kerby.version>2.1.2</kerby.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
     <saaj-api.version>2.0.1</saaj-api.version>
@@ -1603,6 +1604,12 @@
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
         <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.kerby</groupId>
+        <artifactId>kerb-simplekdc</artifactId>
+        <version>${kerby.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>

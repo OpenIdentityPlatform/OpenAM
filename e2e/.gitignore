@@ -18,3 +18,4 @@ package-lock.json
 package.json
 playwright-report/
 test-results/
+kerberos/.work/

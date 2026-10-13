@@ -14,6 +14,8 @@
  * Copyright 2026 3A Systems, LLC.
  */
 
+import { expect } from "@playwright/test";
+
 export const OPENAM_BASE = process.env.OPENAM_BASE_URL ?? "http://openam.example.org:8080/openam";
 export const ADMIN_USER = process.env.OPENAM_ADMIN_USER ?? "amadmin";
 export const ADMIN_PASS = process.env.OPENAM_ADMIN_PASS ?? "ampassword";
@@ -37,4 +39,37 @@ export async function getAuthToken(request, username, password) {
   });
   const json = await resp.json();
   return json.tokenId;
+}
+
+// XUI / LESS-based OpenAM login form selectors
+export const XUI_LOGIN = {
+  usernameInput: "#idToken1",
+  passwordInput: "#idToken2",
+  // The submit button id varies between XUI builds (loginButton / loginButton_0 / none),
+  // so match by submit type as the working SAML spec does.
+  loginButton: "#loginButton, input[type=\"submit\"], button[type=\"submit\"]",
+};
+
+/** Fill in and submit the XUI login form once the page shows it. */
+export async function submitXuiLogin(page, username, password) {
+  await expect(page.locator(XUI_LOGIN.usernameInput)).toBeVisible({ timeout: 30_000 });
+  await page.fill(XUI_LOGIN.usernameInput, username);
+  await page.fill(XUI_LOGIN.passwordInput, password);
+  await page.locator(XUI_LOGIN.loginButton).first().click();
+}
+
+/**
+ * Resolve the id of the active session from the (auto-sent) session cookie, or from the given token.
+ * Returns null when there is no valid session.
+ */
+export async function idFromSession(request, tokenId) {
+  const headers = { "Accept-API-Version": "protocol=1.0,resource=2.0" };
+  if (tokenId) {
+    headers.iPlanetDirectoryPro = tokenId;
+  }
+  const resp = await request.post(`${OPENAM_BASE}/json/users?_action=idFromSession`, { headers });
+  if (!resp.ok()) {
+    return null;
+  }
+  return (await resp.json()).id;
 }
