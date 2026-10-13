@@ -24,7 +24,7 @@
  * pointed at .work/krb5.conf and .work/krb5cc by KRB5_CONFIG and KRB5CCNAME.
  *
  * Requires MIT Kerberos client tools (Debian/Ubuntu package krb5-user); skipped without them.
- * Runs before HttpOnly mode is enabled: once #1170 is fixed, the curl case reads tokenId from the response body.
+ * Runs before HttpOnly mode is enabled: the curl case reads tokenId from the response body.
  *
  * /UI/Login is not covered: with the XUI enabled (the default) XUIFilter redirects it to the XUI.
  */
@@ -53,18 +53,6 @@ const BOOTSTRAP_ENV = {
   KRB_SPN_HOST: process.env.KRB_SPN_HOST ?? OPENAM_HOST,
   KRB_USER: process.env.KRB_USER ?? USERNAME,
 };
-
-// /json/authenticate answers 400 when the Negotiate header arrives with the request that starts the
-// login: the module's script TextOutputCallback cannot be filled from the request, so
-// RestAuthCallbackHandlerManager converts every callback to JSON and
-// RestAuthHttpCallbackHandler.convertToJson rejects the HttpCallback. The browser resends the XUI
-// request with the header after the 401 challenge, so the XUI hits the same error.
-// The curl and XUI cases assert that 400. Once the endpoint is fixed they turn red: assert the session instead.
-const REST_NEGOTIATE_BUG = "/json/authenticate rejects a Negotiate header with 400: "
-  + "https://github.com/OpenIdentityPlatform/OpenAM/issues/1170";
-// A request without the Authorization header gets the module's 401 first, so only one with the header
-// reaches this message.
-const HTTP_CALLBACK_REJECTED = "HttpCallback Authorization Header must be specified in the initial request";
 
 // The browser may answer Negotiate challenges from the OpenAM host only.
 test.use({
@@ -173,8 +161,8 @@ test.afterEach(async ({}, testInfo) => {
 test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
   test("REST: the browser's Negotiate token completes a login started without it", async ({ page }) => {
     // The module reads the Negotiate header of whichever request continues the login, so a client
-    // that first obtains authId and then sends the header together with it is not affected by the
-    // one-step bug. This proves the KDC, the keytab, the module settings and the browser's Kerberos.
+    // that first obtains authId and then sends the header together with it completes the login too.
+    // This proves the KDC, the keytab, the module settings and the browser's Kerberos.
     const authorization = await negotiateHeaderFromBrowser(page);
     expect(authorization, "the browser should answer the Negotiate challenge").toBeTruthy();
 
@@ -194,7 +182,7 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     expect(String(await idFromSession(page.request, tokenId)).toLowerCase()).toBe(krb.user.toLowerCase());
   });
 
-  test("REST: curl --negotiate is rejected with 400 until #1170 is fixed", async () => {
+  test("REST: curl --negotiate completes the login in one request", async ({ request }) => {
     const output = execFileSync("curl", [
       "-sS", "--negotiate", "-u", ":",
       "-H", "Content-Type: application/json",
@@ -208,12 +196,13 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     const status = output.slice(separator + 1);
     console.log(`/json/authenticate answered ${status}: ${body}`);
 
-    // #1170: when this turns red, assert 200, tokenId and the session from idFromSession instead.
-    expect(status, REST_NEGOTIATE_BUG).toBe("400");
-    expect(body, "the 400 should come from curl's Negotiate header").toContain(HTTP_CALLBACK_REJECTED);
+    expect(status, body).toBe("200");
+    const { tokenId } = JSON.parse(body);
+    expect(tokenId, "the response should carry tokenId").toBeTruthy();
+    expect(String(await idFromSession(request, tokenId)).toLowerCase()).toBe(krb.user.toLowerCase());
   });
 
-  test("XUI: the Negotiate login is rejected with 400 until #1170 is fixed", async ({ page }) => {
+  test("XUI: the browser's Negotiate token logs in without a form", async ({ page }) => {
     page.on("response", (resp) => {
       if (new URL(resp.url()).pathname.endsWith("/authenticate")) {
         console.log(`XUI ${resp.request().method()} ${resp.url()} answered ${resp.status()}`);
@@ -225,10 +214,10 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     await page.goto(`${OPENAM_BASE}/XUI/#login/&authIndexType=module`
       + `&authIndexValue=${encodeURIComponent(krb.module)}`);
     const resp = await login;
-    // #1170: when this turns red, poll idFromSession for the user and assert that no login form is shown instead.
-    expect(resp.status(), REST_NEGOTIATE_BUG).toBe(400);
-    expect(await resp.text(), "the 400 should come from the browser's Negotiate header")
-      .toContain(HTTP_CALLBACK_REJECTED);
+    expect(resp.status(), await resp.text()).toBe(200);
+    await expect.poll(async () => String(await idFromSession(page.request)).toLowerCase(), { timeout: 30_000 })
+      .toBe(krb.user.toLowerCase());
+    await expect(page).not.toHaveURL(/#login/, { timeout: 30_000 });
   });
 
   test("fallback: without a ticket the chain continues to the DataStore form", async ({ request }) => {
