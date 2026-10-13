@@ -17,6 +17,7 @@
 
 package org.forgerock.openam.core.rest.authn;
 
+import com.sun.identity.authentication.callbacks.NameValueOutputCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.authentication.spi.HttpCallback;
 import org.forgerock.json.JsonValue;
@@ -29,6 +30,7 @@ import org.testng.annotations.Test;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -39,6 +41,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
 
 public class RestAuthCallbackHandlerManagerTest {
@@ -317,7 +320,27 @@ public class RestAuthCallbackHandlerManagerTest {
     }
 
     @Test
-    public void shouldChallengeWhenHttpCallbackFollowsCallbackThatCannotBeFilled() throws RestAuthException {
+    public void shouldSubmitNameValueOutputCallbackWhenHttpCallbackHeaderIsPresent() throws RestAuthException {
+
+        //Given
+        RestAuthCallbackHandlerManager manager =
+                new RestAuthCallbackHandlerManager(RestAuthCallbackHandlerFactory.getInstance());
+        HttpServletRequest request = postRequest();
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpCallback httpCallback = new HttpCallback("Authorization", "WWW-Authenticate:Negotiate", "401");
+        NameValueOutputCallback nameValue = new NameValueOutputCallback("realm", "/");
+        given(request.getHeader("Authorization")).willReturn("Negotiate YIIB");
+
+        //When
+        JsonValue jsonCallbacks = manager.handleCallbacks(request, response,
+                new Callback[]{httpCallback, nameValue});
+
+        //Then
+        assertEquals(jsonCallbacks.size(), 0);
+    }
+
+    @Test
+    public void shouldChallengeWhenHttpCallbackFollowsOutputCallback() throws RestAuthException {
 
         //Given
         RestAuthCallbackHandlerManager manager =
@@ -359,6 +382,29 @@ public class RestAuthCallbackHandlerManagerTest {
         //Then
         assertEquals(jsonCallbacks.size(), 0);
         assertEquals(nameCallback.getName(), "demo");
+    }
+
+    @Test
+    public void shouldRejectHttpCallbackNextToInputCallbackThatCannotBeFilled() throws RestAuthException {
+
+        //Given
+        RestAuthCallbackHandlerManager manager =
+                new RestAuthCallbackHandlerManager(RestAuthCallbackHandlerFactory.getInstance());
+        HttpServletRequest request = postRequest();
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        HttpCallback httpCallback = new HttpCallback("Authorization", "WWW-Authenticate:Negotiate", "401");
+        PasswordCallback passwordCallback = new PasswordCallback("Password:", false);
+        given(request.getHeader("Authorization")).willReturn("Negotiate YIIB");
+
+        //When
+        try {
+            manager.handleCallbacks(request, response, new Callback[]{httpCallback, passwordCallback});
+            fail("Expected a 400 for the PasswordCallback that cannot be filled from the request");
+        } catch (RestAuthException e) {
+            //Then
+            assertEquals(e.getStatusCode(), 400);
+            assertNull(passwordCallback.getPassword());
+        }
     }
 
     private HttpServletRequest postRequest() {
