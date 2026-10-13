@@ -1,3 +1,17 @@
+# The contents of this file are subject to the terms of the Common Development and
+# Distribution License (the License). You may not use this file except in compliance with the
+# License.
+#
+# You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+# specific language governing permission and limitations under the License.
+#
+# When distributing Covered Software, include this CDDL Header Notice in each file and include
+# the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+# Header, with the fields enclosed by brackets [] replaced by your own identifying
+# information: "Portions copyright [year] [name of copyright owner]".
+#
+# Portions Copyright 2026 3A Systems, LLC.
+
 FROM tomcat:11-jre25
 
 LABEL org.opencontainers.image.authors="Open Identity Platform Community"
@@ -21,7 +35,9 @@ RUN mkdir /usr/openam \
 
 RUN if [ ! -f "$CATALINA_HOME/webapps/$OPENAM_PATH.war" ]; then echo file exists; fi
 
-RUN apt-get update && apt-get install -y curl unzip \
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends curl unzip \
  && if [ -z "$VERSION" ] ; then VERSION="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)"; fi \
  && if [ ! -f "$CATALINA_HOME/webapps/$OPENAM_PATH.war" ]; then echo file exists && curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/OpenAM-$VERSION.war --output $CATALINA_HOME/webapps/$OPENAM_PATH.war; fi \
  && if [ ! -f "/usr/openam/ssoconfiguratortools.zip" ]; then curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/SSOConfiguratorTools-$VERSION.zip --output /usr/openam/ssoconfiguratortools.zip; fi \
