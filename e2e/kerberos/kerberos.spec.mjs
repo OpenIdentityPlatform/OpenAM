@@ -214,7 +214,11 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     await page.goto(`${OPENAM_BASE}/XUI/#login/&authIndexType=module`
       + `&authIndexValue=${encodeURIComponent(krb.module)}`);
     const resp = await login;
-    expect(resp.status(), await resp.text()).toBe(200);
+    // Read the body only on failure: after a successful login the XUI navigates away, and Chromium may drop
+    // the previous document's response bodies.
+    if (resp.status() !== 200) {
+      throw new Error(`/authenticate answered ${resp.status()}: ${await resp.text()}`);
+    }
     await expect.poll(async () => String(await idFromSession(page.request)).toLowerCase(), { timeout: 30_000 })
       .toBe(krb.user.toLowerCase());
     await expect(page).not.toHaveURL(/#login/, { timeout: 30_000 });
