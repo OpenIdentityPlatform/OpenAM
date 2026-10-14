@@ -203,7 +203,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
         // authenticate the user with the kerberos token
         try {
-            authenticateToken(kerberosToken, trustedKerberosRealms);
+            authenticateToken(serviceSubject, kerberosToken, trustedKerberosRealms);
             if (debug.messageEnabled()){
                 debug.message("WindowsDesktopSSO kerberos authentication passed succesfully.");
             }
@@ -215,11 +215,12 @@ public class WindowsDesktopSSO extends AMLoginModule {
                  if (major == GSSException.CREDENTIALS_EXPIRED) {	 
                          debug.message("Credential expired. Re-establish credential...");	 
                  serviceLogin();	 
+                 cacheServiceLogin();
                  try {   
-                     authenticateToken(kerberosToken, trustedKerberosRealms);  
+                     authenticateToken(serviceSubject, kerberosToken, trustedKerberosRealms);  
+                     result = ISAuthConstants.LOGIN_SUCCEED;
                      if (debug.messageEnabled()){
                        debug.message("Authentication succeeded with new cred.");    
-                           result = ISAuthConstants.LOGIN_SUCCEED;
                      }
                  } catch (Exception ee) {   
                        debug.error("Authentication failed with new cred.Stack Trace", ee); 
@@ -237,11 +238,12 @@ public class WindowsDesktopSSO extends AMLoginModule {
            if (major == GSSException.CREDENTIALS_EXPIRED) {
                debug.message("Credential expired. Re-establish credential...");
                serviceLogin();
+               cacheServiceLogin();
                    try {
-                   authenticateToken(kerberosToken, trustedKerberosRealms);
+                   authenticateToken(serviceSubject, kerberosToken, trustedKerberosRealms);
+                   result = ISAuthConstants.LOGIN_SUCCEED;
                    if (debug.messageEnabled()){
                        debug.message("Authentication succeeded with new cred.");
-                           result = ISAuthConstants.LOGIN_SUCCEED; 
                    }
                } catch (Exception ee) {
                        debug.error("Authentication failed with new cred. Stack Trace", ee);
@@ -264,11 +266,12 @@ public class WindowsDesktopSSO extends AMLoginModule {
         return result;
     }
 
-    private void authenticateToken(final byte[] kerberosToken, final Set<String> trustedRealms) 
+    @VisibleForTesting
+    void authenticateToken(final Subject subject, final byte[] kerberosToken, final Set<String> trustedRealms)
             throws AuthLoginException, GSSException, Exception {
 
         debug.message("In authenticationToken ...");
-        Subject.doAs(serviceSubject, new PrivilegedExceptionAction(){
+        Subject.doAs(subject, new PrivilegedExceptionAction(){
             public Object run() throws Exception {
                 GSSContext context =
                     GSSManager.getInstance().createContext(
@@ -602,14 +605,15 @@ public class WindowsDesktopSSO extends AMLoginModule {
         }
         verifyAttributes();
         serviceLogin();
+        cacheServiceLogin();
+    }
 
-        // save the service subject and the other configuration data
-        // into configTable for other auth requests in the same org
-        Map configMap = (Map)configTable.get(confIndex);
-        if (configMap == null) {
-            configMap = new HashMap();
-        }
-
+    /**
+     * Saves the service subject and the other configuration data into configTable for other auth requests in the
+     * same org. Always publishes a new map: other requests read the cached one without a lock.
+     */
+    private void cacheServiceLogin() {
+        Map configMap = new HashMap();
         configMap.put(configAttributes[SUBJECT], serviceSubject);
         configMap.put(configAttributes[PRINCIPAL], servicePrincipalName);
         configMap.put(configAttributes[KEYTAB], keyTabFile);
