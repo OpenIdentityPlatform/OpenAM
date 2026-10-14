@@ -215,6 +215,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
                  if (major == GSSException.CREDENTIALS_EXPIRED) {	 
                          debug.message("Credential expired. Re-establish credential...");	 
                  serviceLogin();	 
+                 cacheServiceLogin();
                  try {   
                      authenticateToken(serviceSubject, kerberosToken, trustedKerberosRealms);  
                      result = ISAuthConstants.LOGIN_SUCCEED;
@@ -237,6 +238,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
            if (major == GSSException.CREDENTIALS_EXPIRED) {
                debug.message("Credential expired. Re-establish credential...");
                serviceLogin();
+               cacheServiceLogin();
                    try {
                    authenticateToken(serviceSubject, kerberosToken, trustedKerberosRealms);
                    result = ISAuthConstants.LOGIN_SUCCEED;
@@ -603,14 +605,15 @@ public class WindowsDesktopSSO extends AMLoginModule {
         }
         verifyAttributes();
         serviceLogin();
+        cacheServiceLogin();
+    }
 
-        // save the service subject and the other configuration data
-        // into configTable for other auth requests in the same org
-        Map configMap = (Map)configTable.get(confIndex);
-        if (configMap == null) {
-            configMap = new HashMap();
-        }
-
+    /**
+     * Saves the service subject and the other configuration data into configTable for other auth requests in the
+     * same org. Always publishes a new map: other requests read the cached one without a lock.
+     */
+    private void cacheServiceLogin() {
+        Map configMap = new HashMap();
         configMap.put(configAttributes[SUBJECT], serviceSubject);
         configMap.put(configAttributes[PRINCIPAL], servicePrincipalName);
         configMap.put(configAttributes[KEYTAB], keyTabFile);

@@ -48,6 +48,7 @@ import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.expectThrows;
 
 /**
@@ -147,6 +148,24 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         assertEquals(processAtServerDebugLevel(module), ISAuthConstants.LOGIN_SUCCEED);
         assertEquals(module.getPrincipal().getName(), USER);
         assertEquals(module.serviceLogins, 2, "the module should log the service in again after the expiry");
+    }
+
+    @Test(dataProvider = "expiredCredentials")
+    public void renewedServiceLoginIsCached(String shape, boolean wrapped) throws Exception {
+        // One test method for both requests: TestNG does not order methods, and they share the expiring credentials.
+        ExpiringServiceCredentials credentials = new ExpiringServiceCredentials(wrapped);
+        TestModule first = newModule("cache-" + shape, negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options());
+        first.credentials = credentials;
+        assertEquals(processAtServerDebugLevel(first), ISAuthConstants.LOGIN_SUCCEED);
+        assertEquals(first.serviceLogins, 2);
+        Subject renewed = credentials.lastUsed();
+
+        // The next request to the module instance: the renewed service subject comes from the cache.
+        TestModule second = newModule("cache-" + shape, negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options());
+        second.credentials = credentials;
+        assertEquals(processAtServerDebugLevel(second), ISAuthConstants.LOGIN_SUCCEED);
+        assertEquals(second.serviceLogins, 0, "the second request should use the renewed service login");
+        assertSame(credentials.lastUsed(), renewed);
     }
 
     @Test
