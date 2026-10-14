@@ -203,7 +203,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
 
         // authenticate the user with the kerberos token
         try {
-            authenticateToken(kerberosToken, trustedKerberosRealms);
+            authenticateToken(serviceSubject, kerberosToken, trustedKerberosRealms);
             if (debug.messageEnabled()){
                 debug.message("WindowsDesktopSSO kerberos authentication passed succesfully.");
             }
@@ -216,10 +216,10 @@ public class WindowsDesktopSSO extends AMLoginModule {
                          debug.message("Credential expired. Re-establish credential...");	 
                  serviceLogin();	 
                  try {   
-                     authenticateToken(kerberosToken, trustedKerberosRealms);  
+                     authenticateToken(serviceSubject, kerberosToken, trustedKerberosRealms);  
+                     result = ISAuthConstants.LOGIN_SUCCEED;
                      if (debug.messageEnabled()){
                        debug.message("Authentication succeeded with new cred.");    
-                           result = ISAuthConstants.LOGIN_SUCCEED;
                      }
                  } catch (Exception ee) {   
                        debug.error("Authentication failed with new cred.Stack Trace", ee); 
@@ -238,10 +238,10 @@ public class WindowsDesktopSSO extends AMLoginModule {
                debug.message("Credential expired. Re-establish credential...");
                serviceLogin();
                    try {
-                   authenticateToken(kerberosToken, trustedKerberosRealms);
+                   authenticateToken(serviceSubject, kerberosToken, trustedKerberosRealms);
+                   result = ISAuthConstants.LOGIN_SUCCEED;
                    if (debug.messageEnabled()){
                        debug.message("Authentication succeeded with new cred.");
-                           result = ISAuthConstants.LOGIN_SUCCEED; 
                    }
                } catch (Exception ee) {
                        debug.error("Authentication failed with new cred. Stack Trace", ee);
@@ -264,11 +264,12 @@ public class WindowsDesktopSSO extends AMLoginModule {
         return result;
     }
 
-    private void authenticateToken(final byte[] kerberosToken, final Set<String> trustedRealms) 
+    @VisibleForTesting
+    protected void authenticateToken(final Subject subject, final byte[] kerberosToken, final Set<String> trustedRealms)
             throws AuthLoginException, GSSException, Exception {
 
         debug.message("In authenticationToken ...");
-        Subject.doAs(serviceSubject, new PrivilegedExceptionAction(){
+        Subject.doAs(subject, new PrivilegedExceptionAction(){
             public Object run() throws Exception {
                 GSSContext context =
                     GSSManager.getInstance().createContext(

@@ -20,6 +20,7 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import com.sun.identity.shared.debug.Debug;
 import jakarta.servlet.http.HttpServletRequest;
 import org.forgerock.guice.core.InjectorHolder;
 import org.powermock.api.mockito.PowerMockito;
@@ -29,19 +30,23 @@ import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import javax.security.auth.Subject;
 import java.io.File;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.expectThrows;
 
@@ -128,6 +133,22 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         assertEquals(second.getPrincipal().getName(), USER);
     }
 
+    @DataProvider(name = "expiredCredentials")
+    public Object[][] expiredCredentials() {
+        // The PrivilegedActionException that Subject.doAs throws, and a bare GSSException.
+        return new Object[][] {{"wrapped", true}, {"bare", false}};
+    }
+
+    @Test(dataProvider = "expiredCredentials")
+    public void retryWithRenewedServiceLoginLogsUserIn(String shape, boolean wrapped) throws Exception {
+        TestModule module = newModule("retry-" + shape, negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options());
+        module.credentials = new ExpiringServiceCredentials(wrapped);
+
+        assertEquals(processAtServerDebugLevel(module), ISAuthConstants.LOGIN_SUCCEED);
+        assertEquals(module.getPrincipal().getName(), USER);
+        assertEquals(module.serviceLogins, 2, "the module should log the service in again after the expiry");
+    }
+
     @Test
     public void returnRealmKeepsRealmInUserName() throws Exception {
         Map<String, Object> options = options();
@@ -183,6 +204,19 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         assertNull(module.getPrincipal());
     }
 
+    /** Runs process() at the server's default debug level; unit tests otherwise run at "on", which hides #1173. */
+    private static int processAtServerDebugLevel(TestModule module) throws Exception {
+        Debug debug = Debug.getInstance("amAuthWindowsDesktopSSO");
+        int level = debug.getState();
+        debug.setDebug("error");
+        try {
+            assertFalse(debug.messageEnabled(), "the module must run without message-level debug");
+            return module.process(null, ISAuthConstants.LOGIN_START);
+        } finally {
+            debug.setDebug(level);
+        }
+    }
+
     /** Module settings as stored in the auth module instance; each test changes what it is about. */
     private Map<String, Object> options() {
         Map<String, Object> options = new HashMap<>();
@@ -219,6 +253,8 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         private final HttpServletRequest request;
         private int moduleAuthLevel;
         private int serviceLogins;
+        // Null: the service credentials never expire.
+        private ExpiringServiceCredentials credentials;
 
         TestModule(HttpServletRequest request) {
             this.request = request;
@@ -245,6 +281,15 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         protected void createUpdateKrb5ConfigFile() {
             // Keep Kerby's krb5.conf: the module would rewrite "kdc = localhost:<port>" as "kdc=localhost", port 88.
             serviceLogins++;
+        }
+
+        @Override
+        protected void authenticateToken(Subject subject, byte[] kerberosToken, Set<String> trustedRealms)
+                throws Exception {
+            if (credentials != null) {
+                credentials.check(subject);
+            }
+            super.authenticateToken(subject, kerberosToken, trustedRealms);
         }
     }
 }
