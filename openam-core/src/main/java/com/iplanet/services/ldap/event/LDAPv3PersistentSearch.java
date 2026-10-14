@@ -75,6 +75,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
     private static final boolean CHANGES_ONLY = true;
     private static final boolean RETURN_CONTROLS = true;
     private static final boolean IS_CRITICAL = true;
+    private static final long ERROR_LOG_INTERVAL = 60000;
     private static final List<String> AD_DEFAULT_ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(
             AD_IS_DELETED_ATTR, AD_WHEN_CHANGED_ATTR, AD_WHEN_CREATED_ATTR));
 
@@ -90,6 +91,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
     private LdapPromise<Result> futureResult;
     private PersistentSearchMode mode;
     private RetryTask retryTask;
+    private volatile long lastErrorLogged = 0;
 
     private enum PersistentSearchMode {
         STANDARD, AD, NONE
@@ -184,6 +186,20 @@ public abstract class LDAPv3PersistentSearch<T, H> {
 
     private void logError(Throwable t) {
         DEBUG.error("An error occurred while trying to initiate persistent search connection", t);
+    }
+
+    /**
+     * Logs a failure of a running or restarting search at most once per {@link #ERROR_LOG_INTERVAL}. A directory that
+     * keeps refusing the search fails it again on every restart, so every retry interval would log it otherwise.
+     */
+    private void logRestartError(String message, Throwable t) {
+        long now = currentTimeMillis();
+        if (now - lastErrorLogged > ERROR_LOG_INTERVAL) {
+            lastErrorLogged = now;
+            DEBUG.error(message, t);
+        } else {
+            DEBUG.message(message, t);
+        }
     }
 
     private void startSearch(Connection conn) throws LdapException {
@@ -376,7 +392,7 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         @Override
         public void handleException(LdapException error) {
             if (!shutdown) {
-                DEBUG.error("An error occurred while executing persistent search", error);
+                logRestartError("An error occurred while executing persistent search", error);
                 DEBUG.message("Restarting persistent search. Some changes may have been missed in the interim.");
                 clearCaches();
                 restartSearch();
@@ -389,7 +405,6 @@ public abstract class LDAPv3PersistentSearch<T, H> {
     private class RetryTask extends GeneralTaskRunnable {
 
         private long runPeriod;
-        private long lastLogged = 0;
 
         public RetryTask() {
             runPeriod = retryInterval;
@@ -412,18 +427,18 @@ public abstract class LDAPv3PersistentSearch<T, H> {
         }
 
         public void run() {
+            //the failure handler may have scheduled this task while the search was being stopped
+            if (shutdown) {
+                runPeriod = -1;
+                return;
+            }
             try {
                 conn = factory.create();
                 startSearch(conn);
-                //everything seems to work, let's disable retryTask and reset the debug limit
+                //everything seems to work, let's disable retryTask
                 runPeriod = -1;
-                lastLogged = 0;
             } catch (DataLayerException | LdapException ex) {
-                long now = currentTimeMillis();
-                if (now - lastLogged > 60000) {
-                    DEBUG.error("Unable to start persistent search: " + ex.getMessage());
-                    lastLogged = now;
-                }
+                logRestartError("Unable to start persistent search: " + ex.getMessage(), null);
                 IOUtils.closeIfNotNull(conn);
             }
         }

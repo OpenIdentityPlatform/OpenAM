@@ -113,6 +113,42 @@ public class CTSDJLDAPv3PersistentSearchTest {
     }
 
     @Test
+    public void shouldRestartSearchWhenDirectoryRefusesSearch() throws Exception {
+        //given
+        pSearch = new CTSDJLDAPv3PersistentSearch(1000, DN.rootDN(), Filter.alwaysFalse(),
+                SearchScope.WHOLE_SUBTREE, mockConnectionFactory);
+        pSearch.addContinuousQueryListener(mock(ContinuousQueryListener.class));
+        PromiseImpl<Result, LdapException> searchResult = PromiseImpl.create();
+        givenDirectoryAcceptsPersistentSearch(searchResult);
+        pSearch.startQuery();
+
+        //when
+        searchResult.handleException(newLdapException(ResultCode.INSUFFICIENT_ACCESS_RIGHTS));
+
+        //then - the access rights may be fixed without restarting AM, so the search keeps being restarted
+        verify(mockConnectionFactory, timeout(5000).times(2)).create();
+    }
+
+    @Test
+    public void shouldInformListenersWhenSearchIsReestablished() throws Exception {
+        //given
+        pSearch = new CTSDJLDAPv3PersistentSearch(1000, DN.rootDN(), Filter.alwaysFalse(),
+                SearchScope.WHOLE_SUBTREE, mockConnectionFactory);
+        ContinuousQueryListener mockListener = mock(ContinuousQueryListener.class);
+        pSearch.addContinuousQueryListener(mockListener);
+        PromiseImpl<Result, LdapException> failedSearch = PromiseImpl.create();
+        givenDirectoryAcceptsPersistentSearch(failedSearch, PromiseImpl.<Result, LdapException>create());
+        pSearch.startQuery();
+
+        //when
+        failedSearch.handleException(newLdapException(ResultCode.UNAVAILABLE));
+
+        //then - one call when the search fails, one when it is re-established
+        verify(mockConnectionFactory, timeout(5000).times(2)).create();
+        verify(mockListener, timeout(5000).times(2)).connectionLost();
+    }
+
+    @Test
     public void shouldNotRestartSearchWhenStopped() throws Exception {
         //given
         pSearch = new CTSDJLDAPv3PersistentSearch(1000, DN.rootDN(), Filter.alwaysFalse(),
@@ -134,12 +170,17 @@ public class CTSDJLDAPv3PersistentSearchTest {
 
     private void givenDirectoryAcceptsPersistentSearch(PromiseImpl<Result, LdapException> searchResult)
             throws Exception {
+        givenDirectoryAcceptsPersistentSearch(searchResult, searchResult);
+    }
+
+    private void givenDirectoryAcceptsPersistentSearch(PromiseImpl<Result, LdapException> firstSearchResult,
+            PromiseImpl<Result, LdapException> laterSearchResult) throws Exception {
         Connection connection = mock(Connection.class);
         given(mockConnectionFactory.create()).willReturn(connection);
         given(connection.searchSingleEntry(any(SearchRequest.class))).willReturn(
                 Responses.newSearchResultEntry("").addAttribute("supportedControl", PersistentSearchRequestControl.OID));
         given(connection.searchAsync(any(SearchRequest.class), any(), any(SearchResultHandler.class)))
-                .willReturn(LdapPromises.asPromise(searchResult));
+                .willReturn(LdapPromises.asPromise(firstSearchResult), LdapPromises.asPromise(laterSearchResult));
     }
 
     @Test
