@@ -267,7 +267,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
     }
 
     @VisibleForTesting
-    protected void authenticateToken(final Subject subject, final byte[] kerberosToken, final Set<String> trustedRealms)
+    void authenticateToken(final Subject subject, final byte[] kerberosToken, final Set<String> trustedRealms)
             throws AuthLoginException, GSSException, Exception {
 
         debug.message("In authenticationToken ...");

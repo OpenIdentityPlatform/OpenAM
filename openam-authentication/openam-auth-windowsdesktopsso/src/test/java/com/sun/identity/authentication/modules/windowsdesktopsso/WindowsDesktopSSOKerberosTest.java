@@ -323,7 +323,7 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         }
 
         @Override
-        protected void authenticateToken(Subject subject, byte[] kerberosToken, Set<String> trustedRealms)
+        void authenticateToken(Subject subject, byte[] kerberosToken, Set<String> trustedRealms)
                 throws Exception {
             if (credentials != null) {
                 credentials.check(subject);
