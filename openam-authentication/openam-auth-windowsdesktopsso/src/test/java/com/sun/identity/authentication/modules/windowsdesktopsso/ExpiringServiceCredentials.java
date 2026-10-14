@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Service credentials that expire once: the first service subject fails as the JDK reports expired credentials.
+ * Service credentials that expire once: the first service subject fails as it would with a GSS provider that reports
+ * expired credentials. The JDK Kerberos provider never does.
  * <p>
  * Not a nested class of the PowerMock test: JDK calls made from there go through reflection into packages
  * the test JVM does not open.
