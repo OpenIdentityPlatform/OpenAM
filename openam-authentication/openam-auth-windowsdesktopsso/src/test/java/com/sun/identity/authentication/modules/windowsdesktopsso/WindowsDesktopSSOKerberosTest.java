@@ -219,6 +219,8 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         AuthLoginException e = expectThrows(AuthLoginException.class,
                 () -> module.process(null, ISAuthConstants.LOGIN_START));
         assertEquals(e.getErrorCode(), "untrustedToken");
+        // The argument is the user principal from the token, not its realm.
+        assertEquals(e.getMessage(), "Kerberos token for " + USER_PRINCIPAL + " is not from a trusted realm.");
         assertNull(module.getPrincipal());
     }
 
