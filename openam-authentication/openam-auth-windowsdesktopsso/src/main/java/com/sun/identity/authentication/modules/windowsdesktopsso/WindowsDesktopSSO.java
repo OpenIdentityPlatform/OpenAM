@@ -232,7 +232,10 @@ public class WindowsDesktopSSO extends AMLoginModule {
                      throw new AuthLoginException(amAuthWindowsDesktopSSO, "auth",  
                               null, e);
               }     
-            }   
+            } else {
+                debug.error("Authentication failed with PrivilegedActionException. Stack Trace", e);
+                throw toAuthLoginException(e);
+            }
        } catch (GSSException e1 ){
            int major = e1.getMajor();
            if (major == GSSException.CREDENTIALS_EXPIRED) {
@@ -359,6 +362,21 @@ public class WindowsDesktopSSO extends AMLoginModule {
          }	 
          return e;	 
      }
+
+    /**
+     * Returns the AuthLoginException that the token check threw inside Subject.doAs, with its error code and
+     * arguments, or wraps any other failure in an "auth" AuthLoginException.
+     *
+     * @param e the exception from the token check, possibly wrapped in PrivilegedActionException(s)
+     * @return the exception for the module to throw
+     */
+    private static AuthLoginException toAuthLoginException(Exception e) {
+        Exception cause = extractException(e);
+        if (cause instanceof AuthLoginException) {
+            return (AuthLoginException) cause;
+        }
+        return new AuthLoginException(amAuthWindowsDesktopSSO, "auth", null, cause);
+    }
 
     /**
      * TODO-JAVADOC
@@ -879,7 +897,8 @@ public class WindowsDesktopSSO extends AMLoginModule {
      * @return the attribute value for the identity searched. Empty string if not found or
      *  null if an error occurs
      */
-    private String searchUserAccount(String attributeValue, String organization) 
+    @VisibleForTesting
+    String searchUserAccount(String attributeValue, String organization) 
             throws AuthLoginException {
 
         String classMethod = "WindowsDesktopSSO.searchUserAccount: ";
