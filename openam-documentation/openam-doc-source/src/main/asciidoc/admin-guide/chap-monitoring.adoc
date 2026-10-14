@@ -392,15 +392,21 @@ The changes takes effect immediately.
 [#log-rotate-debug]
 ==== Rotating Debug Logs
 
-By default OpenAM does not rotate debug logs. To rotate debug logs, edit `WEB-INF/classes/debugconfig.properties` where OpenAM is deployed.
+By default OpenAM does not rotate debug logs. To rotate debug logs, create the file `WEB-INF/classes/debugconfig.properties` where OpenAM is deployed. The OpenAM `.war` file does not include this file.
 --
 The `debugconfig.properties` file includes the following properties:
 
 `org.forgerock.openam.debug.prefix`::
-Specifies the debug log file prefix applied when OpenAM rotates a debug log file. The property has no default. It takes a string as the property value.
+Specifies a prefix that OpenAM adds to the name of each debug log file. The property has no default. It takes a string as the property value.
 
 `org.forgerock.openam.debug.suffix`::
-Specifies the debug log file suffix applied when OpenAM rotates a debug log file. The property takes a `SimpleDateFormat` string. The default is `-MM.dd.yyyy-kk.mm`.
+Specifies a suffix that OpenAM adds to the name of each debug log file when rotation is enabled. The suffix is the creation time of the file, formatted with a `SimpleDateFormat` pattern, so every rotation starts a file with a new name. The property has no default. It is required when rotation is enabled.
++
+The pattern must be fine-grained enough for the rotation in use:
++
+* For rotation based on time, the suffix must change at every interval. For example, `-yyyy.MM.dd-HH` is valid for an interval of 60 minutes, but not for an interval of 1 minute.
+
+* For rotation based on log file size, the suffix must include milliseconds (`SSS`), for example `-yyyy.MM.dd-HH.mm.ss.SSS`, because a file can reach its maximum size at any time.
 
 `org.forgerock.openam.debug.rotation`::
 Specifies an interval in minutes between debug log rotations. Set this to a value greater than zero to enable debug log rotation based on time passed.
@@ -409,7 +415,31 @@ Specifies an interval in minutes between debug log rotations. Set this to a valu
 Specifies a maximum log file size in megabytes between debug log rotations. Set this to a value greater than zero to enable debug log rotation based on log file size.
 
 --
-Changes to properties in the `debugconfig.properties` file take effect immediately. You do not need to restart OpenAM or the container in which it runs for the changes to take effect.
+You can enable both kinds of rotation at once. The following example starts a new debug log file every 24 hours, or earlier when the current file reaches 100 MB:
+
+[source, properties]
+----
+org.forgerock.openam.debug.prefix=
+org.forgerock.openam.debug.suffix=-yyyy.MM.dd-HH.mm.ss.SSS
+org.forgerock.openam.debug.rotation=1440
+org.forgerock.openam.debug.rotation.maxsize=100
+----
+With this configuration, OpenAM writes the `Authentication` debug log to files such as `Authentication-2026.10.14-09.27.33.123`. The prefix and the suffix also apply to the file that OpenAM is currently writing to, not only to the rotated files.
+
+OpenAM reads the `debugconfig.properties` file once, at startup. After you change the file, restart OpenAM or the container in which it runs for the changes to take effect.
+
+If rotation is enabled with an empty suffix, or with a suffix that does not match the rotation settings, OpenAM ignores the whole file and does not rotate debug logs at all. In that case OpenAM writes a message such as the following to the standard error output of the container, for example `catalina.out` for Apache Tomcat:
+
+[source, console]
+----
+DebugConfiguration:10/14/2026 09:27:33:123 AM UTC: Thread[...]
+'/debugconfig.properties' isn't valid, the default configuration will be used instead: This suffix '-yyyy.MM.dd-HH.mm' isn't compatible with the file size rotation enable.
+----
+
+[NOTE]
+====
+OpenAM does not delete rotated debug log files. Rotation keeps each file at a manageable size, but it does not limit the disk space used by debug logs. Use an external tool, such as `logrotate` or a scheduled job, to remove old debug log files.
+====
 
 
 
