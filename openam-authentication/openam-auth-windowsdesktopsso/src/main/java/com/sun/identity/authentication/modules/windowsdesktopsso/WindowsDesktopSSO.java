@@ -224,8 +224,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
                      }
                  } catch (Exception ee) {   
                        debug.error("Authentication failed with new cred.Stack Trace", ee); 
-                       throw new AuthLoginException(amAuthWindowsDesktopSSO,    
-                                "auth", null, ee);  
+                       throw toAuthLoginException(ee);
                 }   
               } else {  
                      debug.error("Authentication failed with PrivilegedActionException wrapped GSSException. Stack Trace", e);  
@@ -250,8 +249,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
                    }
                } catch (Exception ee) {
                        debug.error("Authentication failed with new cred. Stack Trace", ee);
-                       throw new AuthLoginException(amAuthWindowsDesktopSSO, 
-                       "auth", null, ee);
+                       throw toAuthLoginException(ee);
                }
            } else {
                debug.error("Authentication failed with GSSException. Stack Trace", e1);

@@ -178,7 +178,7 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         TestModule first = newModule("cache-failed-" + shape, negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), untrusted);
         first.credentials = credentials;
         AuthLoginException e = expectThrows(AuthLoginException.class, () -> processAtServerDebugLevel(first));
-        assertEquals(e.getErrorCode(), "auth");
+        assertEquals(e.getErrorCode(), "untrustedToken");
         assertEquals(first.serviceLogins, 2);
         Subject renewed = credentials.lastUsed();
 
