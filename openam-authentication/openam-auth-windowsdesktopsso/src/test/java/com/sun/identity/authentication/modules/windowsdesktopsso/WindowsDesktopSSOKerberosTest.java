@@ -168,6 +168,26 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         assertSame(credentials.lastUsed(), renewed);
     }
 
+    @Test(dataProvider = "expiredCredentials")
+    public void renewedServiceLoginIsCachedWhenRetriedTokenFails(String shape, boolean wrapped) throws Exception {
+        ExpiringServiceCredentials credentials = new ExpiringServiceCredentials(wrapped);
+        Map<String, Object> untrusted = options();
+        untrusted.put(ATTR_PREFIX + "kerberos-realms-trusted", Collections.singleton("OTHER.COM"));
+        TestModule first = newModule("cache-failed-" + shape, negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), untrusted);
+        first.credentials = credentials;
+        AuthLoginException e = expectThrows(AuthLoginException.class, () -> processAtServerDebugLevel(first));
+        assertEquals(e.getErrorCode(), "auth");
+        assertEquals(first.serviceLogins, 2);
+        Subject renewed = credentials.lastUsed();
+
+        // The retried check failed on the realm, after the renewed service login: the next request must reuse it.
+        TestModule second = newModule("cache-failed-" + shape, negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options());
+        second.credentials = credentials;
+        assertEquals(processAtServerDebugLevel(second), ISAuthConstants.LOGIN_SUCCEED);
+        assertEquals(second.serviceLogins, 0, "a failed retry should leave the renewed service login cached");
+        assertSame(credentials.lastUsed(), renewed);
+    }
+
     @Test
     public void returnRealmKeepsRealmInUserName() throws Exception {
         Map<String, Object> options = options();
