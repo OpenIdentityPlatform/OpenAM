@@ -392,7 +392,7 @@ The changes takes effect immediately.
 [#log-rotate-debug]
 ==== Rotating Debug Logs
 
-By default OpenAM does not rotate debug logs. To rotate debug logs, create the file `WEB-INF/classes/debugconfig.properties` where OpenAM is deployed. The OpenAM `.war` file does not include this file.
+By default OpenAM does not rotate debug logs. To rotate debug logs, edit the file `WEB-INF/classes/debugconfig.properties` where OpenAM is deployed. The file shipped with OpenAM sets the prefix, the suffix and the rotation interval to empty values, and has no `org.forgerock.openam.debug.rotation.maxsize` line. Add that line to enable rotation based on log file size.
 --
 The `debugconfig.properties` file includes the following properties:
 
@@ -400,7 +400,7 @@ The `debugconfig.properties` file includes the following properties:
 Specifies a prefix that OpenAM adds to the name of each debug log file. The property has no default. It takes a string as the property value.
 
 `org.forgerock.openam.debug.suffix`::
-Specifies a suffix that OpenAM adds to the name of each debug log file when rotation is enabled. The suffix is the creation time of the file, formatted with a `SimpleDateFormat` pattern, so every rotation starts a file with a new name. The property has no default. It is required when rotation is enabled.
+Specifies a suffix that OpenAM adds to the name of each debug log file when rotation is enabled. The suffix is the creation time of the file, formatted with a `SimpleDateFormat` pattern, so every rotation starts a file with a new name. The property has no default. It is required when rotation is enabled. Keep the `org.forgerock.openam.debug.suffix` line in the file even when rotation is disabled; leave its value empty in that case.
 +
 The pattern must be fine-grained enough for the rotation in use:
 +
@@ -409,10 +409,10 @@ The pattern must be fine-grained enough for the rotation in use:
 * For rotation based on log file size, the suffix must include milliseconds (`SSS`), for example `-yyyy.MM.dd-HH.mm.ss.SSS`, because a file can reach its maximum size at any time.
 
 `org.forgerock.openam.debug.rotation`::
-Specifies an interval in minutes between debug log rotations. Set this to a value greater than zero to enable debug log rotation based on time passed.
+Specifies an interval in minutes between debug log rotations. Set this to a value greater than zero to enable debug log rotation based on time passed. To disable it, leave the value empty. Zero and negative values are not valid.
 
 `org.forgerock.openam.debug.rotation.maxsize`::
-Specifies a maximum log file size in megabytes between debug log rotations. Set this to a value greater than zero to enable debug log rotation based on log file size.
+Specifies a maximum log file size in megabytes between debug log rotations. Set this to a value greater than zero to enable debug log rotation based on log file size. To disable it, leave the value empty or remove the line. Zero and negative values are not valid.
 
 --
 You can enable both kinds of rotation at once. The following example starts a new debug log file every 24 hours, or earlier when the current file reaches 100 MB:
@@ -428,13 +428,14 @@ With this configuration, OpenAM writes the `Authentication` debug log to files s
 
 OpenAM reads the `debugconfig.properties` file once, at startup. After you change the file, restart OpenAM or the container in which it runs for the changes to take effect.
 
-If rotation is enabled with an empty suffix, or with a suffix that does not match the rotation settings, OpenAM ignores the whole file and does not rotate debug logs at all. In that case OpenAM writes a message such as the following to the standard error output of the container, for example `catalina.out` for Apache Tomcat:
+If rotation is enabled with an empty suffix, with a suffix that OpenAM detects as too coarse for the rotation settings, or with a suffix pattern that OpenAM cannot parse, or if a rotation property is set to zero, OpenAM ignores the whole file, including the prefix, and does not rotate debug logs at all. In that case OpenAM writes a message such as the following to the standard error output of the container, for example `catalina.out` for Apache Tomcat:
 
 [source, console]
 ----
 DebugConfiguration:10/14/2026 09:27:33:123 AM UTC: Thread[...]
 '/debugconfig.properties' isn't valid, the default configuration will be used instead: This suffix '-yyyy.MM.dd-HH.mm' isn't compatible with the file size rotation enable.
 ----
+OpenAM checks the suffix against a single rotation interval, in the time zone of the server, so it does not detect every suffix that is too coarse. If OpenAM accepts a suffix that does not change at every interval, two consecutive intervals get the same file name, and OpenAM appends the second interval to the file of the first one. Follow the rules for the suffix described above.
 
 [NOTE]
 ====
