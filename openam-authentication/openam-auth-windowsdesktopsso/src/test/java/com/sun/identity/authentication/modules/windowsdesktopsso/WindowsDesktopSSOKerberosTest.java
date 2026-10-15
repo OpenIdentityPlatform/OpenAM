@@ -35,6 +35,8 @@ import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
 import java.io.File;
+import java.io.IOException;
+import java.security.PrivilegedActionException;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -176,7 +178,7 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         TestModule first = newModule("cache-failed-" + shape, negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), untrusted);
         first.credentials = credentials;
         AuthLoginException e = expectThrows(AuthLoginException.class, () -> processAtServerDebugLevel(first));
-        assertEquals(e.getErrorCode(), "auth");
+        assertEquals(e.getErrorCode(), "untrustedToken");
         assertEquals(first.serviceLogins, 2);
         Subject renewed = credentials.lastUsed();
 
@@ -209,18 +211,53 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
     }
 
     @Test
-    public void tokenFromUntrustedRealmDoesNotLogUserIn() throws Exception {
+    public void tokenFromUntrustedRealmIsRejected() throws Exception {
         Map<String, Object> options = options();
         options.put(ATTR_PREFIX + "kerberos-realms-trusted", Collections.singleton("OTHER.COM"));
         TestModule module = newModule("untrustedRealm", negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options);
 
-        // #1174: the "untrustedToken" AuthLoginException is thrown inside Subject.doAs, and process() rethrows only a
-        // wrapped GSSException, so the module ignores the token instead of failing. Once #1174 is fixed this turns
-        // red: expect an AuthLoginException with the "untrustedToken" error code instead.
-        assertEquals(module.process(null, ISAuthConstants.LOGIN_START), ISAuthConstants.LOGIN_IGNORE,
-                "the module ignores an untrusted token instead of failing: "
-                        + "https://github.com/OpenIdentityPlatform/OpenAM/issues/1174");
+        AuthLoginException e = expectThrows(AuthLoginException.class,
+                () -> module.process(null, ISAuthConstants.LOGIN_START));
+        assertEquals(e.getErrorCode(), "untrustedToken");
+        // The argument is the user principal from the token, not its realm.
+        assertEquals(e.getMessage(), "Kerberos token for " + USER_PRINCIPAL + " is not from a trusted realm.");
         assertNull(module.getPrincipal());
+    }
+
+    @Test
+    public void tokenForKnownUserLogsUserIn() throws Exception {
+        Map<String, Object> options = options();
+        options.put(ATTR_PREFIX + "lookupUserInRealm", Collections.singleton("true"));
+        TestModule module = newModule("knownUser", negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options);
+        module.knownUser = USER;
+
+        assertEquals(module.process(null, ISAuthConstants.LOGIN_START), ISAuthConstants.LOGIN_SUCCEED);
+        assertEquals(module.getPrincipal().getName(), USER);
+    }
+
+    @Test
+    public void tokenForUnknownUserIsRejected() throws Exception {
+        Map<String, Object> options = options();
+        options.put(ATTR_PREFIX + "lookupUserInRealm", Collections.singleton("true"));
+        TestModule module = newModule("unknownUser", negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options);
+
+        AuthLoginException e = expectThrows(AuthLoginException.class,
+                () -> module.process(null, ISAuthConstants.LOGIN_START));
+        assertEquals(e.getErrorCode(), "notfound");
+        assertEquals(e.getMessageArgs(), new Object[] {USER, "/"});
+        assertNull(module.getPrincipal());
+    }
+
+    @Test
+    public void unexpectedFailureInTokenCheckIsRejected() throws Exception {
+        TestModule module = newModule("unexpectedFailure", negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options());
+        IOException failure = new IOException("token check failed");
+        module.tokenCheckFailure = failure;
+
+        AuthLoginException e = expectThrows(AuthLoginException.class,
+                () -> module.process(null, ISAuthConstants.LOGIN_START));
+        assertEquals(e.getErrorCode(), "auth");
+        assertSame(e.getCause(), failure);
     }
 
     @Test
@@ -294,6 +331,10 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         private int serviceLogins;
         // Null: the service credentials never expire.
         private ExpiringServiceCredentials credentials;
+        // Null: the token check runs; otherwise it fails as Subject.doAs reports a checked exception.
+        private Exception tokenCheckFailure;
+        // Null: the identity store has no users; otherwise the only user that the search finds.
+        private String knownUser;
 
         TestModule(HttpServletRequest request) {
             this.request = request;
@@ -322,9 +363,18 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
             serviceLogins++;
         }
 
+        /** No identity store in this test: finds only the known user and, as the module does, returns the value. */
+        @Override
+        String searchUserAccount(String attributeValue, String organization) {
+            return attributeValue.equals(knownUser) ? attributeValue : null;
+        }
+
         @Override
         void authenticateToken(Subject subject, byte[] kerberosToken, Set<String> trustedRealms)
                 throws Exception {
+            if (tokenCheckFailure != null) {
+                throw new PrivilegedActionException(tokenCheckFailure);
+            }
             if (credentials != null) {
                 credentials.check(subject);
             }
