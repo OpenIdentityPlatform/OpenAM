@@ -25,7 +25,7 @@
  * $Id: Wizard.java,v 1.27 2009/01/17 02:05:35 kevinserwin Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.config.wizard;
@@ -35,10 +35,10 @@ import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.openidentityplatform.openam.click.control.ActionLink;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.ProtectedPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.AMSetupUtils;
 import com.sun.identity.setup.ConfiguratorException;
@@ -47,37 +47,42 @@ import com.sun.identity.setup.HttpServletResponseWrapper;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
 
-public class Wizard extends ProtectedPage implements Constants {
+public class Wizard extends ProtectedSetupPage implements Constants {
 
     public int startingTab = 1;
 
-    public ActionLink createConfigLink = 
-        new ActionLink("createConfig", this, "createConfig" );
-    public ActionLink testUrlLink = 
-        new ActionLink("testNewInstanceUrl", this, "testNewInstanceUrl" );
-    public ActionLink pushConfigLink = 
-        new ActionLink("pushConfig", this, "pushConfig" );
-    
     private String cookieDomain = null;
-    private String hostName = getHostName();
+    private String hostName;
     private String dataStore = SetupConstants.SMS_EMBED_DATASTORE;
-    
+
     public static String defaultUserName = "cn=Directory Manager";
     public static String defaultPassword = "";
     public static String defaultRootSuffix = DEFAULT_ROOT_SUFFIX;
 
-    public String defaultPort = Integer.toString(
-            AMSetupUtils.getFirstUnusedPort(hostName, 50389, 1000));
-    public String defaultAdminPort = Integer.toString(
-            AMSetupUtils.getFirstUnusedPort(hostName, 4444, 1000));
-    public String defaultJmxPort = Integer.toString(
-            AMSetupUtils.getFirstUnusedPort(hostName, 1689, 1000));
-    
+    public String defaultPort;
+    public String defaultAdminPort;
+    public String defaultJmxPort;
+
+    @Override
+    public void onInit() {
+        super.onInit();
+        // The old Click Wizard computed these in eager field initializers, which ran fine there
+        // because Click binds Context.getThreadLocalContext() before constructing the page.
+        // ConfiguratorContext is only attached after construction here (see ConfiguratorServlet),
+        // so the same "recompute on every request" behavior moves to onInit(), which runs
+        // unconditionally before both render and action dispatch.
+        hostName = getHostName();
+        defaultPort = Integer.toString(AMSetupUtils.getFirstUnusedPort(hostName, 50389, 1000));
+        defaultAdminPort = Integer.toString(AMSetupUtils.getFirstUnusedPort(hostName, 4444, 1000));
+        defaultJmxPort = Integer.toString(AMSetupUtils.getFirstUnusedPort(hostName, 1689, 1000));
+    }
+
     /**
-     * This is the 'execute' operation for the entire wizard.  This method 
-     * aggregates all data submitted across the wizard pages here in one lump 
+     * This is the 'execute' operation for the entire wizard.  This method
+     * aggregates all data submitted across the wizard pages here in one lump
      * and hands it off to the back-end for processing.
      */
+    @ConfiguratorAction
     public boolean createConfig() {
         HttpServletRequest req = getContext().getRequest();
         
@@ -302,10 +307,8 @@ public class Wizard extends ProtectedPage implements Constants {
         } catch (ConfiguratorException cfe) {
             writeToResponse(cfe.getMessage());
         }
-        
-        setPath(null);
+
         return false;
     }
-
 
 }
