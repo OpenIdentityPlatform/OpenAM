@@ -428,7 +428,7 @@ With this configuration, OpenAM writes the `Authentication` debug log to files s
 
 OpenAM reads the `debugconfig.properties` file once, at startup. After you change the file, restart OpenAM or the container in which it runs for the changes to take effect.
 
-If rotation is enabled with an empty suffix, with a suffix that OpenAM detects as too coarse for the rotation settings, or with a suffix pattern that OpenAM cannot parse, or if a rotation property is set to zero, OpenAM ignores the whole file, including the prefix, and does not rotate debug logs at all. In that case OpenAM writes a message such as the following to the standard error output of the container, for example `catalina.out` for Apache Tomcat:
+If rotation is enabled with an empty suffix, with a suffix that OpenAM detects as too coarse for the rotation settings, or with a suffix pattern that OpenAM cannot parse, or if a rotation property is set to zero or a negative value, OpenAM ignores the whole file, including the prefix, and does not rotate debug logs at all. In that case OpenAM writes a message such as the following to the standard error output of the container, for example `catalina.out` for Apache Tomcat:
 
 [source, console]
 ----
