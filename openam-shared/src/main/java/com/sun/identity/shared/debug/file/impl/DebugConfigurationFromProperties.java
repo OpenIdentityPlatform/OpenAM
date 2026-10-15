@@ -68,7 +68,7 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
                     int maxFileSizeInMb = Integer.parseInt(maxFileSizedInMb);
                     if (maxFileSizeInMb <= 0) {
                         throw new InvalidDebugConfigurationException("File size rotation needs to be greater than " +
-                                "zero. File size rotation = '" + maxFileSizeInMb + "'. Leave the value empty to " +
+                                "zero. File size rotation = '" + maxFileSizeInMb + "' MB. Leave the value empty to " +
                                 "disable file size rotation.", null);
                     }
                     //Convert MaxFileSize to byte

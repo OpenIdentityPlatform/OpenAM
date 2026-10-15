@@ -172,8 +172,8 @@ public class DebugConfigurationFromPropertiesTest {
     }
 
     @Test(expectedExceptions = InvalidDebugConfigurationException.class,
-            expectedExceptionsMessageRegExp = "File size rotation needs to be greater than zero\\. .*\\. "
-                    + "Leave the value empty to disable file size rotation\\.")
+            expectedExceptionsMessageRegExp = "File size rotation needs to be greater than zero\\. "
+                    + "File size rotation = '-2' MB\\. Leave the value empty to disable file size rotation\\.")
     public void negativeSizeRotation() throws Exception {
         new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/negativeSizeRotation.properties");
     }
