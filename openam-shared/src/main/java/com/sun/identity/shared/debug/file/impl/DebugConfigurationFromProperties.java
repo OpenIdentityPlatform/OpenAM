@@ -68,7 +68,8 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
                     int maxFileSizeInMb = Integer.parseInt(maxFileSizedInMb);
                     if (maxFileSizeInMb <= 0) {
                         throw new InvalidDebugConfigurationException("File size rotation needs to be greater than " +
-                                "zero. File size rotation = '" + maxFileSizeInMb + "'", null);
+                                "zero. File size rotation = '" + maxFileSizeInMb + "'. Leave the value empty to " +
+                                "disable file size rotation.", null);
                     }
                     //Convert MaxFileSize to byte
                     maxFileSizeInByte = (long) maxFileSizeInMb << 20;
@@ -87,7 +88,8 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
                     int interval = Integer.parseInt(rotation);
                     if (interval <= 0) {
                         throw new InvalidDebugConfigurationException("Rotation interval needs to be greater than " +
-                                "zero. rotationInterval = '" + interval + "'", null);
+                                "zero. rotationInterval = '" + interval + "'. Leave the value empty to disable time " +
+                                "rotation.", null);
                     }
                     rotationInterval = interval;
                 } catch (NumberFormatException e) {

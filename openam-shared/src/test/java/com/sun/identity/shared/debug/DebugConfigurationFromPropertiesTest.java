@@ -90,6 +90,13 @@ public class DebugConfigurationFromPropertiesTest {
     }
 
     @Test
+    public void largeSizeRotation() throws Exception {
+        DebugConfigurationFromProperties debugConfigurationFromProperties = new DebugConfigurationFromProperties
+                (DEBUG_CONFIG_DIRECTORY + "valid/largeSizeRotation.properties");
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), 2048L << 20);
+    }
+
+    @Test
     public void noPrefixAndSuffixLines() throws Exception {
         DebugConfigurationFromProperties debugConfigurationFromProperties = new DebugConfigurationFromProperties
                 (DEBUG_CONFIG_DIRECTORY + "valid/noPrefixAndSuffixLines.properties");
@@ -129,15 +136,24 @@ public class DebugConfigurationFromPropertiesTest {
     }
 
     @Test(expectedExceptions = InvalidDebugConfigurationException.class,
-            expectedExceptionsMessageRegExp = "Rotation interval needs to be greater than zero\\. .*")
+            expectedExceptionsMessageRegExp = "Rotation interval needs to be greater than zero\\. .*\\. "
+                    + "Leave the value empty to disable time rotation\\.")
     public void negativeRotation() throws Exception {
         new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/negativeTimeRotation.properties");
     }
 
     @Test(expectedExceptions = InvalidDebugConfigurationException.class,
-            expectedExceptionsMessageRegExp = "Rotation interval needs to be greater than zero\\. .*")
+            expectedExceptionsMessageRegExp = "Rotation interval needs to be greater than zero\\. .*\\. "
+                    + "Leave the value empty to disable time rotation\\.")
     public void minusOneRotation() throws Exception {
         new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/minusOneTimeRotation.properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Rotation interval needs to be greater than zero\\. .*\\. "
+                    + "Leave the value empty to disable time rotation\\.")
+    public void zeroRotation() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/zeroTimeRotation.properties");
     }
 
     @Test(expectedExceptions = InvalidDebugConfigurationException.class,
@@ -156,9 +172,17 @@ public class DebugConfigurationFromPropertiesTest {
     }
 
     @Test(expectedExceptions = InvalidDebugConfigurationException.class,
-            expectedExceptionsMessageRegExp = "File size rotation needs to be greater than zero\\. .*")
+            expectedExceptionsMessageRegExp = "File size rotation needs to be greater than zero\\. .*\\. "
+                    + "Leave the value empty to disable file size rotation\\.")
     public void negativeSizeRotation() throws Exception {
         new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/negativeSizeRotation.properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "File size rotation needs to be greater than zero\\. .*\\. "
+                    + "Leave the value empty to disable file size rotation\\.")
+    public void zeroSizeRotation() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/zeroSizeRotation.properties");
     }
 
     @Test(expectedExceptions = InvalidDebugConfigurationException.class,
