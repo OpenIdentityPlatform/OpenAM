@@ -892,8 +892,9 @@ public class WindowsDesktopSSO extends AMLoginModule {
      *  identity in the organization
      * @param organization organization or the organization name where the identity will be
      *  looked up
-     * @return the attribute value for the identity searched. Empty string if not found or
-     *  null if an error occurs
+     * @return the attribute value for the identity searched, or null if no identity is found
+     * @throws AuthLoginException if the alias search attribute names cannot be read, or the search fails with an
+     *  identity repository ("idRepoSearch") or SSO ("ssoSearch") error
      */
     @VisibleForTesting
     String searchUserAccount(String attributeValue, String organization) 

@@ -225,6 +225,17 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
     }
 
     @Test
+    public void tokenForKnownUserLogsUserIn() throws Exception {
+        Map<String, Object> options = options();
+        options.put(ATTR_PREFIX + "lookupUserInRealm", Collections.singleton("true"));
+        TestModule module = newModule("knownUser", negotiate(SERVICE_PRINCIPAL, SPNEGO_MECH), options);
+        module.knownUser = USER;
+
+        assertEquals(module.process(null, ISAuthConstants.LOGIN_START), ISAuthConstants.LOGIN_SUCCEED);
+        assertEquals(module.getPrincipal().getName(), USER);
+    }
+
+    @Test
     public void tokenForUnknownUserIsRejected() throws Exception {
         Map<String, Object> options = options();
         options.put(ATTR_PREFIX + "lookupUserInRealm", Collections.singleton("true"));
@@ -322,6 +333,8 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
         private ExpiringServiceCredentials credentials;
         // Null: the token check runs; otherwise it fails as Subject.doAs reports a checked exception.
         private Exception tokenCheckFailure;
+        // Null: the identity store has no users; otherwise the only user that the search finds.
+        private String knownUser;
 
         TestModule(HttpServletRequest request) {
             this.request = request;
@@ -350,10 +363,10 @@ public class WindowsDesktopSSOKerberosTest extends PowerMockTestCase {
             serviceLogins++;
         }
 
-        /** No identity store in this test: every user is unknown. */
+        /** No identity store in this test: finds only the known user and, as the module does, returns the value. */
         @Override
         String searchUserAccount(String attributeValue, String organization) {
-            return null;
+            return attributeValue.equals(knownUser) ? attributeValue : null;
         }
 
         @Override
