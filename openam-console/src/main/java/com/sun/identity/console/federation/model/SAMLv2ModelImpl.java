@@ -75,7 +75,7 @@ import com.sun.identity.saml2.jaxb.metadata.AffiliationDescriptorType;
 import com.sun.identity.saml2.jaxb.entityconfig.AffiliationConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.EncryptionMethodElement;
-import com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType;
+import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.console.federation.SAMLv2AuthContexts;
 import jakarta.xml.bind.JAXBElement;
@@ -91,7 +91,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.math.BigInteger;
 
 public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     private SAML2MetaManager metaManager;
@@ -1725,21 +1724,8 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                             EncryptionMethodElement encrptElement = 
                             (EncryptionMethodElement)encryptMethod.get(0);
                             String alg = encrptElement.getValue().getAlgorithm();
-                            String size = null;
-                            List keySizeList = encrptElement.getValue().getContent();
-                            if (!keySizeList.isEmpty()) {
-                                for (Iterator itt = keySizeList.listIterator(); 
-                                    itt.hasNext(); ) { 
-                                    Object encrptType = (Object)itt.next();
-                                    if (encrptType instanceof EncryptionMethodType.KeySize) {
-                                        EncryptionMethodType.KeySize keysizeElem =
-                                            (EncryptionMethodType.KeySize)
-                                                encrptType;
-                                        BigInteger keysize = keysizeElem.getValue();
-                                        size = Integer.toString(keysize.intValue());
-                                    }
-                                }
-                            }           
+                            int keySize = KeyUtil.getKeySize(encrptElement.getValue());
+                            String size = (keySize == 0) ? null : Integer.toString(keySize);
 
                             map.put(TF_KEY_NAME, 
                                 returnEmptySetIfValueIsNull(size));

@@ -24,15 +24,23 @@ import com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorType;
+import com.sun.identity.shared.xml.XMLUtils;
 import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class SAML2MetaUtilsTest {
@@ -135,6 +143,96 @@ public class SAML2MetaUtilsTest {
                 assertFalse(Boolean.TRUE.equals(acs.getValue().isIsDefault()));
             }
         }
+    }
+
+    /**
+     * Export rewrites query:AttributeQueryDescriptor into an unprefixed RoleDescriptor, which is a
+     * metadata element only while the metadata namespace is the default namespace of the document.
+     */
+    @Test
+    public void attributeQueryDescriptorSurvivesExportAndImport() throws Exception {
+        String metadata = "<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\""
+                + " entityID=\"https://sp.example.com/openam\">"
+                + "<SPSSODescriptor protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">"
+                + "<AssertionConsumerService index=\"0\" Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\""
+                + " Location=\"https://sp.example.com/openam/Consumer/metaAlias/sp\"/>"
+                + "</SPSSODescriptor>"
+                + "<query:AttributeQueryDescriptor xmlns:query=\"urn:oasis:names:tc:SAML:metadata:ext:query\""
+                + " protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">"
+                + "<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>"
+                + "</query:AttributeQueryDescriptor>"
+                + "</EntityDescriptor>";
+        Object descriptor = SAML2MetaUtils.convertStringToJAXB(metadata);
+
+        String exported = SAML2MetaUtils.workaroundAbstractRoleDescriptor(
+                SAML2MetaUtils.convertJAXBToString(descriptor));
+
+        Document doc = XMLUtils.toDOMDocument(exported, SAML2MetaUtils.debug);
+        NodeList roles = doc.getElementsByTagNameNS("*", "RoleDescriptor");
+        assertEquals(roles.getLength(), 1);
+        assertEquals(roles.item(0).getNamespaceURI(), SAML2MetaConstants.NS_METADATA);
+        EntityDescriptorElement imported = SAML2MetaUtils.getEntityDescriptorElement(exported);
+        assertNotNull(SAML2MetaUtils.getAttributeQueryDescriptor(imported));
+    }
+
+    /**
+     * The JAXB 1 runtime declared the query prefix on the AttributeQueryDescriptor element itself, and
+     * declaring it a second time there would make the export malformed.
+     */
+    @Test
+    public void exportKeepsQueryPrefixDeclaredOnTheElement() throws Exception {
+        String exported = SAML2MetaUtils.workaroundAbstractRoleDescriptor(
+                "<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"x\">"
+                + "<query:AttributeQueryDescriptor xmlns:query=\"urn:oasis:names:tc:SAML:metadata:ext:query\""
+                + " protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">"
+                + "<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>"
+                + "</query:AttributeQueryDescriptor></EntityDescriptor>");
+
+        Document doc = XMLUtils.toDOMDocument(exported, SAML2MetaUtils.debug);
+        assertNotNull(doc);
+        assertEquals(doc.getElementsByTagNameNS(SAML2MetaConstants.NS_METADATA, "RoleDescriptor").getLength(), 1);
+    }
+
+    /**
+     * CreateFedlet.flipHostedParameter looks for "<EntityConfig " in the marshalled entity config,
+     * so the root element must stay unprefixed.
+     */
+    @Test
+    public void marshalledEntityConfigRootIsUnprefixed() throws Exception {
+        Object config;
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("idp-extended.xml")) {
+            config = SAML2MetaUtils.convertInputStreamToJAXB(is);
+        }
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        SAML2MetaUtils.convertJAXBToOutputStream(config, os);
+
+        for (String xml : new String[] {SAML2MetaUtils.convertJAXBToString(config),
+                os.toString(StandardCharsets.UTF_8.name())}) {
+            Element root = XMLUtils.toDOMDocument(xml, SAML2MetaUtils.debug).getDocumentElement();
+            assertNull(root.getPrefix());
+            assertEquals(root.getLocalName(), "EntityConfig");
+            assertTrue(xml.contains("<EntityConfig "));
+        }
+    }
+
+    /**
+     * The JAXB 1 runtime rejected metadata with an unexpected element; JAXB 3 drops the element
+     * unless the unmarshaller fails on errors. Here the signing KeyDescriptor is in the wrong namespace.
+     */
+    @Test
+    public void unexpectedElementIsRejected() throws Exception {
+        final String metadata = "<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"x\">"
+                + "<SPSSODescriptor protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">"
+                + "<md:KeyDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata:wrong\" use=\"signing\"/>"
+                + "<AssertionConsumerService index=\"0\" Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\""
+                + " Location=\"https://sp.example.com/acs\"/>"
+                + "</SPSSODescriptor></EntityDescriptor>";
+
+        expectThrows(JAXBException.class, () -> SAML2MetaUtils.convertStringToJAXB(metadata));
+        expectThrows(JAXBException.class, () -> SAML2MetaUtils.convertInputStreamToJAXB(
+                new ByteArrayInputStream(metadata.getBytes(StandardCharsets.UTF_8))));
+        expectThrows(JAXBException.class, () -> SAML2MetaUtils.convertNodeToJAXB(
+                XMLUtils.toDOMDocument(metadata, SAML2MetaUtils.debug)));
     }
 
 }

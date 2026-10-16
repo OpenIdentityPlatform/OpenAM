@@ -47,6 +47,8 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.ValidationEvent;
+import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -94,8 +96,6 @@ public final class SAML2MetaUtils {
     private static final String PROP_NAMESPACE_PREFIX_MAPPER =
                                     "org.glassfish.jaxb.namespacePrefixMapper";
 
-    private static NamespacePrefixMapperImpl nsPrefixMapper =
-                                            new NamespacePrefixMapperImpl();
     static String jaxbPackages = null;
 
     static {
@@ -143,6 +143,30 @@ public final class SAML2MetaUtils {
     }
 
     /**
+     * Creates an unmarshaller that fails on the first error. The JAXB 3 runtime otherwise recovers
+     * from errors such as an unexpected element by dropping the element, where the JAXB 1 runtime
+     * rejected the document.
+     */
+    private static Unmarshaller createUnmarshaller() throws JAXBException {
+        Unmarshaller u = jaxbContext.createUnmarshaller();
+        u.setEventHandler(event -> event.getSeverity() == ValidationEvent.WARNING);
+        return u;
+    }
+
+    /**
+     * Creates a marshaller that writes formatted XML with the namespace of the marshalled element as
+     * the default namespace, as the JAXB 1 runtime did.
+     */
+    private static Marshaller createMarshaller(Object jaxbObj) throws JAXBException {
+        QName name = jaxbContext.createJAXBIntrospector().getElementName(jaxbObj);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(PROP_JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.setProperty(PROP_NAMESPACE_PREFIX_MAPPER,
+            new NamespacePrefixMapperImpl(name == null ? null : name.getNamespaceURI()));
+        return marshaller;
+    }
+
+    /**
      * Converts a <code>String</code> object to a JAXB object.
      * @param str a <code>String</code> object
      * @return a JAXB object converted from the <code>String</code> object.
@@ -152,7 +176,7 @@ public final class SAML2MetaUtils {
     public static Object convertStringToJAXB(String str)
         throws JAXBException {
 
-       Unmarshaller u = jaxbContext.createUnmarshaller();
+       Unmarshaller u = createUnmarshaller();
        return u.unmarshal(XMLUtils.createSAXSource(new InputSource(new StringReader(str))));
     }
 
@@ -166,7 +190,7 @@ public final class SAML2MetaUtils {
     public static Object convertInputStreamToJAXB(InputStream is)
         throws JAXBException {
 
-       Unmarshaller u = jaxbContext.createUnmarshaller();
+       Unmarshaller u = createUnmarshaller();
        return u.unmarshal(XMLUtils.createSAXSource(new InputSource(is)));
     }
 
@@ -180,7 +204,7 @@ public final class SAML2MetaUtils {
     public static Object convertNodeToJAXB(Node node)
         throws JAXBException {
 
-       Unmarshaller u = jaxbContext.createUnmarshaller();
+       Unmarshaller u = createUnmarshaller();
        //no need to get SAXSource, since the node is already created by using
        //a secure XML parser
        return u.unmarshal(node);
@@ -196,10 +220,7 @@ public final class SAML2MetaUtils {
         throws JAXBException {
 
         StringWriter sw = new StringWriter();
-        Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(PROP_JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.setProperty(PROP_NAMESPACE_PREFIX_MAPPER, nsPrefixMapper);
-        marshaller.marshal(jaxbObj, sw);
+        createMarshaller(jaxbObj).marshal(jaxbObj, sw);
         return sw.toString();
     }
 
@@ -213,10 +234,7 @@ public final class SAML2MetaUtils {
                                                  OutputStream os)
         throws JAXBException {
 
-        Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(PROP_JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.setProperty(PROP_NAMESPACE_PREFIX_MAPPER, nsPrefixMapper);
-        marshaller.marshal(jaxbObj, os);
+        createMarshaller(jaxbObj).marshal(jaxbObj, os);
     }
 
     /**
@@ -800,7 +818,14 @@ public final class SAML2MetaUtils {
         }
     }
 
-    private static String workaroundAbstractRoleDescriptor(String xmlstr) {
+    /**
+     * Rewrites the <code>AttributeQueryDescriptor</code> elements of marshalled metadata as
+     * <code>RoleDescriptor</code> elements with an <code>xsi:type</code>.
+     *
+     * @param xmlstr marshalled metadata
+     * @return the metadata with the <code>AttributeQueryDescriptor</code> elements rewritten
+     */
+    public static String workaroundAbstractRoleDescriptor(String xmlstr) {
 	int index =
 	    xmlstr.indexOf(":" +SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR);
 	if (index == -1) {
@@ -816,10 +841,22 @@ public final class SAML2MetaUtils {
 	String type =  prefix + ":" +
             SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR_TYPE;
 
+        // The import parses each RoleDescriptor on its own, so the prefix of its xsi:type has to be
+        // declared on the element itself. JAXB 3 declares it on the root element.
+        String prefixDeclaration = "xmlns:" + prefix + "=";
+        String startTag = xmlstr.substring(index2, xmlstr.indexOf('>', index2));
+        if (startTag.contains(prefixDeclaration)) {
+            prefixDeclaration = "";
+        } else {
+            prefixDeclaration = " " + prefixDeclaration + "\"" +
+                SAML2MetaSecurityUtils.NS_MD_QUERY + "\"";
+        }
+
 	xmlstr = xmlstr.replaceAll("<" + prefix + ":" +
             SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR,
             "<" + SAML2MetaConstants.ROLE_DESCRIPTOR + " " +
-            SAML2Constants.XSI_DECLARE_STR + " xsi:type=\"" + type + "\"");
+            SAML2Constants.XSI_DECLARE_STR + prefixDeclaration +
+            " xsi:type=\"" + type + "\"");
 	xmlstr = xmlstr.replaceAll("</" + prefix + ":" +
            SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR,
             "</" + SAML2MetaConstants.ROLE_DESCRIPTOR);

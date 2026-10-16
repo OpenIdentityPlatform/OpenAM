@@ -23,6 +23,7 @@ import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.jaxb.metadata.*;
+import com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.xml.security.encryption.XMLCipher;
 import java.io.InputStream;
@@ -94,6 +95,19 @@ public class KeyUtilTest {
         Assert.assertNotNull(encInfo);
         Assert.assertEquals(encInfo.getDataEncAlgorithm(), XMLCipher.AES_256);
         Assert.assertEquals(encInfo.getDataEncStrength(), 256);
+    }
+
+    /**
+     * The console shows the key size of a provider through this method.
+     */
+    @Test
+    public void keySizeIsFoundAfterWhitespaceText() throws Exception {
+        SPSSODescriptorType spsso = loadEncryptionKeySizeSPSSODescriptor();
+        EncryptionMethodType em = KeyUtil.getKeyDescriptor(spsso, "encryption").getValue()
+                .getEncryptionMethod().get(0).getValue();
+
+        Assert.assertTrue(em.getContent().get(0) instanceof String);
+        Assert.assertEquals(KeyUtil.getKeySize(em), 256);
     }
 
     private SPSSODescriptorType loadEncryptionKeySizeSPSSODescriptor() throws Exception {

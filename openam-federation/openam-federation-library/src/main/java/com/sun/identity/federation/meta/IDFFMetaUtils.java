@@ -65,6 +65,7 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.ValidationEvent;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
@@ -116,6 +117,17 @@ public class IDFFMetaUtils {
     }
     
     /**
+     * Creates an unmarshaller that fails on the first error. The JAXB 3 runtime otherwise recovers
+     * from errors such as an unexpected element by dropping the element, where the JAXB 1 runtime
+     * rejected the document.
+     */
+    private static Unmarshaller createUnmarshaller() throws JAXBException {
+        Unmarshaller u = jaxbContext.createUnmarshaller();
+        u.setEventHandler(event -> event.getSeverity() == ValidationEvent.WARNING);
+        return u;
+    }
+    
+    /**
      * Converts a JAXB object to a <code>String</code> object.
      * @param jaxbObj a JAXB object
      * @return a <code>String</code> representing the JAXB object.
@@ -163,7 +175,7 @@ public class IDFFMetaUtils {
      */
     public static Object convertNodeToJAXB(Node node)
     throws JAXBException {
-        Unmarshaller u = jaxbContext.createUnmarshaller();
+        Unmarshaller u = createUnmarshaller();
         //no need to get SAXSource, since the node is already created by using
         //a secure XML parser
         return u.unmarshal(node);
@@ -179,7 +191,7 @@ public class IDFFMetaUtils {
      */
     public static Object convertStringToJAXB(String str)
     throws JAXBException {
-        Unmarshaller u = jaxbContext.createUnmarshaller();
+        Unmarshaller u = createUnmarshaller();
         return u.unmarshal(XMLUtils.createSAXSource(new InputSource(new StringReader(str))));
     }
     

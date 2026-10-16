@@ -35,6 +35,31 @@ import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 
+    private final String defaultNamespaceUri;
+
+    /**
+     * Creates a mapper that leaves the default namespace to the JAXB runtime.
+     */
+    public NamespacePrefixMapperImpl() {
+        this(null);
+    }
+
+    /**
+     * Creates a mapper that binds the given namespace to the default namespace.
+     *
+     * The JAXB 1 runtime made the namespace of the marshalled element the default namespace,
+     * and the string post-processing of exported metadata, such as
+     * <code>SAML2MetaUtils.workaroundAbstractRoleDescriptor</code>, writes unprefixed elements
+     * that rely on it. The JAXB 3 runtime does not, so it has to be asked for.
+     *
+     * @param defaultNamespaceUri
+     *      The namespace URI to bind to the default namespace, normally the namespace of the
+     *      element being marshalled; or <code>null</code> to leave the choice to the runtime.
+     */
+    public NamespacePrefixMapperImpl(String defaultNamespaceUri) {
+        this.defaultNamespaceUri = defaultNamespaceUri;
+    }
+
     /**
      * Returns a preferred prefix for the given namespace URI.
      * 
@@ -83,6 +108,8 @@ public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
             return SAML2MetaSecurityUtils.PREFIX_XMLENC;
         } else if (namespaceUri.equals(SAML2MetaSecurityUtils.NS_MD_QUERY)) {
             return SAML2MetaSecurityUtils.PREFIX_MD_QUERY;
+        } else if (!requirePrefix && namespaceUri.equals(defaultNamespaceUri)) {
+            return "";
         }
 
         return suggestion;

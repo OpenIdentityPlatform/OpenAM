@@ -15,7 +15,9 @@
  */
 package com.sun.identity.wsfederation.meta;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -26,10 +28,13 @@ import com.sun.identity.wsfederation.jaxb.wsfederation.TokenSigningKeyInfoElemen
 import com.sun.identity.wsfederation.jaxb.wsse.SecurityTokenReferenceElement;
 import com.sun.identity.wsfederation.jaxb.xmlsig.X509DataElement;
 import com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType;
+import com.sun.identity.shared.xml.XMLUtils;
+import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Test
 public class WSFederationMetaUtilsTest {
@@ -97,5 +102,26 @@ public class WSFederationMetaUtilsTest {
                 .containsEntry("signingCertAlias", Collections.singletonList("test"))
                 .containsEntry("cotlist", Arrays.asList("cot1", "cot2"));
         assertThat(WSFederationMetaUtils.getAttributes(idpConfig, "cotlist")).containsExactly("cot1", "cot2");
+    }
+
+    /**
+     * The JAXB 1 runtime rejected an entity config with an unexpected element; JAXB 3 drops the
+     * element unless the unmarshaller fails on errors.
+     */
+    public void unexpectedElementIsRejected() throws Exception {
+        String entityConfig =
+                "<FederationConfig xmlns=\"urn:sun:fm:wsfederation:1.0:federationconfig\""
+                + " FederationID=\"wsfed-test-entity\" hosted=\"true\">"
+                + "<IDPSSOConfig metaAlias=\"/idp\"><Unexpected/></IDPSSOConfig>"
+                + "</FederationConfig>";
+
+        assertThatThrownBy(() -> WSFederationMetaUtils.convertStringToJAXB(entityConfig))
+                .isInstanceOf(JAXBException.class);
+        assertThatThrownBy(() -> WSFederationMetaUtils.convertInputStreamToJAXB(
+                new ByteArrayInputStream(entityConfig.getBytes(StandardCharsets.UTF_8))))
+                .isInstanceOf(JAXBException.class);
+        assertThatThrownBy(() -> WSFederationMetaUtils.convertNodeToJAXB(
+                XMLUtils.toDOMDocument(entityConfig, WSFederationMetaUtils.debug)))
+                .isInstanceOf(JAXBException.class);
     }
 }

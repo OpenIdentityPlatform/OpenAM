@@ -342,7 +342,7 @@ public class KeyUtil {
      * @param em <code>EncryptionMethodType</code> to read the key size from
      * @return the key size; or <code>0</code> if no <code>KeySize</code> is present.
      */
-    private static int getKeySize(EncryptionMethodType em) {
+    public static int getKeySize(EncryptionMethodType em) {
         List<Object> content = em.getContent();
         if (content != null) {
             for (Object item : content) {

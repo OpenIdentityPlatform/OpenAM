@@ -63,5 +63,7 @@
             </KeyInfo>
         </KeyDescriptor>
         <SoapEndpoint>https://sp.example.com/SOAPReceiver/metaAlias/sp</SoapEndpoint>
+        <AssertionConsumerServiceURL id="1" isDefault="true">https://sp.example.com/AssertionConsumerService/metaAlias/sp</AssertionConsumerServiceURL>
+        <AuthnRequestsSigned>false</AuthnRequestsSigned>
     </SPDescriptor>
 </EntityDescriptor>
