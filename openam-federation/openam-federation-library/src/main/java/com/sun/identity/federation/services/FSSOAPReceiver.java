@@ -270,7 +270,7 @@ public class FSSOAPReceiver extends HttpServlet {
                         metaManager.getIDPDescriptor(realm, hostedEntityId);
                     BaseConfigType hostedConfig = 
                         metaManager.getIDPDescriptorConfig(
-                            realm, hostedEntityId);
+                            realm, hostedEntityId).getValue();
                     FSServiceManager sm = FSServiceManager.getInstance();
                     FSSSOBrowserArtifactProfileHandler handler =
                         (FSSSOBrowserArtifactProfileHandler)sm
@@ -464,14 +464,14 @@ public class FSSOAPReceiver extends HttpServlet {
                                     getIDPDescriptor(realm, hostedEntityId);
                                 hostedConfig = metaManager.
                                     getIDPDescriptorConfig(
-                                        realm, hostedEntityId);
+                                        realm, hostedEntityId).getValue();
                             } else if (hostedRole != null &&
                                 hostedRole.equals(IFSConstants.SP))
                             {
                                 hostedProviderDesc = metaManager.
                                     getSPDescriptor(realm, hostedEntityId);
                                 hostedConfig = metaManager.
-                                    getSPDescriptorConfig(realm,hostedEntityId);
+                                    getSPDescriptorConfig(realm,hostedEntityId).getValue();
                             }
                                 
                             if (hostedProviderDesc == null) {
@@ -617,7 +617,7 @@ public class FSSOAPReceiver extends HttpServlet {
                 ProviderDescriptorType hostedDesc = 
                     metaManager.getIDPDescriptor(realm, hostedEntityId);
                 BaseConfigType hostedConfig = 
-                    metaManager.getIDPDescriptorConfig(realm, hostedEntityId);
+                    metaManager.getIDPDescriptorConfig(realm, hostedEntityId).getValue();
                 FSNameIdentifierMappingRequest mappingRequest =
                     new FSNameIdentifierMappingRequest(elt);
                 String remoteEntityId = mappingRequest.getProviderID();
@@ -803,7 +803,7 @@ public class FSSOAPReceiver extends HttpServlet {
                                         realm, hostedEntityId);
                                 hostedConfig = 
                                     metaManager.getIDPDescriptorConfig(
-                                        realm, hostedEntityId);
+                                        realm, hostedEntityId).getValue();
                             } else if (hostedRole.equalsIgnoreCase(
                                 IFSConstants.SP))
                             {
@@ -812,7 +812,7 @@ public class FSSOAPReceiver extends HttpServlet {
                                         realm, hostedEntityId);
                                 hostedConfig = 
                                     metaManager.getSPDescriptorConfig(
-                                        realm, hostedEntityId);
+                                        realm, hostedEntityId).getValue();
                             }
                         }
                     } catch (Exception e){
@@ -1141,14 +1141,14 @@ public class FSSOAPReceiver extends HttpServlet {
                     hostedProviderDesc = metaManager.getIDPDescriptor(
                         realm, hostedEntityId);
                     hostedConfig = metaManager.getIDPDescriptorConfig(
-                        realm, hostedEntityId);
+                        realm, hostedEntityId).getValue();
                     remoteDesc = metaManager.getSPDescriptor(
                         realm, remoteEntityId);
                 } else if (hostedRole.equalsIgnoreCase(IFSConstants.SP)) {
                     hostedProviderDesc = metaManager.getSPDescriptor(
                         realm, hostedEntityId);
                     hostedConfig = metaManager.getSPDescriptorConfig(
-                        realm, hostedEntityId);
+                        realm, hostedEntityId).getValue();
                     remoteDesc = metaManager.getIDPDescriptor(
                         realm, remoteEntityId);
                 }
@@ -1549,7 +1549,7 @@ public class FSSOAPReceiver extends HttpServlet {
             handler.setHostedDescriptor(
                 metaManager.getIDPDescriptor(realm, hostedEntityId));
             handler.setHostedDescriptorConfig(
-                metaManager.getIDPDescriptorConfig(realm, hostedEntityId));
+                metaManager.getIDPDescriptorConfig(realm, hostedEntityId).getValue());
             handler.setRealm(realm);
             handler.processLECPAuthnRequest(authnRequest);
         } catch(Exception se) {

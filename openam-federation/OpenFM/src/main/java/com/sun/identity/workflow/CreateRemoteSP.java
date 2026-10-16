@@ -28,11 +28,13 @@
 
  /*
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2026 3A Systems LLC
  */
 package com.sun.identity.workflow;
 
 import com.sun.identity.cot.COTException;
 import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeType;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.ObjectFactory;
@@ -44,7 +46,7 @@ import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * Creates Remote Service Provider.
@@ -75,7 +77,7 @@ public class CreateRemoteSP
             try {
                 EntityDescriptorElement e =
                         SAML2MetaUtils.getEntityDescriptorElement(metadata);
-                String eId = e.getEntityID();
+                String eId = e.getValue().getEntityID();
                 extendedMeta =
                         createExtendedDataTemplate(
                         eId, false);
@@ -108,17 +110,15 @@ public class CreateRemoteSP
 
                 if (ssoConfig != null) {
                     ObjectFactory objFactory = new ObjectFactory();
-                    AttributeType avp = objFactory.createAttributeElement();
+                    AttributeElement avp = objFactory.createAttributeElement(objFactory.createAttributeType());
                     String key = SAML2Constants.ATTRIBUTE_MAP;
-                    avp.setName(key);
-                    avp.getValue().addAll(attrMapping);
-                    ssoConfig.getAttribute().add(avp);
+                    avp.getValue().setName(key);
+                    avp.getValue().getValue().addAll(attrMapping);
+                    ssoConfig.getValue().getAttribute().add(avp);
                 }
                 manager.setEntityConfig(realm, config);
             }
         } catch (SAML2MetaException e) {
-            throw new WorkflowException(e.getMessage());
-        } catch (JAXBException e) {
             throw new WorkflowException(e.getMessage());
         }
 

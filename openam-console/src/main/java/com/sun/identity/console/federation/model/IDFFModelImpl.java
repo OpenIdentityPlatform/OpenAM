@@ -61,43 +61,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import jakarta.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 public class IDFFModelImpl
         extends EntityModelImpl
         implements IDFFModel {
 
     private IDFFMetaManager metaManager;
-    private static Map extendedMetaMap = new HashMap(24);
-    private static Map extendedMetaIdpMap = new HashMap(9);
-    private static Map extendedMetaSpMap = new HashMap(13);
-    private static List federationTerminationProfileList = new ArrayList(2);
+    private static Map<String, Set> extendedMetaMap = new HashMap<>(24);
+    private static Map<String, Set> extendedMetaIdpMap = new HashMap<>(9);
+    private static Map<String, Set> extendedMetaSpMap = new HashMap<>(13);
+    private static List<String> federationTerminationProfileList = new ArrayList<>(2);
 
     static {
         federationTerminationProfileList.add("http://projectliberty.org/profiles/fedterm-sp-http");
         federationTerminationProfileList.add("http://projectliberty.org/profiles/fedterm-sp-soap");
     }
-    private static List singleLogoutProfileList = new ArrayList(3);
+    private static List<String> singleLogoutProfileList = new ArrayList<>(3);
 
     static {
         singleLogoutProfileList.add("http://projectliberty.org/profiles/slo-sp-http");
         singleLogoutProfileList.add("http://projectliberty.org/profiles/slo-idp-http-get");
         singleLogoutProfileList.add("http://projectliberty.org/profiles/slo-sp-soap");
     }
-    private static List nameRegistrationProfileList = new ArrayList(2);
+    private static List<String> nameRegistrationProfileList = new ArrayList<>(2);
 
     static {
         nameRegistrationProfileList.add("http://projectliberty.org/profiles/rni-sp-http");
         nameRegistrationProfileList.add("http://projectliberty.org/profiles/rni-sp-soap");
     }
-    private static List federationProfileList = new ArrayList(3);
+    private static List<String> federationProfileList = new ArrayList<>(3);
 
     static {
         federationProfileList.add("http://projectliberty.org/profiles/brws-post");
         federationProfileList.add("http://projectliberty.org/profiles/brws-art");
         federationProfileList.add("http://projectliberty.org/profiles/lecp");
     }
-    private static List supportedSSOProfileList = new ArrayList(4);
+    private static List<String> supportedSSOProfileList = new ArrayList<>(4);
 
     static {
         supportedSSOProfileList.add("http://projectliberty.org/profiles/brws-post");
@@ -238,9 +238,9 @@ public class IDFFModelImpl
             EntityDescriptorElement desc = manager.getEntityDescriptor(
                     realm, entityName);
             values.put(ATTR_VALID_UNTIL, returnEmptySetIfValueIsNull(
-                    desc.getValidUntil()));
+                    desc.getValue().getValidUntil()));
             values.put(ATTR_CACHE_DURATION, returnEmptySetIfValueIsNull(
-                    desc.getCacheDuration()));
+                    desc.getValue().getCacheDuration()));
             logEvent("SUCCEED_GET_ENTITY_DESCRIPTOR_ATTR_VALUES", param);
         } catch (IDFFMetaException e) {
             String[] paramsEx = {realm, entityName, "IDFF", "General",
@@ -271,9 +271,9 @@ public class IDFFModelImpl
             EntityDescriptorElement desc = manager.getEntityDescriptor(
                     realm, entityName);
 
-            desc.setValidUntil((String) AMAdminUtils.getValue(
+            desc.getValue().setValidUntil((String) AMAdminUtils.getValue(
                     (Set) map.get(ATTR_VALID_UNTIL)));
-            desc.setCacheDuration((String) AMAdminUtils.getValue(
+            desc.getValue().setCacheDuration((String) AMAdminUtils.getValue(
                     (Set) map.get(ATTR_CACHE_DURATION)));
 
             manager.setEntityDescriptor(realm, desc);
@@ -421,8 +421,8 @@ public class IDFFModelImpl
                     returnEmptySetIfValueIsNull((String) pDesc.getRegisterNameIdentifierProtocolProfile().get(0)));
 
             // only for Service Provider
-            com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURLType assertionType =
-                    (com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURLType) ((List) pDesc.getAssertionConsumerServiceURL()).get(0);
+            com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURL assertionType =
+                    (com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURL) ((List) pDesc.getAssertionConsumerServiceURL()).get(0);
             if (assertionType != null) {
                 map.put(ATTR_ASSERTION_CUSTOMER_SERVICE_URIID,
                         returnEmptySetIfValueIsNull(assertionType.getId()));
@@ -493,8 +493,10 @@ public class IDFFModelImpl
             manager = getIDFFMetaManager();
             String metaAlias = null;
 
-            BaseConfigType idpConfig =
+            IDPDescriptorConfigElement idpConfigElement =
                     manager.getIDPDescriptorConfig(realm, entityName);
+            BaseConfigType idpConfig = (idpConfigElement != null)
+                    ? idpConfigElement.getValue() : null;
             if (idpConfig != null) {
                 map = IDFFMetaUtils.getAttributes(idpConfig);
                 metaAlias = idpConfig.getMetaAlias();
@@ -561,8 +563,10 @@ public class IDFFModelImpl
             manager = getIDFFMetaManager();
             String metaAlias = null;
 
-            BaseConfigType spConfig =
+            SPDescriptorConfigElement spConfigElement =
                     manager.getSPDescriptorConfig(realm, entityName);
+            BaseConfigType spConfig = (spConfigElement != null)
+                    ? spConfigElement.getValue() : null;
             if (spConfig != null) {
                 map = IDFFMetaUtils.getAttributes(spConfig);
                 metaAlias = spConfig.getMetaAlias();
@@ -734,8 +738,8 @@ public class IDFFModelImpl
                     (Set) attrValues.get(ATTR_AUTHN_REQUESTS_SIGNED));
             com.sun.identity.liberty.ws.meta.jaxb.ObjectFactory objFactory =
                     new com.sun.identity.liberty.ws.meta.jaxb.ObjectFactory();
-            com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURLType assertionType =
-                    objFactory.createSPDescriptorTypeAssertionConsumerServiceURLType();
+            com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType.AssertionConsumerServiceURL assertionType =
+                    objFactory.createSPDescriptorTypeAssertionConsumerServiceURL();
             assertionType.setId(id);
             assertionType.setValue(value);
             if (isDefault.equals("true")) {
@@ -751,8 +755,8 @@ public class IDFFModelImpl
                 pDesc.setAuthnRequestsSigned(false);
             }
 
-            entityDescriptor.getSPDescriptor().clear();
-            entityDescriptor.getSPDescriptor().add(pDesc);
+            entityDescriptor.getValue().getSPDescriptor().clear();
+            entityDescriptor.getValue().getSPDescriptor().add(pDesc);
             idffManager.setEntityDescriptor(realm, entityDescriptor);
             logEvent("SUCCEED_MODIFY_ENTITY_DESCRIPTOR", params);
         } catch (IDFFMetaException e) {
@@ -762,14 +766,6 @@ public class IDFFModelImpl
                     {realm, entityName, "IDFF", "SP-Standard Metadata", strError};
             logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR", paramsEx);
             throw new AMConsoleException(strError);
-        } catch (JAXBException e) {
-            debug.error("JAXBException, updateEntitySPDescriptor");
-            String strError = getErrorString(e);
-            String[] paramsEx =
-                    {realm, entityName, "IDFF", "SP-Standard Metadata", strError};
-            logEvent("FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR", paramsEx);
-            throw new AMConsoleException(strError);
-
         }
     }
 
@@ -896,8 +892,8 @@ public class IDFFModelImpl
 
             }
 
-            entityDescriptor.getIDPDescriptor().clear();
-            entityDescriptor.getIDPDescriptor().add(pDesc);
+            entityDescriptor.getValue().getIDPDescriptor().clear();
+            entityDescriptor.getValue().getIDPDescriptor().add(pDesc);
             idffManager.setEntityDescriptor(realm, entityDescriptor);
             logEvent("SUCCEED_MODIFY_ENTITY_DESCRIPTOR", params);
         } catch (IDFFMetaException e) {
@@ -916,11 +912,11 @@ public class IDFFModelImpl
         List attrList = baseConfig.getAttribute();
         for (Iterator i = attrList.iterator(); i.hasNext();) {
             AttributeElement avpnew = (AttributeElement) i.next();
-            String name = avpnew.getName();
+            String name = avpnew.getValue().getName();
             Set set = (Set) values.get(name);
             if (set != null) {
-                avpnew.getValue().clear();
-                avpnew.getValue().addAll(set);
+                avpnew.getValue().getValue().clear();
+                avpnew.getValue().getValue().addAll(set);
             }
         }
     }
@@ -954,7 +950,7 @@ public class IDFFModelImpl
                 throw new AMConsoleException("invalid.config.element");
             } else {
                 updateAttrInConfig(
-                        idpDecConfigElement,
+                        idpDecConfigElement.getValue(),
                         attrValues,
                         EntityModel.IDENTITY_PROVIDER);
             }
@@ -1007,7 +1003,7 @@ public class IDFFModelImpl
             } else {
                 // update sp entity config
                 updateAttrInConfig(
-                        spDecConfigElement,
+                        spDecConfigElement.getValue(),
                         attrValues,
                         EntityModel.SERVICE_PROVIDER);
                 //handle supported sso profile
@@ -1024,7 +1020,7 @@ public class IDFFModelImpl
                     }
                 }
                 updateAttrInConfig(
-                        spDecConfigElement,
+                        spDecConfigElement.getValue(),
                         ATTR_SUPPORTED_SSO_PROFILE,
                         supportedSSOProfileList);
             }
@@ -1080,7 +1076,7 @@ public class IDFFModelImpl
                 throw new AMConsoleException("invalid.config.element");
             } else {
                 updateAttrInConfig(
-                        idpDecConfigElement,
+                        idpDecConfigElement.getValue(),
                         ATTR_IDP_AUTHN_CONTEXT_MAPPING,
                         list);
             }
@@ -1140,7 +1136,7 @@ public class IDFFModelImpl
             } else {
                 // update sp entity config
                 updateAttrInConfig(
-                        spDecConfigElement,
+                        spDecConfigElement.getValue(),
                         ATTR_SP_AUTHN_CONTEXT_MAPPING,
                         list);
             }
@@ -1170,10 +1166,10 @@ public class IDFFModelImpl
         List attrList = baseConfig.getAttribute();
         for (Iterator i = attrList.iterator(); i.hasNext();) {
             AttributeElement avpnew = (AttributeElement) i.next();
-            String name = avpnew.getName();
+            String name = avpnew.getValue().getName();
             if (name.equals(attributeName)) {
-                avpnew.getValue().clear();
-                avpnew.getValue().addAll(list);
+                avpnew.getValue().getValue().clear();
+                avpnew.getValue().getValue().addAll(list);
             }
         }
     }
@@ -1183,10 +1179,10 @@ public class IDFFModelImpl
         ObjectFactory objFactory = new ObjectFactory();
         for (Iterator iter = values.keySet().iterator();
                 iter.hasNext();) {
-            AttributeType avp = objFactory.createAttributeElement();
+            AttributeElement avp = objFactory.createAttributeElement(objFactory.createAttributeType());
             String key = (String) iter.next();
-            avp.setName(key);
-            avp.getValue().addAll(Collections.EMPTY_LIST);
+            avp.getValue().setName(key);
+            avp.getValue().getValue().addAll(Collections.EMPTY_LIST);
             bctype.getAttribute().add(avp);
         }
         return bctype;
@@ -1204,7 +1200,7 @@ public class IDFFModelImpl
             BaseConfigType baseConfig,
             Map values,
             String role) throws JAXBException, AMConsoleException {
-        List attrList = baseConfig.getAttribute();
+        List<AttributeElement> attrList = baseConfig.getAttribute();
         if (role.equals(EntityModel.IDENTITY_PROVIDER)) {
             attrList.clear();
             baseConfig = addAttributeType(
@@ -1218,14 +1214,14 @@ public class IDFFModelImpl
                     baseConfig);
             attrList = baseConfig.getAttribute();
         }
-        for (Iterator it = attrList.iterator(); it.hasNext();) {
-            AttributeElement avpnew = (AttributeElement) it.next();
-            String name = avpnew.getName();
+        for (Iterator<AttributeElement> it = attrList.iterator(); it.hasNext();) {
+            AttributeElement avpnew = it.next();
+            String name = avpnew.getValue().getName();
             if (values.keySet().contains(name)) {
                 Set set = (Set) values.get(name);
                 if (set != null) {
-                    avpnew.getValue().clear();
-                    avpnew.getValue().addAll(set);
+                    avpnew.getValue().getValue().clear();
+                    avpnew.getValue().getValue().addAll(set);
                 }
             }
         }
@@ -1249,8 +1245,10 @@ public class IDFFModelImpl
             IDFFMetaManager manager = getIDFFMetaManager();
             Map map = new HashMap();
 
-            BaseConfigType idpConfig =
+            IDPDescriptorConfigElement idpConfigElement =
                     manager.getIDPDescriptorConfig(realm, entityName);
+            BaseConfigType idpConfig = (idpConfigElement != null)
+                    ? idpConfigElement.getValue() : null;
             if (idpConfig != null) {
                 map = IDFFMetaUtils.getAttributes(idpConfig);
             } else {
@@ -1308,8 +1306,10 @@ public class IDFFModelImpl
             IDFFMetaManager manager = getIDFFMetaManager();
             Map map = new HashMap();
 
-            BaseConfigType spConfig =
+            SPDescriptorConfigElement spConfigElement =
                     manager.getSPDescriptorConfig(realm, entityName);
+            BaseConfigType spConfig = (spConfigElement != null)
+                    ? spConfigElement.getValue() : null;
             if (spConfig != null) {
                 map = IDFFMetaUtils.getAttributes(spConfig);
             } else {
@@ -1353,13 +1353,13 @@ public class IDFFModelImpl
                     idffMetaMgr.getEntityConfig(realm, entityName);
             if (entityConfig == null) {
                 entityConfig =
-                        objFactory.createEntityConfigElement();
+                        objFactory.createEntityConfigElement(objFactory.createEntityConfigType());
                 // add to entityConfig
-                entityConfig.setEntityID(entityName);
+                entityConfig.getValue().setEntityID(entityName);
                 if (location.equals("remote")) {
-                    entityConfig.setHosted(false);
+                    entityConfig.getValue().setHosted(false);
                 } else {
-                    entityConfig.setHosted(true);
+                    entityConfig.getValue().setHosted(true);
                 }
             }
 
@@ -1370,29 +1370,29 @@ public class IDFFModelImpl
             // It could have one sp and one idp.
             if ((role.equals(IFSConstants.SP)) &&
                     (IDFFMetaUtils.getSPDescriptor(entityDesc) != null)) {
-                baseCfgType = objFactory.createSPDescriptorConfigElement();
+                baseCfgType = objFactory.createBaseConfigType();
 
-                for (Iterator iter = extendedMetaMap.keySet().iterator();
-                        iter.hasNext();) {
+                for (Iterator<String> iter = extendedMetaMap.keySet().iterator();
+                     iter.hasNext();) {
+                    AttributeType atype = objFactory.createAttributeType();
+                    String key = iter.next();
+                    atype.setName(key);
+                    atype.getValue().addAll(Collections.EMPTY_LIST);
+                    baseCfgType.getAttribute().add(objFactory.createAttributeElement(atype));
+                }
+
+                for (Iterator<String> iter = extendedMetaSpMap.keySet().iterator();
+                     iter.hasNext();) {
                     AttributeType atype = objFactory.createAttributeType();
                     String key = (String) iter.next();
                     atype.setName(key);
                     atype.getValue().addAll(Collections.EMPTY_LIST);
-                    baseCfgType.getAttribute().add(atype);
+                    baseCfgType.getAttribute().add(objFactory.createAttributeElement(atype));
                 }
-
-                for (Iterator iter = extendedMetaSpMap.keySet().iterator();
-                        iter.hasNext();) {
-                    AttributeType atype = objFactory.createAttributeType();
-                    String key = (String) iter.next();
-                    atype.setName(key);
-                    atype.getValue().addAll(Collections.EMPTY_LIST);
-                    baseCfgType.getAttribute().add(atype);
-                }
-                entityConfig.getSPDescriptorConfig().add(baseCfgType);
+                entityConfig.getValue().getSPDescriptorConfig().add(objFactory.createSPDescriptorConfigElement(baseCfgType));
             } else if ((role.equals(IFSConstants.IDP)) &&
                     (IDFFMetaUtils.getIDPDescriptor(entityDesc) != null)) {
-                baseCfgType = objFactory.createIDPDescriptorConfigElement();
+                baseCfgType = objFactory.createBaseConfigType();
 
                 for (Iterator iter = extendedMetaMap.keySet().iterator();
                         iter.hasNext();) {
@@ -1400,7 +1400,7 @@ public class IDFFModelImpl
                     String key = (String) iter.next();
                     atype.setName(key);
                     atype.getValue().addAll(Collections.EMPTY_LIST);
-                    baseCfgType.getAttribute().add(atype);
+                    baseCfgType.getAttribute().add(objFactory.createAttributeElement(atype));
                 }
 
                 for (Iterator iter = extendedMetaIdpMap.keySet().iterator();
@@ -1409,14 +1409,12 @@ public class IDFFModelImpl
                     String key = (String) iter.next();
                     atype.setName(key);
                     atype.getValue().addAll(Collections.EMPTY_LIST);
-                    baseCfgType.getAttribute().add(atype);
+                    baseCfgType.getAttribute().add(objFactory.createAttributeElement(atype));
                 }
-                entityConfig.getIDPDescriptorConfig().add(baseCfgType);
+                entityConfig.getValue().getIDPDescriptorConfig().add(objFactory.createIDPDescriptorConfigElement(baseCfgType));
             }
             idffMetaMgr.setEntityConfig(realm, entityConfig);
         } catch (IDFFMetaException e) {
-            throw new AMConsoleException(getErrorString(e));
-        } catch (JAXBException e) {
             throw new AMConsoleException(getErrorString(e));
         }
     }
@@ -1498,10 +1496,12 @@ public class IDFFModelImpl
                 values.put(ATTR_AFFILIATE_OWNER_ID,
                         returnEmptySetIfValueIsNull(aDesc.getAffiliationOwnerID()));                               
 
-                BaseConfigType affiliationConfig =
+                com.sun.identity.federation.jaxb.entityconfig.AffiliationDescriptorConfigElement affiliationConfigElement =
                         idffManager.getAffiliationDescriptorConfig(
-                        realm, 
+                        realm,
                         entityName);
+                BaseConfigType affiliationConfig = (affiliationConfigElement != null)
+                        ? affiliationConfigElement.getValue() : null;
 
                 if (affiliationConfig != null) {
                     Map map = IDFFMetaUtils.getAttributes(affiliationConfig);                                       
@@ -1573,7 +1573,7 @@ public class IDFFModelImpl
             EntityDescriptorElement entityDescriptor =
                     idffManager.getEntityDescriptor(realm, entityName);
             AffiliationDescriptorType aDesc =
-                    entityDescriptor.getAffiliationDescriptor();
+                    entityDescriptor.getValue().getAffiliationDescriptor();
            
             aDesc.setAffiliationOwnerID(
                     (String) AMAdminUtils.getValue((Set) values.get(
@@ -1596,7 +1596,7 @@ public class IDFFModelImpl
                 aDesc.getAffiliateMember().add(newMember);
             }
 
-            entityDescriptor.setAffiliationDescriptor(aDesc);
+            entityDescriptor.getValue().setAffiliationDescriptor(aDesc);
             idffManager.setEntityDescriptor(realm, entityDescriptor);
             logEvent("SUCCEED_MODIFY_AFFILIATE_ENTITY_DESCRIPTOR", params);
         } catch (IDFFMetaException e) {

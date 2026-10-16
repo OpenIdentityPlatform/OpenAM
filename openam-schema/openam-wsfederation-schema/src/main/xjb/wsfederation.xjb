@@ -24,11 +24,33 @@
 
    $Id: binding.xjb,v 1.3 2009/05/04 18:21:06 exu Exp $
 
+   Portions Copyrighted 2026 3A Systems LLC
+
 -->
 
-<jxb:bindings version="1.0"
-               xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
-               xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<jxb:bindings
+        version="3.0"
+        xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+        jxb:extensionBindingPrefixes="xjc">
+
+<!-- ================================================================
+         Global options applied to every schema processed in this run.
+         ================================================================ -->
+    <jxb:globalBindings >
+        <!--<xjc:simple />-->
+        <!-- Use java.util.Calendar for xsd:dateTime — consistent with
+             the original JAXB 1.0 behaviour and the rest of OpenAM. -->
+        <jxb:javaType name="java.util.Calendar"
+                      xmlType="xs:dateTime"
+                      parseMethod="jakarta.xml.bind.DatatypeConverter.parseDateTime"
+                      printMethod="jakarta.xml.bind.DatatypeConverter.printDateTime"/>
+        <xjc:javaType name="java.lang.String" xmlType="xs:anyURI"
+                      adapter="jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter" />
+
+    </jxb:globalBindings>
+
   <jxb:bindings schemaLocation="../xsd/xmldsig-core-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
       <jxb:package name="com.sun.identity.wsfederation.jaxb.xmlsig">
@@ -40,6 +62,12 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='X509Certificate']">
+      <jxb:class name="X509Certificate"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='X509Data']">
+      <jxb:class name="X509DataElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/oasis-200401-wss-wssecurity-utility-1.0.xsd" node="/xs:schema">
@@ -66,6 +94,9 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='SecurityTokenReference']">
+      <jxb:class name="SecurityTokenReferenceElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/ws-addr.xsd" node="/xs:schema">
@@ -79,6 +110,9 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='EndpointReference']">
+      <jxb:class name="EndpointReferenceElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/ws-policy.xsd" node="/xs:schema">
@@ -92,6 +126,12 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='ExactlyOne']">
+      <jxb:class name="ExactlyOneElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='All']">
+      <jxb:class name="AllElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/ws-securitypolicy-1.2.xsd" node="/xs:schema">
@@ -105,6 +145,76 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='AsymmetricBinding']">
+      <jxb:class name="AsymmetricBindingElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SymmetricBinding']">
+      <jxb:class name="SymmetricBindingElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='InitiatorToken']">
+      <jxb:class name="InitiatorTokenElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='RecipientToken']">
+      <jxb:class name="RecipientTokenElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='X509Token']">
+      <jxb:class name="X509TokenElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='UsernameToken']">
+      <jxb:class name="UsernameTokenElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SamlToken']">
+      <jxb:class name="SamlTokenElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='WssX509V3Token10']">
+      <jxb:class name="WssX509V3Token10Element"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='WssUsernameToken10']">
+      <jxb:class name="WssUsernameToken10Element"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='WssSamlV20Token11']">
+      <jxb:class name="WssSamlV20Token11Element"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='WssSamlV11Token11']">
+      <jxb:class name="WssSamlV11Token11Element"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AlgorithmSuite']">
+      <jxb:class name="AlgorithmSuiteElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Basic128']">
+      <jxb:class name="Basic128Element"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Basic192']">
+      <jxb:class name="Basic192Element"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Basic256']">
+      <jxb:class name="Basic256Element"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='TripleDes']">
+      <jxb:class name="TripleDesElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Layout']">
+      <jxb:class name="LayoutElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='ProtectionToken']">
+      <jxb:class name="ProtectionTokenElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='KerberosToken']">
+      <jxb:class name="KerberosTokenElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='WssKerberosV5ApReqToken11']">
+      <jxb:class name="WssKerberosV5ApReqToken11Element"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SignedParts']">
+      <jxb:class name="SignedPartsElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='EncryptedParts']">
+      <jxb:class name="EncryptedPartsElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='IssuedToken']">
+      <jxb:class name="IssuedTokenElement"/>
+    </jxb:bindings>
+
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/ws-federation.xsd" node="/xs:schema">
@@ -118,6 +228,30 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='Federation']">
+      <jxb:class name="FederationElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='TokenIssuerEndpoint']">
+      <jxb:class name="TokenIssuerEndpointElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='TokenIssuerName']">
+      <jxb:class name="TokenIssuerNameElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='TokenSigningKeyInfo']">
+      <jxb:class name="TokenSigningKeyInfoElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='UriNamedClaimTypesOffered']">
+      <jxb:class name="UriNamedClaimTypesOfferedElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SingleSignOutNotificationEndpoint']">
+      <jxb:class name="SingleSignOutNotificationEndpointElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='TokenTypesOffered']">
+      <jxb:class name="TokenTypesOfferedElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='FederationMetadata']">
+      <jxb:class name="FederationMetadataElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/entity-config-schema.xsd" node="/xs:schema">
@@ -131,5 +265,19 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='IDPSSOConfig']">
+      <jxb:class name="IDPSSOConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SPSSOConfig']">
+      <jxb:class name="SPSSOConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='FederationConfig']">
+      <jxb:class name="FederationConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Attribute']">
+      <jxb:class name="AttributeElement"/>
+    </jxb:bindings>
+
   </jxb:bindings>
+
 </jxb:bindings>

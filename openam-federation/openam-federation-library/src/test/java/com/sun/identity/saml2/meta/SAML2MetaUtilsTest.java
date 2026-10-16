@@ -12,16 +12,28 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.meta;
 
 import static org.testng.Assert.*;
+
+import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
+import com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement;
+import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorType;
+import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorType;
+import jakarta.xml.bind.JAXBElement;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
 public class SAML2MetaUtilsTest {
     
@@ -66,6 +78,63 @@ public class SAML2MetaUtilsTest {
                 + PATH_SEPARATOR +  TEST_ENTITY;
         final String result = SAML2MetaUtils.getMetaAliasByUri(uri);
         assertEquals(result, PATH_SEPARATOR + TEST_SUB_REALM + PATH_SEPARATOR + TEST_ENTITY);        
-    }    
-    
+    }
+
+    @Test
+    public void convertInputStreamToJaxbTest() throws Exception {
+        try(InputStream is = getClass().getClassLoader().getResourceAsStream("idp-extended.xml")) {
+            Object jaxb = SAML2MetaUtils.convertInputStreamToJAXB(is);
+            assertNotNull(jaxb);
+            assertTrue(jaxb instanceof EntityConfigElement);
+        }
+
+        try(InputStream is = getClass().getClassLoader().getResourceAsStream("idp-metadata.xml")) {
+            Object jaxb = SAML2MetaUtils.convertInputStreamToJAXB(is);
+            assertNotNull(jaxb);
+            assertTrue(jaxb instanceof EntityDescriptorElement);
+        }
+    }
+
+    /**
+     * Metadata that omits the optional boolean attributes (WantAssertionsSigned,
+     * AuthnRequestsSigned, AssertionConsumerService/@isDefault) must unmarshal
+     * to nullable {@code Boolean} getters that return {@code null} rather than a
+     * primitive {@code false}. This locks in the JAXB 3 generated shape so the
+     * {@code Boolean.TRUE.equals(...)} guards on the SSO paths stay necessary
+     * and correct (absent attribute is treated as {@code false}, never an NPE).
+     */
+    @Test
+    public void optionalBooleanAttributesUnmarshalAsNull() throws Exception {
+        try (InputStream is = getClass().getClassLoader()
+                .getResourceAsStream("sp-metadata-no-optional-booleans.xml")) {
+            Object jaxb = SAML2MetaUtils.convertInputStreamToJAXB(is);
+            assertTrue(jaxb instanceof EntityDescriptorElement);
+
+            EntityDescriptorType entity = ((EntityDescriptorElement) jaxb).getValue();
+            SPSSODescriptorType spsso = null;
+            for (Object role : entity.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor()) {
+                Object value = (role instanceof JAXBElement) ? ((JAXBElement<?>) role).getValue() : role;
+                if (value instanceof SPSSODescriptorType) {
+                    spsso = (SPSSODescriptorType) value;
+                    break;
+                }
+            }
+            assertNotNull(spsso);
+
+            // Absent optional attributes -> nullable Boolean returns null.
+            assertNull(spsso.isWantAssertionsSigned());
+            assertNull(spsso.isAuthnRequestsSigned());
+            // Migration-safe idiom: null is treated as false, no unboxing NPE.
+            assertFalse(Boolean.TRUE.equals(spsso.isWantAssertionsSigned()));
+            assertFalse(Boolean.TRUE.equals(spsso.isAuthnRequestsSigned()));
+
+            List<AssertionConsumerServiceElement> acsList = spsso.getAssertionConsumerService();
+            assertFalse(acsList.isEmpty());
+            for (AssertionConsumerServiceElement acs : acsList) {
+                assertNull(acs.getValue().isIsDefault());
+                assertFalse(Boolean.TRUE.equals(acs.getValue().isIsDefault()));
+            }
+        }
+    }
+
 }

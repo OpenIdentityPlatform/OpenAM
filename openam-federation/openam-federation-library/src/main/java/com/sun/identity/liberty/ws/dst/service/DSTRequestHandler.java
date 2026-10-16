@@ -42,8 +42,10 @@ import com.sun.identity.liberty.ws.common.wsse.BinarySecurityToken;
 import com.sun.identity.liberty.ws.dst.DSTException;
 import com.sun.identity.liberty.ws.disco.common.DiscoUtils;
 import com.sun.identity.shared.xml.XMLUtils;
+import jakarta.xml.bind.JAXBException;
 import java.util.List;
 import java.util.ArrayList;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -196,8 +198,7 @@ public abstract class DSTRequestHandler implements RequestHandler {
           EncryptedResourceIDType encID =
                    (EncryptedResourceIDType)resourceIDType;
           try {
-              Document encDoc = XMLUtils.newDocument();
-                  DiscoUtils.getDiscoMarshaller().marshal(encID, encDoc);
+              Document encDoc = toDocument(encID);
 
               if(DSTUtils.debug.messageEnabled()) {
                  DSTUtils.debug.message("PPRequestHandler.getResourceID:" +
@@ -224,6 +225,22 @@ public abstract class DSTRequestHandler implements RequestHandler {
            return null;
        }
 
+    }
+
+    /**
+     * Marshals an encrypted resource ID to a new DOM document.
+     * @param encID JAXB EncryptedResourceIDType Object.
+     * @return Document whose root is the <code>EncryptedResourceID</code> element.
+     * @exception ParserConfigurationException if the document cannot be created.
+     * @exception JAXBException if the resource ID cannot be marshalled.
+     */
+    static Document toDocument(EncryptedResourceIDType encID)
+        throws ParserConfigurationException, JAXBException {
+        Document encDoc = XMLUtils.newDocument();
+        // the raw type has no @XmlRootElement; marshal via its element wrapper
+        DiscoUtils.getDiscoMarshaller().marshal(
+            DiscoUtils.getDiscoFactory().createEncryptedResourceIDElement(encID), encDoc);
+        return encDoc;
     }
   /*
    * Issue to be resolved: DST Schema does not have any name space associated

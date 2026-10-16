@@ -11,13 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
-<<<<<<< HEAD
  * Copyright 2014-2016 ForgeRock AS.
-=======
- * Copyright 2014 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
->>>>>>> 675e7a8ddd... Issue #42  acr_values not working if the user is login in more than one chain (#101)
-* Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;

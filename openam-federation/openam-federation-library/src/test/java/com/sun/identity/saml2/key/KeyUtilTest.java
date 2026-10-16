@@ -12,24 +12,33 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ * 
+ * Portions copyright 2026 3A Systems LLC
  */
 
 package com.sun.identity.saml2.key;
 
+import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.jaxb.metadata.*;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.apache.xml.security.encryption.XMLCipher;
+import java.io.InputStream;
 import java.util.List;
+
+import jakarta.xml.bind.JAXBElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 public class KeyUtilTest {
 
     private static final String XML_DOCUMENT_TO_LOAD = "no-use-keydescriptor-metadata.xml";
+    private static final String ENCRYPTION_KEYSIZE_METADATA = "sp-metadata-encryption-keysize.xml";
+    private static final String ENCRYPTION_KEYSIZE_ENTITY_ID = "https://sp.example.com/encryption-keysize";
 
     /**
      * A test to verify fixing the case where an IDPs metadata contains at least two KeyDescriptor elements
@@ -43,13 +52,60 @@ public class KeyUtilTest {
                 XMLUtils.toDOMDocument(ClassLoader.getSystemResourceAsStream(XML_DOCUMENT_TO_LOAD),
                     SAML2Utils.debug), "UTF-8");
         EntityDescriptorElement element = SAML2MetaUtils.getEntityDescriptorElement(idpMetadata);
-        List descriptors = element.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor();
-        for (Object descriptor : descriptors) {
-            if (descriptor instanceof IDPSSODescriptorElement) {
-                KeyDescriptorType type = KeyUtil.getKeyDescriptor((IDPSSODescriptorElement)descriptor, "signing");
+        List<JAXBElement<? extends RoleDescriptorType>> descriptors = element.getValue().getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor();
+        for (JAXBElement<? extends RoleDescriptorType> descriptor : descriptors) {
+            if (descriptor.getValue() instanceof IDPSSODescriptorType) {
+                KeyDescriptorElement type = KeyUtil.getKeyDescriptor(descriptor.getValue(), "signing");
                 Assert.assertNotNull(type);
                 break;
             }
         }
+    }
+
+    /**
+     * EncryptionMethod is mixed content, so indented metadata unmarshals to a content list that starts
+     * with a whitespace String; the KeySize element must be found by type, not by index.
+     */
+    @Test
+    public void encInfoReadsKeySizeFromIndentedEncryptionMethod() throws Exception {
+        KeyUtil.clear();
+        SPSSODescriptorType spsso = loadEncryptionKeySizeSPSSODescriptor();
+
+        EncInfo encInfo = KeyUtil.getEncInfo(spsso, ENCRYPTION_KEYSIZE_ENTITY_ID, SAML2Constants.SP_ROLE);
+
+        Assert.assertNotNull(encInfo);
+        Assert.assertNotNull(encInfo.getWrappingKey());
+        Assert.assertEquals(encInfo.getDataEncAlgorithm(), XMLCipher.AES_256);
+        Assert.assertEquals(encInfo.getDataEncStrength(), 256);
+    }
+
+    @Test
+    public void pepEncInfoReadsKeySizeFromIndentedEncryptionMethod() throws Exception {
+        KeyUtil.clear();
+        SPSSODescriptorType spsso = loadEncryptionKeySizeSPSSODescriptor();
+        ObjectFactory objectFactory = new ObjectFactory();
+        XACMLAuthzDecisionQueryDescriptorElement pepDescriptor = objectFactory
+                .createXACMLAuthzDecisionQueryDescriptorElement(
+                        objectFactory.createXACMLAuthzDecisionQueryDescriptorType());
+        pepDescriptor.getValue().getKeyDescriptor().addAll(spsso.getKeyDescriptor());
+
+        EncInfo encInfo = KeyUtil.getPEPEncInfo(pepDescriptor, ENCRYPTION_KEYSIZE_ENTITY_ID);
+
+        Assert.assertNotNull(encInfo);
+        Assert.assertEquals(encInfo.getDataEncAlgorithm(), XMLCipher.AES_256);
+        Assert.assertEquals(encInfo.getDataEncStrength(), 256);
+    }
+
+    private SPSSODescriptorType loadEncryptionKeySizeSPSSODescriptor() throws Exception {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(ENCRYPTION_KEYSIZE_METADATA)) {
+            EntityDescriptorElement element = (EntityDescriptorElement) SAML2MetaUtils.convertInputStreamToJAXB(is);
+            for (JAXBElement<? extends RoleDescriptorType> descriptor
+                    : element.getValue().getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor()) {
+                if (descriptor.getValue() instanceof SPSSODescriptorType) {
+                    return (SPSSODescriptorType) descriptor.getValue();
+                }
+            }
+        }
+        throw new AssertionError("No SPSSODescriptor in " + ENCRYPTION_KEYSIZE_METADATA);
     }
 }

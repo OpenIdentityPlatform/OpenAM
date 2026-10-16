@@ -23,13 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: NamespacePrefixMapperImpl.java,v 1.3 2008/06/25 05:47:49 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
 
 package com.sun.identity.saml2.meta;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 public class NamespacePrefixMapperImpl extends NamespacePrefixMapper {
 

@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.federation.cli;
 
@@ -63,7 +64,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.MessageFormat;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.w3c.dom.Document;
 import java.util.logging.Level;
 

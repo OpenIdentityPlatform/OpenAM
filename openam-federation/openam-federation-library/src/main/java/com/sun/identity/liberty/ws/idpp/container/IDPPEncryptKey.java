@@ -23,23 +23,23 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IDPPEncryptKey.java,v 1.2 2008/06/25 05:47:16 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.liberty.ws.idpp.container;
 
-import javax.xml.bind.JAXBException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Iterator;
-import org.w3c.dom.Document;
+
 import com.sun.identity.liberty.ws.idpp.common.*;
 import com.sun.identity.liberty.ws.idpp.jaxb.*;
-import com.sun.identity.liberty.ws.idpp.plugin.*;
 
 
 /**
@@ -64,39 +64,34 @@ public class IDPPEncryptKey extends IDPPBaseContainer {
       */
      public Object getContainerObject(Map userMap) throws IDPPException {
         IDPPUtils.debug.message("IDPPEncryptKey:getContainerObject:Init");
-        try {
-            PPType ppType = IDPPUtils.getIDPPFactory().createPPElement();
-            EncryptKeyElement encryptKey = 
-                IDPPUtils.getIDPPFactory().createEncryptKeyElement();
-            byte[][] certBytes = (byte[][]) userMap.get(
-                    getAttributeMapper().getDSAttribute(
-                    IDPPConstants.ENCRYPT_KEY_ELEMENT).toLowerCase());
+         PPType ppType = IDPPUtils.getIDPPFactory().createPPType();
+         EncryptKeyElement encryptKey =
+             IDPPUtils.getIDPPFactory().createEncryptKeyElement(
+                     IDPPUtils.getIDPPFactory().createKeyInfoType()
+             );
+         byte[][] certBytes = (byte[][]) userMap.get(
+                 getAttributeMapper().getDSAttribute(
+                 IDPPConstants.ENCRYPT_KEY_ELEMENT).toLowerCase());
 
-            if(certBytes != null) {
-               com.sun.identity.liberty.ws.common.jaxb.xmlsig.ObjectFactory of =
-                        new com.sun.identity.liberty.ws.common.jaxb.xmlsig.
-                        ObjectFactory();
+         if(certBytes != null) {
+            com.sun.identity.liberty.ws.common.jaxb.xmlsig.ObjectFactory of =
+                     new com.sun.identity.liberty.ws.common.jaxb.xmlsig.
+                     ObjectFactory();
 
-               com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType
-               x509DataType = of.createX509DataElement();
+            com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType
+            x509DataType = of.createX509DataType();
 
-               com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.
-               X509Certificate cert = of.createX509DataTypeX509Certificate(
-                         certBytes[0]);
+            com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.
+            X509Certificate cert = of.createX509DataTypeX509Certificate(
+                      certBytes[0]);
 
-               x509DataType.
-                   getX509IssuerSerialOrX509SKIOrX509SubjectName().add(cert);
-               encryptKey.getContent().add(x509DataType);
-            }
+            x509DataType.
+                getX509IssuerSerialOrX509SKIOrX509SubjectName().add(cert);
+            encryptKey.getValue().getContent().add(of.createX509DataElement(x509DataType));
+         }
 
-            ppType.setEncryptKey(encryptKey);
-            return ppType;
-        } catch (JAXBException je) {
-            IDPPUtils.debug.error(
-            "IDPPEncryptKey:getEncryptKey: JAXB failure", je); 
-            throw new IDPPException(
-            IDPPUtils.bundle.getString("jaxbFailure"));
-        }
+         ppType.setEncryptKey(encryptKey);
+         return ppType;
      }
 
      /**
@@ -146,7 +141,7 @@ public class IDPPEncryptKey extends IDPPBaseContainer {
         if(dataElement instanceof EncryptKeyElement) {
            byte[] certBytes = null;
            EncryptKeyElement encryptKey = (EncryptKeyElement)dataElement;
-           List contents = encryptKey.getContent();
+           List<Object> contents = encryptKey.getValue().getContent();
 
            if(contents == null || contents.size() == 0) {
               map.put(getAttributeMapper().getDSAttribute(
@@ -163,8 +158,8 @@ public class IDPPEncryptKey extends IDPPBaseContainer {
                 com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataElement
                 x509Data = (com.sun.identity.liberty.ws.common.jaxb.
                             xmlsig.X509DataElement)obj;
-                List certs =
-                   x509Data.getX509IssuerSerialOrX509SKIOrX509SubjectName();
+                List<Object> certs =
+                   x509Data.getValue().getX509IssuerSerialOrX509SKIOrX509SubjectName();
 
                 if(certs == null || certs.size() == 0) {
                    IDPPUtils.debug.error("IDPPEncryptKey.getDataMapForSelect:" +
