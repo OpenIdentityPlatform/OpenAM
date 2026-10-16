@@ -184,9 +184,7 @@ public class DebugFileImpl implements DebugFile {
         StringBuilder newFileName = new StringBuilder();
 
         //Set prefix
-        if (configuration.getDebugPrefix() != null) {
-            newFileName.append(configuration.getDebugPrefix());
-        }
+        newFileName.append(configuration.getDebugPrefix());
 
         //Set name
         newFileName.append(fileName);
@@ -224,7 +222,7 @@ public class DebugFileImpl implements DebugFile {
                 fileCreationTime -= fileCreationTime % (1000 * 60);
             }
 
-            nextRotation = fileCreationTime + configuration.getRotationInterval() * 60 * 1000;
+            nextRotation = fileCreationTime + configuration.getRotationInterval() * 60L * 1000;
             boolean directoryAvailable = false;
             String debugDir = debugDirectory.get();
 

@@ -85,6 +85,11 @@ The token endpoint fails closed to match: while the property is enabled, an auth
 Update hybrid-flow clients to send a `code_challenge` at the authorization endpoint and the matching `code_verifier` at the token endpoint, or disable Code Verifier Parameter Required for the realm. Disabling it never relaxes verification for codes that *were* issued with a challenge. See xref:../reference/chap-config-ref.adoc#oauth2-provider-configuration["OAuth2 Provider"] in the __Reference__.
 ====
 
+[IMPORTANT]
+====
+Starting with this release `debugconfig.properties` is validated more strictly. A file with `org.forgerock.openam.debug.rotation=-1`, or with a trailing space after a rotation value next to a suffix that is empty, too coarse or cannot be parsed, is now rejected as a whole: OpenAM prints "'/debugconfig.properties' isn't valid, the default configuration will be used instead" to the standard error output and uses no prefix and no rotation. Leave a rotation value empty to turn that rotation off. Trailing spaces are also removed from the prefix and the suffix, so they no longer appear in debug log file names. See xref:../admin-guide/chap-monitoring.adoc#log-rotate-debug["Rotating Debug Logs"] in the __Administration Guide__.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====

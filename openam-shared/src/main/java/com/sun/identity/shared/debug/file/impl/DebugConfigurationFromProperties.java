@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.shared.debug.file.impl;
 
@@ -20,7 +21,6 @@ import static org.forgerock.openam.utils.Time.*;
 import com.sun.identity.shared.debug.DebugConstants;
 import com.sun.identity.shared.debug.file.DebugConfiguration;
 import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.openam.utils.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +46,7 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
      * It will reset the current properties for every Debug instance
      *
      * @param debugFilePropertiesPath path to the debug configuration file
+     * @throws InvalidDebugConfigurationException if the file can't be found, can't be read or isn't valid
      */
     public DebugConfigurationFromProperties(String debugFilePropertiesPath) throws InvalidDebugConfigurationException {
         InputStream is = null;
@@ -58,15 +59,20 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
             Properties rotationConfig = new Properties();
             rotationConfig.load(is);
 
-            debugPrefix = rotationConfig.getProperty(DebugConstants.CONFIG_DEBUG_LOGFILE_PREFIX);
-            debugSuffix = rotationConfig.getProperty(DebugConstants.CONFIG_DEBUG_LOGFILE_SUFFIX);
+            debugPrefix = getTrimmedProperty(rotationConfig, DebugConstants.CONFIG_DEBUG_LOGFILE_PREFIX);
+            debugSuffix = getTrimmedProperty(rotationConfig, DebugConstants.CONFIG_DEBUG_LOGFILE_SUFFIX);
 
-            String maxFileSizedInMb = rotationConfig.getProperty(DebugConstants.CONFIG_DEBUG_LOGFILE_MAX_SIZE);
-            if (!StringUtils.isEmpty(maxFileSizedInMb)) {
+            String maxFileSizedInMb = getTrimmedProperty(rotationConfig, DebugConstants.CONFIG_DEBUG_LOGFILE_MAX_SIZE);
+            if (!maxFileSizedInMb.isEmpty()) {
                 try {
-                    maxFileSizeInByte = Integer.parseInt(maxFileSizedInMb);
+                    int maxFileSizeInMb = Integer.parseInt(maxFileSizedInMb);
+                    if (maxFileSizeInMb <= 0) {
+                        throw new InvalidDebugConfigurationException("File size rotation needs to be greater than " +
+                                "zero. File size rotation = '" + maxFileSizeInMb + "' MB. Leave the value empty to " +
+                                "disable file size rotation.", null);
+                    }
                     //Convert MaxFileSize to byte
-                    maxFileSizeInByte <<= 20;
+                    maxFileSizeInByte = (long) maxFileSizeInMb << 20;
                 } catch (NumberFormatException e) {
                     //Can't parse the number
                     String message = "The '" + DebugConstants.CONFIG_DEBUG_LOGFILE_MAX_SIZE + "' value : "
@@ -76,10 +82,16 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
                 }
             }
 
-            String rotation = rotationConfig.getProperty(DebugConstants.CONFIG_DEBUG_LOGFILE_ROTATION);
-            if (!StringUtils.isEmpty(rotation)) {
+            String rotation = getTrimmedProperty(rotationConfig, DebugConstants.CONFIG_DEBUG_LOGFILE_ROTATION);
+            if (!rotation.isEmpty()) {
                 try {
-                    rotationInterval = Integer.parseInt(rotation);
+                    int interval = Integer.parseInt(rotation);
+                    if (interval <= 0) {
+                        throw new InvalidDebugConfigurationException("Rotation interval needs to be greater than " +
+                                "zero. rotationInterval = '" + interval + "'. Leave the value empty to disable time " +
+                                "rotation.", null);
+                    }
+                    rotationInterval = interval;
                 } catch (NumberFormatException e) {
                     //Can't parse the number
                     String message = "'" + DebugConstants.CONFIG_DEBUG_LOGFILE_ROTATION + "' value can't be parsed: '" +
@@ -96,10 +108,18 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
             String message = "Can't load debug file properties. Please check the configuration file '" +
                     debugFilePropertiesPath + "'.";
             throw new InvalidDebugConfigurationException(message);
+        } catch (RuntimeException ex) {
+            //the file can't be read, for example it contains a malformed Unicode escape
+            throw new InvalidDebugConfigurationException("Can't load debug file properties from '" +
+                    debugFilePropertiesPath + "': " + ex, ex);
         } finally {
             IOUtils.closeIfNotNull(is);
         }
 
+    }
+
+    private static String getTrimmedProperty(Properties properties, String key) {
+        return properties.getProperty(key, "").trim();
     }
 
     @Override
@@ -129,12 +149,7 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
      */
     private void validate() throws InvalidDebugConfigurationException {
 
-        if (getRotationFileSizeInByte() != -1) {
-            if (getRotationFileSizeInByte() <= 0) {
-                throw new InvalidDebugConfigurationException("File size rotation needs to be greater than " +
-                        "zero. File size rotation = '" + getRotationFileSizeInByte() + "'", null);
-            }
-
+        if (getRotationFileSizeInByte() > 0) {
             if (getDebugSuffix().isEmpty()) {
                 throw new InvalidDebugConfigurationException("Log size rotation is enabled (File size rotation = " +
                         getRotationFileSizeInByte() + ") but the debug suffix is empty");
@@ -151,12 +166,7 @@ public class DebugConfigurationFromProperties implements DebugConfiguration {
             }
         }
 
-        if (getRotationInterval() != -1) {
-            if (getRotationInterval() <= 0) {
-                throw new InvalidDebugConfigurationException("Rotation interval needs to be greater than zero. " +
-                        "rotationInterval = '" + rotationInterval + "'", null);
-            }
-
+        if (getRotationInterval() > 0) {
             if (getDebugSuffix().isEmpty()) {
                 throw new InvalidDebugConfigurationException("Log time rotation is enabled (rotation interval = " +
                         getRotationInterval() + ") but the debug suffix is empty");
