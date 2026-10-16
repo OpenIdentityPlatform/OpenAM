@@ -108,8 +108,8 @@ public class CTSDJLDAPv3PersistentSearchTest {
         //when
         searchResult.handleException(newLdapException(ResultCode.UNAVAILABLE));
 
-        //then
-        verify(mockConnectionFactory, timeout(5000).times(2)).create();
+        //then - every restart gets the same failed search, so the count keeps growing
+        verify(mockConnectionFactory, timeout(5000).atLeast(2)).create();
     }
 
     @Test
@@ -125,8 +125,9 @@ public class CTSDJLDAPv3PersistentSearchTest {
         //when
         searchResult.handleException(newLdapException(ResultCode.INSUFFICIENT_ACCESS_RIGHTS));
 
-        //then - the access rights may be fixed without restarting AM, so the search keeps being restarted
-        verify(mockConnectionFactory, timeout(5000).times(2)).create();
+        //then - the access rights may be fixed without restarting AM, so the search keeps being restarted,
+        //also after the restarted search is refused again
+        verify(mockConnectionFactory, timeout(5000).atLeast(3)).create();
     }
 
     @Test

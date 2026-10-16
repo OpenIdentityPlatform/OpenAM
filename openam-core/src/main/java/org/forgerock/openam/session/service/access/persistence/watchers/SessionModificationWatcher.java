@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.session.service.access.persistence.watchers;
@@ -109,7 +109,8 @@ public class SessionModificationWatcher implements SetupListener {
 
         @Override
         public void connectionLost() {
-            debug.error("Continuous query listener has lost its connection");
+            // The persistent search already reports the failure at error level, at most once per minute.
+            debug.warning("Continuous query listener has lost its connection");
         }
 
         @Override
