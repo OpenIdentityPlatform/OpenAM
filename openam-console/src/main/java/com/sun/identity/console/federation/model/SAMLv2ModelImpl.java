@@ -1734,7 +1734,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
                                     if (encrptType instanceof EncryptionMethodType.KeySize) {
                                         EncryptionMethodType.KeySize keysizeElem =
                                             (EncryptionMethodType.KeySize)
-                                                keySizeList.get(0);
+                                                encrptType;
                                         BigInteger keysize = keysizeElem.getValue();
                                         size = Integer.toString(keysize.intValue());
                                     }

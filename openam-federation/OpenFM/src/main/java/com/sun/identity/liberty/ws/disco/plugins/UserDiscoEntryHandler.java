@@ -65,7 +65,7 @@ public class UserDiscoEntryHandler implements DiscoEntryHandler {
      * Finds discovery entries for a user under user entry.
      * @param userID The user whose discovery entries will be returned.
      * @param reqServiceTypes List of
-     *  <code>com.sun.identity.liberty.ws.disco.jaxb.RequestedServiceType</code>
+     *  <code>com.sun.identity.liberty.ws.disco.jaxb.QueryType.RequestedServiceType</code>
      *  objects from discovery query.
      * @return Map of <code>entryId</code> and 
      *  <code>com.sun.identity.liberty.ws.disco.plugins.jaxb.DiscoEntryElement

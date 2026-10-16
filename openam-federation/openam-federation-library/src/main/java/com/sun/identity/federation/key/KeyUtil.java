@@ -350,7 +350,18 @@ public class KeyUtil {
             
             return null;
         }
-        X509DataElement data = (X509DataElement) ki.getContent().get(0);
+        // KeyInfo content is mixed: skip whitespace text and other elements
+        X509DataElement data = null;
+        for (Object content : ki.getContent()) {
+            if (content instanceof X509DataElement) {
+                data = (X509DataElement) content;
+                break;
+            }
+        }
+        if (data == null) {
+            FSUtils.debug.error("KeyUtil.getCert: No X509Data.");
+            return null;
+        }
         byte[] bt = 
             ((com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataType.X509Certificate)
              data.getValue().getX509IssuerSerialOrX509SKIOrX509SubjectName().get(0)).

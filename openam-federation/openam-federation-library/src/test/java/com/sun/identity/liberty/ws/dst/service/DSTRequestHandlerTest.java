@@ -13,17 +13,17 @@
  *
  * Copyright 2026 3A Systems, LLC.
  */
-package com.sun.identity.liberty.ws.disco.common;
+package com.sun.identity.liberty.ws.dst.service;
 
+import com.sun.identity.liberty.ws.disco.common.DiscoUtils;
 import com.sun.identity.liberty.ws.disco.jaxb.EncryptedResourceIDType;
-import com.sun.identity.shared.xml.XMLUtils;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Test
-public class DiscoUtilsTest {
+public class DSTRequestHandlerTest {
 
     /**
      * The raw {@code EncryptedResourceIDType} has no {@code @XmlRootElement}, so DST request
@@ -33,9 +33,7 @@ public class DiscoUtilsTest {
     public void encryptedResourceIDMarshalsViaElementWrapper() throws Exception {
         EncryptedResourceIDType encID = DiscoUtils.getDiscoFactory().createEncryptedResourceIDType();
 
-        Document doc = XMLUtils.newDocument();
-        DiscoUtils.getDiscoMarshaller().marshal(
-                DiscoUtils.getDiscoFactory().createEncryptedResourceIDElement(encID), doc);
+        Document doc = DSTRequestHandler.toDocument(encID);
 
         assertThat(doc.getDocumentElement().getLocalName()).isEqualTo("EncryptedResourceID");
         assertThat(doc.getDocumentElement().getNamespaceURI()).isEqualTo("urn:liberty:disco:2003-08");

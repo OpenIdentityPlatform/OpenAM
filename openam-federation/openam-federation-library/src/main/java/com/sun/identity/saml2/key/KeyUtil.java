@@ -319,19 +319,7 @@ public class KeyUtil {
             em = emList.get(0).getValue();
             if (em != null) {
                 algorithm = em.getAlgorithm();
-                List cList = em.getContent();
-                if (cList != null) {
-                    Iterator cIter = cList.iterator();
-                    while (cIter.hasNext()) {
-                        Object cObject = cIter.next();
-                        if (cObject instanceof EncryptionMethodType.KeySize) {
-                            keySize =
-                                ((EncryptionMethodType.KeySize)(cList.get(0))).
-                                    getValue().intValue();
-                            break;
-                        }
-                    }
-                }
+                keySize = getKeySize(em);
             }
         }
         if (algorithm == null || algorithm.length() == 0) {
@@ -346,6 +334,24 @@ public class KeyUtil {
             encHash.put(index, encInfo);
         }
         return encInfo;
+    }
+
+    /**
+     * Returns the value of the <code>KeySize</code> element of an <code>EncryptionMethod</code>.
+     * The content is mixed, so it can hold whitespace text before the element.
+     * @param em <code>EncryptionMethodType</code> to read the key size from
+     * @return the key size; or <code>0</code> if no <code>KeySize</code> is present.
+     */
+    private static int getKeySize(EncryptionMethodType em) {
+        List<Object> content = em.getContent();
+        if (content != null) {
+            for (Object item : content) {
+                if (item instanceof EncryptionMethodType.KeySize) {
+                    return ((EncryptionMethodType.KeySize) item).getValue().intValue();
+                }
+            }
+        }
+        return 0;
     }
 
     /**
@@ -557,12 +563,7 @@ public class KeyUtil {
             em = emList.get(0).getValue();
             if (em != null) {
                 algorithm = em.getAlgorithm();
-                List cList = em.getContent();
-                if (cList != null) {
-                    keySize =
-                        ((EncryptionMethodType.KeySize)(cList.get(0))).
-                        getValue().intValue();
-                }
+                keySize = getKeySize(em);
             }
         }
         if (algorithm == null || algorithm.length() == 0) {

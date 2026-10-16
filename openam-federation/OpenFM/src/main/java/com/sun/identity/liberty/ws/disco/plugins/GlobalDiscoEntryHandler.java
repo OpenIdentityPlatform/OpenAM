@@ -123,7 +123,7 @@ public class GlobalDiscoEntryHandler implements DiscoEntryHandler {
      * Returns DiscoEntries for a user under userEntry.
      * @param userID The user whose DiscoEntries will be returned.
      * @param reqServiceTypes List of
-     *          com.sun.identity.liberty.ws.disco.jaxb.RequestedServiceType 
+     *          com.sun.identity.liberty.ws.disco.jaxb.QueryType.RequestedServiceType 
      *          objects from discovery Query.
      * @return Map of entryId and 
      * 		com.sun.identity.liberty.ws.disco.plugins.jaxb.DiscoEntryElement

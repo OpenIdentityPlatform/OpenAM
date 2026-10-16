@@ -189,4 +189,15 @@ public enum Time implements DateTimeUtils.MillisProvider {
 
         return DatatypeFactoryHolder.INSTANCE.newXMLGregorianCalendar(gCalendar);
     }
+
+    /**
+     * Parses an XML Schema date/time lexical value, such as an {@code xs:gMonthDay}, with the shared factory.
+     * @param lexicalRepresentation The lexical value to parse.
+     * @return The parsed calendar.
+     * @throws IllegalArgumentException If the value is not a valid lexical representation.
+     * @see DatatypeFactory#newXMLGregorianCalendar(String)
+     */
+    public static XMLGregorianCalendar getXMLGregorianCalendarInstance(String lexicalRepresentation) {
+        return DatatypeFactoryHolder.INSTANCE.newXMLGregorianCalendar(lexicalRepresentation);
+    }
 }

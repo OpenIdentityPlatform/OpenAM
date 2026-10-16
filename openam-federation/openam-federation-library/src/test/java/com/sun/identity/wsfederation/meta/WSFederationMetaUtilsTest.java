@@ -16,7 +16,11 @@
 package com.sun.identity.wsfederation.meta;
 
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collections;
 
+import com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement;
 import com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement;
 import com.sun.identity.wsfederation.jaxb.wsfederation.TokenSigningKeyInfoElement;
 import com.sun.identity.wsfederation.jaxb.wsse.SecurityTokenReferenceElement;
@@ -68,5 +72,30 @@ public class WSFederationMetaUtilsTest {
         FederationElement unmarshalled =
                 (FederationElement) WSFederationMetaUtils.convertStringToJAXB(sw.toString());
         assertThat(WSFederationMetaUtils.findTokenSigningCertificate(unmarshalled)).isEqualTo(certBytes);
+    }
+
+    public void attributesAreReadFromUnmarshalledEntityConfig() throws Exception {
+        String entityConfig =
+                "<FederationConfig xmlns=\"urn:sun:fm:wsfederation:1.0:federationconfig\""
+                + " FederationID=\"wsfed-test-entity\" hosted=\"true\">\n"
+                + "    <IDPSSOConfig metaAlias=\"/idp\">\n"
+                + "        <Attribute name=\"signingCertAlias\">\n"
+                + "            <Value>test</Value>\n"
+                + "        </Attribute>\n"
+                + "        <Attribute name=\"cotlist\">\n"
+                + "            <Value>cot1</Value>\n"
+                + "            <Value>cot2</Value>\n"
+                + "        </Attribute>\n"
+                + "    </IDPSSOConfig>\n"
+                + "</FederationConfig>";
+        FederationConfigElement config =
+                (FederationConfigElement) WSFederationMetaUtils.convertStringToJAXB(entityConfig);
+        BaseConfigType idpConfig = config.getValue().getIDPSSOConfigOrSPSSOConfig().get(0).getValue();
+
+        assertThat(WSFederationMetaUtils.getAttributes(idpConfig))
+                .containsOnlyKeys("signingCertAlias", "cotlist")
+                .containsEntry("signingCertAlias", Collections.singletonList("test"))
+                .containsEntry("cotlist", Arrays.asList("cot1", "cot2"));
+        assertThat(WSFederationMetaUtils.getAttributes(idpConfig, "cotlist")).containsExactly("cot1", "cot2");
     }
 }

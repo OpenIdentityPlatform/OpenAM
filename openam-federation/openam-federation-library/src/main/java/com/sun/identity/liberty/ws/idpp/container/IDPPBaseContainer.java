@@ -35,7 +35,6 @@ import static org.forgerock.openam.utils.Time.*;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.Set;
 import java.util.HashSet;
@@ -264,7 +263,7 @@ public abstract class IDPPBaseContainer implements IDPPContainer {
             if (monthDay.matches("\\d{2}-\\d{2}")) {
                 monthDay = "--" + monthDay;
             }
-            XMLGregorianCalendar cal = DatatypeFactory.newInstance().newXMLGregorianCalendar(monthDay);
+            XMLGregorianCalendar cal = getXMLGregorianCalendarInstance(monthDay);
             dstMonthDay.setValue(cal);
             return dstMonthDay;
         } catch(Exception e) {
