@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.authentication.modules.nt;
 
@@ -50,7 +51,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.security.Principal;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -235,7 +238,7 @@ public class NT extends AMLoginModule {
         File tmpFile = null;
         try {
             // Create the tmpFile
-            tmpFile = File.createTempFile(userName,"pwd");
+            tmpFile = createCredentialsFile();
             FileOutputStream fw = new FileOutputStream(tmpFile);
             OutputStreamWriter dos = new OutputStreamWriter(fw, "UTF-8");
             dos.write("username = " + userName + "\n");
@@ -388,6 +391,16 @@ public class NT extends AMLoginModule {
         host = null;
         domain = null;
         userName = null;
-        smbConfFileName = null; 
+        smbConfFileName = null;
+    }
+
+    /**
+     * The file the user name and password are handed to the authentication helper in. It sits in
+     * the shared temporary directory, so it is created readable by the server's own account only
+     * ({@code java.nio.file.Files} does that, unlike {@link File#createTempFile}); the caller
+     * deletes it once the helper has run.
+     */
+    static File createCredentialsFile() throws IOException {
+        return Files.createTempFile("ntauth", ".pwd").toFile();
     }
 }

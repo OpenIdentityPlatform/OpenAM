@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.core.rest.docs.api;
 
@@ -156,8 +156,7 @@ public class ApiDocsService implements Describable.Listener {
     }
 
     private File getDocs(File asciidoc) throws IOException {
-        File docs = File.createTempFile("openam-api.", ".html");
-        docs.deleteOnExit();
+        File docs = privateTempFile("openam-api.", ".html");
         try (Reader reader = new FileReader(asciidoc); Writer writer = new FileWriter(docs)) {
             asciidoctor.convert(
                     reader,
@@ -177,10 +176,20 @@ public class ApiDocsService implements Describable.Listener {
 
     private File getAsciiDoc(ApiDescription description) throws IOException {
         String asciiDocMarkup = ApiDocGenerator.execute("OpenAM API", description, null);
-        File asciidoc = File.createTempFile("openam-api.", ".asciidoc");
-        asciidoc.deleteOnExit();
+        File asciidoc = privateTempFile("openam-api.", ".asciidoc");
         Files.write(asciiDocMarkup, asciidoc, StandardCharsets.UTF_8);
         return asciidoc;
+    }
+
+    /**
+     * A temporary file in the shared temporary directory that only the server's own account can
+     * read ({@code java.nio.file.Files} creates it with owner-only permissions, unlike
+     * {@link File#createTempFile}), deleted when the JVM exits.
+     */
+    static File privateTempFile(String prefix, String suffix) throws IOException {
+        File file = java.nio.file.Files.createTempFile(prefix, suffix).toFile();
+        file.deleteOnExit();
+        return file;
     }
 
     private ApiDescription getDescription() {

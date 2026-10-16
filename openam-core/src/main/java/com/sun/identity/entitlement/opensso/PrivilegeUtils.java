@@ -38,6 +38,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.entitlement.AndCondition;
 import com.sun.identity.entitlement.Application;
 import com.sun.identity.entitlement.Entitlement;
+import com.sun.identity.entitlement.EntitlementClassResolver;
 import com.sun.identity.entitlement.EntitlementCondition;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
@@ -200,7 +201,7 @@ public class PrivilegeUtils {
     }
 
     private static EntitlementSubject toEntitlementSubject(Policy policy)
-        throws PolicyException {
+        throws PolicyException, EntitlementException {
         Set<String> subjectNames = policy.getSubjectNames();
         Set<EntitlementSubject> entitlementSubjects =
             new HashSet<EntitlementSubject>();
@@ -356,6 +357,13 @@ public class PrivilegeUtils {
         for (Object nConditionObj : nConditons) {
             Object[] nCondition = (Object[]) nConditionObj;
             EntitlementCondition ec = mapGenericCondition(nCondition);
+            if (ec == null) {
+                // A condition that mapped to nothing used to be added to the set as a null, which
+                // a single-element set then handed back as "this policy has no condition" - i.e.
+                // unconditionally satisfied - and which anything reading the set would trip over.
+                throw new EntitlementException(EntitlementException.UNKNOWN_POLICY_CLASS,
+                    new String[]{String.valueOf(nCondition[0])});
+            }
             ecSet.add(ec);
         }
 
@@ -401,7 +409,8 @@ public class PrivilegeUtils {
     private static EntitlementSubject mapGenericSubject(
         String subjectName,
         Subject objSubject,
-        boolean exclusive) {
+        boolean exclusive) throws EntitlementException {
+        String className = null;
         try {
             if (objSubject instanceof com.sun.identity.policy.plugins.PrivilegeSubject) {
                 com.sun.identity.policy.plugins.PrivilegeSubject pips =
@@ -409,25 +418,39 @@ public class PrivilegeUtils {
                 Set<String> values = pips.getValues();
                 String val = values.iterator().next();
                 int idx = val.indexOf("=");
-                String className = val.substring(0, idx);
+                className = val.substring(0, idx);
                 String state = val.substring(idx+1);
-                EntitlementSubject es = (EntitlementSubject) Class.forName(className).newInstance();
+                // Resolve without running the target's static initializer and reject any class that
+                // is not an instantiable EntitlementSubject BEFORE it is constructed. The name comes
+                // straight from an administrator-supplied PrivilegeSubject value, so an unguarded
+                // Class.forName(name).newInstance() here is arbitrary code execution (CWE-470).
+                EntitlementSubject es = EntitlementClassResolver.newInstance(
+                    className, EntitlementSubject.class);
                 es.setState(state);
                 return es;
             } else {
                 Subject sbj = (Subject) objSubject;
                 Set<String> val = sbj.getValues();
-                String className = sbj.getClass().getName();
+                className = sbj.getClass().getName();
                 return new PolicySubject(subjectName, className, val, exclusive);
             }
+        // A refusal used to be swallowed and reported as a null subject, which toEntitlementSubject
+        // then dropped: a policy whose only subject was refused ended up with no subject at all,
+        // and a privilege without a subject matches everyone. This is a write path, so the policy
+        // must not be created rather than be created weaker than it was asked for.
+        } catch (EntitlementClassResolver.RejectedTypeException e) {
+            throw new EntitlementException(EntitlementException.POLICY_CLASS_CAST_EXCEPTION,
+                new String[]{className, EntitlementSubject.class.getName()}, e);
         } catch (ClassNotFoundException e) {
-            PolicyConstants.DEBUG.error("PrivilegeUtils.mapGenericSubject", e);
+            throw new EntitlementException(EntitlementException.UNKNOWN_POLICY_CLASS,
+                new String[]{className}, e);
         } catch (InstantiationException e) {
-            PolicyConstants.DEBUG.error("PrivilegeUtils.mapGenericSubject", e);
+            throw new EntitlementException(EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE,
+                new String[]{className}, e);
         } catch (IllegalAccessException e) {
-            PolicyConstants.DEBUG.error("PrivilegeUtils.mapGenericSubject", e);
+            throw new EntitlementException(EntitlementException.POLICY_CLASS_NOT_ACCESSIBLE,
+                new String[]{className}, e);
         }
-        return null;
     }
 
     private static Set<ResourceAttribute> mapGenericResponseProvider(
@@ -451,15 +474,19 @@ public class PrivilegeUtils {
 
     private static EntitlementCondition mapGenericCondition(
         Object[] nCondition) throws EntitlementException {
+        String className = null;
         try {
             Object objCondition = nCondition[1];
             if (objCondition instanceof com.sun.identity.policy.plugins.PrivilegeCondition) {
                 com.sun.identity.policy.plugins.PrivilegeCondition pipc =
                     (com.sun.identity.policy.plugins.PrivilegeCondition) objCondition;
                 Map<String, Set<String>> props = pipc.getProperties();
-                String className = props.keySet().iterator().next();
-                EntitlementCondition ec =
-                    (EntitlementCondition) Class.forName(className).newInstance();
+                className = props.keySet().iterator().next();
+                // Same guard as mapGenericSubject: the class name is an administrator-supplied
+                // PrivilegeCondition property key, so it must be validated as an instantiable
+                // EntitlementCondition before the class is loaded and constructed (CWE-470).
+                EntitlementCondition ec = EntitlementClassResolver.newInstance(
+                    className, EntitlementCondition.class);
                 Set<String> setValues = props.get(className);
                 ec.setState(setValues.iterator().next());
                 ec.validate();
@@ -467,18 +494,23 @@ public class PrivilegeUtils {
             } else if (objCondition instanceof Condition) {
                 Condition cond = (Condition) objCondition;
                 Map<String, Set<String>> props = cond.getProperties();
-                String className = cond.getClass().getName();
+                className = cond.getClass().getName();
                 return new PolicyCondition((String) nCondition[0], className, props);
             }
+        // Same as mapGenericSubject: a swallowed refusal used to become a null condition, and a
+        // privilege without a condition is unconditionally satisfied.
+        } catch (EntitlementClassResolver.RejectedTypeException e) {
+            throw new EntitlementException(EntitlementException.POLICY_CLASS_CAST_EXCEPTION,
+                new String[]{className, EntitlementCondition.class.getName()}, e);
         } catch (ClassNotFoundException e) {
-            PolicyConstants.DEBUG.error(
-                "PrivilegeUtils.mapGenericCondition", e);
+            throw new EntitlementException(EntitlementException.UNKNOWN_POLICY_CLASS,
+                new String[]{className}, e);
         } catch (InstantiationException e) {
-            PolicyConstants.DEBUG.error(
-                "PrivilegeUtils.mapGenericCondition", e);
+            throw new EntitlementException(EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE,
+                new String[]{className}, e);
         } catch (IllegalAccessException e) {
-            PolicyConstants.DEBUG.error(
-                "PrivilegeUtils.mapGenericCondition", e);
+            throw new EntitlementException(EntitlementException.POLICY_CLASS_NOT_ACCESSIBLE,
+                new String[]{className}, e);
         }
         return null;
     }

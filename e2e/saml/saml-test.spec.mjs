@@ -17,7 +17,7 @@
 
 // openam.spec.mjs – ESM edition
 import { test, expect } from "@playwright/test";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import { resolve } from "path";
 import { fileURLToPath } from "url";
 import { PASSWORD, USERNAME } from "../common/openam-commons.mjs";
@@ -51,7 +51,8 @@ const SEL = {
 
 const execScript = (scriptPath) => {
   try {
-    execSync(`bash "${scriptPath}"`, {
+    // No shell: the script path is handed to bash as an argument, not interpolated.
+    execFileSync("bash", [scriptPath], {
       encoding: "utf-8",
       timeout: 300_000,   // 5 minutes max
       stdio: "inherit",

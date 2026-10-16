@@ -160,6 +160,42 @@ public class IdTokenClaimGathererTest {
         assertThat(requestingPartyId).isNull();
     }
 
+    /** A public client has no secret; an RS256 id_token is verified with the provider's key alone. */
+    @Test
+    public void shouldGatherRsaSignedIdTokenClaimTokenForClientWithoutSecret() {
+
+        //Given
+        AccessToken authorizationApiToken = mockAuthorizationApiToken();
+        given(clientRegistration.getClientSecret()).willReturn(null);
+        JsonValue claimToken = mockRsaIdTokenClaimToken("ISSUER");
+
+        setIdTokenAndOAuth2ProviderIssuers("ISSUER");
+
+        //When
+        String requestingPartyId = claimGatherer.getRequestingPartyId(oAuth2Request, authorizationApiToken, claimToken);
+
+        //Then
+        assertThat(requestingPartyId).isEqualTo("REQUESTING_PARTY_ID");
+    }
+
+    /** An HMAC id_token from a client without a secret cannot be verified; that is a rejection, not an NPE. */
+    @Test
+    public void shouldNotGatherHmacSignedIdTokenClaimTokenForClientWithoutSecret() {
+
+        //Given
+        AccessToken authorizationApiToken = mockAuthorizationApiToken();
+        given(clientRegistration.getClientSecret()).willReturn(null);
+        JsonValue claimToken = mockIdTokenClaimToken("ISSUER");
+
+        setIdTokenAndOAuth2ProviderIssuers("ISSUER");
+
+        //When
+        String requestingPartyId = claimGatherer.getRequestingPartyId(oAuth2Request, authorizationApiToken, claimToken);
+
+        //Then
+        assertThat(requestingPartyId).isNull();
+    }
+
     private AccessToken mockAuthorizationApiToken() {
         AccessToken authorizationApiToken = mock(AccessToken.class);
         given(authorizationApiToken.getClientId()).willReturn("CLIENT_ID");
@@ -175,6 +211,17 @@ public class IdTokenClaimGathererTest {
 
     private JsonValue mockInvalidIdTokenClaimToken(String issuer) {
         mockIdToken(false);
+        given(claimsSet.getSubject()).willReturn("REQUESTING_PARTY_ID");
+        given(claimsSet.getIssuer()).willReturn(issuer);
+        return json("ID_TOKEN");
+    }
+
+    private JsonValue mockRsaIdTokenClaimToken(String issuer) {
+        given(jwsHeader.getAlgorithm()).willReturn(JwsAlgorithm.RS256);
+        given(idToken.getHeader()).willReturn(jwsHeader);
+        SigningHandler signingHandler = mock(SigningHandler.class);
+        given(signingManager.newRsaSigningHandler(any(java.security.Key.class))).willReturn(signingHandler);
+        given(idToken.verify(signingHandler)).willReturn(true);
         given(claimsSet.getSubject()).willReturn("REQUESTING_PARTY_ID");
         given(claimsSet.getIssuer()).willReturn(issuer);
         return json("ID_TOKEN");

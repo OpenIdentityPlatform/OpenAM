@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.cassandra;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -64,9 +65,23 @@ import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import com.datastax.oss.driver.api.querybuilder.select.Select;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.hash.Hashing;
 
 public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.api.TokenStorageAdapter {
 	final static Logger logger = LoggerFactory.getLogger(TokenStorageAdapter.class);
+
+	/**
+	 * Renders a token id for log output as a short SHA-256 digest. The id is a
+	 * session id or an OAuth2 token, so the raw value must never reach the logs;
+	 * a prefix would not do either, because every session id starts with the same
+	 * "AQIC" header. The digest still lets an operator holding the id find its lines.
+	 */
+	static String maskTokenId(String tokenId) {
+		if (tokenId == null) {
+			return "null";
+		}
+		return "sha256:" + Hashing.sha256().hashString(tokenId, StandardCharsets.UTF_8).toString().substring(0, 8);
+	}
 
 	private final DataLayerConfiguration cfg;
 	static ConnectionFactory<CqlSession> connectionFactory;
@@ -111,7 +126,7 @@ public class TokenStorageAdapter implements org.forgerock.openam.sm.datalayer.ap
 				try {
 					value = token.getAttribute(field);
 				}catch (Throwable e) {
-					logger.warn("create {} for {} {}",e.toString(),field,token);
+					logger.warn("update: unable to read {} of {} token {}: {}",field,token.getType(),maskTokenId(token.getTokenId()),e.toString());
 					throw e;
 				}
 				if (value!=null) {

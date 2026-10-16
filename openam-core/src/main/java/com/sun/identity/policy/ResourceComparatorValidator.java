@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyright 2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.policy;
@@ -99,31 +100,12 @@ public class ResourceComparatorValidator implements ServiceAttributeValidator {
                             return false;
                         }
                         if (!wildcardPattern.contains(oneLevelPattern) && !oneLevelPattern.contains(wildcardPattern)) {
-                            boolean overlap = false;
                             if (debug.messageEnabled()) {
                                 debug.message("ResourceComparatorValidator.validate():about to do overlap check");
                             }
                             // find if the wildcard and one level wildcard patterns overlap
-                            int oneLevelWildLength = oneLevelPattern.length();
-                            int wildcardLength = wildcardPattern.length();
-                            char[] wildcard = wildcardPattern.toCharArray();
-                            char[] oneWildcard = oneLevelPattern.toCharArray();
-                            for (int i = 0; i < wildcardPattern.length(); i++) {
-                                for (int j = 0; j < oneLevelPattern.length(); j++) {
-                                    if (wildcard[i] == oneWildcard[j]) {
-                                        String remString1 = String.valueOf(wildcard, i, wildcardLength - i);
-                                        String remString2 = String.valueOf(oneWildcard, j, oneLevelWildLength - j);
-                                        if (oneLevelPattern.startsWith(remString1) ||
-                                                wildcardPattern.startsWith(remString2)) {
-                                            overlap = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (overlap) {
-                                    break;
-                                }
-                            }
+                            boolean overlap = startsWithASuffixOf(oneLevelPattern, wildcardPattern)
+                                    || startsWithASuffixOf(wildcardPattern, oneLevelPattern);
                             if (overlap) {
                                 debug.error("ResourceComparatorValidator.validate():Wildcard and one level "
                                         + "wildcard pattern cannot be overlapping");
@@ -135,5 +117,36 @@ public class ResourceComparatorValidator implements ServiceAttributeValidator {
             } // while
         } // if values not empty
         return true;
+    }
+
+    /**
+     * Returns <code>true</code> if <code>value</code> starts with any non empty suffix of
+     * <code>pattern</code>, which is what makes the two patterns overlap.
+     * <p>
+     * The overlap check used to look for the same thing by walking every pair of positions in
+     * the two patterns and allocating a fresh suffix of both of them for every pair whose
+     * characters matched, which costs O(n<sup>3</sup>) in their length. Neither half of the
+     * test it made there depends on the other pattern's position, and a suffix that is a
+     * prefix of the other pattern necessarily begins with that pattern's first character, so
+     * the pair the old loop needed to reach it was always among the ones it walked: this
+     * gives the same answer in O(n<sup>2</sup>) character comparisons and no allocation.
+     * <p>
+     * The length of the patterns is chosen by whoever supplies the attribute values, and the
+     * JAXRPC <code>validateServiceAttributes</code> endpoint lets any authenticated caller
+     * name this validator and hand it values of its own, so the cost has to be bounded here
+     * rather than left to the caller.
+     *
+     * @param value the string to test.
+     * @param pattern the pattern whose suffixes are tried.
+     * @return <code>true</code> if a suffix of <code>pattern</code> is a prefix of
+     *         <code>value</code>.
+     */
+    private static boolean startsWithASuffixOf(String value, String pattern) {
+        for (int i = 0; i < pattern.length(); i++) {
+            if (value.regionMatches(0, pattern, i, pattern.length() - i)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

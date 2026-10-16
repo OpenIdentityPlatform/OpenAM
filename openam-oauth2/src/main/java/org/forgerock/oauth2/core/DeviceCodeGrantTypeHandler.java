@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -85,35 +85,34 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
 
         String clientId = client.getClientId();
         DeviceCode deviceCode = tokenStore.readDeviceCode(clientId, code, request);
-
+        
         if (deviceCode == null ||
                 !clientId.equals(deviceCode.getClientId()) ||
                 !request.getParameter(REALM).equals(deviceCode.getRealm())) {
             throw new AuthorizationDeclinedException();
         }
 
-        try {
-            if (deviceCode.isAuthorized()) {
-                String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
-                Set<String> scope = deviceCode.getScope();
-                String resourceOwnerId = deviceCode.getResourceOwnerId();
-                String validatedClaims = providerSettings.validateRequestedClaims(
-                        deviceCode.getStringProperty(OAuth2Constants.Custom.CLAIMS));
-                return generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, scope,
-                        validatedClaims, request);
-            }
+        // RFC 8628 section 3.5: an expired device code gets expired_token even if the user has approved it
+        if (deviceCode.getExpiryTime() < currentTimeMillis()) {
+            tryDeleteDeviceCode(clientId, code, request);
+            throw new ExpiredTokenException();
+        }
 
-            if (deviceCode.getExpiryTime() < currentTimeMillis()) {
-                throw new ExpiredTokenException();
-            }
-        } finally {
-            if(deviceCode.isAuthorized() || deviceCode.getExpiryTime() < currentTimeMillis()) {
-                try {
-                    tokenStore.deleteDeviceCode(clientId, code, request);
-                } catch (OAuth2Exception e) {
-                    logger.warn("Could not delete issued/expired device code", e);
-                }
-            }
+        if (deviceCode.isAuthorized()) {
+            String grantType = request.getParameter(OAuth2Constants.Params.GRANT_TYPE);
+            Set<String> scope = deviceCode.getScope();
+            String resourceOwnerId = deviceCode.getResourceOwnerId();
+            String validatedClaims = providerSettings.validateRequestedClaims(
+                    deviceCode.getStringProperty(OAuth2Constants.Custom.CLAIMS));
+
+            AccessToken accessToken = generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, scope,
+                    validatedClaims, deviceCode.getNonce(), request);
+            
+            providerSettings.additionalDataToReturnFromTokenEndpoint(accessToken,request);
+
+            tryDeleteDeviceCode(clientId, code, request);   // only once the response is complete
+            
+            return accessToken;
         }
 
         try {
@@ -130,9 +129,17 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
     }
 
     private AccessToken generateAccessToken(OAuth2ProviderSettings providerSettings, String grantType, String clientId,
-            String resourceOwnerId, Set<String> scope, String validatedClaims, OAuth2Request request)
+            String resourceOwnerId, Set<String> scope, String validatedClaims, String nonce, OAuth2Request request)
             throws ServerException, NotFoundException {
         return accessTokenGenerator.generateAccessToken(providerSettings, grantType, clientId, resourceOwnerId, null,
-                scope, validatedClaims, null, null, request);
+                scope, validatedClaims, null, nonce, request);
+    }
+    
+    private void tryDeleteDeviceCode(String clientId, String code, OAuth2Request request) {
+        try {
+            tokenStore.deleteDeviceCode(clientId, code, request);
+        } catch (OAuth2Exception e) {
+            logger.warn("Could not delete issued/expired device code", e);
+        }
     }
 }

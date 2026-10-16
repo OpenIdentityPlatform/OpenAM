@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
  */
 package com.iplanet.dpro.session.operations.strategies;
 
@@ -50,6 +51,9 @@ import com.iplanet.dpro.session.utils.SessionInfoFactory;
 import com.sun.identity.shared.debug.Debug;
 
 public class LocalOperationsTest {
+
+    private static final String REALM_A = "o=realma,ou=services,dc=openam,dc=example,dc=org";
+    private static final String REALM_B = "o=realmb,ou=services,dc=openam,dc=example,dc=org";
 
     private LocalOperations local;
     @Mock private Session mockRequester;
@@ -152,6 +156,42 @@ public class LocalOperationsTest {
         local.destroy(mockRequester, mockSession);
         // Then
         verifyEvent(SessionEventType.DESTROY);
+    }
+
+    @Test
+    public void shouldAuthorizeAgainstRealmOfSessionBeingDestroyed() throws SessionException {
+        // Given a requester in realm A destroying a session that belongs to realm B
+        given(mockRequester.getClientDomain()).willReturn(REALM_A);
+        given(mockInternalSession.getClientDomain()).willReturn(REALM_B);
+        // When
+        local.destroy(mockRequester, mockSession);
+        // Then the realm reaching the authorizer is the one of the session being destroyed
+        ArgumentCaptor<InternalSession> authorized = ArgumentCaptor.forClass(InternalSession.class);
+        verify(sessionChangeAuthorizer).checkPermissionToDestroySession(eq(mockRequester), authorized.capture());
+        assertThat(authorized.getValue().getClientDomain()).isEqualTo(REALM_B);
+    }
+
+    @Test
+    public void shouldAuthorizeAgainstRealmOfSessionResolvedFromHandle() throws SessionException {
+        // Given the caller supplied a session handle rather than a session id, so that the session to destroy is
+        // only known once it has been resolved
+        SessionID handleSessionID = mock(SessionID.class);
+        InternalSession resolvedSession = mock(InternalSession.class);
+        given(mockSession.getSessionID()).willReturn(handleSessionID);
+        given(sessionAccessManager.getInternalSession(handleSessionID)).willReturn(null);
+        given(sessionAccessManager.getInternalSessionByHandle(handleSessionID.toString()))
+                .willReturn(resolvedSession);
+        given(resolvedSession.getID()).willReturn(mockSessionID);
+        given(resolvedSession.getSessionID()).willReturn(mockSessionID);
+        given(resolvedSession.getClientDomain()).willReturn(REALM_B);
+        given(mockRequester.getClientDomain()).willReturn(REALM_A);
+        // When
+        local.destroy(mockRequester, mockSession);
+        // Then the resolved session is authorized, not the one the caller handed in
+        ArgumentCaptor<InternalSession> authorized = ArgumentCaptor.forClass(InternalSession.class);
+        verify(sessionChangeAuthorizer).checkPermissionToDestroySession(eq(mockRequester), authorized.capture());
+        assertThat(authorized.getValue()).isSameAs(resolvedSession);
+        assertThat(authorized.getValue().getClientDomain()).isEqualTo(REALM_B);
     }
 
     @Test

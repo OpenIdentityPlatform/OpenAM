@@ -2137,7 +2137,7 @@ The following procedure applies when OpenAM is configured as an IdP in one domai
 
 . Install the policy agent.
 +
-The basic process for installing policy agents is available in the link:../../../openam-web-policy-agents/web-users-guide/#web-users-guide[Web Policy Agent User's Guide, window=\_blank] and the link:../../../openam-jee-policy-agents/jee-users-guide/#jee-users-guide[Java EE Policy Agent User's Guide, window=\_blank].
+The basic process for installing policy agents is available in the xref:../web-users-guide/index.adoc[Web Policy Agent User's Guide] and the xref:../jee-users-guide/index.adoc[Java EE Policy Agent User's Guide].
 
 . Replace the given OpenAM Login URL and OpenAM Logout URLs with SAML v2.0 URLs described in xref:#using-saml2-sso-slo["JSP Pages for SSO and SLO"].
 +

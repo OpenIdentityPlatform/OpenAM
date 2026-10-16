@@ -13,6 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openidconnect;
@@ -21,6 +22,7 @@ import java.net.URI;
 import java.security.Key;
 
 import org.forgerock.oauth2.core.ClientRegistration;
+import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 
@@ -37,6 +39,17 @@ public interface OpenIdConnectClientRegistration extends ClientRegistration {
      * @return The OpenId token signed response algorithm.
      */
     String getIDTokenSignedResponseAlgorithm();
+
+    /**
+     * Verifies that the supplied JWT is an ID token this server issued for this client: signed with
+     * the client's {@link #getIDTokenSignedResponseAlgorithm() id_token_signed_response_alg} and
+     * verifiable with the key that algorithm implies. Unlike {@link #verifyJwtIdentity(OAuth2Jwt)},
+     * which checks a JWT the client signed, the algorithm is not the sender's to choose.
+     *
+     * @param idToken The ID token.
+     * @return {@code true} if the ID token was issued for this client.
+     */
+    boolean verifyIdTokenIdentity(OAuth2Jwt idToken);
 
     /**
      * Determines if ID token encryption is enabled.

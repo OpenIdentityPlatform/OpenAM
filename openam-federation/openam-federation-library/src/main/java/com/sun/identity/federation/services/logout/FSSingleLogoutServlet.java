@@ -24,7 +24,7 @@
  *
  * $Id: FSSingleLogoutServlet.java,v 1.5 2008/12/19 06:50:47 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -37,6 +37,7 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.sun.identity.federation.common.ForwardPathValidator;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.services.util.FSServiceUtils;
@@ -121,6 +122,15 @@ public class FSSingleLogoutServlet extends HttpServlet {
             FSUtils.debug.error("Unable to retrieve alias, Hosted" +
                 " Provider. Cannot process request");
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
+                FSUtils.bundle.getString("aliasNotFound"));
+            return;
+        }
+        // The alias is appended to the dispatcher path below; a traversal in it
+        // would forward to an arbitrary resource of the web application.
+        if (!ForwardPathValidator.isSafeMetaAlias(providerAlias)) {
+            FSUtils.debug.error("FSSingleLogoutServlet: rejecting metaAlias " +
+                "with path traversal");
+            response.sendError(response.SC_BAD_REQUEST,
                 FSUtils.bundle.getString("aliasNotFound"));
             return;
         }

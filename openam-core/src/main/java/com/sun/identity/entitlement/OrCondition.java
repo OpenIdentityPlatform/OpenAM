@@ -29,6 +29,7 @@
  */
 package com.sun.identity.entitlement;
 
+import org.forgerock.openam.entitlement.PolicyConstants;
 import org.forgerock.openam.utils.CollectionUtils;
 
 import java.util.HashMap;
@@ -79,6 +80,18 @@ public class OrCondition extends LogicalCondition {
         final Set<EntitlementCondition> conditions = getEConditions();
 
         if (CollectionUtils.isEmpty(conditions)) {
+            if (isMemberRejected()) {
+                // Every member class name was refused while deserialising this policy. Unlike
+                // OrSubject, which denies on an empty member set, an empty condition set is
+                // *satisfied* here, so evaluating it would turn the stored restriction into an
+                // unconditional grant: fail the condition instead. A non-empty remainder needs no
+                // guard - dropping a member from an OR can only make it stricter.
+                PolicyConstants.DEBUG.error(
+                    "OrCondition.evaluate: failing, every member condition of this policy was rejected");
+                return ConditionDecision
+                        .newFailureBuilder()
+                        .build();
+            }
             return ConditionDecision
                     .newSuccessBuilder()
                     .build();

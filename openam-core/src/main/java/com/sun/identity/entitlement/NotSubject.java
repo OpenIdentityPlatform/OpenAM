@@ -25,6 +25,7 @@
  * $Id: NotSubject.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  *
  * Portions copyright 2014-2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement;
@@ -91,27 +92,57 @@ public class NotSubject extends LogicalSubject {
      */
     @Override
     public void setState(String state) {
+        JSONObject memberSubject = null;
         try {
             JSONObject jo = new JSONObject(state);
-            JSONObject memberSubject = jo.optJSONObject("memberESubject");
-            if (memberSubject != null) {
-                String className = memberSubject.getString("className");
-                Class cl = Class.forName(className);
-                eSubject = (EntitlementSubject) cl.newInstance();
-                eSubject.setState(memberSubject.getString("state"));
-
-            }
+            // Read the name before loading the member, so a refused member class name does not also
+            // cost the subject its name (mirrors NotCondition.setState).
             pSubjectName = jo.has("pSubjectName") ?
                 jo.optString("pSubjectName") : null;
+            clearMemberRejection();
+            memberSubject = jo.optJSONObject("memberESubject");
+            if (memberSubject != null) {
+                String className = memberSubject.getString("className");
+                EntitlementSubject member = EntitlementClassResolver.newInstance(
+                    className, EntitlementSubject.class);
+                member.setState(memberSubject.getString("state"));
+                // Assign only once the member has been fully applied, the way
+                // LogicalSubject.setState adds to its set only after the member's own setState
+                // returned. A half-applied member left in the field is what toJSONObject() writes
+                // back out in place of the refused declaration, so a re-save would hand the next
+                // load an intact policy - and an enclosing NOT would negate its deny into a match.
+                eSubject = member;
+            }
         } catch (JSONException e) {
             PolicyConstants.DEBUG.error("NotSubject.setState", e);
+            // Only when the state did declare a member: a state string that fails to parse before
+            // the member is even read is not a rejected member.
+            if (memberSubject != null) {
+                rejectMember(memberSubject);
+            }
         } catch (InstantiationException e) {
             PolicyConstants.DEBUG.error("NotSubject.setState", e);
+            rejectMember(memberSubject);
         } catch (ClassNotFoundException e) {
             PolicyConstants.DEBUG.error("NotSubject.setState", e);
+            rejectMember(memberSubject);
         } catch (IllegalAccessException e) {
             PolicyConstants.DEBUG.error("NotSubject.setState", e);
+            rejectMember(memberSubject);
         }
+    }
+
+    /**
+     * Records the refusal and drops whatever the failed load left in the member field - a partly
+     * initialised instance, or the member of an earlier successful {@code setState} on this same
+     * object. Either would be written back out by {@link #toJSONObject()} instead of the refused
+     * declaration, which is the one thing the refusal must survive.
+     *
+     * @param rejectedMember the declaration that could not be turned into a member.
+     */
+    private void rejectMember(JSONObject rejectedMember) {
+        eSubject = null;
+        markMemberRejected(rejectedMember);
     }
 
     /**
@@ -147,6 +178,15 @@ public class NotSubject extends LogicalSubject {
             return new SubjectDecision(false, Collections.EMPTY_MAP);
         }
 
+        if (hasRejectedMemberInSubtree()) {
+            // A member class name was refused somewhere below, so the nested subject is an
+            // incomplete representation of the stored policy and denies. Negating that deny here
+            // would turn it into a match for everyone the stored policy meant to exclude.
+            PolicyConstants.DEBUG.error(
+                "NotSubject.evaluate: denying, nested policy member subject was rejected");
+            return new SubjectDecision(false, Collections.EMPTY_MAP);
+        }
+
         SubjectDecision d = eSubject.evaluate(realm, mgr, subject,
             resourceName, environment);
         return new SubjectDecision(!d.isSatisfied(), Collections.EMPTY_MAP);
@@ -159,6 +199,7 @@ public class NotSubject extends LogicalSubject {
      */
     public void setESubject(EntitlementSubject eSubject) {
         this.eSubject = eSubject;
+        clearMemberRejection();
     }
 
     /**
@@ -172,6 +213,7 @@ public class NotSubject extends LogicalSubject {
         Reject.ifTrue(eSubjects.size() > 1 || eSubjects.size() < 1);
 
         eSubject = eSubjects.iterator().next();
+        clearMemberRejection();
     }
 
     /**
@@ -195,6 +237,23 @@ public class NotSubject extends LogicalSubject {
         }
 
         return Collections.singleton(eSubject);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * A <code>NotSubject</code> with no member at all counts as damaged too, not only one whose
+     * member {@link #setState(String)} refused. Its own {@link #evaluate} already denies on the
+     * missing member, but an enclosing <code>NotSubject</code> would negate that deny into a match
+     * for everyone. The two are indistinguishable from the outside anyway: a policy stored by a
+     * version that dropped the refused member instead of re-emitting it comes back with the member
+     * simply absent, and a <code>NOT</code> without a member is not a policy statement to begin
+     * with - it already denies on its own.
+     */
+    @Override
+    @JsonIgnore
+    public boolean hasRejectedMemberInSubtree() {
+        return (eSubject == null) || super.hasRejectedMemberInSubtree();
     }
 
     /**
@@ -234,6 +293,12 @@ public class NotSubject extends LogicalSubject {
             subjo.put("className", eSubject.getClass().getName());
             subjo.put("state", eSubject.getState());
             jo.put("memberESubject", subjo);
+        } else if (!getRejectedMembers().isEmpty()) {
+            // Write the refused member back out unchanged, so that storing this object again keeps
+            // the policy as it was written: without it a re-save would emit a NOT with no member at
+            // all, losing the refused class name and, with it, the record that this policy is
+            // damaged. NotSubject holds a single member, so there is at most one entry.
+            jo.put("memberESubject", getRejectedMembers().get(0));
         }
         return jo;
     }

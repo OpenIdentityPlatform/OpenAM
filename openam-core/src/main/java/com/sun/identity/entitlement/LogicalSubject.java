@@ -25,15 +25,19 @@
  * $Id: LogicalSubject.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,6 +49,31 @@ import org.json.JSONObject;
 public abstract class LogicalSubject implements EntitlementSubject {
     private Set<EntitlementSubject> eSubjects;
     private String pSubjectName;
+
+    /**
+     * Set when {@link #setState(String)} refused a member class name. The wrapper is then an
+     * incomplete representation of the stored policy, and subclasses whose semantics get weaker as
+     * members are removed (notably {@code AndSubject}, which is satisfied by an empty member set)
+     * must not evaluate as if the missing constraint had never been written.
+     */
+    private transient boolean memberRejected;
+
+    /**
+     * The refused members, kept verbatim as they appeared in the state read by
+     * {@link #setState(String)} so that {@link #toJSONObject()} can write them back out.
+     * <p>
+     * Without this the refusal would live only as long as the in-memory object: the emitted state
+     * would carry the surviving members only, so a re-save (for instance
+     * {@code ResavePoliciesStep}, which re-reads and re-stores every policy of every realm) would
+     * persist the truncated policy, and the next load would see a wrapper that is indistinguishable
+     * from a legitimately smaller one - for {@code AndSubject} an empty member set means
+     * <em>satisfied</em>, i.e. a grant to everyone. Re-emitting the refused entry makes the next
+     * load hit the same refusal and set {@link #memberRejected} again.
+     * <p>
+     * The refused member is only ever copied as JSON; its class is still never loaded initialised
+     * nor instantiated.
+     */
+    private transient List<JSONObject> rejectedMembers = new ArrayList<JSONObject>();
 
     /**
      * Constructor.
@@ -85,30 +114,47 @@ public abstract class LogicalSubject implements EntitlementSubject {
         try {
             JSONObject jo = new JSONObject(state);
             JSONArray memberSubjects = jo.optJSONArray("memberESubjects");
+            // Reset outside the null check: the state string being applied fully redefines this
+            // object, so a prior refusal must not leak into it (mirrors setESubjects).
+            clearMemberRejection();
             if(memberSubjects != null) {
                 eSubjects = new HashSet<EntitlementSubject>();
                 int len = memberSubjects.length();
                 for (int i = 0; i < len; i++) {
-                    JSONObject memberSubject = memberSubjects.getJSONObject(i);
-                    String className = memberSubject.getString("className");
-                    Class cl = Class.forName(className);
-                    EntitlementSubject es = (EntitlementSubject)cl.newInstance();
-                    es.setState(memberSubject.getString("state"));
-                    eSubjects.add(es);
+                    JSONObject memberSubject = memberSubjects.optJSONObject(i);
+                    try {
+                        // Read className and state inside the per-member try as well: a member
+                        // missing either key has to be refused like any other unusable one. Letting
+                        // the JSONException out of the loop would abort the remaining members and
+                        // record no refusal at all, which is the truncated-to-empty (i.e. satisfied)
+                        // AndSubject this class exists to prevent.
+                        if (memberSubject == null) {
+                            throw new JSONException("member subject " + i + " is not an object");
+                        }
+                        String className = memberSubject.getString("className");
+                        EntitlementSubject es = EntitlementClassResolver.newInstance(
+                            className, EntitlementSubject.class);
+                        es.setState(memberSubject.getString("state"));
+                        eSubjects.add(es);
+                    } catch (JSONException | ClassNotFoundException | InstantiationException
+                            | IllegalAccessException e) {
+                        // Skip only the offending member instead of aborting the whole list, so a
+                        // single rejected class name cannot silently drop the valid siblings, and
+                        // record the refusal so evaluation cannot treat the missing member as if it
+                        // had never been part of the policy.
+                        markMemberRejected(memberSubject);
+                        PolicyConstants.DEBUG.error("LogicalSubject.setState: skipping invalid "
+                            + "member subject "
+                            + ((memberSubject != null) ? memberSubject.optString("className") : ""), e);
+                    }
                 }
             }
             if (jo.optString("pSubjectName").length() > 0) {
-                pSubjectName = jo.optString(pSubjectName);
+                pSubjectName = jo.optString("pSubjectName");
             } else {
                 pSubjectName = null;
             }
         } catch (JSONException e) {
-            PolicyConstants.DEBUG.error("LogicalSubject.setState", e);
-        } catch (InstantiationException e) {
-            PolicyConstants.DEBUG.error("LogicalSubject.setState", e);
-        } catch (ClassNotFoundException e) {
-            PolicyConstants.DEBUG.error("LogicalSubject.setState", e);
-        } catch (IllegalAccessException e) {
             PolicyConstants.DEBUG.error("LogicalSubject.setState", e);
         }
     }
@@ -127,6 +173,92 @@ public abstract class LogicalSubject implements EntitlementSubject {
      */
     public void setESubjects(Set<EntitlementSubject> eSubjects) {
         this.eSubjects = eSubjects;
+        clearMemberRejection();
+    }
+
+    /**
+     * Records that a member could not be rebuilt from the state being applied, keeping the member's
+     * JSON so that {@link #toJSONObject()} can write it back out. Subclasses that read the member
+     * themselves - {@code NotSubject} keeps a single member of its own - have to call this, or a
+     * refusal below them stays invisible to {@link #hasRejectedMemberInSubtree()} and an enclosing
+     * {@code NOT} negates the resulting deny back into a match.
+     *
+     * @param rejectedMember the refused member as it appeared in the state, or <code>null</code>
+     *        when it was not even a JSON object; an empty object is then re-emitted in its place,
+     *        which the next load refuses again and so keeps the wrapper fail-closed across a save.
+     */
+    protected void markMemberRejected(JSONObject rejectedMember) {
+        memberRejected = true;
+        rejectedMembers.add((rejectedMember != null) ? rejectedMember : new JSONObject());
+    }
+
+    /**
+     * Clears a recorded refusal. Called whenever the members are redefined wholesale, so that
+     * programmatic construction is unaffected by what a previous state string contained.
+     */
+    protected void clearMemberRejection() {
+        memberRejected = false;
+        rejectedMembers.clear();
+    }
+
+    /**
+     * Returns the refused members, kept verbatim for re-emission by {@link #toJSONObject()}.
+     *
+     * @return the refused members; never <code>null</code>.
+     */
+    @JsonIgnore
+    protected List<JSONObject> getRejectedMembers() {
+        return rejectedMembers;
+    }
+
+    /**
+     * Returns whether {@link #setState(String)} refused a member class name, leaving this wrapper
+     * with fewer members than the stored policy declares.
+     * <p>
+     * Any subclass whose evaluation gets <em>weaker</em> as members are dropped must consult this
+     * before evaluating: {@code AndSubject} is satisfied by an empty member set, so evaluating the
+     * truncated set would grant what the stored policy restricts. {@code OrSubject} denies on an
+     * empty set and only gets stricter as members are dropped, so it needs no guard. A subclass
+     * that <em>negates</em> its member must use {@link #hasRejectedMemberInSubtree()} instead.
+     *
+     * @return <code>true</code> if at least one member was rejected.
+     */
+    @JsonIgnore
+    public boolean isMemberRejected() {
+        return memberRejected;
+    }
+
+    /**
+     * Returns whether this wrapper, or any logical subject nested below it, had a member class name
+     * refused by {@link #setState(String)}.
+     * <p>
+     * {@link #isMemberRejected()} deliberately reports this wrapper's own refusal only: for
+     * {@code AndSubject}/{@code OrSubject} a refusal further down is already handled where it
+     * happened, because the damaged member denies and a denying member can only make an AND or an
+     * OR stricter. Negation is the exception - {@code NotSubject} turns its member's decision
+     * around, so the damaged member's deny would come back out of the {@code NOT} as a match. It
+     * has to look at the whole subtree.
+     *
+     * @return <code>true</code> if a member was refused anywhere in this subtree.
+     */
+    @JsonIgnore
+    public boolean hasRejectedMemberInSubtree() {
+        if (memberRejected) {
+            return true;
+        }
+
+        // Read the members through the accessor: NotSubject keeps its single member elsewhere and
+        // overrides the getter, so the field would not see it.
+        Set<EntitlementSubject> members = getESubjects();
+        if (members != null) {
+            for (EntitlementSubject member : members) {
+                if (member instanceof LogicalSubject
+                        && ((LogicalSubject) member).hasRejectedMemberInSubtree()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -167,14 +299,19 @@ public abstract class LogicalSubject implements EntitlementSubject {
         if (pSubjectName != null) {
             jo.put("pSubjectName", pSubjectName);
         }
-        if (eSubjects == null) {
-            return jo;
+        if (eSubjects != null) {
+            for (EntitlementSubject eSubject : eSubjects) {
+                JSONObject subjo = new JSONObject();
+                subjo.put("className", eSubject.getClass().getName());
+                subjo.put("state", eSubject.getState());
+                jo.append("memberESubjects", subjo);
+            }
         }
-        for (EntitlementSubject eSubject : eSubjects) {
-            JSONObject subjo = new JSONObject();
-            subjo.put("className", eSubject.getClass().getName());
-            subjo.put("state", eSubject.getState());
-            jo.append("memberESubjects", subjo);
+        // Write the refused members back out unchanged, so that storing this object again keeps
+        // the policy as it was written and the next load refuses them again instead of seeing a
+        // wrapper that looks legitimately smaller. See rejectedMembers.
+        for (JSONObject rejected : rejectedMembers) {
+            jo.append("memberESubjects", rejected);
         }
         return jo;
     }

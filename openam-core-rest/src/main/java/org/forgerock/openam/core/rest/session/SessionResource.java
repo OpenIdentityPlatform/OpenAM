@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.session;
@@ -25,7 +25,7 @@ import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.DES
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_400_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_401_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_500_DESCRIPTION;
-import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ID_QUERY;
+import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ERROR_501_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.ID_QUERY_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.PARAMETER_DESCRIPTION;
 import static org.forgerock.openam.i18n.apidescriptor.ApiDescriptorConstants.SESSION_RESOURCE;
@@ -88,7 +88,6 @@ import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.CaseInsensitiveHashMap;
@@ -98,14 +97,16 @@ import com.sun.identity.shared.debug.Debug;
 /**
  * Represents Sessions that can queried via a REST interface.
  *
- * Currently describe three different entrypoints for this Resource, useful when querying
+ * Currently describes a single entrypoint for this Resource, useful when querying
  * Session Information:
  *
  * <ul>
- *     <li>All - All sessions across all servers known to OpenAM.</li>
  *     <li>Servers - Lists all servers that are known to OpenAM.</li>
- *     <li>[server-id] - Lists the servers for that server instance.</li>
  * </ul>
+ *
+ * The session listing queries of this version, {@literal all} and {@literal [server-id]}, are no longer supported:
+ * they listed the sessions of every realm to any caller reaching this endpoint. Sessions are listed by version 2.0
+ * of this resource, which authorizes the realm of the query filter against the caller.
  *
  * This resources acts as a read only resource for the most part, allowing only
  * specific, whitelisted properties to be set through it.
@@ -156,8 +157,6 @@ public class SessionResource implements CollectionResourceProvider {
 
     private final SessionResourceUtil sessionResourceUtil;
     public static final String TOKEN_ID = "tokenId";
-    private final String ALL_QUERY_ID = "all";
-    private final String SERVER_QUERY_ID = "server";
     private final SSOTokenManager ssoTokenManager;
     private final AuthUtilsWrapper authUtilsWrapper;
     private final SessionPropertyWhitelist sessionPropertyWhitelist;
@@ -689,9 +688,15 @@ public class SessionResource implements CollectionResourceProvider {
     /**
      * Queries the session resources using one of the predefined query filters.
      *
-     * all - (default) will query all Sessions across all servers.
-     * list - will list the available servers which is useful for the next query
-     * [server-id] - will list the available Sessions on the named server.
+     * list - will list the available servers.
+     *
+     * <p>The session listing queries of this version, {@literal all} and {@literal [server-id]}, are no longer
+     * supported. They listed the sessions of a server, or of the whole deployment, through the session service
+     * RPC under the administrative token of the server: neither the realm the sessions belong to nor the caller
+     * took part in the query, so an administrator delegated a single realm was answered with the sessions of
+     * every realm of the deployment. Sessions are listed by version 2.0 of this resource instead, whose query
+     * filter names the realm to list, which is authorized against the caller. The RPC method these queries were
+     * built on has been removed as well, so they have not returned a session since.</p>
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
@@ -700,60 +705,37 @@ public class SessionResource implements CollectionResourceProvider {
     @Queries({
         @Query(
             operationDescription = @Operation(
-                description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
+                description = SESSION_RESOURCE + KEYWORD_LIST + "." + ID_QUERY_DESCRIPTION,
                 errors = {
                     @ApiError(
                         code = 401,
                         description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
-                    )
-                },
-                parameters = @Parameter(name = KEYWORD_SERVER_ID, type = "string", description = SESSION_RESOURCE + SERVER_QUERY_ID + "." + ID_QUERY + KEYWORD_SERVER_ID + "." + PARAMETER_DESCRIPTION)
-            ),
-            type = QueryType.ID,
-            id = SERVER_QUERY_ID
-        ),
-        @Query(
-            operationDescription = @Operation(
-                description = SESSION_RESOURCE + ALL_QUERY_ID + "." + ID_QUERY_DESCRIPTION,
-                errors = {
+                    ),
                     @ApiError(
-                        code = 401,
-                        description = SESSION_RESOURCE + ERROR_401_DESCRIPTION
+                        code = 501,
+                        description = SESSION_RESOURCE + ERROR_501_DESCRIPTION
                     )
                 }
             ),
             type = QueryType.ID,
-            id = ALL_QUERY_ID
+            id = KEYWORD_LIST
         )
     })
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         String id = request.getQueryId();
 
-        if (KEYWORD_LIST.equals(id)) {
-            Collection<String> servers = generateListServers();
-            LOGGER.message("SessionResource.queryCollection() :: Retrieved list of servers for query.");
-            handler.handleResource(newResourceResponse(KEYWORD_LIST, String.valueOf(currentTimeMillis()),
-                    new JsonValue(servers)));
-        } else {
-            Collection<SessionInfo> sessions;
-
-            if (KEYWORD_ALL.equals(id)) {
-                sessions = sessionResourceUtil.generateAllSessions();
-                LOGGER.message("SessionResource.queryCollection() :: Retrieved list of sessions for query.");
-            } else {
-                if (SERVER_QUERY_ID.equals(id)) {
-                    id = request.getAdditionalParameter(KEYWORD_SERVER_ID);
-                }
-                sessions = sessionResourceUtil.generateNamedServerSession(id);
-                LOGGER.message("SessionResource.queryCollection() :: Retrieved list of specified servers for query.");
-            }
-
-            for (SessionInfo session : sessions) {
-                handler.handleResource(newResourceResponse("Sessions", String.valueOf(currentTimeMillis()),
-                        sessionResourceUtil.jsonValueOf(session)));
-            }
+        if (!KEYWORD_LIST.equals(id)) {
+            LOGGER.warning("SessionResource.queryCollection() :: rejected the session query '{}', which is no "
+                    + "longer supported", id);
+            return new NotSupportedException("Sessions are listed by version 2.0 of this resource, with a query "
+                    + "filter naming the realm to list").asPromise();
         }
+
+        Collection<String> servers = generateListServers();
+        LOGGER.message("SessionResource.queryCollection() :: Retrieved list of servers for query.");
+        handler.handleResource(newResourceResponse(KEYWORD_LIST, String.valueOf(currentTimeMillis()),
+                new JsonValue(servers)));
         return newResultPromise(newQueryResponse());
     }
 

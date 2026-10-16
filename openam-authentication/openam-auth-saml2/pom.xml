@@ -19,7 +19,7 @@
     <parent>
         <artifactId>openam-authentication</artifactId>
         <groupId>org.openidentityplatform.openam</groupId>
-        <version>16.2.0-SNAPSHOT</version>
+        <version>16.1.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -32,6 +32,24 @@
     <properties>
         <checkstyleFailOnError>true</checkstyleFailOnError>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <!-- The same provider openam-federation-library's own tests use, so that
+                             the Open Federation Library settings come from the test scope
+                             FederationConfig.properties rather than from whichever provider
+                             happens to be first on the test classpath. -->
+                        <com.sun.identity.systemconfiguration>com.sun.identity.configuration.FedLibSystemProperties</com.sun.identity.systemconfiguration>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>

@@ -28,6 +28,7 @@ import java.util.Base64;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenID;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
@@ -44,6 +45,10 @@ import org.restlet.Response;
  * request. It is no longer derived from the SSO cookie, so the SSO cookie no longer needs to be script-readable
  * and can be shipped as {@code HttpOnly}. For stateful sessions the token is stored as a protected session
  * property; for stateless sessions a double-submit cookie is used as a fallback.</p>
+ *
+ * <p>Validation additionally accepts the resource owner's own session id, which is what a non-browser client
+ * that posts its consent decision directly submits. That client has no consent page to read a minted token
+ * from, and it already holds the session id from its authentication response.</p>
  */
 public class CsrfProtection {
 
@@ -97,7 +102,8 @@ public class CsrfProtection {
 
     /**
      * Checks if the request contains the required "csrf" parameter and that it matches the token bound to the
-     * resource owner's authorization request (either the protected session property or the double-submit cookie).
+     * resource owner's authorization request (either the protected session property or the double-submit cookie),
+     * or failing that the resource owner's session id.
      *
      * @param request The request.
      * @return {@code true} if the request is a CSRF attack, {@code false} if not.
@@ -125,6 +131,21 @@ public class CsrfProtection {
         String cookieValue = readCsrfCookie(request);
         if (StringUtils.isNotEmpty(cookieValue) && constantTimeEquals(cookieValue, csrfValue)) {
             return false;
+        }
+
+        // The resource owner's own session id is also accepted. This is the contract documented for direct
+        // POSTs and the only value available to a client that never renders the consent page. Nothing in the
+        // request reliably identifies such a client, so the value is accepted from any caller, browsers
+        // included. That does not weaken the protection a browser gets: a foreign origin can read neither the
+        // victim's cookies nor a cross-origin response, so an attacking page still cannot discover the value
+        // it would have to submit, and anyone who does know the session id can already act as the user
+        // outright without forging anything. This holds whether or not the SSO cookie is HttpOnly, which
+        // ships disabled by default.
+        if (ssoToken != null) {
+            SSOTokenID ssoTokenId = ssoToken.getTokenID();
+            if (ssoTokenId != null && constantTimeEquals(ssoTokenId.toString(), csrfValue)) {
+                return false;
+            }
         }
 
         return true;

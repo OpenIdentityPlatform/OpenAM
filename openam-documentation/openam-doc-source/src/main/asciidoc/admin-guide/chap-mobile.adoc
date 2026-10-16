@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -107,7 +107,7 @@ Furthermore, OpenAM REST APIs are built on an underlying common REST framework d
 [#get-mobile-sample-apps]
 === Getting Source Code for Sample Mobile Applications
 
-Source code for the sample mobile applications is available in sample repositories on the link:hhttps://github.com/OpenIdentityPlatform/[GitHub, window=\_blank]. Get local clones of one or more of the following repositories so that you can try these sample applications on your system:
+Source code for the sample mobile applications is available in sample repositories on the link:https://github.com/OpenIdentityPlatform/[GitHub, window=\_blank]. Get local clones of one or more of the following repositories so that you can try these sample applications on your system:
 
 * link:https://github.com/OpenIdentityPlatform/mobile-samples-android-openam-apps[OpenAM OAuth2.0 Android sample app, window=\_blank]
 

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -52,8 +52,6 @@ Active/passive deployments are slightly simpler to deploy. Active/passive deploy
 ** Affinity deployments, in which OpenAM connects to one or more writable directory server instances. Each instance acts as the master for a subset of CTS tokens. In this architecture, CTS tokens are described as having an __affinity__ for a given directory server instance. Specifically, OpenAM routes requests with the same target DN to the same directory server.
 +
 Affinity deployments allow you to spread requests to the CTS token store across multiple directory master instances. Affinity deployments are a good fit for deployments with many OpenAM servers.
-+
-For more information on CTS affinity deployments, see link:https://backstage.forgerock.com/knowledge/kb/article/a94140799[Best practice for using Core Token Service (CTS) Affinity based load balancing in AM (All versions) and OpenAM 13.5.1, window=\_top] in the __ForgeRock Knowledge Base__.
 +
 Do not deploy CTS token stores behind a load balancer. Instead, specify connections to the directory server instances that comprise the CTS token store by using the Connection String(s) property in the CTS configuration.
 

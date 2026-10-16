@@ -37,6 +37,7 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.sun.identity.federation.common.ForwardPathValidator;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.LogUtil;
@@ -141,6 +142,15 @@ public class FSReturnLogoutServlet extends HttpServlet {
             FSUtils.debug.message("Unable to retrieve alias, Hosted" +
                 " Provider. Cannot process request");
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
+                FSUtils.bundle.getString("aliasNotFound"));
+            return;
+        }
+        // The alias is appended to the dispatcher path below; a traversal in it
+        // would forward to an arbitrary resource of the web application.
+        if (!ForwardPathValidator.isSafeMetaAlias(providerAlias)) {
+            FSUtils.debug.error("FSReturnLogoutServlet: rejecting metaAlias " +
+                "with path traversal");
+            response.sendError(response.SC_BAD_REQUEST,
                 FSUtils.bundle.getString("aliasNotFound"));
             return;
         }

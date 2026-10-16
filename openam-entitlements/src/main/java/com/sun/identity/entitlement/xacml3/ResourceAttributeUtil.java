@@ -21,6 +21,8 @@ import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.Privilege;
 import com.sun.identity.entitlement.ResourceAttribute;
 
+import org.forgerock.openam.entitlement.utils.EntitlementUtils;
+
 import java.io.IOException;
 
 /**
@@ -86,15 +88,9 @@ public class ResourceAttributeUtil {
         int pos = getSeparatorIndex(json);
         String classname = json.substring(0, pos);
         try {
-            // Load WITHOUT initialising so static initialisers of a malicious class cannot run
-            // before the type check; only real ResourceAttribute implementations may proceed.
-            Class<?> cla = Class.forName(classname, false, ResourceAttributeUtil.class.getClassLoader());
-            if (!ResourceAttribute.class.isAssignableFrom(cla)) {
-                throw new EntitlementException(
-                        EntitlementException.UNKNOWN_RESOURCE_ATTRIBUTE_CLASS,
-                        new Object[]{classname});
-            }
-            return cla.asSubclass(ResourceAttribute.class);
+            // Shared guard: loads WITHOUT initialising and rejects anything that is not an
+            // instantiable ResourceAttribute implementation (unsafe reflection, CWE-470).
+            return EntitlementUtils.resolveExtensionClass(classname, ResourceAttribute.class);
         } catch (ClassNotFoundException e) {
             throw new EntitlementException(
                     EntitlementException.UNKNOWN_RESOURCE_ATTRIBUTE_CLASS,

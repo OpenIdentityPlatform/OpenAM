@@ -12,13 +12,19 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC
  */
 
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
+import com.sun.identity.entitlement.util.ResourceNameIndexGenerator;
+import com.sun.identity.entitlement.util.ResourceNameSplitter;
 import org.forgerock.openam.entitlement.EntitlementRegistry;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -74,6 +80,116 @@ public class ApplicationTest {
 
         //then
         assertEquals(clone.isEditable(), true);
+    }
+
+    @Test
+    public void shouldAcceptValidSearchIndex() throws Exception {
+        Application app = new Application();
+        app.setSearchIndex(ResourceNameSplitter.class);
+        assertEquals(app.getSearchIndexClass(), ResourceNameSplitter.class);
+    }
+
+    @Test
+    public void shouldAcceptValidSaveIndex() throws Exception {
+        Application app = new Application();
+        app.setSaveIndex(ResourceNameIndexGenerator.class);
+        assertEquals(app.getSaveIndexClass(), ResourceNameIndexGenerator.class);
+    }
+
+    // Each reject test uses its OWN gadget class: a class initialises at most once per classloader,
+    // so sharing one gadget would make the static-initialiser assertion vacuous in every test after
+    // the first. Distinct gadgets keep the assertion meaningful regardless of method order.
+
+    @Test
+    public void shouldRejectSearchIndexThatIsNotAnImplementationWithoutInstantiating() {
+        Application app = new Application();
+        Throwable thrown = catchSetterFailure(() -> app.setSearchIndex(SearchGadget.class));
+        // Probes are asserted FIRST: on vulnerable code the setter fails with an unrelated
+        // ClassCastException, and the probe assertions must still report that gadget code ran.
+        assertFalse(Probes.searchStaticInit, "static initialiser must not run");
+        assertFalse(Probes.searchConstructor, "no-arg constructor must not run");
+        assertTrue(thrown instanceof InstantiationException,
+                "expected InstantiationException but was: " + thrown);
+        assertNull(app.getSearchIndexClass());
+    }
+
+    @Test
+    public void shouldRejectSaveIndexThatIsNotAnImplementationWithoutInstantiating() {
+        Application app = new Application();
+        Throwable thrown = catchSetterFailure(() -> app.setSaveIndex(SaveGadget.class));
+        assertFalse(Probes.saveStaticInit, "static initialiser must not run");
+        assertFalse(Probes.saveConstructor, "no-arg constructor must not run");
+        assertTrue(thrown instanceof InstantiationException,
+                "expected InstantiationException but was: " + thrown);
+        assertNull(app.getSaveIndexClass());
+    }
+
+    @Test
+    public void shouldRejectResourceComparatorThatIsNotAnImplementationWithoutInstantiating() {
+        Application app = new Application();
+        Throwable thrown = catchSetterFailure(() -> app.setResourceComparator(ComparatorGadget.class));
+        assertFalse(Probes.comparatorStaticInit, "static initialiser must not run");
+        assertFalse(Probes.comparatorConstructor, "no-arg constructor must not run");
+        assertTrue(thrown instanceof InstantiationException,
+                "expected InstantiationException but was: " + thrown);
+        assertNull(app.getResourceComparatorClass());
+    }
+
+    private static Throwable catchSetterFailure(ThrowingSetter setter) {
+        try {
+            setter.call();
+            return null;
+        } catch (Throwable t) {
+            return t;
+        }
+    }
+
+    private interface ThrowingSetter {
+        void call() throws InstantiationException, IllegalAccessException;
+    }
+
+    /**
+     * Per-gadget tripwire flags, kept in a separate holder so reading a flag never initialises the
+     * gadget it belongs to (which would defeat the static-initialiser assertion).
+     */
+    static final class Probes {
+        static boolean searchStaticInit;
+        static boolean searchConstructor;
+        static boolean saveStaticInit;
+        static boolean saveConstructor;
+        static boolean comparatorStaticInit;
+        static boolean comparatorConstructor;
+    }
+
+    /** Stand-in classes that are not a search/save index or resource comparator; flip flags if run. */
+    public static final class SearchGadget {
+        static {
+            Probes.searchStaticInit = true;
+        }
+
+        public SearchGadget() {
+            Probes.searchConstructor = true;
+        }
+    }
+
+    public static final class SaveGadget {
+        static {
+            Probes.saveStaticInit = true;
+        }
+
+        public SaveGadget() {
+            Probes.saveConstructor = true;
+        }
+    }
+
+    public static final class ComparatorGadget {
+        static {
+            Probes.comparatorStaticInit = true;
+        }
+
+        public ComparatorGadget() {
+            Probes.comparatorConstructor = true;
+        }
     }
 
 }

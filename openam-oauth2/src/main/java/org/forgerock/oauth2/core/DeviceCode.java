@@ -21,8 +21,10 @@ import static org.forgerock.openam.oauth2.OAuth2Constants.CoreTokenParams.*;
 import static org.forgerock.openam.utils.CollectionUtils.newList;
 import static org.forgerock.openam.utils.Time.*;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -115,6 +117,21 @@ public class DeviceCode extends JsonValue implements Token {
         setStringProperty(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwnerId);
     }
 
+    
+    
+    public void setAuthModules(String authModules) {
+    	setStringProperty(AUTH_MODULES, authModules);
+    }
+    
+    
+    /**
+     * Get the auth modules string.
+     * @return list of auth modules.
+     */
+    public String getAuthModules() {
+        return getStringProperty(AUTH_MODULES);
+    }
+    
     /**
      * Gets the Client ID parameter.
      * @return The Client ID.
@@ -138,6 +155,14 @@ public class DeviceCode extends JsonValue implements Token {
     public String getAcrValues() {
         return getStringProperty(OAuth2Constants.Params.ACR_VALUES);
     }
+    
+    /**
+     * Sets the ACR Values for device code object.
+     */
+    public void setAcrValues(String acrValues) {
+        setStringProperty(OAuth2Constants.Params.ACR_VALUES, acrValues);
+    }
+    
 
     /**
      * Gets the Code Challenge Method parameter.
@@ -337,6 +362,7 @@ public class DeviceCode extends JsonValue implements Token {
     public boolean isAuthorized() {
         return Boolean.valueOf(getStringProperty("AUTHORIZED"));
     }
+
 
     /**
      * {@inheritDoc}

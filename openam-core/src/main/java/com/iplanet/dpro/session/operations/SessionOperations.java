@@ -174,9 +174,15 @@ public interface SessionOperations {
      * size is limited by the session service's "iplanet-am-session-max-session-list-size" attribute. The returned
      * sessions are only "partial" sessions, meaning that they do not represent the full session state.
      *
+     * <p>The realm the query runs against is only present in the query filter, hence the caller is needed here to
+     * authorize that realm: without it, any caller reaching this method is able to list the sessions of every
+     * realm of the deployment.</p>
+     *
+     * @param caller The session to use for authorization.
      * @param crestQuery The CREST query based on which we should look for matching sessions.
      * @return The collection of matching partial sessions.
-     * @throws SessionException If the request fails.
+     * @throws SessionException If the request fails, or if the caller may not list the sessions of the realm named
+     *         in the query filter.
      */
-    Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException;
+    Collection<PartialSession> getMatchingSessions(Session caller, CrestQuery crestQuery) throws SessionException;
 }

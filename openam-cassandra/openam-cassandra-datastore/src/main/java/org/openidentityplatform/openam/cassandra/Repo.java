@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2019 Open Identity Platform Community.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package org.openidentityplatform.openam.cassandra;
@@ -296,7 +297,7 @@ public class Repo extends IdRepo {
 				}
 			}
 		}catch(Throwable e){
-			logger.error("getAttributes {} {}",type,name,attrNames,e);
+			logger.error("getAttributes {} {} {}",type,name,attrNames,e);
 			throw new IdRepoException(e.getMessage());
 		}
 		return attr;
@@ -434,7 +435,7 @@ public class Repo extends IdRepo {
 		}catch (IdRepoException e) {
 			throw e;
 		}catch(Throwable e){
-			logger.error("setAttributes {} {} {} {}",type,name,attributes_in,isAdd,e.getMessage());
+			logger.error("setAttributes {} {} {} {}: {}",type,name,names(attributes_in),isAdd,e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
@@ -442,7 +443,7 @@ public class Repo extends IdRepo {
 	@Override
 	public void setBinaryAttributes(SSOToken token, IdType type, String name,Map<String, byte[][]> attributes, boolean isAdd) throws IdRepoException, SSOException {
 		//validate(type, IdOperation.EDIT);
-		logger.warn("unsupported setBinaryAttributes {} {} {} {}",type,name,attributes,isAdd);
+		logger.warn("unsupported setBinaryAttributes {} {} {} {}",type,name,names(attributes),isAdd);
 		throw new IdRepoUnsupportedOpException("unsupported setBinaryAttributes");
 	}
 
@@ -470,7 +471,7 @@ public class Repo extends IdRepo {
 			else
 				new ExecuteCallback(profile,session, statement).execute();
 		}catch(Throwable e){
-			logger.error("removeAttributes {} {} {}",type,name,attrNames,e.getMessage());
+			logger.error("removeAttributes {} {} {}: {}",type,name,attrNames,e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
@@ -649,14 +650,14 @@ public class Repo extends IdRepo {
 					}
 					//test result
 					if (filterOp==Repo.AND_MOD && (result.isEmpty())) {
-						logger.debug("break search by empty query {} {}: {}",pattern,avPairs,filterEntry);
+						logger.debug("break search by empty query {} {}: {}",pattern,names(avPairs),filterEntry.getKey());
 						break;
 					}
 				}
 			}
 			return new RepoSearchResults(result.keySet(),(maxResults>0&&result.size()>maxResults)?RepoSearchResults.SIZE_LIMIT_EXCEEDED:RepoSearchResults.SUCCESS,result,type);
 		}catch(Throwable e){
-			logger.error("search {} {} {} {} {} {} {} {} {}: {}",type,pattern,maxTime,maxResults,returnAttrs,returnAllAttrs,filterOp,avPairs,recursive,logger.isDebugEnabled()?e:e.getMessage());
+			logger.error("search {} {} {} {} {} {} {} {} {}: {}",type,pattern,maxTime,maxResults,returnAttrs,returnAllAttrs,filterOp,names(avPairs),recursive,logger.isDebugEnabled()?e:e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
@@ -744,7 +745,7 @@ public class Repo extends IdRepo {
 			attrMap.put("serviceName", attr.get("serviceName"));
 			setAttributes(token, type, name, attrMap, false);
 		}catch(Throwable e){
-			logger.error("assignService {} {} {} {}",type,name,serviceName,attrMap,e.getMessage());
+			logger.error("assignService {} {} {} {}: {}",type,name,serviceName,names(attrMap),e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
@@ -756,7 +757,7 @@ public class Repo extends IdRepo {
 			Map<String, Set<String>> attr=getAttributes(token, type, name, new HashSet<String>(Arrays.asList(new String[]{"serviceName"})));
 			return (attr.containsKey("serviceName"))?attr.get("serviceName"):new HashSet<String>(0);
 		}catch(Throwable e){
-			logger.error("getAssignedServices {} {} {}",type,name,mapOfServicesAndOCs,e.getMessage());
+			logger.error("getAssignedServices {} {} {}: {}",type,name,mapOfServicesAndOCs,e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
@@ -772,7 +773,7 @@ public class Repo extends IdRepo {
 			attrMap.put("serviceName", attr.get("serviceName"));
 			setAttributes(token, type, name, attrMap, false);
 		}catch(Throwable e){
-			logger.error("unassignService {} {} {} {}",type,name,serviceName,attrMap,e.getMessage());
+			logger.error("unassignService {} {} {} {}: {}",type,name,serviceName,names(attrMap),e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
@@ -801,7 +802,7 @@ public class Repo extends IdRepo {
 			attrMap.put("serviceName", attr.get("serviceName"));
 			setAttributes(token, type, name, attrMap, false);
 		}catch(Throwable e){
-			logger.error("modifyService {} {} {} {}",type,name,serviceName,attrMap,e.getMessage());
+			logger.error("modifyService {} {} {} {}: {}",type,name,serviceName,names(attrMap),e.getMessage());
 			throw new IdRepoException(e.getMessage());
 		}
 	}
@@ -817,6 +818,13 @@ public class Repo extends IdRepo {
 	}
 	
 ///////////////////////////////////////////////////////////////////////////	
+	/**
+	 * Attribute names for log output: the values may carry userPassword.
+	 */
+	static Set<String> names(Map<String, ?> attributes) {
+		return attributes==null?null:attributes.keySet();
+	}
+
 	void validate(IdType type,IdOperation service) throws IdRepoUnsupportedOpException{
 		if (!supportedOps.containsKey(type)||!supportedOps.get(type).contains(service))
 			throw new IdRepoUnsupportedOpException("operation "+service.getName()+" not supported for "+type.getName());

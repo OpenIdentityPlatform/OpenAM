@@ -25,7 +25,7 @@
  * $Id: LoginServlet.java,v 1.9 2009/02/18 03:38:42 222713 Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.authentication.UI;
@@ -42,6 +42,7 @@ import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.common.RequestUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import java.net.URL;
 import java.util.Map;
@@ -272,9 +273,11 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
                                         + "initializeRequestContext removing"
                                         + "cookie " + cookies[i].getName());
                             }
-                            cookies[i].setValue("");
-                            cookies[i].setMaxAge(0);
-                            response.addCookie(cookies[i]);
+                            // A request cookie carries no path or flags: a deletion built
+                            // the way the cookie was set is the one the browser matches.
+                            Cookie hostCookie = AuthUtils.createCookie(cookies[i].getName(), "", null);
+                            hostCookie.setMaxAge(0);
+                            response.addCookie(hostCookie);
                             for (String domain : domains) {
                                 if (debug.messageEnabled()) {
                                     debug.message("LoginServlet:initializeRequestContext removing cookie " + domain);
@@ -339,8 +342,8 @@ extends com.sun.identity.authentication.UI.AuthenticationServletBase {
             }
 
             if (numCookies == 0 && redirectFlag == null) {
-                Cookie dummyCookie = new Cookie("AMTESTCOOKIE", "amtestcookie");
-                response.addCookie(dummyCookie);
+                CookieUtils.addCookieToResponse(response,
+                        CookieUtils.newCookie("AMTESTCOOKIE", "amtestcookie"));
                 String queryStr = request.getQueryString();
                 try {
                     if (queryStr == null || queryStr.length() == 0) {

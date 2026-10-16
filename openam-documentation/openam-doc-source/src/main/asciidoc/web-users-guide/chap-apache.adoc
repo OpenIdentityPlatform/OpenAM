@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -54,7 +54,7 @@ User and Group settings in httpd.conf
 
 * Create a profile for your policy agent as described in xref:chap-web-agents.adoc#chap-web-agents[Configuring Web Policy Agents].
 
-* Create at least one policy in OpenAM to protect resources with the agent, as described in the section on link:../../../docs/openam/13/admin-guide/#configure-authz-policy[Configuring Policies, window=\_blank]. Consider creating a simple policy, such as a policy that allows only authenticated users to access your resources. This allows you to test your policy agent after installation.
+* Create at least one policy in OpenAM to protect resources with the agent, as described in the section on xref:../admin-guide/chap-authz-policy.adoc#configure-policies-with-console[Configuring Policies]. Consider creating a simple policy, such as a policy that allows only authenticated users to access your resources. This allows you to test your policy agent after installation.
 
 * If the OpenAM server uses SSL, you must install OpenSSL on the agent machine.
 +
@@ -66,7 +66,7 @@ User and Group settings in httpd.conf
 
 * Install Apache HTTP Server before you install the policy agent. You must stop the server during installation.
 
-* See the OpenAM __Installation Guide__ section, link:../../../docs/openam/13/install-guide/#download-openam-software[Obtaining OpenAM Software, window=\_blank] to determine which version of the agent to download, and download the agent. Also, verify the checksum of the file you download against the checksum posted on the download page.
+* See the OpenAM __Installation Guide__ section, xref:../install-guide/chap-prepare-install.adoc#download-openam-software[Obtaining OpenAM Software] to determine which version of the agent to download, and download the agent. Also, verify the checksum of the file you download against the checksum posted on the download page.
 +
 Unzip the file in the directory where you plan to install the web policy agent. The agent stores its configuration and logs under this directory.
 +

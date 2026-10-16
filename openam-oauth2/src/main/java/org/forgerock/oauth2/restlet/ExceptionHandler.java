@@ -23,6 +23,7 @@ import org.forgerock.oauth2.core.exceptions.OAuth2Exception;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 import org.forgerock.openam.services.baseurl.BaseURLProviderFactory;
+import org.owasp.esapi.ESAPI;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -131,6 +132,14 @@ public class ExceptionHandler {
             return;
         }
         final Map<String, String> data = new HashMap<>(exception.asMap());
+        // The XUI renders these fields into the DOM with unescaped Handlebars output ({{{error.description}}}),
+        // and the template's ?js_string only protects the JavaScript string literal, so encode for HTML here.
+        // Exception messages can carry raw request data (e.g. a duplicated parameter name).
+        for (String field : new String[] {"error", "error_description", "error_uri"}) {
+            if (data.containsKey(field)) {
+                data.put(field, ESAPI.encoder().encodeForHTML(data.get(field)));
+            }
+        }
         final String realm = requestFactory.create(request).getParameter("realm");
         data.put("realm", realm);
         data.put("baseUrl", baseURLProviderFactory.get(realm).getRootURL(ServletUtils.getRequest(request)));

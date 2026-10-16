@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC.
  */
 
 package com.iplanet.dpro.session.operations.strategies;
@@ -127,15 +128,16 @@ public class StatelessOperationsTest {
     }
 
     @Test
-    public void shouldCheckPermissionToDestroySession() throws Exception {
+    public void shouldCheckPermissionToDestroySessionAgainstSessionBeingDestroyed() throws Exception {
         // Given
         Session requester = mock(Session.class);
 
         // When
         statelessOperations.destroy(requester, mockSession);
 
-        // Then
-        verify(mockSessionChangeAuthorizer).checkPermissionToDestroySession(requester, sid);
+        // Then the session being destroyed is handed over, so that the realm the permission is evaluated against
+        // cannot be taken from the requester.
+        verify(mockSessionChangeAuthorizer).checkPermissionToDestroySession(requester, mockSession);
     }
 
     @Test
@@ -163,7 +165,7 @@ public class StatelessOperationsTest {
         // Given
         Session requester = mock(Session.class);
         SessionException ex = new SessionException("test");
-        willThrow(ex).given(mockSessionChangeAuthorizer).checkPermissionToDestroySession(requester, sid);
+        willThrow(ex).given(mockSessionChangeAuthorizer).checkPermissionToDestroySession(requester, mockSession);
 
         // When
         try {

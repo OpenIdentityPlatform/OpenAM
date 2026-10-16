@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.oauth2;
 
@@ -19,6 +20,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.forgerock.openam.utils.CollectionUtils;
 import org.restlet.Request;
 
 import com.sun.identity.idm.AMIdentity;
@@ -103,7 +105,7 @@ final class Utils {
      * @param identity      The identity with the attribute.
      * @param attributeName The name of the attribute.
      * @param logger        The logger used to log eventual exceptions.
-     * @return The attribute value.
+     * @return The attribute value, or {@code null} if the identity has no value for the attribute.
      */
     static String getAttributeValueFromSet(AMIdentity identity, String attributeName, Debug logger) {
         Set<String> values;
@@ -112,7 +114,7 @@ final class Utils {
         } catch (Exception e) {
             throw createException(attributeName, e, logger);
         }
-        return values.iterator().next();
+        return CollectionUtils.getFirstItem(values);
     }
 
     /**

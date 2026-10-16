@@ -30,19 +30,48 @@
  */
 package com.sun.identity.entitlement;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.forgerock.openam.entitlement.PolicyConstants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.security.auth.Subject;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public abstract class LogicalCondition extends EntitlementConditionAdaptor {
     private Set<EntitlementCondition> eConditions;
     private String pConditionName;
+
+    /**
+     * Set when {@link #setState(String)} refused a member class name. The wrapper is then an
+     * incomplete representation of the stored policy, and subclasses whose semantics get weaker as
+     * members are removed (notably {@code AndCondition}, which is satisfied by an empty member set)
+     * must not evaluate as if the missing constraint had never been written.
+     */
+    private transient boolean memberRejected;
+
+    /**
+     * The refused members, kept verbatim as they appeared in the state read by
+     * {@link #setState(String)} so that {@link #toJSONObject()} can write them back out.
+     * <p>
+     * Without this the refusal would live only as long as the in-memory object: the emitted state
+     * would carry the surviving members only, so a re-save (for instance
+     * {@code ResavePoliciesStep}, which re-reads and re-stores every policy of every realm) would
+     * persist the truncated policy, and the next load would see a wrapper that is indistinguishable
+     * from a legitimately smaller one - for {@code AndCondition} and for an emptied
+     * {@code OrCondition} an empty member set means <em>satisfied</em>, i.e. a grant. Re-emitting
+     * the refused entry makes the next load hit the same refusal and set {@link #memberRejected}
+     * again.
+     * <p>
+     * The refused member is only ever copied as JSON; its class is still never loaded initialised
+     * nor instantiated.
+     */
+    private transient List<JSONObject> rejectedMembers = new ArrayList<JSONObject>();
 
     /**
      * Constructor.
@@ -87,26 +116,42 @@ public abstract class LogicalCondition extends EntitlementConditionAdaptor {
             pConditionName = (jo.has("pConditionName")) ?
                 jo.optString("pConditionName") : null;
             JSONArray memberConditions = jo.optJSONArray("memberECondition");
+            // Reset outside the null check: the state string being applied fully redefines this
+            // object, so a prior refusal must not leak into it (mirrors setEConditions).
+            clearMemberRejection();
             if (memberConditions != null) {
                 eConditions = new HashSet<EntitlementCondition>();
                 int len = memberConditions.length();
                 for (int i = 0; i < len; i++) {
                     JSONObject memberCondition =
-                        memberConditions.getJSONObject(i);
-                    String className = memberCondition.getString("className");
-                    Class cl = Class.forName(className);
-                    EntitlementCondition ec =
-                        (EntitlementCondition) cl.newInstance();
-                    ec.setState(memberCondition.getString("state"));
-                    eConditions.add(ec);
+                        memberConditions.optJSONObject(i);
+                    try {
+                        // Read className and state inside the per-member try as well: a member
+                        // missing either key has to be refused like any other unusable one. Letting
+                        // the JSONException out of the loop would abort the remaining members and
+                        // record no refusal at all, which is the truncated-to-empty (i.e. satisfied)
+                        // AndCondition this class exists to prevent.
+                        if (memberCondition == null) {
+                            throw new JSONException("member condition " + i + " is not an object");
+                        }
+                        String className = memberCondition.getString("className");
+                        EntitlementCondition ec = EntitlementClassResolver.newInstance(
+                            className, EntitlementCondition.class);
+                        ec.setState(memberCondition.getString("state"));
+                        eConditions.add(ec);
+                    } catch (JSONException | ClassNotFoundException | InstantiationException
+                            | IllegalAccessException ex) {
+                        // Skip only the offending member instead of aborting the whole list, so a
+                        // single rejected class name cannot silently drop the valid siblings, and
+                        // record the refusal so evaluation cannot treat the missing member as if it
+                        // had never been part of the policy.
+                        markMemberRejected(memberCondition);
+                        PolicyConstants.DEBUG.error("LogicalCondition.setState: skipping invalid "
+                            + "member condition "
+                            + ((memberCondition != null) ? memberCondition.optString("className") : ""), ex);
+                    }
                 }
             }
-        } catch (InstantiationException ex) {
-            PolicyConstants.DEBUG.error("LogicalCondition.setState", ex);
-        } catch (IllegalAccessException ex) {
-            PolicyConstants.DEBUG.error("LogicalCondition.setState", ex);
-        } catch (ClassNotFoundException ex) {
-            PolicyConstants.DEBUG.error("LogicalCondition.setState", ex);
         } catch (JSONException ex) {
             PolicyConstants.DEBUG.error("LogicalCondition.setState", ex);
         }
@@ -147,9 +192,96 @@ public abstract class LogicalCondition extends EntitlementConditionAdaptor {
      */
     public void setEConditions(Set<EntitlementCondition> eConditions) {
         this.eConditions = new HashSet<EntitlementCondition>();
+        clearMemberRejection();
         if (eConditions != null) {
             this.eConditions.addAll(eConditions);
         }
+    }
+
+    /**
+     * Records that a member could not be rebuilt from the state being applied, keeping the member's
+     * JSON so that {@link #toJSONObject()} can write it back out. Subclasses that read the member
+     * themselves - {@code NotCondition} keeps a single member of its own - have to call this, or a
+     * refusal below them stays invisible to {@link #hasRejectedMemberInSubtree()} and an enclosing
+     * {@code NOT} negates the resulting failure back into a grant.
+     *
+     * @param rejectedMember the refused member as it appeared in the state, or <code>null</code>
+     *        when it was not even a JSON object; an empty object is then re-emitted in its place,
+     *        which the next load refuses again and so keeps the wrapper fail-closed across a save.
+     */
+    protected void markMemberRejected(JSONObject rejectedMember) {
+        memberRejected = true;
+        rejectedMembers.add((rejectedMember != null) ? rejectedMember : new JSONObject());
+    }
+
+    /**
+     * Clears a recorded refusal. Called whenever the members are redefined wholesale, so that
+     * programmatic construction is unaffected by what a previous state string contained.
+     */
+    protected void clearMemberRejection() {
+        memberRejected = false;
+        rejectedMembers.clear();
+    }
+
+    /**
+     * Returns the refused members, kept verbatim for re-emission by {@link #toJSONObject()}.
+     *
+     * @return the refused members; never <code>null</code>.
+     */
+    @JsonIgnore
+    protected List<JSONObject> getRejectedMembers() {
+        return rejectedMembers;
+    }
+
+    /**
+     * Returns whether {@link #setState(String)} refused a member class name, leaving this wrapper
+     * with fewer members than the stored policy declares.
+     * <p>
+     * Any subclass whose evaluation gets <em>weaker</em> as members are dropped must consult this
+     * before evaluating: an empty member set is satisfied both in {@code AndCondition} and in
+     * {@code OrCondition}, so the truncated wrapper would grant what the stored policy restricts.
+     * {@code AndCondition} has to fail on any refusal, {@code OrCondition} only when nothing
+     * survived - dropping a member from a non-empty OR can only make it stricter. A subclass that
+     * <em>negates</em> its member must use {@link #hasRejectedMemberInSubtree()} instead.
+     *
+     * @return <code>true</code> if at least one member was rejected.
+     */
+    @JsonIgnore
+    public boolean isMemberRejected() {
+        return memberRejected;
+    }
+
+    /**
+     * Returns whether this wrapper, or any logical condition nested below it, had a member class
+     * name refused by {@link #setState(String)}.
+     * <p>
+     * {@link #isMemberRejected()} deliberately reports this wrapper's own refusal only: for
+     * {@code AndCondition}/{@code OrCondition} a refusal further down is already handled where it
+     * happened, because the damaged member fails closed and a failing member can only make an AND
+     * or an OR stricter. Negation is the exception - {@code NotCondition} turns its member's
+     * decision around, so the damaged member's fail-closed decision would come back out of the
+     * {@code NOT} as a grant. It has to look at the whole subtree.
+     *
+     * @return <code>true</code> if a member was refused anywhere in this subtree.
+     */
+    @JsonIgnore
+    public boolean hasRejectedMemberInSubtree() {
+        if (memberRejected) {
+            return true;
+        }
+
+        // Read the members through the accessor: NotCondition keeps its single member elsewhere
+        // and overrides the getter, so the field would not see it.
+        Set<EntitlementCondition> members = getEConditions();
+        if (members != null) {
+            for (EntitlementCondition member : members) {
+                if (member instanceof LogicalCondition
+                        && ((LogicalCondition) member).hasRejectedMemberInSubtree()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -198,6 +330,12 @@ public abstract class LogicalCondition extends EntitlementConditionAdaptor {
                 subjo.put("state", eCondition.getState());
                 jo.append("memberECondition", subjo);
             }
+        }
+        // Write the refused members back out unchanged, so that storing this object again keeps
+        // the policy as it was written and the next load refuses them again instead of seeing a
+        // wrapper that looks legitimately smaller. See rejectedMembers.
+        for (JSONObject rejected : rejectedMembers) {
+            jo.append("memberECondition", rejected);
         }
         return jo;
     }

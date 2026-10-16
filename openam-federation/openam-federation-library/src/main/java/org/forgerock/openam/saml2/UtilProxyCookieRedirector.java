@@ -12,7 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2015-2016 ForgeRock AS.
-* Portions copyright 2025 3A Systems LLC.
+* Portions copyright 2025-2026 3A Systems LLC.
 */
 
 package org.forgerock.openam.saml2;
@@ -22,7 +22,6 @@ import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.profile.FederateCookieRedirector;
 import com.sun.identity.saml2.profile.UnableToRedirectException;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.CookieUtils;
 
 import jakarta.servlet.http.Cookie;
@@ -53,6 +52,14 @@ public class UtilProxyCookieRedirector implements FederateCookieRedirector {
         return true;
     }
 
+    /**
+     * A second copy of the bounce logic that {@link FSUtils#needSetLBCookieAndRedirect} carries,
+     * signalling through an exception rather than a boolean. Nothing in this repository calls it -
+     * the live path through this class is {@link #needSetLBCookieAndRedirect}, which delegates
+     * straight back to <code>FSUtils</code> - so keeping it in step is parity maintenance, not a
+     * second hardened path. It is kept in step anyway, because the two copies having drifted apart
+     * is what produced GHSA-v796-mg6j-9c5m.
+     */
     @Override
     public void setCookieAndRedirect(
             final HttpServletRequest request,
@@ -61,19 +68,10 @@ public class UtilProxyCookieRedirector implements FederateCookieRedirector {
 
         FSUtils.setlbCookie(request, response);
 
-        // turn off cookie hash redirect by default
-        String tmpStr = SystemPropertiesManager.get(
-                "com.sun.identity.federation.cookieHashRedirectEnabled");
-        if ((tmpStr == null) || (!(tmpStr.equalsIgnoreCase("true")))) {
-            throw new UnableToRedirectException();
-        }
-
-        String redirected = request.getParameter("redirected");
-        if (redirected != null) {
-            if (FSUtils.debug.messageEnabled()) {
-                FSUtils.debug.message("FSUtils.needSetLBCookieAndRedirect: " +
-                        " redirected already and lbCookie not set correctly.");
-            }
+        // The gate itself is not copied: FSUtils.requireRedirect holds the flag lookup and the
+        // already-bounced check, and returns false in exactly the two cases this method has to
+        // decline in.
+        if (!FSUtils.requireRedirect(request)) {
             throw new UnableToRedirectException();
         }
 
@@ -115,10 +113,25 @@ public class UtilProxyCookieRedirector implements FederateCookieRedirector {
                 throw new UnableToRedirectException();
             }
         } catch (IOException ioe) {
-            FSUtils.debug.error("FSUtils.needSetLBCookieAndRedirect: ", ioe);
-            throw new UnableToRedirectException();
+            handleFailedBounce(response, ioe);
         } catch (SAML2Exception saml2E) {
-            FSUtils.debug.error("FSUtils.needSetLBCookieAndRedirect: ", saml2E);
+            handleFailedBounce(response, saml2E);
+        }
+    }
+
+    /**
+     * Mirrors {@link FSUtils#requireStopAfterFailedBounce} for the exception based signalling of
+     * this class: an <code>UnableToRedirectException</code> tells the caller to carry on, which is
+     * only safe while the response is untouched.
+     * <p>
+     * So a bounce that failed after the response was committed returns normally, the same way a
+     * bounce that succeeded does. That is not the failure being hidden: a void method has no other
+     * way to say "stop", and stopping is the only safe thing left once the response is spoiled. The
+     * interface documents the pair that way.
+     */
+    private void handleFailedBounce(HttpServletResponse response, Exception cause)
+            throws UnableToRedirectException {
+        if (!FSUtils.requireStopAfterFailedBounce(response, cause)) {
             throw new UnableToRedirectException();
         }
     }

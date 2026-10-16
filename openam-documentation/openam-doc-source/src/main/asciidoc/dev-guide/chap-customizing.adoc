@@ -499,7 +499,7 @@ This section shows how to customize authentication with a sample custom authenti
 
 The sample authentication module prompts for a user name and password to authenticate the user, and handles error conditions. The sample shows how you integrate an authentication module into OpenAM such that you can configure the module through OpenAM console, and also localize the user interface.
 
-For information on downloading and building OpenAM sample source code, see link:https://backstage.forgerock.com/knowledge/kb/article/a47487197[How do I access and build the sample code provided for OpenAM 12.x, 13.x and AM (All versions)?, window=\_blank] in the __Knowledge Base__.
+The OpenAM sample source code is in the link:https://github.com/OpenIdentityPlatform/OpenAM/tree/master/openam-samples[openam-samples, window=\_blank] directory of the OpenAM source code on GitHub.
 --
 Get a local clone so that you can try the sample on your system. In the sources, you find the following files under the `/path/to/openam-source/openam-samples/custom-authentication-module` directory:
 
@@ -1068,7 +1068,7 @@ Build the module with Apache Maven, and install the module in OpenAM.
 
 After you successfully build the module, you find the `.jar` file in the `target/` directory of the project.
 
-For information on downloading and building OpenAM sample source code, see link:https://backstage.forgerock.com/knowledge/kb/article/a47487197[How do I access and build the sample code provided for OpenAM 12.x, 13.x and AM (All versions)?, window=\_blank] in the __Knowledge Base__.
+The OpenAM sample source code is in the link:https://github.com/OpenIdentityPlatform/OpenAM/tree/master/openam-samples[openam-samples, window=\_blank] directory of the OpenAM source code on GitHub.
 
 
 [#installing-sample-auth-module]
@@ -1363,7 +1363,7 @@ This section shows how to build and use a custom policy plugin that implements a
 
 The OpenAM policy framework lets you build plugins that extend subject conditions, environment conditions, and resource attributes.
 
-For information on downloading and building OpenAM sample source code, see link:https://backstage.forgerock.com/knowledge/kb/article/a47487197[How do I access and build the sample code provided for OpenAM 12.x, 13.x and AM (All versions)?, window=\_blank] in the __Knowledge Base__.
+The OpenAM sample source code is in the link:https://github.com/OpenIdentityPlatform/OpenAM/tree/master/openam-samples[openam-samples, window=\_blank] directory of the OpenAM source code on GitHub.
 
 Get a local clone so that you can try the sample on your system. In the sources, you find the following files under the `/path/to/openam-source/openam-samples/policy-evaluation-plugin` directory:
 --
@@ -1412,7 +1412,7 @@ Follow the steps in this procedure to build the sample plugin:
 
 . If you have not already done so, download and build the samples.
 +
-For information on downloading and building OpenAM sample source code, see link:https://backstage.forgerock.com/knowledge/kb/article/a47487197[How do I access and build the sample code provided for OpenAM 12.x, 13.x and AM (All versions)?, window=\_blank] in the __Knowledge Base__.
+The OpenAM sample source code is in the link:https://github.com/OpenIdentityPlatform/OpenAM/tree/master/openam-samples[openam-samples, window=\_blank] directory of the OpenAM source code on GitHub.
 
 . Check out the `master` branch of the OpenAM source.
 

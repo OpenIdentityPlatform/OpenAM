@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -23,7 +23,7 @@
 [#chap-legacy-servers]
 == Migrating Legacy Servers
 
-Rather than upgrade legacy servers (running OpenSSO or Sun Access Manager, or an link:https://backstage.forgerock.com/#!/knowledge/kb/article/a18529200[OpenAM version that is no longer supported, window=\_blank]), you instead manually migrate from your existing deployment to a new deployment.
+Rather than upgrade legacy servers (running OpenSSO or Sun Access Manager, or an OpenAM version that is no longer supported), you instead manually migrate from your existing deployment to a new deployment.
 
 For complex legacy deployments, Open Identity Platform Community link:https://github.com/OpenIdentityPlatform/.github/wiki/Approved-Vendor-List[Approved Vendors, window=\_blank] can assist you in the migration process.
 

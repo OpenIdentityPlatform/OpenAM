@@ -23,7 +23,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * Portions Copyrighted 2015 Nomura Research Institute, Ltd.
- * Portions Copyrighted 2018-2025 3A Systems, LLC.
+ * Portions Copyrighted 2018-2026 3A Systems, LLC.
  */
 package org.forgerock.openam.authentication.modules.oauth2;
 
@@ -224,7 +224,7 @@ public class OAuth extends AMLoginModule {
 
                 String ProviderLogoutURL = config.getLogoutServiceUrl();
 
-                String csrfStateTokenId = RandomStringUtils.randomAlphanumeric(32);
+                String csrfStateTokenId = newCsrfStateTokenId();
                 String csrfState = createAuthorizationState();
                 Token csrfStateToken = new Token(csrfStateTokenId, TokenType.GENERIC);
                 csrfStateToken.setAttribute(CoreTokenField.STRING_ONE, csrfState);
@@ -519,6 +519,15 @@ public class OAuth extends AMLoginModule {
         }
         
         throw new AuthLoginException(BUNDLE_NAME, "unknownState", null);
+    }
+
+    /**
+     * Id of the CTS record holding the CSRF state; it also travels in the
+     * NONCE_TOKEN_ID cookie, so it is drawn from a cryptographic generator rather
+     * than the java.util.Random behind RandomStringUtils.randomAlphanumeric().
+     */
+    static String newCsrfStateTokenId() {
+        return RandomStringUtils.random(32, 0, 0, true, true, null, random);
     }
 
     private String createAuthorizationState() {

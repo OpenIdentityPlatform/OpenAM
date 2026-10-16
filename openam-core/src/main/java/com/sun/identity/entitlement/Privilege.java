@@ -25,6 +25,7 @@
  * $Id: Privilege.java,v 1.14 2010/01/08 22:20:47 veiming Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement;
@@ -173,6 +174,28 @@ public abstract class Privilege implements IPrivilege {
     private long lastModifiedDate;
     private Set<String> applicationIndexes;
 
+    /**
+     * The declared {@code eSubject} / {@code eCondition} of the stored privilege, kept verbatim when
+     * {@link #getInstance(JSONObject)} could not rebuild it because its class name was refused or
+     * could not be loaded.
+     * <p>
+     * Without this the privilege would simply come back with the field {@code null}, and a null
+     * subject matches <em>every</em> subject ({@link #doesSubjectMatch}) while a null condition is
+     * unconditionally satisfied ({@link #doesConditionMatch}) - so an unresolvable class name would
+     * turn the stored restriction into a policy that applies to everyone. This is the same failure
+     * mode that {@code LogicalSubject}/{@code LogicalCondition} guard against for nested members,
+     * one level up, and it is handled the same way: the privilege fails closed while the refusal
+     * lasts, and the declaration is written back out by {@link #toMinimalJSONObject()} so that a
+     * re-save does not quietly rewrite the policy into a weaker one and the next load refuses it
+     * again.
+     * <p>
+     * Only the read path records a refusal. A privilege that is being written -
+     * {@link #getNewInstance(JSONObject)}, or the legacy policy import - has nothing stored yet to
+     * preserve, so it refuses the write instead.
+     */
+    private transient JSONObject unresolvedSubject;
+    private transient JSONObject unresolvedCondition;
+
 
     static {
         String privilegeClassName = SystemPropertiesManager.get(PRIVILEGE_CLASS_PROPERTY, DEFAULT_PRIVILEGE_CLASS);
@@ -216,6 +239,7 @@ public abstract class Privilege implements IPrivilege {
         throws EntitlementException {
         validateSubject(eSubject);
          this.eSubject = eSubject;
+        this.unresolvedSubject = null;
     }
 
     void validateSubject(EntitlementSubject sbj)
@@ -378,6 +402,12 @@ public abstract class Privilege implements IPrivilege {
             subjo.put("className", eSubject.getClass().getName());
             subjo.put("state", eSubject.getState());
             jo.put("eSubject", subjo);
+        } else if (unresolvedSubject != null) {
+            // Write the declaration back out unchanged: storing this privilege again must not turn
+            // it into one that never had a subject, which the next load would apply to everyone.
+            // The class is still never loaded initialised nor instantiated - only its name is
+            // copied. See unresolvedSubject.
+            jo.put("eSubject", unresolvedSubject);
         }
 
         if (eCondition != null) {
@@ -385,6 +415,8 @@ public abstract class Privilege implements IPrivilege {
             subjo.put("className", eCondition.getClass().getName());
             subjo.put("state", eCondition.getState());
             jo.put("eCondition", subjo);
+        } else if (unresolvedCondition != null) {
+            jo.put("eCondition", unresolvedCondition);
         }
 
         if ((eResourceAttributes != null) && !eResourceAttributes.isEmpty()) {
@@ -430,8 +462,7 @@ public abstract class Privilege implements IPrivilege {
     public static Privilege getInstance(JSONObject jo) throws EntitlementException {
         String className = jo.optString("className");
         try {
-            Class clazz = Class.forName(className);
-            Privilege privilege = (Privilege)clazz.newInstance();
+            Privilege privilege = EntitlementClassResolver.newInstance(className, Privilege.class);
             privilege.name = jo.optString("name");
             privilege.active = Boolean.parseBoolean(jo.optString("active"));
             privilege.resourceTypeUuid = jo.optString(RESOURCE_TYPE_UUID_ATTRIBUTE);
@@ -449,6 +480,19 @@ public abstract class Privilege implements IPrivilege {
             }
             privilege.eSubject = getESubject(jo);
             privilege.eCondition = getECondition(jo);
+            // A declared subject / condition that did not come back is one whose class name was
+            // refused or could not be loaded. Record it, or the privilege silently loses the
+            // restriction and starts applying to everyone: see unresolvedSubject.
+            if ((privilege.eSubject == null) && jo.has("eSubject")) {
+                privilege.unresolvedSubject = declaredMember(jo, "eSubject");
+                PolicyConstants.DEBUG.error("Privilege.getInstance: privilege " + privilege.name
+                    + " declares a subject whose class could not be resolved; it will deny");
+            }
+            if ((privilege.eCondition == null) && jo.has("eCondition")) {
+                privilege.unresolvedCondition = declaredMember(jo, "eCondition");
+                PolicyConstants.DEBUG.error("Privilege.getInstance: privilege " + privilege.name
+                    + " declares a condition whose class could not be resolved; it will fail");
+            }
             privilege.eResourceAttributes = getResourceAttributes(jo);
             privilege.init(jo);
             
@@ -465,6 +509,17 @@ public abstract class Privilege implements IPrivilege {
         return null;
     }
 
+    /**
+     * Returns the declaration stored under {@code key} so that it can be written back out verbatim,
+     * falling back to an empty object which is unresolvable in exactly the same way - what matters
+     * is that the next load refuses it again rather than seeing a privilege with no such
+     * restriction at all.
+     */
+    private static JSONObject declaredMember(JSONObject jo, String key) {
+        JSONObject declared = jo.optJSONObject(key);
+        return (declared != null) ? declared : new JSONObject();
+    }
+
     private static Set<ResourceAttribute> getResourceAttributes(JSONObject jo)
         throws JSONException{
         if (!jo.has("eResourceAttributes")) {
@@ -475,8 +530,8 @@ public abstract class Privilege implements IPrivilege {
         for (int i = 0; i < array.length(); i++) {
             JSONObject json = (JSONObject)array.get(i);
             try {
-                Class clazz = Class.forName(json.getString("className"));
-                ResourceAttribute ra = (ResourceAttribute)clazz.newInstance();
+                ResourceAttribute ra = EntitlementClassResolver.newInstance(
+                    json.getString("className"), ResourceAttribute.class);
                 ra.setState(json.getString("state"));
                 results.add(ra);
             } catch (InstantiationException ex) {
@@ -500,13 +555,8 @@ public abstract class Privilege implements IPrivilege {
         if (!jo.has("eSubject")) {
             return new NoSubject();
         }
-        JSONObject sbj = jo.getJSONObject("eSubject");
         try {
-            Class clazz = Class.forName(sbj.getString("className"));
-            EntitlementSubject eSubject = (EntitlementSubject)
-                clazz.newInstance();
-            eSubject.setState(sbj.getString("state"));
-            return eSubject;
+            return newESubject(jo.getJSONObject("eSubject"));
         } catch (InstantiationException ex) {
             PolicyConstants.DEBUG.error("Privilege.getESubject", ex);
         } catch (IllegalAccessException ex) {
@@ -524,14 +574,8 @@ public abstract class Privilege implements IPrivilege {
             return null;
         }
 
-        JSONObject sbj = jo.getJSONObject("eCondition");
         try {
-            Class clazz = Class.forName(sbj.getString("className"));
-            EntitlementCondition eCondition = (EntitlementCondition)
-                clazz.newInstance();
-            eCondition.setState(sbj.getString("state"));
-            // Caching moved to #doesConditionMatch(..) method
-            return eCondition;
+            return newECondition(jo.getJSONObject("eCondition"));
         } catch (InstantiationException ex) {
             PolicyConstants.DEBUG.error("Privilege.getECondition", ex);
         } catch (IllegalAccessException ex) {
@@ -540,6 +584,101 @@ public abstract class Privilege implements IPrivilege {
             PolicyConstants.DEBUG.error("Privilege.getECondition", ex);
         }
         return null;
+    }
+
+    private static EntitlementSubject newESubject(JSONObject sbj)
+        throws JSONException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        EntitlementSubject eSubject = EntitlementClassResolver.newInstance(
+            sbj.getString("className"), EntitlementSubject.class);
+        eSubject.setState(sbj.getString("state"));
+        return eSubject;
+    }
+
+    private static EntitlementCondition newECondition(JSONObject sbj)
+        throws JSONException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        EntitlementCondition eCondition = EntitlementClassResolver.newInstance(
+            sbj.getString("className"), EntitlementCondition.class);
+        eCondition.setState(sbj.getString("state"));
+        // Caching moved to #doesConditionMatch(..) method
+        return eCondition;
+    }
+
+    /**
+     * Rebuilds the declared subject of a privilege that is being <em>written</em>, refusing the
+     * write outright when its class name cannot be resolved.
+     * <p>
+     * {@link #getInstance} records the refusal instead and denies while it lasts, because there the
+     * privilege already exists in the store and dropping it would be its own kind of damage. On a
+     * write there is nothing to preserve yet: a subject that silently came back {@code null} would
+     * be stored as a privilege that never had one, and a privilege without a subject matches
+     * everyone ({@link #doesSubjectMatch}). Mirrors the legacy policy path, where
+     * {@code PrivilegeUtils.mapGenericSubject} throws for the same reason and with the same codes.
+     *
+     * @param jo the privilege declaration.
+     * @return the declared subject, or {@link NoSubject} when none was declared.
+     * @throws EntitlementException if the declared class is not a usable EntitlementSubject.
+     */
+    private static EntitlementSubject getDeclaredESubject(JSONObject jo)
+        throws JSONException, EntitlementException {
+        if (!jo.has("eSubject")) {
+            return new NoSubject();
+        }
+        JSONObject sbj = jo.getJSONObject("eSubject");
+        try {
+            return newESubject(sbj);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+            throw refused(sbj.optString("className"), EntitlementSubject.class, ex);
+        }
+    }
+
+    /**
+     * The condition counterpart of {@link #getDeclaredESubject}: a null condition is unconditionally
+     * satisfied, so a declaration that could not be rebuilt must stop the write rather than be
+     * stored as a privilege that never carried the constraint.
+     *
+     * @param jo the privilege declaration.
+     * @return the declared condition, or {@code null} when none was declared.
+     * @throws EntitlementException if the declared class is not a usable EntitlementCondition.
+     */
+    private static EntitlementCondition getDeclaredECondition(JSONObject jo)
+        throws JSONException, EntitlementException {
+        if (!jo.has("eCondition")) {
+            return null;
+        }
+        JSONObject cond = jo.getJSONObject("eCondition");
+        try {
+            return newECondition(cond);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+            throw refused(cond.optString("className"), EntitlementCondition.class, ex);
+        }
+    }
+
+    /**
+     * Maps a refusal to the error code the administrator already sees for the same refusal on the
+     * legacy policy path ({@code PolicyCondition.getPolicyCondition},
+     * {@code PrivilegeUtils.mapGenericSubject}), keeping the cause.
+     *
+     * @param className the class name that was refused.
+     * @param expectedType the entitlement type it was expected to implement.
+     * @param ex the refusal.
+     * @return the exception to fail the write with.
+     */
+    private static EntitlementException refused(String className, Class<?> expectedType,
+        ReflectiveOperationException ex) {
+        if (ex instanceof EntitlementClassResolver.RejectedTypeException) {
+            return new EntitlementException(EntitlementException.POLICY_CLASS_CAST_EXCEPTION,
+                new String[]{className, expectedType.getName()}, ex);
+        }
+        if (ex instanceof ClassNotFoundException) {
+            return new EntitlementException(EntitlementException.UNKNOWN_POLICY_CLASS,
+                new String[]{className}, ex);
+        }
+        if (ex instanceof InstantiationException) {
+            return new EntitlementException(EntitlementException.POLICY_CLASS_NOT_INSTANTIABLE,
+                new String[]{className}, ex);
+        }
+        return new EntitlementException(EntitlementException.POLICY_CLASS_NOT_ACCESSIBLE,
+            new String[]{className}, ex);
     }
 
     /**
@@ -664,6 +803,15 @@ public abstract class Privilege implements IPrivilege {
     ) throws EntitlementException {
         SubjectDecision decision;
 
+        if (unresolvedSubject != null) {
+            // The stored privilege declares a subject whose class could not be resolved. A null
+            // subject matches everyone, so evaluating as if none had been written would hand out
+            // exactly what the declaration restricts: deny while the refusal lasts.
+            PolicyConstants.DEBUG.error("Privilege.doesSubjectMatch: denying, privilege " + name
+                + " declares a subject whose class could not be resolved");
+            return new SubjectDecision(false, Collections.<String, Set<String>>emptyMap());
+        }
+
         if (getSubject() != null) {
             SubjectAttributesManager mgr = SubjectAttributesManager.getInstance(adminSubject, realm);
             decision = getSubject().evaluate(realm, mgr, subject, resourceName, environment);
@@ -689,6 +837,14 @@ public abstract class Privilege implements IPrivilege {
         Map<String, Set<String>> environment
     ) throws EntitlementException {
         ConditionDecision decision;
+
+        if (unresolvedCondition != null) {
+            // Same one level up from the logical wrappers: a null condition is unconditionally
+            // satisfied, so a declaration that could not be rebuilt must fail rather than vanish.
+            PolicyConstants.DEBUG.error("Privilege.doesConditionMatch: failing, privilege " + name
+                + " declares a condition whose class could not be resolved");
+            return ConditionDecision.newFailureBuilder().build();
+        }
 
         if (eCondition != null) {
             EntitlementCondition cachedCondition = new CachingEntitlementCondition(eCondition);
@@ -841,6 +997,27 @@ public abstract class Privilege implements IPrivilege {
      */
     public void setCondition(EntitlementCondition condition) {
         this.eCondition = condition;
+        this.unresolvedCondition = null;
+    }
+
+    /**
+     * Returns whether the stored privilege declares a subject whose class could not be resolved, in
+     * which case {@link #doesSubjectMatch} denies instead of matching everyone.
+     *
+     * @return <code>true</code> if the declared subject could not be rebuilt.
+     */
+    boolean isSubjectUnresolved() {
+        return unresolvedSubject != null;
+    }
+
+    /**
+     * Returns whether the stored privilege declares a condition whose class could not be resolved,
+     * in which case {@link #doesConditionMatch} fails instead of being unconditionally satisfied.
+     *
+     * @return <code>true</code> if the declared condition could not be rebuilt.
+     */
+    boolean isConditionUnresolved() {
+        return unresolvedCondition != null;
     }
 
     /**
@@ -930,8 +1107,11 @@ public abstract class Privilege implements IPrivilege {
                 privilege.entitlement = new Entitlement(
                     jo.getJSONObject("entitlement"));
             }
-            privilege.eSubject = getESubject(jo);
-            privilege.eCondition = getECondition(jo);
+            // Unlike getInstance(..) this is a write path - the privilege is being created or
+            // updated - so an unresolvable class name refuses the write instead of being recorded:
+            // see getDeclaredESubject.
+            privilege.eSubject = getDeclaredESubject(jo);
+            privilege.eCondition = getDeclaredECondition(jo);
             // Validate the privilege condition when creating a new instance
             if (privilege.eCondition != null) {
                 privilege.eCondition.validate();

@@ -12,19 +12,23 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.rest.authn;
 
 import jakarta.inject.Inject;
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.TextOutputCallback;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.inject.Singleton;
+import com.sun.identity.authentication.callbacks.NameValueOutputCallback;
+import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.resource.ResourceException;
@@ -91,6 +95,10 @@ public class RestAuthCallbackHandlerManager {
      * headers and request or the headers and request do not contain the required information the method returns
      * false.
      *
+     * An HttpCallback has no JSON representation, so when one is present, output-only Callbacks (such as the script
+     * fallback of WindowsDesktopSSO) count as updated. Input Callbacks still have to be filled from the headers and
+     * request. The HttpCallback handler answers with a challenge if its header is missing.
+     *
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse from the request.
      * @param callbacks The Callbacks to update with their required values from the headers and request.
@@ -100,17 +108,24 @@ public class RestAuthCallbackHandlerManager {
             HttpServletResponse response, Callback[] callbacks)
             throws RestAuthException {
 
+        boolean hasHttpCallback = Arrays.stream(callbacks).anyMatch(HttpCallback.class::isInstance);
+
         for (Callback callback : callbacks) {
 
             RestAuthCallbackHandler restAuthCallbackHandler =
                     restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(callback.getClass());
 
-            if (!restAuthCallbackHandler.updateCallbackFromRequest(request, response, callback)) {
+            if (!restAuthCallbackHandler.updateCallbackFromRequest(request, response, callback)
+                    && !(hasHttpCallback && isOutputOnly(callback))) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private static boolean isOutputOnly(Callback callback) {
+        return callback instanceof TextOutputCallback || callback instanceof NameValueOutputCallback;
     }
 
     /**

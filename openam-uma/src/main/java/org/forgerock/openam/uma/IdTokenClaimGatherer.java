@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.uma;
@@ -83,8 +84,10 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
 
             OAuth2ProviderSettings oAuth2ProviderSettings = oauth2ProviderSettingsFactory.get(oAuth2Request);
             OAuth2Uris oAuth2Uris = oAuth2UrisFactory.get(oAuth2Request);
-            byte[] clientSecret = clientRegistrationStore.get(authorizationApiToken.getClientId(), oAuth2Request)
-                    .getClientSecret().getBytes(Utils.CHARSET);
+            // A public client has no secret; verify() only needs it for an HMAC-signed id_token.
+            String secret = clientRegistrationStore.get(authorizationApiToken.getClientId(), oAuth2Request)
+                    .getClientSecret();
+            byte[] clientSecret = secret == null ? null : secret.getBytes(Utils.CHARSET);
             KeyPair keyPair = oAuth2ProviderSettings.getSigningKeyPair(idToken.getHeader().getAlgorithm());
 
             if (!idToken.getClaimsSet().getIssuer().equals(oAuth2Uris.getIssuer())) {
@@ -122,6 +125,8 @@ public class IdTokenClaimGatherer implements ClaimGatherer {
         SigningHandler signingHandler;
         if (JwsAlgorithmType.RSA.equals(jwsAlgorithm.getAlgorithmType())) {
             signingHandler = signingManager.newRsaSigningHandler(keyPair.getPublic());
+        } else if (clientSecret == null) {
+            return false;
         } else {
             signingHandler = signingManager.newHmacSigningHandler(clientSecret);
         }

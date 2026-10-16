@@ -22,7 +22,7 @@
   <name>OpenAM Project</name>
   <groupId>org.openidentityplatform.openam</groupId>
   <artifactId>openam</artifactId>
-  <version>16.2.0-SNAPSHOT</version>
+  <version>16.1.4-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>OpenAM</description>
   <inceptionYear>2010</inceptionYear>
@@ -103,6 +103,7 @@
     <jsr311-api.version>1.1.1</jsr311-api.version>
     <jstl.version>2.0.0</jstl.version>
     <mockito.version>2.23.4</mockito.version>
+    <kerby.version>2.1.2</kerby.version>
     <jersey-oauth.version>1.1.5.2</jersey-oauth.version>
     <relaxngDatatype.version>20020414</relaxngDatatype.version>
     <saaj-api.version>2.0.1</saaj-api.version>
@@ -113,13 +114,13 @@
     <FastInfoset.version>2006-26-09</FastInfoset.version>
     <jsr173_api.version>2004-30-01</jsr173_api.version>
     <javax.security.auth.message.version>3.1</javax.security.auth.message.version>
-    <freemarker.version>2.3.31</freemarker.version>
+    <freemarker.version>2.3.35</freemarker.version>
     <java-ipv6.version>0.17</java-ipv6.version>
     <hikaricp.version>2.4.1</hikaricp.version>
     <h2database.version>2.2.220</h2database.version>
     <activemq.version>5.16.8</activemq.version>
     <jakarta.inject.version>2.0.1</jakarta.inject.version>
-    <jetty.jspc.version>9.4.0.M0</jetty.jspc.version>
+    <jetty.jspc.version>11.0.24</jetty.jspc.version>
     <amazon.sns.version>1.10.72</amazon.sns.version>
     <jakarta.websocket-api.version>2.0.0</jakarta.websocket-api.version>
     <openam.version>OpenAM ${project.version}</openam.version>
@@ -219,7 +220,7 @@
 			    <plugin>
                   <groupId>org.sonatype.central</groupId>
                   <artifactId>central-publishing-maven-plugin</artifactId>
-                  <version>0.8.0</version>
+                  <version>0.11.0</version>
                   <extensions>true</extensions>
                   <configuration>
                       <publishingServerId>ossrh</publishingServerId>
@@ -1604,6 +1605,12 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.apache.kerby</groupId>
+        <artifactId>kerb-simplekdc</artifactId>
+        <version>${kerby.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>jetty-servlet-tester</artifactId>
         <version>7.0.0.pre5</version>
@@ -1709,7 +1716,7 @@
 		<dependency>
 		    <groupId>org.apache.thrift</groupId>
 		    <artifactId>libthrift</artifactId>
-		    <version>0.23.0</version>
+		    <version>0.24.0</version>
 		</dependency>
 		<dependency>
    			<groupId>com.fasterxml.woodstox</groupId>

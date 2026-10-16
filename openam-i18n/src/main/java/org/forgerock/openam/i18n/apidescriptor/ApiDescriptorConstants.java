@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.i18n.apidescriptor;
 
@@ -117,6 +118,9 @@ public final class ApiDescriptorConstants {
 
     /** Constant used as key to API Descriptor translations **/
     public static final String ERROR_500_DESCRIPTION = ERROR + "500." + DESCRIPTION;
+
+    /** Constant used as key to API Descriptor translations **/
+    public static final String ERROR_501_DESCRIPTION = ERROR + "501." + DESCRIPTION;
 
     /** Constant used as key to API Descriptor translations **/
     public static final String EXAMPLE_PROVIDER = TRANSLATION_KEY_PREFIX + "ExampleProvider#";

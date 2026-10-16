@@ -25,6 +25,7 @@
  * $Id: ConfigurationInstanceImpl.java,v 1.12 2009/10/29 00:03:50 exu Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.plugin.configuration.impl;
@@ -89,6 +90,8 @@ public class ConfigurationInstanceImpl implements ConfigurationInstance {
         serviceNameMap.put("MULTI_PROTOCOL","sunMultiFederationProtocol");
         serviceNameMap.put("STS_CONFIG","sunFAMSTSService");
         serviceNameMap.put("SAML2_CONFIG", "sunFAMSAML2Configuration"); 
+        // The realm's Valid goto URL list, for the protocols without an allow-list of their own.
+        serviceNameMap.put("VALIDATION", "validationService");
     }
 
     private SSOToken getSSOToken() {

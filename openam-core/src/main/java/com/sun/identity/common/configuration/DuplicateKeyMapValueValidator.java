@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.common.configuration;
@@ -73,6 +74,13 @@ public class DuplicateKeyMapValueValidator implements ServiceAttributeValidator 
                 if (trimmed.length() > 0) {
                     Matcher matcher = pattern.matcher(trimmed);
                     valid = matcher.matches();
+                    // Without this the answer was overwritten by every value
+                    // that followed, so the one read last decided it for the
+                    // whole set - and the order a Set is read in is not the
+                    // order it was written in. Both siblings stop here too.
+                    if (!valid) {
+                        break;
+                    }
                 }
             }
         }

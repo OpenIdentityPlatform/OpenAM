@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.common.configuration;
@@ -47,9 +48,13 @@ public class MapValueParser {
 
     /**
      * Please refer to KEY_WITH_NO_BRACKETS in MapValueValidator, where all the heavy lifting has
-     * already been done.
+     * already been done - including the atomic group, which is copied here for the same reason:
+     * the two quantifiers compete for the same characters, so without it a key that is never
+     * closed is tried in every way the run can be split between them before the match fails.
+     * The group spans both of them and neither can match a bracket, so what group 1 captures is
+     * unchanged.
      */
-    private static final String regExp = "\\s*\\[\\s*([[\\S]&&[^\\[]&&[^\\]]]+[[^\\[]&&[^\\]]]*)\\s*\\]\\s*=(.*)";
+    private static final String regExp = "\\s*\\[\\s*((?>[[\\S]&&[^\\[]&&[^\\]]]+[[^\\[]&&[^\\]]]*))\\s*\\]\\s*=(.*)";
 
     private static final Pattern pattern = Pattern.compile(regExp);
 

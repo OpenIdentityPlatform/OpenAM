@@ -12,6 +12,7 @@
 * information: "Portions copyright [year] [name of copyright owner]".
 *
 * Copyright 2016 ForgeRock AS.
+* Portions Copyright 2026 3A Systems, LLC.
 */
 package com.sun.identity.common.configuration;
 
@@ -39,7 +40,15 @@ public class GlobalMapValueValidatorTest {
                 {"[asdf[asdf]]=NONE", false},
                 {"=ALL", true},
                 {"[]=", true},
-                {"[key_and_or_value_contains_=_sign] ==", true}
+                {"[key_and_or_value_contains_=_sign] ==", true},
+                // white space inside the key, which is what the key expression's two competing
+                // quantifiers exist to allow
+                {"[a b]=v", true},
+                {"[ a b ] = v ", true},
+                {"[a ]=v", true},
+                {"[ a]=v", true},
+                // and a key of nothing but whitespace, which the first of them keeps out
+                {"[  ]=ALL", false}
         };
     }
 
@@ -92,6 +101,27 @@ public class GlobalMapValueValidatorTest {
 
         //then
         assertThat(result).isEqualTo(false);
+    }
+
+    /**
+     * This validator folds the key expression <code>MapValueValidator</code> shares into an
+     * alternation of its own, so the bound on matching a key that is never closed has to hold
+     * through that pattern too.
+     */
+    @Test
+    public void boundsTheCostOfAnUnterminatedKey() {
+        //given
+        String value = "[" + "a".repeat(64000);
+
+        //when
+        long startedAt = System.nanoTime();
+        boolean result = validator.validate(Collections.singleton(value));
+        long elapsedMillis = (System.nanoTime() - startedAt) / 1000000L;
+
+        //then
+        assertThat(result).isFalse();
+        assertThat(elapsedMillis).as("matching an unterminated key has to be bounded")
+                .isLessThan(5000L);
     }
 
 }

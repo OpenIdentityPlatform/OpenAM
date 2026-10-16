@@ -143,7 +143,7 @@ public class LocalOperations implements SessionOperations {
         }
 
         if (internalSessionToDestroy != null) {
-            sessionChangeAuthorizer.checkPermissionToDestroySession(requester, internalSessionToDestroy.getSessionID());
+            sessionChangeAuthorizer.checkPermissionToDestroySession(requester, internalSessionToDestroy);
             destroyInternalSession(internalSessionToDestroy);
         }
     }
@@ -361,8 +361,9 @@ public class LocalOperations implements SessionOperations {
     }
 
     @Override
-    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
-        return sessionQueryManager.getMatchingValidSessions(crestQuery);
+    public Collection<PartialSession> getMatchingSessions(Session caller, CrestQuery crestQuery)
+            throws SessionException {
+        return sessionQueryManager.getMatchingValidSessions(caller, crestQuery);
     }
 
     private void logoutInternalSession(final InternalSession session) {

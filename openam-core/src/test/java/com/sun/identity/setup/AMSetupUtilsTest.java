@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.setup;
@@ -27,6 +27,8 @@ import jakarta.servlet.ServletContext;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
 
 import org.forgerock.openam.utils.IOUtils;
 import org.testng.annotations.Test;
@@ -131,5 +133,15 @@ public class AMSetupUtilsTest {
 
         //Then
         assertThat(unusedPort).isBetween(10, 65535);
+    }
+
+    @Test
+    public void shouldKeepTheDefaultHostNameVerifierForARemoteServerOverHttps() throws IOException {
+        // getRemoteServerInfo posts the admin password to that server, so its certificate has to be
+        // the host's, not merely one the JVM trusts.
+        HttpURLConnection connection = openConnection("https://openam.example.com/openam/getServerInfo.jsp");
+
+        assertThat(((HttpsURLConnection) connection).getHostnameVerifier())
+                .isSameAs(HttpsURLConnection.getDefaultHostnameVerifier());
     }
 }

@@ -19,6 +19,7 @@ import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.testng.Assert.assertThrows;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,6 +32,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.forgerock.jaspi.modules.openid.resolvers.JWKOpenIdResolverImpl;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
@@ -43,10 +45,12 @@ import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.PEMDecoder;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
+import org.forgerock.openam.oauth2.validation.JwksUriValidator;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.net.httpserver.HttpServer;
 
@@ -71,6 +75,10 @@ public class OpenAMClientRegistrationJwksUriIntegrationTest {
 
     private HttpServer jwksServer;
     private String jwksUri;
+    private String brokenJwksUri;
+    private final AtomicInteger jwksRequests = new AtomicInteger();
+    private final AtomicInteger brokenJwksRequests = new AtomicInteger();
+    private String previousAllowAnyAddress;
     private KeyPair clientKeyPair;
     private String clientKid;
 
@@ -80,7 +88,15 @@ public class OpenAMClientRegistrationJwksUriIntegrationTest {
 
     @BeforeMethod
     public void setUp() throws Exception {
+        // The JWKS server below is on 127.0.0.1, which the GHSA-g7cv-hh35-cc7c guard blocks by
+        // default. Lift the address check for these tests — they are about resolver identity, not
+        // about SSRF; SsrfSafeJwksHttpClientTest covers the guard itself. SystemProperties is a
+        // process-wide holder, so remember what was there and hand it back in tearDown.
+        previousAllowAnyAddress = SystemProperties.get(JwksUriValidator.ALLOW_ANY_ADDRESS_PROPERTY);
+        setAllowAnyAddress("true");
         ClientJwksResolverCache.resetForTest();
+        jwksRequests.set(0);
+        brokenJwksRequests.set(0);
         clientKeyPair = generateRsaKeyPair();
         clientKid = UUID.randomUUID().toString();
         startJwksServer();
@@ -97,6 +113,18 @@ public class OpenAMClientRegistrationJwksUriIntegrationTest {
             jwksServer.stop(0);
         }
         ClientJwksResolverCache.resetForTest();
+        setAllowAnyAddress(previousAllowAnyAddress);
+    }
+
+    /**
+     * {@code SystemProperties} has no removal API, so a property that was absent is handed back as
+     * {@code "false"} — the documented default of
+     * {@link JwksUriValidator#ALLOW_ANY_ADDRESS_PROPERTY}, and therefore indistinguishable from
+     * absent to every reader of it.
+     */
+    private static void setAllowAnyAddress(String value) {
+        SystemProperties.initializeProperties(JwksUriValidator.ALLOW_ANY_ADDRESS_PROPERTY,
+                value == null ? "false" : value);
     }
 
     /**
@@ -156,6 +184,55 @@ public class OpenAMClientRegistrationJwksUriIntegrationTest {
                 .isFalse();
     }
 
+    /**
+     * GHSA-g7cv-hh35-cc7c: the guard has to sit on the fetch, not only on dynamic registration,
+     * because this path is also taken by clients registered before the fix and by clients
+     * configured through the console or __ssoadm__. With the address check in force, a
+     * registration pointing at loopback must fail without the server issuing a single request.
+     */
+    @Test
+    public void storedInternalJwksUriIsNotFetched() throws Exception {
+        setAllowAnyAddress("false");
+        OpenAMClientRegistration reg = newRegistration(CLIENT_ID, jwksUri);
+
+        assertThrows(OAuthProblemException.class,
+                () -> invokeByJwksUri(reg, buildAssertion(CLIENT_ID, CLIENT_ID)));
+
+        assertThat(jwksRequests.get())
+                .as("the JWKS endpoint must never be contacted for a blocked address")
+                .isZero();
+        assertThat(ClientJwksResolverCache.size())
+                .as("a refused fetch must not leave a resolver behind")
+                .isZero();
+    }
+
+    /**
+     * GHSA-g7cv-hh35-cc7c: a failed fetch caches no resolver, and this path needs no
+     * authentication, so without a negative cache every inbound request would produce another
+     * outbound one. The failure is remembered instead — and forgotten again as soon as a
+     * configuration change says the operator has had a chance to fix the endpoint.
+     */
+    @Test
+    public void failedFetchIsNotRepeatedWhileTheFailureIsRemembered() throws Exception {
+        OpenAMClientRegistration reg = newRegistration(CLIENT_ID, brokenJwksUri);
+        OAuth2Jwt jwt = buildAssertion(CLIENT_ID, CLIENT_ID);
+
+        assertThrows(OAuthProblemException.class, () -> invokeByJwksUri(reg, jwt));
+        assertThat(brokenJwksRequests.get()).isEqualTo(1);
+
+        assertThrows(OAuthProblemException.class, () -> invokeByJwksUri(reg, jwt));
+        assertThat(brokenJwksRequests.get())
+                .as("a fetch that just failed must not be retried on the next request")
+                .isEqualTo(1);
+
+        ClientJwksResolverCache.invalidateAll();
+
+        assertThrows(OAuthProblemException.class, () -> invokeByJwksUri(reg, jwt));
+        assertThat(brokenJwksRequests.get())
+                .as("a configuration change must let the next request try again")
+                .isEqualTo(2);
+    }
+
     // --- helpers ---------------------------------------------------------------------------
 
     private OpenAMClientRegistration newRegistration(String clientId, String jwksUri) throws Exception {
@@ -198,6 +275,7 @@ public class OpenAMClientRegistrationJwksUriIntegrationTest {
         jwksServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         final String body = buildJwksJson((RSAPublicKey) clientKeyPair.getPublic(), clientKid);
         jwksServer.createContext("/jwks", exchange -> {
+            jwksRequests.incrementAndGet();
             byte[] bytes = body.getBytes(java.nio.charset.StandardCharsets.UTF_8);
             exchange.getResponseHeaders().add("Content-Type", "application/json");
             exchange.sendResponseHeaders(200, bytes.length);
@@ -205,9 +283,15 @@ public class OpenAMClientRegistrationJwksUriIntegrationTest {
                 os.write(bytes);
             }
         });
+        jwksServer.createContext("/broken", exchange -> {
+            brokenJwksRequests.incrementAndGet();
+            exchange.sendResponseHeaders(500, -1);
+            exchange.close();
+        });
         jwksServer.start();
         int port = jwksServer.getAddress().getPort();
         jwksUri = "http://127.0.0.1:" + port + "/jwks";
+        brokenJwksUri = "http://127.0.0.1:" + port + "/broken";
     }
 
     private static String buildJwksJson(RSAPublicKey pk, String kid) {

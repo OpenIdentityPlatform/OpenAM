@@ -530,8 +530,18 @@ public class ServerConfiguration extends ConfigurationBase {
                         "invalid.properties", null);
                 }
             } catch (SMSException e) {
-                throw new ConfigurationException("unable.to.connect.to.server",
-                    null);
+                // The remote validator refuses a caller without a usable
+                // session, and refuses a server that failed to bootstrap, with
+                // an error code of its own. Neither is a connection failure, so
+                // the cause is chained rather than dropped: the message alone
+                // would present every one of them as a dead server. It is not
+                // logged here - the only Debug instance of this class is the
+                // upgrade one, which is not where anyone looks for a failed
+                // configuration write.
+                ConfigurationException ce = new ConfigurationException(
+                    "unable.to.connect.to.server", null);
+                ce.initCause(e);
+                throw ce;
             }
         }
     }

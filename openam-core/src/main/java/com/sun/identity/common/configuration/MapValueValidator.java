@@ -80,10 +80,21 @@ public class MapValueValidator implements ServiceAttributeValidator {
      *
      *  3)  \\s*\\[\\s*\\]\\s*=\\s*    means the case of []=  which is used for 
      *                                 many default map values
+     *
+     *  1 and 2 compete for the same characters - every character 1 can match, 2
+     *  can match as well - so a key that is never closed used to be tried in
+     *  every one of the n ways the run can be split between them before the
+     *  match failed, which is quadratic in the length of a value the caller
+     *  supplies. The JAXRPC validateServiceAttributes endpoint lets any
+     *  authenticated caller name one of these validators and hand it that
+     *  value. They are wrapped in an atomic group (?&gt;...) so that the run is
+     *  consumed once and not reconsidered: neither of them can match a bracket,
+     *  so the position they stop at is the first bracket in the value either
+     *  way, and the group only ever matched one way to begin with.
      */
     
     //also used by GlobalMapValueValidator so package scoped
-    static final String KEY_WITH_NO_BRACKETS = "(\\s*\\[\\s*[[\\S]&&[^\\[]&&[^\\]]]+[[^\\[]&&[^\\]]]*\\s*\\]\\s*=.*)";
+    static final String KEY_WITH_NO_BRACKETS = "(\\s*\\[\\s*(?>[[\\S]&&[^\\[]&&[^\\]]]+[[^\\[]&&[^\\]]]*)\\s*\\]\\s*=.*)";
     //also used by GlobalMapValueValidator  so package scoped
     static final String DEFAULT_NO_KEY_JUST_BRACKETS = "(\\s*\\[\\s*\\]\\s*=\\s*)";
      

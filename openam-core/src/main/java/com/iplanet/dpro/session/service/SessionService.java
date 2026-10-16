@@ -220,14 +220,15 @@ public class SessionService {
      * @param caller The session that initiated the query request. May not be null.
      * @param crestQuery The CREST query based on which we should look for matching sessions. May not be null.
      * @return The collection of matching partial sessions.
-     * @throws SessionException If the request fails.
-     * @see com.iplanet.dpro.session.operations.SessionOperations#getMatchingSessions(CrestQuery)
+     * @throws SessionException If the request fails, or if the caller may not list the sessions of the realm named
+     *         in the query filter.
+     * @see com.iplanet.dpro.session.operations.SessionOperations#getMatchingSessions(Session, CrestQuery)
      */
     public Collection<PartialSession> getMatchingSessions(Session caller, CrestQuery crestQuery)
             throws SessionException {
         Reject.ifNull(caller, "Caller may not be null");
         Reject.ifNull(crestQuery, "CREST query may not be null");
-        return sessionOperationStrategy.getOperation(caller.getSessionID()).getMatchingSessions(crestQuery);
+        return sessionOperationStrategy.getOperation(caller.getSessionID()).getMatchingSessions(caller, crestQuery);
     }
 
     /**

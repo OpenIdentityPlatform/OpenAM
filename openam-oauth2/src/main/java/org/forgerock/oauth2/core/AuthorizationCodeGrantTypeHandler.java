@@ -17,6 +17,7 @@
 
 package org.forgerock.oauth2.core;
 
+import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.joinScope;
 
 import jakarta.inject.Inject;
@@ -112,13 +113,6 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
         final boolean codeWasIssuedWithChallenge =
                 storedCodeChallenge != null && !storedCodeChallenge.isEmpty();
 
-        if (providerSettings.isCodeVerifierRequired() || codeWasIssuedWithChallenge) {
-            if (codeVerifier == null) {
-                String message = "code_verifier parameter required";
-                throw new InvalidRequestException(message);
-            }
-        }
-
         AccessToken accessToken;
         Set<String> authorizationScope;
         // Only allow one request per code through here at a time, to prevent replay.
@@ -162,7 +156,19 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
                 throw new InvalidGrantException("Authorization code expired.");
             }
 
+            // PKCE is checked only after the replay, ownership and expiry checks above, so that a
+            // replayed code still triggers tokenInvalidator and no check here leaks whether a code
+            // exists or how it was minted.
+            // Enforcement is on, but the code was minted without a challenge (e.g. by a hybrid
+            // response_type that slipped past the authorize endpoint): fail closed.
+            if (providerSettings.isCodeVerifierRequired() && !codeWasIssuedWithChallenge) {
+                throw new InvalidRequestException("code_challenge required for authorization code flow");
+            }
+
             if (codeWasIssuedWithChallenge) {
+                if (isEmpty(codeVerifier)) {
+                    throw new InvalidRequestException("code_verifier parameter required");
+                }
                 checkCodeVerifier(authorizationCode, codeVerifier);
             }
 
@@ -199,7 +205,10 @@ public class AuthorizationCodeGrantTypeHandler extends GrantTypeHandler {
         final String codeChallenge = authorizationCode.getCodeChallenge();
         final String codeChallengeMethod = authorizationCode.getCodeChallengeMethod();
 
-        if (OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_PLAIN.equals(codeChallengeMethod)) {
+        // RFC 7636 4.3: an omitted code_challenge_method defaults to "plain". An explicitly empty
+        // value is malformed, not omitted, so it falls through to the rejection below.
+        if (codeChallengeMethod == null
+                || OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_PLAIN.equals(codeChallengeMethod)) {
             checkCodeChallenge(codeChallenge, codeVerifier);
         } else if (OAuth2Constants.Custom.CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)){
             String encodedCodeVerifier = null;

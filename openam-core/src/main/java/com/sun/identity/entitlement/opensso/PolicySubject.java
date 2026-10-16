@@ -25,6 +25,7 @@
  * $Id: PolicySubject.java,v 1.1 2009/08/19 05:40:36 veiming Exp $
  *
  * Portions Copyrighted 2014-2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -32,6 +33,7 @@ package com.sun.identity.entitlement.opensso;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.entitlement.EntitlementClassResolver;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.EntitlementSubject;
 import com.sun.identity.entitlement.SubjectAttributesCollector;
@@ -259,7 +261,10 @@ public class PolicySubject implements EntitlementSubject {
     @JsonIgnore
     public Subject getPolicySubject() throws EntitlementException {
         try {
-            Subject subject = Class.forName(className).asSubclass(Subject.class).newInstance();
+            // Resolve without running the target's static initializer and reject any class that is
+            // not an instantiable com.sun.identity.policy Subject BEFORE it is constructed
+            // (unsafe reflection, CWE-470).
+            Subject subject = EntitlementClassResolver.newInstance(className, Subject.class);
             subject.setValues(values);
             return subject;
         } catch (Exception ex) {

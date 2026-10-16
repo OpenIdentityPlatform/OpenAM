@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 (function () {
@@ -23,6 +23,10 @@
 
     require.config({
         baseUrl: "/base/target/compiled",
+        // The default of 7 seconds is too short on a loaded CI runner, and Squire copies this value into
+        // every context it creates. Keep it above the Mocha timeout in karma.conf.js, so a slow load inside a
+        // test is reported by Mocha and this limit only bounds the initial load of the test files.
+        waitSeconds: 60,
 
         map: {
             "*": {

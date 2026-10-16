@@ -94,8 +94,9 @@ public class MonitoredOperations implements SessionOperations {
     }
 
     @Override
-    public Collection<PartialSession> getMatchingSessions(CrestQuery crestQuery) throws SessionException {
-        return sessionOperations.getMatchingSessions(crestQuery);
+    public Collection<PartialSession> getMatchingSessions(Session caller, CrestQuery crestQuery)
+            throws SessionException {
+        return sessionOperations.getMatchingSessions(caller, crestQuery);
     }
 
     @Override

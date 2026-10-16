@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.core.rest.session;
 
@@ -53,6 +53,7 @@ import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
@@ -74,11 +75,15 @@ import org.forgerock.openam.core.rest.session.action.RefreshActionHandler;
 import org.forgerock.openam.core.rest.session.action.UpdateSessionPropertiesActionHandler;
 import org.forgerock.openam.dpro.session.PartialSession;
 import org.forgerock.openam.dpro.session.PartialSessionFactory;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionConstants;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
+import org.forgerock.openam.session.service.access.SessionQueryFilterRealm;
 import org.forgerock.openam.utils.CrestQuery;
+import org.forgerock.openam.utils.RealmUtils;
+import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 
@@ -344,6 +349,12 @@ public class SessionResourceV2 implements CollectionResourceProvider {
      *
      * i.e. searching using only the username is not supported currently.
      *
+     * <p>The realm the query runs against is taken from the query filter, therefore it is checked against the realm
+     * of the request URI - the only realm the caller has been authorized for by the authorization modules of this
+     * endpoint. A filter asking for any other realm is refused, so that an administrator delegated a single realm
+     * cannot list the sessions of the other realms of the deployment. The caller is checked against the realm once
+     * more by the session service itself.</p>
+     *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
@@ -356,6 +367,9 @@ public class SessionResourceV2 implements CollectionResourceProvider {
                                     code = 400,
                                     description = SESSION_RESOURCE + QUERY + ERROR_400_DESCRIPTION),
                             @ApiError(
+                                    code = 403,
+                                    description = SESSION_RESOURCE + QUERY + ERROR_403_DESCRIPTION),
+                            @ApiError(
                                     code = 500,
                                     description = SESSION_RESOURCE + QUERY + ERROR_500_DESCRIPTION)}),
             queryableFields = {JSON_SESSION_USERNAME, JSON_SESSION_REALM},
@@ -365,6 +379,36 @@ public class SessionResourceV2 implements CollectionResourceProvider {
     public Promise<QueryResponse, ResourceException> queryCollection(Context context, QueryRequest request,
             QueryResourceHandler handler) {
         CrestQuery crestQuery = new CrestQuery(request.getQueryId(), request.getQueryFilter(), request.getFields());
+
+        if (!context.containsContext(RealmContext.class)) {
+            // The realm of the request URI is what the filter realm is authorized against, so without it there is
+            // nothing to authorize against. Every route to this method is wrapped in a RealmContext, therefore
+            // this is refused rather than defaulted to a realm.
+            LOGGER.error("SessionResource.queryCollection :: no realm in the context of the request");
+            return new InternalServerErrorException("Unable to determine the realm of the request").asPromise();
+        }
+        final String requestRealm = context.asContext(RealmContext.class).getRealm().asPath();
+        final String filterRealm;
+        try {
+            filterRealm = SessionQueryFilterRealm.extract(crestQuery);
+        } catch (IllegalArgumentException iae) {
+            return new BadRequestException(iae.getMessage()).asPromise();
+        } catch (UnsupportedOperationException uoe) {
+            // The filter uses a comparison the session query does not support. It would fail the same way once it
+            // is translated into a CTS query, which is a request error rather than a server error.
+            return new BadRequestException("The query filter is not supported by the session query").asPromise();
+        }
+        if (StringUtils.isBlank(filterRealm)) {
+            return new BadRequestException("The query filter must specify the realm").asPromise();
+        }
+        if (!RealmUtils.isSameOrSubRealm(requestRealm, filterRealm)) {
+            // The realm of the request URI is the only realm the caller has been authorized for, so a filter
+            // asking for any other realm has to be refused rather than answered from another realm's sessions.
+            LOGGER.warning("SessionResource.queryCollection :: rejected a query of realm '{}' made against realm "
+                    + "'{}'", filterRealm, requestRealm);
+            return new ForbiddenException("The realm of the query filter must be the realm of the request, or one "
+                    + "of its sub realms").asPromise();
+        }
 
         SSOTokenContext ssoTokenContext = context.asContext(SSOTokenContext.class);
         try {
@@ -377,6 +421,14 @@ public class SessionResourceV2 implements CollectionResourceProvider {
         } catch (IllegalArgumentException iae) {
             return new BadRequestException(iae.getMessage()).asPromise();
         } catch (SessionException se) {
+            if (SessionConstants.NO_PRIVILEGE_ERROR_CODE.equals(se.getErrorCode())) {
+                // The session service checks the realm of the filter against the caller as well, which is what
+                // refuses a caller whose realm the authorization modules of this endpoint did not compare.
+                LOGGER.warning("SessionResource.queryCollection :: the caller may not query the sessions matching "
+                        + "the filter '{}'", crestQuery);
+                return new ForbiddenException("The caller may not query the sessions of the requested realm")
+                        .asPromise();
+            }
             LOGGER.error("An error occurred whilst looking for matching sessions with filter '{}'", crestQuery, se);
             return new InternalServerErrorException("Unable to query for matching sessions").asPromise();
         }
