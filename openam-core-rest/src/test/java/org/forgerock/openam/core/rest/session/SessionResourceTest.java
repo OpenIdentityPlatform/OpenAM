@@ -122,8 +122,9 @@ public class SessionResourceTest {
      * the way {@code IdentityResourceNotificationTest} does.
      *
      * The loader is only consulted while the first injector of the JVM is built, so it has to be in place before any
-     * test of the suite runs, not just before this class: a {@code @BeforeClass} comes too late whenever surefire happens
-     * to run {@code SessionResourceV2Test}, which constructs an {@code AMIdentity} too, ahead of this class.
+     * test of the suite runs, not just before this class: a {@code @BeforeClass} comes too late whenever surefire runs,
+     * ahead of this class, any class that touches InjectorHolder without such a hook - as {@code SessionResourceV2Test},
+     * which constructs an {@code AMIdentity} too, did before it got its own.
      */
     @BeforeSuite(alwaysRun = true)
     public void setupGuiceModuleLoader() {
