@@ -482,7 +482,7 @@ public class WSFedPropertiesModelImpl extends EntityModelImpl
             IDPSSOConfigElement  idpsso = getidpsso(fed);
             if (idpsso != null){
                 BaseConfigType baseConfig = idpsso.getValue();
-                updateBaseConfig(idpsso.getValue(), idpExtValues, role);
+                updateBaseConfig(baseConfig, idpExtValues, role);
             }
 
             //saves the new configuration by passing new fed element created

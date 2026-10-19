@@ -97,14 +97,6 @@ public class IDFFModelImpl
         federationProfileList.add("http://projectliberty.org/profiles/brws-art");
         federationProfileList.add("http://projectliberty.org/profiles/lecp");
     }
-    private static List<String> supportedSSOProfileList = new ArrayList<>(4);
-
-    static {
-        supportedSSOProfileList.add("http://projectliberty.org/profiles/brws-post");
-        supportedSSOProfileList.add("http://projectliberty.org/profiles/brws-art");
-        supportedSSOProfileList.add("http://projectliberty.org/profiles/wml-post");
-        supportedSSOProfileList.add("http://projectliberty.org/profiles/lecp");
-    }
 
     // BOTH idp AND SP extended metadata
     static {

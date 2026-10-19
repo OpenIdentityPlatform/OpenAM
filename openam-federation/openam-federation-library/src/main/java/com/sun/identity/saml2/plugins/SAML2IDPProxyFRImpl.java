@@ -346,7 +346,7 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
                         if (et != null) {
                             debugMessage(classMethod, "Extensions found for idp: " + idp);
                             List idpExtensions = et.getAny();
-                            if (idpExtensions != null || !idpExtensions.isEmpty()) {
+                            if (idpExtensions != null && !idpExtensions.isEmpty()) {
                                 debugMessage(classMethod, "Extensions content found for idp: " + idp);
                                 Iterator idpExtensionsI = idpExtensions.iterator();
                                 while (idpExtensionsI.hasNext()) {
@@ -354,14 +354,14 @@ public class SAML2IDPProxyFRImpl implements SAML2IDPFinder {
                                     if (eael != null) {
                                         debugMessage(classMethod, "Entity Attributes found for idp: " + idp);
                                         List<JAXBElement<?>> attribL = eael.getValue().getAttributeOrAssertion();
-                                        if (attribL != null || !attribL.isEmpty()) {
+                                        if (attribL != null && !attribL.isEmpty()) {
                                             Iterator attrI = attribL.iterator();
                                             while (attrI.hasNext()) {
                                                 AttributeElement ae = (AttributeElement) attrI.next();
                                                 // TODO: Verify what type of element this is (Attribute or assertion)
                                                 // For validation purposes
                                                 List<AttributeValueElement> av = ae.getValue().getAttributeValue();
-                                                if (av != null || !av.isEmpty()) {
+                                                if (av != null && !av.isEmpty()) {
                                                     debugMessage(classMethod, "Attribute Values found for idp: " + idp);
                                                     Iterator<AttributeValueElement> avI = av.iterator();
                                                     while (avI.hasNext()) {
