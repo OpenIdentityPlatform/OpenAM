@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.shared.debug;
 
@@ -29,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.forgerock.openam.utils.Time.*;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -69,6 +71,31 @@ public class DebugRotationTest extends DebugTestTemplate {
                         + maxMb+ "' < '" + megabytes + "'");
             }
         }
+    }
+
+    /** A rotation interval longer than {@code Integer.MAX_VALUE} milliseconds does not rotate every minute. */
+    @Test
+    public void longTimeRotation() throws Exception {
+        String DEBUG_CONFIG_FOR_TEST = "/debug_config_test/debugconfigLongRotation.properties";
+
+        initializeProperties();
+        initializeProvider(DEBUG_CONFIG_FOR_TEST);
+
+        Calendar calInitTime = getCalendarInstance();
+        calInitTime.set(2015, Calendar.MAY, 16, 0, 0, 0);
+        calInitTime.set(Calendar.MILLISECOND, 0);
+        AccelerateTimeService accelerateClock = new AccelerateTimeService(calInitTime.getTimeInMillis());
+        debugFileProvider.setClock(accelerateClock);
+
+        final String debugName = "debugTestForLongRotation";
+        IDebug debugTest = provider.getInstance(debugName);
+
+        debugTest.error("Should appear in the first file", null);
+        accelerateClock.incrementTime(1000 * 60 + 10);
+        debugTest.error("Should appear in the first file too", null);
+
+        File[] logFiles = new File(debugDirectory).listFiles((dir, name) -> name.startsWith(debugName));
+        assertEquals(logFiles.length, 1, "Debug files rotated before the rotation interval");
     }
 
     public void rotationInNormalDate() throws Exception {

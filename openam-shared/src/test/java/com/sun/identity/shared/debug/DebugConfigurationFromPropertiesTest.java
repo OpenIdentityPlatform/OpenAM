@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.shared.debug;
@@ -87,48 +88,130 @@ public class DebugConfigurationFromPropertiesTest {
         Assert.assertEquals(debugConfigurationFromProperties.getRotationInterval(), 3);
         Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), 2 << 20);
     }
+
+    @Test
+    public void largeSizeRotation() throws Exception {
+        DebugConfigurationFromProperties debugConfigurationFromProperties = new DebugConfigurationFromProperties
+                (DEBUG_CONFIG_DIRECTORY + "valid/largeSizeRotation.properties");
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), 2048L << 20);
+    }
+
+    @Test
+    public void noPrefixAndSuffixLines() throws Exception {
+        DebugConfigurationFromProperties debugConfigurationFromProperties = new DebugConfigurationFromProperties
+                (DEBUG_CONFIG_DIRECTORY + "valid/noPrefixAndSuffixLines.properties");
+        Assert.assertEquals(debugConfigurationFromProperties.getDebugPrefix(), "");
+        Assert.assertEquals(debugConfigurationFromProperties.getDebugSuffix(), "");
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationInterval(), -1, "Debug rotation should be " +
+                "empty");
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), -1, "Debug file size " +
+                "rotation should be empty");
+    }
+
+    @Test
+    public void trailingWhitespace() throws Exception {
+        DebugConfigurationFromProperties debugConfigurationFromProperties = new DebugConfigurationFromProperties
+                (DEBUG_CONFIG_DIRECTORY + "valid/trailingWhitespace.properties");
+        Assert.assertEquals(debugConfigurationFromProperties.getDebugPrefix(), "openam_");
+        Assert.assertEquals(debugConfigurationFromProperties.getDebugSuffix(), "-MM.dd.yyyy-HH.mm.ss.SSS");
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationInterval(), 3);
+        Assert.assertEquals(debugConfigurationFromProperties.getRotationFileSizeInByte(), 2 << 20);
+    }
      /*
      * Invalid configuration
      */
 
 
-    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Can't load debug file properties from '.*': "
+                    + "java\\.lang\\.IllegalArgumentException: Malformed .*")
+    public void malformedUnicodeEscape() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/malformedUnicodeEscape.properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Suffix '.*' can't be parsed\\.")
     public void cantParseSuffix() throws Exception {
         new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/cantParseSuffix.properties");
     }
 
-    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Rotation interval needs to be greater than zero\\. .*\\. "
+                    + "Leave the value empty to disable time rotation\\.")
     public void negativeRotation() throws Exception {
         new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/negativeTimeRotation.properties");
     }
 
-    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Rotation interval needs to be greater than zero\\. .*\\. "
+                    + "Leave the value empty to disable time rotation\\.")
+    public void minusOneRotation() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/minusOneTimeRotation.properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Rotation interval needs to be greater than zero\\. .*\\. "
+                    + "Leave the value empty to disable time rotation\\.")
+    public void zeroRotation() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/zeroTimeRotation.properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Suffix '.*' isn't compatible with the rotation interval requested "
+                    + "'3'\\.")
     public void rotationNotCompatibleWithSuffix() throws Exception {
-        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/rotatioTimenNotCompatibleWithSuffix" +
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/timeRotationNotCompatibleWithSuffix" +
                 ".properties");
     }
 
-    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Log time rotation is enabled .* but the debug suffix is empty")
     public void suffixEmptyAndRotationEnabled() throws Exception {
-        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/suffixEmptyAndRotationTimeEnabled" +
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/suffixEmptyAndRotationTimeEnable" +
                 ".properties");
     }
 
-    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "File size rotation needs to be greater than zero\\. "
+                    + "File size rotation = '-2' MB\\. Leave the value empty to disable file size rotation\\.")
     public void negativeSizeRotation() throws Exception {
         new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/negativeSizeRotation.properties");
     }
 
-    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "File size rotation needs to be greater than zero\\. .*\\. "
+                    + "Leave the value empty to disable file size rotation\\.")
+    public void zeroSizeRotation() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/zeroSizeRotation.properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Log size rotation is enabled .* but the debug suffix is empty")
     public void suffixEmptyAndSizeRotationEnable() throws Exception {
-        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/suffixEmptyAndSizeRotationEnable" +
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/suffixEmptyAndSizeRotationTimeEnable" +
                 ".properties");
     }
 
-    @Test(expectedExceptions = InvalidDebugConfigurationException.class)
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "This suffix '.*' isn't compatible with the file size rotation "
+                    + "enable\\.")
     public void suffixNotCompatibleWithFileSizeRotationEnable() throws Exception {
         new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/suffixNotCompatibleWithFileSize" +
                 "RotationEnable.properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Log time rotation is enabled .* but the debug suffix is empty")
+    public void noSuffixLineAndTimeRotationEnabled() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/noSuffixLineAndTimeRotationEnabled" +
+                ".properties");
+    }
+
+    @Test(expectedExceptions = InvalidDebugConfigurationException.class,
+            expectedExceptionsMessageRegExp = "Log size rotation is enabled .* but the debug suffix is empty")
+    public void noSuffixLineAndSizeRotationEnabled() throws Exception {
+        new DebugConfigurationFromProperties(DEBUG_CONFIG_DIRECTORY + "invalid/noSuffixLineAndSizeRotationEnabled" +
+                ".properties");
     }
 
 }

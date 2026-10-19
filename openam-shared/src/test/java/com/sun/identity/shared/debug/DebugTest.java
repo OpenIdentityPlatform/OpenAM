@@ -133,4 +133,18 @@ public class DebugTest extends DebugTestTemplate {
         Assert.assertTrue(log.contains("\n    forged"), log);
     }
 
+    /** A configuration file without the prefix and suffix lines writes to a file named after the debug log. */
+    @Test
+    public void shouldWriteWithoutPrefixAndSuffixLines() throws Exception {
+        // given
+        initializeProvider("/debug_config_test/config_validation/valid/noPrefixAndSuffixLines.properties");
+        IDebug debug = provider.getInstance(logName);
+
+        // when
+        debug.error("Should appear in log", null);
+
+        // then
+        checkLogFileStatus(true, logName);
+    }
+
 }

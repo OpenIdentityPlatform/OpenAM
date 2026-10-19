@@ -24,7 +24,7 @@ public interface DebugConfiguration {
     /**
      * Get the debug prefix configuration
      *
-     * @return prefix
+     * @return prefix, never {@code null}; an empty string if no prefix is configured
      */
     public String getDebugPrefix();
 
@@ -33,7 +33,7 @@ public interface DebugConfiguration {
      * Suffix is an empty string or contains a date format if the
      * rotation interval is enable ({@code rotation interval > 0})
      *
-     * @return suffix
+     * @return suffix, never {@code null}; an empty string if no suffix is configured
      */
     public String getDebugSuffix();
 
