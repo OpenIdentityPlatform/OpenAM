@@ -31,10 +31,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.inject.Module;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.service.SessionService;
@@ -44,6 +48,8 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import org.forgerock.guice.core.GuiceModuleLoader;
+import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -77,6 +83,7 @@ import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 public class SessionResourceV2Test {
@@ -98,6 +105,21 @@ public class SessionResourceV2Test {
     private RealmTestHelper realmTestHelper;
 
     private SessionResourceV2 sessionResource;
+
+    /**
+     * {@link #setUp()} constructs a real {@link AMIdentity}, which asks {@link org.forgerock.guice.core.InjectorHolder}
+     * for a {@code RepoAuditorFactory}. Have the injector built from no modules before any test of the suite runs, for
+     * the reason given on {@code SessionResourceTest#setupGuiceModuleLoader()}.
+     */
+    @BeforeSuite(alwaysRun = true)
+    public void setupGuiceModuleLoader() {
+        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
+            @Override
+            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> moduleAnnotation) {
+                return Collections.emptySet();
+            }
+        });
+    }
 
     @BeforeMethod
     public void setUp() throws Exception {

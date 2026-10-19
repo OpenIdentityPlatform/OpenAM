@@ -88,8 +88,8 @@ import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 public class SessionResourceTest {
@@ -119,10 +119,13 @@ public class SessionResourceTest {
      * for a {@code RepoAuditorFactory}. If this class is the first in the fork to touch the injector holder, the holder builds
      * the injector from the modules of the running server, which cannot be built on this test classpath, and the holder
      * class then stays broken for every later test in the same JVM. Ask for an injector built from no modules instead,
-     * the way {@code IdentityResourceNotificationTest} does; the loader is only consulted while the first injector of the
-     * JVM is built, so this is a no-op when another class got there first.
+     * the way {@code IdentityResourceNotificationTest} does.
+     *
+     * The loader is only consulted while the first injector of the JVM is built, so it has to be in place before any
+     * test of the suite runs, not just before this class: a {@code @BeforeClass} comes too late whenever surefire happens
+     * to run {@code SessionResourceV2Test}, which constructs an {@code AMIdentity} too, ahead of this class.
      */
-    @BeforeClass
+    @BeforeSuite(alwaysRun = true)
     public void setupGuiceModuleLoader() {
         InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
             @Override
