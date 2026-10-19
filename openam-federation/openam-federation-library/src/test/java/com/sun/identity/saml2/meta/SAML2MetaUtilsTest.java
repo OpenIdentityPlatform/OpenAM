@@ -235,4 +235,82 @@ public class SAML2MetaUtilsTest {
                 XMLUtils.toDOMDocument(metadata, SAML2MetaUtils.debug)));
     }
 
+    /**
+     * JAXB 3 keeps the whitespace between the children of mixed-content types such as KeyInfo and
+     * EncryptionMethod, and the formatted marshaller indents around it again, so every save of the
+     * metadata read back from the store would add blank lines.
+     */
+    @Test
+    public void formattedMarshalIsStableAcrossSaves() throws Exception {
+        String metadata;
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("sp-metadata-encryption-keysize.xml")) {
+            metadata = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
+
+        String saved = SAML2MetaUtils.convertJAXBToString(SAML2MetaUtils.convertStringToJAXB(metadata));
+        String savedAgain = SAML2MetaUtils.convertJAXBToString(SAML2MetaUtils.convertStringToJAXB(saved));
+
+        assertEquals(savedAgain, saved);
+    }
+
+    /**
+     * JAXB 3 cannot instantiate the abstract RoleDescriptorType for an xsi:type it does not know, where
+     * JAXB 1 ignored the xsi:type and the import then dropped the role. Partner metadata such as AD FS
+     * metadata carries WS-Federation roles next to its SAML2 roles.
+     */
+    @Test
+    public void roleDescriptorsOfUnknownTypeAreDroppedOnImport() throws Exception {
+        String metadata = "<EntityDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\""
+                + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+                + " xmlns:fed=\"http://docs.oasis-open.org/wsfed/federation/200706\""
+                + " entityID=\"https://adfs.example.com/adfs/services/trust\">"
+                + "<RoleDescriptor xsi:type=\"fed:ApplicationServiceType\""
+                + " protocolSupportEnumeration=\"http://docs.oasis-open.org/wsfed/federation/200706\">"
+                + "<KeyDescriptor use=\"signing\">"
+                + "<KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\"><KeyName>adfs</KeyName></KeyInfo>"
+                + "</KeyDescriptor>"
+                + "</RoleDescriptor>"
+                + "<RoleDescriptor xsi:type=\"fed:SecurityTokenServiceType\""
+                + " protocolSupportEnumeration=\"http://docs.oasis-open.org/wsfed/federation/200706\">"
+                + "<fed:TokenTypesOffered><fed:TokenType Uri=\"urn:oasis:names:tc:SAML:2.0:assertion\"/>"
+                + "</fed:TokenTypesOffered>"
+                + "</RoleDescriptor>"
+                + "<SPSSODescriptor protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">"
+                + "<AssertionConsumerService index=\"0\" Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\""
+                + " Location=\"https://adfs.example.com/adfs/ls/\"/>"
+                + "</SPSSODescriptor>"
+                + "<IDPSSODescriptor protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">"
+                + "<SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\""
+                + " Location=\"https://adfs.example.com/adfs/ls/\"/>"
+                + "</IDPSSODescriptor>"
+                + "</EntityDescriptor>";
+
+        EntityDescriptorElement descriptor = SAML2MetaUtils.getEntityDescriptorElement(metadata);
+
+        assertNotNull(descriptor);
+        assertEquals(descriptor.getValue().getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor().size(), 2);
+        assertNotNull(SAML2MetaUtils.getSPSSODescriptor(descriptor));
+        assertNotNull(SAML2MetaUtils.getIDPSSODescriptor(descriptor));
+    }
+
+    /**
+     * The JAXB RI binds the default namespace to "" when its context holds an element in no namespace,
+     * for example from a package added through com.sun.identity.liberty.ws.jaxb.packageList, and then
+     * gives the metadata namespace a generated prefix. The exported RoleDescriptor must stay a metadata
+     * element in that layout too.
+     */
+    @Test
+    public void exportedRoleDescriptorIsMetadataElementUnderPrefixedRoot() throws Exception {
+        String exported = SAML2MetaUtils.workaroundAbstractRoleDescriptor(
+                "<ns8:EntityDescriptor xmlns:ns8=\"urn:oasis:names:tc:SAML:2.0:metadata\""
+                + " xmlns:query=\"urn:oasis:names:tc:SAML:metadata:ext:query\" entityID=\"x\">"
+                + "<query:AttributeQueryDescriptor protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\">"
+                + "<ns8:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</ns8:NameIDFormat>"
+                + "</query:AttributeQueryDescriptor></ns8:EntityDescriptor>");
+
+        Document doc = XMLUtils.toDOMDocument(exported, SAML2MetaUtils.debug);
+        assertEquals(doc.getElementsByTagNameNS(SAML2MetaConstants.NS_METADATA, "RoleDescriptor").getLength(), 1);
+        assertNotNull(SAML2MetaUtils.getAttributeQueryDescriptor(SAML2MetaUtils.getEntityDescriptorElement(exported)));
+    }
+
 }

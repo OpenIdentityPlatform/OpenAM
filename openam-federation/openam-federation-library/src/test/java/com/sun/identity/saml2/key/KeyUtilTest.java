@@ -64,8 +64,8 @@ public class KeyUtilTest {
     }
 
     /**
-     * EncryptionMethod is mixed content, so indented metadata unmarshals to a content list that starts
-     * with a whitespace String; the KeySize element must be found by type, not by index.
+     * EncryptionMethod is mixed content, so text can come before the KeySize element; the KeySize
+     * element must be found by type, not by index.
      */
     @Test
     public void encInfoReadsKeySizeFromIndentedEncryptionMethod() throws Exception {
@@ -110,13 +110,23 @@ public class KeyUtilTest {
         Assert.assertEquals(KeyUtil.getKeySize(em), 256);
     }
 
+    /**
+     * Loads the SP descriptor with a whitespace String in front of the KeySize element of each
+     * EncryptionMethod. SAML2MetaUtils drops the formatting whitespace of mixed content, so put it back.
+     */
     private SPSSODescriptorType loadEncryptionKeySizeSPSSODescriptor() throws Exception {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(ENCRYPTION_KEYSIZE_METADATA)) {
             EntityDescriptorElement element = (EntityDescriptorElement) SAML2MetaUtils.convertInputStreamToJAXB(is);
             for (JAXBElement<? extends RoleDescriptorType> descriptor
                     : element.getValue().getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor()) {
                 if (descriptor.getValue() instanceof SPSSODescriptorType) {
-                    return (SPSSODescriptorType) descriptor.getValue();
+                    SPSSODescriptorType spsso = (SPSSODescriptorType) descriptor.getValue();
+                    for (KeyDescriptorElement keyDescriptor : spsso.getKeyDescriptor()) {
+                        for (EncryptionMethodElement em : keyDescriptor.getValue().getEncryptionMethod()) {
+                            em.getValue().getContent().add(0, "\n                ");
+                        }
+                    }
+                    return spsso;
                 }
             }
         }

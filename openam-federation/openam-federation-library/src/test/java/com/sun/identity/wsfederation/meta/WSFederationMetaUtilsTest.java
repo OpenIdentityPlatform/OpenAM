@@ -124,4 +124,42 @@ public class WSFederationMetaUtilsTest {
                 XMLUtils.toDOMDocument(entityConfig, WSFederationMetaUtils.debug)))
                 .isInstanceOf(JAXBException.class);
     }
+
+    /**
+     * JAXB 3 keeps the whitespace between the children of the mixed-content KeyInfo, and the formatted
+     * marshaller indents around it again, so every save of a signed entity config would add blank lines.
+     */
+    public void formattedMarshalIsStableAcrossSaves() throws Exception {
+        String entityConfig =
+                "<FederationConfig xmlns=\"urn:sun:fm:wsfederation:1.0:federationconfig\""
+                + " FederationID=\"wsfed-test-entity\" hosted=\"false\">\n"
+                + "    <ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">\n"
+                + "        <ds:SignedInfo>\n"
+                + "            <ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>\n"
+                + "            <ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256\"/>\n"
+                + "            <ds:Reference URI=\"\">\n"
+                + "                <ds:Transforms>\n"
+                + "                    <ds:Transform Algorithm=\"http://www.w3.org/2000/09/xmldsig#enveloped-signature\"/>\n"
+                + "                </ds:Transforms>\n"
+                + "                <ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmlenc#sha256\"/>\n"
+                + "                <ds:DigestValue>AAAA</ds:DigestValue>\n"
+                + "            </ds:Reference>\n"
+                + "        </ds:SignedInfo>\n"
+                + "        <ds:SignatureValue>AAAA</ds:SignatureValue>\n"
+                + "        <ds:KeyInfo>\n"
+                + "            <ds:KeyName>idp.example.com</ds:KeyName>\n"
+                + "        </ds:KeyInfo>\n"
+                + "    </ds:Signature>\n"
+                + "    <IDPSSOConfig metaAlias=\"/idp\">\n"
+                + "        <Attribute name=\"signingCertAlias\">\n"
+                + "            <Value>test</Value>\n"
+                + "        </Attribute>\n"
+                + "    </IDPSSOConfig>\n"
+                + "</FederationConfig>";
+
+        String saved = WSFederationMetaUtils.convertJAXBToString(WSFederationMetaUtils.convertStringToJAXB(entityConfig));
+        String savedAgain = WSFederationMetaUtils.convertJAXBToString(WSFederationMetaUtils.convertStringToJAXB(saved));
+
+        assertThat(savedAgain).isEqualTo(saved);
+    }
 }

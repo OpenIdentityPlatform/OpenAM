@@ -53,6 +53,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import com.sun.identity.common.MixedContentWhitespaceListener;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
@@ -65,6 +66,14 @@ import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.*;
 import com.sun.identity.saml2.jaxb.metadataextquery.AttributeQueryDescriptorElement;
+import com.sun.identity.saml2.jaxb.xmlenc.AgreementMethodType;
+import com.sun.identity.saml2.jaxb.xmlenc.EncryptionMethodType;
+import com.sun.identity.saml2.jaxb.xmlsig.CanonicalizationMethodType;
+import com.sun.identity.saml2.jaxb.xmlsig.DigestMethodType;
+import com.sun.identity.saml2.jaxb.xmlsig.KeyInfoType;
+import com.sun.identity.saml2.jaxb.xmlsig.KeyValueType;
+import com.sun.identity.saml2.jaxb.xmlsig.SignatureMethodType;
+import com.sun.identity.saml2.jaxb.xmlsig.TransformType;
 import java.util.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -95,6 +104,16 @@ public final class SAML2MetaUtils {
                                         "jaxb.formatted.output";
     private static final String PROP_NAMESPACE_PREFIX_MAPPER =
                                     "org.glassfish.jaxb.namespacePrefixMapper";
+    private static final MixedContentWhitespaceListener MIXED_CONTENT_WHITESPACE_LISTENER =
+        new MixedContentWhitespaceListener()
+            .add(KeyInfoType.class, KeyInfoType::getContent)
+            .add(KeyValueType.class, KeyValueType::getContent)
+            .add(SignatureMethodType.class, SignatureMethodType::getContent)
+            .add(DigestMethodType.class, DigestMethodType::getContent)
+            .add(CanonicalizationMethodType.class, CanonicalizationMethodType::getContent)
+            .add(TransformType.class, TransformType::getContent)
+            .add(EncryptionMethodType.class, EncryptionMethodType::getContent)
+            .add(AgreementMethodType.class, AgreementMethodType::getContent);
 
     static String jaxbPackages = null;
 
@@ -143,13 +162,15 @@ public final class SAML2MetaUtils {
     }
 
     /**
-     * Creates an unmarshaller that fails on the first error. The JAXB 3 runtime otherwise recovers
-     * from errors such as an unexpected element by dropping the element, where the JAXB 1 runtime
-     * rejected the document.
+     * Creates an unmarshaller that fails on the first error and drops the formatting whitespace of
+     * mixed-content types, as the JAXB 1 runtime did. The JAXB 3 runtime otherwise recovers from
+     * errors such as an unexpected element by dropping the element, and keeps the whitespace, which
+     * the formatted marshaller indents again on every save.
      */
     private static Unmarshaller createUnmarshaller() throws JAXBException {
         Unmarshaller u = jaxbContext.createUnmarshaller();
         u.setEventHandler(event -> event.getSeverity() == ValidationEvent.WARNING);
+        u.setListener(MIXED_CONTENT_WHITESPACE_LISTENER);
         return u;
     }
 
@@ -782,13 +803,13 @@ public final class SAML2MetaUtils {
 
         NodeList nl = doc.getDocumentElement().getElementsByTagNameNS(
             SAML2MetaConstants.NS_METADATA,SAML2MetaConstants.ROLE_DESCRIPTOR);
-        int length = nl.getLength();
-        if (length == 0) {
-            return;
+        // The list is live, so copy it before replacing or removing its elements.
+        List<Element> roles = new ArrayList<>(nl.getLength());
+        for (int i = 0; i < nl.getLength(); i++) {
+            roles.add((Element) nl.item(i));
         }
 
-        for (int i = 0; i < length; i++) {
-            Element child = (Element)nl.item(i);
+        for (Element child : roles) {
             String type = child.getAttributeNS(SAML2Constants.NS_XSI, "type");
             if (type != null) {
                 if ((type.equals(
@@ -813,8 +834,17 @@ public final class SAML2MetaUtils {
                     Node newChild =
                         doc.importNode(tmpDoc.getDocumentElement(), true);
                     child.getParentNode().replaceChild(newChild, child);
+                    continue;
                 }
             }
+
+            // JAXB 3 cannot instantiate the abstract RoleDescriptorType for any other xsi:type, such as
+            // the WS-Federation roles of AD FS metadata, and no code reads a plain RoleDescriptor.
+            if (debug.messageEnabled()) {
+                debug.message("SAML2MetaUtils.workaroundAbstractRoleDescriptor: "
+                    + "Removing RoleDescriptor of unsupported type " + type);
+            }
+            child.getParentNode().removeChild(child);
         }
     }
 
@@ -850,6 +880,12 @@ public final class SAML2MetaUtils {
         } else {
             prefixDeclaration = " " + prefixDeclaration + "\"" +
                 SAML2MetaSecurityUtils.NS_MD_QUERY + "\"";
+        }
+        // The RoleDescriptor is written unprefixed, so it needs the metadata namespace as its default
+        // namespace. JAXB 3 gives the metadata namespace a generated prefix when its context holds an
+        // element in no namespace.
+        if (!startTag.contains("xmlns=")) {
+            prefixDeclaration += " xmlns=\"" + SAML2MetaConstants.NS_METADATA + "\"";
         }
 
 	xmlstr = xmlstr.replaceAll("<" + prefix + ":" +

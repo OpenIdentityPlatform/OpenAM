@@ -15,8 +15,8 @@
   -->
 <!--
   ID-FF SP metadata with an encryption KeyDescriptor indented the way
-  CreateIDFFMetaDataTemplate writes it. KeyInfo is a mixed-content type, so under
-  JAXB 3 its content list starts with a whitespace String before X509Data.
+  CreateIDFFMetaDataTemplate writes it. KeyInfo is a mixed-content type, whose
+  formatting whitespace JAXB 3 keeps unless the unmarshaller drops it.
 -->
 <EntityDescriptor
         xmlns="urn:liberty:metadata:2003-08"

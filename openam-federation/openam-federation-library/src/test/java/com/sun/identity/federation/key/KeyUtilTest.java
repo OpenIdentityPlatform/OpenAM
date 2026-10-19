@@ -30,8 +30,9 @@ import org.testng.annotations.Test;
 public class KeyUtilTest {
 
     /**
-     * KeyInfo is mixed content, so indented ID-FF metadata unmarshals to a content list that starts
-     * with a whitespace String; the X509Data element must be found by type, not by index.
+     * KeyInfo is mixed content, so text can come before the X509Data element; the X509Data element
+     * must be found by type, not by index. IDFFMetaUtils drops the formatting whitespace of mixed
+     * content, so the test puts it back.
      */
     public void certIsReadFromIndentedKeyInfo() throws Exception {
         EntityDescriptorElement entity;
@@ -41,6 +42,8 @@ public class KeyUtilTest {
                     XMLUtils.toDOMDocument(is, FSUtils.debug));
         }
         SPDescriptorType spDescriptor = IDFFMetaUtils.getSPDescriptor(entity);
+        KeyUtil.getKeyDescriptor(spDescriptor, "encryption").getKeyInfo().getContent()
+                .add(0, "\n                ");
 
         X509Certificate cert = KeyUtil.getCert(spDescriptor, "encryption");
 

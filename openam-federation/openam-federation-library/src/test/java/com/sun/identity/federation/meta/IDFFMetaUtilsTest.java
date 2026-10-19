@@ -16,11 +16,14 @@
 
 package com.sun.identity.federation.meta;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.shared.xml.XMLUtils;
 import jakarta.xml.bind.JAXBException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import org.testng.annotations.Test;
 
 @Test
@@ -45,5 +48,21 @@ public class IDFFMetaUtilsTest {
                 .isInstanceOf(JAXBException.class);
         assertThatThrownBy(() -> IDFFMetaUtils.convertNodeToJAXB(XMLUtils.toDOMDocument(metadata, FSUtils.debug)))
                 .isInstanceOf(JAXBException.class);
+    }
+
+    /**
+     * JAXB 3 keeps the whitespace between the children of the mixed-content KeyInfo, and the formatted
+     * marshaller indents around it again, so every save of the stored metadata would add blank lines.
+     */
+    public void formattedMarshalIsStableAcrossSaves() throws Exception {
+        String metadata;
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("idff-sp-metadata-indented-keyinfo.xml")) {
+            metadata = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
+
+        String saved = IDFFMetaUtils.convertJAXBToString(IDFFMetaUtils.convertStringToJAXB(metadata));
+        String savedAgain = IDFFMetaUtils.convertJAXBToString(IDFFMetaUtils.convertStringToJAXB(saved));
+
+        assertThat(savedAgain).isEqualTo(saved);
     }
 }

@@ -60,6 +60,13 @@ import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
+import com.sun.identity.common.MixedContentWhitespaceListener;
+import com.sun.identity.wsfederation.jaxb.xmlsig.CanonicalizationMethodType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.DigestMethodType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.KeyInfoType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.KeyValueType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.SignatureMethodType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.TransformType;
 
 import org.xml.sax.InputSource;
 
@@ -95,6 +102,14 @@ public final class WSFederationMetaUtils {
         "jaxb.formatted.output";
     private static final String PROP_NAMESPACE_PREFIX_MAPPER =
         "org.glassfish.jaxb.namespacePrefixMapper";
+    private static final MixedContentWhitespaceListener MIXED_CONTENT_WHITESPACE_LISTENER =
+        new MixedContentWhitespaceListener()
+            .add(KeyInfoType.class, KeyInfoType::getContent)
+            .add(KeyValueType.class, KeyValueType::getContent)
+            .add(SignatureMethodType.class, SignatureMethodType::getContent)
+            .add(DigestMethodType.class, DigestMethodType::getContent)
+            .add(CanonicalizationMethodType.class, CanonicalizationMethodType::getContent)
+            .add(TransformType.class, TransformType::getContent);
 
     private static NamespacePrefixMapperImpl nsPrefixMapper =
         new NamespacePrefixMapperImpl();
@@ -124,13 +139,15 @@ public final class WSFederationMetaUtils {
     }
 
     /**
-     * Creates an unmarshaller that fails on the first error. The JAXB 3 runtime otherwise recovers
-     * from errors such as an unexpected element by dropping the element, where the JAXB 1 runtime
-     * rejected the document.
+     * Creates an unmarshaller that fails on the first error and drops the formatting whitespace of
+     * mixed-content types, as the JAXB 1 runtime did. The JAXB 3 runtime otherwise recovers from
+     * errors such as an unexpected element by dropping the element, and keeps the whitespace, which
+     * the formatted marshaller indents again on every save.
      */
     private static Unmarshaller createUnmarshaller() throws JAXBException {
         Unmarshaller u = jaxbContext.createUnmarshaller();
         u.setEventHandler(event -> event.getSeverity() == ValidationEvent.WARNING);
+        u.setListener(MIXED_CONTENT_WHITESPACE_LISTENER);
         return u;
     }
 
