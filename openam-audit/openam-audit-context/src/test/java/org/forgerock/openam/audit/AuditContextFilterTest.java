@@ -21,11 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
-import java.lang.annotation.Annotation;
 import java.util.Collections;
-import java.util.Set;
 
-import org.forgerock.guice.core.GuiceModuleLoader;
 import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.http.header.TransactionIdHeader;
 import org.forgerock.openam.audit.context.AuditContextFilter;
@@ -35,6 +32,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -44,7 +42,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 
 /**
  * @since 13.0.0
@@ -71,17 +68,21 @@ public class AuditContextFilterTest {
      */
     @BeforeSuite(alwaysRun = true)
     public void setupGuiceModuleLoader() {
-        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
-            @Override
-            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> aClass) {
-                return Collections.<Class<? extends Module>>singleton(TestGuiceModule.class);
-            }
-        });
+        InjectorConfiguration.setGuiceModuleLoader(moduleAnnotation -> Collections.singleton(TestGuiceModule.class));
     }
 
     @BeforeMethod
     public void setupTests() {
         MockitoAnnotations.initMocks(this);
+    }
+
+    /**
+     * The binding from {@link TestGuiceModule} serves every class in the JVM, so put the flag the tests change back to
+     * its default.
+     */
+    @AfterMethod(alwaysRun = true)
+    public void resetTrustHeader() {
+        TransactionIdConfigurationImpl.trustHeader = true;
     }
 
     @Test
