@@ -32,7 +32,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.testng.AssertJUnit.*;
 
-import com.google.inject.Module;
 import com.iplanet.services.naming.WebtopNamingQuery;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -42,7 +41,6 @@ import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
-import java.lang.annotation.Annotation;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,8 +52,6 @@ import java.util.concurrent.ExecutionException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.assertj.core.api.Assertions;
-import org.forgerock.guice.core.GuiceModuleLoader;
-import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.http.session.Session;
 import org.forgerock.http.session.SessionContext;
 import org.forgerock.json.JsonValue;
@@ -79,7 +75,6 @@ import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
-import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.ClientContext;
 import org.forgerock.services.context.Context;
@@ -88,7 +83,6 @@ import org.forgerock.services.context.SecurityContext;
 import org.forgerock.util.promise.Promise;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -114,24 +108,6 @@ public class SessionResourceTest {
 
 
 
-    /**
-     * {@link #setUp()} constructs a real {@link AMIdentity}, whose constructor asks {@link org.forgerock.guice.core.InjectorHolder}
-     * for a {@code RepoAuditorFactory}. If this class is the first in the fork to touch the injector holder, the holder builds
-     * the injector from the modules of the running server, which cannot be built on this test classpath, and the holder
-     * class then stays broken for every later test in the same JVM. Ask for an injector built from no modules instead,
-     * the way {@code IdentityResourceNotificationTest} does; the loader is only consulted while the first injector of the
-     * JVM is built, so this is a no-op when another class got there first.
-     */
-    @BeforeClass
-    public void setupGuiceModuleLoader() {
-        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
-            @Override
-            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> moduleAnnotation) {
-                return Collections.emptySet();
-            }
-        });
-    }
-
     @BeforeMethod
     public void setUp() throws Exception {
         ssoTokenManager = mock(SSOTokenManager.class);
@@ -149,7 +125,12 @@ public class SessionResourceTest {
 
         realmContext = new RealmContext(mockContext, Realm.root());
 
-        amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
+        // A mock, not a real AMIdentity: its constructor asks InjectorHolder for a RepoAuditorFactory. If that is the
+        // first call to reach InjectorHolder in the JVM, before any loader is installed, it leaves InjectorHolder
+        // unusable on this classpath for every later test class.
+        amIdentity = mock(AMIdentity.class);
+        given(amIdentity.getName()).willReturn("demo");
+        given(amIdentity.getRealm()).willReturn("dc=example,dc=com");
 
         configureWhitelist();
 
