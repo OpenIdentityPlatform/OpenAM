@@ -25,6 +25,7 @@ import org.forgerock.openam.scripting.guice.ScriptingGuiceModule;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import java.lang.annotation.Annotation;
@@ -46,16 +47,25 @@ public class GroovyAstTransformEscapeTest extends GuiceTestCase {
     /** System property the malicious payloads attempt to set; if it is ever non-null the escape executed. */
     private static final String CANARY = "openam.test.ghsa_5hgj_6j53_p729.executed";
 
-    @BeforeMethod
-    @Override
-    public void setupGuiceModules() throws Exception {
-        // Mirror GroovyValidatorTest: don't let other Guice modules on the classpath load.
+    /**
+     * Have the injector built from no modules before any test of the suite runs, for the reasons and with the limits
+     * given on {@link GroovyValidatorTest#setupGuiceModuleLoader()}. This class needs its own copy: when it runs alone,
+     * as with {@code -Dtest=GroovyAstTransformEscapeTest} or from an IDE, the other classes' {@code @BeforeSuite}
+     * methods do not run.
+     */
+    @BeforeSuite(alwaysRun = true)
+    public void setupGuiceModuleLoader() {
         InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
             @Override
             public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> aClass) {
                 return new HashSet<>();
             }
         });
+    }
+
+    @BeforeMethod
+    @Override
+    public void setupGuiceModules() throws Exception {
         super.setupGuiceModules();
         System.clearProperty(CANARY);
     }

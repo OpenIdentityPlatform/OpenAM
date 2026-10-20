@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.scripting;
@@ -23,7 +24,7 @@ import org.forgerock.guice.core.GuiceTestCase;
 import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.openam.scripting.guice.ScriptingGuiceModule;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import java.lang.annotation.Annotation;
@@ -36,18 +37,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 @GuiceModules({SharedGuiceModule.class, ScriptingGuiceModule.class})
 public class JavaScriptValidatorTest extends GuiceTestCase {
 
-    @BeforeMethod
-    @Override
-    public void setupGuiceModules() throws Exception {
-        //This ensures that the other Guice modules on the classpath don't get
-        //loaded as Guice will balk.
+    /**
+     * Have the injector built from no modules before any test of the suite runs, for the reasons and with the limits
+     * given on {@link GroovyValidatorTest#setupGuiceModuleLoader()}. This class needs its own copy: when it runs alone,
+     * as with {@code -Dtest=JavaScriptValidatorTest} or from an IDE, the other classes' {@code @BeforeSuite} methods do
+     * not run.
+     */
+    @BeforeSuite(alwaysRun = true)
+    public void setupGuiceModuleLoader() {
         InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
             @Override
             public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> aClass) {
                 return new HashSet<>();
             }
         });
-        super.setupGuiceModules();
     }
 
     @Test(expectedExceptions = NullPointerException.class)
