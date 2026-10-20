@@ -71,7 +71,6 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.openam.utils.CrestQuery;
-import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
@@ -109,7 +108,12 @@ public class SessionResourceV2Test {
         realmTestHelper = new RealmTestHelper();
         realmTestHelper.setupRealmClass();
 
-        amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
+        // A mock, not a real AMIdentity: its constructor asks InjectorHolder for a RepoAuditorFactory. If that is the
+        // first call to reach InjectorHolder in the JVM, before any loader is installed, it leaves InjectorHolder
+        // unusable on this classpath for every later test class.
+        amIdentity = mock(AMIdentity.class);
+        given(amIdentity.getName()).willReturn("demo");
+        given(amIdentity.getRealm()).willReturn("dc=example,dc=com");
 
         sessionService = mock(SessionService.class);
         partialSessionFactory = mock(PartialSessionFactory.class);

@@ -58,8 +58,8 @@ import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.services.context.Context;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -113,15 +113,30 @@ public class IdentityResourceNotificationTest extends GuiceTestCase {
      * notification broker that is not there - so the first injector of this JVM has to be built from no modules at
      * all, and the bindings a test needs come from {@link #configure(Binder)}.
      *
+     * The loader is read once, while the first injector of the JVM is built, so it is installed before any test of
+     * the suite runs rather than before this class. Any earlier test that touches InjectorHolder with the default
+     * loader - as the session resource tests did while they built a real {@code AMIdentity}, which asks for a
+     * {@code RepoAuditorFactory} and swallows the failure - leaves InjectorHolder unusable for the rest of the JVM,
+     * and a {@code @BeforeClass} here could not undo that. Even this hook does not always come first: TestNG creates
+     * an instance of every test class before it runs any {@code @BeforeSuite} method, so a constructor, field
+     * initializer or static initializer of a test class that reaches InjectorHolder still builds the injector from
+     * the default loader. A {@code mock(IdentityServicesImpl.class)} field is one such initializer, since a static
+     * field of that class asks InjectorHolder for an instance.
+     *
      * The loader is not put back afterwards, and could not be: InjectorConfiguration exposes no way to read the
      * one in place, and the default implementation of it is not public either. It does not matter much, because
-     * the loader is read once, while the first injector of the JVM is built, and after this class has run that
-     * injector exists whatever the loader says. What a later test class in the same fork inherits is therefore an
-     * empty injector - which is what it would have got in this module anyway, since the real modules cannot be
-     * built here at all. A test that needs bindings has to bring them, the way this one does through
-     * {@link GuiceTestCase}, which is also what puts the injector back after every test method.
+     * once the first injector of the JVM exists the loader is never read again. What every other test class of the
+     * suite gets is therefore an empty injector - which is what it would have got in this module anyway, since the
+     * real modules cannot be built here at all. A test that needs bindings has to bring them, the way this one does
+     * through {@link GuiceTestCase}, which is also what puts the injector back after every test method.
+     *
+     * The suite is the whole module only because the module inherits surefire's {@code forkCount=1} and
+     * {@code reuseForks=true}, which run all its test classes in one TestNG suite in one JVM. With
+     * {@code reuseForks=false} or a {@code forkCount} above 1 surefire runs each class in a suite of its own, and a
+     * class run alone - with {@code -Dtest} or from an IDE - runs without this hook. In those runs the hook guards
+     * this class at most, not the others.
      */
-    @BeforeClass
+    @BeforeSuite(alwaysRun = true)
     public void setupGuiceModuleLoader() {
         InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
             @Override
