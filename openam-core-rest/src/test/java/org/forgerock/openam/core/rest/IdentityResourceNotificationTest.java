@@ -120,8 +120,8 @@ public class IdentityResourceNotificationTest extends GuiceTestCase {
      * and a {@code @BeforeClass} here could not undo that. Even this hook does not always come first: TestNG creates
      * an instance of every test class before it runs any {@code @BeforeSuite} method, so a constructor, field
      * initializer or static initializer of a test class that reaches InjectorHolder still builds the injector from
-     * the default loader. A {@code mock(IdentityServicesImpl.class)} field is one such initializer, since the static
-     * fields of that class ask InjectorHolder for instances.
+     * the default loader. A {@code mock(IdentityServicesImpl.class)} field is one such initializer, since a static
+     * field of that class asks InjectorHolder for an instance.
      *
      * The loader is not put back afterwards, and could not be: InjectorConfiguration exposes no way to read the
      * one in place, and the default implementation of it is not public either. It does not matter much, because

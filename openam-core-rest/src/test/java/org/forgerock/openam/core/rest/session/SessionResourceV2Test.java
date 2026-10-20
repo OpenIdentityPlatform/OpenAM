@@ -108,8 +108,9 @@ public class SessionResourceV2Test {
         realmTestHelper = new RealmTestHelper();
         realmTestHelper.setupRealmClass();
 
-        // A mock, not a real AMIdentity: its constructor asks InjectorHolder for a RepoAuditorFactory, and on this
-        // classpath that leaves InjectorHolder unusable for every later test class in the JVM.
+        // A mock, not a real AMIdentity: its constructor asks InjectorHolder for a RepoAuditorFactory. If that is the
+        // first call to reach InjectorHolder in the JVM, before any loader is installed, it leaves InjectorHolder
+        // unusable on this classpath for every later test class.
         amIdentity = mock(AMIdentity.class);
         given(amIdentity.getName()).willReturn("demo");
         given(amIdentity.getRealm()).willReturn("dc=example,dc=com");
