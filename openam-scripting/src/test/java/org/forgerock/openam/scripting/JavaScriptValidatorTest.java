@@ -17,41 +17,18 @@
 
 package org.forgerock.openam.scripting;
 
-import com.google.inject.Module;
-import org.forgerock.guice.core.GuiceModuleLoader;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
-import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.openam.scripting.guice.ScriptingGuiceModule;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.lang.annotation.Annotation;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @GuiceModules({SharedGuiceModule.class, ScriptingGuiceModule.class})
 public class JavaScriptValidatorTest extends GuiceTestCase {
-
-    /**
-     * Have the injector built from no modules before any test of the suite runs, for the reasons and with the limits
-     * given on {@link GroovyValidatorTest#setupGuiceModuleLoader()}. This class needs its own copy: when it runs alone,
-     * as with {@code -Dtest=JavaScriptValidatorTest} or from an IDE, the other classes' {@code @BeforeSuite} methods do
-     * not run.
-     */
-    @BeforeSuite(alwaysRun = true)
-    public void setupGuiceModuleLoader() {
-        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
-            @Override
-            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> aClass) {
-                return new HashSet<>();
-            }
-        });
-    }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullScript() {

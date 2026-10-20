@@ -17,21 +17,13 @@
 
 package org.forgerock.openam.scripting;
 
-import com.google.inject.Module;
-import org.forgerock.guice.core.GuiceModuleLoader;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
-import org.forgerock.guice.core.InjectorConfiguration;
-import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.scripting.guice.ScriptingGuiceModule;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.lang.annotation.Annotation;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,29 +32,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @GuiceModules({SharedGuiceModule.class, ScriptingGuiceModule.class})
 public class GroovyValidatorTest extends GuiceTestCase {
-
-    /**
-     * Before each test, {@link GuiceTestCase#setupGuiceModules()} asks {@link InjectorHolder} for its injector. The
-     * holder builds the first injector of the JVM from the module loader in place at that moment and never consults the
-     * loader again. The default loader collects every Guice module on the test classpath, Guice cannot build an
-     * injector from those, and the holder class then stays broken for every later test in the same JVM. Ask for an
-     * injector built from no modules instead, before any test of the suite runs: a {@code @BeforeMethod} or
-     * {@code @BeforeClass} comes too late whenever surefire happens to run another class that touches the holder ahead
-     * of this one.
-     *
-     * Two limits remain. TestNG creates the instances of all test classes before any {@code @BeforeSuite} method runs,
-     * so a constructor or field initializer that reaches the holder still goes first. And this method covers other
-     * classes only while the whole suite runs in one JVM ({@code forkCount=1}, {@code reuseForks=true}).
-     */
-    @BeforeSuite(alwaysRun = true)
-    public void setupGuiceModuleLoader() {
-        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
-            @Override
-            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> aClass) {
-                return new HashSet<>();
-            }
-        });
-    }
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldRejectNullScript() {
