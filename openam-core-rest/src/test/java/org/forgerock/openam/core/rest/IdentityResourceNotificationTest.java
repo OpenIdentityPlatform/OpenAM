@@ -115,16 +115,26 @@ public class IdentityResourceNotificationTest extends GuiceTestCase {
      *
      * The loader is read once, while the first injector of the JVM is built, so it is installed before any test of
      * the suite runs rather than before this class. Any earlier test that touches InjectorHolder with the default
-     * loader - as {@code SessionResourceV2Test} did before it got the same hook: it constructs an {@code AMIdentity},
-     * which asks for a {@code RepoAuditorFactory} and swallows the failure - leaves InjectorHolder unusable for the
-     * rest of the JVM, and a {@code @BeforeClass} here could not undo that.
+     * loader - as the session resource tests did while they built a real {@code AMIdentity}, which asks for a
+     * {@code RepoAuditorFactory} and swallows the failure - leaves InjectorHolder unusable for the rest of the JVM,
+     * and a {@code @BeforeClass} here could not undo that. Even this hook does not always come first: TestNG creates
+     * an instance of every test class before it runs any {@code @BeforeSuite} method, so a constructor, field
+     * initializer or static initializer of a test class that reaches InjectorHolder still builds the injector from
+     * the default loader. A {@code mock(IdentityServicesImpl.class)} field is one such initializer, since the static
+     * fields of that class ask InjectorHolder for instances.
      *
      * The loader is not put back afterwards, and could not be: InjectorConfiguration exposes no way to read the
      * one in place, and the default implementation of it is not public either. It does not matter much, because
-     * once the first injector of the JVM exists the loader is never read again. What every test class in the same
-     * fork gets is therefore an empty injector - which is what it would have got in this module anyway, since the
+     * once the first injector of the JVM exists the loader is never read again. What every other test class of the
+     * suite gets is therefore an empty injector - which is what it would have got in this module anyway, since the
      * real modules cannot be built here at all. A test that needs bindings has to bring them, the way this one does
      * through {@link GuiceTestCase}, which is also what puts the injector back after every test method.
+     *
+     * The suite is the whole module only because the module inherits surefire's {@code forkCount=1} and
+     * {@code reuseForks=true}, which run all its test classes in one TestNG suite in one JVM. With
+     * {@code reuseForks=false} or a {@code forkCount} above 1 surefire runs each class in a suite of its own, and a
+     * class run alone - with {@code -Dtest} or from an IDE - runs without this hook. In those runs the hook guards
+     * this class at most, not the others.
      */
     @BeforeSuite(alwaysRun = true)
     public void setupGuiceModuleLoader() {

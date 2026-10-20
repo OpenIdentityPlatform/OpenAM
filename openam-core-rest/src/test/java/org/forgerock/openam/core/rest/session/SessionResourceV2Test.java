@@ -31,14 +31,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-import com.google.inject.Module;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.service.SessionService;
@@ -48,8 +44,6 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import org.forgerock.guice.core.GuiceModuleLoader;
-import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.json.JsonPointer;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
@@ -77,13 +71,11 @@ import org.forgerock.openam.rest.resource.SSOTokenContext;
 import org.forgerock.openam.session.SessionPropertyWhitelist;
 import org.forgerock.openam.test.apidescriptor.ApiAnnotationAssert;
 import org.forgerock.openam.utils.CrestQuery;
-import org.forgerock.opendj.ldap.DN;
 import org.forgerock.services.context.Context;
 import org.forgerock.util.promise.Promise;
 import org.forgerock.util.query.QueryFilter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 public class SessionResourceV2Test {
@@ -106,21 +98,6 @@ public class SessionResourceV2Test {
 
     private SessionResourceV2 sessionResource;
 
-    /**
-     * {@link #setUp()} constructs a real {@link AMIdentity}, which asks {@link org.forgerock.guice.core.InjectorHolder}
-     * for a {@code RepoAuditorFactory}. Have the injector built from no modules before any test of the suite runs, for
-     * the reason given on {@code SessionResourceTest#setupGuiceModuleLoader()}.
-     */
-    @BeforeSuite(alwaysRun = true)
-    public void setupGuiceModuleLoader() {
-        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
-            @Override
-            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> moduleAnnotation) {
-                return Collections.emptySet();
-            }
-        });
-    }
-
     @BeforeMethod
     public void setUp() throws Exception {
 
@@ -131,7 +108,11 @@ public class SessionResourceV2Test {
         realmTestHelper = new RealmTestHelper();
         realmTestHelper.setupRealmClass();
 
-        amIdentity = new AMIdentity(DN.valueOf("id=demo,dc=example,dc=com"), null);
+        // A mock, not a real AMIdentity: its constructor asks InjectorHolder for a RepoAuditorFactory, and on this
+        // classpath that leaves InjectorHolder unusable for every later test class in the JVM.
+        amIdentity = mock(AMIdentity.class);
+        given(amIdentity.getName()).willReturn("demo");
+        given(amIdentity.getRealm()).willReturn("dc=example,dc=com");
 
         sessionService = mock(SessionService.class);
         partialSessionFactory = mock(PartialSessionFactory.class);
