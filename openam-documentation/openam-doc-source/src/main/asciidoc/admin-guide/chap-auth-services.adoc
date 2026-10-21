@@ -212,6 +212,8 @@ Once you have registered an application and obtained your credentials from the s
 .. Select the realm in which to enable social authentication.
 
 .. Enter the __OpenID Discovery URL__ obtained from the third party authentication provider.
++
+OpenAM refuses a discovery URL that resolves to an internal address. For the restrictions and how to lift them, see xref:chap-federation.adoc#saml2-metadata-url-restrictions["Restrictions on metadata and discovery URLs"].
 
 .. Enter a name for the provider in the `Provider Name` field. OpenAM uses this as a label on the login page to identify the provider.
 

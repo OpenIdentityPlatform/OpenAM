@@ -147,6 +147,15 @@ a|xref:#google-apps-as-sp["Configuring Google Apps as a Remote Service Provider"
  xref:#salesforce-as-sp["Configuring Salesforce CRM as a Remote Service Provider"]
 |===
 
+[#saml2-metadata-url-restrictions]
+.Restrictions on metadata and discovery URLs
+[NOTE]
+======
+When you give the wizards a URL instead of the metadata document itself, OpenAM refuses to fetch SAML v2.0 metadata, extended metadata or an OpenID Connect discovery document from a URL that does not use the `http` or `https` scheme, or that resolves — directly or through a redirect — to a blocked address (see xref:chap-openid-connect.adoc#openam-ssrf-blocked-addresses["the list of blocked addresses"]); a host is refused when any one of its addresses is blocked (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-rmw3-j353-w9f7[GHSA-rmw3-j353-w9f7, window=\_blank]). OpenAM follows at most three redirects, and never one that leads from an `https` URL to an `http` one.
+
+To import from a partner on an internal address, or through an HTTP proxy when the OpenAM server cannot resolve the partner's host name itself, either paste the metadata document instead of its URL, or set the advanced server property `org.openidentityplatform.federation.workflow.allow-any-address` to `true`; the scheme restriction still applies.
+======
+
 [#saml2-create-hosted-idp]
 ==== Creating a Hosted Identity Provider
 
