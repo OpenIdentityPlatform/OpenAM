@@ -13,6 +13,7 @@
 ~ information: "Portions copyright [year] [name of copyright owner]".
 ~
 ~ Copyright 2015 ForgeRock AS.
+~ Portions Copyright 2026 3A Systems, LLC.
 -->
 <html lang="en">
 <head>
@@ -30,10 +31,32 @@
   pageData = {
       <#if locale??>locale: "${locale?js_string}",</#if>
       <#if errorCode??>errorCode: "${errorCode?js_string}",</#if>
+      <#if csrf??>csrf: "${csrf?js_string}",</#if>
       realm : "${realm?js_string}",
       baseUrl : "${baseUrl?js_string}/XUI"
   };
+  <#-- Cache-bust XUI: /XUI/* is served for a month, so a browser holding the previous
+       DeviceTemplate.html (no hidden csrf field) would POST empty and be refused.
+       Not a secret and the same for every user - RequireJS appends urlArgs to every module and
+       text! URL it loads, and those URLs are recorded by access logs and shared caches. Bump
+       this value the next time the device page's contract changes. -->
+  var require = { urlArgs: "v=device-csrf-1" };
 </script>
 <script data-main="${baseUrl?html}/XUI/main-device" src="${baseUrl?html}/XUI/libs/requirejs-2.3.7-min.js"></script>
+<script type="text/javascript">
+  <#-- Fallback for any stale template that reaches the DOM anyway (custom main-device,
+       intermediate cache ignoring the query, forked theme). -->
+  document.addEventListener("submit", function (event) {
+      var form = event.target;
+      if (!form || !form.method || form.method.toLowerCase() !== "post") { return; }
+      if (form.querySelector("input[name=csrf]")) { return; }
+      if (!window.pageData || !window.pageData.csrf) { return; }
+      var input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "csrf";
+      input.value = window.pageData.csrf;
+      form.appendChild(input);
+  }, true);
+</script>
 </body>
 </html>

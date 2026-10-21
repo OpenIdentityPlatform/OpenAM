@@ -193,6 +193,33 @@ These are described in the xref:../install-guide/chap-custom-ui.adoc#chap-custom
 
 * Any changes or additional Java class libraries (such as .jar files in `WEB-INF/lib`)
 
+[#upgrade-device-flow-form]
+If you have customized the OAuth 2.0 device flow user code page, carry the CSRF token into your copy before you upgrade. The endpoint `/oauth2/device/user` refuses any submission without a valid `csrf` parameter with HTTP 400, and the stock page supplies that token through two lines that a customized copy made from an earlier release lacks. Without them, every user code a browser submits is refused.
+
+* In a customized `CodeVerificationForm.ftl` (for example, one placed in `WEB-INF/classes/templates`), add the token to `pageData`:
++
+[source, html]
+----
+<#if csrf??>csrf: "${csrf?js_string}",</#if>
+----
+
+* In a customized XUI `templates/user/DeviceTemplate.html`, add a hidden field inside the form:
++
+[source, html]
+----
+<input type="hidden" name="csrf" value="{{csrf}}">
+----
+
+Users of the stock pages are covered by the same `.ftl`: it sets a `urlArgs` value on RequireJS so the browser stops reusing `DeviceTemplate.html` cached from the previous release (that file is served for a month, and its URL is not versioned otherwise), and it registers a submit-time listener that appends the CSRF token to any device form that reaches the DOM without it. Neither of these lines is included in a customized copy of `CodeVerificationForm.ftl` unless the customization brings them across.
+
+Clients that post the user code directly, without the page, send their session ID as the `csrf` parameter. For details, see xref:../dev-guide/chap-client-dev.adoc#proc-device-flow-allow-access["To Grant Consent in the OAuth 2.0 Device Flow"] in the __Developer's Guide__.
+
+[#upgrade-device-flow-verification-uri-query]
+A link or QR code that opens the device verification page with the user code in the query string, such as `/oauth2/device/user?user_code=BDCT-HQKD`, now redirects (HTTP 303) to the same address without that parameter. The user types the code into the empty form the redirect leads to. The endpoint has no way to tell a code the user chose from one a foreign page chose for them, so the code has to be typed where only the user can type it. OpenAM itself does not produce this URL - `/oauth2/device/code` answers with a bare `verification_uri` and never issues `verification_uri_complete` - but any out-of-tree device app or QR code that appends `?user_code=<code>` to the verification URI is affected and must be updated to reflect that users now retype the code on arrival.
+
+[#upgrade-consent-decision-body]
+`/oauth2/authorize` and `/oauth2/device/user` now read the consent decision (`decision`) and the "remember this choice" flag (`save_consent`) from the request body alone; values sent only in the query string are ignored. On `/oauth2/authorize`, a submission that carries no `decision` in the body fails closed as a denial; on `/oauth2/device/user` such a submission is the user code form itself: it leads to the consent page, or approves the device code at once when the client's consent is implied. The stock consent page and the documented headless `curl` invocations already send both in the body, so a deployment using either is unaffected; a bespoke client that put `decision=allow` in the URL of a redirect has to move it into the POST body.
+
 
 [#post-upgrade-rollback]
 ==== Plan for Rollback

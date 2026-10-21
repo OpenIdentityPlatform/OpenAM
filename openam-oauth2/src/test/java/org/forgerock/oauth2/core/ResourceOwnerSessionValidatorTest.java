@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -130,6 +130,35 @@ public class ResourceOwnerSessionValidatorTest {
         } catch (ResourceOwnerAuthenticationRequired ex) {
             // Then
             assertEquals("goto=http://openam.example.com:8080/openam/oauth2/authorize?prompt=",
+                    ex.getRedirectUri().getQuery());
+        }
+    }
+
+    /**
+     * The goto must not carry the user code of a device flow submission. It used to, so that
+     * {@code /oauth2/device/user} could act on the code when the browser came back from login as a GET -
+     * the shape GHSA-545c-rm35-2jj2 turns on. That GET no longer authorizes anything, so the only thing a
+     * surviving code could still do is sit in the query string of the form served after login and disagree
+     * with the code the user then types, which gets the submission refused.
+     */
+    @Test
+    public void shouldNotCarryTheUserCodeIntoTheLoginGoto() throws Exception {
+
+        //given a device verification submission from a browser with no session
+        restletRequest.setResourceRef(
+                new Reference("http://openam.example.com:8080/openam/oauth2/device/user"));
+        given(mockOAuth2Request.getParameter("user_code")).willReturn("BDCT-HQKD");
+        mockSSOToken(NO_SESSION_TOKEN);
+
+        try {
+            //When
+            resourceOwnerSessionValidator.validate(mockOAuth2Request);
+            fail();
+
+        } catch (ResourceOwnerAuthenticationRequired ex) {
+            // Then
+            assertThat(ex.getRedirectUri().toString()).doesNotContain("user_code");
+            assertEquals("goto=http://openam.example.com:8080/openam/oauth2/device/user",
                     ex.getRedirectUri().getQuery());
         }
     }

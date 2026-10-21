@@ -104,16 +104,69 @@ public class OAuth2Request {
         if (request.getMethod().equals(Method.POST)) {
             if (request.getEntity() != null) {
                 if (MediaType.APPLICATION_WWW_FORM.equals(request.getEntity().getMediaType())) {
-                    Form form = new Form(request.getEntity());
-                    // restore the entity body
-                    request.setEntity(form.getWebRepresentation());
-                    return (T) form.getValuesMap().get(name);
+                    return (T) readFormParameter(name);
                 } else if (MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
                     return (T) getBody().get(name).getObject();
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the specified parameter from the request's query string only, ignoring any request attribute or
+     * request body carrying the same name.
+     *
+     * @param name The name of the parameter.
+     * @return The query string value, or {@code null} if the query string does not carry the parameter.
+     */
+    public String getQueryParameter(String name) {
+        return getQueryParameter(request, name);
+    }
+
+    /**
+     * Gets the specified parameter from the request's body only, ignoring any request attribute or query string
+     * parameter carrying the same name. Both body encodings {@link #getParameter(String)} understands are read,
+     * so that a caller cannot be told one thing by a form encoded body and another by a JSON one.
+     *
+     * <p>{@link #getParameter(String)} gives the query string priority over the body and so cannot tell the two
+     * apart. A caller that has to - because the same name arriving from both places means something different
+     * from it arriving from one - reads each side with this method and {@link #getQueryParameter(String)}.</p>
+     *
+     * @param name The name of the parameter.
+     * @return The body value, or {@code null} if the request carries no body with that parameter.
+     */
+    public String getBodyParameter(String name) {
+        if (!request.getMethod().equals(Method.POST) || request.getEntity() == null) {
+            return null;
+        }
+        final MediaType mediaType = request.getEntity().getMediaType();
+        if (MediaType.APPLICATION_WWW_FORM.equals(mediaType)) {
+            return readFormParameter(name);
+        }
+        if (MediaType.APPLICATION_JSON.equals(mediaType)) {
+            final JsonValue body = getBody();
+            if (body == null || !body.isMap()) {
+                return null;
+            }
+            final JsonValue value = body.get(name);
+            return value == null || value.getObject() == null ? null : String.valueOf(value.getObject());
+        }
+        return null;
+    }
+
+    /**
+     * Reads a parameter from a form encoded entity, leaving the entity readable for whatever reads it next -
+     * consuming it would let a later read see an empty form and fall back to the query string.
+     *
+     * @param name The name of the parameter.
+     * @return The form value, or {@code null} if the form does not carry the parameter.
+     */
+    private String readFormParameter(String name) {
+        Form form = new Form(request.getEntity());
+        // restore the entity body
+        request.setEntity(form.getWebRepresentation());
+        return form.getValuesMap().get(name);
     }
 
     /**
@@ -307,6 +360,12 @@ public class OAuth2Request {
         public JsonValue getBody() {
             return null;
         }
+
+        @Override
+        public String getQueryParameter(String name) { throw new UnsupportedOperationException(); }
+
+        @Override
+        public String getBodyParameter(String name) { throw new UnsupportedOperationException(); }
 
         @Override
         public int getParameterCount(String name)  { throw new UnsupportedOperationException(); }

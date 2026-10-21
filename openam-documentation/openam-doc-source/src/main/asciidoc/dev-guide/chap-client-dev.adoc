@@ -5462,7 +5462,7 @@ image::images/oauth2-device-consent.png[]
 --
 
 `user_code`::
-The user code as provided by the `/oauth2/device/code` endpoint.
+The user code as provided by the `/oauth2/device/code` endpoint. If you also send it in the request body, the two values must be identical; a request carrying two different user codes is rejected with an HTTP 400 status.
 
 --
 +

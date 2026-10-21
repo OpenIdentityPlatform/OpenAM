@@ -17,6 +17,8 @@
 
 package org.forgerock.oauth2.restlet;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
@@ -97,6 +99,48 @@ public class AuthorizeResourceTest {
         //then
         verify(hook).beforeAuthorizeHandling(o2request, request, response);
         verify(hook).afterAuthorizeSuccess(o2request, request, response);
+    }
+
+    /**
+     * The consent page posts back to the authorization request's own URL - {@code getDataModel} builds the
+     * form's target out of the path plus that query string - so a link that put {@code decision=allow} in
+     * the query would decide for the resource owner. {@code getParameter} gives the query priority, which
+     * would turn a deliberate "Deny" into a granted, and with {@code save_consent} permanently recorded,
+     * consent.
+     */
+    @Test
+    public void shouldTakeTheConsentDecisionFromTheBodyRatherThanTheQueryString() throws Exception {
+        //given the resource owner clicked "Deny" on a page whose URL says otherwise
+        when(o2request.getBodyParameter("decision")).thenReturn("deny");
+        when(o2request.getBodyParameter("save_consent")).thenReturn(null);
+        when(o2request.<String>getParameter("decision")).thenReturn("allow");
+        when(o2request.<String>getParameter("save_consent")).thenReturn("on");
+        when(service.authorize(eq(o2request), anyBoolean(), anyBoolean())).thenReturn(authToken);
+
+        //when
+        resource.authorize(new EmptyRepresentation());
+
+        //then what the user clicked is what is acted on
+        verify(service).authorize(o2request, false, false);
+    }
+
+    /**
+     * The positive side of the pair above: an "Allow" with "save" ticked, both in the body, has to reach
+     * {@code AuthorizationService.authorize} as {@code (true, true)}. Without this, the mutant that reads
+     * {@code save_consent} as always false stays green.
+     */
+    @Test
+    public void shouldSaveConsentFromTheBody() throws Exception {
+        //given the resource owner clicked "Allow" with "save" ticked
+        when(o2request.getBodyParameter("decision")).thenReturn("allow");
+        when(o2request.getBodyParameter("save_consent")).thenReturn("on");
+        when(service.authorize(eq(o2request), anyBoolean(), anyBoolean())).thenReturn(authToken);
+
+        //when
+        resource.authorize(new EmptyRepresentation());
+
+        //then
+        verify(service).authorize(o2request, true, true);
     }
 
 }

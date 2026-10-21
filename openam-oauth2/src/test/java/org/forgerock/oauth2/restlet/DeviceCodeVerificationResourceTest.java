@@ -109,6 +109,7 @@ public class DeviceCodeVerificationResourceTest {
                 resourceOwnerSessionValidator, clientRegistrationStore, mock(OAuth2Utils.class),
                 mock(CsrfProtection.class)));
         doReturn(request).when(resource).getRequest();
+        doReturn(new Response(request)).when(resource).getResponse();
         doReturn(templatesFromClasspathContext()).when(resource).getContext();
     }
 

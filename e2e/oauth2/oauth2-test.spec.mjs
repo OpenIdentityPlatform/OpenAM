@@ -28,49 +28,55 @@ const REDIRECT_URI="http://app.invalid/cb"
 /**
  * Ensures the OAuth2 service exists in the OpenAM instance.
  * Creates it with default configuration if it doesn't exist.
+ *
+ * Playwright runs spec files in parallel workers, and the device flow spec provisions the same service. On a
+ * fresh instance both hooks see a 404 and both post a create, so losing that race has to be survivable: the
+ * loser re-reads instead of failing, which would otherwise take every test in this file down with it.
  */
 async function ensureOAuth2ServiceExists(adminToken, request) {
-  const response = await request.get(`${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/oauth-oidc`,
-    {
-      headers: {
-        "iPlanetDirectoryPro": adminToken,
-        "Accept-API-Version": "protocol=1.0,resource=1.0",
-      },
-    }
-  );
+  const path = `${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/oauth-oidc`;
+  const headers = {
+    "iPlanetDirectoryPro": adminToken,
+    "Content-Type": "application/json",
+    "Accept-API-Version": "protocol=1.0,resource=1.0",
+  };
 
-  if (response.status() === 404) {
+  let lastFailure = "no attempt was made";
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const response = await request.get(path, { headers });
+
+    if (response.ok()) {
+      console.log("OAuth2 service already exists");
+      return;
+    }
+
+    if (response.status() !== 404) {
+      throw new Error(`Failed to check OAuth2 service: ${response.status()} ${response.statusText()}`);
+    }
+
     // OAuth2 service doesn't exist, create it
-    const createResponse = await request.post(`${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/oauth-oidc?_action=create`,
-      {
-        headers: {
-          "iPlanetDirectoryPro": adminToken,
-          "Content-Type": "application/json",
-          "Accept-API-Version": "protocol=1.0,resource=1.0",
+    const createResponse = await request.post(`${path}?_action=create`, {
+      headers,
+      data: {
+        advancedOAuth2Config: {
+          clientsCanSkipConsent: true,
+          supportedScopes: [SCOPE],
+          defaultScopes: [SCOPE],
         },
-        data: {
-          advancedOAuth2Config: {
-            clientsCanSkipConsent: true,
-            supportedScopes: [SCOPE],
-            defaultScopes: [SCOPE],
-          },
-        },
-      }
-    );
+      },
+    });
 
-    if (!createResponse.ok()) {
-      throw new Error(
-        `Failed to create OAuth2 service: ${createResponse.statusText()}`
-      );
+    if (createResponse.ok()) {
+      console.log("OAuth2 service created successfully");
+      return;
     }
-    console.log("OAuth2 service created successfully");
-  } else if (!response.ok()) {
-    throw new Error(
-      `Failed to check OAuth2 service: ${createResponse.statusText()}`
-    );
-  } else {
-    console.log("OAuth2 service already exists");
+    // Another worker got there first - read it back rather than reporting a failure. Anything else (an
+    // expired admin token, a config store error) has to survive to the message below.
+    lastFailure = `${createResponse.status()} ${createResponse.statusText()} ${await createResponse.text()}`;
   }
+
+  throw new Error(`Failed to create OAuth2 service: ${lastFailure}`);
 }
 
 /**
