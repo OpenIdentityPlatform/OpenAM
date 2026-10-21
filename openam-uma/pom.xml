@@ -54,6 +54,14 @@
             <artifactId>core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.openidentityplatform.commons.http-framework</groupId>
+            <artifactId>client-apache-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.openidentityplatform.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
         </dependency>

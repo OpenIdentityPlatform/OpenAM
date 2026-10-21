@@ -210,6 +210,19 @@ public final class SsrfUrlValidator {
         return true;
     }
 
+    /**
+     * Applies the address rules of {@link #isSafeRemoteUrl(String, boolean)} to one address that
+     * has already been resolved. Fetching code that resolves the host itself — for example in the
+     * DNS resolver of its HTTP client, so that the validated address is the one connected to —
+     * checks every address of the host with this method.
+     *
+     * @param address a resolved address.
+     * @return {@code true} if the server must not connect to the address.
+     */
+    public static boolean isBlockedAddress(InetAddress address) {
+        return isBlockedAddress(address, false);
+    }
+
     private static boolean isBlockedAddress(InetAddress address, boolean allowSiteLocal) {
         if (address.isLoopbackAddress()          // 127.0.0.0/8, ::1
                 || address.isAnyLocalAddress()   // 0.0.0.0, ::
