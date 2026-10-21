@@ -38,12 +38,14 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Enumeration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import java.text.StringCharacterIterator;
 import java.text.CharacterIterator;
@@ -816,7 +818,119 @@ public class SAMLUtils  extends SAMLUtilsCommon {
             return false;
         }
     }
-    
+
+    /**
+     * Returns the trusted partner site that a target URL belongs to.
+     * <p>
+     * A target whose authority carries user info or a backslash belongs to
+     * no site: browsers read a backslash in an http(s) authority as a slash,
+     * so {@code http://attacker.com\@sp.example.com/} leads to
+     * {@code attacker.com}, while {@code java.net.URL} before JDK 20 reports
+     * host {@code sp.example.com}. Otherwise the target's host and port are
+     * matched as in {@link #getTrustedSite(Set, String, int)}.
+     *
+     * @param trustedSites the configured {@code SiteEntry} set, may be null.
+     * @param target the target URL.
+     * @return the matching site, or null if the target belongs to none.
+     * @throws MalformedURLException if the target is not a valid URL.
+     */
+    public static SAMLServiceManager.SiteEntry getTrustedSite(
+        Set trustedSites, String target) throws MalformedURLException
+    {
+        URL url = new URL(target);
+        String authority = url.getAuthority();
+        if (url.getUserInfo() != null
+            || (authority != null && authority.indexOf('\\') != -1)) {
+            return null;
+        }
+        return getTrustedSite(trustedSites, url.getHost(), url.getPort());
+    }
+
+    /**
+     * Returns the trusted partner site that a target belongs to.
+     * <p>
+     * A site's configured target is the domain of the partner site, so the
+     * target host must be that domain or one of its subdomains (see
+     * {@link #isHostInDomain(String, String)}). If the site also names a port,
+     * the target must carry that same port. When several sites match, the one
+     * with the longest domain wins, and among equal domains the one naming a
+     * port. Leading and trailing dots of the domain do not count.
+     *
+     * @param trustedSites the configured {@code SiteEntry} set, may be null.
+     * @param targetHost host of the target URL.
+     * @param targetPort port of the target URL, or -1 if it has none.
+     * @return the matching site, or null if the target belongs to none.
+     */
+    public static SAMLServiceManager.SiteEntry getTrustedSite(
+        Set trustedSites, String targetHost, int targetPort)
+    {
+        if (trustedSites == null) {
+            return null;
+        }
+        SAMLServiceManager.SiteEntry match = null;
+        int matchRank = -1;
+        for (Object o : trustedSites) {
+            SAMLServiceManager.SiteEntry site = (SAMLServiceManager.SiteEntry) o;
+            int sitePort = site.getPort();
+            if ((sitePort != -1 && sitePort != targetPort)
+                || !isHostInDomain(targetHost, site.getHostName())) {
+                continue;
+            }
+            int rank = 2 * normalizeDomain(site.getHostName()).length()
+                + (sitePort != -1 ? 1 : 0);
+            if (rank > matchRank) {
+                match = site;
+                matchRank = rank;
+            }
+        }
+        return match;
+    }
+
+    /**
+     * Checks whether a host is a domain or one of its subdomains. The match
+     * is on whole labels: {@code sp.example.com} is in {@code example.com},
+     * but neither {@code evilsp.example.com} nor
+     * {@code sp.example.com.attacker.com} is in {@code sp.example.com}.
+     * The comparison ignores case, a trailing dot on either name and a
+     * leading dot on the domain. The host may hold only letters, digits,
+     * {@code '-'}, {@code '_'} and {@code '.'}; anything else, including an
+     * IPv6 literal, is in no domain.
+     *
+     * @param host the host to check.
+     * @param domain the domain it must belong to.
+     * @return true if the host is the domain or a subdomain of it.
+     */
+    public static boolean isHostInDomain(String host, String domain) {
+        String h = normalizeHostName(host);
+        String d = normalizeDomain(domain);
+        if (h.isEmpty() || d.isEmpty() || !HOST_NAME.matcher(h).matches()) {
+            return false;
+        }
+        return h.equals(d) || h.endsWith("." + d);
+    }
+
+    // java.net.URL before JDK 20 leaves '\' and '%' in a host
+    private static final Pattern HOST_NAME = Pattern.compile("[a-z0-9_.-]+");
+
+    private static String normalizeDomain(String domain) {
+        String d = normalizeHostName(domain);
+        while (d.startsWith(".")) {
+            d = d.substring(1);
+        }
+        return d;
+    }
+
+    private static String normalizeHostName(String name) {
+        if (name == null) {
+            return "";
+        }
+        String n = name.trim().toLowerCase(Locale.ROOT);
+        while (n.endsWith(".")) {
+            n = n.substring(0, n.length() - 1);
+        }
+        return n;
+    }
+
     /**
      * Replaces every occurence of ch with
      * {@code "&#<ascii code of ch>;"}

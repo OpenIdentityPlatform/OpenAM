@@ -19,9 +19,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import com.sun.identity.saml.common.SAMLServiceManager.SiteEntry;
 
 public class SAMLUtilsTest {
 
@@ -40,5 +47,159 @@ public class SAMLUtilsTest {
         String out = html.toString();
         assertThat(out).doesNotContain("<script>");
         assertThat(out).contains("ACTION=\"https://sp.example.com/acs?next=&quot;&gt;&lt;script&gt;");
+    }
+
+    @DataProvider
+    public Object[][] hostsInDomain() {
+        return new Object[][] {
+            {"sp.example.com", "sp.example.com"},
+            {"www.sp.example.com", "sp.example.com"},
+            {"sp.example.com", "example.com"},
+            {"SP.Example.COM", "sp.example.com"},
+            {"sp.example.com", " SP.EXAMPLE.COM "},
+            {"sp.example.com.", "sp.example.com"},
+            {"sp.example.com", ".example.com"},
+        };
+    }
+
+    @Test(dataProvider = "hostsInDomain")
+    public void hostInPartnerDomainMatches(String host, String domain) {
+        assertThat(SAMLUtils.isHostInDomain(host, domain)).isTrue();
+    }
+
+    @DataProvider
+    public Object[][] hostsOutsideDomain() {
+        return new Object[][] {
+            {"sp.example.com.attacker.com", "sp.example.com"},
+            {"evilsp.example.com", "sp.example.com"},
+            {"attacker-sp.example.com.evil", "sp.example.com"},
+            {"attacker.com", "sp.example.com"},
+            {"example.com", "sp.example.com"},
+            {"sp.example.com", ""},
+            {"sp.example.com", "."},
+            {"sp.example.com", null},
+            {null, "sp.example.com"},
+            {"", ""},
+            {"", "."},
+            {null, null},
+            // java.net.URL before JDK 20 leaves these characters in the host
+            {"attacker.com\\.sp.example.com", "sp.example.com"},
+            {"attacker.com%5c.sp.example.com", "sp.example.com"},
+            // IPv6 literals are not supported as partner targets
+            {"[::1]", "[::1]"},
+        };
+    }
+
+    @Test(dataProvider = "hostsOutsideDomain")
+    public void hostThatOnlyContainsPartnerDomainDoesNotMatch(String host, String domain) {
+        assertThat(SAMLUtils.isHostInDomain(host, domain)).isFalse();
+    }
+
+    @Test
+    public void trustedSiteRejectsTargetThatOnlyContainsPartnerHost() {
+        Set<SiteEntry> sites = sites(site("sp.example.com", -1));
+
+        assertThat(SAMLUtils.getTrustedSite(sites, "sp.example.com.attacker.com", -1)).isNull();
+        assertThat(SAMLUtils.getTrustedSite(sites, "evilsp.example.com", 443)).isNull();
+    }
+
+    @Test
+    public void trustedSiteWithoutPortAcceptsAnyPort() {
+        SiteEntry sp = site("sp.example.com", -1);
+
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "sp.example.com", -1)).isSameAs(sp);
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "app.sp.example.com", 8443)).isSameAs(sp);
+    }
+
+    @Test
+    public void trustedSiteWithPortRequiresThatPort() {
+        SiteEntry sp = site("sp.example.com", 8443);
+
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "sp.example.com", 8443)).isSameAs(sp);
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "sp.example.com", 443)).isNull();
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "sp.example.com", -1)).isNull();
+    }
+
+    @Test
+    public void mostSpecificTrustedSiteWins() {
+        SiteEntry domain = site("example.com", -1);
+        SiteEntry host = site("sp.example.com", -1);
+        SiteEntry hostAndPort = site("sp.example.com", 8443);
+        Set<SiteEntry> sites = sites(domain, host, hostAndPort);
+
+        assertThat(SAMLUtils.getTrustedSite(sites, "other.example.com", 443)).isSameAs(domain);
+        assertThat(SAMLUtils.getTrustedSite(sites, "sp.example.com", 443)).isSameAs(host);
+        assertThat(SAMLUtils.getTrustedSite(sites, "sp.example.com", 8443)).isSameAs(hostAndPort);
+
+        Set<SiteEntry> reversed = sites(hostAndPort, host, domain);
+
+        assertThat(SAMLUtils.getTrustedSite(reversed, "other.example.com", 443)).isSameAs(domain);
+        assertThat(SAMLUtils.getTrustedSite(reversed, "sp.example.com", 443)).isSameAs(host);
+        assertThat(SAMLUtils.getTrustedSite(reversed, "sp.example.com", 8443)).isSameAs(hostAndPort);
+    }
+
+    @Test
+    public void specificityIgnoresLeadingAndTrailingDots() {
+        SiteEntry dottedDomain = site(".sp.example.com", -1);
+        SiteEntry hostAndPort = site("sp.example.com", 8443);
+        SiteEntry dottedParent = site(".example.com.", 443);
+        SiteEntry subdomain = site("a.example.com", -1);
+
+        assertThat(SAMLUtils.getTrustedSite(sites(dottedDomain, hostAndPort), "sp.example.com", 8443))
+                .isSameAs(hostAndPort);
+        assertThat(SAMLUtils.getTrustedSite(sites(dottedParent, subdomain), "a.example.com", 443))
+                .isSameAs(subdomain);
+    }
+
+    @Test
+    public void trustedSiteForTargetUrl() throws Exception {
+        SiteEntry sp = site("sp.example.com", -1);
+
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "https://sp.example.com.attacker.com/x")).isNull();
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "https://evilsp.example.com/x")).isNull();
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "https://app.sp.example.com:8443/x")).isSameAs(sp);
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "https://sp.example.com/x?next=a\\b")).isSameAs(sp);
+    }
+
+    @Test
+    public void targetUrlWithUserInfoIsRejected() throws Exception {
+        SiteEntry sp = site("sp.example.com", -1);
+
+        assertThat(SAMLUtils.getTrustedSite(sites(sp), "http://user@sp.example.com/")).isNull();
+    }
+
+    /**
+     * Browsers read a backslash in an http(s) authority as a slash, so these
+     * TARGETs lead to attacker.com. java.net.URL rejects them from JDK 20 on;
+     * before that it parses them, and the host must not match.
+     */
+    @Test
+    public void targetUrlWithBackslashInAuthorityIsRejected() {
+        SiteEntry sp = site("sp.example.com", -1);
+
+        assertNoTrustedSite(sites(sp), "http://attacker.com\\@sp.example.com/x");
+        assertNoTrustedSite(sites(sp), "http://attacker.com\\.sp.example.com/x");
+    }
+
+    private static void assertNoTrustedSite(Set<SiteEntry> sites, String target) {
+        try {
+            assertThat(SAMLUtils.getTrustedSite(sites, target)).isNull();
+        } catch (MalformedURLException expected) {
+            // JDK 20+
+        }
+    }
+
+    @Test
+    public void noTrustedSitesMeansNoMatch() {
+        assertThat(SAMLUtils.getTrustedSite(null, "sp.example.com", -1)).isNull();
+        assertThat(SAMLUtils.getTrustedSite(sites(), "sp.example.com", -1)).isNull();
+    }
+
+    private static SiteEntry site(String host, int port) {
+        return new SiteEntry(host, port, "sourceID", "https://" + host + "/saml", null, "1.1");
+    }
+
+    private static Set<SiteEntry> sites(SiteEntry... entries) {
+        return new LinkedHashSet<>(Arrays.asList(entries));
     }
 }
