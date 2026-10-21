@@ -16,6 +16,8 @@
 
 package com.sun.identity.federation.common;
 
+import com.sun.identity.federation.meta.IDFFMetaUtils;
+import com.sun.identity.plugin.configuration.ConfigurationException;
 import com.sun.identity.plugin.configuration.ConfigurationInstance;
 import com.sun.identity.plugin.configuration.ConfigurationListener;
 import com.sun.identity.shared.Constants;
@@ -50,8 +52,19 @@ public class StubPlatformConfiguration implements ConfigurationInstance {
 
     private String componentName;
 
+    /**
+     * Declines the ID-FF metadata service. <code>IDFFMetaManager</code> only checks that it was
+     * handed an instance, not what the instance holds, so an empty one lets
+     * {@link FSUtils#getIDFFMetaManager} build a manager over no metadata: a test that clears
+     * {@link FSUtils#metaInstance} to model an SMS that cannot be read would land on the "entity
+     * not found" branch instead. Declining leaves <code>IDFFMetaManager</code> without an
+     * instance, which is where it is without the plugin.
+     */
     @Override
-    public void init(String componentName, Object session) {
+    public void init(String componentName, Object session) throws ConfigurationException {
+        if (IDFFMetaUtils.IDFF_META_SERVICE.equals(componentName)) {
+            throw new ConfigurationException("No ID-FF metadata configuration under test");
+        }
         this.componentName = componentName;
     }
 

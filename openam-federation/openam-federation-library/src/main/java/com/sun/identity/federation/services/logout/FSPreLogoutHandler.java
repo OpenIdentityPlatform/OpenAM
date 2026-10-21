@@ -24,7 +24,7 @@
  *
  * $Id: FSPreLogoutHandler.java,v 1.11 2008/12/19 06:50:47 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -319,7 +319,8 @@ public  class FSPreLogoutHandler {
                         try {
                             logoutResponse = FSLogoutResponse.
                                 parseURLEncodedRequest(request);
-                            relayState = logoutResponse.getRelayState();
+                            // its RelayState is the request parameter the servlet has already
+                            // checked and set on this handler, so it is not taken from here
                             // unabled to access logoutRequest here
                             spAdapter.preSingleLogoutProcess(
                                 hostedEntityId,

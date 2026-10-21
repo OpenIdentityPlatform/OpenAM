@@ -45,6 +45,7 @@ import com.sun.identity.federation.common.LogUtil;
 import com.sun.identity.federation.common.FSException;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.key.KeyUtil;
+import com.sun.identity.federation.login.FSPostLogin;
 import com.sun.identity.federation.message.FSLogoutNotification;
 import com.sun.identity.federation.message.common.FSMsgException;
 import com.sun.identity.federation.meta.IDFFMetaException;
@@ -594,8 +595,10 @@ public class FSProcessLogoutServlet extends HttpServlet {
     {
         FSUtils.debug.message("FSProcessLogoutServlet::doLogoutInitiation");
         FSServiceManager instSManager = FSServiceManager.getInstance();
-        String relayState = 
-            request.getParameter(IFSConstants.LOGOUT_RELAY_STATE);
+        // the logout ends with a redirect to it, once the session is gone; refused, it ends on
+        // the logout done page, as when the caller sends none
+        String relayState = FSPostLogin.allowedRelayState(realm, hostedEntityId, hostedRole,
+            request.getParameter(IFSConstants.LOGOUT_RELAY_STATE));
         if (FSUtils.debug.messageEnabled()) {
             FSUtils.debug.message("FSProcessLogoutServlet.doLogoutInit: relay="
                 + relayState);

@@ -136,11 +136,69 @@ public final class NotificationsWebSocketTest {
         notificationsWebSocket.open(session);
         notificationsWebSocket.message(session, json(object(
                 field("action", "subscribe"),
+                field("topic", "/agent/session")
+        )));
+
+        // Then
+        verify(subscription).bindTo(Topic.of("/agent/session"));
+    }
+
+    @Test
+    public void whenSubscriptionRequestSentForAnotherAgentTopicThenSubscriptionIsBoundToTopic() {
+        // When
+        notificationsWebSocket.open(session);
+        notificationsWebSocket.message(session, json(object(
+                field("action", "subscribe"),
+                field("topic", "/agent/config")
+        )));
+
+        // Then
+        verify(subscription).bindTo(Topic.of("/agent/config"));
+    }
+
+    @Test
+    public void whenSubscriptionRequestSentForInternalTopicThenSubscriptionIsNotBound() throws Exception {
+        // When
+        notificationsWebSocket.open(session);
+        notificationsWebSocket.message(session, json(object(
+                field("action", "subscribe"),
+                field("topic", "/internal/policySet")
+        )));
+
+        // Then
+        verify(subscription, never()).bindTo(any(Topic.class));
+        verify(basic).sendObject(jsonCaptor.capture());
+        assertThat(jsonCaptor.getValue()).stringAt("error").isEqualTo("topic not permitted");
+    }
+
+    @Test
+    public void whenSubscriptionRequestSentForUnprefixedTopicThenSubscriptionIsNotBound() throws Exception {
+        // When
+        notificationsWebSocket.open(session);
+        notificationsWebSocket.message(session, json(object(
+                field("action", "subscribe"),
                 field("topic", "test_topic")
         )));
 
         // Then
-        verify(subscription).bindTo(Topic.of("test_topic"));
+        verify(subscription, never()).bindTo(any(Topic.class));
+        verify(basic).sendObject(jsonCaptor.capture());
+        assertThat(jsonCaptor.getValue()).stringAt("error").isEqualTo("topic not permitted");
+    }
+
+    @Test
+    public void whenSubscriptionRequestSentForPartialPrefixTopicThenSubscriptionIsNotBound() throws Exception {
+        // When
+        notificationsWebSocket.open(session);
+        notificationsWebSocket.message(session, json(object(
+                field("action", "subscribe"),
+                field("topic", "/agent")
+        )));
+
+        // Then
+        verify(subscription, never()).bindTo(any(Topic.class));
+        verify(basic).sendObject(jsonCaptor.capture());
+        assertThat(jsonCaptor.getValue()).stringAt("error").isEqualTo("topic not permitted");
     }
 
     @Test
@@ -149,7 +207,7 @@ public final class NotificationsWebSocketTest {
         notificationsWebSocket.open(session);
         notificationsWebSocket.message(session, json(object(
                 field("action", "subscribe"),
-                field("topic", "test_topic")
+                field("topic", "/agent/session")
         )));
 
         // Then
@@ -163,7 +221,7 @@ public final class NotificationsWebSocketTest {
         notificationsWebSocket.open(session);
         notificationsWebSocket.message(session, json(object(
                 field("action", "subscribe"),
-                field("topic", "test_topic"),
+                field("topic", "/agent/session"),
                 field("id", "this_is_an_id")
         )));
 
@@ -178,7 +236,7 @@ public final class NotificationsWebSocketTest {
         notificationsWebSocket.open(session);
         notificationsWebSocket.message(session, json(object(
                 field("action", "subscribe"),
-                field("topic", "test_topic")
+                field("topic", "/agent/session")
         )));
 
         // Then

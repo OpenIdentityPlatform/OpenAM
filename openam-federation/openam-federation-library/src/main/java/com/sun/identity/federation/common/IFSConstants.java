@@ -24,6 +24,7 @@
  *
  * $Id: IFSConstants.java,v 1.12 2008/08/29 04:57:15 exu Exp $
  * Portions Copyrights 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 
@@ -990,6 +991,11 @@ public interface IFSConstants {
      * <code>RelayState</code> parameter
      */
     public static final String LRURL = "RelayState";
+    /**
+     * Extended metadata attribute holding the per-provider allow-list of valid
+     * <code>RelayState</code> URLs. Mirrors SAML2's <code>relayStateUrlList</code>.
+     */
+    public static final String RELAY_STATE_URL_LIST = "relayStateUrlList";
     /**
      * Length of an identifier
      */

@@ -25,7 +25,7 @@
  * $Id: FSLoginHelper.java,v 1.5 2008/06/25 05:46:54 qcheng Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services;
@@ -36,6 +36,7 @@ import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.login.FSPostLogin;
 import com.sun.identity.federation.message.FSAuthnRequest;
 import com.sun.identity.federation.message.FSAuthnRequestEnvelope;
 import com.sun.identity.federation.message.FSIDPList;
@@ -84,17 +85,13 @@ public class FSLoginHelper {
     private SPDescriptorType hostDescriptor = null;
     private List cotList = null; 
     private String protocolProfile = null;
-    private static IDFFMetaManager metaManager =null;
+    private IDFFMetaManager metaManager = null;
     private String errorPage = null; 
     private HttpServletRequest request = null;
     private boolean isPassiveQuery = false;
     private String actionOnNoFedCookie = null;
     private String anonymousOnetime = null;
 
-    static {
-        metaManager = FSUtils.getIDFFMetaManager();
-    }
-    
     /**
      * Creates a new <code>FSLoginHelper</code> object.
      *
@@ -102,6 +99,9 @@ public class FSLoginHelper {
      */
     public FSLoginHelper(HttpServletRequest request) {
         this.request = request;
+        // per instance, not per class load: a manager that could not be built when the class
+        // loaded - an SMS not up yet - would otherwise fail every login until a restart
+        metaManager = FSUtils.getIDFFMetaManager();
         amserverURI = FSServiceUtils.getBaseURL(request);
         interSiteURL = amserverURI + "/" + IFSConstants.INTERSITE_URL;
         if (FSUtils.debug.messageEnabled()) {
@@ -741,7 +741,10 @@ public class FSLoginHelper {
 
             Set idpSet = getIDPs(metaAlias);
 
-            String LRURL = request.getParameter (IFSConstants.LRURL);
+            // the AuthnRequest carries it to the IdP and back, and the assertion consumer
+            // redirects to it
+            String LRURL = FSPostLogin.allowedRelayState(request,
+                request.getParameter(IFSConstants.LRURL));
             if (LRURL == null || LRURL.equals ("")) {
                 LRURL = FSServiceUtils.getFederationDonePageURL(
                     request, hostConfig, metaAlias);

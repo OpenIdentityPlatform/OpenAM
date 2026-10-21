@@ -28,6 +28,7 @@
 
 <!--
     Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2026 3A Systems LLC
 -->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
@@ -489,5 +490,26 @@
             </cc>
         </property>
     </section>    
+    <section name="RelayStateUrlList" defaultValue="idff.entityDescriptor.provider.section.title.relayState">
+        <subsection name="elistRelayStateUrlList" defaultValue="" >
+            <property>
+                <label name="lblRelayStateUrlList"
+                       defaultValue="idff.entityDescriptor.provider.attribute.label.relayStateUrlList"
+                       labelFor="relayStateUrlList" />
+                <ccgroup>
+                    <property>
+                        <cc name="relayStateUrlList"
+                            tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                            <attribute name="name" value="list" />
+                            <attribute name="listboxLabel" value="label.current.value" />
+                            <attribute name="textboxLabel" value="label.new.value" />
+                        </cc>
+                        <fieldhelp name="helpRelayStateUrlList"
+                                   defaultValue="idff.entityDescriptor.provider.attribute.help.relayStateUrlList" />
+                    </property>
+                </ccgroup>
+            </property>
+        </subsection>
+    </section>
 </propertysheet>
 

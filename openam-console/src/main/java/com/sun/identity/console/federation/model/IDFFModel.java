@@ -24,11 +24,14 @@
  *
  * $Id: IDFFModel.java,v 1.7 2008/11/18 22:39:42 asyhuang Exp $
  *
+ * Portions Copyrighted 2026 3A Systems LLC.
+ *
  */
 package com.sun.identity.console.federation.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.federation.IDFFAuthContexts;
+import com.sun.identity.federation.common.IFSConstants;
 
 import java.util.Set;
 import java.util.Map;
@@ -139,6 +142,12 @@ public interface IDFFModel
             "logoutDoneURL";
     public static final String ATTR_PROVIDER_HOME_PAGE_URL =
             "providerHomePageURL";
+    // RelayState allow-list; shared by the IDP and SP roles (mirrors SAMLv2Model).
+    // Taken from IFSConstants rather than repeated: the allow-list is read back through that
+    // constant, and a console that writes a different string would silently write an
+    // attribute nothing reads.
+    public static final String ATTR_RELAY_STATE_URL_LIST =
+            IFSConstants.RELAY_STATE_URL_LIST;
     // IDP extend meta attribute ONLY IDP
     // idp
     public static final String ATTR_ASSERTION_LIMIT =

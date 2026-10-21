@@ -178,6 +178,9 @@ public class IDFFModelImpl
                 Collections.EMPTY_SET);
         extendedMetaIdpMap.put(ATTR_ASSERTION_INTERVAL,
                 Collections.EMPTY_SET);
+        // RelayState allow-list; kept so updateAttrInConfig does not drop it on save.
+        extendedMetaIdpMap.put(ATTR_RELAY_STATE_URL_LIST,
+                Collections.EMPTY_SET);
     }
 
     // SP extend meta attribute.. ONLY SP
@@ -207,6 +210,9 @@ public class IDFFModelImpl
         extendedMetaSpMap.put(ATTR_USE_INTRODUCTION_FOR_IDP_PROXY,
                 Collections.EMPTY_SET);
         extendedMetaSpMap.put(ATTR_SUPPORTED_SSO_PROFILE,
+                Collections.EMPTY_SET);
+        // RelayState allow-list; kept so updateAttrInConfig does not drop it on save.
+        extendedMetaSpMap.put(ATTR_RELAY_STATE_URL_LIST,
                 Collections.EMPTY_SET);
     }
 

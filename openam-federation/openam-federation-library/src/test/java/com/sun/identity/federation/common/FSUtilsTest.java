@@ -19,31 +19,702 @@ package com.sun.identity.federation.common;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+
 import org.mockito.ArgumentCaptor;
 import org.owasp.esapi.ESAPI;
 import org.owasp.esapi.codecs.HTMLEntityCodec;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
+
 public class FSUtilsTest {
+
+    // FSUtils.deploymentURI is a public static read live by isSameContainer and forwardRequest,
+    // so it has to be set for these to mean anything. FSUtilsForwardRewriteTest and
+    // FSUtilsForwardPathTest set the same value, so all three take FederationStaticsLock rather
+    // than relying on surefire running this module single-threaded.
+    private String originalDeploymentURI;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+    private RequestDispatcher dispatcher;
+    private Debug originalDebug;
+    private Debug debug;
+
+    @BeforeMethod
+    public void setUp() {
+        FederationStaticsLock.acquire();
+        originalDeploymentURI = FSUtils.deploymentURI;
+        FSUtils.deploymentURI = "/openam";
+        originalDebug = FSUtils.debug;
+        debug = mock(Debug.class);
+        FSUtils.debug = debug;
+
+        request = mock(HttpServletRequest.class);
+        response = mock(HttpServletResponse.class);
+        dispatcher = mock(RequestDispatcher.class);
+
+        when(request.getServerName()).thenReturn("host.example.com");
+        when(request.getServerPort()).thenReturn(8080);
+        when(request.getRequestDispatcher(anyString())).thenReturn(dispatcher);
+    }
+
+    @AfterMethod
+    public void tearDown() throws Exception {
+        try {
+            FSUtils.deploymentURI = originalDeploymentURI;
+            FSUtils.debug = originalDebug;
+            DeploymentIdentityFixture.restore();
+        } finally {
+            FederationStaticsLock.release();
+        }
+    }
+
+    @DataProvider(name = "notThisDeployment")
+    public Object[][] notThisDeployment() {
+        return new Object[][] {
+            { "http://host.example.com:9090/openam/landing" },   // another port
+            { "https://host.example.com:8080/openam/landing" },  // another scheme
+            { "http://host.example.com:8080/other/landing" },    // another application
+            { "http://host.example.com:8080/openamx/landing" }   // shares the name as a prefix
+        };
+    }
+
+    /**
+     * {@code isDeploymentURL} is the whole allow-list for every ID-FF entity that configures
+     * none, so each probe here differs from the configured http://host.example.com:8080/openam
+     * in exactly one part.
+     */
+    @Test(dataProvider = "notThisDeployment")
+    public void shouldNotTreatAnotherOriginOrPathAsThisDeployment(String url) throws Exception {
+        DeploymentIdentityFixture.installServer("http", "host.example.com", "8080", "/openam");
+        DeploymentIdentityFixture.installServerList((String[]) null);
+
+        assertThat(FSUtils.isDeploymentURL(url)).isFalse();
+    }
+
+    @DataProvider(name = "thisDeployment")
+    public Object[][] thisDeployment() {
+        return new Object[][] {
+            // the default port is left out of the URL but written into the configuration
+            { "https", "443", "https://host.example.com/openam/landing" },
+            // host names are case insensitive, and browsers send them lower cased anyway
+            { "http", "8080", "http://HOST.EXAMPLE.COM:8080/openam/landing" }
+        };
+    }
+
+    @Test(dataProvider = "thisDeployment")
+    public void shouldTreatThisDeploymentsOwnURLAsThisDeployment(String protocol, String port,
+        String url) throws Exception {
+
+        DeploymentIdentityFixture.installServer(protocol, "host.example.com", port, "/openam");
+        DeploymentIdentityFixture.installServerList((String[]) null);
+
+        assertThat(FSUtils.isDeploymentURL(url)).isTrue();
+    }
+
+    /**
+     * {@code deploymentURI} is read once, when the class loads, which can be before the
+     * properties are; the deployment's identity is read when it is asked for.
+     */
+    @Test
+    public void shouldReadThisDeploymentsIdentityWhenAsked() throws Exception {
+        DeploymentIdentityFixture.installServer("http", "host.example.com", "8080", "/openam");
+        DeploymentIdentityFixture.installServerList((String[]) null);
+        FSUtils.isDeploymentURL("http://host.example.com:8080/openam/landing");
+
+        DeploymentIdentityFixture.installServer("http", "moved.example.com", "8080", "/sso");
+
+        assertThat(FSUtils.isDeploymentURL("http://moved.example.com:8080/sso/landing")).isTrue();
+    }
+
+    @DataProvider(name = "anotherServerOrSite")
+    public Object[][] anotherServerOrSite() {
+        return new Object[][] {
+            // a site in front of this server: platform entries carry the port explicitly
+            { new String[] { "https://sso.example.com:443/openam" },
+                "https://sso.example.com/openam/landing" },
+            // deployed as /OpenAM, which the list only holds lower cased
+            { new String[] { "https://sso.example.com:443/OpenAM" },
+                "https://sso.example.com/OpenAM/landing" },
+            // an entry is only split on '|' when loaded, so one without a scheme gets in
+            { new String[] { "sso.example.com:443/openam", "https://sso.example.com:443/openam" },
+                "https://sso.example.com/openam/landing" }
+        };
+    }
+
+    /**
+     * The platform server list names every server and site of the deployment, and is only
+     * reachable through {@code SystemConfigurationUtil}, which lower cases each entry.
+     */
+    @Test(dataProvider = "anotherServerOrSite")
+    public void shouldTreatAServerOrSiteOfThePlatformListAsThisDeployment(String[] serverList,
+        String url) throws Exception {
+
+        DeploymentIdentityFixture.installServer("http", "host.example.com", "8080", "/openam");
+        DeploymentIdentityFixture.installServerList(serverList);
+
+        assertThat(FSUtils.isDeploymentURL(url)).isTrue();
+    }
+
+    /**
+     * {@code getRemoteServiceURLs} removes the sites from the list {@code getServerList} hands
+     * out - the shared one - so after its first call a site is only in {@code getSiteList}.
+     */
+    @Test
+    public void shouldTreatASiteAsThisDeploymentAfterTheServerListLostIt() throws Exception {
+        DeploymentIdentityFixture.installServer("http", "host.example.com", "8080", "/openam");
+        DeploymentIdentityFixture.installServerList(
+            "http://host.example.com:8080/openam", "https://sso.example.com:443/openam");
+        DeploymentIdentityFixture.installSiteList("https://sso.example.com:443/openam");
+        FSUtils.getRemoteServiceURLs(request);
+
+        assertThat(FSUtils.isDeploymentURL("https://sso.example.com/openam/landing")).isTrue();
+    }
+
+    @Test
+    public void shouldNotTreatAnotherServerAsThisDeploymentWhenTheServerListCannotBeRead()
+        throws Exception {
+
+        DeploymentIdentityFixture.installServer("http", "host.example.com", "8080", "/openam");
+        DeploymentIdentityFixture.installUnreadableServerList();
+
+        assertThat(FSUtils.isDeploymentURL("https://sso.example.com/openam/landing")).isFalse();
+    }
+
+    /** Where the platform list cannot be read, the server's own properties still can. */
+    @Test
+    public void shouldTreatThisServersOwnURLAsThisDeploymentWhenTheServerListCannotBeRead()
+        throws Exception {
+
+        DeploymentIdentityFixture.installServer("http", "host.example.com", "8080", "/openam");
+        DeploymentIdentityFixture.installUnreadableServerList();
+
+        assertThat(FSUtils.isDeploymentURL("http://host.example.com:8080/openam/landing"))
+            .isTrue();
+    }
+
+    @DataProvider(name = "allowedForwardTargets")
+    public Object[][] allowedForwardTargets() {
+        return new Object[][] {
+            { "/wsfederation/jsp/mex.jsp" },
+            { "/config/federation/default/cdclogin.jsp" },
+            { "/UI/Login?goto=x" },
+            { "/index.html" },
+            { "/websocket-docs/readme.html" },
+            // a correctly encoded literal percent: URLEncDec.decode threw on the second
+            // decoding round and answered a legitimate page with a 400
+            { "/config/federation/default/100%25done.jsp" },
+            { "/jsp/report%25.jsp" },
+            // '+' is not a space in a dispatch path, and either reading is harmless here
+            { "/jsp/my+page.jsp" },
+            // a container strips ';jsessionid' before mapping, so a rewritten URL still has
+            // to be forwardable - the guard must not simply refuse every ';'
+            { "/jsp/x;jsessionid=ABC" },
+            { "/config/federation/default/cdclogin.jsp;jsessionid=ABC?goto=x" }
+        };
+    }
+
+    @DataProvider(name = "deniedForwardTargets")
+    public Object[][] deniedForwardTargets() {
+        return new Object[][] {
+            { "/notifications" },
+            { "/notifications?x=1" },
+            { "//notifications" },
+            { "/./notifications" },
+            { "/foo/../notifications" },
+            { "/NOTIFICATIONS" },
+            { "/%6eotifications" },
+            { "/foo/..//./notifications" },
+            { "\\notifications" },
+            { "/ws" },
+            { "/ws/" },
+            { "/ws/Test?a=b" },
+            { "/foo/../ws/Test" },
+            { "/../../ws/Test" },
+            { "/notifications;jsessionid=abc" },
+            { "/ws;a=b/Test" },
+            { "/%252e%252e/ws/Test" },
+            { "/foo/%252e%252e/notifications" },
+            // a percent-encoded delimiter becomes a real one once decoded, so the
+            // query/fragment strip has to run again after every decode round
+            { "/notifications%3Fx=1" },
+            { "/notifications%3fx=1" },
+            { "/notifications%23frag" },
+            { "/ws%3Fa=b" },
+            { "/%6eotifications%3Fx=1" },
+            // a decoded delimiter must not swallow the traversal that follows it
+            { "/x%3F/../notifications" },
+            { "/x%23/../notifications" },
+            { "/%3F/../notifications" },
+            { "/foo%3F/../ws/Test" },
+            { "/a%3f/../ws" },
+            { "/a%3F/..%2fnotifications" },
+            { "/foo%253F/../../ws/Test" },
+            // ... and the traversal must still be caught when a real query
+            // string follows it, i.e. when the fold has to happen before the split
+            { "/x%3F/../notifications%3Fq=1" },
+            { "/x%3F/../notifications?q=1" },
+            { "/x%3F/..%2fnotifications#f" },
+            { "/x%3F/%2e%2e/notifications?q=1" },
+            // JAXRPCRequestFilter authenticates /jaxrpc/*; it is REQUEST-only by default, so
+            // a forward there would reach the endpoint with the auth filter skipped
+            { "/jaxrpc" },
+            { "/jaxrpc/" },
+            { "/jaxrpc/IdentityManagementServices" },
+            { "/foo/../jaxrpc/x" },
+            // a malformed escape is not a valid dispatch path: UDecoder throws out of
+            // getRequestDispatcher and leaves the response uncommitted, so refuse it here
+            // and answer 400 rather than let the container commit a blank 200
+            { "/notifications%" },
+            { "/ws%/Test" },
+            { "/%6eotifications%" },
+            // verified against Tomcat 10.1.41's getRequestDispatcher pipeline ('?'-cut,
+            // stripPathParams, UDecoder, normalize): each of these maps into an internal
+            // root, while a guard that folds ';' per segment reads them as harmless
+            { "/notifications;\\.." },
+            { "/;\\a/notifications" },
+            { "/a#/../notifications?/.." },
+            { "/ws%5c..%3b" },
+            { "/jaxrpc%2F..%3bx" },
+            { "/jaxrpc;x" },
+            { "/ws;a/b" },
+            // one row per alternative reading the guard takes, each refused by that reading
+            // alone. No container is known to read them that way; the readings are kept so
+            // that a container which does is covered too, and a row fails if its reading goes.
+            // Parameters left in place:
+            { "/ws/..;x" },
+            // parameters cut to the end of the segment, after decoding and before it:
+            { "/a/..%3by/ws/%252e%252e/..%25/..%25" },
+            { "/w%73/;%2f..%2f..\\y/.." },
+            // a stray '%' dropped, parameters then cut to the next '/' and to the segment end:
+            { "/w%25s;\\.." },
+            { "/x/..;y\\w%25s" },
+            // '+' read as a space:
+            { "/ws/%252e%252e/..%25/..%25/+%3F/../../../../.." },
+            // the target cut at its fragment, and not cut at all:
+            { "/ws#/.." },
+            { "/x?/../ws" },
+            // a fragment that only surfaced during decoding, cut after folding:
+            { "/x%23/../ws%23" },
+            // '\' ending a segment's parameters as '/' does:
+            { "/;x\\ws" },
+            // a '%' not followed by two hex digits, whatever else it decodes to
+            { "/index%z4.html" },
+            { "/index%4z.html" },
+            { "/index%zz.html" },
+            // a decoded NUL: containers disagree on whether it truncates the path
+            { "/notifications%00" },
+            { "/notifications%2500" },
+            // ... as many times encoded as the guard decodes
+            { "/notifications%25252500" },
+            // DEL is a control character too
+            { "/index%7f.html" },
+            { null }
+        };
+    }
+
+    @Test(dataProvider = "allowedForwardTargets")
+    public void shouldAllowLegitimateForwardTargets(String resource) {
+        assertThat(FSUtils.isForwardTargetAllowed(resource)).isTrue();
+    }
+
+    @Test(dataProvider = "deniedForwardTargets")
+    public void shouldDenyInternalForwardTargets(String resource) {
+        assertThat(FSUtils.isForwardTargetAllowed(resource)).isFalse();
+    }
+
+    /**
+     * One row per root whose filter-mappings in web.xml name no dispatcher, so the filter runs
+     * on a REQUEST dispatch only and a forward reaches the endpoint without it.
+     */
+    @DataProvider(name = "requestOnlyFilteredTargets")
+    public Object[][] requestOnlyFilteredTargets() {
+        return new Object[][] {
+            // FQDNValidationFilter, CacheForFiveMinutes, CacheForAMonth
+            { "/XUI/" },
+            // FQDNValidationFilter, CORSFilter
+            { "/oauth2/authorize?client_id=x" },
+            // CORSFilter
+            { "/json/users" },
+            // JatoAuditFilter
+            { "/service/x" },
+            { "/federation/x" },
+            { "/realm/x" },
+            { "/agentconfig/x" },
+            { "/sts/x" },
+            { "/delegation/x" },
+            // JatoAuditFilter, XUIFilter
+            { "/idm/EndUser" },
+            { "/Debug.jsp" },
+            // SsoAdmJspAuditFilter
+            { "/ssoadm.jsp" },
+            // the container maps these into /XUI and /json once it has decoded the path and
+            // stripped its parameters
+            { "/%58UI/" },
+            { "/%2558UI/" },
+            { "/XUI;x/index.html" },
+            { "/foo/..%2fjson/users" }
+        };
+    }
+
+    @Test(dataProvider = "requestOnlyFilteredTargets")
+    public void shouldTellATargetWhoseFiltersRunOnRequestOnly(String resource) {
+        assertThat(FSUtils.hasRequestOnlyFilters(resource)).isTrue();
+    }
+
+    /** Every filter mapped on these runs on a forward as well, or runs on /* for the request. */
+    @DataProvider(name = "fullyFilteredTargets")
+    public Object[][] fullyFilteredTargets() {
+        return new Object[][] {
+            { "/config/federation/default/LogoutDone.jsp" },
+            { "/wsfederation/jsp/mex.jsp" },
+            // XUIFilter declares FORWARD on /UI/*
+            { "/UI/Login?goto=x" },
+            { "/index.html" },
+            // a root is a whole segment
+            { "/jsonp/x" },
+            { "/xuix/" },
+            { "/Debug.jspx" }
+        };
+    }
+
+    @Test(dataProvider = "fullyFilteredTargets")
+    public void shouldNotTellAFullyFilteredTargetApart(String resource) {
+        assertThat(FSUtils.hasRequestOnlyFilters(resource)).isFalse();
+    }
+
+    /**
+     * FQDNValidationFilter is mapped on /oauth2/authorize for REQUEST only, so a forward there
+     * reaches the endpoint without it. A redirect is a request of the browser's own, which the
+     * filter sees.
+     */
+    @Test
+    public void shouldRedirectRatherThanForwardPastARequestOnlyFilter() throws Exception {
+        String target = "http://host.example.com:8080/openam/oauth2/authorize?client_id=x";
+
+        FSUtils.forwardRequest(request, response, target);
+
+        verify(response).sendRedirect(target);
+        verify(dispatcher, never()).forward(any(), any());
+    }
+
+    @Test
+    public void shouldRefuseForwardToInternalResource() throws Exception {
+        FSUtils.forwardRequest(request, response,
+            "http://host.example.com:8080/openam/notifications");
+
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+        verify(dispatcher, never()).forward(any(), any());
+    }
+
+    /**
+     * A 400 that cannot be written is logged where it failed. Left to the catch around the
+     * dispatch, it was followed by a 500 on the same response.
+     */
+    @Test
+    public void shouldNotWriteTwiceWhenTheRefusalCannotBeWritten() throws Exception {
+        doThrow(new IOException("gone")).when(response).sendError(anyInt());
+
+        FSUtils.forwardRequest(request, response,
+            "http://host.example.com:8080/openam/notifications");
+
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+        verify(response, times(1)).sendError(anyInt());
+    }
+
+    @Test
+    public void shouldForwardToAllowedResource() throws Exception {
+        FSUtils.forwardRequest(request, response,
+            "http://host.example.com:8080/openam/wsfederation/jsp/mex.jsp");
+
+        verify(dispatcher).forward(request, response);
+        verify(response, never()).sendError(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+    /**
+     * Several of the values passed through here are query parameters on unauthenticated
+     * endpoints, logged before any length limit is applied to them - a loop of requests
+     * carrying an 8KB RelayState would otherwise write 8KB apiece to the debug file.
+     */
+    @Test
+    public void shouldBoundTheLengthOfALoggedValue() {
+        StringBuilder value = new StringBuilder();
+        for (int i = 0; i < 8192; i++) {
+            value.append('a');
+        }
+
+        String logged = FSUtils.forLog(value.toString());
+
+        assertThat(logged.length()).isLessThan(512);
+        assertThat(logged).startsWith("aaaa").contains("8192");
+    }
+
+    @Test
+    public void shouldLeaveAShortValueIntactApartFromLineBreaks() {
+        assertThat(FSUtils.forLog("https://trusted.example.com/a\nb"))
+            .isEqualTo("https://trusted.example.com/a_b");
+        assertThat(FSUtils.forLog("https://trusted.example.com/a\rb"))
+            .isEqualTo("https://trusted.example.com/a_b");
+        assertThat(FSUtils.forLog(null)).isEqualTo("null");
+    }
+
+    /** A CR or LF in a refused target reaches the log line that says why it was refused. */
+    @Test
+    public void shouldLogARefusedNonAbsoluteTargetOnOneLine() throws Exception {
+        FSUtils.forwardRequest(request, response, "/console\r\nX");
+
+        verify(debug).error("FSUtils.forwardRequest: target is not an absolute URL:/console__X");
+    }
+
+    @Test
+    public void shouldLogARefusedInternalTargetOnOneLine() throws Exception {
+        when(debug.warningEnabled()).thenReturn(true);
+
+        FSUtils.forwardRequest(request, response,
+            "http://host.example.com:8080/openam/notifications\r\nX");
+
+        verify(debug).warning(
+            "FSUtils.forwardRequest: refused forward to internal resource: /notifications__X");
+    }
+
+    /**
+     * A target that gets as far as the dispatcher carries no CR or LF - those are refused
+     * first - so on the lines below all forLog has left to do is bound its length.
+     */
+    private static final String LONG_TARGET =
+        "http://host.example.com:8080/openam/wsfederation/jsp/mex.jsp?x=" + "a".repeat(300);
+    private static final String LONG_RESOURCE_LOGGED =
+        "/wsfederation/jsp/mex.jsp?x=" + "a".repeat(228) + "...[truncated, 328 characters]";
+
+    @Test
+    public void shouldBoundTheLoggedLengthOfAForwardedTarget() throws Exception {
+        when(debug.messageEnabled()).thenReturn(true);
+
+        FSUtils.forwardRequest(request, response, LONG_TARGET);
+
+        verify(debug).message("FSUtils.forwardRequest: Forwarding to :" + LONG_RESOURCE_LOGGED);
+    }
+
+    @Test
+    public void shouldBoundTheLoggedLengthOfATargetWithNoDispatcher() throws Exception {
+        when(request.getRequestDispatcher(anyString())).thenReturn(null);
+
+        FSUtils.forwardRequest(request, response, LONG_TARGET);
+
+        verify(debug).error("FSUtils.forwardRequest: container returned no dispatcher for "
+            + "resource:" + LONG_RESOURCE_LOGGED);
+    }
+
+    @Test
+    public void shouldBoundTheLoggedLengthOfATargetWhoseForwardFailed() throws Exception {
+        ServletException failure = new ServletException("boom");
+        doThrow(failure).when(dispatcher).forward(any(), any());
+
+        FSUtils.forwardRequest(request, response, LONG_TARGET);
+
+        verify(debug).error(eq("FSUtils.forwardRequest: Exception occured while trying to "
+            + "forward to resource:" + LONG_RESOURCE_LOGGED), eq(failure));
+    }
+
+    /**
+     * A FORWARD dispatch runs only the filters that declare
+     * {@code <dispatcher>FORWARD</dispatcher>}, and the {@code /*} security filters in web.xml
+     * - AuditContextFilter, amSetupFilter, SecurityHeaders, ResponseValidationFilter - do not.
+     * So the forward/redirect decision reads the port exactly as written: a same-host target
+     * with no port has always been redirected to, and reading it as the scheme's default so
+     * that URL rewriting keeps working must not move it onto the forward branch.
+     */
+    @Test
+    public void shouldRedirectRatherThanForwardWhenTheTargetWritesNoPort() throws Exception {
+        String target = "http://host.example.com/openam/wsfederation/jsp/mex.jsp";
+        when(request.getServerPort()).thenReturn(80);
+
+        FSUtils.forwardRequest(request, response, target);
+
+        verify(response).sendRedirect(target);
+        verify(dispatcher, never()).forward(any(), any());
+    }
+
+    @DataProvider(name = "offContainerTargets")
+    public Object[][] offContainerTargets() {
+        return new Object[][] {
+            { "https://evil.example/openam/landing" },   // other host
+            { "http://host.example.com:9090/openam/x" }, // other port
+            { "http://host.example.com:8080/other/x" },  // other deployment URI
+            { "not a url" }
+        };
+    }
+
+    /**
+     * {@code forwardRequest} gates {@code SessionProvider.rewriteURL} on this predicate, so a
+     * false here is what keeps a URL-rewritten session token off a third party's host. The
+     * wiring itself is covered by {@link FSUtilsForwardRewriteTest}.
+     */
+    @Test(dataProvider = "offContainerTargets")
+    public void shouldNotTreatOffContainerTargetAsSameContainer(String url) {
+        assertThat(FSUtils.isSameContainer(request, url)).isFalse();
+    }
+
+    @Test
+    public void shouldTreatSameContainerTargetAsSameContainer() {
+        assertThat(FSUtils.isSameContainer(request,
+            "http://host.example.com:8080/openam/wsfederation/jsp/mex.jsp")).isTrue();
+    }
+
+    @DataProvider(name = "implicitPortTargets")
+    public Object[][] implicitPortTargets() {
+        return new Object[][] {
+            { 80, "http://host.example.com/openam/landing" },
+            { 443, "https://host.example.com/openam/landing" }
+        };
+    }
+
+    /**
+     * {@code URL.getPort()} is -1 when the port is not written out, while
+     * {@code getServerPort()} always reports a number. Comparing the two raw read the normal
+     * way an admin writes a home or RelayState URL as a different container, which skipped
+     * {@code rewriteURL} and dropped the session token for cookie-less clients.
+     */
+    @Test(dataProvider = "implicitPortTargets")
+    public void shouldTreatImplicitPortTargetAsSameContainer(int serverPort, String url) {
+        when(request.getServerPort()).thenReturn(serverPort);
+
+        assertThat(FSUtils.isSameContainer(request, url)).isTrue();
+    }
+
+    @Test
+    public void shouldNotTreatImplicitPortTargetOnAnotherPortAsSameContainer() {
+        // the request is on 8080, the target's implicit port is 80
+        assertThat(FSUtils.isSameContainer(request,
+            "http://host.example.com/openam/landing")).isFalse();
+    }
+
+    @DataProvider(name = "nonAbsoluteTargets")
+    public Object[][] nonAbsoluteTargets() {
+        return new Object[][] {
+            { "/console" },
+            { "console/index.html" },
+            { "//evil.example/openam/landing" }
+        };
+    }
+
+    /**
+     * A relative target is neither dispatchable nor safe to redirect to - "//host/x" is a 302
+     * to another host - and {@code new URL} used to throw here, leaving the container to
+     * commit an empty 200.
+     */
+    @Test(dataProvider = "nonAbsoluteTargets")
+    public void shouldRefuseNonAbsoluteTarget(String url) throws Exception {
+        FSUtils.forwardRequest(request, response, url);
+
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+        verify(response, never()).sendRedirect(anyString());
+        verify(dispatcher, never()).forward(any(), any());
+    }
+
+    @Test
+    public void shouldLeaveACommittedResponseAloneWhenRefusingANonAbsoluteTarget()
+        throws Exception {
+
+        when(response.isCommitted()).thenReturn(true);
+
+        FSUtils.forwardRequest(request, response, "/console");
+
+        verify(response, never()).sendError(anyInt());
+    }
+
+    /**
+     * A container returns null from {@code getRequestDispatcher} for a path it will not map -
+     * Tomcat does so when the decoded path normalizes differently, e.g. "/%2e%2e/x". Forwarding
+     * on null NPEs into the catch below and leaves an empty 200 committed.
+     * <p>
+     * {@link ForwardPathValidator} now refuses that form before a dispatcher is asked for, so
+     * the probe is a plain path and the mock stands in for a container declining to map it.
+     */
+    @Test
+    public void shouldRefuseWhenContainerReturnsNoDispatcher() throws Exception {
+        when(request.getRequestDispatcher(anyString())).thenReturn(null);
+
+        FSUtils.forwardRequest(request, response,
+            "http://host.example.com:8080/openam/wsfederation/jsp/mex.jsp");
+
+        verify(request).getRequestDispatcher("/wsfederation/jsp/mex.jsp");
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void shouldNotWriteTwiceWhenTheMissingDispatcherCannotBeReported() throws Exception {
+        when(request.getRequestDispatcher(anyString())).thenReturn(null);
+        doThrow(new IOException("gone")).when(response).sendError(anyInt());
+
+        FSUtils.forwardRequest(request, response,
+            "http://host.example.com:8080/openam/wsfederation/jsp/mex.jsp");
+
+        verify(request).getRequestDispatcher("/wsfederation/jsp/mex.jsp");
+        verify(response).sendError(HttpServletResponse.SC_BAD_REQUEST);
+        verify(response, times(1)).sendError(anyInt());
+    }
+
+    /**
+     * A forward that throws before anything was written must not leave the container to commit
+     * an empty 200 either.
+     */
+    @Test
+    public void shouldAnswerErrorWhenForwardFailsBeforeCommit() throws Exception {
+        doThrow(new ServletException("boom")).when(dispatcher).forward(any(), any());
+        when(response.isCommitted()).thenReturn(false);
+
+        FSUtils.forwardRequest(request, response,
+            "http://host.example.com:8080/openam/wsfederation/jsp/mex.jsp");
+
+        verify(response).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    public void shouldAnswerErrorWhenARedirectFailsBeforeCommit() throws Exception {
+        doThrow(new IOException("gone")).when(response).sendRedirect(anyString());
+
+        FSUtils.forwardRequest(request, response, "https://trusted.example.com/landing");
+
+        verify(response).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    public void shouldLeaveACommittedResponseAloneWhenForwardFails() throws Exception {
+        doThrow(new ServletException("boom")).when(dispatcher).forward(any(), any());
+        when(response.isCommitted()).thenReturn(true);
+
+        FSUtils.forwardRequest(request, response,
+            "http://host.example.com:8080/openam/wsfederation/jsp/mex.jsp");
+
+        verify(response, never()).sendError(anyInt());
+    }
 
     private static final String XSS = "\"><script>alert(document.cookie)</script>";
 
