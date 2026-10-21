@@ -5411,6 +5411,20 @@ Specifies the name of the client agent profile in OpenAM.
 
 --
 +
+The following URL parameters are optional:
++
+--
+
+`code_challenge`::
+Binds the device code to a __Proof Key for Code Exchange__ (PKCE) challenge, as described in link:https://tools.ietf.org/html/rfc7636[RFC 7636, window=\_top]. If you send it, OpenAM issues the access token only to a poll that supplies the matching `code_verifier`, see xref:#proc-device-flow-poll-for-authz["To Poll for Authorization in the OAuth 2.0 Device Flow"].
+
+`code_challenge_method`::
+Either `S256` or `plain`. If omitted, it defaults to `plain`. When a `code_challenge` is sent, any other value, including an empty one, is rejected with HTTP 400 `invalid_request`; without a `code_challenge` this parameter is ignored. Prefer `S256`.
+
+--
++
+The Code Verifier Parameter Required property of the OAuth2 Provider does not apply to the device flow: PKCE is optional here, and is enforced for a device code only when that code was requested with a `code_challenge`.
++
 
 [source, console]
 ----
@@ -5559,6 +5573,8 @@ Any client using the endpoints to register consent is responsible for ensuring t
 * On the client device, create a POST request to poll the `/oauth2/access_token` endpoint to request an access token. Include the client ID, client secret, and the device code as query parameters in the request. You must also specify a `grant_type` of `\http://oauth.net/grant_type/device/1.0`.
 +
 The client device must wait for the number of seconds previously provided as the value of `interval` between polling OpenAM for an access token.
++
+If the device code was requested with a `code_challenge`, include the matching `code_verifier` in every poll. A poll without it fails with HTTP 400 `invalid_request`, and a poll with a verifier that does not match the challenge fails with HTTP 400 `invalid_grant`, whether or not the user has authorized the device yet. Neither failure consumes the device code.
 +
 
 [source, console]

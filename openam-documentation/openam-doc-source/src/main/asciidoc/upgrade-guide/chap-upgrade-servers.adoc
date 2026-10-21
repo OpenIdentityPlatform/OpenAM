@@ -90,6 +90,13 @@ Update hybrid-flow clients to send a `code_challenge` at the authorization endpo
 Starting with this release `debugconfig.properties` is validated more strictly. A file with `org.forgerock.openam.debug.rotation=-1`, or with a trailing space after a rotation value next to a suffix that is empty, too coarse or cannot be parsed, is now rejected as a whole: OpenAM prints "'/debugconfig.properties' isn't valid, the default configuration will be used instead" to the standard error output and uses no prefix and no rotation. Leave a rotation value empty to turn that rotation off. Trailing spaces are also removed from the prefix and the suffix, so they no longer appear in debug log file names. See xref:../admin-guide/chap-monitoring.adoc#log-rotate-debug["Rotating Debug Logs"] in the __Administration Guide__.
 ====
 
+[IMPORTANT]
+====
+Starting with this release the OAuth 2.0 device flow verifies PKCE, as part of the GHSA-h93p-35jm-rj83 hardening. Previously a `code_challenge` sent to `/oauth2/device/code` was stored with the device code but never checked, so the device code could be redeemed without the `code_verifier`. Now every poll of `/oauth2/access_token` for such a device code must supply the matching `code_verifier`, and `/oauth2/device/code` rejects a `code_challenge` sent with a `code_challenge_method` other than `S256` or `plain`.
+
+Device-flow clients that send no `code_challenge` are not affected: the Code Verifier Parameter Required property does not apply to the device flow. Clients that do send a `code_challenge` but never sent the `code_verifier` must be updated to send it.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====
