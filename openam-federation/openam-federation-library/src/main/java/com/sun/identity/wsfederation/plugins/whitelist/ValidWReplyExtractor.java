@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.wsfederation.plugins.whitelist;
 
@@ -35,7 +36,10 @@ import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
  */
 public class ValidWReplyExtractor implements ValidDomainExtractor<ValidWReplyExtractor.WSFederationEntityInfo> {
 
-    private static final Debug DEBUG = WSFederationUtils.debug;
+    // Not WSFederationUtils.debug: a static field initialiser would run the WS-Federation static setup merely to
+    // load this class. extractValidDomains below still needs the meta manager, so the dependency is not gone -
+    // it is deferred to the point where this extractor is actually used.
+    private static final Debug DEBUG = Debug.getInstance(WSFederationConstants.AM_WSFEDERATION);
 
     @Override
     public Collection<String> extractValidDomains(final WSFederationEntityInfo entityInfo) {

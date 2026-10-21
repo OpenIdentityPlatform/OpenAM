@@ -25,6 +25,7 @@
    $Id: realmSelection.jsp,v 1.10 2009/10/29 00:00:00 exu Exp $
 
     Portions Copyrighted 2013-2016 ForgeRock AS.
+    Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <%@page
@@ -32,6 +33,8 @@
     import="com.sun.identity.shared.debug.Debug"
     import="com.sun.identity.wsfederation.common.WSFederationConstants"
     import="com.sun.identity.wsfederation.common.WSFederationUtils"
+    import="com.sun.identity.wsfederation.common.WReplyValidator"
+    import="com.sun.identity.saml2.common.SAML2Constants"
     import="com.sun.identity.wsfederation.meta.WSFederationMetaManager"
     import="com.sun.identity.wsfederation.meta.WSFederationMetaUtils"
     import="com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement"
@@ -42,10 +45,6 @@
     Debug debug = WSFederationUtils.debug;
     String jspFile = "realmSelection.jsp: ";
     String wreply = (String)request.getParameter("wreply");
-    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + wreply, wreply,
-        "URL", 2000, false)){
-            wreply = "";
-    }
     String wctx = (String)request.getParameter("wctx");
     if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + wctx, wctx,
         "HTTPParameterValue", 2000, true)){
@@ -74,6 +73,15 @@
         metaManager.getSPSSOConfig(spRealm,spEntityId));
     String accountRealmCookieName =
         spConfig.get(WSFederationConstants.ACCOUNT_REALM_COOKIE_NAME).get(0);
+
+    // wreply ends up in a redirect, so it has to be checked against the wreplyList of the hosted entity,
+    // falling back to this server's own origin when no wreplyList has been configured. There is nothing this
+    // page can do without it, so a rejected wreply ends the request rather than becoming an empty base URL.
+    if (!WReplyValidator.isValid(request, spRealm, spEntityId, wreply, SAML2Constants.SP_ROLE)) {
+        debug.error(jspFile + "Invalid wreply URL: " + wreply);
+        response.sendError(response.SC_BAD_REQUEST, "Invalid wreply URL");
+        return;
+    }
 
     String selectedRealm = (String)request.getParameter("realm_list");
     if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + selectedRealm,
@@ -183,11 +191,11 @@
 
 	<td><div class="logInp">
 
-        <input type="hidden" name="wreply" value="<%=wreply%>" />
+        <input type="hidden" name="wreply" value="<%=ESAPI.encoder().encodeForHTMLAttribute(wreply)%>" />
 <%
         if ( wctx != null && wctx.length() > 0 ) {
 %>
-        <input type="hidden" name="wctx" value="<%=wctx%>" />
+        <input type="hidden" name="wctx" value="<%=ESAPI.encoder().encodeForHTMLAttribute(wctx)%>" />
 <%
         }
 %>

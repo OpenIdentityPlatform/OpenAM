@@ -28,11 +28,13 @@
 
 <%--
    Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <%@ page import="com.sun.identity.federation.common.FSUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.meta.SAML2MetaManager" %>
@@ -151,8 +153,7 @@
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
             if (relayState != null && !relayState.isEmpty() &&
-                    SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.SP_ROLE) &&
-                    ESAPI.validator().isValidInput("HTTP URL Value: " + relayState, relayState, "URL", 2000, true)) {
+                    RelayStateValidator.isValidForRequest(request, relayState, SAML2Constants.SP_ROLE)) {
                 response.sendRedirect(relayState);
             } else {
                 %>

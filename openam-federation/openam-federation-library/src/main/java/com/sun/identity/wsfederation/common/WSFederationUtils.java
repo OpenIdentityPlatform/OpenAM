@@ -25,7 +25,7 @@
  * $Id: WSFederationUtils.java,v 1.6 2009/10/28 23:58:58 exu Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.wsfederation.common;
 
@@ -380,9 +380,28 @@ public class WSFederationUtils {
         try {
             String wreply = (String)
                 request.getAttribute(WSFederationConstants.LOGOUT_WREPLY);
+            // Validated here and not only before the redirect below, because doIDPSingleLogout hands the wreply
+            // to SingleLogoutManager, which stores it against an opaque handle (SingleLogoutManager:513) and
+            // redirects to it from MultiProtocolRelayServlet on a later request (:768). A check after that call
+            // cannot reach that redirect, and the LOGOUT_REDIRECTED_STATUS guard below skips it precisely when a
+            // handler has taken over. multi.jsp, the JSP that ships with the server, validates it too - it has
+            // to, because it redirects to wreply on its own unauthenticated path - but the JSPs are shipped
+            // exploded and can be replaced, so this method does not trust whoever set the attribute.
+            if (!WReplyValidator.pointsBackAtThisServer(request, wreply)) {
+                if (wreply != null && wreply.length() != 0) {
+                    debug.warning("WSFederationUtils.processMultiProtocolLogout: "
+                        + "the wreply URL does not point back at this server and is ignored");
+                }
+                wreply = null;
+            }
             String realm = (String)
                 request.getAttribute(WSFederationConstants.REALM_PARAM);
-            String idpEntityId = (String)
+            // Named idpEntityId below for the doIDPSingleLogout argument it fills, but the entity is whichever one
+            // the signout endpoint was reached for: IPRPSignoutRequest takes it from the metaAlias of the request
+            // URI, which may name the IdP or the RP, and it reaches this method through the query string of
+            // multi.jsp. Neither the role nor the value can be trusted here, which is why the wreply check above
+            // reads no wreplyList at all rather than reading the one this entity happens to name.
+            String entityId = (String)
                 request.getAttribute(WSFederationConstants.ENTITYID_PARAM);
             Set sessSet = new HashSet();
             sessSet.add(userSession);
@@ -394,9 +413,12 @@ public class WSFederationUtils {
             // TODO : find out spEntityID/logout request if any
             int status = manager.doIDPSingleLogout(sessSet, sessUser,
                 request, response, false, true, SingleLogoutManager.WS_FED, 
-                realm, idpEntityId, null, wreply, null, null, 
+                realm, entityId, null, wreply, null, null,
                 SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS);
-            if (status != SingleLogoutManager.LOGOUT_REDIRECTED_STATUS) {
+            // The null guard is the reason this condition exists at all: BASE called sendRedirect(null) where
+            // the ESAPI check had nulled the wreply. Validation is above, before doIDPSingleLogout.
+            if (status != SingleLogoutManager.LOGOUT_REDIRECTED_STATUS
+                && wreply != null && wreply.length() != 0) {
                 response.sendRedirect(wreply);
             }
         } catch (SessionException ex) {
@@ -418,17 +440,13 @@ public class WSFederationUtils {
      * @param request    Used to help establish the realm and hostEntityID.
      * @param relayState The URL to validate.
      * @return <code>true</code> if the wreply is valid.
+     * @deprecated Use {@link WReplyValidator#isValid(HttpServletRequest, String)} instead. This method now
+     * delegates to it, because on its own it treated a hosted entity with no <code>wreplyList</code> - the
+     * default - as permission to redirect anywhere.
      */
+    @Deprecated
     public static boolean isWReplyURLValid(HttpServletRequest request, String relayState) {
-        String metaAlias = WSFederationMetaUtils.getMetaAliasByUri(request.getRequestURI());
-
-        try {
-            WSFederationMetaManager metaManager = new WSFederationMetaManager();
-            return isWReplyURLValid(metaAlias, relayState, metaManager.getRoleByMetaAlias(metaAlias));
-        } catch (WSFederationMetaException e) {
-            debug.warning("Can't get metaManager.", e);
-            return false;
-        }
+        return WReplyValidator.isValid(request, relayState);
     }
 
     /**
@@ -438,33 +456,29 @@ public class WSFederationUtils {
      * @param wreply The URL to validate.
      * @param role       The role of the caller.
      * @return <code>true</code> if the wreply is valid.
+     * @deprecated Use {@link WReplyValidator#isValid(HttpServletRequest, String, String, String, String)} instead.
+     * This method now delegates to it, because on its own it treated a hosted entity with no
+     * <code>wreplyList</code> - the default - as permission to redirect anywhere. With no request to take an
+     * origin from, the fallback is the configured server URL.
      */
+    @Deprecated
     public static boolean isWReplyURLValid(String metaAlias, String wreply, String role) {
-        boolean result = false;
+        String realm = null;
+        String hostEntityID = null;
 
         if (metaAlias != null) {
-            String realm = WSFederationMetaUtils.getRealmByMetaAlias(metaAlias);
+            realm = WSFederationMetaUtils.getRealmByMetaAlias(metaAlias);
             try {
-                String hostEntityID = WSFederationUtils.getMetaManager().getEntityByMetaAlias(metaAlias);
-                if (hostEntityID != null) {
-                    validateWReplyURL(realm, hostEntityID, wreply, role);
-                    result = true;
-                }
+                hostEntityID = WSFederationUtils.getMetaManager().getEntityByMetaAlias(metaAlias);
             } catch (WSFederationException e) {
                 if (debug.messageEnabled()) {
                     debug.message("WSFederationUtils.isWReplyURLValid(): wreply " + wreply +
                             " for role " + role + " triggered an exception: " + e.getMessage(), e);
                 }
-                result = false;
             }
         }
 
-        if (debug.messageEnabled()) {
-            debug.message("WSFederationUtils.isWReplyURLValid(): wreply " + wreply +
-                    " for role " + role + " was valid? " + result);
-        }
-
-        return result;
+        return WReplyValidator.isValid(null, realm, hostEntityID, wreply, role);
     }
 
     /**

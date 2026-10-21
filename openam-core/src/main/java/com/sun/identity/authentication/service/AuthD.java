@@ -52,6 +52,7 @@ import org.forgerock.openam.authentication.service.AuthSessionFactory;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.session.service.SessionAccessManager;
+import org.forgerock.openam.shared.security.whitelist.FailSafeRedirectUrlValidator;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.sso.providers.stateless.StatelessSessionManager;
 import org.forgerock.opendj.ldap.DN;
@@ -208,6 +209,9 @@ public class AuthD implements ConfigurationListener {
     public String defaultAuthLevel;
     private final ConcurrentMap<String, String> authMethods = new ConcurrentHashMap<String, String>();
     private long defaultSleepTime = 300; /* 5 minutes */
+    private static final FailSafeRedirectUrlValidator<String> FAIL_SAFE_REDIRECT_URL_VALIDATOR =
+            new FailSafeRedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
+
     private static final RedirectUrlValidator<String> REDIRECT_URL_VALIDATOR =
             new RedirectUrlValidator<String>(ValidGotoUrlExtractor.getInstance());
     
@@ -1264,12 +1268,31 @@ public class AuthD implements ConfigurationListener {
     /**
      * Checks whether an input URL is valid in an organization.
      *
+     * <p>This overload fails open: with no <code>Valid goto URL Resources</code> configured, which is the default,
+     * every URL is valid, including one leaving this server. Redirect endpoints should call
+     * {@link #isGotoUrlValid(HttpServletRequest, String, String)} instead, which falls back to the URLs of this
+     * deployment rather than to everything. It is kept for <code>LoginState</code>, whose use of it is a separate
+     * change.
+     *
      * @param url The URL to be validated.
      * @param orgDN The organization DN.
      * @return <code>true</code> if input URL is valid, <code>false</code> otherwise.
      */
     public boolean isGotoUrlValid(String url, String orgDN) {
         return REDIRECT_URL_VALIDATOR.isRedirectUrlValid(url, orgDN);
+    }
+
+    /**
+     * Checks whether the URL is a valid goto URL, refusing to leave this server when the realm has no
+     * <code>Valid goto URL Resources</code> configured.
+     *
+     * @param request The request being processed, used to establish the origin of this server.
+     * @param url The URL to validate.
+     * @param orgDN The realm the goto URL list is read from.
+     * @return <code>true</code> if the URL may be used in a redirect.
+     */
+    public boolean isGotoUrlValid(HttpServletRequest request, String url, String orgDN) {
+        return FAIL_SAFE_REDIRECT_URL_VALIDATOR.isRedirectUrlValid(request, url, orgDN);
     }
 
     /**

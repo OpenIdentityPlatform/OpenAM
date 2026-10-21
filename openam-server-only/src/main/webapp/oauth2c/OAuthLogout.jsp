@@ -24,6 +24,7 @@
 --%>
 <%--
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -43,6 +44,7 @@
 <%@ page import="com.iplanet.sso.SSOToken" %>
 <%@ page import="com.sun.identity.authentication.service.AuthD" %>
 <%@ page import="com.sun.identity.idm.AMIdentity" %>
+<%@ page import="com.sun.identity.authentication.service.AuthUtils" %>
 <%
    // Internationalization stuff. You can use any internationalization framework
    String lang = request.getParameter("lang");
@@ -82,13 +84,20 @@
    String OAuth2IdP = "";
    
    String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+   String realm = AuthUtils.getDomainNameByRequest(request, AuthUtils.parseRequestParameters(request));
    SSOTokenManager manager = SSOTokenManager.getInstance();
    try {
        SSOToken ssoToken = manager.createSSOToken(request);
-       String realm = ssoToken.getProperty("Organization");
-       boolean isValidGotoUrl = AuthD.getAuth().isGotoUrlValid(gotoURL, realm)
-               && ESAPI.validator().isValidInput("URLContext", gotoURL, "HTTPURI", 2000, false);
-       if (!isValidGotoUrl) {
+       // The realm of the session is the better source, but the property can come back empty, and
+       // DNMapper.orgNameToDN(null) resolves to the root realm - which would consult the wrong goto list
+       // rather than fail. Keep the realm derived from the request in that case.
+       String sessionRealm = ssoToken.getProperty("Organization");
+       if (sessionRealm != null && !sessionRealm.isEmpty()) {
+           realm = sessionRealm;
+       }
+       // gotoURL is assigned to window.location, so the realm has to accept it as a goto URL. The
+       // Validator.HTTPURI check this replaces let "//attacker.example.com" through.
+       if (!AuthD.getAuth().isGotoUrlValid(request, gotoURL, realm)) {
            OAuthUtil.debugError("OAuthLogout: invalid or empty goto URL ignored on Logout page: " + gotoURL);
            gotoURL = ServiceURI + "/UI/Logout";
        }
@@ -102,16 +111,18 @@
    if (logoutURL == null) {
       logoutURL = "";
    } else {
-       boolean isValidURL = ESAPI.validator().
-               isValidInput("URLContext", logoutURL, "URL", 255, false); 
-       if (!isValidURL) {   
+       // logoutURL is loaded in an iframe, so the realm has to accept it as a goto URL.
+       if (!AuthD.getAuth().isGotoUrlValid(request, logoutURL, realm)) {
            OAuthUtil.debugError("OAuthLogout: wrong logoutURL URL attempted to be used "
                    + "in the Logout page: " + logoutURL);
            logoutURL = "wronglogoutURL";
        } else {
-           int loc1 = logoutURL.indexOf("//") + 2;
-           OAuth2IdP = logoutURL.substring(loc1, logoutURL.indexOf("/", loc1));
-           doYouWantToLogout = doYouWantToLogout.replace("#IDP#", OAuth2IdP);
+           // A logout URL naming no authority is resolved against this server, and the base ESAPI "URL"
+           // check - which rejected everything - meant this branch never had to name a host at all.
+           String logoutHost = OAuthUtil.getUrlHost(logoutURL);
+           OAuth2IdP = logoutHost != null ? logoutHost : request.getServerName();
+           doYouWantToLogout = doYouWantToLogout.replace("#IDP#",
+                   ESAPI.encoder().encodeForHTML(OAuth2IdP));
        }
    }
    logoutURL = ESAPI.encoder().encodeForJavaScript(logoutURL);

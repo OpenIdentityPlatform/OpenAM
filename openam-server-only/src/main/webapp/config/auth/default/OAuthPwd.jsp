@@ -23,6 +23,10 @@
                                                               
 --%>
 
+<%--
+   Portions Copyright 2026 3A Systems, LLC.
+--%>
+
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -36,6 +40,8 @@
 <%@ page import="java.util.MissingResourceException" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
+<%@ page import="com.sun.identity.authentication.service.AuthD" %>
+<%@ page import="com.sun.identity.authentication.service.AuthUtils" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
 
 <% // Internationalization
@@ -61,14 +67,15 @@
     if (logoutURL == null) {
         logoutURL = ServiceURI;
     } else {
-        boolean isValidURL = ESAPI.validator().
-                isValidInput("URLContext", logoutURL, "URL", 255, false);
-        if (!isValidURL) {
+        // logoutURL is assigned to window.location, so the realm has to accept it as a goto URL.
+        String orgDN = AuthUtils.getDomainNameByRequest(request, AuthUtils.parseRequestParameters(request));
+        if (!AuthD.getAuth().isGotoUrlValid(request, logoutURL, orgDN)) {
             OAuthUtil.debugError("OAuthPwd: wrong logoutURL URL attempted to be used "
                     + "in the OAuthPwd page: " + logoutURL);
             logoutURL = ServiceURI;
         }
     }
+    logoutURL = ESAPI.encoder().encodeForJavaScript(logoutURL);
 
     String errLength = ESAPI.encoder().encodeForHTML(resources.getString("errLength"));
     String errNumbers = ESAPI.encoder().encodeForHTML(resources.getString("errNumbers"));

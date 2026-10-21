@@ -25,11 +25,13 @@
    $Id: idpSingleLogoutRedirect.jsp,v 1.9 2009/06/12 22:21:42 mallas Exp $
 
    Portions Copyrighted 2013-2016 ForgeRock AS.
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPCache" %>
@@ -116,8 +118,7 @@
         }
 
         if (!doRelayState) {
-            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE) &&
-                ESAPI.validator().isValidInput("HTTP URL Value: " + relayState, relayState, "URL", 2000, true)) {
+            if (relayState != null && RelayStateValidator.isValidForRequest(request, relayState, SAML2Constants.IDP_ROLE)) {
                 if (relayState.indexOf("?") != -1) {
                     response.sendRedirect(relayState 
                         + "&logoutStatus=logoutSuccess");

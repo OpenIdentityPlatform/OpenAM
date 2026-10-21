@@ -25,6 +25,7 @@
    $Id: SA_SP.jsp,v 1.8 2009/02/26 23:57:19 exu Exp $
 
    Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <%@ page language="java" 
@@ -44,8 +45,8 @@ com.sun.identity.saml2.meta.SAML2MetaException,
 com.sun.identity.saml2.meta.SAML2MetaUtils,
 com.sun.identity.sae.api.SecureAttrs,
 com.sun.identity.sae.api.Utils,
-org.forgerock.openam.utils.ClientUtils,
-org.owasp.esapi.ESAPI"
+org.forgerock.openam.saml2.plugins.RelayStateValidator,
+org.forgerock.openam.utils.ClientUtils"
 %>
 <%@ page import="java.io.PrintWriter" %>
 
@@ -131,9 +132,6 @@ org.owasp.esapi.ESAPI"
         return;
     }
     String spApp = (String) request.getParameter(SecureAttrs.SAE_PARAM_SPAPPURL);
-    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + spApp, spApp, "URL", 2000, true)) {
-            spApp = null;
-    }
     if (spApp == null ) {
         String errStr = errorUrl+"?errorcode=6&errorstring=SP_NOSPAppURL";
 	    SAML2Utils.debug.error(errStr);
@@ -193,14 +191,14 @@ org.owasp.esapi.ESAPI"
         realm, spEntityId, SAML2Constants.SP_ROLE, spApp);
 
     if (hp == null) {
-        String errStr = errorUrl
-                        +"?errorcode=13&errorstring=Error_invalid_SAEAttrs:"
-                        +spApp;
-	SAML2Utils.debug.error(errStr);
-        String data[] = {errStr};
-        SAML2Utils.logError(Level.INFO, LogUtil.SAE_SP_ERROR, 
+        // spApp is a request parameter and stays out of the redirect, as do the SAE attributes below: a
+        // redirect URL is carried into the browser history and the access log of every hop.
+        String detail = "SA_SP.jsp: no SAE attributes configured for " + spApp;
+        SAML2Utils.debug.error(detail);
+        String data[] = {detail};
+        SAML2Utils.logError(Level.INFO, LogUtil.SAE_SP_ERROR,
                    data, token, ipaddr, userid, realm, "SAE", null);
-        response.sendRedirect(errStr);
+        response.sendRedirect(errorUrl + "?errorcode=13&errorstring=Error_invalid_SAEAttrs");
         return;
     }
 
@@ -215,14 +213,12 @@ org.owasp.esapi.ESAPI"
         encSecret = (String) hp.get(SecureAttrs.SAE_CONFIG_PUBLIC_KEY_ALIAS);
     }
     if (secret == null || secret.length() == 0) {
-        String errStr = errorUrl
-                        +"?errorcode=13&errorstring=Error_invalid_sharedSecret:"
-                        +spApp;
-	SAML2Utils.debug.error(errStr);
-        String data[] = {errStr};
-        SAML2Utils.logError(Level.INFO, LogUtil.SAE_SP_ERROR, 
+        String detail = "SA_SP.jsp: no shared secret configured for " + spApp;
+        SAML2Utils.debug.error(detail);
+        String data[] = {detail};
+        SAML2Utils.logError(Level.INFO, LogUtil.SAE_SP_ERROR,
                    data, token, ipaddr, userid, realm, "SAE", null);
-        response.sendRedirect(errStr);
+        response.sendRedirect(errorUrl + "?errorcode=13&errorstring=Error_invalid_sharedSecret");
         return;
     }
 
@@ -251,14 +247,12 @@ org.owasp.esapi.ESAPI"
     }
     String encodedString = sa.getEncodedString(map, secret, encSecret);
     if (encodedString == null) {
-       String errStr = errorUrl
-                       +"?errorcode=7&errorstring=Couldnt_secure_attrs:"
-                       +map;
-	SAML2Utils.debug.error(errStr);
-        String data[] = {errStr};
-        SAML2Utils.logError(Level.INFO, LogUtil.SAE_SP_ERROR, 
+        String detail = "SA_SP.jsp: could not secure the attributes Map=" + map;
+        SAML2Utils.debug.error(detail);
+        String data[] = {detail};
+        SAML2Utils.logError(Level.INFO, LogUtil.SAE_SP_ERROR,
                    data, token, ipaddr, userid, realm, "SAE", null);
-        response.sendRedirect(errStr);
+        response.sendRedirect(errorUrl + "?errorcode=7&errorstring=Couldnt_secure_attrs");
         return;
     }
     HashMap sParams = new HashMap();
@@ -270,20 +264,21 @@ org.owasp.esapi.ESAPI"
     // Comment this redirect and uncomment the below href for debugging. 
     // The href at the bottom will take effect
     try {
-        if (spApp != null && SAML2Utils.isRelayStateURLValid(request, spApp, SAML2Constants.SP_ROLE)) {
+        if (spApp != null && RelayStateValidator.isValid(request, realm, spEntityId, spApp,
+                SAML2Constants.SP_ROLE)) {
             Utils.redirect(response, new PrintWriter(out, true), spApp, sParams, action);
         } else {
             throw new Exception("Redirect URL was not valid " + spApp);
         }
     } catch (Exception ex) {
-       String errStr = errorUrl
-                       +"?errorcode=7&errorstring=Couldnt_redirect:"+ex
-                       +" Map="+map;
-	SAML2Utils.debug.error(errStr);
-        String data1[] = {errStr};
-        SAML2Utils.logError(Level.INFO, LogUtil.SAE_SP_ERROR, 
+        // The details stay in the log: map holds the SAE attributes read out of the user's session, and the
+        // redirect URL would carry them into the browser history and the access log of every hop.
+        String detail = "SA_SP.jsp: could not redirect to " + spApp + " Map=" + map;
+        SAML2Utils.debug.error(detail, ex);
+        String data1[] = {detail};
+        SAML2Utils.logError(Level.INFO, LogUtil.SAE_SP_ERROR,
                    data1, token, ipaddr, userid, realm, "SAE", null);
-        response.sendRedirect(errStr);
+        response.sendRedirect(errorUrl + "?errorcode=7&errorstring=Couldnt_redirect");
         return;
     }
 /*

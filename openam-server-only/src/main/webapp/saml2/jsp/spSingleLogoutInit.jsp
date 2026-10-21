@@ -25,12 +25,14 @@
    $Id: spSingleLogoutInit.jsp,v 1.13 2009/10/15 00:01:11 exu Exp $
 
    Portions Copyrighted 2012-2016 ForgeRock AS.
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <%@ page import="com.sun.identity.plugin.session.SessionManager" %>
 <%@ page import="com.sun.identity.plugin.session.SessionException" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement" %>
 <%@ page import="com.sun.identity.saml2.meta.SAML2MetaManager" %>
@@ -118,8 +120,7 @@
                 //There is no local session, so we can't perform the logout on the IdP,
                 //let's just return with HTTP 200
                 if (RelayState != null && !RelayState.isEmpty()
-                        && SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)
-                        && ESAPI.validator().isValidInput("RelayState", RelayState, "URL", 2000, true)) {
+                        && RelayStateValidator.isValidForRequest(request, RelayState, SAML2Constants.SP_ROLE)) {
                     saml2Auditor.auditAccessSuccess();
                     response.sendRedirect(RelayState);
                 } else {
@@ -163,8 +164,7 @@
                     SAML2Utils.debug.message("No session.");
                 }
             }
-            if (RelayState != null && SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)
-                    && ESAPI.validator().isValidInput("RelayState", RelayState, "URL", 2000, true)) {
+            if (RelayState != null && RelayStateValidator.isValidForRequest(request, RelayState, SAML2Constants.SP_ROLE)) {
                 saml2Auditor.auditAccessSuccess();
                 response.sendRedirect(RelayState);
             } else {
@@ -269,8 +269,7 @@
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
             if (RelayState != null && !RelayState.isEmpty()
-                    && SAML2Utils.isRelayStateURLValid(metaAlias, RelayState, SAML2Constants.SP_ROLE)
-                    && ESAPI.validator().isValidInput("RelayState", RelayState, "URL", 2000, true)) {
+                    && RelayStateValidator.isValid(request, metaAlias, RelayState, SAML2Constants.SP_ROLE)) {
                 response.sendRedirect(RelayState);
             } else {
                 %>

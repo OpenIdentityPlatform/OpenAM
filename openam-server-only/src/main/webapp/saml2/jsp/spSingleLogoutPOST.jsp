@@ -25,12 +25,14 @@
    $Id: spSingleLogoutPOST.jsp,v 1.8 2009/06/24 23:05:31 mrudulahg Exp $
 
    Portions Copyrighted 2013-2015 ForgeRock AS.
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 
 <%@ page import="com.sun.identity.sae.api.SecureAttrs" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement" %>
@@ -134,8 +136,7 @@
         boolean isRelayStateURLValid = false;
         if (!SPCache.isFedlet) {
             isRelayStateURLValid = relayState != null && !relayState.isEmpty()
-                    && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.SP_ROLE)
-                    && ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true);
+                    && RelayStateValidator.isValidForRequest(request, relayState, SAML2Constants.SP_ROLE);
         } else {
             SAML2MetaManager manager = new SAML2MetaManager();
             String metaAlias = null;
@@ -146,8 +147,7 @@
             }
 
             isRelayStateURLValid = relayState != null && !relayState.isEmpty()
-                    && SAML2Utils.isRelayStateURLValid(metaAlias, relayState, SAML2Constants.SP_ROLE)
-                    && ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true);
+                    && RelayStateValidator.isValid(request, metaAlias, relayState, SAML2Constants.SP_ROLE);
         }
         if (isRelayStateURLValid) {
             try {

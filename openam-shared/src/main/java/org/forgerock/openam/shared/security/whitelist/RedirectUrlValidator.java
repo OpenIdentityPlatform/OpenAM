@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.shared.security.whitelist;
@@ -80,25 +80,21 @@ public class RedirectUrlValidator<T> {
         DEBUG.message("RedirectUrlValidator.isRedirectUrlValid: Validating goto URL {} against patterns: {}",
                 url, patterns);
 
-        if (url.length() > MAX_URL_LENGTH) {
-            DEBUG.message("RedirectUrlValidator.isRedirectUrlValid:"
-                    + " The url was length {} which is longer than the allowed maximum of {}",
-                    url.length(), MAX_URL_LENGTH);
+        if (!isWithinLengthLimit(url)) {
             return false;
         }
 
-        try {
-            final URI uri = new URI(url);
-            // Both Absolute and scheme relative URLs should be validated.
-            if (!uri.isAbsolute() && !url.startsWith("//")) {
-                return true;
-            }
+        final URI uri = parseRedirectUrl(url);
+        if (uri == null) {
+            return false;
+        }
 
-            if (uri.getScheme() != null && !uri.getScheme().equals("http") && !uri.getScheme().equals("https")) {
-                return false;
-            }
-        } catch (final URISyntaxException urise) {
-            DEBUG.message("RedirectUrlValidator.isRedirectUrlValid: The goto URL {} is not a valid URI", url, urise);
+        // Both Absolute and scheme relative URLs should be validated.
+        if (isRelative(url, uri)) {
+            return true;
+        }
+
+        if (!hasRedirectableScheme(uri)) {
             return false;
         }
 
@@ -108,11 +104,77 @@ public class RedirectUrlValidator<T> {
             return true;
         }
 
+        return matchesPatterns(url, patterns);
+    }
+
+    /**
+     * Tells whether a redirect URL is short enough to be considered at all. Shared with the validators built on top
+     * of this one so that a single limit applies to every redirect endpoint.
+     *
+     * @param url The URL that needs to be validated, may not be <code>null</code>.
+     * @return <code>true</code> if the URL is within the configured maximum length.
+     */
+    static boolean isWithinLengthLimit(final String url) {
+        if (url.length() > MAX_URL_LENGTH) {
+            DEBUG.message("RedirectUrlValidator.isWithinLengthLimit:"
+                    + " The url was length {} which is longer than the allowed maximum of {}",
+                    url.length(), MAX_URL_LENGTH);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Parses a redirect URL.
+     *
+     * @param url The URL that needs to be validated, may not be <code>null</code>.
+     * @return The parsed URI, or <code>null</code> when the URL is not a valid URI.
+     */
+    static URI parseRedirectUrl(final String url) {
+        try {
+            return new URI(url);
+        } catch (final URISyntaxException urise) {
+            DEBUG.message("RedirectUrlValidator.parseRedirectUrl: The goto URL {} is not a valid URI", url, urise);
+            return null;
+        }
+    }
+
+    /**
+     * Tells whether a URL is relative, and so can only ever point back at the server that resolves it. Scheme
+     * relative URLs are not: they name a host of their own.
+     *
+     * @param url The URL that needs to be validated.
+     * @param uri The same URL, already parsed.
+     * @return <code>true</code> if the URL is relative.
+     */
+    static boolean isRelative(final String url, final URI uri) {
+        return !uri.isAbsolute() && !url.startsWith("//");
+    }
+
+    /**
+     * Tells whether the scheme of a URL is one a redirect may use.
+     *
+     * @param uri The URL that needs to be validated.
+     * @return <code>true</code> if the URL names no scheme, or names <code>http</code> or <code>https</code>.
+     */
+    static boolean hasRedirectableScheme(final URI uri) {
+        final String scheme = uri.getScheme();
+        return scheme == null || scheme.equals("http") || scheme.equals("https");
+    }
+
+    /**
+     * Matches a URL against a collection of already extracted patterns.
+     *
+     * @param url The URL that needs to be validated.
+     * @param patterns The patterns to match against, may not be empty.
+     * @return <code>true</code> if the URL matches one of the patterns.
+     */
+    static boolean matchesPatterns(final String url, final Collection<String> patterns) {
         final URLPatternMatcher patternMatcher = new URLPatternMatcher();
         try {
             return patternMatcher.match(url, patterns, true);
         } catch (MalformedURLException murle) {
-            DEBUG.error("RedirectUrlValidator.isRedirectUrlValid: An error occurred while validating goto URL: {}",
+            DEBUG.error("RedirectUrlValidator.matchesPatterns: An error occurred while validating goto URL: {}",
                     url, murle);
             return false;
         }

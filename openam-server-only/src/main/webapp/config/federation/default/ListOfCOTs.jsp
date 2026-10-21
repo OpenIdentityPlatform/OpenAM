@@ -28,6 +28,7 @@
 
  <%--
      Portions Copyrighted 2013 ForgeRock AS
+     Portions Copyright 2026 3A Systems, LLC.
   --%>
 
 
@@ -62,9 +63,6 @@
             metaAlias = "";
     }
     String LRURL = request.getParameter(LRURLKey);
-    if (!ESAPI.validator().isValidInput("URL Value: " + LRURL, LRURL, "URL", 2000, true)){
-        LRURL = null;
-    }
     String actionURL = LibertyManager.getConsentHandlerURL(request);
     String providerID = LibertyManager.getEntityID(metaAlias);
     String providerRole = LibertyManager.getProviderRole(metaAlias);
@@ -74,21 +72,24 @@
         response.sendError(response.SC_INTERNAL_SERVER_ERROR,"Not able to get Provider ID");
         return;
     }
-    if(LRURL == null || LRURL.length() <= 0) {
-        LRURL = LibertyManager.getHomeURL(providerID, providerRole);
-    }
-    if (LRURL != null) {
-        String orgDN = AuthUtils.getDomainNameByRequest(request, new Hashtable(0));
+    if (LRURL != null && LRURL.length() > 0) {
+        // LRURL arrives as a request parameter and ends up in a redirect, so only keep it when the realm
+        // accepts it as a goto URL. The home URL below is administrator configured and is not checked.
+        String orgDN = AuthUtils.getDomainNameByRequest(request, AuthUtils.parseRequestParameters(request));
         AuthD authD = AuthD.getAuth();
-        if (authD.isGotoUrlValid(LRURL, orgDN)) {
+        if (!authD.isGotoUrlValid(request, LRURL, orgDN)) {
             LRURL = null;
         }
     }
+    if (LRURL == null || LRURL.length() <= 0) {
+        LRURL = LibertyManager.getHomeURL(providerID, providerRole);
+    }
     if (cotSet == null) {
-        if (LRURL != null) {
+        // An empty home URL would make this a redirect to the current URI, i.e. back to this page.
+        if (LRURL != null && LRURL.length() > 0) {
             response.sendRedirect(LRURL);
         } else {
-            response.sendError(response.SC_INTERNAL_SERVER_ERROR, "Not able to validate the RelayState URL");
+            response.sendError(response.SC_INTERNAL_SERVER_ERROR, "Not able to determine the return URL");
         }
         return;
     }
@@ -106,8 +107,10 @@
 
     <tr>
     <td align="center">
-        <input type="hidden" name="LRURL" value="<%= LRURL %>">
-        <input type="hidden" name="metaAlias" value="<%= metaAlias%>">
+        <input type="hidden" name="LRURL" value="<%= LRURL == null ? "" :
+            ESAPI.encoder().encodeForHTMLAttribute(LRURL) %>">
+        <input type="hidden" name="metaAlias" value="<%=
+            ESAPI.encoder().encodeForHTMLAttribute(metaAlias) %>">
         <input type="hidden" name="action" >
         <select name="<%=COTKey%>" size="1" >
 

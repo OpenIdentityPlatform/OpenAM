@@ -145,6 +145,7 @@ import jakarta.xml.soap.MimeHeader;
 import jakarta.xml.soap.MimeHeaders;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.SAML2Store;
+import org.forgerock.openam.saml2.plugins.RelayStateValidator;
 import org.forgerock.openam.saml2.plugins.ValidRelayStateExtractor;
 import org.forgerock.openam.saml2.plugins.ValidRelayStateExtractor.SAMLEntityInfo;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
@@ -4496,14 +4497,13 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @param relayState The URL to validate.
      * @param role       The role of the caller.
      * @return <code>true</code> if the relayState is valid.
+     * @deprecated Use {@link org.forgerock.openam.saml2.plugins.RelayStateValidator#isValidForRequest} instead.
+     * This method now delegates to it, because on its own it treated a hosted entity with no
+     * <code>relayStateUrlList</code> - the default - as permission to redirect anywhere.
      */
+    @Deprecated
     public static boolean isRelayStateURLValid(HttpServletRequest request, String relayState, String role) {
-        String metaAlias = SAML2MetaUtils.getMetaAliasByUri(request.getRequestURI());
-        if (metaAlias == null) {
-            //try to acquire the metaAlias from request parameter
-            metaAlias = request.getParameter(SAML2MetaManager.NAME_META_ALIAS_IN_URI);
-        }
-        return isRelayStateURLValid(metaAlias, relayState, role);
+        return RelayStateValidator.isValidForRequest(request, relayState, role);
     }
 
     /**
@@ -4513,33 +4513,14 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @param relayState The URL to validate.
      * @param role       The role of the caller.
      * @return <code>true</code> if the relayState is valid.
+     * @deprecated Use {@link org.forgerock.openam.saml2.plugins.RelayStateValidator#isValid(HttpServletRequest,
+     * String, String, String)} instead. This method now delegates to it, because on its own it treated a hosted
+     * entity with no <code>relayStateUrlList</code> - the default - as permission to redirect anywhere. With no
+     * request to take an origin from, the fallback is the configured server URL.
      */
+    @Deprecated
     public static boolean isRelayStateURLValid(String metaAlias, String relayState, String role) {
-        boolean result = false;
-
-        if (metaAlias != null) {
-            String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
-            try {
-                String hostEntityID = saml2MetaManager.getEntityByMetaAlias(metaAlias);
-                if (hostEntityID != null) {
-                    validateRelayStateURL(realm, hostEntityID, relayState, role);
-                    result = true;
-                }
-            } catch (SAML2Exception e) {
-                if (debug.messageEnabled()) {
-                    debug.message("SAML2Utils.isRelayStateURLValid(): relayState " + relayState +
-                            " for role " + role + " triggered an exception: " + e.getMessage(), e);
-                }
-                result = false;
-            }
-        }
-
-        if (debug.messageEnabled()) {
-            debug.message("SAML2Utils.isRelayStateURLValid(): relayState " + relayState +
-                    " for role " + role + " was valid? " + result);
-        }
-
-        return result;
+        return RelayStateValidator.isValid(null, metaAlias, relayState, role);
     }
 
     /**
