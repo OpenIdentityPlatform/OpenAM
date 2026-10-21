@@ -22,7 +22,9 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.testng.annotations.DataProvider;
@@ -201,5 +203,28 @@ public class SAMLUtilsTest {
 
     private static Set<SiteEntry> sites(SiteEntry... entries) {
         return new LinkedHashSet<>(Arrays.asList(entries));
+    }
+
+    /**
+     * Attribute names and values come verbatim from the partner IdP's assertion, so they are
+     * escaped in full: markup must stay inert and an '&' must reach the target unchanged.
+     */
+    @Test
+    public void postToTargetEscapesAttributeNamesAndValues() throws Exception {
+        Map<String, String> attrs = new LinkedHashMap<>();
+        attrs.put("x\"<y", "<script>alert(1)</script>");
+        attrs.put("amp", "a&amp;b");
+        StringWriter html = new StringWriter();
+
+        SAMLUtils.postToTarget(null, new PrintWriter(html), Collections.emptyList(),
+                "https://sp.example.com/acs", attrs);
+
+        String out = html.toString();
+        assertThat(out).doesNotContain("<script>");
+        assertThat(out).contains(
+                "NAME=\"x&quot;&lt;y\" VALUE=\"&lt;script&gt;alert(1)&lt;/script&gt;\"");
+        assertThat(out).contains("NAME=\"amp\" VALUE=\"a&amp;amp;b\"");
+        assertThat(out).contains("NAME=\"" + SAMLConstants.POST_ATTR_NAMES
+                + "\" VALUE=\"x&quot;&lt;y:amp\"");
     }
 }

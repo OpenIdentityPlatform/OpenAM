@@ -763,8 +763,10 @@ public class SAMLUtils  extends SAMLUtilsCommon {
             Set entrySet = attrMap.entrySet();
             for(Iterator iter = entrySet.iterator(); iter.hasNext();) {
                 Map.Entry entry = (Map.Entry)iter.next();
-                String attrName = HTMLEncode((String)entry.getKey(), '\"');
-                String attrValue = HTMLEncode((String)entry.getValue(), '\"');
+                // Names and values come verbatim from the partner's assertion:
+                // escape them in full, not only the quote character.
+                String attrName = StringEscapeUtils.escapeHtml4((String)entry.getKey());
+                String attrValue = StringEscapeUtils.escapeHtml4((String)entry.getValue());
                 out.println("<INPUT TYPE=\"HIDDEN\" NAME=\""+ attrName +
                 "\" VALUE=\"" + attrValue + "\">");
                 if (attrNamesSB.length() > 0) {
