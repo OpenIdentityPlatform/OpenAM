@@ -16,6 +16,8 @@
 
 package com.sun.identity.security.cert;
 
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.Locale;
 
 import org.testng.annotations.Test;
@@ -56,6 +58,28 @@ public class AMCertStoreTest {
     public void shouldPreserveNormalAssertionValue() {
         String filter = AMCertStore.setSearchFilter("cn", "Barbara Jensen");
         assertThat(filter).isEqualTo("(cn=Barbara Jensen)");
+    }
+
+    @Test
+    public void aCertificateLookupLeavesTheCallersSearchFilterAlone() throws Exception {
+        // CRLValidator keeps one AMLDAPCertStoreParameters in a static and resolves issuer
+        // certificates through this method from every thread validating a signature. Writing the
+        // lookup's filter into that shared object hands it to whichever other search reads the
+        // object next — including an AMCRLStore that is part way through its own.
+        AMLDAPCertStoreParameters params = AMCertStore.setLdapStoreParam("127.0.0.1", closedPort(),
+                "cn=admin", "secret", "dc=example,dc=com", null, false);
+        params.setSearchFilter("(cn=the caller's own)");
+
+        AMCertStore.getCertificate(params, "cn", "TestCA");
+
+        assertThat(params.getSearchFilter()).isEqualTo("(cn=the caller's own)");
+    }
+
+    /** A loopback port nothing listens on, so the lookup fails fast instead of hanging. */
+    private static int closedPort() throws Exception {
+        try (ServerSocket socket = new ServerSocket(0, 1, InetAddress.getLoopbackAddress())) {
+            return socket.getLocalPort();
+        }
     }
 
     @Test

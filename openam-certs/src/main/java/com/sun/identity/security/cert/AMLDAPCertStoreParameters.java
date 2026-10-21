@@ -54,6 +54,26 @@ public class AMLDAPCertStoreParameters {
         serverPort = port;
     }
 
+    /**
+     * A copy of {@code other}, for a lookup that needs a search filter of its own. Callers keep
+     * one instance of these parameters for as long as their configuration lasts — CRLValidator
+     * in a static — so a filter set on it is visible to every other search that reads it,
+     * including one already under way on another thread.
+     */
+    AMLDAPCertStoreParameters(AMLDAPCertStoreParameters other) {
+        // Through the getters, so a subclass that computes a value keeps it in the copy.
+        serverName = other.getServerName();
+        serverPort = other.getPort();
+        ldapUser = other.getUser();
+        password = other.getPassword();
+        searchFilter = other.getSearchFilter();
+        startSearchLoc = other.getStartLoc();
+        secureLdap = other.isSecure();
+        uriParams = other.getURIParams();
+        doCRLCaching = other.isDoCRLCaching();
+        doCRLupdate = other.isDoUpdateCRLs();
+    }
+
     public static AMLDAPCertStoreParameters
         setLdapStoreParam(AMLDAPCertStoreParameters ldapParams,
                           String user, String passwd, String searchLoc,

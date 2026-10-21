@@ -1474,6 +1474,60 @@ When enabled, OpenAM updates CRLs from the LDAP directory store.
 +
 `ssoadm` attribute: `openam-am-auth-cert-update-crl`
 
++
+[NOTE]
+======
+When OpenAM refreshes a CRL, it fetches the CRL Distribution Point URL named by the certificate being validated, or the one named by the expired CRL's own `IssuingDistributionPoint` extension. To prevent server-side request forgery (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-g5vw-v384-gw9v[GHSA-g5vw-v384-gw9v, window=\_blank]), that URL must use the `http`, `https`, `ldap`, or `ldaps` scheme and must not resolve to a blocked address, as listed in xref:chap-openid-connect.adoc#openam-ssrf-blocked-addresses["OpenID Connect Relying Party Registration"] — with one difference: by default, private, site-local, and unique-local addresses (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `fec0::/10`, `fc00::/7`), including an IPv6 transition address that embeds one, are allowed. The cloud metadata endpoints inside `fc00::/7` — `fd00:ec2::254` (AWS), `fd20:ce::254` (Google Cloud), and `fd00:c1::a9fe:a9fe` (Oracle Cloud) — stay refused. If OpenAM reaches IPv4 through a NAT64 translator with a Network-Specific Prefix, declare the prefix in `org.openidentityplatform.ssrf.nat64-prefixes`, as described there. At most three redirects are followed, each `Location` goes through the same check as the URL the certificate named, and a redirect out of `https` into `http` is refused. The response is bounded in size and duration.
+
+Private and site-local addresses such as `10.0.0.0/8` remain allowed by default, so an internal PKI publishing its CRLs on an internal address keeps working after an upgrade. The shared address space `100.64.0.0/10` is not private address space here: it holds the `100.100.100.200` cloud metadata endpoint and is refused in the default mode too. A distribution point in that range, as used by some container platforms, carrier-grade NAT, and overlay VPNs, needs `org.openidentityplatform.openam.crl.dp.allow-any-url`, which turns the address check off altogether, link-local metadata addresses included; restrict outbound traffic from the OpenAM host with egress filtering in that case. The following advanced server properties tune this behavior. Those that take `true` or `false` accept nothing else: a value such as `yes`, `on`, or `1` is ignored, with a warning in the `Security` debug log, and the default applies.
+
+`org.openidentityplatform.openam.crl.dp.allow-any-url`::
+Set to `true` to disable the address check entirely and restore the previous behavior — for example, when a CRL distribution point is served from a loopback or link-local address. The scheme restriction still applies. Takes precedence over `org.openidentityplatform.openam.crl.dp.strict` if both are set. Default: `false`.
+
+`org.openidentityplatform.openam.crl.dp.strict`::
+Set to `true` to also reject private, site-local, and IPv6 unique-local addresses. Default: `false`.
++
+The default is permissive on purpose: an internal PKI publishing its CRLs on an RFC1918 address is ordinary, and blocking it on upgrade would stop CRL refreshes silently and then fail every certificate login closed once the CRL already held expires. The cost of leaving it off is that a certificate chaining to one of your trust anchors can name an internal address as its distribution point, and the timing of the fetch distinguishes an open port from a closed one. Set it to `true` if your CRL distribution points are all on public addresses.
++
+The address check resolves the distribution point host name, and the connection that follows resolves it again. The two normally agree because the JVM caches the answer (`networkaddress.cache.ttl` in the JVM's `java.security` file), but a name whose DNS record changes in between — DNS rebinding — can pass the check on one address and be connected to on another; setting `networkaddress.cache.ttl` to `0` widens that window. An HTTP proxy, if OpenAM uses one, resolves the name on its own. Where internal addresses must stay unreachable whatever a certificate names, block them with egress filtering on the OpenAM host as well: this property alone does not guarantee it.
+
+`org.openidentityplatform.openam.crl.dp.max-size`::
+Largest CRL, in bytes, that will be downloaded from a distribution point. Default: `10485760` (10 MB).
+
+`org.openidentityplatform.openam.crl.dp.timeout`::
+Time budget, in milliseconds, for refreshing the CRL of one certificate. The budget covers every distribution point location tried for that certificate, redirects included, rather than being granted afresh to each: what is left of it caps the connect and read timeouts of every attempt, so `org.forgerock.openam.url.connectTimeout` and `com.sun.identity.url.readTimeout` set to `0` (no timeout) cannot hold the request open past it. It is also the connect and request timeout for an `ldap` distribution point. A connection already in flight when the budget runs out is only abandoned once the operating system returns from it, so a single unresponsive distribution point can overrun the budget by one socket timeout. Default: `10000`.
+
+`org.openidentityplatform.openam.crl.dp.max-locations`::
+Most distribution point locations tried for one certificate. A location refused by the address check is not counted, so a certificate that lists several unreachable spellings of its CRL before the one that works still reaches it. Must be `1` or greater; a value of `0` or less is ignored and the default applies. Default: `5`.
+
+`org.openidentityplatform.openam.crl.dp.param-hosts`::
+Comma-separated list of hosts that the HTTP parameters configured in `HTTP Parameters for CRL Update` (`ssoadm` attribute `iplanet-am-auth-cert-param-get-crl`) may be sent to. An entry is a whole host name, matched case-insensitively; an entry starting with `.` matches any host in the domain below it, so `.example.com` covers `pki.example.com` but not `example.com` itself.
++
+Those parameters are your deployment's own configuration and often carry a credential for its CRL endpoint, while the URL they are posted to comes out of the certificate being validated. Empty by default, which means they are sent to no distribution point at all: list the distribution point hosts of your own PKI here if your CRL endpoint needs them. When a distribution point is skipped for this reason, the `Security` debug log records it — the CRL itself is still fetched, only the parameters are withheld. A redirect carries them on only when it is a `301` or `302` to the same URL on another scheme or port, such as the `https` endpoint behind an http-to-https redirector. Every other redirect, and everything after a `303 See Other`, is followed as a plain `GET` without them, even to a host this list names. Default: empty.
+
+`org.openidentityplatform.openam.crl.require-verified-signature`::
+When `true`, a CRL fetched from a distribution point is only written to the CRL cache and the LDAP CRL entry once its signature has been verified against the issuer, and never if it is older than the CRL already held. OpenAM finds the issuer's key in the trust store, or in the certificate chain presented alongside the certificate when that chain leads back to a configured trust anchor.
++
+Where the key cannot be found — a PKI whose CRLs are signed under a rotated CA key, or an issuing CA that appears in neither the trust store nor the presented chain — the CRL is still used for the validation in hand but is not stored, so it is fetched again on every validation. Setting this property to `false` stores it instead.
++
+A CRL issued by a delegated CRL signer (an indirect CRL, RFC 5280 section 5.2.5) is only used at all when the certificate's own distribution point names that signer in its `cRLIssuer` field, which is the same condition PKIX applies, and it is never stored, whatever this property is set to. A certificate that delegates to nobody — almost all of them — can only be validated against a CRL from its own issuer, whatever the distribution point answers with.
++
+Set to `false` with care: it means a CRL served from a hijacked, spoofed, or intercepted distribution point will be written to the shared CRL cache and the LDAP CRL entry, where it outlives the request and, for the LDAP entry, the process. The issuer and CRL-number checks still apply, so a CRL for another issuer or one older than the CRL already held is still refused — including one older than the CRL the shared LDAP entry holds, which in a multi-server deployment may be newer than the one the server doing the refresh had cached. Default: `true`.
++
+A CA in the middle of a key rollover has two certificates under one name, and both may be trusted at once. Every trusted certificate carrying the issuer's name is tried, so a CRL signed with either key verifies.
+
+`org.openidentityplatform.openam.crl.cache.max-size`::
+Most CRLs held in the in-memory CRL cache, which is shared across realms. Default: `1000`.
+
+If a CRL stops being refreshed after an upgrade, look for `AMCRLStore` messages in the `Security` debug log: they name the distribution point that was refused, whether `org.openidentityplatform.openam.crl.dp.strict` was in force, and which property relaxes the check.
+
+The address check resolves the distribution point host locally. If OpenAM reaches the internet only through an HTTP proxy and cannot resolve external names itself, the check rejects the distribution point as unresolvable; set `org.openidentityplatform.openam.crl.dp.allow-any-url` to `true` in that deployment. Likewise, a resolver that answers every name with an address from `198.18.0.0/15`, as the fake-IP DNS mode of some proxy and VPN clients does, makes every distribution point named by host name look blocked; set `org.openidentityplatform.openam.crl.dp.allow-any-url` to `true` there as well, or exempt the OpenAM host from that resolver. Name resolution itself is not covered by `org.openidentityplatform.openam.crl.dp.timeout` — the JDK provides no timeout for it — so a distribution point naming a host under an unresponsive nameserver stalls the request for as long as the operating system resolver takes. Keep `org.openidentityplatform.openam.crl.dp.max-locations` low if that matters.
+
+A CRL issued by a delegated CRL signer, whose issuer name therefore differs from the certificate's issuer name (an *indirect* CRL, RFC 5280 section 5.2.5), is used for the validation in hand but is never written to the CRL cache or the LDAP CRL entry, so it is fetched again each time. OpenAM recognizes it by the `indirectCRL` flag of the CRL's own `IssuingDistributionPoint` and uses it only when the certificate's own distribution point names that signer in its `cRLIssuer` field; certificate path validation checks the delegation again. A CRL whose issuer name simply does not match, with no such flag, is refused outright — it is either the wrong CRL or one substituted by whoever answered the distribution point.
+
+A host-less LDAP URL such as `ldap:///CN=CA,CN=CDP,...`, which Active Directory Certificate Services issues by default, resolves to `localhost` and is refused as a loopback address. Keep such a CRL in the LDAP CRL store described above and turn `Update CA CRLs from CRLDistributionPoint` off, so the store is used as configured and no distribution point is contacted.
+======
+
 OCSP Validation::
 Enable this to use Online Certificate Status Protocol (OCSP) instead of CRLs to check certificates' revocation status.
 
