@@ -43,7 +43,6 @@
 <%@ page import="com.sun.identity.saml2.profile.SPSingleLogout" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.owasp.esapi.ESAPI" %>
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="org.forgerock.guice.core.InjectorHolder" %>
 <%@ page import="org.forgerock.openam.audit.AuditEventPublisher" %>
@@ -96,9 +95,6 @@
         if (RelayState == null || RelayState.isEmpty()) {
             RelayState = request.getParameter(SAML2Constants.GOTO);
         }
-        if (!ESAPI.validator().isValidInput("RelayState", RelayState, "HTTPQueryString", 2000, true)) {
-            RelayState = null;
-        }
 
         String metaAlias = null;
 
@@ -119,8 +115,12 @@
             if (ssoToken == null) {
                 //There is no local session, so we can't perform the logout on the IdP,
                 //let's just return with HTTP 200
+                // This branch names no hosted entity of its own, so isValidForRequest would take the metaAlias
+                // from the request - letting the caller choose whose relayStateUrlList judges their redirect.
+                // Nothing else here uses it, so no whitelist is consulted and only this server's origin is.
                 if (RelayState != null && !RelayState.isEmpty()
-                        && RelayStateValidator.isValidForRequest(request, RelayState, SAML2Constants.SP_ROLE)) {
+                        && RelayStateValidator.isValidForEntity(request, null, null, RelayState,
+                                SAML2Constants.SP_ROLE)) {
                     saml2Auditor.auditAccessSuccess();
                     response.sendRedirect(RelayState);
                 } else {
@@ -164,7 +164,12 @@
                     SAML2Utils.debug.message("No session.");
                 }
             }
-            if (RelayState != null && RelayStateValidator.isValidForRequest(request, RelayState, SAML2Constants.SP_ROLE)) {
+            // This branch names no hosted entity of its own, so isValidForRequest would take the metaAlias
+            // from the request - letting the caller choose whose relayStateUrlList judges their redirect.
+            // Nothing else here uses it, so no whitelist is consulted and only this server's origin is.
+            if (RelayState != null
+                    && RelayStateValidator.isValidForEntity(request, null, null, RelayState,
+                                SAML2Constants.SP_ROLE)) {
                 saml2Auditor.auditAccessSuccess();
                 response.sendRedirect(RelayState);
             } else {
@@ -269,7 +274,8 @@
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
             if (RelayState != null && !RelayState.isEmpty()
-                    && RelayStateValidator.isValid(request, metaAlias, RelayState, SAML2Constants.SP_ROLE)) {
+                    && RelayStateValidator.isValidForMetaAlias(request, metaAlias, RelayState,
+                            SAML2Constants.SP_ROLE)) {
                 response.sendRedirect(RelayState);
             } else {
                 %>

@@ -47,7 +47,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Properties" %>
-<%@ page import="org.owasp.esapi.ESAPI" %>
 <%@ page import="java.io.PrintWriter" %>
 
 
@@ -89,9 +88,6 @@
         if ((tmpRs != null)) {
             relayState = (String) tmpRs.getObject();
         }
-    }
-    if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
-        relayState = null;
     }
     String samlResponse = request.getParameter(SAML2Constants.SAML_RESPONSE);
     if (samlResponse != null) {
@@ -156,7 +152,7 @@
             }
 
             isRelayStateURLValid = relayState != null && !relayState.isEmpty()
-                    && RelayStateValidator.isValid(request, metaAlias, relayState, SAML2Constants.SP_ROLE);
+                    && RelayStateValidator.isValidForMetaAlias(request, metaAlias, relayState, SAML2Constants.SP_ROLE);
         }
         if (sloFailed) {
             if (isRelayStateURLValid) {

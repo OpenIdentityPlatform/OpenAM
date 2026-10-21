@@ -264,7 +264,7 @@ org.forgerock.openam.utils.ClientUtils"
     // Comment this redirect and uncomment the below href for debugging. 
     // The href at the bottom will take effect
     try {
-        if (spApp != null && RelayStateValidator.isValid(request, realm, spEntityId, spApp,
+        if (spApp != null && RelayStateValidator.isValidForEntity(request, realm, spEntityId, spApp,
                 SAML2Constants.SP_ROLE)) {
             Utils.redirect(response, new PrintWriter(out, true), spApp, sParams, action);
         } else {

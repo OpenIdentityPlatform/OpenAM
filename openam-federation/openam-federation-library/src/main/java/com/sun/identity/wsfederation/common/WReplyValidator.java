@@ -18,7 +18,6 @@ package com.sun.identity.wsfederation.common;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
-import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 import com.sun.identity.wsfederation.plugins.whitelist.ValidWReplyExtractor;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,22 +35,68 @@ import org.forgerock.openam.utils.StringUtils;
  * deployed under a metaAlias, where the hosted entity cannot be resolved from the request URI and no whitelist is
  * consulted at all - see
  * {@link #pointsBackAtThisServer(HttpServletRequest, String)}.
+ *
+ * <p>The static methods are the entry points the JSPs and the servlets use. They delegate to an instance holding the
+ * collaborators, which the tests build with stubs of their own.
  */
 public final class WReplyValidator {
 
     private static final Debug DEBUG = Debug.getInstance(WSFederationConstants.AM_WSFEDERATION);
 
     /**
-     * Holds the validator, which drags in the WS-Federation configuration on first use.
+     * Resolves the hosted entity a metaAlias belongs to.
+     */
+    interface EntityResolver {
+
+        /**
+         * Returns the entity ID the metaAlias belongs to.
+         *
+         * @param metaAlias The metaAlias to resolve, never <code>null</code>.
+         * @return The entity ID, or <code>null</code> when the metaAlias belongs to no hosted entity.
+         * @throws WSFederationMetaException If the metadata could not be read.
+         */
+        String getEntityByMetaAlias(String metaAlias) throws WSFederationMetaException;
+
+        /**
+         * Returns the role the metaAlias is deployed under.
+         *
+         * @param metaAlias The metaAlias to resolve, never <code>null</code>.
+         * @return The role, or {@link SAML2Constants#UNKNOWN_ROLE} when it can not be told apart.
+         * @throws WSFederationMetaException If the metadata could not be read.
+         */
+        String getRoleByMetaAlias(String metaAlias) throws WSFederationMetaException;
+    }
+
+    /**
+     * Holds the default instance, which drags in the WS-Federation configuration on first use.
      */
     private static final class Holder {
 
-        private static final FailSafeRedirectUrlValidator<ValidWReplyExtractor.WSFederationEntityInfo> VALIDATOR =
+        private static final WReplyValidator INSTANCE = new WReplyValidator(
                 new FailSafeRedirectUrlValidator<ValidWReplyExtractor.WSFederationEntityInfo>(
-                        new ValidWReplyExtractor());
+                        new ValidWReplyExtractor()),
+                new EntityResolver() {
+
+                    @Override
+                    public String getEntityByMetaAlias(final String metaAlias) throws WSFederationMetaException {
+                        return WSFederationUtils.getMetaManager().getEntityByMetaAlias(metaAlias);
+                    }
+
+                    @Override
+                    public String getRoleByMetaAlias(final String metaAlias) throws WSFederationMetaException {
+                        return WSFederationUtils.getMetaManager().getRoleByMetaAlias(metaAlias);
+                    }
+                });
     }
 
-    private WReplyValidator() {
+    private final FailSafeRedirectUrlValidator<ValidWReplyExtractor.WSFederationEntityInfo> validator;
+
+    private final EntityResolver entityResolver;
+
+    WReplyValidator(final FailSafeRedirectUrlValidator<ValidWReplyExtractor.WSFederationEntityInfo> validator,
+            final EntityResolver entityResolver) {
+        this.validator = validator;
+        this.entityResolver = entityResolver;
     }
 
     /**
@@ -69,24 +114,24 @@ public final class WReplyValidator {
      * @return <code>true</code> if the wreply URL points back at this server.
      */
     public static boolean pointsBackAtThisServer(HttpServletRequest request, String wreply) {
-        return Holder.VALIDATOR.isRedirectUrlValid(request, wreply,
-                Collections.<ValidWReplyExtractor.WSFederationEntityInfo>emptyList());
+        return Holder.INSTANCE.validate(request, null, null, wreply, null);
     }
 
     /**
-     * Tells whether it is safe to redirect to the given wreply URL, consulting the whitelist of one role.
+     * Tells whether it is safe to redirect to the given wreply URL, consulting only the whitelist of the given role.
      *
-     * @param request The request being processed, used to establish the origin of this server.
+     * @param request The request being processed, consulted as a secondary view of this server's origin, may be
+     * <code>null</code>.
      * @param realm The realm of the hosted entity, may be <code>null</code>.
      * @param entityId The entity ID of the hosted entity, may be <code>null</code>.
      * @param wreply The URL to validate.
-     * @param role The role the endpoint was reached for; when <code>null</code> or unknown the whitelists of
-     * both roles are honoured, because there is nothing to choose between them.
+     * @param role The role serving this endpoint, {@link SAML2Constants#UNKNOWN_ROLE} or <code>null</code> when the
+     * caller can not tell, in which case both roles are consulted.
      * @return <code>true</code> if the wreply URL may be used in a redirect.
      */
-    public static boolean isValid(HttpServletRequest request, String realm, String entityId, String wreply,
+    public static boolean isValidForEntity(HttpServletRequest request, String realm, String entityId, String wreply,
             String role) {
-        return Holder.VALIDATOR.isRedirectUrlValid(request, wreply, entityInfos(realm, entityId, role));
+        return Holder.INSTANCE.validate(request, realm, entityId, wreply, role);
     }
 
     /**
@@ -101,36 +146,96 @@ public final class WReplyValidator {
      * @param wreply The URL to validate.
      * @return <code>true</code> if the wreply URL may be used in a redirect.
      */
-    public static boolean isValid(HttpServletRequest request, String wreply) {
+    public static boolean isValidForRequest(HttpServletRequest request, String wreply) {
+        return Holder.INSTANCE.validateForRequest(request, wreply);
+    }
+
+    /**
+     * Tells whether it is safe to redirect to the given wreply URL, taking the hosted entity from the provided
+     * metaAlias.
+     *
+     * @param request The request being processed, may be <code>null</code>.
+     * @param metaAlias The metaAlias of the hosted entity, may be <code>null</code>.
+     * @param wreply The URL to validate.
+     * @return <code>true</code> if the wreply URL may be used in a redirect.
+     */
+    public static boolean isValidForMetaAlias(HttpServletRequest request, String metaAlias, String wreply) {
+        return Holder.INSTANCE.validateForMetaAlias(request, metaAlias, wreply);
+    }
+
+    /**
+     * Validates the wreply against the whitelist of the given hosted entity.
+     *
+     * @param request The request being processed, may be <code>null</code>.
+     * @param realm The realm of the hosted entity, may be <code>null</code>.
+     * @param entityId The entity ID of the hosted entity, may be <code>null</code>.
+     * @param wreply The URL to validate.
+     * @param role The role serving this endpoint, <code>null</code> when the caller can not tell, in which case
+     * both roles are consulted.
+     * @return <code>true</code> if the wreply URL may be used in a redirect.
+     */
+    boolean validate(final HttpServletRequest request, final String realm, final String entityId, final String wreply,
+            final String role) {
+        return validator.isRedirectUrlValid(request, wreply, entityInfos(realm, entityId, role));
+    }
+
+    /**
+     * Validates the wreply against the whitelist of the entity the metaAlias belongs to.
+     *
+     * @param request The request being processed, may be <code>null</code>.
+     * @param metaAlias The metaAlias of the hosted entity, may be <code>null</code>.
+     * @param wreply The URL to validate.
+     * @return <code>true</code> if the wreply URL may be used in a redirect.
+     */
+    boolean validateForMetaAlias(final HttpServletRequest request, final String metaAlias, final String wreply) {
         if (StringUtils.isEmpty(wreply)) {
-            // WSFederationActionFactory asks about every request, most of which carry no wreply at all, and
-            // resolving the hosted entity below costs three configuration lookups.
+            // There is nothing to redirect to, which the validator answers the same way. Saying so here keeps the
+            // metadata of the hosted entity unread on the requests that carry no wreply at all - the overwhelming
+            // majority, since WSFederationActionFactory asks about every WS-Federation request it serves.
             return false;
         }
         String realm = null;
         String entityId = null;
         String role = null;
-        String metaAlias = WSFederationMetaUtils.getMetaAliasByUri(request.getRequestURI());
         if (metaAlias != null) {
             realm = WSFederationMetaUtils.getRealmByMetaAlias(metaAlias);
             try {
-                WSFederationMetaManager metaManager = WSFederationUtils.getMetaManager();
-                entityId = metaManager.getEntityByMetaAlias(metaAlias);
-                role = metaManager.getRoleByMetaAlias(metaAlias);
+                entityId = entityResolver.getEntityByMetaAlias(metaAlias);
+                // The metaAlias names one role, so only that role's whitelist is consulted. Taking both in as
+                // well would let an IDP wreplyList widen what the SP list actually serving the endpoint allows.
+                role = entityResolver.getRoleByMetaAlias(metaAlias);
             } catch (WSFederationMetaException wsfe) {
-                DEBUG.warning("WReplyValidator.isValid(): cannot resolve the entity of metaAlias " + metaAlias, wsfe);
+                // The whitelist of the hosted entity can not be read, so there is nothing left to validate against.
+                DEBUG.warning("WReplyValidator: cannot resolve the entity the metaAlias names", wsfe);
+                return false;
+            } catch (RuntimeException re) {
+                // Metadata that is present but incomplete surfaces here rather than as a checked exception. It
+                // leaves just as little to validate against, so it is answered the same way instead of escaping
+                // as a 500.
+                DEBUG.warning("WReplyValidator: cannot resolve the entity the metaAlias names", re);
+                return false;
             }
         }
-        return isValid(request, realm, entityId, wreply, role);
+        return validate(request, realm, entityId, wreply, role);
     }
 
     /**
-     * Names the configurations whose whitelist applies. A caller that knows which role the endpoint was reached
-     * for gets only that one; a caller that can not tell - the entity of a WS-Federation signout may be hosted
-     * as the IdP or as the RP - gets both, since picking whichever role happens to be configured first would be
-     * arbitrary rather than safer. This only ever applies to an entity resolved from a metaAlias: an entity the
-     * caller names is not trustworthy enough to select a whitelist at all, which is what
-     * {@link #pointsBackAtThisServer(HttpServletRequest, String)} is for.
+     * Validates the wreply against the whitelist of the entity addressed by the request.
+     *
+     * @param request The request being processed.
+     * @param wreply The URL to validate.
+     * @return <code>true</code> if the wreply URL may be used in a redirect.
+     */
+    boolean validateForRequest(final HttpServletRequest request, final String wreply) {
+        return validateForMetaAlias(request, WSFederationMetaUtils.getMetaAliasByUri(request.getRequestURI()), wreply);
+    }
+
+    /**
+     * Names the configurations the whitelist may be read from. When the caller knows which role serves the endpoint
+     * only that one is consulted; otherwise both are and their whitelists are taken together, so that a dual role
+     * entity does not have the list of one role shadow the other's. This only ever applies to an entity resolved
+     * from a metaAlias or named by trusted code: an entity the caller names is not trustworthy enough to select a
+     * whitelist at all, which is what {@link #pointsBackAtThisServer(HttpServletRequest, String)} is for.
      *
      * <p>Package private so that the role selection can be tested without a live configuration store.
      *

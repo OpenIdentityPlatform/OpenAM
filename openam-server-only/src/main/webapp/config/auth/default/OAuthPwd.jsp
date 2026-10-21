@@ -42,6 +42,7 @@
 <%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
 <%@ page import="com.sun.identity.authentication.service.AuthD" %>
 <%@ page import="com.sun.identity.authentication.service.AuthUtils" %>
+<%@ page import="java.util.HashMap" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
 
 <% // Internationalization
@@ -67,11 +68,21 @@
     if (logoutURL == null) {
         logoutURL = ServiceURI;
     } else {
-        // logoutURL is assigned to window.location, so the realm has to accept it as a goto URL.
-        String orgDN = AuthUtils.getDomainNameByRequest(request, AuthUtils.parseRequestParameters(request));
+        // logoutURL is assigned to window.location, so the realm has to accept it as a goto URL. The realm
+        // is deliberately not taken from the request parameters: that would let the caller name a realm whose
+        // goto whitelist happens to be permissive. With no parameters to read, getDomainNameByRequest()
+        // resolves the realm from the name this server was reached by - only the OpenID Connect endpoints put
+        // a realm attribute on the request, never this page - so it answers the root realm unless the
+        // deployment maps a host name per realm, and a goto URL listed only in a sub realm is not accepted
+        // here. A relative URL is accepted either way; an absolute one pointing back at this server is
+        // accepted only while the realm configures no list at all, since a list that is configured decides
+        // on its own and a same origin URL missing from it is refused like any other.
+        String orgDN = AuthUtils.getDomainNameByRequest(request, new HashMap<String, String>());
         if (!AuthD.getAuth().isGotoUrlValid(request, logoutURL, orgDN)) {
-            OAuthUtil.debugError("OAuthPwd: wrong logoutURL URL attempted to be used "
-                    + "in the OAuthPwd page: " + logoutURL);
+            // The URL stays out of the message: it has been refused, and a value carrying CRLF would
+            // forge lines in the plain text debug file.
+            OAuthUtil.debugError("OAuthPwd: the goto URL is not a permitted redirect target, "
+                    + "the service URI is used instead");
             logoutURL = ServiceURI;
         }
     }

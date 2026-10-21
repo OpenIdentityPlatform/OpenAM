@@ -38,6 +38,7 @@
  %>
 <%@ page import="com.sun.identity.authentication.service.AuthUtils" %>
 <%@ page import="com.sun.identity.authentication.service.AuthD" %>
+<%@ page import="com.sun.identity.federation.common.FSUtils" %>
 
 <%@ include file="Header.jsp"%>
 
@@ -73,15 +74,29 @@
         return;
     }
     if (LRURL != null && LRURL.length() > 0) {
-        // LRURL arrives as a request parameter and ends up in a redirect, so only keep it when the realm
-        // accepts it as a goto URL. The home URL below is administrator configured and is not checked.
-        String orgDN = AuthUtils.getDomainNameByRequest(request, AuthUtils.parseRequestParameters(request));
-        AuthD authD = AuthD.getAuth();
-        if (!authD.isGotoUrlValid(request, LRURL, orgDN)) {
+        // LRURL arrives on the request and ends up in a redirect, so it has to be checked. The realm whose
+        // goto whitelist judges it is determined by this server rather than by the caller: the metaAlias this
+        // page is entered with is a request parameter, so a realm derived from it would be as caller
+        // controlled as the URL being judged - the caller would name whichever realm has a permissive
+        // whitelist and have it vouch for their own redirect. getDomainNameByRequest() with no query
+        // parameters to read resolves the realm from the name this server was reached by, which answers the
+        // root realm unless the deployment maps a host name per realm. A relative URL is kept whether that
+        // realm configures a goto list or not; an absolute one pointing back at this server is kept only
+        // while it configures none, since a list that is configured decides on its own.
+        String orgDN = AuthUtils.getDomainNameByRequest(request, new HashMap<String, String>());
+        if (!AuthD.getAuth().isGotoUrlValid(request, LRURL, orgDN)) {
+            // The configured home URL is used instead, the way an absent LRURL is answered, so say in the log
+            // why the one on the request was dropped.
+            FSUtils.debug.warning("ListOfCOTs.jsp: the LRURL is not a permitted redirect target, "
+                + "falling back to the home URL of the provider");
             LRURL = null;
         }
+    } else {
+        LRURL = null;
     }
-    if (LRURL == null || LRURL.length() <= 0) {
+    if (LRURL == null) {
+        // The home URL comes from the provider's own metadata rather than from the request, so it is an
+        // administrator configured destination and is not measured against this server's origin.
         LRURL = LibertyManager.getHomeURL(providerID, providerRole);
     }
     if (cotSet == null) {

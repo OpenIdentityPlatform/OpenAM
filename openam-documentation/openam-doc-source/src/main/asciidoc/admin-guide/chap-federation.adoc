@@ -927,7 +927,7 @@ List of URLs permitted for the `RelayState` parameter. OpenAM validates the redi
 Use the pattern matching rules described in xref:chap-auth-services.adoc#configure-valid-goto-url-resources["Configuring Valid goto URL Resources"] to specify URLs in the list.
 
 +
-If you do not specify any URLs in this property, OpenAM does not validate the `RelayState` parameter.
+If you do not specify any URLs in this property, OpenAM only redirects to a `RelayState` that is a relative URL or an `http` or `https` URL on the same scheme, host and port as this OpenAM server, either as configured in its server URL or as the request reached it. To let the `RelayState` point at another host, add that host's URLs to this list. Give an internationalized host name in the server URL in its ASCII (`xn--`) form: a host name in Unicode form is never matched.
 
 --
 [#idp-adapter]
@@ -1216,7 +1216,7 @@ List of URLs permitted for the `RelayState` parameter. OpenAM validates the redi
 Use the pattern matching rules described in xref:chap-auth-services.adoc#configure-valid-goto-url-resources["Configuring Valid goto URL Resources"] to specify URLs in the list.
 
 +
-If you do not specify any URLs in this property, OpenAM does not validate the `RelayState` parameter.
+If you do not specify any URLs in this property, OpenAM only redirects to a `RelayState` that is a relative URL or an `http` or `https` URL on the same scheme, host and port as this OpenAM server, either as configured in its server URL or as the request reached it. To let the `RelayState` point at another host, add that host's URLs to this list. Give an internationalized host name in the server URL in its ASCII (`xn--`) form: a host name in Unicode form is never matched.
 
 --
 

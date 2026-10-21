@@ -1142,6 +1142,12 @@ public class WSFederationMetaManager {
                 federationId);
             SPSSOConfigElement spConfig = getSPSSOConfig(realm, federationId);
             
+            if (idpConfig == null && spConfig == null) {
+                // The entity has no extended configuration under either role, so there is no metaAlias on it to
+                // recognise and the role stays unknown.
+                return role;
+            }
+
             if (idpConfig == null) {
                 String m = spConfig.getMetaAlias();
                 if ((m != null) && m.equals(metaAlias)) {

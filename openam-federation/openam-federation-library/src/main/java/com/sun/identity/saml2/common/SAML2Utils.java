@@ -4513,14 +4513,14 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @param relayState The URL to validate.
      * @param role       The role of the caller.
      * @return <code>true</code> if the relayState is valid.
-     * @deprecated Use {@link org.forgerock.openam.saml2.plugins.RelayStateValidator#isValid(HttpServletRequest,
-     * String, String, String)} instead. This method now delegates to it, because on its own it treated a hosted
-     * entity with no <code>relayStateUrlList</code> - the default - as permission to redirect anywhere. With no
-     * request to take an origin from, the fallback is the configured server URL.
+     * @deprecated Use {@link org.forgerock.openam.saml2.plugins.RelayStateValidator#isValidForMetaAlias(
+     * HttpServletRequest, String, String, String)} instead. This method now delegates to it, because on its own it
+     * treated a hosted entity with no <code>relayStateUrlList</code> - the default - as permission to redirect
+     * anywhere. With no request to take an origin from, the fallback is the configured server URL.
      */
     @Deprecated
     public static boolean isRelayStateURLValid(String metaAlias, String relayState, String role) {
-        return RelayStateValidator.isValid(null, metaAlias, relayState, role);
+        return RelayStateValidator.isValidForMetaAlias(null, metaAlias, relayState, role);
     }
 
     /**

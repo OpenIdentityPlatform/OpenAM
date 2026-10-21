@@ -20,6 +20,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -42,6 +43,29 @@ import org.forgerock.openam.utils.StringUtils;
  *     whether or not a whitelist exists, since it can not be an open redirect;</li>
  *     <li>any other URL has to match the configured patterns, and is refused when there are none.</li>
  * </ul>
+ *
+ * <p>This server has two origins and either of them is accepted, because neither is right on its own:
+ *
+ * <ul>
+ *     <li>the <code>com.iplanet.am.server.protocol</code>, <code>com.iplanet.am.server.host</code> and
+ *     <code>com.iplanet.am.server.port</code> properties, the same values the federation code builds its own local
+ *     URL from. They are the only correct answer behind a TLS terminating proxy, where the servlet container sees
+ *     the internal connection while the deployment is configured with the address browsers reach it at;</li>
+ *     <li>the origin the servlet container reports. It is the only correct answer on a site installation, where the
+ *     properties above describe this instance rather than the load balancer in front of the site, and it is what
+ *     OpenAM itself builds the URLs it hands out from - <code>RPSigninRequest</code> mints its <code>wreply</code>
+ *     from {@link jakarta.servlet.http.HttpServletRequest#getRequestURL()} and the SAML2 IdP proxy builds its
+ *     RelayState from the <code>Host</code> header.</li>
+ * </ul>
+ *
+ * <p>The container view is derived from the <code>Host</code> header, so accepting it widens what counts as this
+ * server to whatever name resolves to it. That is the deployment's FQDN map to control, the same way it controls
+ * every other URL OpenAM builds from the header; a redirect lure cannot exploit it, because the header on the
+ * victim's request is the one their own browser sends.
+ *
+ * <p>Host names are compared as they stand, apart from ASCII case and a trailing root label: a deployment whose
+ * name is an internationalised one has to name itself in <code>com.iplanet.am.server.host</code> in ASCII
+ * compatible form, the same the whitelist path expects of it.
  *
  * @param <T> The type identifying the configuration the whitelist is read from.
  */
@@ -69,7 +93,8 @@ public class FailSafeRedirectUrlValidator<T> {
     /**
      * Tells whether it is safe to redirect to the given URL.
      *
-     * @param request The request being processed, used to establish the origin of this server.
+     * @param request The request being processed, consulted as one of the two views of this server's origin, may
+     * be <code>null</code>.
      * @param url The URL to validate.
      * @param configInfo Identifies the configuration holding the whitelist, may be <code>null</code>.
      * @return <code>true</code> if the URL may be used in a redirect.
@@ -85,19 +110,38 @@ public class FailSafeRedirectUrlValidator<T> {
      * <p>The whitelists of all the provided configurations are honoured together. This suits endpoints that can be
      * reached for more than one role, where the caller can not tell up front which one holds the configuration.
      *
-     * @param request The request being processed, used to establish the origin of this server.
+     * @param request The request being processed, consulted as one of the two views of this server's origin, may be
+     * <code>null</code>.
      * @param url The URL to validate.
      * @param configInfos Identifies the configurations holding the whitelist, may be empty.
      * @return <code>true</code> if the URL may be used in a redirect.
      */
     public boolean isRedirectUrlValid(final HttpServletRequest request, final String url,
             final Collection<T> configInfos) {
-        if (StringUtils.isEmpty(url) || !RedirectUrlValidator.isWithinLengthLimit(url)) {
+        if (StringUtils.isEmpty(url)) {
+            DEBUG.message("FailSafeRedirectUrlValidator: no URL to validate");
             return false;
         }
 
-        final URI uri = RedirectUrlValidator.parseRedirectUrl(url);
-        if (uri == null) {
+        final int maxUrlLength = getMaxUrlLength();
+        if (url.length() > maxUrlLength) {
+            DEBUG.message("FailSafeRedirectUrlValidator: the URL was length {} which is longer than the allowed "
+                    + "maximum of {}", url.length(), maxUrlLength);
+            return false;
+        }
+
+        final URI uri;
+        try {
+            uri = new URI(url);
+        } catch (final URISyntaxException urise) {
+            // This is the one branch the URL itself stays out of. Every message below it describes a value
+            // java.net.URI has already accepted, and URI refuses a raw CR or LF; this one describes precisely
+            // a value it could not read, so it is the only one a CRLF can reach, and the plain text debug
+            // file is where that forges lines. The exception is not handed over either - its own message
+            // quotes the input - so what is left is the reason and the index, which is the part that says
+            // what was wrong with it.
+            DEBUG.message("FailSafeRedirectUrlValidator: the URL is not a valid URI: {} at index {}",
+                    urise.getReason(), urise.getIndex());
             return false;
         }
 
@@ -133,6 +177,10 @@ public class FailSafeRedirectUrlValidator<T> {
     /**
      * Collects the patterns of every provided configuration into a single whitelist.
      *
+     * <p>Every configuration is read exactly once. A configuration whose whitelist can not be read contributes
+     * nothing: the remaining ones still decide, and a result that stays empty accepts only the URLs of this
+     * deployment rather than any URL.
+     *
      * @param configInfos Identifies the configurations holding the whitelist, may be <code>null</code> or empty.
      * @return The configured patterns, never <code>null</code>.
      */
@@ -145,12 +193,25 @@ public class FailSafeRedirectUrlValidator<T> {
             if (configInfo == null) {
                 continue;
             }
-            final Collection<String> configured = domainExtractor.extractValidDomains(configInfo);
-            if (configured != null) {
-                patterns.addAll(configured);
+            try {
+                final Collection<String> configured = domainExtractor.extractValidDomains(configInfo);
+                if (configured != null) {
+                    patterns.addAll(configured);
+                }
+            } catch (final RuntimeException re) {
+                DEBUG.error("FailSafeRedirectUrlValidator: cannot read the URL patterns of {}", configInfo, re);
             }
         }
         return patterns;
+    }
+
+    /**
+     * Returns the maximum accepted length of a redirect URL. Overridden by the tests.
+     *
+     * @return The maximum accepted length of a redirect URL.
+     */
+    int getMaxUrlLength() {
+        return RedirectUrlValidator.getMaxUrlLength();
     }
 
     /**
@@ -198,12 +259,12 @@ public class FailSafeRedirectUrlValidator<T> {
 
         // Behind a TLS terminating proxy the container sees the internal scheme and port, while this server's own
         // URLs carry the ones it is configured with, so the configured origin has to count as well.
-        final String serverProtocol = getServerProperty(Constants.AM_SERVER_PROTOCOL);
-        final String serverHost = getServerProperty(Constants.AM_SERVER_HOST);
-        final int serverPort = parsePort(getServerProperty(Constants.AM_SERVER_PORT));
-        if (StringUtils.isNotEmpty(serverProtocol) && StringUtils.isNotEmpty(serverHost) && serverPort != -1) {
-            return matchesOrigin(scheme, host, port, serverProtocol, serverHost, serverPort);
+        if (matchesOrigin(scheme, host, port, getConfiguredScheme(), getConfiguredHost(), getConfiguredPort())) {
+            return true;
         }
+
+        DEBUG.message("FailSafeRedirectUrlValidator: the URL {} points at neither the configured origin of this "
+                + "server nor the one the servlet container reports", uri);
         return false;
     }
 
@@ -302,6 +363,33 @@ public class FailSafeRedirectUrlValidator<T> {
     }
 
     /**
+     * Returns the scheme this server is configured to be reached at. Overridden by the tests.
+     *
+     * @return The configured scheme, or <code>null</code> when it is not configured.
+     */
+    String getConfiguredScheme() {
+        return getServerProperty(Constants.AM_SERVER_PROTOCOL);
+    }
+
+    /**
+     * Returns the host this server is configured to be reached at. Overridden by the tests.
+     *
+     * @return The configured host, or <code>null</code> when it is not configured.
+     */
+    String getConfiguredHost() {
+        return getServerProperty(Constants.AM_SERVER_HOST);
+    }
+
+    /**
+     * Returns the port this server is configured to be reached at. Overridden by the tests.
+     *
+     * @return The configured port, or <code>-1</code> when it is not configured.
+     */
+    int getConfiguredPort() {
+        return parsePort(getServerProperty(Constants.AM_SERVER_PORT));
+    }
+
+    /**
      * Parses a configured port number.
      *
      * @param port The configured value, may be <code>null</code>.
@@ -325,22 +413,21 @@ public class FailSafeRedirectUrlValidator<T> {
      * @param urlScheme The scheme of the URL, <code>null</code> for a scheme relative URL.
      * @param host The host of the URL, already known to be non <code>null</code>.
      * @param urlPort The port of the URL, <code>-1</code> when it names none.
-     * @param originScheme The scheme of the origin.
-     * @param originHost The host of the origin.
-     * @param originPort The port of the origin.
+     * @param originScheme The scheme of the origin, may be <code>null</code> when it is not configured.
+     * @param originHost The host of the origin, may be <code>null</code> when it is not configured.
+     * @param originPort The port of the origin, not positive when it is not configured.
      * @return <code>true</code> if the URL points at that origin.
      */
-    private boolean matchesOrigin(final String urlScheme, final String host, final int urlPort,
+    private static boolean matchesOrigin(final String urlScheme, final String host, final int urlPort,
             final String originScheme, final String originHost, final int originPort) {
-        // A scheme relative URL inherits the scheme it is resolved against.
-        String scheme = urlScheme;
-        if (scheme == null) {
-            scheme = originScheme;
+        if (StringUtils.isEmpty(originScheme) || StringUtils.isEmpty(originHost) || originPort <= 0) {
+            return false;
         }
+        // A scheme relative URL inherits the scheme it is resolved against.
+        final String scheme = urlScheme != null ? urlScheme : originScheme;
         // Not equalsIgnoreCase for the host: it folds U+0131 and U+0130 onto "i", which a browser does not.
-        if (originScheme == null || originHost == null || scheme == null
-                || !scheme.equalsIgnoreCase(originScheme)
-                || !host.toLowerCase(Locale.ROOT).equals(originHost.toLowerCase(Locale.ROOT))) {
+        if (!scheme.equalsIgnoreCase(originScheme)
+                || !canonicalHost(host).equals(canonicalHost(originHost))) {
             return false;
         }
 
@@ -349,5 +436,33 @@ public class FailSafeRedirectUrlValidator<T> {
             port = "https".equalsIgnoreCase(scheme) ? 443 : 80;
         }
         return port == originPort;
+    }
+
+    /**
+     * Puts a host name into the form the comparison is made in: lower case in the root locale, without a trailing
+     * root label.
+     *
+     * <p>A root anchored name names the host it is compared against, so it may not be turned away: with no
+     * whitelist configured that would deny a legitimate redirect back to this server. Only that one form is
+     * folded - the comparison stays an equality, never a suffix match.
+     *
+     * <p>No IDNA mapping is applied. {@link java.net.IDN} implements IDNA2003, which <em>maps</em> characters rather
+     * than preserving them: it turns <code>gro&szlig;.example.com</code> into <code>gross.example.com</code>, a
+     * separately registrable third party domain, which would then be taken for this server's own origin. It also
+     * never produces the form a browser reaching that host actually sends, the UTS46 one -
+     * <code>xn--gro-7ka.example.com</code> - so it would not even serve the names it was applied for. A deployment
+     * whose name is an internationalised one therefore has to set <code>com.iplanet.am.server.host</code> to the
+     * ASCII compatible form of it, which is what the whitelist path demands as well:
+     * {@link com.sun.identity.shared.whitelist.URLPatternMatcher} matches the host of a URL as it stands too.
+     *
+     * @param host The host name to canonicalise, never <code>null</code>.
+     * @return The name in lower case, without a trailing root label.
+     */
+    private static String canonicalHost(final String host) {
+        final String lowerCase = host.toLowerCase(Locale.ROOT);
+        if (lowerCase.length() > 1 && lowerCase.endsWith(".")) {
+            return lowerCase.substring(0, lowerCase.length() - 1);
+        }
+        return lowerCase;
     }
 }

@@ -73,6 +73,7 @@ import com.sun.identity.saml2.protocol.StatusCode;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
+import org.forgerock.openam.saml2.plugins.RelayStateValidator;
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
 
@@ -116,6 +117,41 @@ public class IDPSingleLogout {
     }
 
     private IDPSingleLogout() {
+    }
+
+    /**
+     * Returns the RelayState the multi-federation-protocol logout may send the browser to.
+     *
+     * <p>{@link com.sun.identity.multiprotocol.SingleLogoutManager} keeps this value and, once the other
+     * protocols have logged out, appends the logout status to it and hands it to <code>sendRedirect</code> with
+     * no check of its own. The only check in front of it is
+     * {@link SAML2Utils#validateRelayStateURL(String, String, String, String)}, which accepts every URL while the
+     * hosted entity has no <code>relayStateUrlList</code> - the default - so the value gets the fail safe check
+     * here before it is handed over.
+     *
+     * <p>A RelayState that is not accepted is dropped rather than raised as an error: the logout itself has
+     * already run by this point, and the browser then ends on the status page the same way it does when the
+     * logout was initiated without a RelayState at all. An absent one is passed on unchanged, so that it keeps
+     * choosing that same branch.
+     *
+     * @param request The request being processed.
+     * @param realm The realm of the hosted IdP.
+     * @param idpEntityID The entity ID of the hosted IdP.
+     * @param relayState The RelayState the logout was initiated with, may be <code>null</code> or empty.
+     * @return The RelayState to hand on, or <code>null</code> when it may not be redirected to.
+     */
+    static String relayStateForMultiProtocolLogout(final HttpServletRequest request, final String realm,
+            final String idpEntityID, final String relayState) {
+        if (StringUtils.isEmpty(relayState)
+                || RelayStateValidator.isValidForEntity(request, realm, idpEntityID, relayState,
+                        SAML2Constants.IDP_ROLE)) {
+            return relayState;
+        }
+        // The RelayState stays out of the message: it has not been accepted, and a value carrying CRLF would
+        // forge lines in the plain text debug file.
+        debug.warning("IDPSingleLogout: the RelayState is not a permitted redirect target, the multi protocol "
+                + "logout continues without it");
+        return null;
     }
 
     /**
@@ -376,7 +412,9 @@ public class IDPSingleLogout {
                         retStat = SingleLogoutManager.getInstance().
                             doIDPSingleLogout(set, sessUser, request, response,
                             isSOAPInitiated, true, SingleLogoutManager.SAML2,
-                            realm, idpEntityID, null, relayState, null, null,
+                            realm, idpEntityID, null,
+                            relayStateForMultiProtocolLogout(request, realm, idpEntityID, relayState),
+                            null, null,
                             logoutStatus);
                 } catch (Exception ex) {
                         debug.warning("IDPSingleLogout.initiateLoogutReq: MP", 
@@ -1648,7 +1686,8 @@ public class IDPSingleLogout {
                     int retStatus = SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS;
                     try {
                         retStatus = sloManager.doIDPSingleLogout(set, uid, request, response, false, true,
-                                SingleLogoutManager.SAML2, realm, idpEntityID, originatingLogoutSPEntityID, relayState,
+                                SingleLogoutManager.SAML2, realm, idpEntityID, originatingLogoutSPEntityID,
+                                relayStateForMultiProtocolLogout(request, realm, idpEntityID, relayState),
                                 null, null, getLogoutStatus(logoutRes));
                     } catch (SAML2Exception ex) {
                         throw ex;

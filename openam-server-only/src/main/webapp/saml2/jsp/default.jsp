@@ -25,6 +25,7 @@
    $Id: default.jsp,v 1.3 2008/10/29 03:11:52 veiming Exp $
 
    Portions Copyrighted 2013-2014 ForgeRock AS.
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <%@page
@@ -57,8 +58,12 @@ org.owasp.esapi.ESAPI"
     }
     String relayState = (String) request.getAttribute(SAML2Constants.RELAY_STATE);
     if (relayState != null && !relayState.isEmpty()) {
+        // The RelayState has passed RelayStateValidator, which answers whether it is safe to redirect to, not
+        // whether it is safe in HTML: a relative URL such as "&#x6a;avascript:alert(1)" is accepted, and a
+        // browser decodes the character reference in an href into a javascript: URL. Encoding keeps it the
+        // relative URL the validator judged.
         %>
-        <a href="<%= relayState %>"><%= ESAPI.encoder().encodeForHTML(SAML2Utils.bundle.getString("followRelayState")) %></a>
+        <a href="<%= ESAPI.encoder().encodeForHTMLAttribute(relayState) %>"><%= ESAPI.encoder().encodeForHTML(SAML2Utils.bundle.getString("followRelayState")) %></a>
         <%
     }
 %>

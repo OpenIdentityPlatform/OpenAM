@@ -25,7 +25,7 @@
  * $Id: SPSingleLogout.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
  * Portions Copyrighted 2013-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.profile;
@@ -82,6 +82,7 @@ import org.forgerock.openam.audit.AMAuditEventBuilderUtils;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.SAML2Store;
 import org.forgerock.openam.saml2.audit.SAML2EventLogger;
+import org.forgerock.openam.saml2.plugins.RelayStateValidator;
 
 /**
  * This class reads the required data from HttpServletRequest and
@@ -292,11 +293,15 @@ public class SPSingleLogout {
 
             String relayState = SAML2Utils.getParameter(paramsMap,
                 SAML2Constants.RELAY_STATE);
-            
+
+            // An administrator configured landing page is not a redirect target the caller chose, so it is
+            // deliberately not put through the RelayState whitelist below.
+            boolean isConfiguredRelayState = false;
             if (relayState == null || relayState.equals("")) {
                 relayState = SAML2Utils.getAttributeValueFromSSOConfig(realm,
                     spEntityID, SAML2Constants.SP_ROLE,
                     SAML2Constants.DEFAULT_RELAY_STATE);
+                isConfiguredRelayState = relayState != null && !relayState.equals("");
             }
 
             // Validate the RelayState URL.
@@ -310,7 +315,11 @@ public class SPSingleLogout {
                 // relay state if any
                 debug.warning("SPSingleLogout.initiateLogoutRequest : Unable to get infoKeyString from session.");
                 sessionProvider.invalidateSession(session, request, response);
-                if ((relayState != null) && !relayState.equals("")) {
+                // validateRelayStateURL() above accepts any URL while the hosted entity has no
+                // relayStateUrlList, so the redirect needs the fail safe check of its own.
+                if ((relayState != null) && !relayState.equals("")
+                        && (isConfiguredRelayState || RelayStateValidator.isValidForEntity(request, realm,
+                                spEntityID, relayState, SAML2Constants.SP_ROLE))) {
                     try {
                         response.sendRedirect(relayState);
                     } catch (IOException e) {

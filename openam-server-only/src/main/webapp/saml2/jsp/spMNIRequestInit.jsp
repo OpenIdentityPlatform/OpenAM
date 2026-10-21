@@ -41,7 +41,6 @@
 <%@ page import="com.sun.identity.saml2.meta.SAML2MetaUtils" %>
 <%@ page import="com.sun.identity.saml2.profile.DoManageNameID" %>
 <%@ page import="java.util.HashMap" %>
-<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%--
     idpMNIRequestInit.jsp initiates the ManageNameIDRequest at
@@ -113,9 +112,6 @@
         }
 
         String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-        if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
-            relayState = null;
-        }
         
         
         if ((relayState == null) || (relayState.isEmpty())) {
@@ -152,8 +148,10 @@
                                           metaAlias, idpEntityID, paramsMap);
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
+            // The metaAlias that drove the request above is the one the RelayState is measured against:
+            // isValidForRequest would prefer the one in the URI, which need not be the same alias.
             if (relayState != null && !relayState.isEmpty() &&
-                    RelayStateValidator.isValidForRequest(request, relayState, SAML2Constants.SP_ROLE)) {
+                    RelayStateValidator.isValidForMetaAlias(request, metaAlias, relayState, SAML2Constants.SP_ROLE)) {
                 response.sendRedirect(relayState);
             } else {
                 %>

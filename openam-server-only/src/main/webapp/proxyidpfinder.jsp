@@ -26,6 +26,7 @@
 
 <%@ page import="com.sun.identity.shared.encode.Base64" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
+<%@ page import="com.sun.identity.shared.encode.URLEncDec" %>
 <%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="org.owasp.esapi.ESAPI"%>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
@@ -62,9 +63,15 @@
         <%
             }
 
+            // No hosted entity is named on purpose, so that this server's own origin is what decides. The value
+            // being checked is not a RelayState the caller supplied: SAML2IDPProxyFRImpl.buildReturnURL composes
+            // it from the URL of the request that started the SSO, so it always names this server and would be on
+            // no relayStateUrlList - consulting one would reject every proxied SSO on a deployment that has one.
+            // The metaAlias request parameter is left out for the same reason: this page carries none of its own,
+            // so honouring it would only let the caller pick which configuration is consulted.
             relayState = (String) hts.getAttribute("_RELAYSTATE_");
             if (relayState == null || relayState.isEmpty() ||
-                    !RelayStateValidator.isValidForRequest(request, relayState, SAML2Constants.IDP_ROLE)) {
+                    !RelayStateValidator.isValidForEntity(request, null, null, relayState, SAML2Constants.IDP_ROLE)) {
         %>
             <jsp:forward page="<%= errorURL %>" />
         <%
@@ -95,12 +102,10 @@
                 hts.removeAttribute("_SPREQUESTER_");
                 hts.removeAttribute("_REQAUTHNCONTEXT_");
 
-                if (relayState.indexOf("?") == -1) {
-                    relayState += "?";
-                } else {
-                    relayState += "&";
-                }
-                response.sendRedirect(relayState + "_saml_idp=" + samlIdP);
+                // The parameter has to stay in front of the fragment and has to be encoded: samlIdP is
+                // Base64, whose '+' would otherwise be read back as a space. The page must not carry on
+                // writing its own body into the redirect either.
+                response.sendRedirect(URLEncDec.appendQueryParameter(relayState, "_saml_idp", samlIdP));
                 return;
             }
 

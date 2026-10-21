@@ -105,7 +105,7 @@ public class WSFederationActionFactory {
             wreply = request.getParameter(WSFederationConstants.WREPLY);
         }
 
-        if (!WReplyValidator.isValid(request, wreply)) {
+        if (!WReplyValidator.isValidForRequest(request, wreply)) {
             wreply = null;
         }
 

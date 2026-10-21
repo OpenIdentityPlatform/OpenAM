@@ -1941,11 +1941,28 @@ public class SPACSUtils {
         }
         
         if (relayStateUrl == null || relayStateUrl.trim().length() == 0) {
-            relayStateUrl = getAttributeValueFromSPSSOConfig(
-                orgName, hostEntityId, sm, SAML2Constants.DEFAULT_RELAY_STATE);
+            relayStateUrl = getDefaultRelayState(orgName, hostEntityId, sm);
         }
-        
+
         return relayStateUrl;
+    }
+
+    /**
+     * Retrieves the default relay state from <code>SPSSOConfig</code>. This URL is administrator configured, so it
+     * needs no validation against the RelayState whitelist of the hosted entity.
+     *
+     * @param orgName realm or organization name the service provider resides in
+     * @param hostEntityId Entity ID of the hosted service provider
+     * @param sm <code>SAML2MetaManager</code> instance.
+     * @return the default relay state; or <code>null</code> if it is not configured or an error occurred during the
+     *                retrieval process.
+     */
+    public static String getDefaultRelayState(String orgName,
+                                        String hostEntityId,
+                                        SAML2MetaManager sm)
+    {
+        return getAttributeValueFromSPSSOConfig(orgName, hostEntityId, sm,
+                                        SAML2Constants.DEFAULT_RELAY_STATE);
     }
 
     /**

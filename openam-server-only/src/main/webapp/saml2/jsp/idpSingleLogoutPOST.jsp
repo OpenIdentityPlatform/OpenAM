@@ -30,12 +30,12 @@
 
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="com.sun.identity.shared.encode.URLEncDec" %>
 <%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPCache" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPSingleLogout" %>
-<%@ page import="org.owasp.esapi.ESAPI" %>
 <%@ page import="java.io.PrintWriter" %>
 
 <%--
@@ -69,9 +69,6 @@
         if (tmpRs != null) {
             relayState = tmpRs;
         }
-    }
-    if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
-        relayState = null;
     }
     String samlResponse = request.getParameter(SAML2Constants.SAML_RESPONSE);
     if (samlResponse != null) {
@@ -112,13 +109,10 @@
 
         if (!doRelayState) {
             if (relayState != null && RelayStateValidator.isValidForRequest(request, relayState, SAML2Constants.IDP_ROLE)) {
-                if (relayState.indexOf("?") != -1) {
-                    response.sendRedirect(relayState 
-                        + "&logoutStatus=logoutSuccess");
-                } else {
-                    response.sendRedirect(relayState 
-                        + "?logoutStatus=logoutSuccess");
-                }
+                // The parameter has to stay in front of the fragment, or a RelayState such as
+                // /openam/XUI/#login swallows it.
+                response.sendRedirect(URLEncDec.appendQueryParameter(relayState,
+                    "logoutStatus", "logoutSuccess"));
             } else {
                 %>
                 <jsp:forward page="/saml2/jsp/default.jsp?message=idpSloSuccess" />

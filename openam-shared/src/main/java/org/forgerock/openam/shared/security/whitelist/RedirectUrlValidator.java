@@ -55,6 +55,16 @@ public class RedirectUrlValidator<T> {
     private final static int MAX_URL_LENGTH = SystemPropertiesManager.getAsInt(MAX_URL_LENGTH_PROPERTY, 2000);
 
     /**
+     * Returns the maximum accepted length of a redirect URL, as configured by the
+     * <code>org.forgerock.openam.redirecturlvalidator.maxUrlLength</code> property.
+     *
+     * @return The maximum accepted length of a redirect URL.
+     */
+    public static int getMaxUrlLength() {
+        return MAX_URL_LENGTH;
+    }
+
+    /**
      * Constructs a new RedirectUrlValidator instance.
      *
      * @param domainExtractor A ValidDomainExtractor instance.
