@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -36,8 +38,16 @@ import org.testng.annotations.Test;
  */
 public class FailSafeRedirectUrlValidatorTest {
 
+    /** The configuration of an entity that was read and holds no patterns. */
+    private static final String EMPTY = "empty";
+
+    /** The configuration of an entity whose patterns could not be read at all. */
+    private static final String UNREADABLE = "unreadable";
+
     /**
-     * Hands back whatever patterns the test configured for a given configuration name.
+     * Hands back whatever patterns the test configured, keyed by the configuration name, and tells the two answers
+     * an extractor can give for "no patterns here" apart: an empty collection for a configuration that was read
+     * and holds none, <code>null</code> for one that could not be read.
      */
     private static final class StubExtractor implements ValidDomainExtractor<String> {
 
@@ -47,7 +57,14 @@ public class FailSafeRedirectUrlValidatorTest {
         @Override
         public Collection<String> extractValidDomains(String configInfo) {
             reads++;
-            return patterns.get(configInfo);
+            if (EMPTY.equals(configInfo)) {
+                return Collections.emptyList();
+            }
+            if (UNREADABLE.equals(configInfo)) {
+                return null;
+            }
+            final Collection<String> configured = patterns.get(configInfo);
+            return configured == null ? Collections.<String>emptyList() : configured;
         }
     }
 
@@ -124,6 +141,19 @@ public class FailSafeRedirectUrlValidatorTest {
         }
     }
 
+    /**
+     * The origin fallback counts the URL this server was installed under as one of its own, so these are pinned
+     * rather than left to whatever else ran in this JVM first - an ambient value would silently add an accepted
+     * origin and make the assertions below depend on test ordering.
+     */
+    private static final String[] INSTALLATION = {
+        Constants.AM_SERVER_PROTOCOL,
+        Constants.AM_SERVER_HOST,
+        Constants.AM_SERVER_PORT,
+    };
+
+    private final Map<String, String> previousValues = new HashMap<String, String>();
+
     private HttpServletRequest request;
     private StubExtractor extractor;
     private TestValidator validator;
@@ -137,6 +167,36 @@ public class FailSafeRedirectUrlValidatorTest {
         when(request.getContextPath()).thenReturn("/openam");
         extractor = new StubExtractor();
         validator = new TestValidator(extractor);
+
+        previousValues.clear();
+        for (String property : INSTALLATION) {
+            previousValues.put(property, SystemPropertiesManager.get(property));
+        }
+        SystemPropertiesManager.initializeProperties(Constants.AM_SERVER_PROTOCOL, "https");
+        SystemPropertiesManager.initializeProperties(Constants.AM_SERVER_HOST, "installed.example.com");
+        SystemPropertiesManager.initializeProperties(Constants.AM_SERVER_PORT, "443");
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        for (String property : INSTALLATION) {
+            String previous = previousValues.get(property);
+            // Restores what get() returned before. The test SystemProperties stub has no remove, so a property that
+            // was absent comes back as "" and stays present: getOrDefault then answers "" rather than its default.
+            // Harmless for the installation properties, which are read through StringUtils.isEmpty.
+            SystemPropertiesManager.initializeProperties(property, previous == null ? "" : previous);
+        }
+    }
+
+    @Test
+    public void shouldAcceptTheUrlThisServerWasInstalledUnder() {
+        // The container reports openam.example.com for this request while the installation names another host;
+        // both are origins of this server, which is what keeps a proxied deployment working. A plain
+        // validator rather than the test one, so that the real properties are what is read.
+        FailSafeRedirectUrlValidator<String> validator = new FailSafeRedirectUrlValidator<String>(extractor);
+        assertThat(validator.isRedirectUrlValid(request, "https://installed.example.com/openam/", EMPTY)).isTrue();
+        assertThat(validator.isRedirectUrlValid(request, "https://installed.example.com:8443/openam/", EMPTY))
+                .isFalse();
     }
 
     /**
@@ -655,5 +715,233 @@ public class FailSafeRedirectUrlValidatorTest {
 
         assertThat(validator.isRedirectUrlValid(request, "https://%C4%B0nfo.example.com/openam/", "realm"))
                 .isFalse();
+    }
+
+    @Test
+    public void shouldAcceptAnAdditionalOriginThisServerAnswersOn() {
+        // Behind a TLS terminating reverse proxy the container reports the internal origin for a request that
+        // reached OpenAM on the published one, so the published one has to count as this server too.
+        FailSafeRedirectUrlValidator<String> published = new PublishedAtSsoExampleCom(extractor);
+
+        assertThat(published.isRedirectUrlValid(request, "https://sso.example.com/openam/console", "realm")).isTrue();
+        // Still an origin comparison, not a prefix one.
+        assertThat(published.isRedirectUrlValid(request, "https://sso.example.com:8443/openam/", "realm")).isFalse();
+        assertThat(published.isRedirectUrlValid(request, "https://sso.example.com.attacker.example.com/", "realm"))
+                .isFalse();
+        assertThat(published.isRedirectUrlValid(request, "https://attacker.example.com/", "realm")).isFalse();
+        // The origin of the request itself keeps working alongside it.
+        assertThat(published.isRedirectUrlValid(request, "https://openam.example.com/openam/", "realm")).isTrue();
+    }
+
+    @Test
+    public void shouldAcceptAnAdditionalOriginOfThisDeploymentWhenAWhitelistIsConfigured() {
+        // An additional origin is this server as much as the one the container reports, so a URL of this
+        // deployment on it needs no whitelist either; anything else on that host is still left to the list.
+        extractor.patterns.put("realm", Collections.singletonList("https://partner.example.com/*"));
+        FailSafeRedirectUrlValidator<String> published = new PublishedAtSsoExampleCom(extractor);
+
+        assertThat(published.isRedirectUrlValid(request, "https://sso.example.com/openam/console", "realm")).isTrue();
+        assertThat(published.isRedirectUrlValid(request, "https://sso.example.com/otherapp/x", "realm")).isFalse();
+    }
+
+    @Test
+    public void shouldCompareTheRequestOriginWithTheDefaultPortItNamesNone() {
+        // A container answering an HTTP/1.0 request, or a request wrapper filling in nothing, reports no port at
+        // all. Comparing that against the 443 the URL side is normalised to would drop every absolute URL naming
+        // this very server on a realm that has no whitelist - the deployments this validator is here to keep
+        // working.
+        HttpServletRequest noPort = mock(HttpServletRequest.class);
+        when(noPort.getScheme()).thenReturn("https");
+        when(noPort.getServerName()).thenReturn("openam.example.com");
+        when(noPort.getServerPort()).thenReturn(-1);
+
+        assertThat(validator.isRedirectUrlValid(noPort, "https://openam.example.com/openam/", "realm")).isTrue();
+        assertThat(validator.isRedirectUrlValid(noPort, "https://openam.example.com:443/openam/", "realm")).isTrue();
+        assertThat(validator.isRedirectUrlValid(noPort, "https://openam.example.com:8443/openam/", "realm"))
+                .isFalse();
+        assertThat(validator.isRedirectUrlValid(noPort, "https://attacker.example.com/", "realm")).isFalse();
+    }
+
+    @Test
+    public void shouldRefuseARedirectWhenTheRequestWillNotSayWhereItWasAddressed() {
+        // Every other input this class reads is allowed to be missing without throwing, and a wrapped request is
+        // somebody else's code: a request with no host is a redirect to refuse, not a NullPointerException to
+        // throw out of the login path.
+        HttpServletRequest hostless = mock(HttpServletRequest.class);
+        when(hostless.getScheme()).thenReturn("https");
+        when(hostless.getServerName()).thenReturn(null);
+        when(hostless.getServerPort()).thenReturn(443);
+
+        assertThat(validator.isRedirectUrlValid(hostless, "https://openam.example.com/openam/", "realm")).isFalse();
+        assertThat(validator.isRedirectUrlValid(hostless, "/openam/XUI/", "realm")).isTrue();
+    }
+
+    @Test
+    public void shouldCompareAnIpv6LiteralHostWithoutItsBrackets() {
+        // java.net.URI hands back "[::1]" while the container may report "::1" for the same host.
+        HttpServletRequest ipv6Request = mock(HttpServletRequest.class);
+        when(ipv6Request.getScheme()).thenReturn("https");
+        when(ipv6Request.getServerName()).thenReturn("::1");
+        when(ipv6Request.getServerPort()).thenReturn(443);
+
+        assertThat(validator.isRedirectUrlValid(ipv6Request, "https://[::1]/openam/", "realm")).isTrue();
+        assertThat(validator.isRedirectUrlValid(ipv6Request, "https://[::2]/openam/", "realm")).isFalse();
+    }
+
+    @Test
+    public void shouldApplyTheSameUrlLengthLimitAsTheLegacyValidator() {
+        extractor.patterns.put("realm", Collections.singletonList("https://partner.example.com/*"));
+        RedirectUrlValidator<String> legacy = new RedirectUrlValidator<String>(extractor);
+        String atTheLimit = whitelistedUrlOfLength(RedirectUrlValidator.MAX_URL_LENGTH);
+        String overTheLimit = whitelistedUrlOfLength(RedirectUrlValidator.MAX_URL_LENGTH + 1);
+
+        // Both validators take the limit from RedirectUrlValidator.MAX_URL_LENGTH, which reads
+        // org.forgerock.openam.redirecturlvalidator.maxUrlLength once, at class initialisation. Nothing sets that
+        // property in this JVM, so these rows pin the boundary at the default and that the two agree on it - not
+        // that a raised limit reaches both.
+        assertThat(legacy.isRedirectUrlValid(atTheLimit, "realm")).isTrue();
+        assertThat(validator.isRedirectUrlValid(request, atTheLimit, "realm")).isTrue();
+        assertThat(legacy.isRedirectUrlValid(overTheLimit, "realm")).isFalse();
+        assertThat(validator.isRedirectUrlValid(request, overTheLimit, "realm")).isFalse();
+    }
+
+    @Test
+    public void shouldMatchAgainstTheWhitelistItAlreadyRead() {
+        // ValidGotoUrlExtractor caches the patterns, drops the entry whenever the configuration changes and hands
+        // back nothing at all when the configuration store is unreachable, so two reads of the same realm can
+        // disagree. Reading twice would let the second one come back empty and turn a configured realm into the
+        // open redirect this validator exists to close.
+        List<String> patterns = Collections.singletonList("https://partner.example.com/*");
+        VanishingExtractor vanishing = new VanishingExtractor(patterns);
+        FailSafeRedirectUrlValidator<String> validator = new FailSafeRedirectUrlValidator<String>(vanishing);
+
+        assertThat(validator.isRedirectUrlValid(request, "https://attacker.example.com/", "realm")).isFalse();
+        assertThat(vanishing.reads).isEqualTo(1);
+    }
+
+    @Test
+    public void shouldFallBackToOriginWhenTheWhitelistCouldNotBeRead() {
+        // The extractor answers null - the store is unreachable - rather than an empty collection. Nothing is
+        // known about the patterns, so the URL only passes when it points back at this server.
+        assertThat(validator.isRedirectUrlValid(request, "https://partner.example.com/slo", UNREADABLE)).isFalse();
+        assertThat(validator.isRedirectUrlValid(request, "https://openam.example.com/openam/", UNREADABLE)).isTrue();
+        assertThat(validator.isRedirectUrlValid(request, "/openam/XUI/", UNREADABLE)).isTrue();
+    }
+
+    @Test
+    public void shouldAcceptAnyUrlWhenTheWhitelistIsEmptyAndTheEscapeHatchIsOn() {
+        FailSafeRedirectUrlValidator<String> hatched = new WithEscapeHatch(extractor);
+
+        assertThat(hatched.isRedirectUrlValid(request, "https://partner.example.com/slo", EMPTY)).isTrue();
+    }
+
+    @Test
+    public void shouldKeepAPopulatedWhitelistAuthoritativeWhenTheEscapeHatchIsOn() {
+        // The hatch only decides what an empty list means, so it may not be consulted before the list is read.
+        extractor.patterns.put("realm", Collections.singletonList("https://partner.example.com/*"));
+        FailSafeRedirectUrlValidator<String> hatched = new WithEscapeHatch(extractor);
+
+        assertThat(hatched.isRedirectUrlValid(request, "https://attacker.example.com/", "realm")).isFalse();
+        assertThat(hatched.isRedirectUrlValid(request, "https://partner.example.com/slo", "realm")).isTrue();
+    }
+
+    @Test
+    public void shouldNotLetTheEscapeHatchActOnAWhitelistItCouldNotRead() {
+        // The extractors swallow the exception the configuration store throws and answer null, which used to be
+        // indistinguishable from "no list is configured": a store that blinked handed the hatch a deployment that
+        // did populate its list, and with it the open redirect this validator exists to close.
+        FailSafeRedirectUrlValidator<String> hatched = new WithEscapeHatch(extractor);
+
+        assertThat(hatched.isRedirectUrlValid(request, "https://attacker.example.com/", UNREADABLE)).isFalse();
+        assertThat(hatched.isRedirectUrlValid(request, "https://openam.example.com/openam/", UNREADABLE)).isTrue();
+    }
+
+    @Test
+    public void shouldStillFallBackToOriginWhenOneOfSeveralConfigurationsCouldNotBeRead() {
+        List<String> configInfos = Arrays.asList(UNREADABLE, EMPTY);
+        FailSafeRedirectUrlValidator<String> hatched = new WithEscapeHatch(extractor);
+
+        // One of them holds no list and the other could not be read, so it is not known that none of them has one.
+        assertThat(hatched.isRedirectUrlValid(request, "https://attacker.example.com/", configInfos)).isFalse();
+    }
+
+    @Test
+    public void shouldStillApplyTheWhitelistOfAConfigurationThatCouldBeRead() {
+        extractor.patterns.put("realm", Collections.singletonList("https://partner.example.com/*"));
+        List<String> configInfos = Arrays.asList(UNREADABLE, "realm");
+
+        assertThat(validator.isRedirectUrlValid(request, "https://partner.example.com/slo", configInfos)).isTrue();
+    }
+
+    @Test
+    public void shouldOnlyAcceptOwnOriginWhenTheCallerHasNoWhitelistToOffer() {
+        // The caller could not even work out which configuration holds the list, so the hatch has no say either.
+        FailSafeRedirectUrlValidator<String> hatched = new WithEscapeHatch(extractor);
+
+        assertThat(hatched.isOwnOriginRedirectUrl(request, "https://attacker.example.com/")).isFalse();
+        assertThat(hatched.isOwnOriginRedirectUrl(request, "https://openam.example.com/openam/")).isTrue();
+        assertThat(hatched.isOwnOriginRedirectUrl(request, "/openam/XUI/")).isTrue();
+        assertThat(hatched.isOwnOriginRedirectUrl(request, "javascript:alert(1)")).isFalse();
+    }
+
+    private static String whitelistedUrlOfLength(int length) {
+        StringBuilder url = new StringBuilder("https://partner.example.com/");
+        while (url.length() < length) {
+            url.append('a');
+        }
+        return url.toString();
+    }
+
+    /**
+     * Hands back the patterns once and nothing afterwards, the way the extractor behaves when the cached entry is
+     * dropped between two reads and the configuration store cannot be reached for the second one.
+     */
+    private static final class VanishingExtractor implements ValidDomainExtractor<String> {
+
+        private final Collection<String> patterns;
+
+        private int reads;
+
+        VanishingExtractor(Collection<String> patterns) {
+            this.patterns = patterns;
+        }
+
+        @Override
+        public Collection<String> extractValidDomains(String configInfo) {
+            return reads++ == 0 ? patterns : null;
+        }
+    }
+
+    /**
+     * A validator whose endpoints offer the escape hatch that reads an unconfigured whitelist the way
+     * RedirectUrlValidator reads it, as permission to redirect anywhere.
+     */
+    private static final class WithEscapeHatch extends FailSafeRedirectUrlValidator<String> {
+
+        WithEscapeHatch(ValidDomainExtractor<String> extractor) {
+            super(extractor);
+        }
+
+        @Override
+        protected boolean allowAnyUrlWithoutWhitelist() {
+            return true;
+        }
+    }
+
+    /**
+     * A validator for an OpenAM published at https://sso.example.com while the container answers on another origin.
+     */
+    private static final class PublishedAtSsoExampleCom extends FailSafeRedirectUrlValidator<String> {
+
+        PublishedAtSsoExampleCom(ValidDomainExtractor<String> extractor) {
+            super(extractor);
+        }
+
+        @Override
+        protected Collection<String> getAdditionalOrigins(HttpServletRequest request, Collection<String> configInfos) {
+            Collection<String> origins = super.getAdditionalOrigins(request, configInfos);
+            addOrigin(origins, "https://sso.example.com/openam");
+            return origins;
+        }
     }
 }

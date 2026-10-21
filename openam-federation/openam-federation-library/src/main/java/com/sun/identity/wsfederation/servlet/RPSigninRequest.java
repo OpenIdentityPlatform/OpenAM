@@ -112,7 +112,7 @@ public class RPSigninRequest extends WSFederationAction {
             if (wreply != null && (wreply.length() > 0)) {
                 // The browser is sent to wreply once the sign-in completes;
                 // the realm's Valid goto URL list decides whether it may be.
-                if (!RealmGotoUrlValidator.isValid(wreply, spRealm)) {
+                if (!RealmGotoUrlValidator.isValid(request, wreply, spRealm)) {
                     debug.warning(classMethod
                         + "refusing a wreply outside the realm's valid goto URLs");
                     throw new WSFederationException(

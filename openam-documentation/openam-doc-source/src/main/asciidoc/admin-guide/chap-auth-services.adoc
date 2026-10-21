@@ -4122,6 +4122,9 @@ Before using this plugin, configure the OAuth 2.0 authentication module with the
 +
 Sometimes OAuth 2.0 providers change their endpoints, including their logout URLs. When using a provider like Facebook, Google, or MSN, make sure you are aware when they change their endpoint locations so that you can change your client configuration accordingly.
 
++
+`OAuthLogout.jsp` loads the provider's logout URL in an iframe, so that URL is validated the same way a `goto` URL is: add the provider's logout endpoint to the realm's Valid `goto` URL Resources, as described in xref:configure-valid-goto-url-resources["Configuring Valid goto URL Resources"], or the page falls back to a placeholder and the provider session is left alone. Earlier versions ran the URL through a validation type that is not defined in the shipped `ESAPI.properties`, so the check never passed and the iframe never worked.
+
 Class name: `org.forgerock.openam.authentication.plugins.AccountExpirePlugin`::
 The account expiration post-authentication plugin sets an account expiration date after successful authentication. OpenAM uses this to prevent expired accounts from being used to authenticate.
 
@@ -4152,6 +4155,8 @@ This section explains how to connect to OpenAM for user authentication by adding
 When using the XUI, the base URL to authenticate to OpenAM points to `/XUI/#login` under the deployment URL, such as `\http://openam.example.com:8080/openam/XUI/#login`.
 
 The base URL to log out is similar, for example, `\http://openam.example.com:8080/openam/XUI/#logout/`.
+
+A `goto` parameter of the logout URL, such as `\http://openam.example.com:8080/openam/XUI/#logout/&goto=http%3A%2F%2Fwww.example.com`, is followed only when the realm's Valid `goto` URL Resources allow it, which the XUI asks OpenAM about before it ends the session. Without an active session there is nothing to ask, so the XUI then follows only a relative URL or one on the origin it was loaded from. Only `http` and `https` URLs are followed, after login and logout alike.
 
 [#authn-from-browser-XUI-realm]
 ===== Specifying the Realm in the Login URL
@@ -4308,7 +4313,7 @@ goto::
 On successful authentication, or successful logout, request that OpenAM redirect the user to the specified location. Values must be URL-encoded.
 
 gotoOnFail::
-On authentication failure, request that OpenAM redirect the user to the specified location. Values must be URL-encoded.
+On authentication failure, request that OpenAM redirect the user to the specified location. Values must be URL-encoded. The location is followed only when the realm's Valid `goto` URL Resources allow it, by the XUI as by the classic UI; otherwise the failure URL configured for the login applies, if there is one. Only `http` and `https` URLs are followed.
 
 IDToken1, IDToken2, ..., IDTokenN::
 Pass the specified credentials as `IDToken` parameters in the URL. The `IDToken` credentials map to the fields in the login page for the authentication module, such as `IDToken1` as user ID and `IDToken2` as password for basic user name, password authentication. The order depends on the callbacks in login page for the module; `IDTokenN` represents the N^th^  callback of the login page.
@@ -5412,9 +5417,29 @@ When you set this property to `true` for your OpenAM servers, users can potentia
 [#configure-valid-goto-url-resources]
 === Configuring Valid goto URL Resources
 
-By default, OpenAM redirects the user to the URL specified in the `goto` and `gotoOnFail` query string parameters supplied to the authentication interface in the login URL. You can increase security against possible phishing attacks through open redirect by specifying a list of valid URL resources using the Validation Service.
+OpenAM redirects the user to the URL specified in the `goto` and `gotoOnFail` query string parameters supplied to the authentication interface in the login URL. You protect against phishing attacks through open redirect by specifying a list of valid URL resources using the Validation Service.
 
-OpenAM only redirects a user if the `goto` and `gotoOnFail` URL matches any of the resources specified in this setting. If no setting is present, it is assumed that the `goto` or `gotoOnFail` URL is valid.
+OpenAM only redirects a user if the `goto` and `gotoOnFail` URL matches any of the resources specified in this setting.
+
+If no setting is present, OpenAM accepts only URLs that point back at the OpenAM server itself: a relative URL always, and an absolute one when it names one of the origins the server answers on. Those are the origin the container reports for the incoming request, the URL OpenAM was installed under, and - when the realm's Base URL Source service is set to `Fixed value` or `Extension class` - the base URL it yields. A deployment behind a TLS terminating reverse proxy whose container is not configured with the published scheme, host and port should pin one of those so that the published origin is recognized.
+
+[IMPORTANT]
+====
+The `Forwarded header` and `X-Forwarded-* headers` provider types are deliberately *not* used here. They build the base URL out of request headers, which a caller can set unless every route into the container rewrites them, so accepting one as an origin of this server would reopen the very open redirect this validation closes. Configure the container, pin a `Fixed value` base URL, or populate the list of valid `goto` URL resources instead.
+
+An `Extension class` is judged by the provider it names: naming one of the header based providers is read as choosing that provider, and its base URL is not used here either. A class of your own is taken at its word, so an extension used on a realm whose list is empty must yield an origin the deployment fixed rather than one built out of the request.
+====
+
+Two rules apply whether or not the list is populated: an absolute or protocol relative URL is accepted only with an `http` or `https` scheme - a relative URL carries no scheme and is always accepted - and a URL longer than the limit set by the advanced server property `org.forgerock.openam.redirecturlvalidator.maxUrlLength` (2000 characters by default) is rejected.
+
+Origins are compared by scheme, host and port, and the host has to be one that can be read as a host name. A name Java declines to parse - one holding an underscore, such as the `openam_1` a container is given in a compose file - can not be matched, so a deployment published under such a name has to populate the list of valid `goto` URL resources. The origin of the incoming request is the one the container reports; where a Tomcat `RemoteIpValve` or `RemoteIpFilter` is configured with `protocolHeader`, `hostHeader` or `portHeader`, that origin comes from those headers, so restrict the valve to the proxies you trust through its `internalProxies` setting.
+
+[NOTE]
+====
+Earlier versions treated an absent setting as permission to redirect anywhere, which made an unconfigured realm usable as an open redirect. If an existing deployment relies on cross domain `goto` URLs and cannot populate this list right away, set the advanced server property `org.openidentityplatform.openam.auth.goto.allowAnyUrlWithoutWhitelist` to `true` to restore the old behaviour. The property only decides what an *empty* list means: once this list is populated it is authoritative regardless of the property, and so is a list OpenAM could not read at all. Where the configuration store cannot be reached, nothing is known about what the realm allows, so the `goto` URL is held to the same rule as an unconfigured realm - relative URLs, and absolute ones naming an origin this server answers on - whatever the property is set to.
+
+Restoring the old behaviour restores all of it. With the property set and the list empty, OpenAM accepts any `http` or `https` `goto` URL, including a protocol relative one such as `//www.example.net/` and one whose real host hides behind a user information component, such as `\https://openam.example.com@www.example.net/`. Populating the list is the better answer; treat the property as a way to keep an upgrade moving, not as a setting to leave in place.
+====
 
 The URL whitelisting and pattern matching follow the wildcard rules as specified in xref:chap-authz-policy.adoc#policy-patterns-wildcards["Specifying Resource Patterns with Wildcards"].
 

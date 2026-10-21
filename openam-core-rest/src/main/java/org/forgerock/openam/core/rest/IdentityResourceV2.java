@@ -31,6 +31,10 @@ import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
@@ -73,6 +77,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
+import org.forgerock.services.context.AttributesContext;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
@@ -105,6 +110,7 @@ import org.forgerock.openam.forgerockrest.utils.MailServerLoader;
 import org.forgerock.openam.forgerockrest.utils.PrincipalRestUtils;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
+import org.forgerock.openam.security.whitelist.GotoUrlValidator;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.RestSecurityProvider;
@@ -546,7 +552,23 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             SSOTokenManager mgr = SSOTokenManager.getInstance();
             SSOToken ssoToken = mgr.createSSOToken(getCookieFromServerContext(context));
 
-            String gotoURL = URL_VALIDATOR.getRedirectUrl(ssoToken.getProperty(ISAuthConstants.ORGANIZATION),
+            // The realm's goto URL list is the only thing constraining this URL, and it is empty by
+            // default, so the check has to fall back to the origin of the request rather than to
+            // accepting anything. The servlet request is what carries that origin. HttpFrameworkServlet
+            // puts it in the AttributesContext for every request that arrives over HTTP; asContext would
+            // throw rather than return null for a context chain that has none, so it is asked for first.
+            HttpServletRequest httpRequest = null;
+            if (context.containsContext(AttributesContext.class)) {
+                httpRequest = (HttpServletRequest) context.asContext(AttributesContext.class)
+                        .getAttributes().get(HttpServletRequest.class.getName());
+            }
+            if (httpRequest == null) {
+                debug.warning("IdentityResource.validateGoto() :: no servlet request in the context, the goto URL "
+                        + "can only be checked against the configured origins of this server");
+            }
+
+            String gotoURL = GotoUrlValidator.getRedirectUrl(httpRequest,
+                    ssoToken.getProperty(ISAuthConstants.ORGANIZATION),
                     URL_VALIDATOR.getValueFromJson(jVal, RedirectUrlValidator.GOTO),
                     ssoToken.getProperty("successURL"));
 

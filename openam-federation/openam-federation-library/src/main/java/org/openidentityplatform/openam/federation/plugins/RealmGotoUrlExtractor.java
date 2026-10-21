@@ -16,6 +16,7 @@
 package org.openidentityplatform.openam.federation.plugins;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,9 +33,11 @@ import org.forgerock.openam.shared.security.whitelist.ValidDomainExtractor;
  * cannot reach the core extractor of that list, so this one reads the same service attribute
  * through {@link ConfigurationManager}.
  * <p>
- * {@code null} means "no list": a realm that configures none, a realm without a configuration,
- * a missing plugin or a read failure. The validator then restricts nothing, as it does for the
- * login goto.
+ * It answers the way {@link ValidDomainExtractor} asks, and the way the core extractor does: an
+ * empty collection for a realm that was read and has no list - the attribute absent or empty, or
+ * no configuration of the service in the realm - and {@code null} for a list that could not be
+ * read - a read failure, or no configuration plugin to read it through. The validator holds an
+ * empty list to the origins this server answers on, and never takes an unreadable one for empty.
  */
 public class RealmGotoUrlExtractor implements ValidDomainExtractor<String> {
 
@@ -69,15 +72,18 @@ public class RealmGotoUrlExtractor implements ValidDomainExtractor<String> {
         try {
             ConfigurationInstance instance = source.get();
             if (instance == null) {
+                // Nothing to read the realm configuration through, so nothing is known about its list.
+                DEBUG.warning("RealmGotoUrlExtractor.extractValidDomains: no configuration plugin for "
+                        + VALIDATION_COMPONENT);
                 return null;
             }
             Map<?, ?> attributes = instance.getConfiguration(realm == null || realm.isEmpty() ? ROOT_REALM : realm, null);
             if (attributes == null) {
-                return null;
+                return Collections.emptySet();
             }
             Object values = attributes.get(VALID_GOTO_RESOURCES);
-            if (!(values instanceof Collection) || ((Collection<?>) values).isEmpty()) {
-                return null;
+            if (!(values instanceof Collection)) {
+                return Collections.emptySet();
             }
             Set<String> patterns = new LinkedHashSet<>();
             for (Object value : (Collection<?>) values) {
@@ -85,7 +91,7 @@ public class RealmGotoUrlExtractor implements ValidDomainExtractor<String> {
                     patterns.add(value.toString());
                 }
             }
-            return patterns.isEmpty() ? null : patterns;
+            return patterns;
         } catch (ConfigurationException e) {
             DEBUG.error("RealmGotoUrlExtractor.extractValidDomains: cannot read the valid goto URLs of realm "
                     + realm, e);

@@ -4541,6 +4541,15 @@ public class SAML2Utils extends SAML2SDKUtils {
 
         // Check for the validity of the RelayState URL.
         if (relayState != null && !relayState.isEmpty()) {
+            if (!SAML2Constants.SP_ROLE.equalsIgnoreCase(role) && !SAML2Constants.IDP_ROLE.equalsIgnoreCase(role)) {
+                // An entity can host both roles, each with a relayStateUrlList of its own, so an unresolved role
+                // leaves it unknown which list governs the redirect. ValidRelayStateExtractor reports that as a
+                // configuration it could not read, which this validator would otherwise take as permission to
+                // redirect anywhere.
+                debug.warning("SAML2Utils.validateRelayStateURL(): no relayStateUrlList applies to the role " + role
+                        + " of entity " + hostEntityId + ", refusing the RelayState URL " + relayState);
+                throw new SAML2Exception(SAML2Utils.bundle.getString("invalidRelayStateUrl"));
+            }
             if (!RELAY_STATE_VALIDATOR.isRedirectUrlValid(relayState,
                     SAMLEntityInfo.from(orgName, hostEntityId, role))) {
                 throw new SAML2Exception(SAML2Utils.bundle.getString("invalidRelayStateUrl"));

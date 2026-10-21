@@ -17,12 +17,12 @@
 package com.sun.identity.wsfederation.plugins.whitelist;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.forgerock.openam.shared.security.whitelist.ValidDomainExtractor;
 
-import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
@@ -33,6 +33,11 @@ import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 
 /**
  * Extracts the valid relaystate URL list from the hosted SAML entity's configuration.
+ *
+ * <p>Per {@link ValidDomainExtractor#extractValidDomains(Object)} an empty collection means the configuration was
+ * read and holds no <code>wreplyList</code>, while <code>null</code> means it could not be read at all - the
+ * configuration store is unreachable, or the role whose list applies is not one of the two an entity can host.
+ * Callers that fail safe refuse to leave this server in the latter case.
  */
 public class ValidWReplyExtractor implements ValidDomainExtractor<ValidWReplyExtractor.WSFederationEntityInfo> {
 
@@ -43,27 +48,39 @@ public class ValidWReplyExtractor implements ValidDomainExtractor<ValidWReplyExt
 
     @Override
     public Collection<String> extractValidDomains(final WSFederationEntityInfo entityInfo) {
+        final boolean spRole = SAML2Constants.SP_ROLE.equalsIgnoreCase(entityInfo.role);
+        if (!spRole && !SAML2Constants.IDP_ROLE.equalsIgnoreCase(entityInfo.role)) {
+            // An entity can host both roles, each with a wreplyList of its own, so a role that could not be
+            // resolved leaves it unknown which of the two lists governs the redirect. Reading it as the IdP one -
+            // which is what falling through to the else branch below used to do - judges an SP flow by the wrong
+            // list, so it is reported as a configuration that could not be read instead.
+            DEBUG.warning("ValidWReplyExtractor.getValidDomains: no wreplyList applies to the unresolved role of "
+                    + entityInfo);
+            return null;
+        }
+
         try {
-            BaseConfigType config;
+            final BaseConfigType config;
             final Map<String, List<String>> attrs;
 
-
-            if (SAML2Constants.SP_ROLE.equalsIgnoreCase(entityInfo.role)) {
-                config = WSFederationUtils.getMetaManager().getSPSSOConfig(entityInfo.realm, entityInfo.entityID);
+            if (spRole) {
+                config = getSPSSOConfig(entityInfo.realm, entityInfo.entityID);
             } else {
-                config = WSFederationUtils.getMetaManager().getIDPSSOConfig(entityInfo.realm, entityInfo.entityID);
+                config = getIDPSSOConfig(entityInfo.realm, entityInfo.entityID);
             }
 
             if (config == null) {
+                // The entity does not host that role, so there is no list to read rather than one that could not
+                // be read - the same answer as an entity that hosts the role with no wreplyList in it.
                 DEBUG.warning("ValidWReplyExtractor.getValidDomains: Entity config is null for entityInfo: "
                         + entityInfo);
-                return null;
+                return Collections.emptyList();
             }
 
             attrs = WSFederationMetaUtils.getAttributes(config);
             if (attrs == null) {
                 DEBUG.warning("ValidWReplyExtractor.getValidDomains: Cannot find extended attributes");
-                return null;
+                return Collections.emptyList();
             }
 
             final List<String> values = attrs.get(WSFederationConstants.WREPLY_URL_LIST);
@@ -71,9 +88,38 @@ public class ValidWReplyExtractor implements ValidDomainExtractor<ValidWReplyExt
                 return values;
             }
         } catch (final WSFederationMetaException sme) {
+            // The configuration could not be read, which is not the same answer as an entity without a list.
             DEBUG.warning("Unable to retrieve extended configuration", sme);
+            return null;
         }
-        return null;
+        return Collections.emptyList();
+    }
+
+    /**
+     * The configuration of the entity in its SP role.
+     *
+     * <p>A seam: the meta manager needs a configuration store behind it, which a unit test has no business
+     * bootstrapping.
+     *
+     * @param realm The realm of the hosted entity.
+     * @param entityId The entity ID of the hosted entity.
+     * @return The configuration, <code>null</code> when the entity does not host that role.
+     * @throws WSFederationMetaException If the configuration could not be read.
+     */
+    BaseConfigType getSPSSOConfig(final String realm, final String entityId) throws WSFederationMetaException {
+        return WSFederationUtils.getMetaManager().getSPSSOConfig(realm, entityId);
+    }
+
+    /**
+     * The configuration of the entity in its IdP role.
+     *
+     * @param realm The realm of the hosted entity.
+     * @param entityId The entity ID of the hosted entity.
+     * @return The configuration, <code>null</code> when the entity does not host that role.
+     * @throws WSFederationMetaException If the configuration could not be read.
+     */
+    BaseConfigType getIDPSSOConfig(final String realm, final String entityId) throws WSFederationMetaException {
+        return WSFederationUtils.getMetaManager().getIDPSSOConfig(realm, entityId);
     }
 
     /**
@@ -101,6 +147,33 @@ public class ValidWReplyExtractor implements ValidDomainExtractor<ValidWReplyExt
          */
         public static WSFederationEntityInfo from(final String realm, final String entityID, final String role) {
             return new WSFederationEntityInfo(realm, entityID, role);
+        }
+
+        /**
+         * The realm the hosted entity belongs to.
+         *
+         * @return The realm.
+         */
+        public String getRealm() {
+            return realm;
+        }
+
+        /**
+         * The entity ID of the hosted entity.
+         *
+         * @return The entity ID.
+         */
+        public String getEntityID() {
+            return entityID;
+        }
+
+        /**
+         * The role the hosted entity is acting in, which decides whose <code>wreplyList</code> applies.
+         *
+         * @return The role, {@link SAML2Constants#SP_ROLE} or {@link SAML2Constants#IDP_ROLE}.
+         */
+        public String getRole() {
+            return role;
         }
 
         @Override

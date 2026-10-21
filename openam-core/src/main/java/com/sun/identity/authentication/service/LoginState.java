@@ -3219,7 +3219,7 @@ public class LoginState {
                 }
                 currentGoto = decodedGoTo;
             }
-            if (!LazyConfig.AUTHD.isGotoUrlValid(currentGoto, getOrgDN())) {
+            if (!LazyConfig.AUTHD.isGotoUrlValid(servletRequest, currentGoto, getOrgDN())) {
                 if (DEBUG.messageEnabled()) {
                     DEBUG.message("LoginState.getSuccessLoginURL():Original goto URL is " + currentGoto
                             + " which is invalid");
@@ -3732,17 +3732,20 @@ public class LoginState {
         if (postProcessURL != null) {
             return postProcessURL;
         }
-        if (gotoOnFailURL != null && !gotoOnFailURL.isEmpty()) {
-            if (!LazyConfig.AUTHD.isGotoUrlValid(gotoOnFailURL, getOrgDN())) {
+        // A rejected URL is dropped for this evaluation only: gotoOnFailURL is session scoped, and nulling the
+        // field would discard it for every later call as well.
+        String gotoOnFail = gotoOnFailURL;
+        if (gotoOnFail != null && !gotoOnFail.isEmpty()) {
+            if (!LazyConfig.AUTHD.isGotoUrlValid(servletRequest, gotoOnFail, getOrgDN())) {
                 if (DEBUG.messageEnabled()) {
-                    DEBUG.message("LoginState.getFailureLoginURL(): Original gotoOnFail URL is " + gotoOnFailURL
+                    DEBUG.message("LoginState.getFailureLoginURL(): Original gotoOnFail URL is " + gotoOnFail
                             + " which is invalid");
                 }
-                gotoOnFailURL = null;
+                gotoOnFail = null;
             }
         }
-        if (gotoOnFailURL != null && !gotoOnFailURL.isEmpty() && !gotoOnFailURL.equalsIgnoreCase("null")) {
-            fqdnFailureLoginURL = LazyConfig.AUTHD.processURL(gotoOnFailURL, servletRequest);
+        if (gotoOnFail != null && !gotoOnFail.isEmpty() && !gotoOnFail.equalsIgnoreCase("null")) {
+            fqdnFailureLoginURL = LazyConfig.AUTHD.processURL(gotoOnFail, servletRequest);
         } else if (fqdnFailureLoginURL == null || !fqdnFailureLoginURL.isEmpty()) {
             fqdnFailureLoginURL = LazyConfig.AUTHD.processURL(failureLoginURL, servletRequest);
         }

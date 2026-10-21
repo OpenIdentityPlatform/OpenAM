@@ -29,8 +29,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.iplanet.sso.SSOToken;
@@ -45,6 +48,7 @@ import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.core.rest.authn.core.AuthIndexType;
+import org.forgerock.openam.core.rest.authn.core.CompletedLoginProcess;
 import org.forgerock.openam.core.rest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.core.rest.authn.core.LoginConfiguration;
 import org.forgerock.openam.core.rest.authn.core.LoginProcess;
@@ -54,6 +58,8 @@ import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.security.whitelist.GotoUrlValidatorTestSupport;
+import org.forgerock.openam.shared.security.whitelist.ValidDomainExtractor;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.mockito.ArgumentCaptor;
@@ -647,5 +653,194 @@ public class RestAuthenticationHandlerTest {
         given(loginProcess.getOrgDN()).willReturn("/realm");
 
         return restAuthenticationHandler.initiateAuthentication(request, httpResponse, null, null, null);
+    }
+
+    /*
+     * The goto URL below arrives in the request body, so it is the one value on this path an attacker controls.
+     * The realm is left unstubbed - a null orgDN means no Valid goto URL Resources list, the state of a fresh
+     * installation and the one the advisory is about - so what is exercised is the origin fallback.
+     */
+
+    @Test
+    public void shouldKeepAGotoUrlPointingBackAtThisServerInTheSuccessResponse() throws Exception {
+
+        //Given
+        HttpServletRequest request = requestOn("https", "openam.example.com", 443);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        successfulLoginProcess("/openam/XUI");
+
+        //When
+        JsonValue response = restAuthenticationHandler.continueAuthentication(request, httpResponse,
+                bodyWithGoto("https://openam.example.com/openam/console"), null, null, null);
+
+        //Then
+        assertEquals(response.get("successUrl").asString(), "https://openam.example.com/openam/console");
+    }
+
+    @Test
+    public void shouldReplaceAGotoUrlLeavingThisServerWithTheConfiguredSuccessUrl() throws Exception {
+
+        //Given
+        HttpServletRequest request = requestOn("https", "openam.example.com", 443);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        successfulLoginProcess("/openam/XUI");
+
+        //When
+        JsonValue response = restAuthenticationHandler.continueAuthentication(request, httpResponse,
+                bodyWithGoto("https://attacker.example.com/phishing"), null, null, null);
+
+        //Then
+        assertEquals(response.get("successUrl").asString(), "/openam/XUI");
+    }
+
+    @Test
+    public void shouldJudgeTheGotoUrlByTheListOfTheRealmTheLoginHappenedIn() throws Exception {
+
+        //Given
+        final List<String> realmsRead = new ArrayList<String>();
+        GotoUrlValidatorTestSupport.install(new ValidDomainExtractor<String>() {
+            @Override
+            public Collection<String> extractValidDomains(String realm) {
+                realmsRead.add(realm);
+                return "o=sub,ou=services".equals(realm)
+                        ? Collections.singletonList("https://partner.example.com:443/*")
+                        : Collections.<String>emptyList();
+            }
+        });
+        try {
+            HttpServletRequest request = requestOn("https", "openam.example.com", 443);
+            HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+            LoginProcess loginProcess = successfulLoginProcess("/openam/XUI");
+            given(loginProcess.getOrgDN()).willReturn("o=sub,ou=services");
+
+            //When
+            JsonValue response = restAuthenticationHandler.continueAuthentication(request, httpResponse,
+                    bodyWithGoto("https://partner.example.com/app"), null, null, null);
+
+            //Then
+            assertEquals(response.get("successUrl").asString(), "https://partner.example.com/app");
+            assertEquals(realmsRead, Collections.singletonList("o=sub,ou=services"));
+        } finally {
+            GotoUrlValidatorTestSupport.restore();
+        }
+    }
+
+    @Test
+    public void shouldKeepTheConfiguredFailureUrlEvenWhenItLeavesThisServer() throws Exception {
+
+        //Given
+        HttpServletRequest request = requestOn("https", "openam.example.com", 443);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        LoginProcess loginProcess = failedLoginProcess();
+        // Configuration derived and already validated in LoginState.getFailureLoginURL(), so the client keeps it.
+        given(loginProcess.getFailureURL()).willReturn("https://portal.example.com/login-failed");
+
+        //When
+        try {
+            restAuthenticationHandler.continueAuthentication(request, httpResponse, bodyWithGoto(null),
+                    null, null, null);
+            fail("expected the failed authentication to be reported as a RestAuthException");
+        } catch (RestAuthException e) {
+            //Then
+            assertEquals(e.getFailureUrl(), "https://portal.example.com/login-failed");
+        }
+    }
+
+    @Test
+    public void shouldReportAnEmptyFailureUrlAsNone() throws Exception {
+
+        //Given
+        HttpServletRequest request = requestOn("https", "openam.example.com", 443);
+        LoginProcess loginProcess = failedLoginProcess();
+        // The failure URL is optional, and the callers of getFailureUrl() only ever test it for null.
+        given(loginProcess.getFailureURL()).willReturn("");
+
+        //When
+        try {
+            restAuthenticationHandler.continueAuthentication(request, mock(HttpServletResponse.class),
+                    bodyWithGoto(null), null, null, null);
+            fail("expected the failed authentication to be reported as a RestAuthException");
+        } catch (RestAuthException e) {
+            //Then
+            assertNull(e.getFailureUrl());
+        }
+    }
+
+    @Test
+    public void shouldNotAskACompletedLoginProcessForAFailureUrl() throws Exception {
+
+        //Given
+        HttpServletRequest request = requestOn("https", "openam.example.com", 443);
+        // CompletedLoginProcess.getFailureURL() throws rather than answering, so it may not be asked at all.
+        CompletedLoginProcess loginProcess = mock(CompletedLoginProcess.class);
+        given(loginProcess.getLoginStage()).willReturn(LoginStage.COMPLETE);
+        given(loginProcess.isSuccessful()).willReturn(false);
+        given(loginProcess.getFailureURL()).willThrow(new UnsupportedOperationException());
+        AuthContextLocalWrapper authContextLocalWrapper = mock(AuthContextLocalWrapper.class);
+        given(authContextLocalWrapper.getErrorCode()).willReturn("ERROR_CODE");
+        given(authContextLocalWrapper.getErrorMessage()).willReturn("ERROR_MESSAGE");
+        given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject()))
+                .willReturn(loginProcess);
+
+        //When
+        try {
+            restAuthenticationHandler.continueAuthentication(request, mock(HttpServletResponse.class),
+                    bodyWithGoto(null), null, null, null);
+            fail("expected the failed authentication to be reported as a RestAuthException");
+        } catch (RestAuthException e) {
+            //Then
+            assertNull(e.getFailureUrl());
+            verify(loginProcess, never()).getFailureURL();
+        }
+    }
+
+    private LoginProcess failedLoginProcess() throws Exception {
+        AuthContextLocalWrapper authContextLocalWrapper = mock(AuthContextLocalWrapper.class);
+        given(authContextLocalWrapper.getErrorCode()).willReturn("ERROR_CODE");
+        given(authContextLocalWrapper.getErrorMessage()).willReturn("ERROR_MESSAGE");
+
+        LoginProcess loginProcess = mock(LoginProcess.class);
+        given(loginProcess.getLoginStage()).willReturn(LoginStage.COMPLETE);
+        given(loginProcess.isSuccessful()).willReturn(false);
+        given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
+
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject()))
+                .willReturn(loginProcess);
+        return loginProcess;
+    }
+
+    private HttpServletRequest requestOn(String scheme, String serverName, int serverPort) {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        given(request.getScheme()).willReturn(scheme);
+        given(request.getServerName()).willReturn(serverName);
+        given(request.getServerPort()).willReturn(serverPort);
+        return request;
+    }
+
+    private LoginProcess successfulLoginProcess(String successUrl) throws Exception {
+        SSOTokenID ssoTokenID = mock(SSOTokenID.class);
+        given(ssoTokenID.toString()).willReturn("SSO_TOKEN_ID");
+        SSOToken ssoToken = mock(SSOToken.class);
+        given(ssoToken.getTokenID()).willReturn(ssoTokenID);
+
+        LoginProcess loginProcess = mock(LoginProcess.class);
+        given(loginProcess.getSSOToken()).willReturn(ssoToken);
+        given(loginProcess.getLoginStage()).willReturn(LoginStage.COMPLETE);
+        given(loginProcess.isSuccessful()).willReturn(true);
+        given(loginProcess.getAuthContext()).willReturn(mock(AuthContextLocalWrapper.class));
+        given(loginProcess.getSuccessURL()).willReturn(successUrl);
+
+        given(loginAuthenticator.getLoginProcess(ArgumentMatchers.<LoginConfiguration>anyObject()))
+                .willReturn(loginProcess);
+        return loginProcess;
+    }
+
+    private JsonValue bodyWithGoto(String gotoUrl) {
+        Map<String, Object> body = new HashMap<String, Object>();
+        if (gotoUrl != null) {
+            body.put("goto", gotoUrl);
+        }
+        return new JsonValue(body);
     }
 }

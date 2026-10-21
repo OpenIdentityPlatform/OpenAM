@@ -221,6 +221,39 @@ public interface Constants {
             "org.openidentityplatform.openam.httponly.allowTokenInBody";
 
     /**
+     * Property string controlling what an unconfigured goto URL whitelist means.
+     * <p>
+     * The <code>Valid goto URL Resources</code> list of the Validation Service is empty on a fresh
+     * installation. Defaults to <code>false</code>, meaning that with no list configured a
+     * <code>goto</code> or <code>gotoOnFail</code> URL is only honoured when it points back at this
+     * server, so an unconfigured realm cannot be used as an open redirect. Set to <code>true</code>
+     * to restore the legacy behaviour, in which an empty list accepts any URL - only do that where
+     * cross domain goto URLs are needed and configuring the Validation Service is not an option.
+     * A configured list is authoritative either way, and so is a list that could not be read at
+     * all: a configuration store that cannot be reached never counts as a realm without a list.
+     * The same list, and so this property, also decides the SAML 1.x <code>TARGET</code> and the
+     * <code>wreply</code> of a WS-Federation relying party sign-in.
+     */
+    static final String GOTO_ALLOW_ANY_URL_WITHOUT_WHITELIST =
+            "org.openidentityplatform.openam.auth.goto.allowAnyUrlWithoutWhitelist";
+
+    /**
+     * Property string controlling what an unconfigured federation redirect whitelist means.
+     * <p>
+     * The <code>relayStateUrlList</code> of a SAML2 entity and the <code>wreplyList</code> of a
+     * WS-Federation one are empty unless configured. Defaults to <code>false</code>, meaning that
+     * with no list configured a <code>RelayState</code> or <code>wreply</code> URL is only honoured
+     * when it points back at this server. Set to <code>true</code> to restore the legacy behaviour,
+     * in which an empty list accepts any URL - only do that where cross domain redirects are needed
+     * and populating the list of the hosted entity is not an option. A configured list is
+     * authoritative either way, and so is a list that could not be read at all: a configuration
+     * store that cannot be reached, or a metaAlias whose hosted entity could not be resolved, never
+     * counts as an entity without a list.
+     */
+    static final String FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST =
+            "org.openidentityplatform.openam.federation.allowAnyUrlWithoutWhitelist";
+
+    /**
      * Property string for cookie encoding.
      */
     static final String AM_COOKIE_ENCODE = "com.iplanet.am.cookie.encode";

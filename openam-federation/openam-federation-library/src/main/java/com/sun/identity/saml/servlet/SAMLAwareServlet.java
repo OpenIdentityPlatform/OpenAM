@@ -345,7 +345,7 @@ public class SAMLAwareServlet extends HttpServlet {
             // TARGET comes from the request and is redirected to below; the
             // realm's Valid goto URL list decides whether it may be, before
             // any session is created for it.
-            if (!RealmGotoUrlValidator.isValid(targeturl,
+            if (!RealmGotoUrlValidator.isValid(request, targeturl,
                     (String) sessionAttr.get(SessionProvider.REALM))) {
                 SAMLUtils.debug.warning("SAMLAwareServlet.ArtifactHandler: "
                     + "refusing a TARGET outside the realm's valid goto URLs");

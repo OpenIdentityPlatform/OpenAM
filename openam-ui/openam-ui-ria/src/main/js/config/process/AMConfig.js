@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Portions copyright 2011-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 define([
@@ -20,8 +21,9 @@ define([
     "org/forgerock/openam/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/util/URIUtils"
-], ($, _, Constants, EventManager, Router, URIUtils) => {
+    "org/forgerock/commons/ui/common/util/URIUtils",
+    "org/forgerock/openam/ui/user/login/validateLogoutGotoUrl"
+], ($, _, Constants, EventManager, Router, URIUtils, validateLogoutGotoUrl) => {
     return [{
         startEvent: Constants.EVENT_LOGOUT,
         description: "used to override common logout event",
@@ -36,37 +38,38 @@ define([
         ],
         processDescription (event, router, conf, sessionManager, SessionValidator, creators, store) {
             var argsURLFragment = event ? (event.args ? event.args[0] : "") : "",
-                urlParams = URIUtils.parseQueryString(argsURLFragment),
-                gotoURL = urlParams.goto;
+                urlParams = URIUtils.parseQueryString(argsURLFragment);
 
             SessionValidator.stop();
 
-            sessionManager.logout(function (response) {
-                store.default.dispatch(creators.sessionRemoveInfo());
-                EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
-                delete conf.gotoURL;
+            // The goto of the route is whatever the link put there, so it is judged before it is followed, and
+            // before the logout, since only a live session can ask the server about the realm's goto URL list.
+            validateLogoutGotoUrl.default(urlParams.goto).then((gotoURL) => {
+                sessionManager.logout(function (response) {
+                    store.default.dispatch(creators.sessionRemoveInfo());
+                    EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
+                    delete conf.gotoURL;
 
-                if (!gotoURL && response) {
-                    gotoURL = response.goto;
-                }
-
-                if (gotoURL) {
-                    Router.setUrl(decodeURIComponent(gotoURL));
-                } else {
-                    EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                        route: router.configuration.routes.loggedOut
-                    });
-                }
-            }, function () {
-                EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
-                EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
-                if (gotoURL) {
-                    Router.setUrl(decodeURIComponent(gotoURL));
-                } else {
-                    EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
-                        route: router.configuration.routes.login
-                    });
-                }
+                    if (gotoURL) {
+                        Router.setUrl(gotoURL);
+                    } else if (response && response.goto) {
+                        Router.setUrl(decodeURIComponent(response.goto));
+                    } else {
+                        EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                            route: router.configuration.routes.loggedOut
+                        });
+                    }
+                }, function () {
+                    EventManager.sendEvent(Constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: true });
+                    EventManager.sendEvent(Constants.EVENT_DISPLAY_MESSAGE_REQUEST, "unauthorized");
+                    if (gotoURL) {
+                        Router.setUrl(gotoURL);
+                    } else {
+                        EventManager.sendEvent(Constants.EVENT_CHANGE_VIEW, {
+                            route: router.configuration.routes.login
+                        });
+                    }
+                });
             });
         }
     }, {

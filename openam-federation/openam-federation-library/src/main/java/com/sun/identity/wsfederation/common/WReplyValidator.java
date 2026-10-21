@@ -16,6 +16,8 @@
 package com.sun.identity.wsfederation.common;
 
 import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
@@ -25,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.forgerock.openam.shared.security.whitelist.FailSafeRedirectUrlValidator;
+import org.forgerock.openam.shared.security.whitelist.ValidDomainExtractor;
 import org.forgerock.openam.utils.StringUtils;
 
 /**
@@ -35,6 +38,12 @@ import org.forgerock.openam.utils.StringUtils;
  * deployed under a metaAlias, where the hosted entity cannot be resolved from the request URI and no whitelist is
  * consulted at all - see
  * {@link #pointsBackAtThisServer(HttpServletRequest, String)}.
+ *
+ * <p>Deployments that need cross domain wreply URLs and cannot populate the list of every hosted entity can set
+ * {@link Constants#FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST} to restore the old behaviour. The property is read on
+ * every call, so it can be changed without a restart, and it only decides what an <em>empty</em> list means: a
+ * populated list rules either way, and so does a list that could not be read - a configuration store that cannot be
+ * reached, or a metaAlias whose entity could not be resolved, is never taken for an entity without a list.
  *
  * <p>The static methods are the entry points the JSPs and the servlets use. They delegate to an instance holding the
  * collaborators, which the tests build with stubs of their own.
@@ -68,25 +77,84 @@ public final class WReplyValidator {
     }
 
     /**
+     * Resolves the hosted entity a metaAlias belongs to, and the role it is deployed for, through the WS-Federation
+     * meta manager.
+     *
+     * <p>A seam: the meta manager needs a configuration store behind it, which a unit test has no business
+     * bootstrapping.
+     */
+    static class HostedEntities implements EntityResolver {
+
+        @Override
+        public final String getEntityByMetaAlias(final String metaAlias) throws WSFederationMetaException {
+            return entityId(metaAlias);
+        }
+
+        @Override
+        public final String getRoleByMetaAlias(final String metaAlias) throws WSFederationMetaException {
+            return role(metaAlias);
+        }
+
+        /**
+         * The entity ID the metaAlias belongs to.
+         *
+         * @param metaAlias The metaAlias of the hosted entity.
+         * @return The entity ID.
+         * @throws WSFederationMetaException If the entity could not be resolved.
+         */
+        String entityId(String metaAlias) throws WSFederationMetaException {
+            return WSFederationUtils.getMetaManager().getEntityByMetaAlias(metaAlias);
+        }
+
+        /**
+         * The role the metaAlias is deployed for.
+         *
+         * @param metaAlias The metaAlias of the hosted entity.
+         * @return The role, {@link SAML2Constants#IDP_ROLE} or {@link SAML2Constants#SP_ROLE}.
+         * @throws WSFederationMetaException If the role could not be resolved.
+         */
+        String role(String metaAlias) throws WSFederationMetaException {
+            return WSFederationUtils.getMetaManager().getRoleByMetaAlias(metaAlias);
+        }
+    }
+
+    /**
      * Holds the default instance, which drags in the WS-Federation configuration on first use.
      */
     private static final class Holder {
 
-        private static final WReplyValidator INSTANCE = new WReplyValidator(
-                new FailSafeRedirectUrlValidator<ValidWReplyExtractor.WSFederationEntityInfo>(
-                        new ValidWReplyExtractor()),
-                new EntityResolver() {
+        private static final WReplyValidator DEFAULT =
+                new WReplyValidator(new ValidWReplyExtractor(), new HostedEntities());
 
-                    @Override
-                    public String getEntityByMetaAlias(final String metaAlias) throws WSFederationMetaException {
-                        return WSFederationUtils.getMetaManager().getEntityByMetaAlias(metaAlias);
-                    }
+        private static volatile WReplyValidator instance = DEFAULT;
+    }
 
-                    @Override
-                    public String getRoleByMetaAlias(final String metaAlias) throws WSFederationMetaException {
-                        return WSFederationUtils.getMetaManager().getRoleByMetaAlias(metaAlias);
-                    }
-                });
+    /**
+     * Test seam: puts the given validator behind the static entry points, so that a test can see the realm, entity
+     * and role they forward. <code>null</code> restores the validator that reads the configuration.
+     *
+     * @param replacement The validator to use, or <code>null</code>.
+     */
+    static void setInstance(WReplyValidator replacement) {
+        Holder.instance = replacement == null ? Holder.DEFAULT : replacement;
+    }
+
+    /**
+     * The wreply validator, with the escape hatch for deployments that cannot populate a <code>wreplyList</code>.
+     */
+    private static final class WReplyUrlValidator
+            extends FailSafeRedirectUrlValidator<ValidWReplyExtractor.WSFederationEntityInfo> {
+
+        WReplyUrlValidator(ValidDomainExtractor<ValidWReplyExtractor.WSFederationEntityInfo> extractor) {
+            super(extractor);
+        }
+
+        @Override
+        protected boolean allowAnyUrlWithoutWhitelist() {
+            // Read on every call, so it can be changed without a restart. The validator only asks once it knows
+            // the entity has no list, so a populated one - and a list that could not be read - still rules.
+            return SystemPropertiesManager.getAsBoolean(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, false);
+        }
     }
 
     private final FailSafeRedirectUrlValidator<ValidWReplyExtractor.WSFederationEntityInfo> validator;
@@ -97,6 +165,19 @@ public final class WReplyValidator {
             final EntityResolver entityResolver) {
         this.validator = validator;
         this.entityResolver = entityResolver;
+    }
+
+    /**
+     * Creates a validator reading the wreply list through the provided extractor, with the escape hatch the
+     * production instance carries. Package private: production reaches the configuration through a single shared
+     * instance, tests supply their own.
+     *
+     * @param extractor The extractor of the configured wreply patterns.
+     * @param entityResolver The resolver of the hosted entity behind a metaAlias.
+     */
+    WReplyValidator(final ValidDomainExtractor<ValidWReplyExtractor.WSFederationEntityInfo> extractor,
+            final EntityResolver entityResolver) {
+        this(new WReplyUrlValidator(extractor), entityResolver);
     }
 
     /**
@@ -114,7 +195,7 @@ public final class WReplyValidator {
      * @return <code>true</code> if the wreply URL points back at this server.
      */
     public static boolean pointsBackAtThisServer(HttpServletRequest request, String wreply) {
-        return Holder.INSTANCE.validate(request, null, null, wreply, null);
+        return Holder.instance.validate(request, null, null, wreply, null);
     }
 
     /**
@@ -131,7 +212,7 @@ public final class WReplyValidator {
      */
     public static boolean isValidForEntity(HttpServletRequest request, String realm, String entityId, String wreply,
             String role) {
-        return Holder.INSTANCE.validate(request, realm, entityId, wreply, role);
+        return Holder.instance.validate(request, realm, entityId, wreply, role);
     }
 
     /**
@@ -147,7 +228,7 @@ public final class WReplyValidator {
      * @return <code>true</code> if the wreply URL may be used in a redirect.
      */
     public static boolean isValidForRequest(HttpServletRequest request, String wreply) {
-        return Holder.INSTANCE.validateForRequest(request, wreply);
+        return Holder.instance.validateForRequest(request, wreply);
     }
 
     /**
@@ -160,7 +241,7 @@ public final class WReplyValidator {
      * @return <code>true</code> if the wreply URL may be used in a redirect.
      */
     public static boolean isValidForMetaAlias(HttpServletRequest request, String metaAlias, String wreply) {
-        return Holder.INSTANCE.validateForMetaAlias(request, metaAlias, wreply);
+        return Holder.instance.validateForMetaAlias(request, metaAlias, wreply);
     }
 
     /**
@@ -201,6 +282,14 @@ public final class WReplyValidator {
             realm = WSFederationMetaUtils.getRealmByMetaAlias(metaAlias);
             try {
                 entityId = entityResolver.getEntityByMetaAlias(metaAlias);
+                if (StringUtils.isEmpty(entityId)) {
+                    // The meta manager answers null rather than throwing for a metaAlias no hosted entity is
+                    // deployed under. The request still names one, so this is not an endpoint without a list: it is
+                    // judged like an entity whose list could not be read, or the escape hatch would read it as one
+                    // without a list.
+                    DEBUG.warning("WReplyValidator: no hosted entity is deployed under the metaAlias");
+                    return validator.isOwnOriginRedirectUrl(request, wreply);
+                }
                 // The metaAlias names one role, so only that role's whitelist is consulted. Taking both in as
                 // well would let an IDP wreplyList widen what the SP list actually serving the endpoint allows.
                 role = entityResolver.getRoleByMetaAlias(metaAlias);

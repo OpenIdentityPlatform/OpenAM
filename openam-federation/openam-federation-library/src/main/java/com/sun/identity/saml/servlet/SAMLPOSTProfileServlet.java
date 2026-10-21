@@ -440,7 +440,7 @@ public class SAMLPOSTProfileServlet extends HttpServlet {
             // TARGET comes from the request and is redirected to below; the
             // realm's Valid goto URL list decides whether it may be, before
             // any session is created for it.
-            if (!RealmGotoUrlValidator.isValid(target,
+            if (!RealmGotoUrlValidator.isValid(request, target,
                     (String) sessionAttr.get(SessionProvider.REALM))) {
                 SAMLUtils.debug.warning("SAMLPOSTProfileServlet.doPost: "
                     + "refusing a TARGET outside the realm's valid goto URLs");

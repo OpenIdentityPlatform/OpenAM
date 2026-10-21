@@ -47,6 +47,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.session.SessionServiceURLService;
+import org.forgerock.openam.security.whitelist.GotoUrlValidator;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.util.Reject;
@@ -1243,7 +1244,7 @@ public class AuthUtils extends AuthClientUtils {
         AuthContextLocal authContext) {
         String orgDN = authContext.getOrgDN();
 
-        return REDIRECT_URL_VALIDATOR.getRedirectUrl(orgDN,
+        return GotoUrlValidator.getRedirectUrl(request, orgDN,
                 REDIRECT_URL_VALIDATOR.getAndDecodeParameter(request, RedirectUrlValidator.GOTO),
                 getSessionProperty("successURL",authContext));
     }              
@@ -1631,8 +1632,8 @@ public class AuthUtils extends AuthClientUtils {
      * @return The validated goto URL.
      */
     public static String getValidGotoURL(HttpServletRequest request, String orgDN) {
-        return REDIRECT_URL_VALIDATOR.getRedirectUrl(
-                orgDN, REDIRECT_URL_VALIDATOR.getAndDecodeParameter(request, RedirectUrlValidator.GOTO), null);
+        return GotoUrlValidator.getRedirectUrl(request, orgDN,
+                REDIRECT_URL_VALIDATOR.getAndDecodeParameter(request, RedirectUrlValidator.GOTO), null);
     }
 
     /**

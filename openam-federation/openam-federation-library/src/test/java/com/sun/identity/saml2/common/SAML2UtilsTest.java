@@ -190,6 +190,15 @@ public class SAML2UtilsTest {
                 SAML2Constants.WANT_ARTIFACT_RESPONSE_SIGNED, "true");
     }
 
+    @Test(expectedExceptions = SAML2Exception.class)
+    public void shouldRefuseARelayStateWhenTheRoleWhoseListAppliesIsUnknown() throws Exception {
+        // A hosted entity can be configured for both roles, each with a relayStateUrlList of its own, so an
+        // unresolved role leaves it unknown which list governs the redirect. ValidRelayStateExtractor reports that
+        // as a configuration it could not read, and an unreadable list is not an empty one to redirect anywhere on.
+        SAML2Utils.validateRelayStateURL("/", "urn:example:entity", "https://attacker.example.com/",
+                SAML2Constants.UNKNOWN_ROLE);
+    }
+
     @Test
     public void encodeDecodeTest() {
 

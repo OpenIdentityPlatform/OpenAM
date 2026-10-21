@@ -25,7 +25,7 @@
  * $Id: EntityOpViewBeanBase.java,v 1.4 2008/09/04 23:59:37 veiming Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.console.idm;
@@ -55,6 +55,7 @@ import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.tabs.CCTabs;
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.forgerock.openam.security.whitelist.GotoUrlValidator;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 
@@ -71,6 +72,12 @@ public abstract class EntityOpViewBeanBase extends AMPrimaryMastHeadViewBean {
     protected boolean hasNoAttributeToDisplay;
     protected boolean submitCycle;
 
+    /**
+     * @deprecated Accepts any URL when the realm has no Valid goto URL Resources, which is the default. Kept for
+     * subclasses compiled against it; use {@link GotoUrlValidator}, which falls back to the origins this server
+     * answers on.
+     */
+    @Deprecated
     protected static final RedirectUrlValidator<String> REDIRECT_URL_VALIDATOR =
                 new RedirectUrlValidator<>(ValidGotoUrlExtractor.getInstance());
 
@@ -223,7 +230,9 @@ public abstract class EntityOpViewBeanBase extends AMPrimaryMastHeadViewBean {
         HttpServletRequest req = getRequestContext().getRequest();
         String url = req.getParameter(PropertyTemplate.PARAM_PROPERTIES_VIEW_BEAN_URL);
         String realmName = (String) getPageSessionAttribute(AMAdminConstants.CURRENT_REALM);
-        if (REDIRECT_URL_VALIDATOR.isRedirectUrlValid(url, realmName)) {
+        // The realm's goto URL list is empty by default and the allow-all validator reads that as permission to
+        // forward anywhere, so this goes through GotoUrlValidator, which falls back to the origin of the request.
+        if (GotoUrlValidator.isValid(req, url, realmName)) {
             AMPostViewBean vb = (AMPostViewBean) getViewBean(AMPostViewBean.class);
             passPgSessionMap(vb);
             vb.setTargetViewBeanURL(url);

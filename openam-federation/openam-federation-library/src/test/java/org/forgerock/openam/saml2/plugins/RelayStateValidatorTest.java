@@ -19,13 +19,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sun.identity.configuration.FedLibSystemProperties;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import org.forgerock.openam.saml2.plugins.RelayStateValidator.HostedEntities;
 import org.forgerock.openam.shared.security.whitelist.FailSafeRedirectUrlValidator;
+import org.forgerock.openam.saml2.plugins.ValidRelayStateExtractor.SAMLEntityInfo;
 import org.forgerock.openam.shared.security.whitelist.ValidDomainExtractor;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -74,6 +85,19 @@ public class RelayStateValidatorTest {
         }
     }
 
+    /**
+     * The origin fallback counts the URL this server was installed under as one of its own, so these are pinned
+     * rather than left to whatever else ran in this JVM first - an ambient value would silently add an accepted
+     * origin and make the assertions below depend on test ordering.
+     */
+    private static final String[] INSTALLATION = {
+        Constants.AM_SERVER_PROTOCOL,
+        Constants.AM_SERVER_HOST,
+        Constants.AM_SERVER_PORT,
+    };
+
+    private final Map<String, String> previousValues = new HashMap<String, String>();
+
     private HttpServletRequest request;
     private StubExtractor extractor;
     private StubEntityResolver entityResolver;
@@ -91,6 +115,30 @@ public class RelayStateValidatorTest {
         validator = new RelayStateValidator(
                 new FailSafeRedirectUrlValidator<ValidRelayStateExtractor.SAMLEntityInfo>(extractor),
                 entityResolver);
+
+        previousValues.clear();
+        for (String property : INSTALLATION) {
+            previousValues.put(property, SystemPropertiesManager.get(property));
+        }
+        setInstallation("https", "installed.example.com", "443");
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        Properties properties = new Properties();
+        for (String property : INSTALLATION) {
+            String previous = previousValues.get(property);
+            properties.setProperty(property, previous == null ? "" : previous);
+        }
+        new FedLibSystemProperties().initializeProperties(properties);
+    }
+
+    private static void setInstallation(String protocol, String host, String port) {
+        Properties properties = new Properties();
+        properties.setProperty(Constants.AM_SERVER_PROTOCOL, protocol);
+        properties.setProperty(Constants.AM_SERVER_HOST, host);
+        properties.setProperty(Constants.AM_SERVER_PORT, port);
+        new FedLibSystemProperties().initializeProperties(properties);
     }
 
     @DataProvider(name = "rejectedRelayStates")
@@ -338,8 +386,9 @@ public class RelayStateValidatorTest {
 
     @Test
     public void shouldCarryAnUnknownRoleThroughRatherThanNameOneOfItsOwn() {
-        // ValidRelayStateExtractor reads the IdP configuration for anything that is not SPRole. That contract is
-        // its own, so this must not quietly substitute IDPRole here and hide a caller that names no role.
+        // ValidRelayStateExtractor reports a role that is neither SPRole nor IDPRole as a list it could not read.
+        // That contract is its own, so this must not quietly substitute IDPRole here and hide a caller that names
+        // no role.
         assertThat(RelayStateValidator.entityInfo("/", "https://sp.example.com", null).toString())
                 .contains("role=null");
     }
@@ -351,5 +400,233 @@ public class RelayStateValidatorTest {
         assertThat(RelayStateValidator.entityInfo(null, "https://sp.example.com", SAML2Constants.SP_ROLE)).isNull();
         assertThat(RelayStateValidator.entityInfo("/", null, SAML2Constants.SP_ROLE)).isNull();
         assertThat(RelayStateValidator.entityInfo("", "", SAML2Constants.SP_ROLE)).isNull();
+    }
+
+    @Test
+    public void shouldAcceptTheUrlThisServerWasInstalledUnder() {
+        // The container reports openam.example.com for this request while the installation names another host;
+        // both are origins of this server, which is what keeps a proxied deployment working.
+        assertThat(isValid("https://installed.example.com/openam/")).isTrue();
+        assertThat(isValid("https://installed.example.com:8443/openam/")).isFalse();
+    }
+
+    @Test
+    public void shouldAcceptAnyHttpUrlWhenTheLegacyPropertyIsSet() {
+        // The escape hatch for a deployment that cannot populate the relayStateUrlList of every hosted entity.
+        setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "true");
+        try {
+            assertThat(isValid("https://partner.example.com/consumer")).isTrue();
+            // It restores the old behaviour whole, protocol relative URLs included.
+            assertThat(isValid("//partner.example.com/consumer")).isTrue();
+            // Not a licence to redirect to anything at all.
+            assertThat(isValid("javascript:alert(1)")).isFalse();
+        } finally {
+            setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "false");
+        }
+    }
+
+    /*
+     * The relayStateUrlList of a hosted entity below. An entity can be configured for both roles, each with a list
+     * of its own, so which of the two decides is the role the redirect belongs to.
+     */
+
+    private static final String SP_RELAY_STATE = "https://sp.example.com/*";
+
+    private static final String IDP_RELAY_STATE = "https://idp.example.com/*";
+
+    @Test
+    public void shouldJudgeTheRelayStateByTheListOfTheRoleInPlay() {
+        RelayStateValidator validator = new RelayStateValidator(new PerRoleExtractor(), new HostedEntities());
+
+        assertThat(validator.validate(request, "/", "entity", "https://sp.example.com/consumer",
+                SAML2Constants.SP_ROLE)).isTrue();
+        assertThat(validator.validate(request, "/", "entity", "https://idp.example.com/consumer",
+                SAML2Constants.SP_ROLE)).isFalse();
+        assertThat(validator.validate(request, "/", "entity", "https://idp.example.com/consumer",
+                SAML2Constants.IDP_ROLE)).isTrue();
+    }
+
+    @Test
+    public void shouldNotAcceptAnyUrlWhenTheRelayStateListCouldNotBeReadEvenWithTheLegacyPropertySet() {
+        // ValidRelayStateExtractor swallows the exception the configuration store throws and answers null, which
+        // used to be indistinguishable from an entity without a list: a store that blinked handed the escape
+        // hatch an entity that did populate its relayStateUrlList.
+        setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "true");
+        try {
+            RelayStateValidator validator = new RelayStateValidator(UNREADABLE_LIST, new HostedEntities());
+
+            assertThat(validator.validate(request, "/", "entity", "https://attacker.example.com/",
+                    SAML2Constants.SP_ROLE)).isFalse();
+            assertThat(validator.validate(request, "/", "entity", "https://openam.example.com/openam/",
+                    SAML2Constants.SP_ROLE)).isTrue();
+        } finally {
+            setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "false");
+        }
+    }
+
+    @Test
+    public void shouldKeepAPopulatedRelayStateListAuthoritativeWhenTheLegacyPropertyIsSet() {
+        setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "true");
+        try {
+            RelayStateValidator validator = new RelayStateValidator(new PerRoleExtractor(), new HostedEntities());
+
+            assertThat(validator.validate(request, "/", "entity", "https://attacker.example.com/",
+                    SAML2Constants.SP_ROLE)).isFalse();
+        } finally {
+            setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "false");
+        }
+    }
+
+    @Test
+    public void shouldRefuseTheRelayStateWhenTheEntityBehindTheMetaAliasCannotBeResolvedEvenWithTheLegacyPropertySet() {
+        // The whitelist of the hosted entity can not be read, so there is nothing left to validate against - not
+        // even a RelayState pointing back at this server, as shouldRejectTheRelayStateWhenTheHostedEntityCannotBeResolved
+        // pins for the stubbed resolver. What matters here is that the escape hatch does not reopen it.
+        setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "true");
+        try {
+            RelayStateValidator validator = new RelayStateValidator(new PerRoleExtractor(), new HostedEntities() {
+                @Override
+                String entityId(String metaAlias) throws SAML2Exception {
+                    throw new SAML2Exception("the configuration store is unreachable");
+                }
+            });
+
+            assertThat(validator.validateForMetaAlias(request, "/sp", "https://attacker.example.com/",
+                    SAML2Constants.SP_ROLE)).isFalse();
+            assertThat(validator.validateForMetaAlias(request, "/sp", "https://openam.example.com/openam/",
+                    SAML2Constants.SP_ROLE)).isFalse();
+            assertThat(validator.validateForMetaAlias(request, "/sp", "/openam/saml2/jsp/default.jsp",
+                    SAML2Constants.SP_ROLE)).isFalse();
+        } finally {
+            setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "false");
+        }
+    }
+
+    @Test
+    public void shouldOnlyAcceptOwnOriginWhenNoEntityIsDeployedUnderTheMetaAlias() {
+        // SAML2MetaManager.getEntityByMetaAlias answers null for a metaAlias it does not know and throws only when
+        // the store fails. A metaAlias no hosted entity is deployed under must not read as an endpoint without a
+        // list and reach the escape hatch.
+        setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "true");
+        try {
+            RelayStateValidator validator = new RelayStateValidator(new PerRoleExtractor(), new HostedEntities() {
+                @Override
+                String entityId(String metaAlias) {
+                    return null;
+                }
+            });
+
+            assertThat(validator.validateForMetaAlias(request, "/bogus", "https://attacker.example.com/",
+                    SAML2Constants.SP_ROLE)).isFalse();
+            assertThat(validator.validateForMetaAlias(request, "/bogus", "https://openam.example.com/openam/",
+                    SAML2Constants.SP_ROLE)).isTrue();
+            assertThat(validator.validateForMetaAlias(request, "/bogus", "/openam/saml2/jsp/default.jsp",
+                    SAML2Constants.SP_ROLE)).isTrue();
+        } finally {
+            setProperty(Constants.FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST, "false");
+        }
+    }
+
+    /*
+     * The static entry points below are what the JSPs and SAML2 classes call. The tests above that go through them
+     * pass no realm, so nothing is read behind them; these put a recording validator in place and check what the
+     * entry points hand on, so a wrapper that swapped the realm and the entity or dropped the role would show.
+     */
+
+    @Test
+    public void shouldForwardTheRealmEntityAndRoleThroughTheStaticEntryPoint() {
+        RecordingExtractor extractor = new RecordingExtractor();
+        RelayStateValidator.setInstance(new RelayStateValidator(extractor, new HostedEntities()));
+        try {
+            RelayStateValidator.isValidForEntity(request, "/sub", "https://sp.example.com", "https://partner.example.com/",
+                    SAML2Constants.SP_ROLE);
+        } finally {
+            RelayStateValidator.setInstance(null);
+        }
+
+        assertThat(extractor.asked).hasSize(1);
+        assertThat(extractor.asked.get(0).getRealm()).isEqualTo("/sub");
+        assertThat(extractor.asked.get(0).getEntityID()).isEqualTo("https://sp.example.com");
+        assertThat(extractor.asked.get(0).getRole()).isEqualTo(SAML2Constants.SP_ROLE);
+    }
+
+    @Test
+    public void shouldForwardTheMetaAliasOfTheRequestUriThroughTheStaticEntryPoint() {
+        RecordingExtractor extractor = new RecordingExtractor();
+        RecordingEntities entities = new RecordingEntities();
+        RelayStateValidator.setInstance(new RelayStateValidator(extractor, entities));
+        try {
+            when(request.getRequestURI()).thenReturn("/openam/SPSloRedirect/metaAlias/sub/sp");
+            RelayStateValidator.isValidForRequest(request, "https://partner.example.com/", SAML2Constants.SP_ROLE);
+        } finally {
+            RelayStateValidator.setInstance(null);
+        }
+
+        assertThat(entities.asked).containsExactly("/sub/sp");
+        assertThat(extractor.asked).hasSize(1);
+        assertThat(extractor.asked.get(0).getRealm()).isEqualTo("/sub");
+        assertThat(extractor.asked.get(0).getEntityID()).isEqualTo("entity:/sub/sp");
+        assertThat(extractor.asked.get(0).getRole()).isEqualTo(SAML2Constants.SP_ROLE);
+    }
+
+    /** Records the entity each list is read for, and holds no list. */
+    private static final class RecordingExtractor implements ValidDomainExtractor<SAMLEntityInfo> {
+
+        private final List<SAMLEntityInfo> asked = new ArrayList<SAMLEntityInfo>();
+
+        @Override
+        public Collection<String> extractValidDomains(SAMLEntityInfo entityInfo) {
+            asked.add(entityInfo);
+            return Collections.emptyList();
+        }
+    }
+
+    /** Records the metaAlias each entity is resolved for, and names the entity after it. */
+    private static final class RecordingEntities extends HostedEntities {
+
+        private final List<String> asked = new ArrayList<String>();
+
+        @Override
+        String entityId(String metaAlias) {
+            asked.add(metaAlias);
+            return "entity:" + metaAlias;
+        }
+    }
+
+    /**
+     * A hosted entity configured for both roles, each with a relayStateUrlList of its own.
+     */
+    private static final class PerRoleExtractor implements ValidDomainExtractor<SAMLEntityInfo> {
+
+        @Override
+        public Collection<String> extractValidDomains(SAMLEntityInfo entityInfo) {
+            if (SAML2Constants.SP_ROLE.equals(entityInfo.getRole())) {
+                return Collections.singletonList(SP_RELAY_STATE);
+            }
+            if (SAML2Constants.IDP_ROLE.equals(entityInfo.getRole())) {
+                return Collections.singletonList(IDP_RELAY_STATE);
+            }
+            // The role decides which list applies, so an unresolved one leaves the list unknown.
+            return null;
+        }
+    }
+
+    /** Stands for an entity whose configuration could not be read at all. */
+    private static final ValidDomainExtractor<SAMLEntityInfo> UNREADABLE_LIST =
+            new ValidDomainExtractor<SAMLEntityInfo>() {
+                @Override
+                public Collection<String> extractValidDomains(SAMLEntityInfo entityInfo) {
+                    return null;
+                }
+            };
+
+    private boolean isValid(String relayState) {
+        return RelayStateValidator.isValidForEntity(request, null, null, relayState, SAML2Constants.SP_ROLE);
+    }
+
+    private static void setProperty(String key, String value) {
+        Properties properties = new Properties();
+        properties.setProperty(key, value);
+        new FedLibSystemProperties().initializeProperties(properties);
     }
 }

@@ -50,24 +50,25 @@ public class RealmGotoUrlExtractorTest {
     }
 
     @Test
-    public void treatsAnAbsentAttributeAsNoList() throws Exception {
+    public void treatsAnAbsentAttributeAsAnEmptyList() throws Exception {
         RealmGotoUrlExtractor extractor =
                 new RealmGotoUrlExtractor(() -> validationService(new HashMap<String, Object>()));
 
-        assertThat(extractor.extractValidDomains("/myrealm")).isNull();
+        assertThat(extractor.extractValidDomains("/myrealm")).isNotNull().isEmpty();
     }
 
     @Test
-    public void treatsAnEmptyAttributeAsNoList() throws Exception {
+    public void treatsAnEmptyAttributeAsAnEmptyList() throws Exception {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("openam-auth-valid-goto-resources", Collections.emptySet());
         RealmGotoUrlExtractor extractor = new RealmGotoUrlExtractor(() -> validationService(attributes));
 
-        assertThat(extractor.extractValidDomains("/myrealm")).isNull();
+        assertThat(extractor.extractValidDomains("/myrealm")).isNotNull().isEmpty();
     }
 
     @Test
-    public void yieldsNoListWhenTheConfigurationCannotBeRead() {
+    public void reportsAListThatCannotBeReadAsUnreadable() {
+        // null, not an empty list: the validator must not take a realm whose list it could not read for one without.
         RealmGotoUrlExtractor extractor = new RealmGotoUrlExtractor(() -> {
             throw new ConfigurationException("boom");
         });
@@ -76,19 +77,19 @@ public class RealmGotoUrlExtractorTest {
     }
 
     @Test
-    public void yieldsNoListWithoutAConfigurationPlugin() {
+    public void reportsTheListAsUnreadableWithoutAConfigurationPlugin() {
         RealmGotoUrlExtractor extractor = new RealmGotoUrlExtractor(() -> null);
 
         assertThat(extractor.extractValidDomains("/myrealm")).isNull();
     }
 
     @Test
-    public void yieldsNoListWhenTheRealmHasNoConfiguration() throws Exception {
+    public void treatsARealmWithoutAConfigurationAsAnEmptyList() throws Exception {
         ConfigurationInstance instance = mock(ConfigurationInstance.class);
         when(instance.getConfiguration("/myrealm", null)).thenReturn(null);
         RealmGotoUrlExtractor extractor = new RealmGotoUrlExtractor(() -> instance);
 
-        assertThat(extractor.extractValidDomains("/myrealm")).isNull();
+        assertThat(extractor.extractValidDomains("/myrealm")).isNotNull().isEmpty();
     }
 
     @Test
