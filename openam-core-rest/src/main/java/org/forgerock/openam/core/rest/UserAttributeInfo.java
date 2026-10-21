@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.rest;
@@ -92,7 +93,14 @@ final class UserAttributeInfo {
          * @param validCreationAttributes
          *         valid creation attributes
          */
-        @ConfigAttribute("selfServiceUserRegistrationValidUserAttributes")
+        // Optional, like the setting above it and like the schema says (<IsOptional/>).  What this does NOT do is
+        // give the enforcement code an empty whitelist to refuse: ConsoleConfigHandlerImpl throws "Expected
+        // attribute" for a key that is absent before it ever consults required(), and selfService.xml declares
+        // seven DefaultValues for this key, which AttributeValidator.inheritDefaults puts back - so neither the
+        // absent nor the present-but-empty shape occurs through SMS.  It is here to match the schema, not to
+        // reach a behaviour; the empty whitelist is refused by IdentityRestUtils.enforceWhiteList for callers that
+        // supply the set directly.
+        @ConfigAttribute(value = "selfServiceUserRegistrationValidUserAttributes", required = false)
         public void setValidCreationAttributes(Set<String> validCreationAttributes) {
             this.validCreationAttributes.addAll(validCreationAttributes);
         }

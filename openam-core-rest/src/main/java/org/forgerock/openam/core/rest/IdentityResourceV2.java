@@ -75,6 +75,7 @@ import org.forgerock.json.resource.PreconditionFailedException;
 import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.services.context.Context;
 import org.forgerock.json.JsonValue;
+import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.ActionResponse;
 import org.forgerock.json.resource.BadRequestException;
@@ -200,18 +201,59 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
         }
     }
 
+    /**
+     * The token store the anonymous registration flow reads and writes registration tokens through.
+     *
+     * Null everywhere but in a test: production goes through {@link CTSHolder}, whose singleton must not be created
+     * before OpenAM is configured, and which a test has no injector to satisfy.
+     */
+    private final CTSPersistentStore cts;
+
+    private CTSPersistentStore cts() {
+        return cts == null ? CTSHolder.getCTS() : cts;
+    }
+
+    /**
+     * The system admin token the anonymous registration flow creates the identity with.
+     *
+     * Null everywhere but in a test: production goes through {@link RestUtils#getToken()}, a static that reaches
+     * the whole authentication stack and that a unit test has nothing to satisfy.  Supplying it is what lets a test
+     * see the object that reaches the identity service, so that the whitelist can be pinned to the document that
+     * actually gets created rather than to a copy of it.
+     */
+    private final SSOToken adminToken;
+
+    private SSOToken adminToken() {
+        return adminToken == null ? RestUtils.getToken() : adminToken;
+    }
+
     // Constructor used for testing...
     IdentityResourceV2(String userType, ServiceConfig mailServiceConfig,
             MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
             RestSecurityProvider restSecurityProvider, ConsoleConfigHandler configHandler,
             BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates) {
+        this(userType, mailServiceConfig, mailServerLoader, identityServices, coreWrapper, restSecurityProvider,
+                configHandler, baseURLProviderFactory, uiRolePredicates, null, null);
+    }
+
+    // Constructor used for testing, with the token store and the admin token supplied rather than looked up.
+    IdentityResourceV2(String userType, ServiceConfig mailServiceConfig,
+            MailServerLoader mailServerLoader, IdentityServicesImpl identityServices, CoreWrapper coreWrapper,
+            RestSecurityProvider restSecurityProvider, ConsoleConfigHandler configHandler,
+            BaseURLProviderFactory baseURLProviderFactory, Set<UiRolePredicate> uiRolePredicates,
+            CTSPersistentStore cts, SSOToken adminToken) {
+        this.cts = cts;
+        this.adminToken = adminToken;
         this.objectType = userType;
         this.mailServiceConfig = mailServiceConfig;
         this.mailServerLoader = mailServerLoader;
         this.restSecurityProvider = restSecurityProvider;
         this.configHandler = configHandler;
-        this.identityResourceV1 = new IdentityResourceV1(userType, mailServerLoader, identityServices, coreWrapper,
-                restSecurityProvider, configHandler, uiRolePredicates);
+        // The delegate handles the actions this version does not override - forgotPasswordReset among them - and
+        // those read the token store and create identities too, so it gets the same ones rather than resolving its
+        // own.
+        this.identityResourceV1 = new IdentityResourceV1(userType, null, mailServerLoader, identityServices,
+                coreWrapper, restSecurityProvider, configHandler, uiRolePredicates, cts, adminToken);
         this.identityServices = identityServices;
         this.baseURLProviderFactory = baseURLProviderFactory;
         this.currentPasswordVerifier = new CurrentPasswordVerifier(userType);
@@ -389,7 +431,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                     tokenLifeTime, realm);
 
             // Store token in datastore
-            CTSHolder.getCTS().createAsync(ctsToken);
+            cts().createAsync(ctsToken);
             tokenID = ctsToken.getTokenId();
 
             // Create confirmationId
@@ -615,7 +657,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
         Reject.ifNull(confirmationId);
 
         //check expiry
-        org.forgerock.openam.cts.api.tokens.Token ctsToken = CTSHolder.getCTS().read(tokenID);
+        org.forgerock.openam.cts.api.tokens.Token ctsToken = cts().read(tokenID);
 
         if (ctsToken == null || TimeUtils.toUnixTime(ctsToken.getExpiryTimestamp()) < TimeUtils.currentUnixTime()) {
             throw ResourceException.getException(HttpURLConnection.HTTP_GONE, "Cannot find tokenID: " + tokenID);
@@ -768,7 +810,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                     tokenLifeTime, realm);
 
             // Store token in datastore
-            CTSHolder.getCTS().createAsync(ctsToken);
+            cts().createAsync(ctsToken);
 
             // Create confirmationId
             String confirmationId = Hash.hash(
@@ -900,6 +942,12 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
         String email;
 
         try{
+            // The identity is created with the system admin token, so this action must not be usable to create
+            // anything other than the self registered user itself.
+            if (!USER_TYPE.equals(objectType)) {
+                throw new BadRequestException("Self-registration is only supported for users");
+            }
+
             if (!restSecurity.isSelfRegistration()) {
                 throw new BadRequestException("Self-registration disabled");
             }
@@ -913,8 +961,25 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             if (email == null || email.isEmpty()) {
                 throw new BadRequestException("Email not provided");
             }
-            // Convert to IDRepo Attribute schema
-            jVal.put("mail", email);
+            // Convert to IDRepo Attribute schema.  "email" is a parameter of this action rather than a user
+            // attribute - validateToken ties its value to the confirmation id - so it goes out of the object
+            // altogether, leaving the whitelist below to see exactly what gets created.
+            //
+            // Every spelling of it goes, and of "mail" with it: the identity repository matches attribute names
+            // case insensitively, so a "Mail" the caller sent along would otherwise survive the whitelist - which
+            // matches case insensitively too, and so accepts it - and land on the account beside the address the
+            // confirmation id actually vouches for.
+            //
+            // Two consequences for the whitelist, both deliberate.  What it inspects is not only what the caller
+            // sent: "mail" is put back here, so it has to stay in the whitelist even though no client sends it,
+            // and an operator who trims it out refuses every registration.  And tokenId and confirmationId are
+            // removed as spelled above rather than case insensitively, because neither is an attribute of the
+            // repository - a case variant of them cannot collapse into one there the way "Mail" collapses into
+            // "mail", so it is simply not whitelisted, and the caller is told which key was refused rather than
+            // having a typo silently swallowed.
+            removeIgnoringCase(jVal, EMAIL);
+            removeIgnoringCase(jVal, FIELD_MAIL);
+            jVal.put(FIELD_MAIL, email);
 
             if (confirmationId == null || confirmationId.isEmpty()) {
                 throw new BadRequestException("confirmationId not provided");
@@ -926,8 +991,17 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
 
             validateToken(tokenID, realm, email, confirmationId);
 
+            // Nothing further down the chain restricts what an anonymous caller may set: the identity is created
+            // with the system admin token, and unlike createInstance(Context, CreateRequest) this request carries
+            // no SelfServiceContext for the whitelist to key off. Apply the whitelist here.
+            //
+            // After the token on purpose.  This action is reachable without a session, and the rejection names the
+            // attribute it rejected, so checking first would answer "is this attribute whitelisted?" - a whitelisted
+            // one fails on the token, a rejected one says so - to a caller holding no token at all.
+            enforceSelfRegistrationWhiteList(configHandler, realm, jVal, objectType);
+
             // create an Identity
-            SSOToken admin = RestUtils.getToken();
+            SSOToken admin = adminToken();
             final String finalTokenID = tokenID;
 
             return createInstance(admin, jVal, realm, context, null)
@@ -938,7 +1012,7 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                             try {
                                 // Even though the generated token will eventually timeout, delete it after a successful read
                                 // so that the completed registration request cannot be made again using the same token.
-                                CTSHolder.getCTS().deleteAsync(finalTokenID);
+                                cts().deleteAsync(finalTokenID);
                             } catch (DeleteFailedException e) {
                                 // Catch this rather than letting it stop the process as it is possible that between successfully
                                 // reading and deleting, the token has expired.
@@ -947,8 +1021,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                                             " after a successful read failed due to " + e.getMessage(), e);
                                 }
                             } catch (CoreTokenException cte) { // For any unexpected CTS error
-                                debug.error("IdentityResource.anonymousCreate(): CTS Error : " + cte.getMessage());
-                                return new InternalServerErrorException(cte.getMessage(), cte).asPromise();
+                                debug.error("IdentityResource.anonymousCreate(): CTS Error", cte);
+                                return new InternalServerErrorException(
+                                        "Unable to complete the registration request", cte).asPromise();
                             }
                             return newResultPromise(response);
                         }
@@ -960,12 +1035,30 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             debug.warning("IdentityResource.anonymousCreate() :: Resource error", re);
             return re.asPromise();
         } catch (CoreTokenException cte) { // For any unexpected CTS error
+            // These three arms answer with the same fixed message on purpose.  ResourceException reports its
+            // cause's message when it has none of its own, and toJsonValue() puts that in the response body - so
+            // constructing them from the cause alone would hand the token store's and the service configuration's
+            // text to a caller with no session.  The cause is still attached, for the log and for anything upstream
+            // that wants it; only includeCause would put it on the wire.
+            //
+            // Identity store failures never reach these arms: createInstance answers them through the promise it
+            // returns, which is handed back as it is, so they still carry the store's own message.
             debug.error("IdentityResource.anonymousCreate() :: CTS error", cte);
-            return new InternalServerErrorException(cte).asPromise();
+            return new InternalServerErrorException("Unable to complete the registration request", cte).asPromise();
         } catch (ServiceNotFoundException snfe) {
             // Failure from RestSecurity
             debug.error("IdentityResource.anonymousCreate() :: Internal error", snfe);
-            return new InternalServerErrorException(snfe).asPromise();
+            return new InternalServerErrorException("Unable to complete the registration request", snfe).asPromise();
+        } catch (JsonValueException jve) {
+            // A field of the request body that is not of the type it is read as - the action parameters are read
+            // with asString() - is the caller's mistake rather than ours.
+            debug.warning("IdentityResource.anonymousCreate() :: Invalid Parameter", jve);
+            return new BadRequestException("Invalid registration request").asPromise();
+        } catch (RuntimeException re) {
+            // This action is reachable without a session, so anything else unchecked has to be turned into a
+            // response rather than escape as a raw 500.
+            debug.error("IdentityResource.anonymousCreate() :: Unexpected error", re);
+            return new InternalServerErrorException("Unable to complete the registration request", re).asPromise();
         }
     }
 
@@ -1071,6 +1164,16 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
         final String realm = realmContext.getRealm().asPath();
 
         try {
+            // GHSA-jv8f-m88g-h6mm: this is where the self service user registration flow creates the identity,
+            // with the system admin token.  Enforcing before the admin token is acquired keeps the check reachable
+            // without one, which is what lets the regression test pin this call.
+            //
+            // It does mean a self service request that cannot be authenticated is answered by whichever of the two
+            // fails first, rather than always by the authentication failure.  The trade is deliberate: the check
+            // itself reads nothing outside a SelfServiceContext, and this route is behind the SSO filter, so the
+            // only caller that notices is one whose cookie has already gone stale.
+            enforceSelfRegistrationWhiteList(configHandler, context, request.getContent(), objectType);
+
             // anyone can create an account add
             SSOToken admin = getSSOToken(getCookieFromServerContext(context));
 
@@ -1091,10 +1194,6 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
             } else {
                 resourceId = identity.getName();
             }
-
-            UserAttributeInfo userAttributeInfo = configHandler.getConfig(realm, UserAttributeInfoBuilder.class);
-            enforceWhiteList(context, request.getContent(), objectType,
-                                                            userAttributeInfo.getValidCreationAttributes());
 
             final String id = resourceId;
             return attemptResourceCreation(realm, admin, identity, resourceId, context, request)
@@ -1117,8 +1216,8 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
 
         } catch (SSOException e) {
             return new ForbiddenException(e).asPromise();
-        } catch (BadRequestException bre) {
-            return bre.asPromise();
+        } catch (ResourceException re) {
+            return re.asPromise();
         }
     }
 
@@ -1163,7 +1262,10 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                     .asPromise();
         } catch (ConflictException re) {
             debug.warning("IdentityResource.createInstance() :: Create already existing resourceId={}", resourceId, re);
-            if (isContractConformantUserProvidedIdCreate(context, request)) {
+            // anonymousCreate has no CreateRequest to conform to - it reaches this method through
+            // createInstance(SSOToken, JsonValue, String, Context, CreateRequest) with a null one - so a self
+            // registering user picking a name that is taken used to leave this dereferencing null.
+            if (request != null && isContractConformantUserProvidedIdCreate(context, request)) {
                 return new PreconditionFailedException(re.getMessage()).asPromise();
             } else {
                 return re.asPromise();

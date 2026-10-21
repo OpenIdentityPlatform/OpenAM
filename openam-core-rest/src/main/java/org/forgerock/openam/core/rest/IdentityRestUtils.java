@@ -12,12 +12,13 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2023 3A Systems LLC
+ * Portions copyright 2023-2026 3A Systems LLC
  */
 package org.forgerock.openam.core.rest;
 
 import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asAttributeArray;
 import static com.sun.identity.idsvcs.opensso.IdentityServicesImpl.asMap;
+import static org.forgerock.openam.core.rest.UserAttributeInfo.UserAttributeInfoBuilder;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -34,6 +35,7 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.json.JsonValue;
 import org.forgerock.json.JsonValueException;
 import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.json.resource.PermanentException;
 import org.forgerock.json.resource.ResourceException;
@@ -41,6 +43,7 @@ import org.forgerock.openam.core.CoreWrapper;
 import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.rest.RestUtils;
 import org.forgerock.openam.rest.resource.SSOTokenContext;
+import org.forgerock.openam.sm.config.ConsoleConfigHandler;
 import org.forgerock.openam.errors.IdentityResourceExceptionMappingHandler;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.forgerock.selfservice.core.SelfServiceContext;
@@ -53,6 +56,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -198,14 +202,14 @@ public final class IdentityRestUtils {
     }
 
     private static boolean isPasswordAttribute(String attributeName) {
-        return PASSWORD_ATTRIBUTES.contains(attributeName.toLowerCase());
+        return PASSWORD_ATTRIBUTES.contains(attributeName.toLowerCase(Locale.ROOT));
     }
 
     /**
      * When an instance of a user is created via self service, we impose additional rules for security purposes.
-     * Namely, we strictly apply a whitelist of valid attribute names to each attribute in the incoming JSON
-     * representation of the user object.  This ensures a hacker can't manipulate the request and thereby pretend
-     * to be a manager, demigod or individual they are not.
+     * Namely, we strictly apply a whitelist of valid attribute names to each attribute, and to any group
+     * membership, in the incoming JSON representation of the user object.  This ensures a hacker can't manipulate
+     * the request and thereby pretend to be a manager, demigod or individual they are not.
      *
      * There is no return value.  If you survive calling this function without an exception being thrown, there
      * are no illegal values in the incoming JSON
@@ -214,31 +218,196 @@ public final class IdentityRestUtils {
      * @param jsonValue The request
      * @param objectType The type of object we're creating, user, group, etc.
      * @param validUserAttributes The set of valid user attributes
-     * @throws BadRequestException If any attribute is found in the JSON representation of the user object containing
-     * an attribute that is not in our whitelist
+     * @throws BadRequestException If the JSON representation of the user object cannot be converted into an
+     * identity, or contains an attribute or a group membership that is not in our whitelist
      */
     public static void enforceWhiteList(final Context context, final JsonValue jsonValue,
                                         final String objectType, final Set<String> validUserAttributes)
             throws BadRequestException {
 
-        if (!context.containsContext(SelfServiceContext.class) || !objectType.equals(USER_TYPE)) {
+        if (!appliesTo(context)) {
             return;
         }
 
-        final String realm = RealmContext.getRealm(context).asPath();
+        enforceWhiteList(RealmContext.getRealm(context).asPath(), jsonValue, objectType, validUserAttributes);
+    }
 
+    /**
+     * The whitelist applies to what the self service framework creates on behalf of an anonymous user, which is what
+     * the {@link SelfServiceContext} marks.  An authenticated caller creating an identity is restricted by its own
+     * privileges instead.
+     *
+     * @param context The context of the request
+     * @return Whether the whitelist has anything to say about this request
+     */
+    private static boolean appliesTo(final Context context) {
+        return context.containsContext(SelfServiceContext.class);
+    }
+
+    /**
+     * Removes every spelling of an attribute from a request.
+     *
+     * The identity repository matches attribute names case insensitively - {@literal DJLDAPv3Repo} wraps them in a
+     * {@link com.sun.identity.common.CaseInsensitiveHashMap}, and the directory does the same - so removing only the
+     * key as spelled here would leave a case variant of it behind to be created under the very name that was
+     * supposed to have been taken out.
+     *
+     * @param jsonValue The request content
+     * @param attributeName The attribute to remove, in any casing
+     */
+    public static void removeIgnoringCase(final JsonValue jsonValue, final String attributeName) {
+        if (!jsonValue.isMap()) {
+            return;
+        }
+
+        for (String key : new ArrayList<>(jsonValue.keys())) {
+            if (key.equalsIgnoreCase(attributeName)) {
+                jsonValue.remove(key);
+            }
+        }
+    }
+
+    /**
+     * Applies the whitelist of valid attribute names regardless of the calling context.
+     *
+     * The context based overload above only applies the whitelist to requests carrying a
+     * {@link SelfServiceContext}, which the self service framework adds to the requests it makes on behalf of an
+     * anonymous user.  Endpoints that are anonymous in their own right, such as the legacy
+     * {@literal anonymousCreate} action, never carry that context, so they have to ask for the whitelist explicitly.
+     *
+     * @param realm The realm the identity is being created in
+     * @param jsonValue The JSON representation of the identity to create
+     * @param objectType The type of object we're creating, user, group, etc.
+     * @param validUserAttributes The set of valid user attributes
+     * @throws BadRequestException If the JSON representation of the user object cannot be converted into an
+     * identity, or contains an attribute or a group membership that is not in our whitelist
+     */
+    public static void enforceWhiteList(final String realm, final JsonValue jsonValue, final String objectType,
+                                        final Set<String> validUserAttributes) throws BadRequestException {
+
+        if (!objectType.equals(USER_TYPE)) {
+            return;
+        }
+
+        // Not reachable through the SMS supplier - selfService.xml ships seven default values for the setting and
+        // the config handler will not hand back a whitelist without them - but this method takes the set from its
+        // caller, and an empty one would otherwise let a body with no attributes at all through: the per attribute
+        // loop below has nothing to reject when jsonValueToIdentityDetails produced none.
         if (validUserAttributes == null || validUserAttributes.isEmpty()) {
             throw new BadRequestException("Null/empty whitelist of valid attributes for self service user creation");
         }
 
+        // The identity repository matches attribute names case insensitively, so a case sensitive whitelist would
+        // accept or reject one and the same attribute depending on how the caller happened to spell it.
+        Set<String> whiteList = new HashSet<>(validUserAttributes.size());
+        for (String validUserAttribute : validUserAttributes) {
+            whiteList.add(validUserAttribute.toLowerCase(Locale.ROOT));
+        }
+
+        // Group membership does not turn up as an attribute - jsonValueToIdentityDetails diverts an exactly
+        // lower case memberof into the identity's group list - so it has to be checked here or it would bypass the
+        // whitelist altogether.  Checking it first, and case insensitively, means every spelling of memberof is
+        // answered by this check rather than by whichever of the two happens to see it first.
+        if (jsonValue.isMap()) {
+            for (String key : jsonValue.keys()) {
+                String attributeName = key.toLowerCase(Locale.ROOT);
+                if (MEMBEROF_ATTRIBUTES.contains(attributeName) && !whiteList.contains(attributeName)) {
+                    throw new BadRequestException("Group membership "
+                            + key
+                            + " is not valid for self service creation");
+                }
+            }
+        }
+
         IdentityDetails identityDetails = jsonValueToIdentityDetails(objectType, jsonValue, realm);
         Attribute[] attributes = identityDetails.getAttributes();
+
+        // jsonValueToIdentityDetails swallows a malformed user object and returns before it sets the attributes, so
+        // a null here means there is nothing left to check rather than that there is nothing to check.  Refusing the
+        // request keeps an unconvertible body from passing the whitelist by having no attributes at all.
+        if (attributes == null) {
+            throw new BadRequestException("Invalid user object for self service creation");
+        }
+
         for (Attribute attribute : attributes) {
-            if (!validUserAttributes.contains(attribute.getName())) {
+            if (!whiteList.contains(attribute.getName().toLowerCase(Locale.ROOT))) {
                 throw new BadRequestException("User attribute "
                         + attribute.getName()
                         + " is not valid for self service creation");
             }
+        }
+    }
+
+    /**
+     * Applies the self service whitelist of valid creation attributes to an anonymous self-registration request.
+     *
+     * Shared by both versions of the users endpoint on purpose: the gap this closes was itself duplicated across
+     * them, so keeping the check in one place is what stops the two from drifting apart again.
+     *
+     * @param configHandler The handler the whitelist is configured through
+     * @param realm The realm the user is being registered in
+     * @param jsonValue The request content, with the action parameters already stripped out
+     * @param objectType The type of object we're creating, user, group, etc.
+     * @throws ResourceException If the request sets an attribute or a group membership that is not whitelisted, or
+     * the whitelist itself cannot be read
+     */
+    public static void enforceSelfRegistrationWhiteList(final ConsoleConfigHandler configHandler, final String realm,
+            final JsonValue jsonValue, final String objectType) throws ResourceException {
+
+        enforceWhiteList(realm, jsonValue, objectType, validCreationAttributes(configHandler, realm));
+    }
+
+    /**
+     * Applies the self service whitelist of valid creation attributes to a request that carries the calling context,
+     * which is what decides whether the whitelist applies at all.
+     *
+     * @param configHandler The handler the whitelist is configured through
+     * @param context The context of the request
+     * @param jsonValue The JSON representation of the identity to create
+     * @param objectType The type of object we're creating, user, group, etc.
+     * @throws ResourceException If the request sets an attribute or a group membership that is not whitelisted, or
+     * the whitelist itself cannot be read
+     */
+    public static void enforceSelfRegistrationWhiteList(final ConsoleConfigHandler configHandler,
+            final Context context, final JsonValue jsonValue, final String objectType) throws ResourceException {
+
+        // The overload below owns the rule; asking the same questions here is only about not paying for them, which
+        // keeps a create the whitelist has nothing to say about from depending on the self service configuration at
+        // all - the base code read it on every create, so a realm that cannot read it failed every one of them.
+        // Both have to be asked before the call rather than left to the overload: the whitelist is an argument, so
+        // it is read before the callee gets to return.
+        if (!appliesTo(context) || !USER_TYPE.equals(objectType)) {
+            return;
+        }
+
+        String realm = RealmContext.getRealm(context).asPath();
+        enforceWhiteList(realm, jsonValue, objectType, validCreationAttributes(configHandler, realm));
+    }
+
+    /**
+     * Reads the whitelist of attributes a self registering user may set.
+     *
+     * The read goes to the self service SMS service, which fails with an unchecked exception when it cannot be read
+     * for the realm - {@literal IllegalArgumentException} for an attribute the service does not carry,
+     * {@literal ConfigRetrievalException} or a {@literal NullPointerException} for a realm it is not configured for.
+     * Turning that into an internal error of our own keeps the whitelist fail closed and says which check failed,
+     * rather than letting the service configuration's own text escape to a caller with no session.
+     *
+     * @param configHandler The handler the whitelist is configured through
+     * @param realm The realm the identity is being created in
+     * @return The set of attribute names a self registering user may set, possibly empty
+     * @throws InternalServerErrorException If the whitelist cannot be read
+     */
+    private static Set<String> validCreationAttributes(ConsoleConfigHandler configHandler, String realm)
+            throws InternalServerErrorException {
+
+        try {
+            return configHandler.getConfig(realm, UserAttributeInfoBuilder.class).getValidCreationAttributes();
+        } catch (RuntimeException re) {
+            debug.error("IdentityRestUtils.validCreationAttributes() :: Cannot read the self service user "
+                    + "registration whitelist in realm={}", realm, re);
+            throw new InternalServerErrorException(
+                    "Self service user registration is not configured for this realm", re);
         }
     }
 
