@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.console.base;
@@ -56,13 +57,25 @@ public class ConsoleViewBeanBase extends ViewBeanBase {
                         classLoader = refObject.getClass().getClassLoader();
                     }
                     setPageSessionAttributes(
-                            IOUtils.<Map>deserialise(Encoder.decodeHttp64(pageAttributesParam), false, classLoader));
+                            IOUtils.<Map>deserialise(Encoder.decodeHttp64(pageAttributesParam), false, classLoader,
+                                    getPageSessionCollectionDepth()));
                 } catch (Exception e) {
                     handleDeserializePageAttributesException(e);
                 }
             }
             setPageSessionDeserialized();
         }
+    }
+
+    /**
+     * The collection-nesting depth this bean's page session may legitimately reach, passed to
+     * {@link IOUtils#deserialise(byte[], boolean, ClassLoader, long)}. This base class also serves the
+     * unauthenticated authentication UI ({@code AuthViewBeanBase}), whose page session stores no nested
+     * collections, so it keeps the default limit; the admin-console base class overrides this with its
+     * known deeper shape.
+     */
+    protected long getPageSessionCollectionDepth() {
+        return 0L;
     }
 
     private boolean isPageSessionDeserialized() {

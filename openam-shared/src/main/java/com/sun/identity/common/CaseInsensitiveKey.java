@@ -27,6 +27,7 @@
  */
 /**
  * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.common;
 
@@ -34,9 +35,11 @@ import java.io.Serializable;
 
 /**
  * String wrapper that returns a case insensitive hash code useful for case
- * insensitive hashing in HashSet and HashMap.
+ * insensitive hashing in HashSet and HashMap. It is comparable so that a HashMap
+ * can order keys whose hash codes collide in a tree bin instead of scanning the
+ * whole bin on every insertion.
  */
-public class CaseInsensitiveKey implements Serializable  {
+public class CaseInsensitiveKey implements Serializable, Comparable<CaseInsensitiveKey> {
 
 private static final long serialVersionUID = 1L;
 	String mKey;
@@ -57,6 +60,12 @@ private static final long serialVersionUID = 1L;
     @Override
     public int hashCode() {
         return mKey.toLowerCase().hashCode();
+    }
+
+    // Consistent with equals(): String.CASE_INSENSITIVE_ORDER returns 0 exactly when equalsIgnoreCase holds
+    @Override
+    public int compareTo(CaseInsensitiveKey o) {
+        return String.CASE_INSENSITIVE_ORDER.compare(mKey, o.mKey);
     }
 
     @Override

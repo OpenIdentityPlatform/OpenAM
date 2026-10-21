@@ -25,6 +25,7 @@
  * $Id: SerializedField.java,v 1.4 2008/08/19 19:09:06 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.console.components.view.html;
@@ -34,6 +35,7 @@ import com.iplanet.jato.util.Encoder;
 import com.iplanet.jato.view.ContainerView;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.html.HtmlDisplayFieldBase;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.utils.IOUtils;
 
 import java.io.IOException;
@@ -49,6 +51,8 @@ import java.io.Serializable;
  */
 public class SerializedField extends HtmlDisplayFieldBase
 {
+    private static final Debug DEBUG = Debug.getInstance("amConsole");
+
     /**
      * Constructs  a minimal instance using the parent's default model
      * and the field's name as its bound name
@@ -119,10 +123,16 @@ public class SerializedField extends HtmlDisplayFieldBase
 
         if (serializedStr != null) {
             try {
-                result = IOUtils.deserialise(Encoder.decode(serializedStr), true);
+                // Console table/model state nests collections like the page session; pass the console depth.
+                result = IOUtils.deserialise(Encoder.decode(serializedStr), true, null,
+                        IOUtils.CONSOLE_STATE_MAX_COLLECTION_DEPTH);
             } catch (IOException ioe) {
+                // A rejection by the deserialisation limits or whitelist lands here; without a log line it
+                // would only show up as silently missing console state.
+                DEBUG.error("SerializedField.getSerializedObj: could not deserialise field " + getName(), ioe);
                 result = null;
             } catch (ClassNotFoundException cnfe) {
+                DEBUG.error("SerializedField.getSerializedObj: could not deserialise field " + getName(), cnfe);
                 result = null;
             }
         }

@@ -1405,6 +1405,43 @@ public interface Constants {
     public static final String DESERIALISATION_CLASSES_WHITELIST = "openam.deserialisation.classes.whitelist";
 
     /**
+     * Property that defines the resource limits applied during deserialisation of Java classes in OpenAM, in the
+     * JEP 290 limit syntax, for example {@code maxdepth=20;maxrefs=100000;maxexpandedrefs=100000}.
+     * <p>
+     * The value is a {@code ;}-separated list of {@code name=value} pairs, where each value is a positive
+     * integer. The recognised names (case-sensitive) and the defaults they keep when not set are:
+     * <ul>
+     *     <li>{@code maxdepth} - maximum object graph depth, default 20;</li>
+     *     <li>{@code maxrefs} - maximum number of object references, default 100000;</li>
+     *     <li>{@code maxarray} - maximum array length, including the internal capacity of maps and sets,
+     *     default 100000;</li>
+     *     <li>{@code maxbytes} - maximum number of bytes read, after decompression, default 10485760
+     *     (10 MiB);</li>
+     *     <li>{@code maxcollectiondepth} - maximum depth to which collections, maps and object arrays may be
+     *     nested inside one another, default 2;</li>
+     *     <li>{@code maxexpandedrefs} - maximum total size of the object graph once it is expanded into a tree
+     *     from the root, counting each shared or back-referenced object once for every path that reaches it,
+     *     default 100000. This is checked by a single linear pass over the stream before anything is
+     *     deserialised, and it bounds the overall volume of the reconstruction, including graphs that share
+     *     structure through back-references;</li>
+     *     <li>{@code maxweakhashkeys} - maximum number of keys of one hash map (or elements of one hash set)
+     *     when they are not all strings, case-insensitive keys, integers, longs, booleans, IP addresses or
+     *     constants of one enum, default 32. Keys that share a hash code and cannot be ordered are compared
+     *     with each other on every insertion, so this bounds that work. A collection or map used as a key is
+     *     always rejected.</li>
+     * </ul>
+     * An unknown name, a pair without {@code =}, or a value that is not a positive integer is ignored with a
+     * warning, and the limit keeps its default. The property is read on every deserialisation, so a change
+     * takes effect without a restart.
+     * <p>
+     * The administration console's page state nests collections three levels deep and its deserialisation calls
+     * therefore raise {@code maxcollectiondepth} to at least 3 - but only while {@code maxcollectiondepth} is
+     * not set here. A value set explicitly applies to every caller as is, so setting {@code maxcollectiondepth}
+     * below 3 breaks the administration console's page state.
+     */
+    public static final String DESERIALISATION_LIMITS = "openam.deserialisation.limits";
+
+    /**
      * Property used by the XML builder to retrieve a configuration specific name for an attribute schema.
      */
     public static final String CONFIGURATION_NAME = "configuration_name";

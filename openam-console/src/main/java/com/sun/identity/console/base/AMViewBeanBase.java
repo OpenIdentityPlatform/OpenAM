@@ -237,7 +237,9 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
 
         if (pgSession != null) {
             try {
-                Map map = IOUtils.deserialise(Encoder.decodeHttp64(pgSession), false);
+                // The page session nests map -> attribute-value map -> value set; pass the console depth.
+                Map map = IOUtils.deserialise(Encoder.decodeHttp64(pgSession), false, null,
+                        IOUtils.CONSOLE_STATE_MAX_COLLECTION_DEPTH);
 
                 if (map != null) {
                     for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {
@@ -829,6 +831,15 @@ public abstract class AMViewBeanBase extends ConsoleViewBeanBase {
             }
         }
         return strAttr;
+    }
+
+    /**
+     * The admin-console page session nests page-session map -&gt; attribute-value map -&gt; value set
+     * (see {@code AMPropertySheet.getAttributeValues}), one collection level past the default limit.
+     */
+    @Override
+    protected long getPageSessionCollectionDepth() {
+        return IOUtils.CONSOLE_STATE_MAX_COLLECTION_DEPTH;
     }
 
     protected void deserializePageAttributes() {

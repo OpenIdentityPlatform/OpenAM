@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.common;
@@ -29,5 +30,22 @@ public class CaseInsensitiveKeyTest {
         assertEquals(a.hashCode(), b.hashCode());
         assertTrue(a.equals(b));
         assertTrue(b.equals(a));
+    }
+
+    @Test
+    public void shouldCompareConsistentlyWithEquals() {
+        // HashMap orders colliding keys in a tree bin by compareTo, so it must agree with equals
+        CaseInsensitiveKey a = new CaseInsensitiveKey("one");
+        CaseInsensitiveKey b = new CaseInsensitiveKey("ONE");
+        assertEquals(a.compareTo(b), 0);
+        assertEquals(b.compareTo(a), 0);
+    }
+
+    @Test
+    public void shouldOrderIgnoringCase() {
+        CaseInsensitiveKey lower = new CaseInsensitiveKey("apple");
+        CaseInsensitiveKey upper = new CaseInsensitiveKey("BANANA");
+        assertTrue(lower.compareTo(upper) < 0);
+        assertTrue(upper.compareTo(lower) > 0);
     }
 }
