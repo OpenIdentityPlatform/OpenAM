@@ -25,6 +25,7 @@
  * $Id: CreateSAML2HostedProviderTemplate.java,v 1.29 2009/11/24 21:49:04 madan_ranganath Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.workflow;
@@ -446,6 +447,10 @@ public class CreateSAML2HostedProviderTemplate {
             "       </Attribute>\n" +
             "       <Attribute name=\"" +
             SAML2Constants.WANT_ARTIFACT_RESPONSE_SIGNED + "\">\n" +
+            "           <Value></Value>\n" +
+            "       </Attribute>\n" +
+            "       <Attribute name=\"" +
+            SAML2Constants.SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS + "\">\n" +
             "           <Value></Value>\n" +
             "       </Attribute>\n" +
             "       <Attribute name=\"" +

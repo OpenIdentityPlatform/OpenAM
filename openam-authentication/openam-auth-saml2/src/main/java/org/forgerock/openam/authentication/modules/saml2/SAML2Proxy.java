@@ -263,6 +263,33 @@ public final class SAML2Proxy {
             SAML2Store.saveTokenWithKey(key, data);
         }
 
+        try {
+            // GHSA-3j2f-qhrc-rjfj: this endpoint never went through SPACSUtils.processResponse, which
+            // is where the bearer assertion used to be recorded as consumed, so nothing here made the
+            // one-time check in verifyResponse fire on a second submission - on any binding.
+            //
+            // Claimed once the response has been accepted and stored, and before the key that leads
+            // to it is handed out: the key is what the authentication module redeems for a session,
+            // and it does not exist for anyone until this method returns. Claiming ahead of the
+            // store would spend the assertion on a SAML2 token repository outage, which has nothing
+            // to do with the assertion and which the caller reports as a configuration error.
+            SPACSUtils.markAssertionAsConsumed(smap);
+        } catch (SAML2Exception se) {
+            DEBUG.error("SAML2Proxy: An error occurred while consuming the SAML assertion", se);
+            // The key is never handed out, so nothing could redeem what was stored under it - drop
+            // it rather than leave it for the store to expire.
+            if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
+                try {
+                    SAML2FailoverUtils.deleteSAML2Token(key);
+                } catch (SAML2TokenRepositoryException e) {
+                    DEBUG.warning("SAML2Proxy: could not delete the response stored for a refused assertion", e);
+                }
+            } else {
+                SAML2Store.removeToken(key);
+            }
+            return getUrlWithError(request, SAML_VERIFY_RESPONSE_ERROR, se.getL10NMessage(request.getLocale()));
+        }
+
         return getUrlWithKey(request, key);
     }
 

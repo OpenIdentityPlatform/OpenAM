@@ -254,6 +254,90 @@ Alternatively, provide the URL to other providers so they can load the metadata.
 ====
 
 
+[#saml2-sp-assertion-signature]
+==== Requiring Signed Assertions on the Service Provider
+
+OpenAM rejects a SAML v2.0 response unless the response itself, or every assertion it carries, is signed. The requirement holds for every binding the assertion consumer service accepts — HTTP-POST, ECP/PAOS and HTTP-Artifact — and does not depend on the `WantAssertionsSigned` flag in the service provider metadata, which the hosted SP template sets to `false`.
+
+On HTTP-POST and on ECP/PAOS the requirement is absolute. The response is attacker-supplied input on those bindings — the browser or the ECP client hands it to the assertion consumer service — so the signature is the only thing tying an assertion to the identity provider that issued it.
+
+[IMPORTANT]
+====
+This is a change of behaviour, and an existing HTTP-Artifact deployment can stop working after the upgrade.
+
+An OpenAM identity provider signs an artifact-delivered assertion only when the service provider metadata sets `WantAssertionsSigned="true"`, and it never signs the enclosing `Response` on that binding. A hosted service provider created from the OpenAM template sets `WantAssertionsSigned="false"`, and so does the Fedlet, whose metadata publishes an HTTP-Artifact assertion consumer service as well. A pair of OpenAM servers — or an OpenAM identity provider and a Fedlet — federated over HTTP-Artifact with the default settings therefore produces exactly the unsigned response this release now rejects, with `assertionNotSigned`.
+
+The fix is to sign the assertions: set `WantAssertionsSigned="true"` in the service provider metadata, which makes the identity provider sign them. Accepting them unsigned, as described below, is the fallback for an identity provider you cannot change.
+
+A second HTTP-Artifact change applies to every artifact deployment, whether or not it accepts unsigned assertions: a response resolved from an artifact must be issued by the identity provider the artifact was resolved against. A response whose `Issuer` names a different entity is now rejected with `invalidIssuerInResponse`. An OpenAM identity provider writes its own entity id into both the `ArtifactResponse` and the `Response` it encloses, so an OpenAM pair is unaffected; an identity provider that answers a resolution on behalf of another entity — a proxy, or one that issues under a second entity id — is not.
+====
+
+===== Accepting Unsigned Assertions over HTTP-Artifact
+
+HTTP-Artifact is the one binding where the requirement can be relaxed. The service provider resolves the artifact itself, over a back channel it picked out of the identity provider metadata, so the response is at least not something a browser handed to the assertion consumer service.
+
+[WARNING]
+====
+Delivery over that back channel does not say who issued the assertion.
+
+The identity provider the artifact is resolved against is chosen by the `SourceID` the artifact carries, while the identity the assertion claims is the `Issuer` written inside the response, and OpenAM checks that `Issuer` only for membership of the circle of trust. The assertion signature is what ties the two together. Without it, an identity provider that can answer the resolution can return a response issued in the name of any other identity provider the service provider trusts, and OpenAM will accept it.
+
+OpenAM narrows that as far as it can without a signature: the response resolved from an artifact must be issued by the identity provider the artifact was resolved against, and the relaxation applies only where the `ArtifactResponse` itself is verified. Relax the requirement only for an identity provider you are willing to trust with the identities of every other identity provider in the same circle of trust.
+====
+
+Two conditions gate the relaxation, whatever the settings below say.
+
+The service provider's assertion consumer service has to publish the HTTP-Artifact binding. A response is labelled as artifact-delivered whenever the request carries a `SAMLart` parameter, and that endpoint accepts HTTP-POST; a service provider that does not offer artifact therefore never reaches the relaxation.
+
+And `wantArtifactResponseSigned` has to be `true` in the same extended metadata, so that the `ArtifactResponse` is actually verified — an unverified one leaves nothing tying the response to the identity provider that answered the resolution. Set it on the identity provider side as well, in the extended metadata of the remote service provider, which is what makes an OpenAM identity provider sign the `ArtifactResponse`:
+
+[source, xml]
+----
+<Attribute name="wantArtifactResponseSigned">
+    <Value>true</Value>
+</Attribute>
+----
+
+Then relax the requirement for a single service provider by setting the `allowUnsignedArtifactAssertions` attribute in its extended metadata:
+
+[source, xml]
+----
+<Attribute name="allowUnsignedArtifactAssertions">
+    <Value>true</Value>
+</Attribute>
+----
+
+The value has to be the literal `true`. Anything else — `TRUE`, `yes`, a typo — leaves the signature required, as does an attribute nobody set.
+
+A service provider that leaves the attribute empty follows the deployment-wide default, which is set under Configure > Server Defaults > Advanced and is `false` unless you change it:
+
+[source, console]
+----
+openam.saml.sp.artifact.allow.unsigned.assertions=true
+----
+
+[NOTE]
+====
+The property never relaxes anything on its own. `wantArtifactResponseSigned` is empty in the OpenAM template and in the Fedlet template, and it gates the relaxation before the property is read, so the extended metadata of every service provider that is to accept unsigned artifact assertions has to be edited in any case — and the identity provider's copy of that service provider along with it. The property decides only between service providers that have `wantArtifactResponseSigned="true"` and have left `allowUnsignedArtifactAssertions` empty.
+====
+
+[NOTE]
+====
+The attribute is set in extended metadata rather than in the console. A console checkbox has two states, not three, so saving the Assertion Content page of a service provider would write `false` for a box nobody ticked — pinning that service provider to the strict behaviour and taking away the deployment-wide fallback without saying so. Import the extended metadata, or edit it with **ssoadm**, to leave the attribute empty and let the property decide.
+
+A service provider created by OpenAM, and one created from the Fedlet template, carries the attribute with an empty value. An empty value, and the absence of the attribute altogether, both mean "follow the deployment-wide default".
+====
+
+[IMPORTANT]
+====
+Upgrade every node that serves the console before setting the attribute, and check it again after a rollback.
+
+The console rebuilds a service provider's extended metadata from its own list of known attributes every time that service provider is saved, and drops anything the list does not name. A node that predates this release does not know `allowUnsignedArtifactAssertions`, so saving any field on that service provider's page from such a node deletes the attribute — with nothing said in the console — and artifact single sign-on stops again with `assertionNotSigned`.
+====
+
+Neither setting relaxes HTTP-POST or ECP/PAOS, and neither overrides `WantAssertionsSigned="true"` in the service provider metadata.
+
+
 [#saml2-configure-remote-idp]
 ==== Configuring a Remote Identity Provider
 

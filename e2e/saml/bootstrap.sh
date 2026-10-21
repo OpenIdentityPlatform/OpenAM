@@ -87,6 +87,14 @@ echo "modify sp-metadata.xml"
 docker exec -w '/usr/openam/ssoadmintools/openam/bin' openam-sp bash -c \
   "sed -i 's/http:\/\/sp.mycompany.org:8080/http:\/\/sp.mycompany.org:8081/g' sp-metadata.xml"
 
+# The SP refuses an unsigned assertion on every binding, HTTP-Artifact included (GHSA-3j2f-qhrc-rjfj), and an
+# OpenAM IdP signs an artifact-delivered assertion only when the SP metadata asks for it. The grep fails the
+# setup if the template ever stops carrying the attribute, rather than leaving the flow to break at login.
+docker exec -w '/usr/openam/ssoadmintools/openam/bin' openam-sp \
+  sed -i 's/WantAssertionsSigned="false"/WantAssertionsSigned="true"/' sp-metadata.xml
+docker exec -w '/usr/openam/ssoadmintools/openam/bin' openam-sp \
+  grep -q 'WantAssertionsSigned="true"' sp-metadata.xml
+
 echo "modify sp-extended.xml"
 
 docker exec -w '/usr/openam/ssoadmintools/openam/bin' openam-sp bash -c '
