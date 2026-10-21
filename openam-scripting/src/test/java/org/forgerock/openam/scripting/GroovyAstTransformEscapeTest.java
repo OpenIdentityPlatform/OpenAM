@@ -16,21 +16,15 @@
 
 package org.forgerock.openam.scripting;
 
-import com.google.inject.Module;
-import org.forgerock.guice.core.GuiceModuleLoader;
 import org.forgerock.guice.core.GuiceModules;
 import org.forgerock.guice.core.GuiceTestCase;
-import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.openam.scripting.guice.ScriptingGuiceModule;
 import org.forgerock.openam.shared.guice.SharedGuiceModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.lang.annotation.Annotation;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,19 +41,6 @@ public class GroovyAstTransformEscapeTest extends GuiceTestCase {
     private static final String CANARY = "openam.test.ghsa_5hgj_6j53_p729.executed";
 
     @BeforeMethod
-    @Override
-    public void setupGuiceModules() throws Exception {
-        // Mirror GroovyValidatorTest: don't let other Guice modules on the classpath load.
-        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
-            @Override
-            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> aClass) {
-                return new HashSet<>();
-            }
-        });
-        super.setupGuiceModules();
-        System.clearProperty(CANARY);
-    }
-
     @AfterMethod
     public void clearCanary() {
         System.clearProperty(CANARY);
