@@ -91,6 +91,48 @@ You should therefore plan to test policy upgrade before upgrading the service, a
 For details on how to configure OpenAM policies, see xref:../admin-guide/chap-authz-policy.adoc#chap-authz-policy["Defining Authorization Policies"] in the __Administration Guide__.
 
 
+[#upgrade-authentication-defaults]
+=== Upgrading & Authentication Defaults
+
+This release changes three authentication defaults: module-based authentication is disabled, account lockout is enabled, and the account lockout duration is 30 minutes rather than `0`. They apply to **new installations only**. An upgraded installation keeps the defaults it has, in every realm, and nothing in the upgrade rewrites an authentication setting — the behavior of your realms after upgrading is the behavior they had before it.
+
+Adopting the new defaults in an existing deployment is worth doing, and is a decision to take per realm rather than a step to run blind, because disabling module-based authentication is a trade-off of availability against exposure. In a realm where it is disabled, the following stop working:
+
+* Login by module, using the `module=__module-name__` login parameter, or `authIndexType=module` in the REST API.
+
+* Login by authentication level, using the `authlevel=__level__` login parameter, or `authIndexType=level` in the REST API.
+
+* Policies whose environment conditions include *Authentication Level* or *Authentication Scheme*. The re-authentication such a condition asks for reaches OpenAM as module-typed composite advice, which is refused along with the rest of module-based authentication, so the user is denied access instead of being sent to authenticate. Express policy step-up with the *Authenticate to Realm* or *Authenticate to Service* conditions instead, which are unaffected.
+
+The `Application` module and modules of type `Federation` are exempt from the switch, so policy agent authentication and federation flows continue to work. A federation deployment whose SAML v2 Authentication Context mapping names an ordinary module — an entry of the form `module=__module-name__` in the IdP extended metadata — is an exception: that login is made by module and is refused like any other. Map such a context onto a chain with `service=__chain-name__`, or leave its authentication scheme empty, which is what the shipped mapping does.
+
+The Liberty ID-WSF Authentication Service is another exception. Its PLAIN and CRAM-MD5 SASL mechanisms, exposed at `/openam/Liberty/*`, log in through `IndexType.MODULE_INSTANCE` against the top level realm, aimed at the modules named by `PlainMechanismAuthModule` and `CramMD5MechanismAuthModule` (both default to `DataStore`, and neither is `Application` nor of type `Federation`). Disabling module-based authentication in the top level realm therefore refuses every SASL request to that endpoint with `MODULE_BASED_AUTH_NOT_ALLOWED`. Where such an integration exists, leave module-based authentication enabled in the top level realm alone.
+
+The Security Token Service is another. The default authentication target mappings of a REST STS instance validate OpenID Connect ID tokens against the `oidc` module and X.509 certificates against `cert_module` with `authIndexType=module`, and the default X.509 mapping of a SOAP STS instance does the same. In a realm where module-based authentication is disabled, these validations are refused with `MODULE_BASED_AUTH_NOT_ALLOWED`. Keep module-based authentication enabled in the realm of the STS instance, or map the token type onto a chain that contains the module, for example `OPENIDCONNECT|service|oidcChain|oidc_id_token_auth_target_header_key=oidc_id_token`. The SOAP STS agent logs in through the `Application` module and is unaffected.
+
+Account lockout has a requirement of its own: keep the lockout duration above `0`. A duration of `0` selects physical locking, which sets `inetuserstatus=Inactive` on an account after five failed logins and leaves it switched off until an administrator re-enables it, so enabling lockout while the duration is `0` turns five bad passwords into a lasting denial of service against any account whose name can be guessed. That is why the two defaults moved together.
+
+Once you have weighed both, apply them to a realm with:
+
+[source, console]
+----
+$ ssoadm set-realm-svc-attrs \
+ --adminid amadmin \
+ --password-file pwd.txt \
+ --realm / \
+ --servicename iPlanetAMAuthService \
+ --attributevalues sunEnableModuleBasedAuth=false \
+                   iplanet-am-auth-login-failure-lockout-mode=true \
+                   iplanet-am-auth-lockout-duration=30
+----
+
+The same settings are on the console page Realms > __Realm Name__ > Authentication > Settings, under the Security and Account Lockout tabs. For details of the attributes, see xref:../admin-guide/chap-auth-services.adoc#auth-core-security["Core Authentication Attributes - Security"] and xref:../admin-guide/chap-auth-services.adoc#auth-core-account-lockout["Core Authentication Attributes - Account Lockout"] in the __Administration Guide__.
+
+What the upgrade does do is deactivate the identities the configurator created with a password published in the OpenAM installer source — `demo`, `wsc`, `wsp`, `SecurityTokenService`, and `agentAuth` — where they still have that password and are still active. Their passwords are not changed. A deployment that uses WS-Security, the STS, or the agent authenticator with the shipped credentials must give the identity a password of its own and activate it again after upgrading; the upgrade report lists every identity that was switched off. The `anonymous` user of the Top Level Realm no longer authenticates with a password at all, which takes effect as soon as this version is deployed; the Anonymous authentication module is unaffected.
+
+`ssoadm` authenticates administrators against the Administrator Authentication Configuration of the top level realm — the chain that already serves a browser login to `/openam/console` — rather than by naming the `DataStore` module, so that it keeps working in a realm where module-based authentication is disabled. Where the realm names no administrator chain, it falls back to the Organization Authentication Configuration. It answers only user name and password callbacks, so a top level realm whose chain requires more than that — a one-time password, a choice, a confirmation — refuses `ssoadm` where the pinned module previously succeeded. If you pinned the mechanism with `org.forgerock.openam.ssoadm.auth.indexType` and `org.forgerock.openam.ssoadm.auth.indexName` in the `ssoadm` script, an `indexType` of `module_instance` only works while that realm allows module-based authentication; use `service` and the name of a chain that a user name and a password satisfy, or remove both properties and let `ssoadm` follow the administrator chain.
+
+
 [#upgrade-best-practices]
 === Best Practices for Upgrades
 

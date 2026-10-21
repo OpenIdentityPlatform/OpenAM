@@ -696,7 +696,9 @@ Print the version of this tool.
 
 [#d981e1551]
 ==== JVM Properties for ssoadm
-You can specifically set the authentication module or chain for administrator logins using two JVM settings. These settings provide more control to select the exact authentication mechanisms to be used when `ssoadm` authenticates administrators in the top-level realm.
+Unless told otherwise, `ssoadm` authenticates administrators against the Administrator Authentication Configuration of the top level realm — the same chain that serves a browser login to `/openam/console`, and not the Organization Authentication Configuration that serves `/openam/UI/Login`. Where the realm names no administrator chain, `ssoadm` falls back to the Organization Authentication Configuration.
+
+`ssoadm` answers only user name and password callbacks, so the chain it ends up with must be satisfiable with a user name and a password alone; if it is not, point `ssoadm` at a chain that is, using two JVM settings.
 
 To set these properties, manually edit the following two JVM settings in the `ssoadm` or `ssoadm.bat` script.
 --
@@ -705,9 +707,14 @@ To set these properties, manually edit the following two JVM settings in the `ss
 Specifies the module or chain-based authentication in the top level realm. If the property is set, OpenAM uses only __that__ authentication mechanism.
 
 `org.forgerock.openam.ssoadm.auth.indexName`::
-Specifies the actual name of the authentication module/chain as controlled by the `indexType` setting. For example, if the `indexType` is set to `module_instance` and `indexName` is set to `LDAP`, then `ssoadm` authenticates using only the LDAP authentication module.
+Specifies the actual name of the authentication module/chain as controlled by the `indexType` setting. For example, if the `indexType` is set to `service` and `indexName` is set to `ldapService`, then `ssoadm` authenticates using only that authentication chain.
 
 --
+
+[IMPORTANT]
+====
+Module-based authentication is disabled by default, and a realm where it is disabled refuses every module named directly except `Application` and modules of type `Federation`. An `indexType` of `module_instance` therefore only works in a realm that has module-based authentication switched back on; pin a chain with `service` instead. See xref:../admin-guide/chap-auth-services.adoc#auth-core-security["Core Authentication Attributes - Security"] in the __Administration Guide__.
+====
 
 [#d981e1607]
 ==== Subcommands: By Category

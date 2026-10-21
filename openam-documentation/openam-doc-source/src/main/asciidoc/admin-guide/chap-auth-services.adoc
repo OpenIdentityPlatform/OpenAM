@@ -447,7 +447,13 @@ $ ssoadm set-realm-svc-attrs \
 --
 
 Login Failure Lockout Mode::
-Selecting this attribute enables a physical lockout. Physical lockout inactivates an LDAP attribute (defined in the Lockout Attribute Name property) in the user's profile. This attribute works in conjunction with the other account lockout and notification attributes.
+Selecting this attribute enables account lockout. Whether the lockout is physical or in memory depends on Login Failure Lockout Duration: a duration of `0` gives a physical lockout, which inactivates an LDAP attribute (defined in the Lockout Attribute Name property) in the user's profile and requires an administrator to re-enable the account. A duration greater than `0` gives a memory lockout, which expires on its own. This attribute works in conjunction with the other account lockout and notification attributes.
+
++
+Default: Enabled, with a Login Failure Lockout Duration of 30 minutes. Setting the duration back to `0` while lockout is enabled turns five failed logins into a permanent, administrator-assisted lockout of any account whose name an attacker can guess.
+
++
+This default applies to new installations. An upgraded installation keeps the setting it has, in every realm; to adopt the new one, enable lockout and set a lockout duration above `0` in the same change, as described in xref:../upgrade-guide/chap-about-upgrades.adoc#upgrade-authentication-defaults["Upgrading & Authentication Defaults"] in the __Upgrade Guide__.
 
 +
 `ssoadm` attribute: `iplanet-am-auth-login-failure-lockout-mode`
@@ -483,6 +489,9 @@ Login Failure Lockout Duration::
 Defines how many minutes a user must wait after a lockout before attempting to authenticate again. Entering a value greater than 0 enables memory lockout and disables physical lockout. __Memory lockout__ means the user's account is locked in memory for the number of minutes specified. The account is unlocked after the time period has passed.
 
 +
+Default: `30`
+
++
 `ssoadm` attribute: `iplanet-am-auth-lockout-duration`
 
 Lockout Duration Multiplier::
@@ -511,6 +520,17 @@ Specifies the LDAP attribute used to hold the number of failed authentication at
 
 Store Invalid Attempts in Data Store::
 Enables the storage of information regarding failed authentication attempts as the value of the Invalid Attempts Data Attribute Name in the user data store. Information stored includes number of invalid attempts, time of last failed attempt, lockout time and lockout duration. Storing this information in the identity repository allows it to be shared among multiple instances of OpenAM.
+
++
+Default: Enabled. Every failed authentication is then a write to the user's entry, so the identity store must accept it: the bind DN OpenAM uses needs permission to modify user entries, and the directory needs the `sunAMAuthAccountLockout` object class and the `sunAMAuthInvalidAttemptsData` attribute that come with the OpenAM schema.
+
++
+[IMPORTANT]
+====
+Where that write cannot be made — a read-only bind, a directory without the OpenAM schema — the failure count is not recorded and account lockout does not engage at all. The only sign is an `ISAccountLockout.invalidPasswd` error in the `Authentication` debug log for every failed attempt. Check for it after enabling lockout against an external directory.
+
+Disabling this attribute keeps the counts in the memory of each OpenAM instance instead. They are then per instance and lost on restart, and they also apply to `amadmin`, whose entry a data store cannot hold: with the attribute enabled the administrator is never locked out, and with it disabled five failed logins lock the administrator out for the lockout duration.
+====
 
 +
 `ssoadm` attribute: `sunStoreInvalidAttemptsInDS`
@@ -607,10 +627,37 @@ Users authenticating to the chain can authenticate successfully __without__ prov
 --
 
 Module Based Authentication::
-Enables users to authenticate using module-based authentication. Otherwise, all attempts at authentication using the `module=module-name` login parameter result in failure.
+Enables users to authenticate using module-based authentication. Otherwise, all attempts at authentication using the `module=module-name` login parameter result in failure, as do logins by authentication level (`authlevel=level`) and policy composite advice that names a module.
 
 +
-Open Identity Platform Community recommends disabling module-based authentication in production environments.
+[IMPORTANT]
+====
+Policies whose environment conditions include *Authentication Level* or *Authentication Scheme* stop triggering re-authentication while module-based authentication is disabled. The re-authentication such a condition asks for reaches OpenAM as module-typed composite advice, which is refused along with the rest of module-based authentication, so the user is denied access instead of being sent to authenticate. The *Authenticate to Realm* and *Authenticate to Service* conditions are unaffected, and are the way to express policy step-up while this switch is off.
+====
+
++
+The `Application` module and modules of type `Federation` are exempt from this switch: policy agent authentication and federation flows continue to work while module-based authentication is disabled.
+
++
+[IMPORTANT]
+====
+One federation consumer is not exempt. The Liberty ID-WSF Authentication Service, exposed at `/openam/Liberty/*`, drives its PLAIN and CRAM-MD5 SASL mechanisms through `IndexType.MODULE_INSTANCE` against the top level realm, targeting the modules named by `PlainMechanismAuthModule` and `CramMD5MechanismAuthModule` (both default to `DataStore`, and neither is `Application` nor of type `Federation`). While module-based authentication is disabled for the top level realm, those SASL requests are refused with `MODULE_BASED_AUTH_NOT_ALLOWED`. Where an integration depends on Liberty ID-WSF SASL authentication, enable the switch for the top level realm alone.
+====
+
++
+[IMPORTANT]
+====
+The Security Token Service is not exempt either. The default authentication target mappings of a REST STS instance validate OpenID Connect ID tokens against the `oidc` module and X.509 certificates against `cert_module` with `authIndexType=module`, and the default X.509 mapping of a SOAP STS instance does the same. Neither module is `Application` nor of type `Federation`, so on a new installation these validations are refused with `MODULE_BASED_AUTH_NOT_ALLOWED`, unless module-based authentication is enabled in the realm of the STS instance, or the mapping names a chain that contains the module, for example `OPENIDCONNECT|service|oidcChain|oidc_id_token_auth_target_header_key=oidc_id_token`. The SOAP STS agent logs in through the `Application` module and is unaffected.
+====
+
++
+`ssoadm` is unaffected as well: it authenticates administrators against the authentication chain of the top level realm rather than by naming a module. If you pinned it to a module with the `org.forgerock.openam.ssoadm.auth.indexType` and `org.forgerock.openam.ssoadm.auth.indexName` properties, set the type to `service` and name a chain instead.
+
++
+Default: Disabled. Open Identity Platform Community recommends leaving module-based authentication disabled in production environments.
+
++
+This default applies to new installations. An upgraded installation keeps the setting it has, in every realm; disable the attribute per realm once you have checked that no integration depends on `module=module-name`, on authentication by level, or on the policy conditions above. See xref:../upgrade-guide/chap-about-upgrades.adoc#upgrade-authentication-defaults["Upgrading & Authentication Defaults"] in the __Upgrade Guide__.
 
 +
 `ssoadm` attribute: `sunEnableModuleBasedAuth`
@@ -1311,6 +1358,8 @@ The default module instance login URL is defined as follows:
 ----
 protocol://hostname:port/deploy_URI/XUI/#login?module=Anonymous&org=org_name
 ----
++
+A login URL that names a module works only where the realm allows module based authentication, which a new installation does not. Either enable it for the realm, under Authentication > Settings > Security, or reach the module through a chain that contains it, with `service=__chain-name__`.
 
 Default Anonymous User Name::
 Specifies the user ID assigned by the module if the Valid Anonymous Users list is empty. The default value is `anonymous`. Note that the anonymous user must be defined in the realm.
@@ -3948,6 +3997,8 @@ The Organization Authentication Configuration serves when users access `/openam/
 The Administrator Authentication Configuration serves when users access `/openam/console`.
 +
 You can set these independently to separate administrative login from user login. For example, you can change the default user chain, but leave the default administrator chain as is to avoid locking yourself out as administrator. By default, `amadmin` can log in at `/openam/UI/Login`. You can change that for your deployment.
++
+`ssoadm` follows the Administrator Authentication Configuration as well, falling back to the Organization Authentication Configuration where the realm names no administrator chain. It answers only user name and password callbacks, so keep the chain it follows satisfiable with a user name and a password alone, or pin `ssoadm` to a chain that is, as described in xref:../reference/openam-cli-tools.adoc#d981e1551["JVM Properties for ssoadm"] in the __Reference__.
 
 . Save your work.
 

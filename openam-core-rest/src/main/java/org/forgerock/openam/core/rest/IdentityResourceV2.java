@@ -31,9 +31,6 @@ import static org.forgerock.openam.utils.Time.*;
 import static org.forgerock.util.promise.Promises.newResultPromise;
 
 import jakarta.mail.MessagingException;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
@@ -53,7 +50,6 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.GeneralFailure;
@@ -168,6 +164,9 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
     private final BaseURLProviderFactory baseURLProviderFactory;
     private final ConsoleConfigHandler configHandler;
 
+    /** Re-authenticates the caller before a protected attribute is changed. */
+    private final CurrentPasswordVerifier currentPasswordVerifier;
+
     /**
      * The Email Service configuration to send with, or null in a running server, where it is read per realm and
      * cached behind a configuration listener. Only a test injects one.
@@ -215,10 +214,16 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
                 restSecurityProvider, configHandler, uiRolePredicates);
         this.identityServices = identityServices;
         this.baseURLProviderFactory = baseURLProviderFactory;
+        this.currentPasswordVerifier = new CurrentPasswordVerifier(userType);
     }
 
     private IdentityServicesImpl getIdentityServices() {
         return identityServices;
+    }
+
+    /** The verifier this endpoint re-authenticates its caller with. Package visible so a test can pin its type. */
+    CurrentPasswordVerifier currentPasswordVerifier() {
+        return currentPasswordVerifier;
     }
 
     /*
@@ -1208,26 +1213,13 @@ public final class IdentityResourceV2 implements CollectionResourceProvider, Ser
         return identityResourceV1.readInstance(context, resourceId, request);
     }
 
+    /**
+     * Whether the identity of this endpoint confirms the given password as its own. Used to re-authenticate the
+     * caller before a protected attribute is changed. See {@link CurrentPasswordVerifier} for what the check has
+     * to do that the authentication service would otherwise have done.
+     */
     private boolean checkValidPassword(String username, char[] password, String realm) throws BadRequestException {
-        if (username == null || password == null) {
-            throw new BadRequestException("Invalid Username or Password");
-        }
-        try {
-            Callback[] callbacks = new Callback[2];
-            NameCallback nc = new NameCallback("dummy");
-            nc.setName(username);
-            callbacks[0] = nc;
-            PasswordCallback pc = new PasswordCallback("dummy", false);
-            pc.setPassword(password);
-            callbacks[1] = pc;
-            AMIdentityRepository idRepo = new AMIdentityRepository(null, realm);
-            return idRepo.authenticate(callbacks);
-        } catch (Exception ex) {
-            if (debug.messageEnabled()) {
-                debug.message("Failed to verify password for username={}", username, ex.getMessage());
-            }
-            return false;
-        }
+        return currentPasswordVerifier.isCurrentPasswordOf(username, password, realm);
     }
 
     /**

@@ -27,6 +27,7 @@
    $Id: idRepoService.xml,v 1.37 2009/11/10 01:50:57 hengming Exp $
 
    Portions Copyrighted 2012-2016 ForgeRock AS.
+   Portions Copyright 2026 3A Systems, LLC.
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -4587,12 +4588,15 @@
                             <Value>cn=dsameuser,ou=DSAME Users,</Value>
                         </AttributeValuePair>
                     </SubConfiguration>
+                    <!--
+                       No userPassword: unlike the other entries here, whose password is
+                       substituted at installation time, this one carried a literal hash and was
+                       therefore identical on every installation. "anonymous" stands for
+                       unauthenticated access and holds no password of its own, and SMSAuthModule
+                       refuses to authenticate it with one.
+                    -->
                     <SubConfiguration name="anonymous"
                         id="user">
-                        <AttributeValuePair>
-                            <Attribute name="userPassword" />
-                            <Value>CpL6syMBNMym6t2YmDJbmyrmeZg=</Value>
-                        </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="dn" />
                             <Value>@USER_NAMING_ATTR@=anonymous,ou=people,</Value>

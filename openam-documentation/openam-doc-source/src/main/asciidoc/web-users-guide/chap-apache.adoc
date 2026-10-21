@@ -25,6 +25,11 @@
 
 This chapter covers prerequisites and installation procedures for Web Policy Agents 4 into Apache HTTP Servers 2.2.x and 2.4.x.
 
+[NOTE]
+====
+Examples in this chapter authenticate as the demonstration user `demo` with the password `changeit`. A new installation creates that account inactive, so activate it and give it a password of your own before you begin, and substitute that password in the examples. See xref:../admin-guide/chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"] in the __Administration Guide__.
+====
+
 [#apache-before-you-install]
 === Before You Install
 

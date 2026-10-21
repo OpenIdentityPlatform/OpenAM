@@ -500,7 +500,7 @@ The URL to simulate this action is something like `\http://ap.example.net:8080/a
 +
 OpenAM requires that you authenticate.
 
-.. Login as OpenAM demo user, `demo` with default password `changeit`, on the asserting party server.
+.. Login as OpenAM demo user, `demo` with default password `changeit`, on the asserting party server. A new installation creates that account inactive; see xref:chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"].
 
 .. Notice that you are redirected to OpenAM console on the relying party server, and that you are successfully logged in as the demo user.
 

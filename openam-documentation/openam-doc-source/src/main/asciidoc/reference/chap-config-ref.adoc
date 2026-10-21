@@ -391,7 +391,7 @@ Enable the HTML monitoring interface using this attribute.
 `ssoadm` attribute: `iplanet-am-monitoring-http-enabled`
 
 Monitoring HTTP interface authentication file path::
-Set this to path to indicate the file indicating the user name and password used to protect access to monitoring information. The default user name password combination is `demo` and `changeit`. You can encode a new password using the xref:openam-cli-tools.adoc#ampassword-1[ampassword(1)]command.
+Set this to path to indicate the file indicating the user name and password used to protect access to monitoring information. The default user name password combination is `demo` and `changeit`, which does not authenticate on a new installation: the `demo` account is created inactive because that password is published in the installer source. Give monitoring an account of its own and encode its password using the xref:openam-cli-tools.adoc#ampassword-1[ampassword(1)]command.
 
 +
 `ssoadm` attribute: `iplanet-am-monitoring-authfile-path`

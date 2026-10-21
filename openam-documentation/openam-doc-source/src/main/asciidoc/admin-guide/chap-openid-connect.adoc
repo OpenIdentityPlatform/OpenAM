@@ -46,6 +46,11 @@ In the case of the online mail application, this key could be used to access the
 
 In OpenID Connect, the relying party can verify claims about the identity of the end user, and log the user out at the end of a session. OpenID Connect also makes it possible to discover the OpenID Provider for an end user, and to register relying party client applications dynamically. OpenID connect services are built on OAuth 2.0, JSON Web Token (JWT), WebFinger and Well-Known URIs.
 
+[NOTE]
+====
+Examples in this chapter authenticate as the demonstration user `demo` with the password `changeit`. A new installation creates that account inactive, so activate it and give it a password of your own before you begin, and substitute that password in the examples. See xref:chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"].
+====
+
 [#about-openid-connect-support]
 === About OpenID Connect 1.0 Support in OpenAM
 

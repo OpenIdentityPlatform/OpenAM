@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -40,7 +40,11 @@ OpenAM includes default settings to make it easier for you to evaluate the softw
 
 * Create specific administrator users to track better who makes configuration changes.
 
-* Remove the demo user account. For example, if you configure the embedded OpenDJ directory server as a configuration and CTS store, the default demo user account gets created during the installation process. You should remove the user using the OpenAM console under Realms > Top Level Realm > Subjects > User.
+* Remove the demo user account. If you configure the embedded OpenDJ directory server as a configuration and CTS store, a `demo` account with the published default password `changeit` is created during the installation process. It is created *inactive*, and upgrading an older installation deactivates it if it is still active and still carries that password, but you should remove it altogether using the OpenAM console under Realms > Top Level Realm > Identities.
+
+* Remove the WS-Security agent identities, unless you use WS-Security or the Security Token Service. The installation process creates `wsc`, `wsp`, `SecurityTokenService` and `agentAuth` in the Top Level Realm, each with a password that is published in the installer source — `wsc`, `wsp`, `SecurityTokenService` and `changeit` respectively. They are created inactive, and upgrading an older installation deactivates any of them that is still active and still carries its default password. Remove them under Realms > Top Level Realm > Applications > Agents, or, if you do need them, give each a password of your own before activating it.
+
+* Be aware that the `anonymous` user of the Top Level Realm can no longer authenticate with a password. Earlier versions shipped it with the password `anonymous`, stored as a literal hash in the installer source and therefore identical on every installation, which made it a valid login on any deployment. It now holds no password at all, and OpenAM refuses to authenticate it with one even where an installation still stores the old value, so no upgrade action is needed. The Anonymous authentication module is unaffected: it grants a session on the strength of the user name, not a password. If you had given `anonymous` a password of your own and used it as an ordinary account, create a separate account for that purpose.
 
 * Set the list of Valid `goto` URL Resources. By default, OpenAM redirects the user to the URL specified in the `goto` and `gotoOnFail` query string parameters supplied to the authentication interface in the login URL.
 +
@@ -52,6 +56,17 @@ When setting valid `goto` URLs, you can use the "*" wildcard, where "*" matches 
 
 * Disable module based authentication for all OpenAM realms. Module based authentication lets users authenticate using the `module=module-name` login parameter. To disable module based authentication for a realm, select the realm in the OpenAM console, then select Authentication > Settings > Security and clear the Module Based Authentication check box.
 
+
+[#defaults-in-documentation-examples]
+=== Preparing to Follow the Examples in This Documentation
+
+Procedures throughout this documentation set authenticate as the demonstration user `demo` with the password `changeit`, and a few of them name an authentication module directly in a login URL, as `module=__module-name__`. Both are settings a new installation no longer accepts, for the reasons given above. Before following such a procedure on a new installation, prepare the realm you are working in:
+
+* Activate the `demo` account and give it a password, under Realms > Top Level Realm > Identities > demo, and substitute that password wherever an example shows `changeit`. An account of your own does just as well; the examples name `demo` only because it used to be there.
+
+* Where an example logs in with `module=__module-name__`, either enable Module Based Authentication for that realm, under Realms > __Realm Name__ > Authentication > Settings > Security, or authenticate against a chain that contains the module and name it with `service=__chain-name__` instead.
+
+Delete the account, and switch module based authentication off again, once you are finished. Neither belongs in a deployment that is being used for anything real.
 
 
 [#protect-network-access]

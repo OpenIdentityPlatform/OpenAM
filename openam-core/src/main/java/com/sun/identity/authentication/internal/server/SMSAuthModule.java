@@ -25,6 +25,7 @@
  * $Id: SMSAuthModule.java,v 1.9 2009/12/11 06:51:37 hengming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.authentication.internal.server;
 
@@ -37,6 +38,7 @@ import com.sun.identity.authentication.internal.LoginModule;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.DNUtils;
+import com.sun.identity.idm.IdConstants;
 import com.sun.identity.security.AdminDNAction;
 import com.sun.identity.security.AdminPasswordAction;
 import com.sun.identity.security.AdminTokenAction;
@@ -222,6 +224,15 @@ public class SMSAuthModule implements LoginModule {
                     userDN = (String) userNameToDN.get(username);
                 }
             }
+            // "anonymous" stands for unauthenticated access: the Anonymous authentication module
+            // grants it a session on the strength of the user name alone, and it holds no password
+            // of its own. Refuse it here rather than relying on what the repository happens to
+            // contain, so that installations carrying the password the installer shipped for it
+            // are closed by deploying this version.
+            if (IdConstants.ANONYMOUS_USER.equalsIgnoreCase(username)) {
+                debug.message("SMSAuthModule::login() Password authentication refused for: {}", username);
+                return false;
+            }
             // Need to make sure userDN is not null, since this
             // be set in the subject
             if (userDN != null) {
@@ -381,6 +392,16 @@ public class SMSAuthModule implements LoginModule {
     }
 
     private static void addUserToCache(String name, String hash) {
+        if (name == null || hash == null || hash.isEmpty()) {
+            // A user without a DN or without a stored password cannot authenticate, and caching it
+            // is not possible either: both maps are ConcurrentSkipListMaps, which reject a null,
+            // and the resulting exception would abandon the loading of every user not yet read.
+            if (debug.messageEnabled()) {
+                debug.message("SMSAuthModule::addUserToCache() Not cached, cannot authenticate: "
+                        + name);
+            }
+            return;
+        }
         // Add the DN
         users.put(name, hash);
         // Add the "name"

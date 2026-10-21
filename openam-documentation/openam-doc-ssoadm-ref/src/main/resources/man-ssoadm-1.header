@@ -21,7 +21,8 @@
   ! CCPL HEADER END
   !
   !      Copyright 2011-2016 ForgeRock AS.
-  !    
+  !      Portions Copyright 2026 3A Systems, LLC.
+  !
 -->
 <refentry xml:id='ssoadm-1'
  xmlns='http://docbook.org/ns/docbook'
@@ -105,6 +106,14 @@
  <refsect1>
   <title>JVM Properties for ssoadm</title>
    <para>
+     Unless told otherwise, <command>ssoadm</command> authenticates administrators
+     against the Administrator Authentication Configuration of the top-level realm,
+     the same chain that serves a browser login to <literal>/openam/console</literal>,
+     falling back to the Organization Authentication Configuration where the realm
+     names no administrator chain. It answers only user name and password callbacks,
+     so the chain it follows must be satisfiable with a user name and a password alone.
+    </para>
+   <para>
      You can specifically set the authentication module or chain for administrator
      logins using two JVM settings. These settings provide more control to select
      the exact authentication mechanisms to be used when
@@ -136,10 +145,12 @@
        <para>
         Specifies the actual name of the authentication module/chain as
         controlled by the <literal>indexType</literal> setting. For example, if the
-        <literal>indexType</literal> is set to <literal>module_instance</literal>
-        and <literal>indexName</literal> is set to <literal>LDAP</literal>, then
+        <literal>indexType</literal> is set to <literal>service</literal>
+        and <literal>indexName</literal> is set to <literal>ldapService</literal>, then
         <command>ssoadm</command> authenticates
-        using only the LDAP authentication module.
+        using only that authentication chain. Module-based authentication is
+        disabled by default, and a realm where it is disabled refuses an
+        <literal>indexType</literal> of <literal>module_instance</literal>.
        </para>
       </listitem>
      </varlistentry>

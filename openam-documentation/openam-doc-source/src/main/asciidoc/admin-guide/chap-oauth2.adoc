@@ -25,6 +25,11 @@
 
 This chapter covers OpenAM support for the OAuth 2.0 authorization framework. The chapter begins by showing where OpenAM fits into the OAuth 2.0 authorization framework, and then shows how to configure the functionality.
 
+[NOTE]
+====
+Examples in this chapter authenticate as the demonstration user `demo` with the password `changeit`, and one of them names an authentication module in a login URL as `module=OAuth2`. A new installation creates that account inactive and refuses a module named directly, so prepare the realm before you begin. See xref:chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"].
+====
+
 [#about-oauth2-support]
 === About OAuth 2.0 Support in OpenAM
 

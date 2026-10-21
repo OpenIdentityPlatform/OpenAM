@@ -189,7 +189,7 @@ port=1812
 show-traffic=true
 ----
 --
-. Make sure that your current working directory is the directory in which you created the `radius.properties` file, then execute the sample client. Messages from the sample client indicate success or failure authenticating. If you specify `show-traffic=true` in the `radius.properties` file, the packets to and from the OpenAM RADIUS server appear in standard output:
+. Make sure that your current working directory is the directory in which you created the `radius.properties` file, then execute the sample client. Messages from the sample client indicate success or failure authenticating. The sample below authenticates as `demo`, an account a new installation creates inactive — see xref:chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"]. If you specify `show-traffic=true` in the `radius.properties` file, the packets to and from the OpenAM RADIUS server appear in standard output:
 +
 [source, console, subs="attributes"]
 ----

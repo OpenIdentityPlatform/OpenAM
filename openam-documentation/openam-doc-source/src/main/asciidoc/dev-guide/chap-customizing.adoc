@@ -28,6 +28,11 @@ Service provider interfaces (SPI's) provide a framework to customize all OpenAM 
 
 This part of the guide covers customizing OpenAM functionality.
 
+[NOTE]
+====
+Examples in this chapter authenticate as the demonstration user `demo` with the password `changeit`, and try a custom module by naming it in a login URL as `module=__module-name__`. A new installation creates that account inactive and refuses a module named directly, so prepare the realm before you begin. See xref:../admin-guide/chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"] in the __Administration Guide__.
+====
+
 [#sec-custom-attr]
 === Customizing Profile Attributes
 

@@ -20,6 +20,9 @@
  * bootstrap.sh starts a KDC in a container (provider selected by KRB_PROVIDER, MIT by default),
  * installs the service keytab into OpenAM, configures the WindowsDesktopSSO module and a chain
  * "module SUFFICIENT -> DataStore REQUIRED", and obtains a TGT for the test user into .work/krb5cc.
+ * Every login goes through that chain: a new installation refuses a module named directly, because
+ * module-based authentication is disabled by default (GHSA-hvfc-4v4r-8p9w), and the module sits first
+ * in the chain, so its Negotiate challenge is what a chain login starts with.
  * The browser and curl use that ticket through the system GSSAPI library (libgssapi_krb5),
  * pointed at .work/krb5.conf and .work/krb5cc by KRB5_CONFIG and KRB5CCNAME.
  *
@@ -80,8 +83,8 @@ function runBootstrap(args = [], options = {}) {
   return execFileSync("bash", [BOOTSTRAP_SCRIPT, ...args], { env: BOOTSTRAP_ENV, ...options });
 }
 
-function authenticateUrl(indexValue, indexType = "module") {
-  return `${OPENAM_BASE}/json/authenticate?authIndexType=${indexType}&authIndexValue=${encodeURIComponent(indexValue)}`;
+function authenticateUrl(chain) {
+  return `${OPENAM_BASE}/json/authenticate?authIndexType=service&authIndexValue=${encodeURIComponent(chain)}`;
 }
 
 /**
@@ -167,12 +170,12 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     expect(authorization, "the browser should answer the Negotiate challenge").toBeTruthy();
 
     const headers = { "Accept-API-Version": "resource=2.0, protocol=1.0" };
-    const start = await page.request.post(authenticateUrl(krb.module), { headers, data: {} });
+    const start = await page.request.post(authenticateUrl(krb.chain), { headers, data: {} });
     expect(start.status(), "the login should ask for Negotiate").toBe(401);
     const { authId } = await start.json();
     expect(authId, "the challenge should carry authId").toBeTruthy();
 
-    const finish = await page.request.post(authenticateUrl(krb.module), {
+    const finish = await page.request.post(authenticateUrl(krb.chain), {
       headers: { ...headers, Authorization: authorization },
       data: { authId },
     });
@@ -189,7 +192,7 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
       "-H", "Accept-API-Version: resource=2.0, protocol=1.0",
       "-d", "{}",
       "-w", "\n%{http_code}",
-      authenticateUrl(krb.module),
+      authenticateUrl(krb.chain),
     ], { encoding: "utf-8", env: KRB_ENV });
     const separator = output.lastIndexOf("\n");
     const body = output.slice(0, separator);
@@ -211,8 +214,7 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
     // The browser answers the 401 challenge in its network stack: the page sees only the resent request.
     const login = page.waitForResponse((resp) => resp.request().method() === "POST"
       && new URL(resp.url()).pathname.endsWith("/authenticate"));
-    await page.goto(`${OPENAM_BASE}/XUI/#login/&authIndexType=module`
-      + `&authIndexValue=${encodeURIComponent(krb.module)}`);
+    await page.goto(`${OPENAM_BASE}/XUI/#login/&service=${encodeURIComponent(krb.chain)}`);
     const resp = await login;
     // Read the body only on failure: after a successful login the XUI navigates away, and Chromium may drop
     // the previous document's response bodies.
@@ -226,7 +228,7 @@ test.describe("OpenAM WindowsDesktopSSO - Kerberos SSO", () => {
 
   test("fallback: without a ticket the chain continues to the DataStore form", async ({ request }) => {
     // The chain must start with the Kerberos module's challenge, or the DataStore form below proves nothing.
-    const start = await request.post(authenticateUrl(krb.chain, "service"), {
+    const start = await request.post(authenticateUrl(krb.chain), {
       headers: { "Accept-API-Version": "resource=2.0, protocol=1.0" },
       data: {},
     });
