@@ -140,7 +140,7 @@ If the relying party queries the asserting party, also gather this information:
 
 * Partners' public key certificates used for HTTPS
 
-* Partners' public key certificates used for message signing (unless included on the `KeyInfo` element of signed messages)
+* Partners' public key certificates used for message signing (for an asserting party, even when included on the `KeyInfo` element of signed messages)
 
 * Partners' Site IDs (base64-encoded ID, for example, `XARFfsIAXeLX8BEWNIJg9Q8r0PE=`)
 
@@ -343,7 +343,7 @@ OpenAM console refers to the asserting party as the Source, because the assertin
 +
 Optionally set a custom account mapper. By default OpenAM maps accounts based on the NameID format configuration for your site.
 +
-If the asserting party signs assertions (or other messages) and you have imported the signing certificate into OpenAM's keystore (also used as a trust store), then enter the signing certificate alias. If instead the asserting party includes the signing certificate in the KeyInfo element of signed messages, then you can leave the alias blank.
+If the asserting party signs assertions (or other messages), import its signing certificate into OpenAM's keystore (also used as a trust store) and enter the signing certificate alias. The alias is required: signed assertions and responses from a partner without one are rejected, and a certificate in the KeyInfo element must be the one of that alias.
 
 . In the Source section, if the SAML Artifact profile is used with the asserting party, set the SOAP URL to the asserting party endpoint that responds to requests such as `\https://ap.example.net/openam/SAMLSOAPReceiver`.
 +

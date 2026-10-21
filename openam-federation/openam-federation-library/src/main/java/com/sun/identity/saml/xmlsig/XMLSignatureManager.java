@@ -655,7 +655,7 @@ public class XMLSignatureManager {
      * @param element XML dom document whose signature to be verified
      * @param certAlias alias for Signer's certificate, this is used to search
      *        signer's public certificate if it is not presented in
-     *        <code>ds:KeyInfo</code>
+     *        <code>ds:KeyInfo</code>; if it is presented, it must be this certificate
      * @return true if the XML signature is verified, false otherwise
      * @throws XMLSignatureException if problem occurs during verification
      */
@@ -670,8 +670,8 @@ public class XMLSignatureManager {
      * @param element XML dom document whose signature to be verified
      * @param idAttrName Attribute name for the id attribute 
      * @param certAlias alias for Signer's certificate, this is used to search
-     *        signer's public certificate if it is not presented in 
-     *        <code>ds:KeyInfo</code>.
+     *        signer's public certificate if it is not presented in
+     *        <code>ds:KeyInfo</code>; if it is presented, it must be this certificate.
      * @return true if the XML signature is verified, false otherwise
      * @throws XMLSignatureException if problem occurs during verification
      */
@@ -698,7 +698,7 @@ public class XMLSignatureManager {
      * @param XML XML string whose signature to be verified
      * @param certAlias alias for Signer's certificate, this is used to search 
      *        signer's public certificate if it is not presented in
-     *        <code>ds:KeyInfo</code>/
+     *        <code>ds:KeyInfo</code>; if it is presented, it must be this certificate.
      * @return true if the XML signature is verified, false otherwise
      * @throws XMLSignatureException if problem occurs during verification
      */
@@ -714,7 +714,8 @@ public class XMLSignatureManager {
      * @param idAttrName Attribute name for the id attribute
      * @param certAlias <code>certAlias</code> for Signer's certificate,
      *        this is used to search signer's public certificate if it is not
-     *        presented in <code>ds:KeyInfo</code>.
+     *        presented in <code>ds:KeyInfo</code>; if it is presented, it must be
+     *        this certificate.
      * @return true if the XML signature is verified, false otherwise.
      * @throws XMLSignatureException if problem occurs during verification.
      */

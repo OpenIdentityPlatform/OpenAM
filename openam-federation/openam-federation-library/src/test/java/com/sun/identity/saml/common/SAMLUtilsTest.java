@@ -16,10 +16,15 @@
 package com.sun.identity.saml.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
+import java.security.AccessController;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -27,8 +32,17 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.openam.utils.AMKeyProvider;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.w3c.dom.Document;
+
+import com.sun.identity.saml.xmlsig.AMSignatureProvider;
+import com.sun.identity.saml.xmlsig.XMLSignatureManager;
+import com.sun.identity.saml2.common.SAML2Utils;
+import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.encode.URLEncDec;
+import com.sun.identity.shared.xml.XMLUtils;
 
 import com.sun.identity.saml.common.SAMLServiceManager.SiteEntry;
 
@@ -226,5 +240,81 @@ public class SAMLUtilsTest {
         assertThat(out).contains("NAME=\"amp\" VALUE=\"a&amp;amp;b\"");
         assertThat(out).contains("NAME=\"" + SAMLConstants.POST_ATTR_NAMES
                 + "\" VALUE=\"x&quot;&lt;y:amp\"");
+    }
+
+    private static final String ISSUER = "https://idp-a.example.com";
+    private static final String ID_ATTRIBUTE = "ID";
+
+    /**
+     * Partner B's certificate is in the keystore too, so a message that claims issuer A
+     * and carries B's certificate in KeyInfo must not verify as A's.
+     */
+    @Test
+    public void checkSignatureValidRejectsAnotherPartnersCertificate() throws Exception {
+        String signedByPartnerB = signWithPrivateKey();
+
+        assertThat(SAMLUtils.checkSignatureValid(signedByPartnerB, ID_ATTRIBUTE, ISSUER,
+                partnerWithCertAlias("defaultkey"))).isFalse();
+    }
+
+    @Test
+    public void checkSignatureValidAcceptsTheIssuersOwnCertificate() throws Exception {
+        String signedByPartnerB = signWithPrivateKey();
+
+        assertThat(SAMLUtils.checkSignatureValid(signedByPartnerB, ID_ATTRIBUTE, ISSUER,
+                partnerWithCertAlias("privatekey"))).isTrue();
+    }
+
+    @Test
+    public void checkSignatureValidRejectsPartnerWithoutCertAlias() throws Exception {
+        String signedByPartnerB = signWithPrivateKey();
+
+        assertThat(SAMLUtils.checkSignatureValid(signedByPartnerB, ID_ATTRIBUTE, ISSUER,
+                partnerWithCertAlias(null))).isFalse();
+    }
+
+    /**
+     * Production code enters through the 3-arg overload, which must look the issuer up in
+     * PARTNER_URLS; without that lookup there is no expected alias and any keystore
+     * certificate is accepted again. Mockito 2 has no mockStatic, so the service
+     * manager's static state is seeded by reflection.
+     */
+    @Test
+    public void publicCheckSignatureValidBindsTheIssuerFromPartnerUrls() throws Exception {
+        String signedByPartnerB = signWithPrivateKey();
+        Field instance = SAMLServiceManager.class.getDeclaredField("instance");
+        Field map = SAMLServiceManager.class.getDeclaredField("map");
+        Constructor<SAMLServiceManager> constructor = SAMLServiceManager.class.getDeclaredConstructor();
+        instance.setAccessible(true);
+        map.setAccessible(true);
+        constructor.setAccessible(true);
+        Object savedInstance = instance.get(null);
+        Object savedMap = map.get(null);
+        try {
+            instance.set(null, constructor.newInstance());
+            map.set(null, Collections.singletonMap(SAMLConstants.PARTNER_URLS, partnerWithCertAlias("defaultkey")));
+
+            assertThat(SAMLUtils.checkSignatureValid(signedByPartnerB, ID_ATTRIBUTE, ISSUER)).isFalse();
+        } finally {
+            instance.set(null, savedInstance);
+            map.set(null, savedMap);
+        }
+    }
+
+    private static Map<String, SAMLServiceManager.SOAPEntry> partnerWithCertAlias(String certAlias) {
+        SAMLServiceManager.SOAPEntry partner = mock(SAMLServiceManager.SOAPEntry.class);
+        when(partner.getCertAlias()).thenReturn(certAlias);
+        return Collections.singletonMap(ISSUER, partner);
+    }
+
+    private static String signWithPrivateKey() throws Exception {
+        String keyStore = URLEncDec.decode(ClassLoader.getSystemResource("keystore.jks").getFile());
+        XMLSignatureManager signer = XMLSignatureManager.getInstance(
+                new AMKeyProvider(true, keyStore, "testcase", "JKS", "testcase"), new AMSignatureProvider());
+        Document document = XMLUtils.toDOMDocument(
+                ClassLoader.getSystemResourceAsStream("documenttosign.xml"), SAML2Utils.debug);
+        signer.signXMLUsingKeyPass(document, "privatekey",
+                AccessController.doPrivileged(new EncodeAction("keypass")), null, ID_ATTRIBUTE, "signme", true, null);
+        return XMLUtils.print(document.getDocumentElement());
     }
 }

@@ -66,6 +66,7 @@ import com.sun.identity.common.TaskRunnable;
 import com.sun.identity.common.TimerPool;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.forgerock.openam.utils.StringUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.encode.Base64;
 
@@ -1465,15 +1466,25 @@ public class SAMLUtils  extends SAMLUtilsCommon {
                                                   String idAttribute, 
                                                   String issuer)
     {
+        return checkSignatureValid(xmlString, idAttribute, issuer,
+                (Map) SAMLServiceManager.getAttribute(SAMLConstants.PARTNER_URLS));
+    }
+
+    static boolean checkSignatureValid(String xmlString, String idAttribute, String issuer, Map entries) {
             String certAlias = null;
             boolean valid = true; 
-            Map entries = (Map) SAMLServiceManager.getAttribute(
-                                SAMLConstants.PARTNER_URLS);
         if (entries != null) {
             SAMLServiceManager.SOAPEntry srcSite =
                 (SAMLServiceManager.SOAPEntry) entries.get(issuer);
             if (srcSite != null) {
                 certAlias = srcSite.getCertAlias();
+                // Without the partner's own certificate any certificate in the keystore
+                // would be accepted for this issuer, including another partner's.
+                if (StringUtils.isEmpty(certAlias)) {
+                    SAMLUtils.debug.error("SAMLUtils.checkSignatureValid: no certificate alias is"
+                            + " configured for the trusted partner of issuer {}", issuer);
+                    return false;
+                }
             }
         }
       

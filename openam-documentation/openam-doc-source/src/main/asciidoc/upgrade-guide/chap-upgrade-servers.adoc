@@ -97,6 +97,13 @@ Starting with this release the OAuth 2.0 device flow verifies PKCE, as part of t
 Device-flow clients that send no `code_challenge` are not affected: the Code Verifier Parameter Required property does not apply to the device flow. Clients that do send a `code_challenge` but never sent the `code_verifier` must be updated to send it.
 ====
 
+[IMPORTANT]
+====
+Starting with this release the signature on a SAML v1.x assertion or response is verified against the signing certificate configured for its issuer, as part of the GHSA-j56q-q3r3-hg7f hardening. Previously a certificate carried in the `KeyInfo` element was accepted as long as it was present anywhere in OpenAM's keystore, so one trusted asserting party could sign messages on behalf of another.
+
+A trusted asserting party therefore now needs its signing certificate alias configured. Signed assertions and responses from a partner whose alias is blank are rejected, and a certificate in the `KeyInfo` element must be the one of that alias. There is no property to restore the previous behaviour. Before promoting the upgrade, import each asserting party's signing certificate into OpenAM's keystore and enter its alias in the trusted partner configuration. See xref:../admin-guide/chap-saml-1.adoc#saml-1-configure-trusted-ap["To Configure a Trusted Asserting Party"] in the __Administration Guide__.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====
