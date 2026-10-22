@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.uma;
@@ -30,7 +30,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
+import com.sun.identity.common.SsrfUrlValidator;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
@@ -56,6 +58,14 @@ import org.forgerock.util.Pair;
  */
 @Singleton
 public class PendingRequestEmailTemplate {
+
+    /**
+     * When set to {@code true}, a scope description URI may resolve to a loopback, private or
+     * link-local address. The {@code http}/{@code https} scheme allowlist still applies. Default
+     * {@code false}.
+     */
+    public static final String ALLOW_ANY_SCOPE_DESCRIPTION_ADDRESS =
+            "org.openidentityplatform.uma.scope-description.allow-any-address";
 
     private final Debug debug = Debug.getInstance("UmaProvider");
     private final UmaProviderSettingsFactory settingsFactory;
@@ -150,19 +160,73 @@ public class PendingRequestEmailTemplate {
         }
     }
 
+    /**
+     * Whether a scope that is a URI may be fetched to resolve its scope description
+     * (GHSA-7q42-6xr7-9rmw).
+     *
+     * <p>Scopes are chosen by whoever registers the resource set, so the URI must use {@code http}
+     * or {@code https} and must not resolve to a loopback, private, link-local or otherwise
+     * special-purpose address, as decided by {@link SsrfUrlValidator}. Redirects need no check of
+     * their own: the {@code UMA} client is built with redirect handling disabled.
+     *
+     * <p>The host is resolved here and resolved again when the client connects, so the {@code UMA}
+     * client ({@link ScopeDescriptionClientProvider}) repeats the address check in its own DNS
+     * resolver, on the addresses it connects to; a host whose DNS answer changes in between (DNS
+     * rebinding) is refused there. With the system proxy enabled only this check applies, also to
+     * hosts that bypass the proxy (e.g. {@code http.nonProxyHosts}).
+     *
+     * <p>The address check — never the scheme check — can be lifted with
+     * {@link #ALLOW_ANY_SCOPE_DESCRIPTION_ADDRESS} for resource servers that publish their scope
+     * descriptions on an internal address.
+     *
+     * @param uri the scope, parsed as a URI with a scheme.
+     * @return {@code true} if the scope description may be fetched.
+     */
+    static boolean isScopeDescriptionUriAllowed(URI uri) {
+        final String scheme = uri.getScheme();
+        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+            return false;
+        }
+        return isAnyScopeDescriptionAddressAllowed() || SsrfUrlValidator.isSafeRemoteUrl(uri.toString());
+    }
+
+    /**
+     * @return {@code true} if {@link #ALLOW_ANY_SCOPE_DESCRIPTION_ADDRESS} lifts the address check.
+     */
+    static boolean isAnyScopeDescriptionAddressAllowed() {
+        return SystemProperties.getAsBoolean(ALLOW_ANY_SCOPE_DESCRIPTION_ADDRESS, false);
+    }
+
     private String resolveScope(String scope, Locale locale) {
-        if (URI.create(scope).getScheme() != null) {
-            Request request = new Request().setMethod("GET").setUri(URI.create(scope));
+        final URI uri;
+        try {
+            uri = URI.create(scope);
+        } catch (IllegalArgumentException e) {
+            // A plain scope name such as "read write" is not a URI; it is shown as it is.
+            return scope;
+        }
+        if (uri.getScheme() != null) {
+            if (!isScopeDescriptionUriAllowed(uri)) {
+                debug.warning("Not fetching the scope description at " + scope + ": it does not use http or "
+                        + "https, or it resolves to a private, loopback or link-local address. Set "
+                        + ALLOW_ANY_SCOPE_DESCRIPTION_ADDRESS + "=true if the resource server is intentionally "
+                        + "on an internal address.");
+                return scope;
+            }
+            Request request = new Request().setMethod("GET").setUri(uri);
             request.getHeaders().put("Accept-Language", locale.toLanguageTag());
-            Response response = client.send(request).getOrThrowUninterruptibly();
-            if (Status.OK.equals(response.getStatus())) {
-                try {
-                    JsonValue json = json(response.getEntity().getJson());
-                    if (json.isDefined("name") && json.get("name").isString()) {
-                        return json.get("name").asString();
+            // Closing the response returns its connection to the client's pool; reading the JSON
+            // does not, as it stops at the end of the value and leaves the stream open.
+            try (Response response = client.send(request).getOrThrowUninterruptibly()) {
+                if (Status.OK.equals(response.getStatus())) {
+                    try {
+                        JsonValue json = json(response.getEntity().getJson());
+                        if (json.isDefined("name") && json.get("name").isString()) {
+                            return json.get("name").asString();
+                        }
+                    } catch (IOException e) {
+                        debug.warning("Failed to parse Scope description JSON", e);
                     }
-                } catch (IOException e) {
-                    debug.warning("Failed to parse Scope description JSON", e);
                 }
             }
         }

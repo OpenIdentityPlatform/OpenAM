@@ -27,6 +27,7 @@
     $Id: amAuth.xml,v 1.16 2009/11/25 12:06:32 manish_rustagi Exp $
 
     Portions Copyrighted 2011-2016 ForgeRock AS.
+    Portions Copyright 2026 3A Systems, LLC.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -38,7 +39,7 @@
         <Schema
                 serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthService"
                 i18nFileName="amAuth"
-                revisionNumber="63"
+                revisionNumber="64"
                 i18nKey="iplanet-am-auth-service-description"
                 resourceName="EMPTY">
             <Global>
@@ -215,8 +216,22 @@
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
                     </BooleanValues>
+                    <!--
+                        Disabled by default: module based authentication (module=<name>) exposes every
+                        registered authentication module directly, bypassing the configured chain.
+                        The Application and Federation modules are exempt from this switch, so agent
+                        and federation authentication keep working when it is off. The Liberty ID-WSF
+                        Authentication Service does not: its PLAIN and CRAM-MD5 SASL handlers log in
+                        with IndexType.MODULE_INSTANCE against the root realm, aimed at the module
+                        named by PlainMechanismAuthModule / CramMD5MechanismAuthModule (DataStore by
+                        default), and the /Liberty/* endpoint stops answering when this switch is off
+                        for the root realm. Nor does the Security Token Service: the default REST STS
+                        mappings validate OpenID Connect and X.509 tokens with authIndexType=module
+                        (oidc, cert_module), as does the default SOAP STS X.509 mapping, and they are
+                        refused in a realm where this switch is off.
+                    -->
                     <DefaultValues>
-                        <Value>true</Value>
+                        <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-stateless-sessions"
@@ -278,8 +293,15 @@
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
                     </BooleanValues>
+                    <!--
+                        Enabled by default. Must be kept together with a non-zero
+                        iplanet-am-auth-lockout-duration: with a zero duration ISAccountLockout runs in
+                        physical locking mode and permanently sets inetuserstatus=Inactive on the account,
+                        which would turn five bad passwords into a denial of service against any known
+                        account name.
+                    -->
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="sunStoreInvalidAttemptsInDS"
@@ -302,8 +324,14 @@
                                  i18nKey="a130"
                                  order="1300"
                                  resourceName="lockoutDuration">
+                    <!--
+                        Minutes. Non-zero selects memory locking, so a locked account recovers by itself.
+                        Zero means physical locking (inetuserstatus=Inactive until an administrator
+                        re-enables the account) and must not be combined with the lockout mode being on
+                        by default.
+                    -->
                     <DefaultValues>
-                        <Value>0</Value>
+                        <Value>30</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="sunLockoutDurationMultiplier"

@@ -28,16 +28,17 @@
 
 <%--
    Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.profile.DoManageNameID" %>
 <%@ page import="java.util.HashMap" %>
-<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%--
     spMNIHTTPRedirect.jsp processes the ManageNameIDRequest from
@@ -62,12 +63,8 @@
                 response, paramsMap);
             if (success == true) {
                 String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-                if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + relayState,
-                        relayState, "URL", 2000, true)) {
-                    relayState = null;
-                }
                 if (relayState != null &&
-                        SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.SP_ROLE)) {
+                        RelayStateValidator.isValidForRequest(request, relayState, SAML2Constants.SP_ROLE)) {
                     response.sendRedirect(relayState);
                 } else {
                     %>

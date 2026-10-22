@@ -92,6 +92,10 @@ public class SsrfUrlValidatorTest {
                 {"https://[2002:808:808:0:0:5efe:c0a8:101]/x"}, // 6to4 of 8.8.8.8 + ISATAP 192.168.1.1
                 {"https://[::ffff:127.0.0.1]/x"},               // IPv4-mapped -> 127.0.0.1
                 {"https://[::c0a8:0101]/x"},                    // IPv4-compatible -> 192.168.1.1
+                {"https://[2002:a9fe:a9fe::]/x"},               // 6to4 -> 169.254.169.254
+                {"https://[::169.254.169.254]/x"},              // IPv4-compatible -> 169.254.169.254
+                {"https://[fd00::1]/x"},                        // IPv6 unique local
+                {"https://[64:ff9b::169.254.169.254]/x"},       // 64:ff9b::a9fe:a9fe in dotted form
         };
     }
 

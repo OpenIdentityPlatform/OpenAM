@@ -60,6 +60,7 @@ import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
+import com.sun.identity.federation.login.FSPostLogin;
 import com.sun.identity.federation.message.common.FSMsgException;
 import com.sun.identity.federation.message.FSNameIdentifierMappingRequest;
 import com.sun.identity.federation.message.FSNameIdentifierMappingResponse;
@@ -94,11 +95,22 @@ import org.w3c.dom.*;
 public class LibertyManager {
     
     static Debug debug = null;
-    private static IDFFMetaManager metaManager = null;
     
     static {
         debug = Debug.getInstance("libIDFF");
-        metaManager = FSUtils.getIDFFMetaManager();
+    }
+
+    /**
+     * Resolved per call rather than latched in the class initialiser.
+     * {@code FSUtils.getIDFFMetaManager} returns <code>null</code> while the SMS is
+     * unreachable and retries on the next call, so a manager captured when this class was
+     * first touched stayed <code>null</code> for the life of the JVM: every provider lookup
+     * here - including the home URL {@code FSPostLogin} falls back to when a RelayState is
+     * refused - failed until a restart.
+     * @return the meta manager, or <code>null</code> if it still cannot be created.
+     */
+    private static IDFFMetaManager getMetaManager() {
+        return FSUtils.getIDFFMetaManager();
     }
     
     /**
@@ -127,6 +139,7 @@ public class LibertyManager {
         // hence returning the List of all the active idps.
         Set idpList = new HashSet();
         try {
+            IDFFMetaManager metaManager = getMetaManager();
             if (metaManager != null) {
                 // TODO: check if the idp is active if we decide to support it
                 idpList.addAll(
@@ -197,6 +210,7 @@ public class LibertyManager {
         // hence returning the List of all the active sps.
         Set spList = new HashSet();
         try {
+            IDFFMetaManager metaManager = getMetaManager();
             if (metaManager != null) {
                 // TODO: check if the sp is active if we decide to support it
                 spList.addAll(
@@ -431,6 +445,10 @@ public class LibertyManager {
         String remoteProviderRole)
     {
         Set trustedProviders = null;
+        // Resolved once and reused: the two reads can disagree now that getMetaManager()
+        // retries after a failure, and a null here with a non-null config below is an NPE
+        // out of getIDPList/getSPList that nothing catches.
+        IDFFMetaManager metaManager = getMetaManager();
         BaseConfigType providerConfig = IDFFMetaUtils.getExtendedConfig(
             realm, entityID, providerRole, metaManager);
         if (providerConfig != null) {
@@ -579,7 +597,7 @@ public class LibertyManager {
     {
         String homeURL = null;
         BaseConfigType config = IDFFMetaUtils.getExtendedConfig(
-            realm, providerID, providerRole, metaManager);
+            realm, providerID, providerRole, getMetaManager());
         if (config != null) {
             homeURL = IDFFMetaUtils.getFirstAttributeValue(
                 IDFFMetaUtils.getAttributes(config),
@@ -676,6 +694,7 @@ public class LibertyManager {
      */
     public static String getEntityID(String metaAlias) {
         try {
+            IDFFMetaManager metaManager = getMetaManager();
             if (metaManager == null) {
                 debug.error("LibertyManager: getEntityID: meta manager isnull");
                 return null;
@@ -852,7 +871,7 @@ public class LibertyManager {
     {
         Set returnSet = new HashSet();
         BaseConfigType hostConfig = IDFFMetaUtils.getExtendedConfig(
-            realm, providerId, providerRole, metaManager);
+            realm, providerId, providerRole, getMetaManager());
         if (hostConfig != null) {
             List cotSet = IDFFMetaUtils.getAttributeValueFromConfig(
                 hostConfig, IFSConstants.COT_LIST);
@@ -919,7 +938,7 @@ public class LibertyManager {
         String realm, String providerID, String providerRole) 
     {
         BaseConfigType providerConfig = IDFFMetaUtils.getExtendedConfig(
-            realm, providerID, providerRole, metaManager);
+            realm, providerID, providerRole, getMetaManager());
 
         String metaAlias = "";
         if (providerConfig != null) {
@@ -967,7 +986,7 @@ public class LibertyManager {
         String providerRole, HttpServletRequest request) 
     {
         BaseConfigType providerConfig = IDFFMetaUtils.getExtendedConfig(
-            realm, providerID, providerRole, metaManager);
+            realm, providerID, providerRole, getMetaManager());
         String metaAlias = null;
         if (providerConfig != null) {
             metaAlias = providerConfig.getMetaAlias();
@@ -1010,7 +1029,7 @@ public class LibertyManager {
         String providerRole, HttpServletRequest request) 
     {
         BaseConfigType providerConfig = IDFFMetaUtils.getExtendedConfig(
-            realm, providerID, providerRole, metaManager);
+            realm, providerID, providerRole, getMetaManager());
         String metaAlias = null;
         if (providerConfig != null) {
             metaAlias = providerConfig.getMetaAlias();
@@ -1137,7 +1156,7 @@ public class LibertyManager {
         HttpServletRequest request) 
     {
         BaseConfigType providerConfig = IDFFMetaUtils.getExtendedConfig(
-            realm, providerId, providerRole, metaManager);
+            realm, providerId, providerRole, getMetaManager());
         String metaAlias = null;
         if (providerConfig != null) {
             metaAlias = providerConfig.getMetaAlias();
@@ -1267,7 +1286,10 @@ public class LibertyManager {
      * @return New Request ID from the <code>HttpRequestServlet</code>.
      */
     public static String getNewRequest(HttpServletRequest request) {
-        String targetURL = request.getParameter(IFSConstants.LRURL);
+        // the AuthnRequest carries it to the IdP and back, and the assertion consumer
+        // redirects to it
+        String targetURL = FSPostLogin.allowedRelayState(request,
+            request.getParameter(IFSConstants.LRURL));
         String metaAlias = request.getParameter(IFSConstants.META_ALIAS);
         String entityID = getEntityID(metaAlias);
         String realm = IDFFMetaUtils.getRealmByMetaAlias(metaAlias);
@@ -1275,6 +1297,7 @@ public class LibertyManager {
         String homePage = null;
         if (targetURL == null || targetURL.length() <= 0 ) {
             try {
+                IDFFMetaManager metaManager = getMetaManager();
                 if (metaManager != null) {
                     SPDescriptorConfigElement spConfigElem =
                         metaManager.getSPDescriptorConfig(realm, entityID);
@@ -1587,7 +1610,7 @@ public class LibertyManager {
         HttpServletRequest request) 
     {      
         BaseConfigType extendedConfig = IDFFMetaUtils.getExtendedConfig(
-            realm, providerID, providerRole, metaManager);
+            realm, providerID, providerRole, getMetaManager());
         String metaAlias = null;
         if (extendedConfig != null) {
             metaAlias = extendedConfig.getMetaAlias();
@@ -1973,6 +1996,7 @@ public class LibertyManager {
      */
     public static String getProviderRole(String metaAlias) {
         try {
+            IDFFMetaManager metaManager = getMetaManager();
             if (metaManager == null) {
                 return null;
             }
@@ -2025,6 +2049,7 @@ public class LibertyManager {
         SPDescriptorType hostedDescriptor = null;
         BaseConfigType hostedConfig = null;
         try {
+            IDFFMetaManager metaManager = getMetaManager();
             hostedDescriptor = metaManager.getSPDescriptor(
                 realm, hostedEntityID);
             SPDescriptorConfigElement hostedConfigElem = metaManager.getSPDescriptorConfig(
@@ -2124,7 +2149,7 @@ public class LibertyManager {
         } 
         IDPDescriptorType remoteProviderDesc = null;
         try {
-            remoteProviderDesc = metaManager.getIDPDescriptor(
+            remoteProviderDesc = getMetaManager().getIDPDescriptor(
                 realm, remoteIDPEntityID);
         } catch (IDFFMetaException fme1) {
             debug.error(classMethod, fme1);

@@ -212,6 +212,8 @@ Once you have registered an application and obtained your credentials from the s
 .. Select the realm in which to enable social authentication.
 
 .. Enter the __OpenID Discovery URL__ obtained from the third party authentication provider.
++
+OpenAM refuses a discovery URL that resolves to an internal address. For the restrictions and how to lift them, see xref:chap-federation.adoc#saml2-metadata-url-restrictions["Restrictions on metadata and discovery URLs"].
 
 .. Enter a name for the provider in the `Provider Name` field. OpenAM uses this as a label on the login page to identify the provider.
 
@@ -447,7 +449,13 @@ $ ssoadm set-realm-svc-attrs \
 --
 
 Login Failure Lockout Mode::
-Selecting this attribute enables a physical lockout. Physical lockout inactivates an LDAP attribute (defined in the Lockout Attribute Name property) in the user's profile. This attribute works in conjunction with the other account lockout and notification attributes.
+Selecting this attribute enables account lockout. Whether the lockout is physical or in memory depends on Login Failure Lockout Duration: a duration of `0` gives a physical lockout, which inactivates an LDAP attribute (defined in the Lockout Attribute Name property) in the user's profile and requires an administrator to re-enable the account. A duration greater than `0` gives a memory lockout, which expires on its own. This attribute works in conjunction with the other account lockout and notification attributes.
+
++
+Default: Enabled, with a Login Failure Lockout Duration of 30 minutes. Setting the duration back to `0` while lockout is enabled turns five failed logins into a permanent, administrator-assisted lockout of any account whose name an attacker can guess.
+
++
+This default applies to new installations. An upgraded installation keeps the setting it has, in every realm; to adopt the new one, enable lockout and set a lockout duration above `0` in the same change, as described in xref:../upgrade-guide/chap-about-upgrades.adoc#upgrade-authentication-defaults["Upgrading & Authentication Defaults"] in the __Upgrade Guide__.
 
 +
 `ssoadm` attribute: `iplanet-am-auth-login-failure-lockout-mode`
@@ -483,6 +491,9 @@ Login Failure Lockout Duration::
 Defines how many minutes a user must wait after a lockout before attempting to authenticate again. Entering a value greater than 0 enables memory lockout and disables physical lockout. __Memory lockout__ means the user's account is locked in memory for the number of minutes specified. The account is unlocked after the time period has passed.
 
 +
+Default: `30`
+
++
 `ssoadm` attribute: `iplanet-am-auth-lockout-duration`
 
 Lockout Duration Multiplier::
@@ -511,6 +522,17 @@ Specifies the LDAP attribute used to hold the number of failed authentication at
 
 Store Invalid Attempts in Data Store::
 Enables the storage of information regarding failed authentication attempts as the value of the Invalid Attempts Data Attribute Name in the user data store. Information stored includes number of invalid attempts, time of last failed attempt, lockout time and lockout duration. Storing this information in the identity repository allows it to be shared among multiple instances of OpenAM.
+
++
+Default: Enabled. Every failed authentication is then a write to the user's entry, so the identity store must accept it: the bind DN OpenAM uses needs permission to modify user entries, and the directory needs the `sunAMAuthAccountLockout` object class and the `sunAMAuthInvalidAttemptsData` attribute that come with the OpenAM schema.
+
++
+[IMPORTANT]
+====
+Where that write cannot be made — a read-only bind, a directory without the OpenAM schema — the failure count is not recorded and account lockout does not engage at all. The only sign is an `ISAccountLockout.invalidPasswd` error in the `Authentication` debug log for every failed attempt. Check for it after enabling lockout against an external directory.
+
+Disabling this attribute keeps the counts in the memory of each OpenAM instance instead. They are then per instance and lost on restart, and they also apply to `amadmin`, whose entry a data store cannot hold: with the attribute enabled the administrator is never locked out, and with it disabled five failed logins lock the administrator out for the lockout duration.
+====
 
 +
 `ssoadm` attribute: `sunStoreInvalidAttemptsInDS`
@@ -607,10 +629,37 @@ Users authenticating to the chain can authenticate successfully __without__ prov
 --
 
 Module Based Authentication::
-Enables users to authenticate using module-based authentication. Otherwise, all attempts at authentication using the `module=module-name` login parameter result in failure.
+Enables users to authenticate using module-based authentication. Otherwise, all attempts at authentication using the `module=module-name` login parameter result in failure, as do logins by authentication level (`authlevel=level`) and policy composite advice that names a module.
 
 +
-Open Identity Platform Community recommends disabling module-based authentication in production environments.
+[IMPORTANT]
+====
+Policies whose environment conditions include *Authentication Level* or *Authentication Scheme* stop triggering re-authentication while module-based authentication is disabled. The re-authentication such a condition asks for reaches OpenAM as module-typed composite advice, which is refused along with the rest of module-based authentication, so the user is denied access instead of being sent to authenticate. The *Authenticate to Realm* and *Authenticate to Service* conditions are unaffected, and are the way to express policy step-up while this switch is off.
+====
+
++
+The `Application` module and modules of type `Federation` are exempt from this switch: policy agent authentication and federation flows continue to work while module-based authentication is disabled.
+
++
+[IMPORTANT]
+====
+One federation consumer is not exempt. The Liberty ID-WSF Authentication Service, exposed at `/openam/Liberty/*`, drives its PLAIN and CRAM-MD5 SASL mechanisms through `IndexType.MODULE_INSTANCE` against the top level realm, targeting the modules named by `PlainMechanismAuthModule` and `CramMD5MechanismAuthModule` (both default to `DataStore`, and neither is `Application` nor of type `Federation`). While module-based authentication is disabled for the top level realm, those SASL requests are refused with `MODULE_BASED_AUTH_NOT_ALLOWED`. Where an integration depends on Liberty ID-WSF SASL authentication, enable the switch for the top level realm alone.
+====
+
++
+[IMPORTANT]
+====
+The Security Token Service is not exempt either. The default authentication target mappings of a REST STS instance validate OpenID Connect ID tokens against the `oidc` module and X.509 certificates against `cert_module` with `authIndexType=module`, and the default X.509 mapping of a SOAP STS instance does the same. Neither module is `Application` nor of type `Federation`, so on a new installation these validations are refused with `MODULE_BASED_AUTH_NOT_ALLOWED`, unless module-based authentication is enabled in the realm of the STS instance, or the mapping names a chain that contains the module, for example `OPENIDCONNECT|service|oidcChain|oidc_id_token_auth_target_header_key=oidc_id_token`. The SOAP STS agent logs in through the `Application` module and is unaffected.
+====
+
++
+`ssoadm` is unaffected as well: it authenticates administrators against the authentication chain of the top level realm rather than by naming a module. If you pinned it to a module with the `org.forgerock.openam.ssoadm.auth.indexType` and `org.forgerock.openam.ssoadm.auth.indexName` properties, set the type to `service` and name a chain instead.
+
++
+Default: Disabled. Open Identity Platform Community recommends leaving module-based authentication disabled in production environments.
+
++
+This default applies to new installations. An upgraded installation keeps the setting it has, in every realm; disable the attribute per realm once you have checked that no integration depends on `module=module-name`, on authentication by level, or on the policy conditions above. See xref:../upgrade-guide/chap-about-upgrades.adoc#upgrade-authentication-defaults["Upgrading & Authentication Defaults"] in the __Upgrade Guide__.
 
 +
 `ssoadm` attribute: `sunEnableModuleBasedAuth`
@@ -1311,6 +1360,8 @@ The default module instance login URL is defined as follows:
 ----
 protocol://hostname:port/deploy_URI/XUI/#login?module=Anonymous&org=org_name
 ----
++
+A login URL that names a module works only where the realm allows module based authentication, which a new installation does not. Either enable it for the realm, under Authentication > Settings > Security, or reach the module through a chain that contains it, with `service=__chain-name__`.
 
 Default Anonymous User Name::
 Specifies the user ID assigned by the module if the Valid Anonymous Users list is empty. The default value is `anonymous`. Note that the anonymous user must be defined in the realm.
@@ -1424,6 +1475,60 @@ When enabled, OpenAM updates CRLs from the LDAP directory store.
 
 +
 `ssoadm` attribute: `openam-am-auth-cert-update-crl`
+
++
+[NOTE]
+======
+When OpenAM refreshes a CRL, it fetches the CRL Distribution Point URL named by the certificate being validated, or the one named by the expired CRL's own `IssuingDistributionPoint` extension. To prevent server-side request forgery (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-g5vw-v384-gw9v[GHSA-g5vw-v384-gw9v, window=\_blank]), that URL must use the `http`, `https`, `ldap`, or `ldaps` scheme and must not resolve to a blocked address, as listed in xref:chap-openid-connect.adoc#openam-ssrf-blocked-addresses["OpenID Connect Relying Party Registration"] — with one difference: by default, private, site-local, and unique-local addresses (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `fec0::/10`, `fc00::/7`), including an IPv6 transition address that embeds one, are allowed. The cloud metadata endpoints inside `fc00::/7` — `fd00:ec2::254` (AWS), `fd20:ce::254` (Google Cloud), and `fd00:c1::a9fe:a9fe` (Oracle Cloud) — stay refused. If OpenAM reaches IPv4 through a NAT64 translator with a Network-Specific Prefix, declare the prefix in `org.openidentityplatform.ssrf.nat64-prefixes`, as described there. At most three redirects are followed, each `Location` goes through the same check as the URL the certificate named, and a redirect out of `https` into `http` is refused. The response is bounded in size and duration.
+
+Private and site-local addresses such as `10.0.0.0/8` remain allowed by default, so an internal PKI publishing its CRLs on an internal address keeps working after an upgrade. The shared address space `100.64.0.0/10` is not private address space here: it holds the `100.100.100.200` cloud metadata endpoint and is refused in the default mode too. A distribution point in that range, as used by some container platforms, carrier-grade NAT, and overlay VPNs, needs `org.openidentityplatform.openam.crl.dp.allow-any-url`, which turns the address check off altogether, link-local metadata addresses included; restrict outbound traffic from the OpenAM host with egress filtering in that case. The following advanced server properties tune this behavior. Those that take `true` or `false` accept nothing else: a value such as `yes`, `on`, or `1` is ignored, with a warning in the `Security` debug log, and the default applies.
+
+`org.openidentityplatform.openam.crl.dp.allow-any-url`::
+Set to `true` to disable the address check entirely and restore the previous behavior — for example, when a CRL distribution point is served from a loopback or link-local address. The scheme restriction still applies. Takes precedence over `org.openidentityplatform.openam.crl.dp.strict` if both are set. Default: `false`.
+
+`org.openidentityplatform.openam.crl.dp.strict`::
+Set to `true` to also reject private, site-local, and IPv6 unique-local addresses. Default: `false`.
++
+The default is permissive on purpose: an internal PKI publishing its CRLs on an RFC1918 address is ordinary, and blocking it on upgrade would stop CRL refreshes silently and then fail every certificate login closed once the CRL already held expires. The cost of leaving it off is that a certificate chaining to one of your trust anchors can name an internal address as its distribution point, and the timing of the fetch distinguishes an open port from a closed one. Set it to `true` if your CRL distribution points are all on public addresses.
++
+The address check resolves the distribution point host name, and the connection that follows resolves it again. The two normally agree because the JVM caches the answer (`networkaddress.cache.ttl` in the JVM's `java.security` file), but a name whose DNS record changes in between — DNS rebinding — can pass the check on one address and be connected to on another; setting `networkaddress.cache.ttl` to `0` widens that window. An HTTP proxy, if OpenAM uses one, resolves the name on its own. Where internal addresses must stay unreachable whatever a certificate names, block them with egress filtering on the OpenAM host as well: this property alone does not guarantee it.
+
+`org.openidentityplatform.openam.crl.dp.max-size`::
+Largest CRL, in bytes, that will be downloaded from a distribution point. Default: `10485760` (10 MB).
+
+`org.openidentityplatform.openam.crl.dp.timeout`::
+Time budget, in milliseconds, for refreshing the CRL of one certificate. The budget covers every distribution point location tried for that certificate, redirects included, rather than being granted afresh to each: what is left of it caps the connect and read timeouts of every attempt, so `org.forgerock.openam.url.connectTimeout` and `com.sun.identity.url.readTimeout` set to `0` (no timeout) cannot hold the request open past it. It is also the connect and request timeout for an `ldap` distribution point. A connection already in flight when the budget runs out is only abandoned once the operating system returns from it, so a single unresponsive distribution point can overrun the budget by one socket timeout. Default: `10000`.
+
+`org.openidentityplatform.openam.crl.dp.max-locations`::
+Most distribution point locations tried for one certificate. A location refused by the address check is not counted, so a certificate that lists several unreachable spellings of its CRL before the one that works still reaches it. Must be `1` or greater; a value of `0` or less is ignored and the default applies. Default: `5`.
+
+`org.openidentityplatform.openam.crl.dp.param-hosts`::
+Comma-separated list of hosts that the HTTP parameters configured in `HTTP Parameters for CRL Update` (`ssoadm` attribute `iplanet-am-auth-cert-param-get-crl`) may be sent to. An entry is a whole host name, matched case-insensitively; an entry starting with `.` matches any host in the domain below it, so `.example.com` covers `pki.example.com` but not `example.com` itself.
++
+Those parameters are your deployment's own configuration and often carry a credential for its CRL endpoint, while the URL they are posted to comes out of the certificate being validated. Empty by default, which means they are sent to no distribution point at all: list the distribution point hosts of your own PKI here if your CRL endpoint needs them. When a distribution point is skipped for this reason, the `Security` debug log records it — the CRL itself is still fetched, only the parameters are withheld. A redirect carries them on only when it is a `301` or `302` to the same URL on another scheme or port, such as the `https` endpoint behind an http-to-https redirector. Every other redirect, and everything after a `303 See Other`, is followed as a plain `GET` without them, even to a host this list names. Default: empty.
+
+`org.openidentityplatform.openam.crl.require-verified-signature`::
+When `true`, a CRL fetched from a distribution point is only written to the CRL cache and the LDAP CRL entry once its signature has been verified against the issuer, and never if it is older than the CRL already held. OpenAM finds the issuer's key in the trust store, or in the certificate chain presented alongside the certificate when that chain leads back to a configured trust anchor.
++
+Where the key cannot be found — a PKI whose CRLs are signed under a rotated CA key, or an issuing CA that appears in neither the trust store nor the presented chain — the CRL is still used for the validation in hand but is not stored, so it is fetched again on every validation. Setting this property to `false` stores it instead.
++
+A CRL issued by a delegated CRL signer (an indirect CRL, RFC 5280 section 5.2.5) is only used at all when the certificate's own distribution point names that signer in its `cRLIssuer` field, which is the same condition PKIX applies, and it is never stored, whatever this property is set to. A certificate that delegates to nobody — almost all of them — can only be validated against a CRL from its own issuer, whatever the distribution point answers with.
++
+Set to `false` with care: it means a CRL served from a hijacked, spoofed, or intercepted distribution point will be written to the shared CRL cache and the LDAP CRL entry, where it outlives the request and, for the LDAP entry, the process. The issuer and CRL-number checks still apply, so a CRL for another issuer or one older than the CRL already held is still refused — including one older than the CRL the shared LDAP entry holds, which in a multi-server deployment may be newer than the one the server doing the refresh had cached. Default: `true`.
++
+A CA in the middle of a key rollover has two certificates under one name, and both may be trusted at once. Every trusted certificate carrying the issuer's name is tried, so a CRL signed with either key verifies.
+
+`org.openidentityplatform.openam.crl.cache.max-size`::
+Most CRLs held in the in-memory CRL cache, which is shared across realms. Default: `1000`.
+
+If a CRL stops being refreshed after an upgrade, look for `AMCRLStore` messages in the `Security` debug log: they name the distribution point that was refused, whether `org.openidentityplatform.openam.crl.dp.strict` was in force, and which property relaxes the check.
+
+The address check resolves the distribution point host locally. If OpenAM reaches the internet only through an HTTP proxy and cannot resolve external names itself, the check rejects the distribution point as unresolvable; set `org.openidentityplatform.openam.crl.dp.allow-any-url` to `true` in that deployment. Likewise, a resolver that answers every name with an address from `198.18.0.0/15`, as the fake-IP DNS mode of some proxy and VPN clients does, makes every distribution point named by host name look blocked; set `org.openidentityplatform.openam.crl.dp.allow-any-url` to `true` there as well, or exempt the OpenAM host from that resolver. Name resolution itself is not covered by `org.openidentityplatform.openam.crl.dp.timeout` — the JDK provides no timeout for it — so a distribution point naming a host under an unresponsive nameserver stalls the request for as long as the operating system resolver takes. Keep `org.openidentityplatform.openam.crl.dp.max-locations` low if that matters.
+
+A CRL issued by a delegated CRL signer, whose issuer name therefore differs from the certificate's issuer name (an *indirect* CRL, RFC 5280 section 5.2.5), is used for the validation in hand but is never written to the CRL cache or the LDAP CRL entry, so it is fetched again each time. OpenAM recognizes it by the `indirectCRL` flag of the CRL's own `IssuingDistributionPoint` and uses it only when the certificate's own distribution point names that signer in its `cRLIssuer` field; certificate path validation checks the delegation again. A CRL whose issuer name simply does not match, with no such flag, is refused outright — it is either the wrong CRL or one substituted by whoever answered the distribution point.
+
+A host-less LDAP URL such as `ldap:///CN=CA,CN=CDP,...`, which Active Directory Certificate Services issues by default, resolves to `localhost` and is refused as a loopback address. Keep such a CRL in the LDAP CRL store described above and turn `Update CA CRLs from CRLDistributionPoint` off, so the store is used as configured and no distribution point is contacted.
+======
 
 OCSP Validation::
 Enable this to use Online Certificate Status Protocol (OCSP) instead of CRLs to check certificates' revocation status.
@@ -3948,6 +4053,8 @@ The Organization Authentication Configuration serves when users access `/openam/
 The Administrator Authentication Configuration serves when users access `/openam/console`.
 +
 You can set these independently to separate administrative login from user login. For example, you can change the default user chain, but leave the default administrator chain as is to avoid locking yourself out as administrator. By default, `amadmin` can log in at `/openam/UI/Login`. You can change that for your deployment.
++
+`ssoadm` follows the Administrator Authentication Configuration as well, falling back to the Organization Authentication Configuration where the realm names no administrator chain. It answers only user name and password callbacks, so keep the chain it follows satisfiable with a user name and a password alone, or pin `ssoadm` to a chain that is, as described in xref:../reference/openam-cli-tools.adoc#d981e1551["JVM Properties for ssoadm"] in the __Reference__.
 
 . Save your work.
 
@@ -4017,6 +4124,9 @@ Before using this plugin, configure the OAuth 2.0 authentication module with the
 +
 Sometimes OAuth 2.0 providers change their endpoints, including their logout URLs. When using a provider like Facebook, Google, or MSN, make sure you are aware when they change their endpoint locations so that you can change your client configuration accordingly.
 
++
+`OAuthLogout.jsp` loads the provider's logout URL in an iframe, so that URL is validated the same way a `goto` URL is: add the provider's logout endpoint to the realm's Valid `goto` URL Resources, as described in xref:configure-valid-goto-url-resources["Configuring Valid goto URL Resources"], or the page falls back to a placeholder and the provider session is left alone. Earlier versions ran the URL through a validation type that is not defined in the shipped `ESAPI.properties`, so the check never passed and the iframe never worked.
+
 Class name: `org.forgerock.openam.authentication.plugins.AccountExpirePlugin`::
 The account expiration post-authentication plugin sets an account expiration date after successful authentication. OpenAM uses this to prevent expired accounts from being used to authenticate.
 
@@ -4047,6 +4157,8 @@ This section explains how to connect to OpenAM for user authentication by adding
 When using the XUI, the base URL to authenticate to OpenAM points to `/XUI/#login` under the deployment URL, such as `\http://openam.example.com:8080/openam/XUI/#login`.
 
 The base URL to log out is similar, for example, `\http://openam.example.com:8080/openam/XUI/#logout/`.
+
+A `goto` parameter of the logout URL, such as `\http://openam.example.com:8080/openam/XUI/#logout/&goto=http%3A%2F%2Fwww.example.com`, is followed only when the realm's Valid `goto` URL Resources allow it, which the XUI asks OpenAM about before it ends the session. Without an active session there is nothing to ask, so the XUI then follows only a relative URL or one on the origin it was loaded from. Only `http` and `https` URLs are followed, after login and logout alike.
 
 [#authn-from-browser-XUI-realm]
 ===== Specifying the Realm in the Login URL
@@ -4203,7 +4315,7 @@ goto::
 On successful authentication, or successful logout, request that OpenAM redirect the user to the specified location. Values must be URL-encoded.
 
 gotoOnFail::
-On authentication failure, request that OpenAM redirect the user to the specified location. Values must be URL-encoded.
+On authentication failure, request that OpenAM redirect the user to the specified location. Values must be URL-encoded. The location is followed only when the realm's Valid `goto` URL Resources allow it, by the XUI as by the classic UI; otherwise the failure URL configured for the login applies, if there is one. Only `http` and `https` URLs are followed.
 
 IDToken1, IDToken2, ..., IDTokenN::
 Pass the specified credentials as `IDToken` parameters in the URL. The `IDToken` credentials map to the fields in the login page for the authentication module, such as `IDToken1` as user ID and `IDToken2` as password for basic user name, password authentication. The order depends on the callbacks in login page for the module; `IDTokenN` represents the N^th^  callback of the login page.
@@ -5307,9 +5419,29 @@ When you set this property to `true` for your OpenAM servers, users can potentia
 [#configure-valid-goto-url-resources]
 === Configuring Valid goto URL Resources
 
-By default, OpenAM redirects the user to the URL specified in the `goto` and `gotoOnFail` query string parameters supplied to the authentication interface in the login URL. You can increase security against possible phishing attacks through open redirect by specifying a list of valid URL resources using the Validation Service.
+OpenAM redirects the user to the URL specified in the `goto` and `gotoOnFail` query string parameters supplied to the authentication interface in the login URL. You protect against phishing attacks through open redirect by specifying a list of valid URL resources using the Validation Service.
 
-OpenAM only redirects a user if the `goto` and `gotoOnFail` URL matches any of the resources specified in this setting. If no setting is present, it is assumed that the `goto` or `gotoOnFail` URL is valid.
+OpenAM only redirects a user if the `goto` and `gotoOnFail` URL matches any of the resources specified in this setting.
+
+If no setting is present, OpenAM accepts only URLs that point back at the OpenAM server itself: a relative URL always, and an absolute one when it names one of the origins the server answers on. Those are the origin the container reports for the incoming request, the URL OpenAM was installed under, and - when the realm's Base URL Source service is set to `Fixed value` or `Extension class` - the base URL it yields. A deployment behind a TLS terminating reverse proxy whose container is not configured with the published scheme, host and port should pin one of those so that the published origin is recognized.
+
+[IMPORTANT]
+====
+The `Forwarded header` and `X-Forwarded-* headers` provider types are deliberately *not* used here. They build the base URL out of request headers, which a caller can set unless every route into the container rewrites them, so accepting one as an origin of this server would reopen the very open redirect this validation closes. Configure the container, pin a `Fixed value` base URL, or populate the list of valid `goto` URL resources instead.
+
+An `Extension class` is judged by the provider it names: naming one of the header based providers is read as choosing that provider, and its base URL is not used here either. A class of your own is taken at its word, so an extension used on a realm whose list is empty must yield an origin the deployment fixed rather than one built out of the request.
+====
+
+Two rules apply whether or not the list is populated: an absolute or protocol relative URL is accepted only with an `http` or `https` scheme - a relative URL carries no scheme and is always accepted - and a URL longer than the limit set by the advanced server property `org.forgerock.openam.redirecturlvalidator.maxUrlLength` (2000 characters by default) is rejected.
+
+Origins are compared by scheme, host and port, and the host has to be one that can be read as a host name. A name Java declines to parse - one holding an underscore, such as the `openam_1` a container is given in a compose file - can not be matched, so a deployment published under such a name has to populate the list of valid `goto` URL resources. The origin of the incoming request is the one the container reports; where a Tomcat `RemoteIpValve` or `RemoteIpFilter` is configured with `protocolHeader`, `hostHeader` or `portHeader`, that origin comes from those headers, so restrict the valve to the proxies you trust through its `internalProxies` setting.
+
+[NOTE]
+====
+Earlier versions treated an absent setting as permission to redirect anywhere, which made an unconfigured realm usable as an open redirect. If an existing deployment relies on cross domain `goto` URLs and cannot populate this list right away, set the advanced server property `org.openidentityplatform.openam.auth.goto.allowAnyUrlWithoutWhitelist` to `true` to restore the old behaviour. The property only decides what an *empty* list means: once this list is populated it is authoritative regardless of the property, and so is a list OpenAM could not read at all. Where the configuration store cannot be reached, nothing is known about what the realm allows, so the `goto` URL is held to the same rule as an unconfigured realm - relative URLs, and absolute ones naming an origin this server answers on - whatever the property is set to.
+
+Restoring the old behaviour restores all of it. With the property set and the list empty, OpenAM accepts any `http` or `https` `goto` URL, including a protocol relative one such as `//www.example.net/` and one whose real host hides behind a user information component, such as `\https://openam.example.com@www.example.net/`. Populating the list is the better answer; treat the property as a way to keep an upgrade moving, not as a setting to leave in place.
+====
 
 The URL whitelisting and pattern matching follow the wildcard rules as specified in xref:chap-authz-policy.adoc#policy-patterns-wildcards["Specifying Resource Patterns with Wildcards"].
 

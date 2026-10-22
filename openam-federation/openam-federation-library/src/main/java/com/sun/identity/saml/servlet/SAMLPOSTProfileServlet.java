@@ -56,7 +56,6 @@ import java.io.PrintWriter;
 import java.net.URL;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -257,37 +256,14 @@ public class SAMLPOSTProfileServlet extends HttpServlet {
         try {
             URL targetUrl = new URL(target);
             String targetHost = targetUrl.getHost();
-            int targetPort = targetUrl.getPort();
             if (targetHost == null) {
                 SAMLUtils.debug.error("SAMLPOSTProfileServlet.getDestSite:"
                 + " missing host in target.");
                 return null;
             }
-            // loop through the trusted server list and try to find the server
-            SAMLServiceManager.SiteEntry serverSite = null;
-            Iterator iter = ((Set) SAMLServiceManager.getAttribute(
-            SAMLConstants.TRUSTED_SERVER_LIST)).iterator();
-            String serverHost = null;
-            int serverPort = -1;
-            while (iter.hasNext()) {
-                serverSite = (SAMLServiceManager.SiteEntry) iter.next();
-                serverHost = serverSite.getHostName();
-                serverPort = serverSite.getPort();
-                if (serverHost == null) {
-                    continue;
-                }
-                if (targetHost.indexOf(serverHost) != -1) {
-                    if (serverPort != -1) {
-                        if (serverPort == targetPort) {
-                            destSite = serverSite;
-                            break;
-                        }
-                    } else {
-                        destSite = serverSite;
-                    }
-                }
-            }
-            
+            destSite = SAMLUtils.getTrustedSite((Set) SAMLServiceManager.
+                getAttribute(SAMLConstants.TRUSTED_SERVER_LIST), target);
+
             if (destSite == null) {
                 SAMLUtils.debug.error("SAMLPOSTProfileServlet.getDestSite: "
                 + " No destSite found from the target.");
@@ -440,7 +416,7 @@ public class SAMLPOSTProfileServlet extends HttpServlet {
             // TARGET comes from the request and is redirected to below; the
             // realm's Valid goto URL list decides whether it may be, before
             // any session is created for it.
-            if (!RealmGotoUrlValidator.isValid(target,
+            if (!RealmGotoUrlValidator.isValid(request, target,
                     (String) sessionAttr.get(SessionProvider.REALM))) {
                 SAMLUtils.debug.warning("SAMLPOSTProfileServlet.doPost: "
                     + "refusing a TARGET outside the realm's valid goto URLs");

@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -64,6 +65,13 @@ import com.sun.identity.shared.debug.Debug;
  *       {@link #NAT64_PREFIXES_PROPERTY}.</li>
  * </ul>
  *
+ * <p>The private/site-local and unique-local clauses are the only part of the policy a caller may
+ * relax, through {@link #isSafeRemoteAddresses(InetAddress[], boolean)}: an internal PKI publishing
+ * its CRLs on an RFC1918 address is a legitimate target, the shared address space and the cloud
+ * metadata endpoints are not. The metadata endpoints that sit inside {@code fc00::/7} — AWS
+ * {@code fd00:ec2::254}, Google Cloud {@code fd20:ce::254} and Oracle Cloud
+ * {@code fd00:c1::a9fe:a9fe} — therefore stay blocked when the unique-local clause is relaxed.
+ *
  * <p>NAT64 Network-Specific Prefixes (RFC 6052 §2.2) are chosen by the operator out of the
  * operator's own address space and are bit-for-bit indistinguishable from an ordinary global
  * address, so they cannot be recognised from the literal alone. Deployments that run a NAT64 with
@@ -104,6 +112,18 @@ public final class SsrfUrlValidator {
             new byte[]{0x00, 0x64, (byte) 0xff, (byte) 0x9b, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 96);
 
     private static final Nat64Prefix[] NO_PREFIXES = new Nat64Prefix[0];
+
+    /**
+     * Cloud instance metadata endpoints inside {@code fc00::/7}: AWS {@code fd00:ec2::254}, Google
+     * Cloud {@code fd20:ce::254} and Oracle Cloud {@code fd00:c1::a9fe:a9fe}. The unique-local
+     * clause blocks them already; they are listed so that relaxing it does not admit them.
+     */
+    private static final byte[][] CLOUD_METADATA_IPV6 = {
+            {(byte) 0xfd, 0x00, 0x0e, (byte) 0xc2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x02, 0x54},
+            {(byte) 0xfd, 0x20, 0x00, (byte) 0xce, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x02, 0x54},
+            {(byte) 0xfd, 0x00, 0x00, (byte) 0xc1, 0, 0, 0, 0, 0, 0, 0, 0,
+                    (byte) 0xa9, (byte) 0xfe, (byte) 0xa9, (byte) 0xfe},
+    };
 
     /** Last seen raw value of {@link #NAT64_PREFIXES_PROPERTY} together with its parsed form. */
     private static volatile ParsedPrefixes parsedPrefixes = new ParsedPrefixes(null, NO_PREFIXES);
@@ -154,7 +174,7 @@ public final class SsrfUrlValidator {
                 return false;
             }
             for (InetAddress address : addresses) {
-                if (isBlockedAddress(address)) {
+                if (isBlockedAddress(address, false)) {
                     return false;
                 }
             }
@@ -164,12 +184,53 @@ public final class SsrfUrlValidator {
         return true;
     }
 
-    private static boolean isBlockedAddress(InetAddress address) {
+    /**
+     * Judges addresses the caller has already resolved: for a sink whose scheme is not http(s) —
+     * an {@code ldap://} URL, say — or one that must not pay for a second lookup, which would also
+     * widen the window in which a short-TTL DNS rebind can change the answer between the two.
+     *
+     * @param addresses every address the host resolved to. An empty array is refused: there is
+     *     nothing to judge.
+     * @param allowSiteLocal {@code true} to accept private/site-local ({@code 10/8},
+     *     {@code 172.16/12}, {@code 192.168/16}, {@code fec0::/10}) and unique-local
+     *     ({@code fc00::/7}) addresses, also when a transition address embeds one. Every other rule
+     *     of this class, {@code 100.64.0.0/10}, {@code 64:ff9b:1::/48} and the cloud metadata
+     *     endpoints inside {@code fc00::/7} included, still applies.
+     * @return {@code true} if the server may connect to all of them.
+     */
+    public static boolean isSafeRemoteAddresses(InetAddress[] addresses, boolean allowSiteLocal) {
+        if (addresses == null || addresses.length == 0) {
+            return false;
+        }
+        for (InetAddress address : addresses) {
+            if (isBlockedAddress(address, allowSiteLocal)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Applies the address rules of {@link #isSafeRemoteUrl(String, boolean)} to one address that
+     * has already been resolved. Fetching code that resolves the host itself — for example in the
+     * DNS resolver of its HTTP client, so that the validated address is the one connected to —
+     * checks every address of the host with this method.
+     *
+     * @param address a resolved address.
+     * @return {@code true} if the server must not connect to the address.
+     */
+    public static boolean isBlockedAddress(InetAddress address) {
+        return isBlockedAddress(address, false);
+    }
+
+    private static boolean isBlockedAddress(InetAddress address, boolean allowSiteLocal) {
         if (address.isLoopbackAddress()          // 127.0.0.0/8, ::1
                 || address.isAnyLocalAddress()   // 0.0.0.0, ::
                 || address.isLinkLocalAddress()  // 169.254.0.0/16, fe80::/10
-                || address.isSiteLocalAddress()  // 10/8, 172.16/12, 192.168/16, fec0::/10
                 || address.isMulticastAddress()) {
+            return true;
+        }
+        if (!allowSiteLocal && address.isSiteLocalAddress()) { // 10/8, 172.16/12, 192.168/16, fec0::/10
             return true;
         }
         final byte[] bytes = address.getAddress();
@@ -179,8 +240,13 @@ public final class SsrfUrlValidator {
         if (bytes.length != 16) {
             return false;
         }
+        for (byte[] metadata : CLOUD_METADATA_IPV6) {
+            if (Arrays.equals(bytes, metadata)) {
+                return true; // whatever allowSiteLocal says
+            }
+        }
         // IPv6 Unique Local Addresses (fc00::/7) are not reported by isSiteLocalAddress().
-        if ((bytes[0] & 0xfe) == 0xfc) {
+        if (!allowSiteLocal && (bytes[0] & 0xfe) == 0xfc) {
             return true;
         }
         // NAT64 local-use prefix 64:ff9b:1::/48 (RFC 8215) is translation-only space, and the
@@ -198,7 +264,7 @@ public final class SsrfUrlValidator {
         // embedded IPv4 the literal can be read as.
         for (byte[] embedded : embeddedIpv4Addresses(bytes)) {
             try {
-                if (isBlockedAddress(InetAddress.getByAddress(embedded))) {
+                if (isBlockedAddress(InetAddress.getByAddress(embedded), allowSiteLocal)) {
                     return true;
                 }
             } catch (UnknownHostException e) {

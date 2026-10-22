@@ -126,10 +126,12 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -144,6 +146,7 @@ import jakarta.xml.soap.MimeHeader;
 import jakarta.xml.soap.MimeHeaders;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.SAML2Store;
+import org.forgerock.openam.saml2.plugins.RelayStateValidator;
 import org.forgerock.openam.saml2.plugins.ValidRelayStateExtractor;
 import org.forgerock.openam.saml2.plugins.ValidRelayStateExtractor.SAMLEntityInfo;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
@@ -180,6 +183,12 @@ public class SAML2Utils extends SAML2SDKUtils {
     private static final char EQUALS = '=';
     private static final char SEMI_COLON = ';';
     private static final char DOUBLE_QUOTE = '"';
+    /**
+     * How many unsigned assertions of one rejected response are named in the audit log, one record
+     * each. A response is unauthenticated input and can carry any number of them, so the rejection
+     * writes a bounded number of records and says how many it left out.
+     */
+    private static final int UNSIGNED_ASSERTION_RECORD_LIMIT = 10;
 
     private static String bufferLen = (String)
             ((SAML2ConfigService.getAttribute(SAML2ConfigService.SAML2_BUFFER_LENGTH) == null)
@@ -412,11 +421,9 @@ public class SAML2Utils extends SAML2SDKUtils {
         if (saml2MetaManager == null) {
             throw new SAML2Exception(bundle.getString("nullMetaManager"));
         }
-        SPSSOConfigElement spConfig = null;
-        SPSSODescriptorElement spDesc = null;
-        spConfig = saml2MetaManager.getSPSSOConfig(
+        final SPSSOConfigElement spConfig = saml2MetaManager.getSPSSOConfig(
                 orgName, hostEntityId);
-        spDesc = saml2MetaManager.getSPSSODescriptor(orgName, hostEntityId);
+        SPSSODescriptorElement spDesc = saml2MetaManager.getSPSSODescriptor(orgName, hostEntityId);
 
         if (debug.messageEnabled()) {
             debug.message(method + "binding is :" + profileBinding);
@@ -497,6 +504,71 @@ public class SAML2Utils extends SAML2SDKUtils {
             debug.message(method + "wantAssertionsSigned is :" + wantAssertionsSigned);
         }
 
+        // 5.3 signature inheritance - an assertion can be considered to inherit the signature from
+        // the enclosing element, so either the response or every assertion has to carry one.
+        //
+        // GHSA-3j2f-qhrc-rjfj: this requirement used to be enforced for the HTTP-POST binding only,
+        // with every other binding left to the WantAssertionsSigned metadata flag - which the hosted
+        // SP template ships as false. An assertion delivered encrypted over ECP/PAOS is decrypted
+        // above, after SPACSUtils has finished checking the signatures of the cleartext assertions,
+        // so nothing verified it at all. The requirement now covers every binding, and can be
+        // relaxed for the back-channel HTTP-Artifact binding alone.
+        //
+        // Whether a signature is there at all is settled here, ahead of everything else the response
+        // is put through: the loop below reaches the one-time cache, the audience and the condition
+        // checks, and fillMap, which instantiates the deployment's own SPAuthnContextMapper. On
+        // ECP that is all reachable by an unauthenticated caller, so none of it should run for a
+        // response that nothing ties to an identity provider. Whether the signatures that are there
+        // are valid stays in the loop, where the issuer decides which certificates to check against.
+        boolean allAssertionsSigned = true;
+        List<String> unsignedAssertionIDs = new ArrayList<>();
+        for (Assertion assertion : assertions) {
+            if (!assertion.isSigned()) {
+                allAssertionsSigned = false;
+                unsignedAssertionIDs.add(assertion.getID());
+            }
+        }
+        // Signed first: the decision resolves metadata and system properties, and cannot change
+        // the outcome for the responses that carry a signature, which is nearly all of them.
+        if (isMissingRequiredSignature(responseIsSigned, allAssertionsSigned,
+                () -> isAssertionSignatureRequired(wantAssertionsSigned, profileBinding, spConfig, orgName,
+                        hostEntityId))) {
+            debug.error(method + "neither the response nor all of its assertions are signed");
+            // SAML2LogMessageIDs.xml declares a single Assertion ID item for this message id, and an
+            // @ID is whatever the sender wrote - it is not signature-verified here and can contain
+            // the separator of whatever reads the log. One record per assertion keeps that field
+            // single-valued rather than handing a parser a variable number of columns; the count is
+            // capped, because the sender also decides how many assertions the response carries and
+            // one rejected request should not be able to write an unbounded number of records.
+            int recorded = 0;
+            for (String unsignedAssertionID : unsignedAssertionIDs) {
+                if (recorded == UNSIGNED_ASSERTION_RECORD_LIMIT) {
+                    debug.error(method + (unsignedAssertionIDs.size() - recorded) + " further "
+                            + "unsigned assertions in this response were not recorded individually");
+                    break;
+                }
+                recorded++;
+                String[] data = { unsignedAssertionID == null ? "" : unsignedAssertionID };
+                LogUtil.error(Level.INFO, LogUtil.INVALID_SIGNATURE_ASSERTION, data, null);
+            }
+            throw new SAML2Exception(bundle.getString("assertionNotSigned"));
+        }
+
+        // GHSA-3j2f-qhrc-rjfj: the ECP profile carries the response in the request, and requires
+        // each assertion to be signed in its own right - inheriting the signature of the enclosing
+        // <Response> is not enough there. SPACSUtils.getResponseFromPostECP enforces that for the
+        // cleartext assertions of the response, but an <EncryptedAssertion> is opaque to it. The
+        // ones decrypted above are in this list, so this is where they are covered.
+        if (isEcpAssertionSignatureMissing(profileBinding, allAssertionsSigned)) {
+            debug.error(method + "an assertion delivered over ECP/PAOS is not signed");
+            // The Issuer of the response, which was checked for circle of trust membership above.
+            // Empty where the response left it out: the assertion Issuer would do as well, but
+            // nothing has verified it at this point.
+            String[] data = { idpEntityId == null ? "" : idpEntityId };
+            LogUtil.error(Level.INFO, LogUtil.ECP_ASSERTION_NOT_SIGNED, data, null);
+            throw new SAML2Exception(bundle.getString("assertionNotSigned"));
+        }
+
         // in seconds
         int timeskew = SAML2Constants.ASSERTION_TIME_SKEW_DEFAULT;
         String timeskewStr = getAttributeValueFromSPSSOConfig(
@@ -517,7 +589,12 @@ public class SAML2Utils extends SAML2SDKUtils {
         Map bearerMap = null;
         IDPSSODescriptorElement idp = null;
         Set<X509Certificate> verificationCerts = null;
-        boolean allAssertionsSigned = true;
+        // GHSA-3j2f-qhrc-rjfj: every bearer assertion of the response is checked against the
+        // one-time cache below, so every one of them has to be claimed once the response is
+        // accepted - see SPACSUtils.markAssertionAsConsumed. Only the assertion that filled the
+        // map used to be, which left a response carrying more than one of them replayable by
+        // dropping the assertion that had already been spent.
+        Map<String, Long> bearerAssertionIDs = new LinkedHashMap<>();
         for (Assertion assertion : assertions) {
             String assertionID = assertion.getID();
             Issuer issuer = assertion.getIssuer();
@@ -566,8 +643,6 @@ public class SAML2Utils extends SAML2SDKUtils {
                     throw new SAML2Exception(bundle.getString(
                             "invalidSignatureOnAssertion"));
                 }
-            } else {
-                allAssertionsSigned = false;
             }
             List<AuthnStatement> authnStmts = assertion.getAuthnStatements();
             if (authnStmts != null && !authnStmts.isEmpty()) {
@@ -615,6 +690,8 @@ public class SAML2Utils extends SAML2SDKUtils {
                         hostEntityId,
                         assertionID);
                 checkConditions(assertion.getConditions(), hostEntityId, assertionID, timeskew);
+                bearerAssertionIDs.put(assertionID, bearerAcceptedUntil(
+                        (Date) bearerMap.get(SAML2Constants.NOTONORAFTER), timeskew));
                 if (smap == null) {
                     smap = fillMap(authnStmts,
                             subject,
@@ -635,18 +712,14 @@ public class SAML2Utils extends SAML2SDKUtils {
             debug.error("No Authentication Assertion in Response.");
             throw new SAML2Exception(bundle.getString("missingAuthnAssertion"));
         }
-        // 5.3 signature inheritance -  assertion can be considered to inherit the signature from
-        // the enclosing element
-        if (wantAssertionsSigned && !(responseIsSigned || allAssertionsSigned)){
-            debug.error(method + "WantAssertionsSigned is true and response or all assertions are not signed");
-            String[] data = { orgName, hostEntityId, idpEntityId };
-            LogUtil.error(Level.INFO, LogUtil.INVALID_SIGNATURE_ASSERTION, data, null);
-            throw new SAML2Exception(bundle.getString("assertionNotSigned"));
-        }
+        // GHSA-3j2f-qhrc-rjfj: SPACSUtils.markAssertionAsConsumed claims every one of these, and
+        // refuses a map that does not carry them - the signature requirement and the ECP rule that
+        // let the response get this far are enforced above, before anything is done with it.
+        smap.put(SAML2Constants.BEARER_ASSERTION_IDS, bearerAssertionIDs);
 
         // 4.1.4.5 POST-Specific Processing Rules each assertion MUST be protected by a digital signature either by
         // signing each individual <Assertion> element or by signing the <Response> element.
-        if (profileBinding.equals(SAML2Constants.HTTP_POST) ) {
+        if (SAML2Constants.HTTP_POST.equals(profileBinding)) {
             boolean wantPostResponseSigned = SAML2Utils
                     .wantPOSTResponseSigned(orgName, hostEntityId, SAML2Constants.SP_ROLE);
 
@@ -659,17 +732,233 @@ public class SAML2Utils extends SAML2SDKUtils {
                 LogUtil.error(Level.INFO, LogUtil.POST_RESPONSE_INVALID_SIGNATURE, data, null);
                 throw new SAML2Exception(bundle.getString("responseNotSigned"));
             }
-            if (!responseIsSigned && !allAssertionsSigned) {
-                debug.error(method + "WantAssertionsSigned is true but some or all assertions are not signed");
-                String[] data = { orgName, hostEntityId, idpEntityId };
-                LogUtil.error(Level.INFO, LogUtil.INVALID_SIGNATURE_ASSERTION, data, null);
-                throw new SAML2Exception(bundle.getString("assertionNotSigned"));
-            }
         }
 
         return smap;
     }
 
+    /**
+     * Tells whether a response has to be rejected for carrying no signature the deployment accepts.
+     *
+     * <p>SAML 2.0 Core 5.3 lets an assertion inherit the signature of the enclosing element, so a
+     * signature on the {@code Response} covers the assertions inside it and either will do.
+     *
+     * <p>{@code signatureRequired} is asked for only where the answer can still depend on it -
+     * resolving it goes to the SP's extended metadata and to the system properties, and a response
+     * that carries a signature is accepted whatever it says.
+     *
+     * @param responseIsSigned whether the {@code Response} carries a signature that verified.
+     * @param allAssertionsSigned whether every assertion carries one of its own.
+     * @param signatureRequired the decision of
+     *                          {@link #isAssertionSignatureRequired(boolean, String, SPSSOConfigElement, String, String)},
+     *                          evaluated only when neither of the above holds.
+     * @return {@code true} if the response has to be rejected.
+     */
+    static boolean isMissingRequiredSignature(boolean responseIsSigned, boolean allAssertionsSigned,
+            BooleanSupplier signatureRequired) {
+        return !(responseIsSigned || allAssertionsSigned) && signatureRequired.getAsBoolean();
+    }
+
+    /**
+     * Tells whether an assertion delivered over ECP/PAOS is missing the signature that profile
+     * requires of it.
+     *
+     * <p>The ECP profile requires each assertion to be signed in its own right, so the signature
+     * inheritance of Core 5.3 does not apply: a signed {@code Response} does not cover an unsigned
+     * assertion here. {@code SPACSUtils.getResponseFromPostECP} enforces that for the cleartext
+     * assertions of the response, but an {@code <EncryptedAssertion>} is opaque to it - this covers
+     * the ones {@code verifyResponse} decrypted.
+     *
+     * <p>There is no escape hatch: the response travels in the request on this binding, so the
+     * signature is the only thing tying an assertion to the identity provider that issued it. An
+     * OpenAM identity provider always signs assertions on PAOS.
+     *
+     * @param profileBinding the binding the response arrived on.
+     * @param allAssertionsSigned whether every assertion of the response carries a signature.
+     * @return {@code true} if the response has to be rejected.
+     */
+    static boolean isEcpAssertionSignatureMissing(String profileBinding, boolean allAssertionsSigned) {
+        return SAML2Constants.PAOS.equals(profileBinding) && !allAssertionsSigned;
+    }
+
+    /**
+     * The instant until which a bearer assertion is accepted, and so until which the one-time
+     * marker {@code SPACSUtils.markAssertionAsConsumed} writes for it has to last.
+     *
+     * <p>{@code isBearerSubjectConfirmation} accepts the assertion until its {@code NotOnOrAfter}
+     * plus {@code assertionTimeSkew}, not until its {@code NotOnOrAfter}. A marker that expired at
+     * the {@code NotOnOrAfter} alone would leave the assertion replayable for as long as the skew -
+     * against another node, or against this one after a restart - once the SAML2 token repository
+     * had dropped it.
+     *
+     * @param notOnOrAfter the {@code NotOnOrAfter} of the bearer subject confirmation; may be
+     *                     {@code null}.
+     * @param timeskew the {@code assertionTimeSkew} the assertion was checked with, in seconds.
+     * @return the instant in milliseconds, or {@code null} if {@code notOnOrAfter} is.
+     */
+    static Long bearerAcceptedUntil(Date notOnOrAfter, int timeskew) {
+        return notOnOrAfter == null ? null : notOnOrAfter.getTime() + timeskew * 1000L;
+    }
+
+    /**
+     * Tells whether the response or every one of its assertions has to be signed, resolving the
+     * HTTP-Artifact relaxation from the hosted SP's configuration.
+     *
+     * <p>This is the decision {@link #verifyResponse} makes about a response, and the one
+     * {@code SPACSUtils.getResponseFromArtifact} asks for when it decides whether the absence of an
+     * optional {@code Response/Issuer} leaves an artifact-delivered response unbound.
+     *
+     * @param wantAssertionsSigned the {@code WantAssertionsSigned} flag of the hosted SP.
+     * @param profileBinding the binding the response arrived on.
+     * @param spConfig the extended metadata of the hosted SP; may be {@code null}.
+     * @param realm the realm of the hosted SP.
+     * @param hostEntityId the entity id of the hosted SP.
+     * @return {@code true} if an unsigned response with unsigned assertions has to be rejected.
+     */
+    public static boolean isAssertionSignatureRequired(boolean wantAssertionsSigned, String profileBinding,
+            SPSSOConfigElement spConfig, String realm, String hostEntityId) {
+        // Asked with the relaxation granted: where the answer is still "required", no configuration
+        // can change it - WantAssertionsSigned, HTTP-POST and ECP/PAOS among them - and there is no
+        // reason to go to the metadata for it.
+        if (isAssertionSignatureRequired(wantAssertionsSigned, profileBinding, true)) {
+            return true;
+        }
+        return isAssertionSignatureRequired(wantAssertionsSigned, profileBinding,
+                isUnsignedArtifactAssertionAllowed(spConfig, realm, hostEntityId));
+    }
+
+    /**
+     * Tells whether the response or every one of its assertions has to be signed.
+     *
+     * <p>The SAML 2.0 profile mandates it for the HTTP-POST binding (4.1.4.5), and it is what
+     * {@code WantAssertionsSigned} in the SP metadata asks for. Beyond that, OpenAM requires it on
+     * every binding: the signature is the only thing that binds an assertion to a trusted IdP.
+     *
+     * <p>The single relaxation is HTTP-Artifact, and only where the deployment asks for it - see
+     * {@link #isUnsignedArtifactAssertionAllowed(String, boolean)}. The artifact is resolved by the
+     * SP itself, over a back channel it picked out of the IdP metadata, so an unsigned assertion
+     * there is at least not attacker-supplied front-channel input. It is no more than that: the
+     * channel authenticates the IdP that answers the {@code ArtifactResolve}, while the identity
+     * the assertion claims is the {@code Issuer} written inside it, which is only checked for
+     * membership of the circle of trust. Without a signature any trusted IdP can therefore assert
+     * as any other, which is why the relaxation additionally requires the {@code ArtifactResponse}
+     * to be signed and why {@code SPACSUtils.getResponseFromArtifact} binds the {@code Issuer} of
+     * the resolved response to the IdP the artifact was resolved against.
+     *
+     * <p>HTTP-POST and ECP/PAOS carry the response as attacker-supplied front-channel input and are
+     * never relaxed; neither is a binding this method does not recognise, {@code null} included.
+     *
+     * @param wantAssertionsSigned the {@code WantAssertionsSigned} flag of the hosted SP.
+     * @param profileBinding the binding the response arrived on.
+     * @param unsignedArtifactAssertionsAllowed whether this SP accepts unsigned assertions over
+     *                                          HTTP-Artifact.
+     * @return {@code true} if an unsigned response with unsigned assertions has to be rejected.
+     */
+    static boolean isAssertionSignatureRequired(boolean wantAssertionsSigned, String profileBinding,
+            boolean unsignedArtifactAssertionsAllowed) {
+        if (wantAssertionsSigned) {
+            return true;
+        }
+        if (!SAML2Constants.HTTP_ARTIFACT.equals(profileBinding)) {
+            return true;
+        }
+        return !unsignedArtifactAssertionsAllowed;
+    }
+
+    /**
+     * Tells whether this hosted SP accepts unsigned assertions delivered over HTTP-Artifact, from
+     * its {@link SAML2Constants#SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS} attribute and, failing that,
+     * from {@link SAML2Constants#SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS_PROPERTY}.
+     *
+     * <p>Two conditions gate it, both of them about what the back channel is actually worth.
+     *
+     * <p>The binding of a response is not, on its own, evidence that the SP does artifact at all:
+     * {@code SPACSUtils.getResponseFromPost} labels a response {@code HTTP_ARTIFACT} whenever the
+     * request carries a {@code SAMLart} parameter, and that endpoint is gated on the HTTP-POST
+     * binding. An SP whose assertion consumer service does not publish HTTP-Artifact therefore
+     * never reaches the relaxation, whatever the attribute or the property say.
+     *
+     * <p>And the {@code ArtifactResponse} has to be verified, which
+     * {@code SPACSUtils.getResponseFromArtifact} only does when
+     * {@link SAML2Constants#WANT_ARTIFACT_RESPONSE_SIGNED} is {@code true} in the same extended
+     * metadata - the value is compared exactly as that code compares it, so an SP that spells it
+     * any other way keeps the signature requirement rather than losing the verification with it.
+     * An unverified {@code ArtifactResponse} leaves nothing at all tying the response to the IdP
+     * the artifact was resolved against, and dropping the assertion signature on top of that would
+     * accept a response from anyone who can answer the resolution.
+     *
+     * @param spConfig the extended metadata of the hosted SP; may be {@code null}.
+     * @param realm the realm of the hosted SP.
+     * @param hostEntityId the entity id of the hosted SP.
+     * @return {@code true} if unsigned assertions are accepted over HTTP-Artifact.
+     */
+    public static boolean isUnsignedArtifactAssertionAllowed(SPSSOConfigElement spConfig, String realm,
+            String hostEntityId) {
+        if (!isSPProfileBindingSupported(realm, hostEntityId, SAML2Constants.ACS_SERVICE,
+                SAML2Constants.HTTP_ARTIFACT)) {
+            if (debug.messageEnabled()) {
+                debug.message("SAML2Utils.isUnsignedArtifactAssertionAllowed: the assertion consumer "
+                        + "service of " + hostEntityId + " does not publish HTTP-Artifact.");
+            }
+            return false;
+        }
+        if (!SAML2Constants.TRUE.equals(getAttributeValueFromSPSSOConfig(spConfig,
+                SAML2Constants.WANT_ARTIFACT_RESPONSE_SIGNED))) {
+            if (debug.messageEnabled()) {
+                debug.message("SAML2Utils.isUnsignedArtifactAssertionAllowed: " + hostEntityId
+                        + " does not verify the ArtifactResponse, so an unsigned assertion "
+                        + "delivered over HTTP-Artifact is not tied to any identity provider.");
+            }
+            return false;
+        }
+        return isUnsignedArtifactAssertionAllowed(
+                getAttributeValueFromSPSSOConfig(spConfig,
+                        SAML2Constants.SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS),
+                isTrue(SystemPropertiesManager.get(
+                        SAML2Constants.SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS_PROPERTY)));
+    }
+
+    /**
+     * The decision of {@link #isUnsignedArtifactAssertionAllowed(SPSSOConfigElement, String, String)},
+     * with both inputs passed in rather than read from the metadata and the system properties.
+     *
+     * <p>An SP that sets the attribute decides for itself; one that leaves it unset follows the
+     * deployment-wide property. Only extended metadata can leave it unset, which is why the console
+     * does not offer the attribute: every console checkbox submits {@code "true"} or {@code "false"}
+     * and has no way to say "inherit", so a box nobody ticked would pin that SP to the strict
+     * behaviour on the first save of an unrelated field.
+     *
+     * <p>Both are read with {@link #isTrue(String)}: the literal {@code "true"}, and nothing else,
+     * relaxes anything. That is the strictest of the three gates rather than the loosest -
+     * {@link SAML2Constants#WANT_ARTIFACT_RESPONSE_SIGNED} above has to be compared byte for byte,
+     * because {@code SPACSUtils.getResponseFromArtifact} compares it that way when it decides
+     * whether to verify the {@code ArtifactResponse} at all, and a spelling that relaxed the
+     * signature requirement without also triggering that verification would open the very gap the
+     * gate exists to close. Reading the other two the same way keeps one rule for all three.
+     *
+     * @param perSpValue the value of {@link SAML2Constants#SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS}
+     *                   in the SP's extended metadata, {@code null} or empty when unset.
+     * @param allowedByDefault the value of
+     *                         {@link SAML2Constants#SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS_PROPERTY}.
+     * @return {@code true} if unsigned assertions are accepted over HTTP-Artifact.
+     */
+    static boolean isUnsignedArtifactAssertionAllowed(String perSpValue, boolean allowedByDefault) {
+        if (perSpValue == null || perSpValue.trim().isEmpty()) {
+            return allowedByDefault;
+        }
+        return isTrue(perSpValue);
+    }
+
+    /**
+     * Tells whether a configuration value reads as {@code true}, the way the SAML2 extended metadata
+     * is compared elsewhere: the literal {@code "true"}, case and all, surrounding whitespace apart.
+     *
+     * @param value the configured value; may be {@code null}.
+     * @return {@code true} only for {@code "true"}.
+     */
+    private static boolean isTrue(String value) {
+        return value != null && SAML2Constants.TRUE.equals(value.trim());
+    }
 
     private static Map isBearerSubjectConfirmation(final List subjectConfirms,
                                                    final String inRespToResponse,
@@ -4128,6 +4417,12 @@ public class SAML2Utils extends SAML2SDKUtils {
         try {
             SPSSODescriptorElement spDescriptor =
                     saml2MetaManager.getSPSSODescriptor(realm, spEntityID);
+            if (spDescriptor == null) {
+                // An entity that is not in this realm, or that has no service provider role, has
+                // published no binding. Return rather than dereference: the callers use this to
+                // decide what to accept, so an entity nobody can find has to fail closed.
+                return false;
+            }
             List<? extends JAXBElement<? extends EndpointType>> services = null;
             if (SAML2Constants.ACS_SERVICE.equals(profile)) {
                 services = spDescriptor.getValue().getAssertionConsumerService();
@@ -4213,14 +4508,13 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @param relayState The URL to validate.
      * @param role       The role of the caller.
      * @return <code>true</code> if the relayState is valid.
+     * @deprecated Use {@link org.forgerock.openam.saml2.plugins.RelayStateValidator#isValidForRequest} instead.
+     * This method now delegates to it, because on its own it treated a hosted entity with no
+     * <code>relayStateUrlList</code> - the default - as permission to redirect anywhere.
      */
+    @Deprecated
     public static boolean isRelayStateURLValid(HttpServletRequest request, String relayState, String role) {
-        String metaAlias = SAML2MetaUtils.getMetaAliasByUri(request.getRequestURI());
-        if (metaAlias == null) {
-            //try to acquire the metaAlias from request parameter
-            metaAlias = request.getParameter(SAML2MetaManager.NAME_META_ALIAS_IN_URI);
-        }
-        return isRelayStateURLValid(metaAlias, relayState, role);
+        return RelayStateValidator.isValidForRequest(request, relayState, role);
     }
 
     /**
@@ -4230,33 +4524,14 @@ public class SAML2Utils extends SAML2SDKUtils {
      * @param relayState The URL to validate.
      * @param role       The role of the caller.
      * @return <code>true</code> if the relayState is valid.
+     * @deprecated Use {@link org.forgerock.openam.saml2.plugins.RelayStateValidator#isValidForMetaAlias(
+     * HttpServletRequest, String, String, String)} instead. This method now delegates to it, because on its own it
+     * treated a hosted entity with no <code>relayStateUrlList</code> - the default - as permission to redirect
+     * anywhere. With no request to take an origin from, the fallback is the configured server URL.
      */
+    @Deprecated
     public static boolean isRelayStateURLValid(String metaAlias, String relayState, String role) {
-        boolean result = false;
-
-        if (metaAlias != null) {
-            String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
-            try {
-                String hostEntityID = saml2MetaManager.getEntityByMetaAlias(metaAlias);
-                if (hostEntityID != null) {
-                    validateRelayStateURL(realm, hostEntityID, relayState, role);
-                    result = true;
-                }
-            } catch (SAML2Exception e) {
-                if (debug.messageEnabled()) {
-                    debug.message("SAML2Utils.isRelayStateURLValid(): relayState " + relayState +
-                            " for role " + role + " triggered an exception: " + e.getMessage(), e);
-                }
-                result = false;
-            }
-        }
-
-        if (debug.messageEnabled()) {
-            debug.message("SAML2Utils.isRelayStateURLValid(): relayState " + relayState +
-                    " for role " + role + " was valid? " + result);
-        }
-
-        return result;
+        return RelayStateValidator.isValidForMetaAlias(null, metaAlias, relayState, role);
     }
 
     /**
@@ -4277,6 +4552,15 @@ public class SAML2Utils extends SAML2SDKUtils {
 
         // Check for the validity of the RelayState URL.
         if (relayState != null && !relayState.isEmpty()) {
+            if (!SAML2Constants.SP_ROLE.equalsIgnoreCase(role) && !SAML2Constants.IDP_ROLE.equalsIgnoreCase(role)) {
+                // An entity can host both roles, each with a relayStateUrlList of its own, so an unresolved role
+                // leaves it unknown which list governs the redirect. ValidRelayStateExtractor reports that as a
+                // configuration it could not read, which this validator would otherwise take as permission to
+                // redirect anywhere.
+                debug.warning("SAML2Utils.validateRelayStateURL(): no relayStateUrlList applies to the role " + role
+                        + " of entity " + hostEntityId + ", refusing the RelayState URL " + relayState);
+                throw new SAML2Exception(SAML2Utils.bundle.getString("invalidRelayStateUrl"));
+            }
             if (!RELAY_STATE_VALIDATOR.isRedirectUrlValid(relayState,
                     SAMLEntityInfo.from(orgName, hostEntityId, role))) {
                 throw new SAML2Exception(SAML2Utils.bundle.getString("invalidRelayStateUrl"));

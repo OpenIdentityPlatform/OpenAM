@@ -99,6 +99,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -622,11 +623,15 @@ public class SPACSUtils {
         }
 
         // verify ArtifactResponse
-        String wantArtiRespSigned = getAttributeValueFromSPSSOConfig(
-                                orgName,
-                                hostEntityId,
-                                sm,
-                                SAML2Constants.WANT_ARTIFACT_RESPONSE_SIGNED);
+        //
+        // Read once here and used again for the Issuer binding below. A metadata error now leaves
+        // this method rather than being swallowed into a null: read through the local helper, an
+        // unreachable configuration store meant this SP silently stopped verifying the
+        // ArtifactResponse for the duration. The caller renders the failure - spAssertionConsumer.jsp
+        // and SAML2Proxy both catch SAML2Exception, of which SAML2MetaException is one.
+        SPSSOConfigElement spConfig = sm.getSPSSOConfig(orgName, hostEntityId);
+        String wantArtiRespSigned = SAML2Utils.getAttributeValueFromSPSSOConfig(spConfig,
+                SAML2Constants.WANT_ARTIFACT_RESPONSE_SIGNED);
         if (wantArtiRespSigned != null && wantArtiRespSigned.equals("true")) {
             Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(idp.getValue(), idpEntityID,
                     SAML2Constants.IDP_ROLE);
@@ -712,8 +717,9 @@ public class SPACSUtils {
                 SAML2Utils.bundle.getString("invalidStatusCode"));
         } 
 
+        Response res;
         try {
-            return ProtocolFactory.getInstance().createResponse(
+            res = ProtocolFactory.getInstance().createResponse(
                                 artiResp.getAny());
         } catch (SAML2Exception se) {
             if (SAML2Utils.debug.messageEnabled()) {
@@ -730,6 +736,75 @@ public class SPACSUtils {
                 "failedToCreateResponse", se.getMessage());
             throw se;
         }
+
+        // GHSA-3j2f-qhrc-rjfj: the identity provider this response was resolved against is the one
+        // whose SourceID the artifact carried, and the envelope Issuer checked above is the
+        // envelope's alone. SAML2Utils.verifyResponse takes the identity of the asserting party
+        // from the Issuer written inside this response and checks it for membership of the circle
+        // of trust only, so nothing but the assertion signature would stop the identity provider
+        // that answered the resolution from issuing the response in the name of another member.
+        // Bind the two here, where both are in hand: the entity that resolved the artifact is the
+        // entity that has to have issued what it returned.
+        // The signature decision is resolved eagerly although only the response that leaves the
+        // Issuer out depends on it: getSPSSODescriptor throws SAML2MetaException, which a
+        // BooleanSupplier cannot carry, and this is the artifact binding - the SP has just made an
+        // HTTP round trip of its own, against which two cached metadata reads do not signify.
+        Issuer resIssuer = res.getIssuer();
+        SPSSODescriptorElement spDesc = sm.getSPSSODescriptor(orgName, hostEntityId);
+        if (isArtifactResponseUnbound(idpEntityID, resIssuer,
+                SAML2Utils.isAssertionSignatureRequired(
+                        spDesc != null && Boolean.TRUE.equals(spDesc.getValue().isWantAssertionsSigned()),
+                        SAML2Constants.HTTP_ARTIFACT, spConfig, orgName, hostEntityId))) {
+            SAML2Utils.debug.error(method + "the response resolved from the artifact was issued by "
+                    + (resIssuer == null ? "no one" : resIssuer.getValue())
+                    + ", not by " + idpEntityID + ", which resolved it.");
+            String[] data = {hostEntityId, orgName, res.getID()};
+            LogUtil.error(Level.INFO,
+                        LogUtil.INVALID_ISSUER_RESPONSE,
+                        data,
+                        null);
+            SAMLUtils.sendError(request, response,
+                response.SC_INTERNAL_SERVER_ERROR, "invalidIssuerInResponse",
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
+            throw new SAML2Exception(
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
+        }
+
+        return res;
+    }
+
+    /**
+     * Tells whether nothing ties a response resolved from an artifact to the identity provider it
+     * was resolved against.
+     *
+     * <p>The identity provider that answers the {@code ArtifactResolve} is chosen by the
+     * {@code SourceID} inside the artifact; the identity the response claims is the {@code Issuer}
+     * written inside it, which {@code SAML2Utils.verifyResponse} only checks for membership of the
+     * circle of trust. A {@code Issuer} naming some other member is therefore refused here, always
+     * and on every artifact deployment: without this, any member of the circle of trust could
+     * answer a resolution with a response issued in the name of any other.
+     *
+     * <p>The {@code Issuer} of a {@code Response} is optional (SAML 2.0 Core 3.2.2), and
+     * {@code verifyResponse} falls back to the {@code Issuer} of the assertions, which their
+     * signature binds. Its absence therefore leaves the response unbound only where this SP has
+     * relaxed that signature - which is what {@code assertionSignatureRequired} reports, the same
+     * decision {@code verifyResponse} will make about this response. A deployment that requires the
+     * signature keeps accepting a response that leaves the element out, as it did before: third
+     * party identity providers that omit it are within their rights.
+     *
+     * @param idpEntityID the identity provider the artifact was resolved against.
+     * @param resIssuer the {@code Issuer} of the resolved response; may be {@code null}.
+     * @param assertionSignatureRequired the decision of
+     *                                   {@code SAML2Utils.isAssertionSignatureRequired} for this SP
+     *                                   on the HTTP-Artifact binding.
+     * @return {@code true} if the response has to be rejected.
+     */
+    static boolean isArtifactResponseUnbound(String idpEntityID, Issuer resIssuer,
+            boolean assertionSignatureRequired) {
+        if (resIssuer != null) {
+            return !idpEntityID.equals(resIssuer.getValue());
+        }
+        return !assertionSignatureRequired;
     }
 
     /**
@@ -822,7 +897,23 @@ public class SPACSUtils {
             throw se;
         }
 
-        String idpEntityID = resp.getIssuer().getValue();
+        // GHSA-3j2f-qhrc-rjfj: Response/Issuer is optional (SAML 2.0 Core 3.2.2), and this endpoint
+        // takes unauthenticated input - dereferencing it produced a NullPointerException, which is
+        // not a SAML2Exception and escaped as a raw 500 past every handler on the way out. There is
+        // nothing to fall back to here: the identity provider named by the Issuer is what decides
+        // which certificates the assertion signatures below are checked against.
+        Issuer respIssuer = resp.getIssuer();
+        if (respIssuer == null || respIssuer.getValue() == null) {
+            SAML2Utils.debug.error("SPACSUtils.getResponseFromPostECP: the response carries no Issuer.");
+            String[] data = {hostEntityId, orgName, resp.getID()};
+            LogUtil.error(Level.INFO, LogUtil.INVALID_ISSUER_RESPONSE, data, null);
+            SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
+                "invalidIssuerInResponse",
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
+            throw new SAML2Exception(
+                SAML2Utils.bundle.getString("invalidIssuerInResponse"));
+        }
+        String idpEntityID = respIssuer.getValue();
         IDPSSODescriptorElement idpDesc = null;
         try {
             idpDesc = metaManager.getIDPSSODescriptor(orgName, idpEntityID);
@@ -836,6 +927,10 @@ public class SPACSUtils {
         }
 
         Set<X509Certificate> certificates = KeyUtil.getVerificationCerts(idpDesc.getValue(), idpEntityID, SAML2Constants.IDP_ROLE);
+        // GHSA-3j2f-qhrc-rjfj: this only reaches the cleartext assertions of the response. An
+        // <EncryptedAssertion> is opaque here; it is decrypted in SAML2Utils.verifyResponse, which
+        // applies this same "every assertion signed" rule to the PAOS binding once it has. Do not
+        // read the loop below as covering the whole response.
         List assertions = resp.getAssertion();
         if ((assertions != null) && (!assertions.isEmpty())) {
             for(Iterator iter = assertions.iterator(); iter.hasNext(); ) {
@@ -1230,6 +1325,24 @@ public class SPACSUtils {
             throw new SAML2Exception(SAML2Utils.bundle.getString("noUserMapping"));
         }
 
+        // GHSA-3j2f-qhrc-rjfj: claim the bearer assertions here. The claim used to happen at the
+        // very end of this method - after the session had been created and after the SP adapter had
+        // run - and for the HTTP-POST binding alone, so an assertion delivered over ECP/PAOS or
+        // HTTP-Artifact could be replayed at will, and two concurrent submissions of the same
+        // assertion could both get past the one-time check in verifyResponse before either of them
+        // recorded it. It cannot move any earlier than this: the local login above re-presents this
+        // very response to processResponse a second time, through SPCache.responseHash, and an
+        // assertion claimed on the first pass would be refused on the second, breaking first-time
+        // federation. Everything below this line - the session, the SP adapter, the federation
+        // record - happens with the assertion already spent.
+        try {
+            markAssertionAsConsumed(smap);
+        } catch (SAML2Exception se) {
+            invokeSPAdapterForSSOFailure(hostEntityId, realm, request, response, smap, respInfo,
+                SAML2ServiceProviderAdapter.INVALID_RESPONSE, se);
+            throw se;
+        }
+
         boolean writeFedInfo = isNewAccountLink && shouldPersistNameID;
 
         if (SAML2Utils.debug.messageEnabled()) {
@@ -1397,15 +1510,111 @@ public class SPACSUtils {
             }
         }
      
-        String assertionID=authnAssertion.getID();
-        if (respInfo.getProfileBinding().equals(SAML2Constants.HTTP_POST)) {
-            SPCache.assertionByIDCache.put(assertionID, SAML2Constants.ONETIME);
+        respInfo.setAssertion(authnAssertion);
+ 
+        return session;
+    }
+
+    /**
+     * Records the bearer assertions of a verified response as used up, so that a second submission
+     * of any of them is turned away by the one-time check in {@code SAML2Utils.verifyResponse}.
+     *
+     * <p>Every bearer assertion the response carries is claimed, not only the one the session is
+     * built from. {@code verifyResponse} checks all of them against the one-time cache on the way
+     * in, and claiming just one left the rest replayable: an unsolicited response carrying two
+     * individually signed assertions could be submitted a second time with the spent one dropped.
+     *
+     * <p>The claim on the in-memory cache is atomic: {@code put} reports the previous value under
+     * the key, so a request that finds one there has lost a race with a concurrent submission of the
+     * same assertion and is rejected. That holds within one JVM. Nothing compares and sets across
+     * the cluster - a node reads the SAML2 failover repository before accepting and writes to it
+     * afterwards, so two nodes handed the same response at the same time can both read nothing and
+     * both accept. The repository write is best effort; it closes the replay window across a
+     * restart, another node or a later request, not against a simultaneous one.
+     *
+     * <p>Call this on every binding, as soon as the caller has committed to the response - before
+     * the session is created and before the service provider adapter runs, so that nothing done
+     * with the assertion happens while it is still replayable. The assertion is therefore spent even
+     * if the SSO that follows fails on something transient; recovery is to start SSO again, not to
+     * resubmit the response.
+     *
+     * <p>"Committed to the response" is later than "verified it": {@code SPACSUtils.processResponse}
+     * hands a response it cannot map to a user back to the caller, which sends the user through a
+     * local login and then re-presents the same response - the same {@code ResponseInfo}, out of
+     * {@code SPCache.responseHash} - to {@code processResponse} again. An assertion claimed on the
+     * first of those passes would be refused on the second, so the claim goes after that decision.
+     * {@code SAML2Proxy}, which has no such re-entry, claims once the verified response has been
+     * stored and before the key that leads to it is handed out - late enough that an outage of the
+     * SAML2 token repository does not spend the assertion on a failure unrelated to it, early
+     * enough that nothing can redeem the key in the meantime.
+     *
+     * <p>One gap remains with SAML2 failover switched off. {@code SPCache.assertionByIDCache} expires
+     * an entry on a fixed schedule - {@code SAML2Constants.CACHE_CLEANUP_INTERVAL}, 600s by default -
+     * while an assertion stays acceptable until its {@code NotOnOrAfter} plus
+     * {@code assertionTimeSkew}. An IdP that issues long-lived bearer assertions can outlast the
+     * marker. Enable SAML2 failover, which stores the marker for exactly as long - until
+     * {@code NotOnOrAfter} plus {@code assertionTimeSkew} - or keep the assertion lifetime inside
+     * the cleanup interval.
+     *
+     * @param smap the map returned by {@code SAML2Utils.verifyResponse}. It has to carry
+     *             {@link SAML2Constants#BEARER_ASSERTION_IDS}, the bearer assertions of the response
+     *             as assertion id to the instant in milliseconds until which it is accepted, which
+     *             is how long its marker is stored. {@code verifyResponse} never reports a
+     *             {@code null} there - it rejects a bearer subject confirmation that carries no
+     *             {@code NotOnOrAfter} - but a map from anywhere else might, and such an id is
+     *             claimed in this JVM and not
+     *             written to the SAML2 token repository, there being no expiry to store it under.
+     *             A map without that key is refused rather than partly claimed - see
+     *             {@link #bearerAssertionsOf(Map)}.
+     * @throws SAML2Exception if any of the assertions had already been consumed, or if the map does
+     *                        not report any.
+     */
+    public static void markAssertionAsConsumed(Map smap) throws SAML2Exception {
+        String classMethod = "SPACSUtils.markAssertionAsConsumed: ";
+        Map<String, Long> bearerAssertions = bearerAssertionsOf(smap);
+        if (bearerAssertions.isEmpty()) {
+            // SAML2Utils.verifyResponse reports every bearer assertion of every response it accepts,
+            // and rejects a response it could not build a session map from, so this cannot happen
+            // for a response that was just verified. Refuse rather than return: this method is the
+            // only replay defence the callers have, and a silent no-op here - or a fallback to the
+            // one assertion the session is built from - would reduce it without a trace.
+            SAML2Utils.debug.error(classMethod + "the response reports no bearer assertion to mark "
+                    + "as consumed; " + SAML2Constants.BEARER_ASSERTION_IDS + " is missing or empty.");
+            throw new SAML2Exception(SAML2Utils.bundle.getString("missingAuthnAssertion"));
+        }
+        List<String> claimed = new ArrayList<>(bearerAssertions.size());
+        for (Map.Entry<String, Long> bearerAssertion : bearerAssertions.entrySet()) {
+            String assertionID = bearerAssertion.getKey();
+            if (SPCache.assertionByIDCache.put(assertionID, SAML2Constants.ONETIME) != null) {
+                SAML2Utils.debug.error(classMethod + "Bearer Assertion is one time use only!");
+                // Hand back the ones this call did claim. The response is refused, so none of its
+                // assertions was used - and burning the fresh ones would let a response that pairs
+                // a captured assertion with a spent one spend the captured one on the way out.
+                for (String claimedID : claimed) {
+                    SPCache.assertionByIDCache.remove(claimedID);
+                }
+                throw new SAML2Exception(SAML2Utils.bundle.getString("usedBearAssertion"));
+            }
+            claimed.add(assertionID);
+        }
+        for (Map.Entry<String, Long> bearerAssertion : bearerAssertions.entrySet()) {
+            String assertionID = bearerAssertion.getKey();
+            Long acceptedUntil = bearerAssertion.getValue();
+            if (acceptedUntil == null) {
+                // verifyResponse only reports an assertion whose bearer subject confirmation had a
+                // NotOnOrAfter, so this is a map from somewhere else. Say so: without an expiry
+                // there is nothing to write to the repository, and the marker for that assertion
+                // then lives in this JVM alone.
+                SAML2Utils.debug.error(classMethod + "no NotOnOrAfter for assertionID:" + assertionID
+                        + ", the one-time marker is not replicated for it.");
+                continue;
+            }
             try {
                 if (SAML2FailoverUtils.isSAML2FailoverEnabled()) {
                     SAML2FailoverUtils.saveSAML2TokenWithoutSecondaryKey(
                             assertionID,
                             SAML2Constants.ONETIME,
-                            ((Long) smap.get(SAML2Constants.NOTONORAFTER)).longValue() / 1000);
+                            acceptedUntil.longValue() / 1000);
                 }
             } catch (SAML2TokenRepositoryException se) {
                 SAML2Utils.debug.error(classMethod +
@@ -1413,9 +1622,21 @@ public class SPACSUtils {
                         + assertionID, se);
             }
         }
-        respInfo.setAssertion(authnAssertion);
- 
-        return session;
+    }
+
+    /**
+     * The bearer assertions of a verified response, as assertion id to the instant in milliseconds
+     * until which it is accepted.
+     *
+     * <p>{@code SAML2Utils.verifyResponse} reports every bearer assertion it accepted under
+     * {@link SAML2Constants#BEARER_ASSERTION_IDS}. A map that does not carry them did not come from
+     * it, and the caller refuses it: falling back to the one assertion the session is built from
+     * would leave the rest of the response replayable, which is the gap this claim exists to close,
+     * and it would do so without anything in the logs to say the protection had been reduced.
+     */
+    private static Map<String, Long> bearerAssertionsOf(Map smap) {
+        Map<String, Long> reported = (Map<String, Long>) smap.get(SAML2Constants.BEARER_ASSERTION_IDS);
+        return reported == null ? Collections.<String, Long>emptyMap() : reported;
     }
 
     private static boolean getNeedNameIDEncrypted(boolean needAssertionEncrypted, SPSSOConfigElement spssoconfig) {
@@ -1721,11 +1942,28 @@ public class SPACSUtils {
         }
         
         if (relayStateUrl == null || relayStateUrl.trim().length() == 0) {
-            relayStateUrl = getAttributeValueFromSPSSOConfig(
-                orgName, hostEntityId, sm, SAML2Constants.DEFAULT_RELAY_STATE);
+            relayStateUrl = getDefaultRelayState(orgName, hostEntityId, sm);
         }
-        
+
         return relayStateUrl;
+    }
+
+    /**
+     * Retrieves the default relay state from <code>SPSSOConfig</code>. This URL is administrator configured, so it
+     * needs no validation against the RelayState whitelist of the hosted entity.
+     *
+     * @param orgName realm or organization name the service provider resides in
+     * @param hostEntityId Entity ID of the hosted service provider
+     * @param sm <code>SAML2MetaManager</code> instance.
+     * @return the default relay state; or <code>null</code> if it is not configured or an error occurred during the
+     *                retrieval process.
+     */
+    public static String getDefaultRelayState(String orgName,
+                                        String hostEntityId,
+                                        SAML2MetaManager sm)
+    {
+        return getAttributeValueFromSPSSOConfig(orgName, hostEntityId, sm,
+                                        SAML2Constants.DEFAULT_RELAY_STATE);
     }
 
     /**

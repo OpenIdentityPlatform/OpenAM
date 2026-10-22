@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.notifications;
@@ -81,14 +81,14 @@ public class NotificationsWebSocketFilterTest extends GuiceTestCase
         filter.init(null);
     }
 
-    @Test(enabled=false)
+    @Test
     public void filterReturnsUnauthorizedIfTokenIdIsMissing() throws Exception {
         filter.doFilter(request, response, filterChain);
 
         assertThatResponseStatusIsSetTo(SC_UNAUTHORIZED);
     }
 
-    @Test(enabled=false)
+    @Test
     public void filterReturnsUnauthorizedIfTokenIdIsEmpty() throws Exception {
         when(request.getHeader(COOKIE_NAME)).thenReturn("");
 
@@ -97,7 +97,7 @@ public class NotificationsWebSocketFilterTest extends GuiceTestCase
         assertThatResponseStatusIsSetTo(SC_UNAUTHORIZED);
     }
 
-    @Test(enabled=false)
+    @Test
     public void filterReturnsUnauthorizedIfTokenIsMissing() throws Exception {
         when(request.getHeader(COOKIE_NAME)).thenReturn(TOKEN_ID);
         when(ssoTokenFactory.getTokenFromId(TOKEN_ID)).thenReturn(null);
@@ -107,7 +107,7 @@ public class NotificationsWebSocketFilterTest extends GuiceTestCase
         assertThatResponseStatusIsSetTo(SC_UNAUTHORIZED);
     }
 
-    @Test(enabled=false)
+    @Test
     public void filterReturnsForbiddenIfTokenDoesNotBelongToJ2EEOrWebAgent() throws Exception {
         createSSOTokenFor(AGENT_TYPE_OAUTH2);
 
@@ -116,7 +116,7 @@ public class NotificationsWebSocketFilterTest extends GuiceTestCase
         assertThatResponseStatusIsSetTo(SC_FORBIDDEN);
     }
 
-    @Test(enabled=false)
+    @Test
     public void filterContinuesExecutionIfTokenBelongsToJ2EEAgent() throws Exception {
         createSSOTokenFor(AGENT_TYPE_J2EE);
 
@@ -125,7 +125,7 @@ public class NotificationsWebSocketFilterTest extends GuiceTestCase
         verify(filterChain, times(1)).doFilter(request, response);
     }
 
-    @Test(enabled=false)
+    @Test
     public void filterContinuesExecutionIfTokenBelongsToWebAgent() throws Exception {
         createSSOTokenFor(AGENT_TYPE_WEB);
 
@@ -134,7 +134,7 @@ public class NotificationsWebSocketFilterTest extends GuiceTestCase
         verify(filterChain, times(1)).doFilter(request, response);
     }
 
-    @Test(enabled=false)
+    @Test
     public void filterReturnsUnauthorizedIfCannotGetIdentity() throws Exception {
         when(request.getHeader(COOKIE_NAME)).thenReturn(TOKEN_ID);
         when(ssoTokenFactory.getTokenFromId(TOKEN_ID)).thenReturn(ssoToken);
@@ -145,7 +145,7 @@ public class NotificationsWebSocketFilterTest extends GuiceTestCase
         assertThatResponseStatusIsSetTo(SC_UNAUTHORIZED);
     }
 
-    @Test(enabled=false)
+    @Test
     public void filterReturnsUnauthorizedIfTokenException() throws Exception {
         when(request.getHeader(COOKIE_NAME)).thenReturn(TOKEN_ID);
         when(ssoTokenFactory.getTokenFromId(TOKEN_ID)).thenReturn(ssoToken);

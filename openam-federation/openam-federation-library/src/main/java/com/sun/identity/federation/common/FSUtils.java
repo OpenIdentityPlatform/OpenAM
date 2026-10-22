@@ -35,17 +35,23 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.function.Predicate;
 
 import com.sun.identity.common.SystemConfigurationException;
 import com.sun.identity.common.SystemConfigurationUtil;
@@ -79,7 +85,17 @@ public class FSUtils {
     public static Debug debug = Debug.getInstance("libIDFF");    
     private static SecureRandom random = new SecureRandom();
     public static final String FSID_PREFIX = "f"; 
-    public static IDFFMetaManager metaInstance = null;    
+    public static volatile IDFFMetaManager metaInstance = null;
+
+    /**
+     * When the last attempt to build {@link #metaInstance} failed, or <code>0</code>.
+     * Read outside the lock so that a failing attempt is not repeated by every concurrent
+     * caller for the length of an SMS outage.
+     */
+    private static volatile long metaManagerFailedAt = 0L;
+
+    /** How long a failed meta manager creation is remembered before it is retried. */
+    private static final long META_MANAGER_RETRY_INTERVAL = 2000L;
 
     private static String server_protocol =
         SystemPropertiesManager.get(Constants.AM_SERVER_PROTOCOL);
@@ -237,6 +253,105 @@ public class FSUtils {
     }
    
 /**
+     * The port a URL actually addresses. {@code URL.getPort()} is <code>-1</code> when the
+     * port is not written out, while {@code HttpServletRequest.getServerPort()} always
+     * reports a number, so comparing the two raw reads
+     * <code>http://host.example.com/openam/landing</code> as a different container than the
+     * request it was issued on. Cookie-less clients would lose URL rewriting on the
+     * deployment's own host.
+     * @param url the URL to read the port of.
+     * @return the explicit port, or the scheme's default port when none was written.
+     */
+    private static int effectivePort(URL url) {
+        int port = url.getPort();
+        return port == -1 ? url.getDefaultPort() : port;
+    }
+
+    /**
+     * Parses a target that has to be an absolute URL. A relative or protocol relative target
+     * can be neither mapped to a resource nor redirected to safely - a
+     * <code>sendRedirect("//host/x")</code> leaves this deployment for another host - so it is
+     * refused rather than left to make {@code new URL} throw, which committed an empty 200.
+     * @param url the target to parse.
+     * @return the parsed target, or <code>null</code> if it is not an absolute URL.
+     */
+    private static URL absoluteURL(String url) {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException mue) {
+            return null;
+        }
+    }
+
+    /**
+     * Tells whether a URL addresses this deployment, as the deployment's own configuration
+     * names it: this server's URL, or a server or site of the platform server list, with a
+     * path under its context. Unlike {@link #isSameContainer}, nothing is read from the
+     * request: its host and port come from the Host header, which is whatever the sender
+     * wrote. The configuration is read on each call, as {@link #deploymentURI} is not.
+     * @param url the URL to test.
+     * @return <code>true</code> if the URL is on this deployment.
+     */
+    public static boolean isDeploymentURL(String url) {
+        URL target;
+        try {
+            target = new URL(url);
+        } catch (MalformedURLException mue) {
+            return false;
+        }
+        if (isUnder(target,
+                SystemPropertiesManager.get(Constants.AM_SERVER_PROTOCOL),
+                SystemPropertiesManager.get(Constants.AM_SERVER_HOST),
+                SystemPropertiesManager.get(Constants.AM_SERVER_PORT),
+                SystemPropertiesManager.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR))) {
+            return true;
+        }
+        List servers;
+        List sites;
+        try {
+            servers = SystemConfigurationUtil.getServerList();
+            // getRemoteServiceURLs removes the sites from the shared server list
+            sites = SystemConfigurationUtil.getSiteList();
+        } catch (SystemConfigurationException | RuntimeException e) {
+            // with no configuration plugin named - the library outside the war - the read
+            // fails with a NullPointerException, on every call
+            debug.message("FSUtils.isDeploymentURL: cannot read the server list", e);
+            return false;
+        }
+        return isUnderAny(target, servers) || isUnderAny(target, sites);
+    }
+
+    private static boolean isUnderAny(URL target, List bases) {
+        if (bases == null) {
+            return false;
+        }
+        for (Object entry : bases) {
+            URL base;
+            try {
+                base = new URL((String) entry);
+            } catch (MalformedURLException mue) {
+                continue;
+            }
+            if (isUnder(target, base.getProtocol(), base.getHost(),
+                    String.valueOf(effectivePort(base)), base.getPath())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isUnder(URL target, String protocol, String host, String port,
+        String path) {
+
+        String prefix = path + "/";
+        // the platform list holds its entries lower cased, context path included
+        return target.getProtocol().equals(protocol)
+            && target.getHost().equalsIgnoreCase(host)
+            && String.valueOf(effectivePort(target)).equals(port)
+            && target.getPath().regionMatches(true, 0, prefix, 0, prefix.length());
+    }
+
+    /**
      * Test if url in argument is
      *  in  the same web container as current opensso web
      * apps serving the request.
@@ -248,47 +363,461 @@ public class FSUtils {
             HttpServletRequest request,
             String url) {
 
+        URL target;
+        try {
+            target = new URL(url);
+        } catch (MalformedURLException ex) {
+            FSUtils.debug.error("FSUtils.isSameContainer: Exception occured", ex);
+            return false;
+        }
+        return isSameContainer(request, url, target);
+    }
+
+    /**
+     * {@link #isSameContainer(HttpServletRequest, String)} on a target already parsed.
+     * @param request HttpServletRequest
+     * @param url the URL to test, as written.
+     * @param target the same URL, parsed.
+     * @return true if request and url are in the same web container else false
+     */
+    private static boolean isSameContainer(
+            HttpServletRequest request,
+            String url,
+            URL target) {
+
         boolean result = false;
         FSUtils.debug.message("FSUtils.isSameContainer: called");
 
-        try {
-            //get source host and port
-            String sourceHost = request.getServerName();
-            int sourcePort = request.getServerPort();
+        //get source host and port
+        String sourceHost = request.getServerName();
+        int sourcePort = request.getServerPort();
+        if (debug.messageEnabled()) {
+            FSUtils.debug.message("FSUtils.isSameContainer: " +
+                "SourceHost=" + sourceHost + " SourcePort=" + sourcePort);
+        }
+        //get target host and port
+        String targetHost = target.getHost();
+        int targetPort = effectivePort(target);
+        if (debug.messageEnabled()) {
+            FSUtils.debug.message("FSUtils.isSameContainer: targetHost=" +
+                targetHost + " targetPort=" + targetPort);
+        }
+        int index = url.indexOf(deploymentURI + "/");
+        if (!(targetHost.equals(sourceHost)) ||
+                !(sourcePort == targetPort) ||
+                !(index > 0)) {
             if (debug.messageEnabled()) {
-		FSUtils.debug.message("FSUtils.isSameContainer: " +
-                    "SourceHost=" + sourceHost + " SourcePort=" + sourcePort);
- 	    }
-            //get target host and port
-            URL target = new URL(url);
-            String targetHost = target.getHost();
-            int targetPort = target.getPort();
-            if (debug.messageEnabled()) {
-		FSUtils.debug.message("FSUtils.isSameContainer: targetHost=" + 
-			targetHost + " targetPort=" + targetPort);
+                FSUtils.debug.message("FSUtils.isSameContainer: Source and "
+                    + "Target are not on the same container.");
             }
-            int index = url.indexOf(deploymentURI + "/");
-            if (!(sourceHost.equals(targetHost)) ||
-                    !(sourcePort == targetPort) ||
-                    !(index > 0)) {
-                if (debug.messageEnabled()) {
-			FSUtils.debug.message("FSUtils.isSameContainer: Source and "
-			 + "Target are not on the same container.");
-		}
 
-            } else {
-                if (debug.messageEnabled()) {
-		FSUtils.debug.message("FSUtils.isSameContainer: Source and " +
-                        "Target are on the same container.");
-		}
-                result = true;
+        } else {
+            if (debug.messageEnabled()) {
+                FSUtils.debug.message("FSUtils.isSameContainer: Source and " +
+                    "Target are on the same container.");
             }
-        } catch (Exception ex) {
-            FSUtils.debug.error("FSUtils.isSameContainer: Exception occured", ex);
+            result = true;
         }
         return result;
     }
  
+    // These roots are served by internal endpoints only and must never be reachable through a
+    // forward driven by a caller supplied URL. Defence in depth for the <dispatcher> elements
+    // on the matching <filter-mapping>s in openam-server-only/src/main/webapp/WEB-INF/web.xml,
+    // which are the deep fix; keep the two in step when a security filter is added there.
+    private static final String[] INTERNAL_FORWARD_ROOTS = {
+        "/notifications", "/ws", "/jaxrpc"
+    };
+
+    // The roots of the <filter-mapping>s in web.xml that name no <dispatcher>. Such a filter runs
+    // on a REQUEST dispatch only, so a forward reaches the endpoint with it skipped; a target
+    // under one of these is redirected to instead, which the browser makes as a request of its
+    // own. Lower case, as fold() leaves a path. Keep in step with web.xml as the list above.
+    private static final String[] REQUEST_ONLY_FILTER_ROOTS = {
+        // FQDNValidationFilter, CacheForFiveMinutes, CacheForAMonth
+        "/xui",
+        // FQDNValidationFilter, CORSFilter
+        "/oauth2",
+        // CORSFilter
+        "/json",
+        // JatoAuditFilter; XUIFilter also on /idm/EndUser
+        "/service", "/federation", "/realm", "/agentconfig", "/sts", "/delegation", "/idm",
+        "/debug.jsp",
+        // SsoAdmJspAuditFilter
+        "/ssoadm.jsp"
+    };
+
+    /** How much of an untrusted value {@link #forLog} keeps. */
+    private static final int MAX_LOGGED_LENGTH = 256;
+
+    /**
+     * Renders an untrusted value for a single log line. Strips CR/LF so a request
+     * parameter cannot forge additional entries in the debug file, and truncates so a
+     * caller cannot write an arbitrary volume to it: several of these values come from
+     * query parameters on unauthenticated endpoints and are logged before any length
+     * limit is applied to them. A prefix identifies the value just as well.
+     * @param value the value to render, may be <code>null</code>.
+     * @return the value with CR and LF replaced and its length bounded, or
+     *  <code>"null"</code>.
+     */
+    public static String forLog(String value) {
+        if (value == null) {
+            return "null";
+        }
+        String single = value.replace('\r', '_').replace('\n', '_');
+        if (single.length() <= MAX_LOGGED_LENGTH) {
+            return single;
+        }
+        return single.substring(0, MAX_LOGGED_LENGTH) + "...[truncated, "
+            + single.length() + " characters]";
+    }
+
+    /**
+     * Tells whether a target names the host and the port the request arrived on, reading the
+     * port exactly as it is written: a URL with no port is <em>not</em> on the request's port.
+     * <p>
+     * Deliberately stricter than {@link #isSameContainer}, which reads an unwritten port as
+     * the scheme's default so that URL rewriting still reaches the deployment's own host.
+     * That reading must not widen the forward/redirect decision as a side effect: a same-host
+     * target written without a port has always been redirected to, and a FORWARD dispatch
+     * runs only the filters that declare {@code <dispatcher>FORWARD</dispatcher>}, which the
+     * {@code /*} security filters in web.xml do not.
+     * @param request the request being served.
+     * @param target the target URL, parsed.
+     * @return <code>true</code> if host and written port both match the request's.
+     */
+    private static boolean writesTheRequestsPort(HttpServletRequest request, URL target) {
+        return target.getHost().equals(request.getServerName())
+            && request.getServerPort() == target.getPort();
+    }
+
+    /**
+     * Drops the query string from a forward target, the way a container does before
+     * mapping it. Only <code>?</code> is a delimiter here: a container treats
+     * <code>#</code> as an ordinary path character, so it gets its own reading rather
+     * than being cut unconditionally.
+     * @param path the path to strip.
+     * @return the path up to the first <code>?</code>.
+     */
+    private static String cutAtQuery(String path) {
+        int index = path.indexOf('?');
+        return index == -1 ? path : path.substring(0, index);
+    }
+
+    /**
+     * Drops everything from the first <code>#</code>, for the reading in which a
+     * <code>#</code> is taken to open a fragment.
+     * @param path the path to strip.
+     * @return the path up to the first <code>#</code>.
+     */
+    private static String cutAtFragment(String path) {
+        int index = path.indexOf('#');
+        return index == -1 ? path : path.substring(0, index);
+    }
+
+    /**
+     * Removes <code>;</code> path parameters the way a servlet container does: from each
+     * <code>;</code> up to the next <code>/</code>, on the still encoded string. This runs
+     * before decoding, so an encoded <code>%3B</code> is not a delimiter, and the parameter
+     * of the last segment extends to the end of the path.
+     * @param path the path to strip.
+     * @return the path without its path parameters.
+     */
+    private static String stripPathParams(String path) {
+        StringBuilder stripped = new StringBuilder(path.length());
+        int i = 0;
+        while (i < path.length()) {
+            char c = path.charAt(i);
+            if (c == ';') {
+                int slash = path.indexOf('/', i);
+                if (slash == -1) {
+                    break;
+                }
+                i = slash;
+            } else {
+                stripped.append(c);
+                i++;
+            }
+        }
+        return stripped.toString();
+    }
+
+    /**
+     * Removes <code>;</code> path parameters to the end of the segment they appear in,
+     * treating both <code>/</code> and <code>\</code> as segment separators. A stricter
+     * reading than {@link #stripPathParams}, kept because it turns <code>..;x</code> into a
+     * traversal that the other reading leaves inert - whichever a container takes, one of
+     * the two readings sees the internal path.
+     * @param path the path to strip.
+     * @return the path without its path parameters.
+     */
+    private static String stripSegmentParams(String path) {
+        StringBuilder stripped = new StringBuilder(path.length());
+        boolean inParams = false;
+        for (int i = 0; i < path.length(); i++) {
+            char c = path.charAt(i);
+            if (c == '/' || c == '\\') {
+                inParams = false;
+            } else if (c == ';') {
+                inParams = true;
+            }
+            if (!inParams) {
+                stripped.append(c);
+            }
+        }
+        return stripped.toString();
+    }
+
+    /**
+     * Collapses a path the way a container normalizes a dispatch target: <code>\</code>
+     * treated as a separator, empty and <code>.</code> segments dropped and <code>..</code>
+     * segments applied. Only a segment that is exactly <code>..</code> traverses, which is
+     * what makes the path parameter readings differ.
+     * @param path the path to fold.
+     * @return the folded path, lower cased for comparison.
+     */
+    private static String fold(String path) {
+        Deque<String> segments = new ArrayDeque<String>();
+        StringTokenizer tokenizer =
+            new StringTokenizer(path.replace('\\', '/'), "/");
+        while (tokenizer.hasMoreTokens()) {
+            String segment = tokenizer.nextToken();
+            if (segment.length() == 0 || segment.equals(".")) {
+                continue;
+            }
+            if (segment.equals("..")) {
+                segments.pollLast();
+            } else {
+                segments.addLast(segment);
+            }
+        }
+        StringBuilder folded = new StringBuilder();
+        for (String segment : segments) {
+            folded.append('/').append(segment);
+        }
+        return folded.toString().toLowerCase(java.util.Locale.ROOT);
+    }
+
+    /**
+     * Tells whether any reading a container might plausibly take of this path lands inside
+     * one of the roots.
+     * <p>
+     * Emulating one container exactly is not enough: the readings differ in where the path
+     * is cut, whether <code>;</code> parameters run to the next <code>/</code> or to the end
+     * of the segment, and whether decoding happens before or after either. A reading that
+     * folds more aggressively than the container can fold an internal segment away and
+     * report a path that looks harmless - which is how <code>/notifications;\..</code> was
+     * read as <code>""</code> while the container mapped it to <code>/notifications</code>.
+     * So every reading is tested and any one of them landing inside a root counts. Matching a
+     * contrived path too often is acceptable; missing one is not.
+     * @param path the (possibly still encoded) path to test.
+     * @param roots the roots to test against, lower case.
+     * @return <code>true</code> if any reading lands inside one of the roots.
+     */
+    private static boolean resolvesInside(String path, String[] roots) {
+        String query = cutAtQuery(path);
+        String[] bases = { query, cutAtFragment(query), path };
+        for (int i = 0; i < bases.length; i++) {
+            if (readingLandsIn(bases[i], roots)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean readingLandsIn(String base, String[] roots) {
+        // the container reading: strip parameters on the encoded string, then decode, then fold
+        if (landsIn(fold(decodeLenient(stripPathParams(base))), roots)
+            // a container that does not strip path parameters at all
+            || landsIn(fold(decodeLenient(base)), roots)
+            // parameters taken to the end of the segment, before and after decoding
+            || landsIn(fold(stripSegmentParams(decodeLenient(base))), roots)
+            || landsIn(fold(decodeLenient(stripSegmentParams(base))), roots))
+        {
+            return true;
+        }
+        // a decoder that drops a stray '%' rather than keeping it, as decodeLenient does
+        if (base.indexOf('%') != -1) {
+            String noPercent = base.replace("%", "");
+            if (landsIn(fold(stripPathParams(noPercent)), roots)
+                || landsIn(fold(stripSegmentParams(noPercent)), roots))
+            {
+                return true;
+            }
+        }
+        // a decoder that maps '+' to a space in a path, which no container is known to do
+        return base.indexOf('+') != -1
+            && landsIn(fold(stripSegmentParams(base.replace('+', ' '))), roots);
+    }
+
+    /**
+     * Tells whether a folded path lands inside one of the roots, cutting a delimiter that
+     * only surfaced during decoding. Folding before the cut is the order that matters here:
+     * it can move a root segment in front of a <code>?</code> that a <code>%3F</code>
+     * turned into a real delimiter, which cutting first would have discarded along with the
+     * traversal that follows it.
+     * @param folded the folded path.
+     * @param roots the roots to test against, lower case.
+     * @return <code>true</code> if it, or any prefix cut from it, is inside one of the roots.
+     */
+    private static boolean landsIn(String folded, String[] roots) {
+        return isUnderRoot(folded, roots)
+            || isUnderRoot(cutAtQuery(folded), roots)
+            || isUnderRoot(cutAtFragment(cutAtQuery(folded)), roots);
+    }
+
+    private static boolean isHexDigit(char c) {
+        return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+    }
+
+    /**
+     * Tells whether the target carries a <code>%</code> that does not begin a complete hex
+     * escape. Such a target is not a valid URI path and {@code UDecoder} refuses it, so the
+     * container would throw out of {@code getRequestDispatcher} and leave the response
+     * uncommitted. Refusing here turns that blank 200 into a 400. A correctly encoded
+     * literal percent - <code>%25</code> - is unaffected.
+     * @param path the raw target.
+     * @return <code>true</code> if an escape is malformed.
+     */
+    private static boolean hasMalformedEscape(String path) {
+        for (int i = 0; i < path.length(); i++) {
+            if (path.charAt(i) == '%'
+                && (i + 2 >= path.length()
+                    || !isHexDigit(path.charAt(i + 1))
+                    || !isHexDigit(path.charAt(i + 2))))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Tells whether the path carries a control character. Containers disagree on whether a
+     * decoded NUL truncates a path, so a target that decodes to one is refused outright.
+     * @param path the path to test.
+     * @return <code>true</code> if a control character is present.
+     */
+    private static boolean hasControlCharacter(String path) {
+        for (int i = 0; i < path.length(); i++) {
+            char c = path.charAt(i);
+            if (c < 0x20 || c == 0x7f) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Decodes <code>%XX</code> escapes without throwing on a malformed one: a <code>%</code>
+     * that does not begin a complete hex escape is kept literally. The raw target has already
+     * been refused by {@link #hasMalformedEscape} at that point, so this only concerns a
+     * percent that a previous decoding round produced - <code>%2525</code> and the like - and
+     * failing there would refuse a legitimate target such as
+     * <code>/config/federation/default/100%25done.jsp</code> with a 400.
+     * <p>
+     * Unlike {@code URLEncDec.decode} this does not map <code>+</code> to a space: no
+     * container does so when mapping a dispatch path. That reading is kept as one of the
+     * alternatives in {@link #readingLandsIn} instead, where it can only refuse more.
+     * @param path the path to decode.
+     * @return the decoded path.
+     */
+    private static String decodeLenient(String path) {
+        StringBuilder decoded = new StringBuilder(path.length());
+        int i = 0;
+        int length = path.length();
+        while (i < length) {
+            char c = path.charAt(i);
+            if (c == '%' && i + 2 < length
+                && isHexDigit(path.charAt(i + 1)) && isHexDigit(path.charAt(i + 2)))
+            {
+                // consecutive escapes are one byte run: a multi-byte character must be
+                // decoded as a whole or its bytes turn into replacement characters
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                while (i + 2 < length && path.charAt(i) == '%'
+                    && isHexDigit(path.charAt(i + 1)) && isHexDigit(path.charAt(i + 2)))
+                {
+                    bytes.write(Integer.parseInt(path.substring(i + 1, i + 3), 16));
+                    i += 3;
+                }
+                decoded.append(new String(bytes.toByteArray(), StandardCharsets.UTF_8));
+            } else {
+                decoded.append(c);
+                i++;
+            }
+        }
+        return decoded.toString();
+    }
+
+    private static boolean isUnderRoot(String canonicalPath, String[] roots) {
+        for (int i = 0; i < roots.length; i++) {
+            String root = roots[i];
+            if (canonicalPath.equals(root) ||
+                canonicalPath.startsWith(root + "/"))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Canonicalizes a forward target at least as strictly as the servlet
+     * container would and tells whether it may be dispatched to.
+     * @param resource the resource path a forward is about to target.
+     * @return <code>false</code> if the path resolves inside an internal only
+     *  root or cannot be canonicalized, <code>true</code> otherwise.
+     */
+    static boolean isForwardTargetAllowed(String resource) {
+        if (resource == null) {
+            return false;
+        }
+        try {
+            if (hasMalformedEscape(resource)) {
+                return false;
+            }
+            return !anyDecoding(resource,
+                path -> hasControlCharacter(path) || resolvesInside(path, INTERNAL_FORWARD_ROOTS));
+        } catch (Exception ex) {
+            // none of the helpers throws, but they all run on caller data: any
+            // unexpected failure must refuse the forward
+            return false;
+        }
+    }
+
+    /**
+     * Tells whether a forward target lies under a root whose filters web.xml maps for REQUEST
+     * dispatches only, so that a forward would reach the endpoint with those filters skipped.
+     * @param resource a resource path {@link #isForwardTargetAllowed} has allowed.
+     * @return <code>true</code> if the target has to be reached by a request of its own.
+     */
+    static boolean hasRequestOnlyFilters(String resource) {
+        return anyDecoding(resource, path -> resolvesInside(path, REQUEST_ONLY_FILTER_ROOTS));
+    }
+
+    /**
+     * Decodes repeatedly so a multiply-encoded target cannot slip a segment past a guard on a
+     * container that decodes the dispatch path more than once, and tests every intermediate
+     * form rather than only the fully decoded one.
+     * @param resource the raw target.
+     * @param test the test for one form of it.
+     * @return <code>true</code> if any form passes the test.
+     */
+    private static boolean anyDecoding(String resource, Predicate<String> test) {
+        String path = resource;
+        for (int i = 0; i < 4; i++) {
+            if (test.test(path)) {
+                return true;
+            }
+            String decoded = decodeLenient(path);
+            if (decoded.equals(path)) {
+                return false;
+            }
+            path = decoded;
+        }
+        return test.test(path);
+    }
+
     /**
      * Forwards or redirects to a new URL. This method will do forwarding
      * if the target url is in  the same web deployment URI as current web 
@@ -304,10 +833,30 @@ public class FSUtils {
     {
         FSUtils.debug.message("FSUtils.forwardRequest: called");
         String newUrl = null;
+        // Parsed once, here, and handed to every decision below, so no two of them can read
+        // the string differently. Not through the public isSameContainer, which logs a parse
+        // failure at error level with a stack trace: a relative RelayState on an
+        // unauthenticated endpoint would write one to the debug file per request.
+        URL target = absoluteURL(url);
+        if (target == null) {
+            // Neither dispatchable nor safe to redirect to: "//host/x" would send the
+            // caller to another host. Previously new URL(url) threw further down and the
+            // container committed an empty 200.
+            FSUtils.debug.error("FSUtils.forwardRequest: target is not an absolute URL:"
+                + forLog(url));
+            sendErrorIfUncommitted(response, HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        // Taken once, on the URL as it arrived, and reused for the forward/redirect decision
+        // below. Deriving it twice let the rewrite gate and the dispatch gate disagree.
+        boolean sameContainer = isSameContainer(request, url, target);
         try {
             SessionProvider sessionProvider = SessionManager.getProvider();
             Object token = sessionProvider.getSession(request);
-            if ((token != null) && (sessionProvider.isValid(token))) {
+            // Only rewrite a target served by this container. URL rewriting
+            // appends the session token to the URL for cookie-less clients, so
+            // rewriting an off-host target would hand the token to that host.
+            if ((token != null) && (sessionProvider.isValid(token)) && sameContainer) {
                 newUrl = sessionProvider.rewriteURL(token, url);
             }
         } catch (Exception se) {
@@ -321,20 +870,25 @@ public class FSUtils {
         if (newUrl == null) {
             newUrl = url;
         }
+        // A provider whose rewriteURL does more than append a path parameter can move the
+        // target; the dispatch decision has to be about the string actually dispatched.
+        URL dispatched = target;
+        if (sameContainer && !newUrl.equals(url)) {
+            URL rewritten = absoluteURL(newUrl);
+            if (rewritten == null || !isSameContainer(request, newUrl, rewritten)) {
+                // rewriteURL moved the target off this container, or out of URL form. The
+                // rewritten string is the one carrying the session token, so it must not be
+                // sent anywhere: fall back to the URL as it arrived and redirect that instead.
+                FSUtils.debug.error("FSUtils.forwardRequest: URL rewriting moved the target "
+                    + "off this container; redirecting the un-rewritten URL:" + forLog(url));
+                newUrl = url;
+                sameContainer = false;
+            } else {
+                dispatched = rewritten;
+            }
+        }
 
         try {
-            //get source host and port
-            String sourceHost = request.getServerName();            
-            int sourcePort = request.getServerPort();
-            FSUtils.debug.message("FSUtils.forwardRequest: " +
-                "SourceHost=" + sourceHost + " SourcePort="+ sourcePort);
-            //get target host and port
-            URL target = new URL(newUrl);
-            String targetHost = target.getHost();
-            int targetPort = target.getPort();            
-            FSUtils.debug.message("FSUtils.forwardRequest: targetHost=" 
-                + targetHost + " targetPort=" + targetPort);
- 
             /**
              * IBM websphere is not able to handle forwards with long urls.
              */ 
@@ -344,12 +898,10 @@ public class FSUtils {
             if (container != null && (container.indexOf("IBM") != -1)) {
                isWebSphere = true;
             }
-            
-                        
+
             int index = newUrl.indexOf(deploymentURI + "/");
-            if( !(sourceHost.equals(targetHost)) || 
-                !(sourcePort == targetPort) || 
-                !(index > 0) || isWebSphere)
+            if (!sameContainer || !writesTheRequestsPort(request, dispatched)
+                || !(index > 0) || isWebSphere)
             {
                 FSUtils.debug.message("FSUtils.forwardRequest: Source and " +
                     "Target are not on the same container." + 
@@ -359,6 +911,14 @@ public class FSUtils {
             } else {      
                 String resource = newUrl.substring(
                     index + deploymentURI.length());
+                if (!isForwardTargetAllowed(resource)) {
+                    if (FSUtils.debug.warningEnabled()) {
+                        FSUtils.debug.warning("FSUtils.forwardRequest: refused "
+                            + "forward to internal resource: " + forLog(resource));
+                    }
+                    sendErrorIfUncommitted(response, HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
                 // The target comes from the request (goto/RelayState). A forward
                 // bypasses the web.xml filters and can reach /WEB-INF, so refuse
                 // anything that is not a plain in-app path and dispatch the form
@@ -368,25 +928,64 @@ public class FSUtils {
                     FSUtils.debug.warning("FSUtils.forwardRequest: refusing to "
                         + "forward to a path with traversal or a reserved "
                         + "directory");
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    sendErrorIfUncommitted(response, HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+                if (hasRequestOnlyFilters(resource)) {
+                    FSUtils.debug.message("FSUtils.forwardRequest: target has filters that "
+                        + "do not run on a forward. Redirecting to target");
+                    response.sendRedirect(newUrl);
                     return;
                 }
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message(
-                        "FSUtils.forwardRequest: Forwarding to :" + dispatchPath);
+                        "FSUtils.forwardRequest: Forwarding to :" + forLog(dispatchPath));
                 }
                 RequestDispatcher dispatcher =
                     request.getRequestDispatcher(dispatchPath);
+                if (dispatcher == null) {
+                    // The container declined to map the target - it decodes to a path it will
+                    // not dispatch to, such as one climbing above the context root. Forwarding
+                    // on null NPEs and leaves the container to commit an empty 200.
+                    FSUtils.debug.error("FSUtils.forwardRequest: container returned no "
+                        + "dispatcher for resource:" + forLog(dispatchPath));
+                    sendErrorIfUncommitted(response, HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
                 try {
                     dispatcher.forward(request, response);
                 } catch (Exception e) {
                     FSUtils.debug.error("FSUtils.forwardRequest: Exception "
                         + "occured while trying to forward to resource:" +
-                        dispatchPath, e);
+                        forLog(dispatchPath), e);
+                    sendErrorIfUncommitted(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 }
             } 
         } catch (Exception ex) {
             FSUtils.debug.error("FSUtils.forwardRequest: Exception occured",ex);
+            sendErrorIfUncommitted(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Answers a status when nothing has been written yet. A forward that fails part way through
+     * has already committed, and there the status stands as it is; the case this covers is a
+     * failure before anything reached the client, which otherwise leaves the container to
+     * commit an empty 200 that the caller reads as a successful federation. A status that
+     * cannot be written is logged here rather than thrown, so that no caller's catch answers
+     * the same response a second time.
+     * @param response the response to write the status to.
+     * @param status the status to send.
+     */
+    private static void sendErrorIfUncommitted(HttpServletResponse response, int status) {
+        if (response.isCommitted()) {
+            return;
+        }
+        try {
+            response.sendError(status);
+        } catch (Exception ioe) {
+            FSUtils.debug.error(
+                "FSUtils.forwardRequest: could not write the error status", ioe);
         }
     }
 
@@ -482,20 +1081,36 @@ public class FSUtils {
      *  if it cannot retrieve the instance.
      */
     public static IDFFMetaManager getIDFFMetaManager() {
-        if (metaInstance == null){
-            synchronized (IDFFMetaManager.class) {
-                try {
-                    // TODO: generate admin session and pass it in
-                    metaInstance = new IDFFMetaManager(null);
-                    return metaInstance;
-                } catch (Exception e) {
-                    FSUtils.debug.error ("FSUtils.getIDFFMetaManager:"
-                        + " Could not create meta Manager", e);
-                    return null;
-                }
+        IDFFMetaManager instance = metaInstance;
+        if (instance != null) {
+            return instance;
+        }
+        // The federation endpoints resolve the manager per request rather than latching the
+        // first answer, so that a transient SMS failure recovers without a restart. Without
+        // this window every concurrent request would queue on the monitor below and pay its
+        // own failing constructor for the whole length of an outage.
+        long failedAt = metaManagerFailedAt;
+        if (failedAt != 0
+            && System.currentTimeMillis() - failedAt < META_MANAGER_RETRY_INTERVAL)
+        {
+            return null;
+        }
+        synchronized (IDFFMetaManager.class) {
+            if (metaInstance != null) {
+                return metaInstance;
+            }
+            try {
+                // TODO: generate admin session and pass it in
+                metaInstance = new IDFFMetaManager(null);
+                metaManagerFailedAt = 0L;
+                return metaInstance;
+            } catch (Exception e) {
+                metaManagerFailedAt = System.currentTimeMillis();
+                FSUtils.debug.error ("FSUtils.getIDFFMetaManager:"
+                    + " Could not create meta Manager", e);
+                return null;
             }
         }
-        return metaInstance;
     }
 
     /*

@@ -38,8 +38,11 @@ const BOOTSTRAP_SCRIPT = process.env.BOOTSTRAP_SCRIPT ?? "./bootstrap.sh";
 
 // Derived URLs
 const LOGIN_URL = "http://sp.mycompany.org:8081/openam/spssoinit?metaAlias=/sp&idpEntityID=http%3A//openam.example.org%3A8080/openam&RelayState=http%3A//sp.mycompany.org%3A8081/openam";
-const EXPECTED_IDP_URL_PATTERN = /openam\.example\.org/;
-const EXPECTED_SP_URL_PATTERN = /sp\.mycompany\.org/;
+// Anchored to the origin: each host also appears inside the other side's URLs - the SP's spssoinit names the
+// IdP entity, the IdP's SSORedirect carries the SP's acsURL - so an unanchored match would end the wait while
+// the browser is still on the wrong server, and the SSO round trip would race the element timeout below.
+const EXPECTED_IDP_URL_PATTERN = /^http:\/\/openam\.example\.org:8080\//;
+const EXPECTED_SP_URL_PATTERN = /^http:\/\/sp\.mycompany\.org:8081\//;
 
 // ─── Selectors (XUI / LESS-based OpenAM UI) ───────────────────────────────────
 const SEL = {

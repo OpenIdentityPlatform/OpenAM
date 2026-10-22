@@ -21,7 +21,7 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.authentication.modules.oauth2;
@@ -32,10 +32,13 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import org.forgerock.openam.shared.security.whitelist.FailSafeRedirectUrlValidator;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
 
 public class OAuthUtil  {
@@ -145,6 +148,49 @@ public class OAuthUtil  {
         }
     }
     
+    /**
+     * Returns the host named by a URL.
+     *
+     * <p>Scanning for <code>"//"</code> does not answer this: it is the delimiter of an authority only at the
+     * start of one, so an empty path segment in a relative URL - <code>/openam/oauth2/logout//x</code> - reads
+     * as a host, and an absolute URL that names no authority - <code>https:/elsewhere/x</code> - reads as
+     * naming none.
+     *
+     * @param url The URL to read the host from, may be <code>null</code>.
+     * @return The host, or <code>null</code> both where the URL names no authority and where it names one this
+     * cannot read. Either way the host of the request is the only one left to name, so the caller does not have
+     * to tell the two apart - but nothing is guessed out of an authority that is not a plain host and port.
+     */
+    public static String getUrlHost(String url) {
+        if (url == null || url.isEmpty()) {
+            return null;
+        }
+        URI uri;
+        try {
+            uri = new URI(url);
+        } catch (URISyntaxException urise) {
+            // Not the URL itself: it is a request parameter, and a CR or LF in it would forge log records.
+            debugWarning("OAuthUtil.getUrlHost(): the logout URL is not a valid URI");
+            return null;
+        }
+        // A server based authority names its host even behind userinfo, which FailSafeRedirectUrlValidator refuses
+        // outright. The name is only shown to the user, after that validator has accepted the URL.
+        String host = uri.getHost();
+        if (host != null) {
+            return host;
+        }
+        // java.net.URI leaves getHost() null for an authority it will not parse as server based - a hostname
+        // holding an underscore, for one. Such an authority is read exactly as FailSafeRedirectUrlValidator reads
+        // it, raw and only where it is an ASCII host and an optional numeric port: its percent decoded form can
+        // spell a different host than the one a browser resolves.
+        String authority = FailSafeRedirectUrlValidator.getBareAuthority(uri);
+        if (authority == null) {
+            return null;
+        }
+        int colon = authority.indexOf(':');
+        return colon < 0 ? authority : authority.substring(0, colon);
+    }
+
     public static String oAuthEncode(String toEncode) throws UnsupportedEncodingException {
         if (toEncode != null && !toEncode.isEmpty()) {
             return URLEncoder.encode(toEncode, "UTF-8").

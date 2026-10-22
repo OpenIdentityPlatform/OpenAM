@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.uma;
@@ -51,7 +51,6 @@ import org.forgerock.openam.cts.adapters.JavaBeanAdapter;
 import org.forgerock.openam.cts.api.tokens.TokenIdGenerator;
 import org.forgerock.openam.entitlement.rest.PolicyResource;
 import org.forgerock.openam.oauth2.AccessTokenProtectionFilter;
-import org.forgerock.openam.shared.guice.CloseableHttpClientProvider;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaAuditEntry;
 import org.forgerock.openam.sm.datalayer.impl.uma.UmaPendingRequest;
 import org.forgerock.openam.uma.audit.UmaAuditLogger;
@@ -101,7 +100,7 @@ public class UmaGuiceModule extends AbstractModule {
 
         bind(Client.class)
                 .annotatedWith(Names.named("UMA"))
-                .toProvider(CloseableHttpClientProvider.class).in(Scopes.SINGLETON);
+                .toProvider(ScopeDescriptionClientProvider.class).in(Scopes.SINGLETON);
     }
 
     @Provides

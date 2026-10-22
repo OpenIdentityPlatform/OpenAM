@@ -29,10 +29,11 @@ define([
     "org/forgerock/openam/ui/user/login/tokens/SessionToken",
     "store/actions/creators",
     "store/index",
-    "org/forgerock/openam/ui/common/util/uri/query"
+    "org/forgerock/openam/ui/common/util/uri/query",
+    "org/forgerock/openam/ui/common/util/uri/redirectUrl"
 
 ], ($, _, Messages, AbstractDelegate, Configuration, EventManager, URIUtils, fetchUrl, Constants, AuthenticationToken,
-    SessionToken, creators, store, query) => {
+    SessionToken, creators, store, query, redirectUrl) => {
     const obj = new AbstractDelegate(`${Constants.host}/${Constants.context}/json`);
     let requirementList = [];
     // to be used to keep track of the attributes associated with whatever requirementList contains
@@ -138,10 +139,9 @@ define([
             obj.resetProcess();
             return [failedStage, reason];
         };
-        const goToFailureUrl = (errorBody) => {
-            if (errorBody.detail && errorBody.detail.failureUrl) {
-                console.log(errorBody.detail.failureUrl);
-                window.location.href = errorBody.detail.failureUrl;
+        const goToFailureUrl = (failureUrl) => {
+            if (redirectUrl.isHttpUrl(failureUrl)) {
+                window.location.href = failureUrl;
             }
         };
         const fragmentParams = URIUtils.getCurrentFragmentQueryString();
@@ -220,10 +220,13 @@ define([
                         message: errorBody.message,
                         type: Messages.TYPE_DANGER
                     });
-                    goToFailureUrl(errorBody);
+                    // The failure URL the server answered with: a gotoOnFail it accepted, or the configured one.
+                    const failureUrl = _.get(errorBody, "detail.failureUrl");
+                    goToFailureUrl(failureUrl);
                     // The reason used here will not be translated into a common message and hence not displayed.
-                    // This is so that only the message above is displayed.
-                    return $.Deferred().reject(currentStage, reasonThatWillNotBeDisplayed).promise();
+                    // This is so that only the message above is displayed. The failure URL goes along so that
+                    // RESTLoginHelper can put it in place of the gotoOnFail of the address bar.
+                    return $.Deferred().reject(currentStage, reasonThatWillNotBeDisplayed, failureUrl).promise();
                 }
             }
         });

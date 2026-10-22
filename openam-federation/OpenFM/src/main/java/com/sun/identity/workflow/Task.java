@@ -28,13 +28,12 @@
 
 /*
  * Portions Copyrighted 2010-2014 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.workflow;
 
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.shared.Constants;
@@ -45,13 +44,7 @@ import com.sun.identity.shared.xml.XMLUtils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -151,40 +144,33 @@ public abstract class Task
 
     /**
      * Reads the content in from a URL and returns as a String.
+     * The URL, and every URL it redirects to, must not resolve to an internal address — see
+     * {@link WebContentFetcher} (GHSA-rmw3-j353-w9f7).
      * @param url The URL to fetch content from.
      * @param locale The locale used to construct error messages.
      * @return A string of the contents fetched from the URL.
-     * @throws WorkflowException Thrown if the URL is malformed, or there is an error fetching content.
+     * @throws WorkflowException Thrown if the URL is malformed or not safe to fetch, or there is an error fetching
+     * content.
      */
     protected static String getWebContent(String url, Locale locale)
         throws WorkflowException {
+        return getWebContent(new WebContentFetcher(), url, locale);
+    }
+
+    static String getWebContent(WebContentFetcher fetcher, String url, Locale locale)
+        throws WorkflowException {
         try {
-            StringBuffer content = new StringBuffer();
-            URL urlObj = new URL(url);
-            URLConnection conn = HttpURLConnectionManager.getConnection(urlObj);
-            if (conn instanceof HttpURLConnection) {
-                HttpURLConnection httpConnection = (HttpURLConnection)conn;
-                httpConnection.setRequestMethod("GET");
-                httpConnection.setDoOutput(true);
-
-                httpConnection.connect();
-                int response = httpConnection.getResponseCode();
-                InputStream is = httpConnection.getInputStream();
-                BufferedReader dataInput = new BufferedReader(
-                    new InputStreamReader(is));
-                String line = dataInput.readLine();
-
-                while (line != null) {
-                    content.append(line).append('\n');
-                    line = dataInput.readLine();
-                }
-            }
-            return content.toString();
-        } catch (ProtocolException e) {
-            debug.error("unable to reach url: ", e);
+            return fetcher.fetch(url);
+        } catch (WebContentFetcher.UnsafeUrlException e) {
+            debug.error("unsafe url: ", e);
             Object[] param = {url};
             throw new WorkflowException(MessageFormat.format(
-                getMessage("unable.to.reach.url", locale), param));
+                getMessage("unsafe.url", locale), param));
+        } catch (WebContentFetcher.InsecureRedirectException e) {
+            debug.error("insecure redirect: ", e);
+            Object[] param = {url};
+            throw new WorkflowException(MessageFormat.format(
+                getMessage("insecure.redirect", locale), param));
         } catch (MalformedURLException e) {
             debug.error("malformed url: ", e);
             Object[] param = {url};

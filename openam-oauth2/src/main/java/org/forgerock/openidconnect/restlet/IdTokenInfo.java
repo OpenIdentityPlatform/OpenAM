@@ -260,6 +260,16 @@ public class IdTokenInfo extends ServerResource {
             return delegate.getParameter(name);
         }
 
+        @Override
+        public String getQueryParameter(final String name) {
+            return delegate.getQueryParameter(name);
+        }
+
+        @Override
+        public String getBodyParameter(final String name) {
+            return delegate.getBodyParameter(name);
+        }
+
         /**
          * Gets the count of the parameter present in the request with the given name
          *

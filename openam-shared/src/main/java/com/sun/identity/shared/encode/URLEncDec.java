@@ -24,6 +24,7 @@
  *
  * $Id: URLEncDec.java,v 1.5 2009/08/11 13:18:15 si224302 Exp $
  *
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.shared.encode;
@@ -123,6 +124,73 @@ public class URLEncDec {
         } catch (UnsupportedEncodingException e) {
         }
         return ret;
+    }
+
+    /**
+     * Puts a query parameter on a URL, encoding it and keeping it in front of the fragment.
+     *
+     * <p>A plain concatenation puts the parameter inside the fragment of a URL such as
+     * <code>/openam/XUI/#login</code>, where the server never gets to see it, and leaves any reserved character in
+     * the value to be read back as part of the query string.
+     *
+     * <p>An occurrence of the same name already on the URL is dropped rather than appended next to. Every consumer
+     * reads the parameter back with {@link jakarta.servlet.http.HttpServletRequest#getParameter(String)}, where the
+     * first occurrence wins, so a caller who put one there first would otherwise stay in charge of the value.
+     *
+     * @param url The URL to put the parameter on, may be <code>null</code>.
+     * @param name The name of the parameter, in its decoded form. A <code>null</code> or empty name leaves the URL
+     * as it stands: there is no parameter to put on it.
+     * @param value The value of the parameter, in its decoded form. A <code>null</code> value is written as an
+     * empty one, the way a parameter carrying nothing is spelled on a query string.
+     * @return The URL carrying the query parameter, or <code>null</code> if the URL was.
+     */
+    public static String appendQueryParameter(String url, String name, String value) {
+        if (url == null) {
+            return null;
+        }
+        if (name == null || name.isEmpty()) {
+            return url;
+        }
+        String parameterValue = value == null ? "" : value;
+        int fragment = url.indexOf('#');
+        String base = fragment == -1 ? url : url.substring(0, fragment);
+        String tail = fragment == -1 ? "" : url.substring(fragment);
+
+        final StringBuilder result = new StringBuilder();
+        int query = base.indexOf('?');
+        boolean first = true;
+        if (query == -1) {
+            result.append(base).append('?');
+        } else {
+            result.append(base, 0, query).append('?');
+            for (String pair : base.substring(query + 1).split("&")) {
+                if (pair.isEmpty() || name.equals(parameterName(pair))) {
+                    continue;
+                }
+                result.append(first ? "" : "&").append(pair);
+                first = false;
+            }
+        }
+        return result.append(first ? "" : "&").append(encode(name)).append('=').append(encode(parameterValue))
+                .append(tail).toString();
+    }
+
+    /**
+     * Returns the name a query string pair carries, in its decoded form.
+     *
+     * @param pair One <code>name=value</code> pair of a query string, never empty.
+     * @return The name of the parameter, decoded where it can be.
+     */
+    private static String parameterName(String pair) {
+        int equals = pair.indexOf('=');
+        String name = equals == -1 ? pair : pair.substring(0, equals);
+        try {
+            String decoded = decode(name);
+            return decoded == null ? name : decoded;
+        } catch (IllegalArgumentException iae) {
+            // The name is not decodable, so it is not the one being put on the URL either.
+            return name;
+        }
     }
 
     /**

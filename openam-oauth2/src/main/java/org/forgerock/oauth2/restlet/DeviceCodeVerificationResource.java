@@ -22,7 +22,9 @@ import static org.forgerock.openam.utils.Time.currentTimeMillis;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,8 +65,11 @@ import org.forgerock.openam.utils.StringUtils;
 import org.forgerock.openam.xui.XUIState;
 import org.restlet.Context;
 import org.restlet.Request;
+import org.restlet.data.CacheDirective;
+import org.restlet.data.Form;
 import org.restlet.data.Language;
 import org.restlet.data.Preference;
+import org.restlet.data.Reference;
 import org.restlet.ext.freemarker.TemplateRepresentation;
 import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
 import org.restlet.representation.Representation;
@@ -126,27 +131,49 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
     }
 
     /**
-     * Handles POST requests to the OAuth2 device/user endpoint.
+     * Handles POST requests to the OAuth2 device/user endpoint. Only a submitted form reaches this method: a
+     * bare navigation to the endpoint arrives as a GET, which any foreign origin can trigger with a plain link
+     * and which therefore never authorizes anything.
      */
     @Post
     public Representation verify(Representation body) throws ServerException, NotFoundException,
             InvalidGrantException, OAuth2RestletException {
-    	
         final Request restletRequest = getRequest();
         OAuth2Request request = requestFactory.create(restletRequest);
 
+        preventCaching();
+
+        // Checked once, ahead of every branch below. This advisory exists because the guard was moved inside
+        // one of those branches and its sibling left uncovered; the consent decision path avoids that shape by
+        // checking first thing (AuthorizationService.authorize(request, consentGiven, saveConsent) - note that
+        // its single argument sibling, which this method also calls, has no check of its own and relies on
+        // this one). This ordering is not itself a defence against enumeration of live user codes - anyone
+        // can mint a token of their own via a GET first - only rate limiting and equal timing would be.
+        if (csrfProtection.isCsrfAttack(request)) {
+            logger.debug("Device code verification rejected: csrf parameter matched neither the user code "
+                    + "form token nor the resource owner's session id");
+            throw new OAuth2RestletException(400, "bad_request", null, request.<String>getParameter("state"));
+        }
+
+        final String userCode = getSubmittedUserCode(request);
+        if (StringUtils.isEmpty(userCode)) {
+            // readDeviceCode turns this into a CTS equality filter, which rejects a null assertion value with
+            // an unchecked exception that would escape as a 500. A request naming no code gets the same answer
+            // as one naming a code that resolves to nothing.
+            return getUserCodeForm(request, "not_found");
+        }
+
         DeviceCode deviceCode;
         try {
-            deviceCode = tokenStore.readDeviceCode(request.<String>getParameter(OAuth2Constants.DeviceCode.USER_CODE),
-                    request);
+            deviceCode = tokenStore.readDeviceCode(userCode, request);
         } catch (InvalidGrantException e) {
-            return getTemplateRepresentation(FORM, request, "not_found");
+            return getUserCodeForm(request, "not_found");
         }
 
         // An expired code, or one that has already been approved, is treated as an unknown user code
         if (deviceCode == null || deviceCode.isIssued() || deviceCode.isAuthorized()
                 || deviceCode.getExpiryTime() < currentTimeMillis()) {
-            return getTemplateRepresentation(FORM, request, "not_found");
+            return getUserCodeForm(request, "not_found");
         }
 
         addRequestParamsFromDeviceCode(restletRequest, deviceCode);
@@ -159,17 +186,17 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                  || !clientRegistration.isConsentImplied();
 
             if (requireConsent) {
-                final String decision = request.getParameter("decision");
+                // Read from the body alone. getParameter would give the query string priority, and the user
+                // code form carries no decision field of its own, so a link to
+                // ?decision=allow&save_consent=on would answer the consent question on the resource owner's
+                // behalf: their own submission contradicts nothing, the consent page naming the client and
+                // the scopes is never rendered, and save_consent records the grant permanently. Every
+                // legitimate producer sends both in the body - the consent page as form fields, the
+                // documented direct POST with --data.
+                final String decision = request.getBodyParameter("decision");
                 if (StringUtils.isNotEmpty(decision)) {
-
-                    if (csrfProtection.isCsrfAttack(request)) {
-                        logger.debug("Consent request rejected: csrf parameter matched neither the consent token "
-                                + "nor the resource owner's session id");
-                        throw new OAuth2RestletException(400, "bad_request", null, request.<String>getParameter("state"));
-                    }
-
-                    final boolean consentGiven = !requireConsent || "allow".equalsIgnoreCase(decision);
-                    final boolean saveConsent = requireConsent && "on".equalsIgnoreCase(request.<String>getParameter("save_consent"));
+                    final boolean consentGiven = "allow".equalsIgnoreCase(decision);
+                    final boolean saveConsent = "on".equalsIgnoreCase(request.getBodyParameter("save_consent"));
                     if (saveConsent) {
                         saveConsent(request);
                     }
@@ -184,8 +211,10 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
                     authorizationService.authorize(request);
                 }
             } else {
-            	
-            	authorizeAndUpdateDeviceCode(deviceCode,request);
+                // Consent is implied, so no consent page is rendered and the user code form is the only page
+                // that posts back here. What keeps a foreign origin from binding the resource owner's session
+                // to a device code of its choosing is the CSRF check at the top of this method.
+                authorizeAndUpdateDeviceCode(deviceCode, request);
             }
             
         } catch (IllegalArgumentException e) {
@@ -225,20 +254,121 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
         providerSettings.saveConsent(resourceOwner, clientRegistration.getClientId(), validatedScope);
     }
 
+    /**
+     * Renders the user code form, minting the CSRF token that its submission has to carry. This form is the only
+     * page of the device verification flow that posts back to this endpoint, so it is the only place a token
+     * needs to be issued from. A cross-origin page can read neither the token nor the cookie backing it.
+     *
+     * <p>The form is deliberately left empty. Nothing distinguishes a user code the resource owner chose from
+     * one a foreign page chose for them - {@code /oauth2/device/code} answers with a bare
+     * {@code verification_uri} and never issues a {@code verification_uri_complete}, so the endpoint has no
+     * legitimate producer of such a link to recognise - and filling the code in would turn this page into a
+     * one-click approval of whichever code arrived in the query string.</p>
+     *
+     * @param request The OAuth2 request.
+     * @return The user code form.
+     */
+    private Representation getUserCodeForm(OAuth2Request request) {
+        return getUserCodeForm(request, null);
+    }
+
+    /**
+     * Renders the user code form with an error to report above it.
+     *
+     * <p>Every render of this template mints a token, not only the one the happy path goes through: which of
+     * the two a theme shows is the template's business, and a rendered form whose token is empty is one whose
+     * every submission is refused.</p>
+     *
+     * @param request The OAuth2 request.
+     * @param errorCode The error code to display, or {@code null} if there is none.
+     * @return The user code form.
+     */
+    private Representation getUserCodeForm(OAuth2Request request, String errorCode) {
+        return getTemplateRepresentation(FORM, request, errorCode,
+                Collections.singletonMap("csrf", csrfProtection.createCsrfToken(request)));
+    }
+
+    /**
+     * Marks the response uncacheable. Every page this endpoint serves either carries a freshly minted CSRF
+     * token - the user code form, and the consent page {@link #getDataModel} builds - or reports the state of
+     * a user code, so no intermediary may hand any of them to a second visitor. The authorize and token
+     * endpoints get the same treatment from {@code OAuth2Filter}, which this route is not behind.
+     */
+    private void preventCaching() {
+        getResponse().getCacheDirectives().add(CacheDirective.noStore());
+    }
+
+    /**
+     * Resolves the user code the request is asking to act on, refusing a request that carries two different
+     * ones.
+     *
+     * <p>The user code form posts back to the URL it was served from, so a submission that started as a
+     * navigation to {@code /oauth2/device/user?user_code=...} carries the code from that link in the query
+     * string alongside the code the user typed into the form. {@link OAuth2Request#getParameter} gives the
+     * query string priority, so the link, not the user, would decide which device code gets authorized, and
+     * the user would be confirming a code they were never shown. Neither value has a stronger claim than the
+     * other, so a disagreement is refused rather than resolved.</p>
+     *
+     * <p>Clients that send the code in one place only, and the documented direct POST that repeats the same
+     * code in both, are unaffected. The comparison is on presence rather than on emptiness: a form submitted
+     * with the field cleared carries an empty {@code user_code}, and treating that as absent would hand the
+     * decision straight back to the query string.</p>
+     *
+     * @param request The OAuth2 request.
+     * @return The user code to act on, which may be {@code null}.
+     * @throws OAuth2RestletException If the query string and the request body carry different user codes.
+     */
+    private String getSubmittedUserCode(OAuth2Request request) throws OAuth2RestletException {
+        final String queryUserCode = request.getQueryParameter(OAuth2Constants.DeviceCode.USER_CODE);
+        final String bodyUserCode = request.getBodyParameter(OAuth2Constants.DeviceCode.USER_CODE);
+        if (queryUserCode != null && bodyUserCode != null && !queryUserCode.equals(bodyUserCode)) {
+            logger.debug("Device code verification rejected: the query string and the request body carry "
+                    + "different user codes");
+            throw new OAuth2RestletException(400, "invalid_request", null, request.<String>getParameter("state"));
+        }
+        return request.getParameter(OAuth2Constants.DeviceCode.USER_CODE);
+    }
+
     private Representation getTemplateRepresentation(String template, OAuth2Request request, String errorCode) {
+        return getTemplateRepresentation(template, request, errorCode, Collections.<String, String>emptyMap());
+    }
+
+    /**
+     * Builds the representation of one of this endpoint's pages.
+     *
+     * @param template The template to render.
+     * @param request The OAuth2 request.
+     * @param errorCode The error code to display, or {@code null} if there is none.
+     * @param extraValues Template specific values, merged over the common ones.
+     * @return The representation to render.
+     */
+    private Representation getTemplateRepresentation(String template, OAuth2Request request, String errorCode,
+            Map<String, String> extraValues) {
         TemplateRepresentation response = getTemplateFactory(getContext()).getTemplateRepresentation(template);
         Map<String, String> dataModel = new HashMap<>();
         dataModel.put("errorCode", errorCode);
-        dataModel.put("baseUrl", baseURLProviderFactory.get(request.<String>getParameter("realm"))
-                .getRootURL(ServletUtils.getRequest(getRequest())));
+        dataModel.put("baseUrl", getRootUrl(request));
         List<String> locale = new ArrayList<>();
         for (Preference<Language> language : getRequest().getClientInfo().getAcceptedLanguages()) {
             locale.add(language.getMetadata().getName());
         }
         dataModel.put("locale", oAuth2Utils.join(locale, " "));
         dataModel.put("realm", request.<String>getParameter(OAuth2Constants.Params.REALM));
+        dataModel.putAll(extraValues);
         response.setDataModel(dataModel);
         return response;
+    }
+
+    /**
+     * The public address of this deployment as the realm's Base URL Source configures it, context path
+     * included - the one the device authorization response hands out as the verification URI.
+     *
+     * @param request The OAuth2 request.
+     * @return The root URL, never ending in a {@code /}.
+     */
+    private String getRootUrl(OAuth2Request request) {
+        return baseURLProviderFactory.get(request.<String>getParameter(OAuth2Constants.Params.REALM))
+                .getRootURL(ServletUtils.getRequest(getRequest()));
     }
 
     private void addRequestParamsFromDeviceCode(Request restletRequest, DeviceCode deviceCode) {
@@ -263,19 +393,60 @@ public class DeviceCodeVerificationResource extends ConsentRequiredResource {
 
     /**
      * Handles GET requests to the OAuth2 device/user endpoint, returning a form to allow the user to submit their
-     * user code
+     * user code.
      *
-     * @return The form to allow the user to submit their user code
+     * <p>A GET never acts on a user code, whatever the request carries. It is the one request a foreign origin
+     * can make the resource owner's browser send with its session cookie attached - {@code SameSite=Lax} blocks
+     * a cross-site POST but not a top-level navigation - so it may only render this form.</p>
+     *
+     * <p>A user code in the query string is not merely ignored, it is redirected away. The form has no action
+     * of its own, so it posts back to the address it was served from, and a code left in that address would be
+     * submitted alongside the one the user typed - which {@link #getSubmittedUserCode} then refuses, leaving
+     * whoever followed such a link with a bare 400 and no form to retry on. Serving the form only from an
+     * address that carries no code makes the query string that reaches the POST the user's own.</p>
+     *
+     * @return The form to allow the user to submit their user code, or {@code null} if the request is being
+     * redirected to the same address without its user code.
      */
     @Get
-    public Representation userCodeForm() throws OAuth2RestletException, InvalidGrantException, NotFoundException,
-            ServerException {
+    public Representation userCodeForm() {
+        preventCaching();
         final OAuth2Request request = requestFactory.create(getRequest());
-        if (request.getParameter(OAuth2Constants.DeviceCode.USER_CODE) != null) {
-            return verify(null);
-        } else {
-            return getTemplateRepresentation(FORM, request, null);
+        final Reference withoutUserCode = withoutUserCode(request);
+        if (withoutUserCode != null) {
+            redirectSeeOther(withoutUserCode);
+            return null;
         }
+        return getUserCodeForm(request);
+    }
+
+    /**
+     * Strips the user code from the address the form is about to be served from, leaving the path and every
+     * other query string parameter - the realm this endpoint may be addressed with, among them - in place.
+     *
+     * <p>Scheme, host, port and context path come from the realm's Base URL Source, like the page's own
+     * {@code baseUrl} and the verification URI the device was given, rather than from the container's view of
+     * the request: behind a proxy that terminates TLS without telling the connector, the container sees a
+     * plain-http address on its own host, and sending the browser there would break a request that renders
+     * the form. Only the path below the context path is the request's own, so nothing in it can make the
+     * redirect name another host. The reference has to be absolute: Restlet writes the Location header through
+     * {@link Reference#getTargetRef()}, and that refuses a relative reference that has no base to resolve
+     * against.</p>
+     *
+     * @param request The OAuth2 request.
+     * @return The same address without its user code, or {@code null} if it carries none.
+     */
+    private Reference withoutUserCode(OAuth2Request request) {
+        final Form query = getRequest().getResourceRef().getQueryAsForm();
+        if (!query.removeAll(OAuth2Constants.DeviceCode.USER_CODE)) {
+            return null;
+        }
+        // Both undecoded, so the path keeps the encoding the browser sent it with
+        final HttpServletRequest servletRequest = ServletUtils.getRequest(getRequest());
+        final String path = servletRequest.getRequestURI().substring(servletRequest.getContextPath().length());
+        final Reference redirect = new Reference(getRootUrl(request) + path);
+        redirect.setQuery(query.isEmpty() ? null : query.getQueryString());
+        return redirect;
     }
 
     /**

@@ -49,6 +49,7 @@ import org.forgerock.openam.core.rest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.core.rest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.security.whitelist.GotoUrlValidator;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
 import org.forgerock.openam.utils.JsonObject;
@@ -185,10 +186,16 @@ public class RestAuthenticationHandler {
             return jsonValue;
 
         } catch (RestAuthException e) {
-            if (loginProcess != null) {
-                String failureUrl = urlValidator.getRedirectUrl(loginProcess.getAuthContext().getOrgDN(),
-                        loginProcess.getFailureURL(), null);
-                e.setFailureUrl(failureUrl);
+            // CompletedLoginProcess has no failure URL to give and throws when asked for one.
+            if (loginProcess != null && !(loginProcess instanceof CompletedLoginProcess)) {
+                // The failure URL is configuration derived, not a URL from this request: LoginState
+                // .getFailureLoginURL() has already validated the gotoOnFail part of it against the realm and run
+                // the rest through AuthD.processURL. Validating it a second time here with no fallback could only
+                // drop it, leaving the client with no failure redirect at all - so it is used as it is, the same
+                // way the success path below treats loginProcess.getSuccessURL(). An empty one is still no URL,
+                // and the callers of getFailureUrl() only test it for null.
+                String failureUrl = loginProcess.getFailureURL();
+                e.setFailureUrl(StringUtils.isEmpty(failureUrl) ? null : failureUrl);
             }
             throw e;
         } catch (L10NMessageImpl e) {
@@ -345,7 +352,7 @@ public class RestAuthenticationHandler {
                         jsonResponseObject.put("message", "Authentication Successful");
                     }
 
-                    String gotoUrl = urlValidator.getRedirectUrl(loginProcess.getOrgDN(),
+                    String gotoUrl = GotoUrlValidator.getRedirectUrl(request, loginProcess.getOrgDN(),
                             urlValidator.getValueFromJson(postBody, RedirectUrlValidator.GOTO),
                             loginProcess.getSuccessURL());
 

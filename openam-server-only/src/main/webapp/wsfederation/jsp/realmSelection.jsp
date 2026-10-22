@@ -25,8 +25,7 @@
    $Id: realmSelection.jsp,v 1.10 2009/10/29 00:00:00 exu Exp $
 
     Portions Copyrighted 2013-2016 ForgeRock AS.
-    Portions Copyrighted 2026 3A Systems LLC.
-    
+    Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <%@page
@@ -34,28 +33,23 @@
     import="com.sun.identity.shared.debug.Debug"
     import="com.sun.identity.wsfederation.common.WSFederationConstants"
     import="com.sun.identity.wsfederation.common.WSFederationUtils"
+    import="com.sun.identity.wsfederation.common.WReplyValidator"
+    import="com.sun.identity.saml2.common.SAML2Constants"
     import="com.sun.identity.wsfederation.meta.WSFederationMetaManager"
     import="com.sun.identity.wsfederation.meta.WSFederationMetaUtils"
     import="com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement"
     import="com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement"
+    import="com.sun.identity.shared.encode.URLEncDec"
     import="org.owasp.esapi.ESAPI"
 %>
 <%
     Debug debug = WSFederationUtils.debug;
     String jspFile = "realmSelection.jsp: ";
     String wreply = (String)request.getParameter("wreply");
-    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + wreply, wreply,
-        "URL", 2000, false)){
-            wreply = "";
-    }
     String wctx = (String)request.getParameter("wctx");
     if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + wctx, wctx,
         "HTTPParameterValue", 2000, true)){
             wctx = null;
-    }
-
-    if (debug.messageEnabled()) {
-        debug.message(jspFile + "wreply: "+wreply);
     }
 
     String spMetaAlias = WSFederationMetaUtils.getMetaAliasByUri(
@@ -77,6 +71,26 @@
     String accountRealmCookieName =
         spConfig.get(WSFederationConstants.ACCOUNT_REALM_COOKIE_NAME).get(0);
 
+    // wreply ends up in a redirect, so it has to be checked against the wreplyList of the hosted entity,
+    // falling back to this server's own origin when no wreplyList has been configured. Only log it once it
+    // has been accepted, so that a rejected parameter does not reach the log. A request that carries no
+    // wreply at all still renders the form; it is the redirect below that cannot do without one.
+    if (wreply != null && wreply.length() != 0
+            && !WReplyValidator.isValidForEntity(request, spRealm, spEntityId, wreply,
+                    SAML2Constants.SP_ROLE)) {
+        debug.warning(jspFile + "wreply is not a permitted redirect target");
+        response.sendError(response.SC_BAD_REQUEST,
+            WSFederationUtils.bundle.getString("invalidWReplyUrl"));
+        return;
+    }
+    if (wreply == null) {
+        wreply = "";
+    }
+
+    if (debug.messageEnabled()) {
+        debug.message(jspFile + "wreply: " + wreply);
+    }
+
     String selectedRealm = (String)request.getParameter("realm_list");
     if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + selectedRealm,
         selectedRealm, "HTTPParameterValue", 2000, true)){
@@ -87,17 +101,22 @@
     }
     if ( selectedRealm != null )
     {
-        StringBuffer url = new StringBuffer(wreply);
-        url.append("?whr=");
-        url.append(selectedRealm);
+        if (wreply.length() == 0) {
+            // Without a wreply there is nowhere to send the browser; redirecting to a relative "?whr=..."
+            // would only bring it back to this page.
+            debug.warning(jspFile + "no wreply to redirect to");
+            response.sendError(response.SC_BAD_REQUEST,
+                WSFederationUtils.bundle.getString("invalidWReplyUrl"));
+            return;
+        }
+        String url = URLEncDec.appendQueryParameter(wreply, "whr", selectedRealm);
         if (wctx != null) {
-            url.append("&wctx=");
-            url.append(wctx);
+            url = URLEncDec.appendQueryParameter(url, "wctx", wctx);
         }
         if (debug.messageEnabled()) {
-            debug.message(jspFile + "Redirecting to: "+url);
+            debug.message(jspFile + "Redirecting to: " + url);
         }
-        response.sendRedirect(url.toString());
+        response.sendRedirect(url);
         return;
     }
 
@@ -185,11 +204,11 @@
 
 	<td><div class="logInp">
 
-        <input type="hidden" name="wreply" value="<%=wreply%>" />
+        <input type="hidden" name="wreply" value="<%= ESAPI.encoder().encodeForHTMLAttribute(wreply) %>" />
 <%
         if ( wctx != null && wctx.length() > 0 ) {
 %>
-        <input type="hidden" name="wctx" value="<%=wctx%>" />
+        <input type="hidden" name="wctx" value="<%= ESAPI.encoder().encodeForHTMLAttribute(wctx) %>" />
 <%
         }
 %>

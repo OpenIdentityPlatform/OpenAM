@@ -88,7 +88,9 @@ public abstract class ConsentRequiredResource extends RouterContextResource {
         data.put("display_name", ESAPI.encoder().encodeForHTML(displayName));
         data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
         addDisplayScopesAndClaims(consentRequired, data);
-        data.put("user_name", userDisplayName);
+        // The display name comes from the identity store and reaches the XUI consent template through a
+        // triple-brace (unescaped) Handlebars expression, so it is HTML-encoded here like the client metadata.
+        data.put("user_name", encodeForHTML(userDisplayName));
         data.put("xui", xuiState.isXUIEnabled());
         data.put("user_code", request.getParameter(OAuth2Constants.DeviceCode.USER_CODE));
         data.put("baseUrl", baseURLProviderFactory.get(request.<String>getParameter("realm"))

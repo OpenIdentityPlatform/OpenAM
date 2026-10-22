@@ -54,6 +54,7 @@ import com.sun.identity.saml2.protocol.LogoutResponse;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml.protocol.Status;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -631,14 +632,12 @@ public class SingleLogoutManager {
                 response.getWriter().print("Logout DONE. Status = " 
                     + statusString);
             } else {
-                // include logout status
-                if (origRelayState.indexOf("?") == -1) {
-                    response.sendRedirect(origRelayState + "?" + 
-                        SingleLogoutManager.STATUS_PARAM + "=" + statusString);
-                } else {
-                    response.sendRedirect(origRelayState + "&" + 
-                        SingleLogoutManager.STATUS_PARAM + "=" + statusString);
-                }
+                // Include the logout status. The parameter goes on through the helper rather than by hand:
+                // the RelayState reaching here is a caller supplied URL that IDPSingleLogout has accepted,
+                // and one such as /openam/XUI/#login would otherwise take the status inside its fragment,
+                // where the browser never sends it back.
+                response.sendRedirect(URLEncDec.appendQueryParameter(origRelayState,
+                    SingleLogoutManager.STATUS_PARAM, statusString));
             }
         } else {
             String protocol = (String) origProtocolMap.get(relayState);

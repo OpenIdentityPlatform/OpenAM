@@ -29,7 +29,7 @@ export async function getAdminToken(request) {
 
 export async function getAuthToken(request, username, password) {
   const resp = await request.post(`${OPENAM_BASE}/json/authenticate`, {
-    headers: { 
+    headers: {
       "Content-Type": "application/json",
       "X-OpenAM-Username": username,
       "X-OpenAM-Password": password,
@@ -72,4 +72,15 @@ export async function idFromSession(request, tokenId) {
     return null;
   }
   return (await resp.json()).id;
+}
+
+/**
+ * Logs a user in through the XUI login form and waits until the user leaves the #login route.
+ * Establishes the iPlanetDirectoryPro session cookie in the browser context, which the classic
+ * (JATO) admin console then reuses for its own authenticated requests.
+ */
+export async function loginViaXui(page, user, pass) {
+  await page.goto(`${OPENAM_BASE}/XUI/#login/`);
+  await submitXuiLogin(page, user, pass);
+  await page.waitForURL((url) => !url.hash.startsWith("#login"), { timeout: 30_000 });
 }

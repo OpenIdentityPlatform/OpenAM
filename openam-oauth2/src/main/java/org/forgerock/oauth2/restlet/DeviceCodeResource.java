@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.restlet;
@@ -99,6 +99,18 @@ public class DeviceCodeResource extends ServerResource {
                 clientRegistrationStore.get(clientId, request);
             }
 
+            final String codeChallenge = request.getParameter(CODE_CHALLENGE);
+            final String codeChallengeMethod = request.getParameter(CODE_CHALLENGE_METHOD);
+            // The challenge is verified when the device code is redeemed; reject a method that could never
+            // verify now, rather than at the client's first poll. An explicitly empty method is malformed,
+            // not omitted (RFC 7636 4.3).
+            if (!isEmpty(codeChallenge) && codeChallengeMethod != null
+                    && !CODE_CHALLENGE_METHOD_S_256.equals(codeChallengeMethod)
+                    && !CODE_CHALLENGE_METHOD_PLAIN.equals(codeChallengeMethod)) {
+                throw new OAuth2RestletException(400, "invalid_request",
+                        "Invalid value for " + CODE_CHALLENGE_METHOD, state);
+            }
+
             if (scope == null) {
                 scope = "";
             }
@@ -117,8 +129,8 @@ public class DeviceCodeResource extends ServerResource {
                     maxAge == null ? null : Integer.valueOf(maxAge),
                     request.<String>getParameter(CLAIMS),
                     request,
-                    request.<String>getParameter(CODE_CHALLENGE),
-                    request.<String>getParameter(CODE_CHALLENGE_METHOD));
+                    codeChallenge,
+                    codeChallengeMethod);
 
             Map<String, Object> result = new HashMap<>();
             OAuth2ProviderSettings providerSettings = providerSettingsFactory.get(request);

@@ -209,6 +209,23 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedMetaSpMap.put(WANT_ASSERTION_ENCRYPTED,
                 Collections.EMPTY_SET);
         extendedMetaSpMap.put(WANT_ARTIF_RESP_SIGN, Collections.EMPTY_SET);
+        // GHSA-3j2f-qhrc-rjfj: registered here although the console offers no field for it, and
+        // registered here only. updateBaseConfig clears an SP's attribute list and rebuilds it from
+        // this map, so a key missing from it is deleted from the extended metadata on any save of
+        // the Assertion Content, Advanced or Assertion Processing page; registering it is what
+        // makes a value set with ssoadm survive such a save. extendedACMetaSpMap, by contrast,
+        // only feeds AMPropertySheet.getAttributeValues, which skips every name for which
+        // isChildSupported is false - so an entry there would do nothing at all.
+        //
+        // A checkbox is deliberately not offered: it has two states where this attribute needs
+        // three, and an unticked box would write "false" and pin the SP to the strict behaviour,
+        // taking away the deployment-wide fallback on the first save of an unrelated field.
+        //
+        // The registration protects the attribute on this version only. A node that predates it
+        // has no such key, so saving the same page there deletes the attribute and artifact SSO
+        // fails again with assertionNotSigned - which is why the admin guide says to upgrade every
+        // console node before setting it, and to check it again after a rollback.
+        extendedMetaSpMap.put(ALLOW_UNSIGNED_ARTIF_ASSERTIONS, Collections.EMPTY_SET);
         extendedMetaSpMap.put(WANT_POST_RESP_SIGN, Collections.EMPTY_SET);
         extendedMetaSpMap.put(ARTI_MSG_ENCODE, Collections.EMPTY_SET);
         extendedMetaSpMap.put(COT_LIST, Collections.EMPTY_SET);        

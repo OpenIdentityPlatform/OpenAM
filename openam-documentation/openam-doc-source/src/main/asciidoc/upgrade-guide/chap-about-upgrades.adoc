@@ -91,6 +91,48 @@ You should therefore plan to test policy upgrade before upgrading the service, a
 For details on how to configure OpenAM policies, see xref:../admin-guide/chap-authz-policy.adoc#chap-authz-policy["Defining Authorization Policies"] in the __Administration Guide__.
 
 
+[#upgrade-authentication-defaults]
+=== Upgrading & Authentication Defaults
+
+This release changes three authentication defaults: module-based authentication is disabled, account lockout is enabled, and the account lockout duration is 30 minutes rather than `0`. They apply to **new installations only**. An upgraded installation keeps the defaults it has, in every realm, and nothing in the upgrade rewrites an authentication setting — the behavior of your realms after upgrading is the behavior they had before it.
+
+Adopting the new defaults in an existing deployment is worth doing, and is a decision to take per realm rather than a step to run blind, because disabling module-based authentication is a trade-off of availability against exposure. In a realm where it is disabled, the following stop working:
+
+* Login by module, using the `module=__module-name__` login parameter, or `authIndexType=module` in the REST API.
+
+* Login by authentication level, using the `authlevel=__level__` login parameter, or `authIndexType=level` in the REST API.
+
+* Policies whose environment conditions include *Authentication Level* or *Authentication Scheme*. The re-authentication such a condition asks for reaches OpenAM as module-typed composite advice, which is refused along with the rest of module-based authentication, so the user is denied access instead of being sent to authenticate. Express policy step-up with the *Authenticate to Realm* or *Authenticate to Service* conditions instead, which are unaffected.
+
+The `Application` module and modules of type `Federation` are exempt from the switch, so policy agent authentication and federation flows continue to work. A federation deployment whose SAML v2 Authentication Context mapping names an ordinary module — an entry of the form `module=__module-name__` in the IdP extended metadata — is an exception: that login is made by module and is refused like any other. Map such a context onto a chain with `service=__chain-name__`, or leave its authentication scheme empty, which is what the shipped mapping does.
+
+The Liberty ID-WSF Authentication Service is another exception. Its PLAIN and CRAM-MD5 SASL mechanisms, exposed at `/openam/Liberty/*`, log in through `IndexType.MODULE_INSTANCE` against the top level realm, aimed at the modules named by `PlainMechanismAuthModule` and `CramMD5MechanismAuthModule` (both default to `DataStore`, and neither is `Application` nor of type `Federation`). Disabling module-based authentication in the top level realm therefore refuses every SASL request to that endpoint with `MODULE_BASED_AUTH_NOT_ALLOWED`. Where such an integration exists, leave module-based authentication enabled in the top level realm alone.
+
+The Security Token Service is another. The default authentication target mappings of a REST STS instance validate OpenID Connect ID tokens against the `oidc` module and X.509 certificates against `cert_module` with `authIndexType=module`, and the default X.509 mapping of a SOAP STS instance does the same. In a realm where module-based authentication is disabled, these validations are refused with `MODULE_BASED_AUTH_NOT_ALLOWED`. Keep module-based authentication enabled in the realm of the STS instance, or map the token type onto a chain that contains the module, for example `OPENIDCONNECT|service|oidcChain|oidc_id_token_auth_target_header_key=oidc_id_token`. The SOAP STS agent logs in through the `Application` module and is unaffected.
+
+Account lockout has a requirement of its own: keep the lockout duration above `0`. A duration of `0` selects physical locking, which sets `inetuserstatus=Inactive` on an account after five failed logins and leaves it switched off until an administrator re-enables it, so enabling lockout while the duration is `0` turns five bad passwords into a lasting denial of service against any account whose name can be guessed. That is why the two defaults moved together.
+
+Once you have weighed both, apply them to a realm with:
+
+[source, console]
+----
+$ ssoadm set-realm-svc-attrs \
+ --adminid amadmin \
+ --password-file pwd.txt \
+ --realm / \
+ --servicename iPlanetAMAuthService \
+ --attributevalues sunEnableModuleBasedAuth=false \
+                   iplanet-am-auth-login-failure-lockout-mode=true \
+                   iplanet-am-auth-lockout-duration=30
+----
+
+The same settings are on the console page Realms > __Realm Name__ > Authentication > Settings, under the Security and Account Lockout tabs. For details of the attributes, see xref:../admin-guide/chap-auth-services.adoc#auth-core-security["Core Authentication Attributes - Security"] and xref:../admin-guide/chap-auth-services.adoc#auth-core-account-lockout["Core Authentication Attributes - Account Lockout"] in the __Administration Guide__.
+
+What the upgrade does do is deactivate the identities the configurator created with a password published in the OpenAM installer source — `demo`, `wsc`, `wsp`, `SecurityTokenService`, and `agentAuth` — where they still have that password and are still active. Their passwords are not changed. A deployment that uses WS-Security, the STS, or the agent authenticator with the shipped credentials must give the identity a password of its own and activate it again after upgrading; the upgrade report lists every identity that was switched off. The `anonymous` user of the Top Level Realm no longer authenticates with a password at all, which takes effect as soon as this version is deployed; the Anonymous authentication module is unaffected.
+
+`ssoadm` authenticates administrators against the Administrator Authentication Configuration of the top level realm — the chain that already serves a browser login to `/openam/console` — rather than by naming the `DataStore` module, so that it keeps working in a realm where module-based authentication is disabled. Where the realm names no administrator chain, it falls back to the Organization Authentication Configuration. It answers only user name and password callbacks, so a top level realm whose chain requires more than that — a one-time password, a choice, a confirmation — refuses `ssoadm` where the pinned module previously succeeded. If you pinned the mechanism with `org.forgerock.openam.ssoadm.auth.indexType` and `org.forgerock.openam.ssoadm.auth.indexName` in the `ssoadm` script, an `indexType` of `module_instance` only works while that realm allows module-based authentication; use `service` and the name of a chain that a user name and a password satisfy, or remove both properties and let `ssoadm` follow the administrator chain.
+
+
 [#upgrade-best-practices]
 === Best Practices for Upgrades
 
@@ -150,6 +192,33 @@ These are described in the xref:../install-guide/chap-custom-ui.adoc#chap-custom
 * Any changes to OpenAM classes
 
 * Any changes or additional Java class libraries (such as .jar files in `WEB-INF/lib`)
+
+[#upgrade-device-flow-form]
+If you have customized the OAuth 2.0 device flow user code page, carry the CSRF token into your copy before you upgrade. The endpoint `/oauth2/device/user` refuses any submission without a valid `csrf` parameter with HTTP 400, and the stock page supplies that token through two lines that a customized copy made from an earlier release lacks. Without them, every user code a browser submits is refused.
+
+* In a customized `CodeVerificationForm.ftl` (for example, one placed in `WEB-INF/classes/templates`), add the token to `pageData`:
++
+[source, html]
+----
+<#if csrf??>csrf: "${csrf?js_string}",</#if>
+----
+
+* In a customized XUI `templates/user/DeviceTemplate.html`, add a hidden field inside the form:
++
+[source, html]
+----
+<input type="hidden" name="csrf" value="{{csrf}}">
+----
+
+Users of the stock pages are covered by the same `.ftl`: it sets a `urlArgs` value on RequireJS so the browser stops reusing `DeviceTemplate.html` cached from the previous release (that file is served for a month, and its URL is not versioned otherwise), and it registers a submit-time listener that appends the CSRF token to any device form that reaches the DOM without it. Neither of these lines is included in a customized copy of `CodeVerificationForm.ftl` unless the customization brings them across.
+
+Clients that post the user code directly, without the page, send their session ID as the `csrf` parameter. For details, see xref:../dev-guide/chap-client-dev.adoc#proc-device-flow-allow-access["To Grant Consent in the OAuth 2.0 Device Flow"] in the __Developer's Guide__.
+
+[#upgrade-device-flow-verification-uri-query]
+A link or QR code that opens the device verification page with the user code in the query string, such as `/oauth2/device/user?user_code=BDCT-HQKD`, now redirects (HTTP 303) to the same address without that parameter. The user types the code into the empty form the redirect leads to. The endpoint has no way to tell a code the user chose from one a foreign page chose for them, so the code has to be typed where only the user can type it. OpenAM itself does not produce this URL - `/oauth2/device/code` answers with a bare `verification_uri` and never issues `verification_uri_complete` - but any out-of-tree device app or QR code that appends `?user_code=<code>` to the verification URI is affected and must be updated to reflect that users now retype the code on arrival.
+
+[#upgrade-consent-decision-body]
+`/oauth2/authorize` and `/oauth2/device/user` now read the consent decision (`decision`) and the "remember this choice" flag (`save_consent`) from the request body alone; values sent only in the query string are ignored. On `/oauth2/authorize`, a submission that carries no `decision` in the body fails closed as a denial; on `/oauth2/device/user` such a submission is the user code form itself: it leads to the consent page, or approves the device code at once when the client's consent is implied. The stock consent page and the documented headless `curl` invocations already send both in the body, so a deployment using either is unaffected; a bespoke client that put `decision=allow` in the URL of a redirect has to move it into the POST body.
 
 
 [#post-upgrade-rollback]

@@ -12,6 +12,8 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.saml.xmlsig;
@@ -183,5 +185,51 @@ public class XMLSignatureManagerTest {
             Assert.fail(e.getMessage());
         }
         Assert.assertTrue(verified);
+    }
+
+    @Test
+    public void verifyRejectsKeyInfoCertificateOfAnotherSigner() throws Exception {
+
+        // Both certificates are in the keystore, but the caller expects the default key's
+        Element signed = signWithPrivateKeyIncludingCertificate();
+
+        Assert.assertFalse(xmlSignatureManager.verifyXMLSignature(signed, SAML2Constants.ID,
+                DEFAULT_PRIVATE_KEY_ALIAS));
+    }
+
+    @Test
+    public void verifyAcceptsKeyInfoCertificateOfTheExpectedSigner() throws Exception {
+
+        Element signed = signWithPrivateKeyIncludingCertificate();
+
+        Assert.assertTrue(xmlSignatureManager.verifyXMLSignature(signed, SAML2Constants.ID, PRIVATE_KEY_ALIAS));
+    }
+
+    @Test
+    public void verifyRejectsKeyInfoCertificateWhenExpectedAliasIsNotInKeystore() throws Exception {
+
+        // A misconfigured partner alias must not fall back to trusting any keystore certificate
+        Element signed = signWithPrivateKeyIncludingCertificate();
+
+        Assert.assertFalse(xmlSignatureManager.verifyXMLSignature(signed, SAML2Constants.ID, "no-such-alias"));
+    }
+
+    @Test
+    public void verifyWithoutExpectedSignerAcceptsAnyKeystoreCertificate() throws Exception {
+
+        Element signed = signWithPrivateKeyIncludingCertificate();
+
+        Assert.assertTrue(xmlSignatureManager.verifyXMLSignature(signed, SAML2Constants.ID, null));
+    }
+
+    private Element signWithPrivateKeyIncludingCertificate() throws XMLSignatureException {
+        Document documentToSign =
+                XMLUtils.toDOMDocument(ClassLoader.getSystemResourceAsStream(XML_DOCUMENT_TO_SIGN), SAML2Utils.debug);
+        String encodedPrivatePass = AccessController.doPrivileged(new EncodeAction(PRIVATE_KEY_PASS));
+        xmlSignatureManager.signXMLUsingKeyPass(documentToSign, PRIVATE_KEY_ALIAS, encodedPrivatePass, null,
+                SAML2Constants.ID, ID_ATTRIBUTE_VALUE, true, null);
+        Assert.assertEquals(documentToSign.getElementsByTagNameNS(
+                "http://www.w3.org/2000/09/xmldsig#", "X509Certificate").getLength(), 1);
+        return documentToSign.getDocumentElement();
     }
 }

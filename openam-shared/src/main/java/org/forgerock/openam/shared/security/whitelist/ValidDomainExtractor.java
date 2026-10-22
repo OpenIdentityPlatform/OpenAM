@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.shared.security.whitelist;
 
@@ -27,8 +28,23 @@ public interface ValidDomainExtractor<T> {
     /**
      * Extracts the Valid goto URL domains based on the provided configuration details.
      *
+     * <p>An empty collection and <code>null</code> are two different answers, and
+     * {@link FailSafeRedirectUrlValidator} tells them apart:
+     *
+     * <ul>
+     *     <li>an empty collection means the configuration was read and holds no URL patterns, which is what a
+     *     realm or entity that was never configured looks like;</li>
+     *     <li><code>null</code> means the configuration could not be read at all - the store is unreachable, or
+     *     the caller did not say which configuration to read - so nothing is known about the patterns. Callers
+     *     that fail safe refuse to redirect off this server in that case, whatever they make of an empty
+     *     list.</li>
+     * </ul>
+     *
+     * <p>{@link RedirectUrlValidator}, which fails open, treats the two the same.
+     *
      * @param configInfo The necessary information to retrieve the correct configuration.
-     * @return The collection of valid goto URL domains based on the provided configuration information. May be null.
+     * @return The collection of valid goto URL domains based on the provided configuration information. Empty when
+     * none are configured, <code>null</code> when they could not be read.
      */
     public Collection<String> extractValidDomains(final T configInfo);
 }

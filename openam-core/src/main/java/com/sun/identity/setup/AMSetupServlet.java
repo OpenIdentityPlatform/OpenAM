@@ -1685,17 +1685,12 @@ public class AMSetupServlet extends HttpServlet {
         }
     }
 
-    private static void createDemoUser() 
+    private static void createDemoUser()
         throws IdRepoException, SSOException {
         SetupProgress.reportStart("configurator.progress.create.demo.user", null);
-        Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
-        attributes.put("sn", CollectionUtils.asSet("demo"));
-        attributes.put("cn", CollectionUtils.asSet("demo"));
-        attributes.put("userpassword", CollectionUtils.asSet("changeit"));
-        attributes.put("inetuserstatus", CollectionUtils.asSet("Active"));
         try {
             AMIdentityRepository amir = new AMIdentityRepository(getAdminSSOToken(), "/");
-            amir.createIdentity(IdType.USER, "demo", attributes);
+            amir.createIdentity(IdType.USER, "demo", demoUserAttributes());
         } catch (IdRepoException e) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error("AMSetupServlet.createDemoUser", e);
             throw e;
@@ -1704,6 +1699,21 @@ public class AMSetupServlet extends HttpServlet {
             throw e;
         }
         SetupProgress.reportEnd("emb.done", null);
+    }
+
+    /**
+     * The attributes {@code createDemoUser} writes for the {@code demo} user of a new installation.
+     * Package-private so that a unit test can pin them without a live configurator around.
+     */
+    static Map<String, Set<String>> demoUserAttributes() {
+        Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
+        attributes.put("sn", CollectionUtils.asSet("demo"));
+        attributes.put("cn", CollectionUtils.asSet("demo"));
+        attributes.put("userpassword", CollectionUtils.asSet("changeit"));
+        // Created inactive: the password is a published default, so the account must not be usable
+        // until an administrator has given it a password of their own and activated it.
+        attributes.put("inetuserstatus", CollectionUtils.asSet("Inactive"));
+        return attributes;
     }
 
     /**
@@ -1724,7 +1734,10 @@ public class AMSetupServlet extends HttpServlet {
         Map<String, String> config = new HashMap<String, String>();
 
         // Add WSC configuration
-        config.put("sunIdentityServerDeviceStatus", "Active");
+        // The WS-Security agents below are created with a password equal to their own name, so they are
+        // created inactive. Deployments that actually use WS-Security/STS must set a password and activate
+        // them explicitly.
+        config.put("sunIdentityServerDeviceStatus", "Inactive");
         config.put("SecurityMech", "urn:sun:wss:security:null:UserNameToken");
         config.put("UserCredential", "UserName:test|UserPassword:test");
         config.put("useDefaultStore", "true");
@@ -1775,7 +1788,7 @@ public class AMSetupServlet extends HttpServlet {
         // Add Agent Authenticator configuration
         Map<String, String> configAgentAuth = new HashMap<String, String>();
         configAgentAuth.put("AgentType", "SharedAgent");
-        configAgentAuth.put("sunIdentityServerDeviceStatus", "Active");
+        configAgentAuth.put("sunIdentityServerDeviceStatus", "Inactive");
         configAgentAuth.put("AgentsAllowedToRead", "wsc,wsp,SecurityTokenService");
         createAgent(token, idrepo, "agentAuth", "changeit", "Agent_Authenticator", "", configAgentAuth);
         

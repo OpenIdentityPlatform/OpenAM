@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.audit;
@@ -21,11 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
-import java.lang.annotation.Annotation;
 import java.util.Collections;
-import java.util.Set;
 
-import org.forgerock.guice.core.GuiceModuleLoader;
 import org.forgerock.guice.core.InjectorConfiguration;
 import org.forgerock.http.header.TransactionIdHeader;
 import org.forgerock.openam.audit.context.AuditContextFilter;
@@ -35,8 +32,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import jakarta.servlet.FilterChain;
@@ -44,7 +42,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Module;
 
 /**
  * @since 13.0.0
@@ -55,19 +52,37 @@ public class AuditContextFilterTest {
     @Mock private HttpServletResponse httpServletResponse;
     @Mock private FilterChain filterChain;
 
-    @BeforeClass
-    public void setUpSuite() throws Exception {
-        InjectorConfiguration.setGuiceModuleLoader(new GuiceModuleLoader() {
-            @Override
-            public Set<Class<? extends Module>> getGuiceModules(Class<? extends Annotation> aClass) {
-                return Collections.<Class<? extends Module>>singleton(TestGuiceModule.class);
-            }
-        });
+    /**
+     * {@link AuditContextFilter} asks {@link org.forgerock.guice.core.InjectorHolder} for a
+     * {@link TransactionIdConfiguration}, which no module the default loader finds on this classpath binds. This class
+     * is not a {@code GuiceTestCase}, so no per-test injector is registered: the binding from {@link TestGuiceModule}
+     * has to be in the holder's own injector, the first injector of the JVM. The holder builds that injector from the
+     * module loader in place at that moment and never consults the loader again, so ask for {@link TestGuiceModule}
+     * before any test of the suite runs: a {@code @BeforeClass} comes too late whenever surefire happens to run another
+     * class that touches the holder ahead of this one.
+     *
+     * Two limits remain. TestNG creates the instances of all test classes before any {@code @BeforeSuite} method runs,
+     * so a constructor or field initializer that reaches the holder still goes first. And the loader is set for the
+     * whole JVM: every other class in it that reaches the holder sees this binding, and a second class that sets a
+     * different loader from its own {@code @BeforeSuite} would make the winner depend on class order again.
+     */
+    @BeforeSuite(alwaysRun = true)
+    public void setupGuiceModuleLoader() {
+        InjectorConfiguration.setGuiceModuleLoader(moduleAnnotation -> Collections.singleton(TestGuiceModule.class));
     }
 
     @BeforeMethod
     public void setupTests() {
         MockitoAnnotations.initMocks(this);
+    }
+
+    /**
+     * The binding from {@link TestGuiceModule} serves every class in the JVM, so put the flag the tests change back to
+     * its default.
+     */
+    @AfterMethod(alwaysRun = true)
+    public void resetTrustHeader() {
+        TransactionIdConfigurationImpl.trustHeader = true;
     }
 
     @Test

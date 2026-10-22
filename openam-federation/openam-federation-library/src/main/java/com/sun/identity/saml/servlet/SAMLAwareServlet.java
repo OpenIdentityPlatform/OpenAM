@@ -179,10 +179,8 @@ public class SAMLAwareServlet extends HttpServlet {
     private void IntersiteTransfer(HttpServletRequest request,
                                    HttpServletResponse response, String target) 
                                    throws IOException, ServletException {
-        // put _Sites as HashSet, loop through _Sites.
-        // to check if the real target contains the siteid from the config
-        // and if the targte port number equals the port number in config
-        // (the port number is optional)
+        // find the trusted site whose configured domain the target host is in
+        // and, if the site names a port, whose port the target carries
         URL theTarget = new URL(target);
         String theHost = theTarget.getHost();
         int thePort = theTarget.getPort();
@@ -201,8 +199,6 @@ public class SAMLAwareServlet extends HttpServlet {
             SAMLUtils.debug.message("TargetUrl Host = " + theHost+
             " Port= " + thePort);
         }
-        // target break on ":"
-        SAMLServiceManager.SiteEntry thisSite = null;
         Set trustedserver = (Set) SAMLServiceManager.
         getAttribute(SAMLConstants.TRUSTED_SERVER_LIST);
         if (trustedserver == null) {
@@ -212,31 +208,9 @@ public class SAMLAwareServlet extends HttpServlet {
                 SAMLUtils.bundle.getString("nullTrustedSite"));
             return;
         }
-        Iterator iter = trustedserver.iterator();
-        while (iter.hasNext()) {
-            String key = null;
-            int portNum = 0;
-            SAMLServiceManager.SiteEntry se =
-            (SAMLServiceManager.SiteEntry) iter.next();
-            key = se.getHostName();
-            portNum = se.getPort();
-            if (portNum != -1) {
-                if (theHost.indexOf(key) != -1) {
-                    if (thePort != -1) {
-                        if (thePort == portNum) {
-                            thisSite = se;
-                            break;
-                        }
-                    }
-                }
-            } else {
-                // there is no port number specified in the SiteEntry:Target
-                if (theHost.indexOf(key) != -1) {
-                    thisSite = se;
-                }
-            }
-        }
-        
+        SAMLServiceManager.SiteEntry thisSite =
+            SAMLUtils.getTrustedSite(trustedserver, target);
+
         if (thisSite != null) {
             //create Session
             Object ssoToken = null; 
@@ -280,7 +254,7 @@ public class SAMLAwareServlet extends HttpServlet {
             getAttribute(SAMLConstants.TARGET_SPECIFIER);
             String artifactName = (String) SAMLServiceManager.
             getAttribute(SAMLConstants.ARTIFACT_NAME);
-            iter = artis.iterator();
+            Iterator iter = artis.iterator();
             StringBuffer sb = new StringBuffer(1000);
             String samltmp = null;
             while (iter.hasNext()) {
@@ -345,7 +319,7 @@ public class SAMLAwareServlet extends HttpServlet {
             // TARGET comes from the request and is redirected to below; the
             // realm's Valid goto URL list decides whether it may be, before
             // any session is created for it.
-            if (!RealmGotoUrlValidator.isValid(targeturl,
+            if (!RealmGotoUrlValidator.isValid(request, targeturl,
                     (String) sessionAttr.get(SessionProvider.REALM))) {
                 SAMLUtils.debug.warning("SAMLAwareServlet.ArtifactHandler: "
                     + "refusing a TARGET outside the realm's valid goto URLs");

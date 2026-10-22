@@ -416,11 +416,14 @@ public class AMCertStore {
          */ 
 
         try {
-            String searchFilter = 
+            String searchFilter =
                     AMCertStore.setSearchFilter(attrName, attrValue);
 
-            ldapParam.setSearchFilter(searchFilter);
-            AMCertStore store = new AMCertStore(ldapParam);
+            // On a copy: the caller's parameters may be shared with a CRL store part way through
+            // a search of its own, and would otherwise point that search at this entry.
+            AMLDAPCertStoreParameters storeParam = new AMLDAPCertStoreParameters(ldapParam);
+            storeParam.setSearchFilter(searchFilter);
+            AMCertStore store = new AMCertStore(storeParam);
             ldapcert = store.getCertificate();
         } catch (Exception e) {
             if (debug.messageEnabled()) {

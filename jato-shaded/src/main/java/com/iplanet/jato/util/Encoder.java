@@ -143,6 +143,9 @@ public class Encoder {
                         .collect(Collectors.joining("; ")));
             debug.message("Encoder:deserialize callers trace: " + trace);
         }
+        // This path also serves the unauthenticated authentication UI (JATO's own page-session handling),
+        // so it keeps the default limits; the admin console raises its depth in ConsoleViewBeanBase's
+        // deserializePageAttributes override and in its own call sites instead.
         return IOUtils.deserialise(b, compressed);
     }
 }

@@ -25,6 +25,7 @@
    $Id: idpSingleLogoutInit.jsp,v 1.9 2009/10/15 00:00:41 exu Exp $
 
    Portions Copyrighted 2010-2014 ForgeRock AS
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 
@@ -32,6 +33,7 @@
 <%@ page import="com.sun.identity.plugin.session.SessionException" %>
 <%@ page import="com.sun.identity.plugin.session.SessionManager" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
@@ -39,7 +41,7 @@
 <%@ page import="com.sun.identity.saml2.profile.IDPSingleLogout" %>
 <%@ page import="com.sun.identity.saml2.profile.LogoutUtil" %>
 <%@ page import="java.util.HashMap" %>
-<%@ page import="org.owasp.esapi.ESAPI" %>
+<%@ page import="com.sun.identity.shared.encode.URLEncDec" %>
 <%@ page import="java.io.PrintWriter" %>
 
 <%--
@@ -76,9 +78,6 @@
         if ((relayState == null) || (relayState.length() == 0)) {
             relayState = request.getParameter(SAML2Constants.GOTO);
         }
-        if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
-            relayState = null;
-        }
         Object ssoToken = null;
         try {
               ssoToken = SessionManager.getProvider().getSession(request);
@@ -87,13 +86,32 @@
                     "openam.idpsloinit.nosession.intermmediate.page", "");
 
             if ( intermmediatePage.length() != 0 ) {
-               if (relayState != null) {
-                   intermmediatePage = intermmediatePage + "?RelayState=" + relayState;
-               } 
+               // The intermediate page is expected to redirect on to the RelayState, so the RelayState has to
+               // pass the same check here as it does on the branches that redirect to it directly. The page
+               // itself comes from configuration, the relay state does not: encode it so that it cannot append
+               // parameters of its own to that page.
+               // This branch names no hosted entity of its own, so isValidForRequest would take the metaAlias
+               // from the request - letting the caller choose whose relayStateUrlList judges their redirect.
+               // Nothing else here uses it, so no whitelist is consulted and only this server's origin is.
+               if (relayState != null
+                       && RelayStateValidator.isValidForEntity(request, null, null, relayState,
+                                SAML2Constants.IDP_ROLE)) {
+                   intermmediatePage = URLEncDec.appendQueryParameter(intermmediatePage,
+                       SAML2Constants.RELAY_STATE, relayState);
+               } else if (relayState != null) {
+                   // The sibling branches forward to default.jsp with a message; here the intermediate page is
+                   // still reached, so say in the log why it was reached without a RelayState.
+                   SAML2Utils.debug.warning("idpSingleLogoutInit.jsp: the RelayState is not a permitted redirect "
+                       + "target, redirecting to the intermediate page without it");
+               }
                response.sendRedirect(intermmediatePage);
             } else {
-                if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE) &&
-                    ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true)) {
+                // This branch names no hosted entity of its own, so isValidForRequest would take the metaAlias
+                // from the request - letting the caller choose whose relayStateUrlList judges their redirect.
+                // Nothing else here uses it, so no whitelist is consulted and only this server's origin is.
+                if (relayState != null
+                        && RelayStateValidator.isValidForEntity(request, null, null, relayState,
+                                SAML2Constants.IDP_ROLE)) {
                    response.sendRedirect(relayState);
                } else {
                    %>
@@ -117,8 +135,12 @@
         }
         if (metaAlias == null) {
             SessionManager.getProvider().invalidateSession(ssoToken, request, response);
-            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)
-                    && ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true)) {
+            // This branch names no hosted entity of its own, so isValidForRequest would take the metaAlias
+            // from the request - letting the caller choose whose relayStateUrlList judges their redirect.
+            // Nothing else here uses it, so no whitelist is consulted and only this server's origin is.
+            if (relayState != null
+                    && RelayStateValidator.isValidForEntity(request, null, null, relayState,
+                                SAML2Constants.IDP_ROLE)) {
                 response.sendRedirect(relayState);
             } else {
                 %>
@@ -182,8 +204,8 @@
         IDPSingleLogout.initiateLogoutRequest(request,response, new PrintWriter(out, true),
             binding,paramsMap);
         if (!response.isCommitted()) {
-            if (relayState != null && SAML2Utils.isRelayStateURLValid(metaAlias, relayState, SAML2Constants.IDP_ROLE)
-                    && ESAPI.validator().isValidInput("RelayState", relayState, "URL", 2000, true)) {
+            if (relayState != null && RelayStateValidator.isValidForMetaAlias(request, metaAlias, relayState,
+                    SAML2Constants.IDP_ROLE)) {
                 response.sendRedirect(relayState);
             } else {
                 %>

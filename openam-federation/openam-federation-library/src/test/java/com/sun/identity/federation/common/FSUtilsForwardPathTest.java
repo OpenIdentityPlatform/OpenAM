@@ -45,7 +45,9 @@ public class FSUtilsForwardPathTest {
     @BeforeMethod
     public void setUp() {
         // forwardRequest reads the static deployment URI; pinned per test and
-        // restored whatever the outcome.
+        // restored whatever the outcome. FSUtilsTest and FSUtilsForwardRewriteTest
+        // pin the same static, so this takes the same lock they do.
+        FederationStaticsLock.acquire();
         savedDeploymentURI = FSUtils.deploymentURI;
         FSUtils.deploymentURI = "/openam";
         request = mock(HttpServletRequest.class);
@@ -56,7 +58,11 @@ public class FSUtilsForwardPathTest {
 
     @AfterMethod(alwaysRun = true)
     public void restoreDeploymentUri() {
-        FSUtils.deploymentURI = savedDeploymentURI;
+        try {
+            FSUtils.deploymentURI = savedDeploymentURI;
+        } finally {
+            FederationStaticsLock.release();
+        }
     }
 
     @Test

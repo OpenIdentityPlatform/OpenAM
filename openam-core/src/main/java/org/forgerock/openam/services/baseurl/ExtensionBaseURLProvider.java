@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.services.baseurl;
@@ -29,6 +29,16 @@ import org.forgerock.openam.utils.OpenAMSettings;
 public class ExtensionBaseURLProvider extends BaseURLProvider {
     private static final String EXTENSION_TYPE = "base-url-extension-class";
     private BaseURLProvider delegate;
+
+    /**
+     * The provider the configured extension class turned out to be, which is the one that decides where the base URL
+     * comes from. <code>null</code> until {@link #init(OpenAMSettings, String)} has run.
+     *
+     * @return The wrapped provider.
+     */
+    BaseURLProvider getDelegate() {
+        return delegate;
+    }
 
     @Override
     protected String getBaseURL(HttpServletRequest request) {

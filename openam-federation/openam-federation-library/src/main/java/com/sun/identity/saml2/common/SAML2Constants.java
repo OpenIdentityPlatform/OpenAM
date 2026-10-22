@@ -25,6 +25,7 @@
  * $Id: SAML2Constants.java,v 1.44 2009/11/24 21:53:02 madan_ranganath Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.saml2.common;
 
@@ -1638,6 +1639,71 @@ public interface SAML2Constants {
      * Property to determine whether SAML SP Decryption Debug mode has been enabled.
      */
     String SAML_DECRYPTION_DEBUG_MODE = "openam.saml.decryption.debug.mode";
+
+    /**
+     * Extended metadata attribute of a hosted SP that lets it accept an unsigned response whose
+     * assertions are unsigned too, when the response arrived over the HTTP-Artifact binding.
+     *
+     * <p>Absent or empty, the deployment-wide
+     * {@link #SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS_PROPERTY} decides. Only extended metadata can
+     * leave it empty: a console checkbox has two states where this needs three, so it is not
+     * offered there.
+     *
+     * <p>The relaxation is confined to HTTP-Artifact, which the SP fetches over a back channel of
+     * its own choosing, and further to an SP whose assertion consumer service actually publishes
+     * that binding - a response is labelled artifact-delivered on the strength of a {@code SAMLart}
+     * request parameter alone. It never applies to HTTP-POST or ECP/PAOS, where the response is
+     * attacker-supplied front-channel input, and it never overrides a
+     * {@code WantAssertionsSigned} of {@code true} in the SP metadata. See GHSA-3j2f-qhrc-rjfj.
+     *
+     * <p>Delivery over that back channel is not, in itself, an assurance of who issued the
+     * assertion. The IdP the artifact is resolved against is chosen by the {@code SourceID} inside
+     * the artifact, while the identity the assertion claims is the {@code Issuer} written inside
+     * the response, and that {@code Issuer} is only checked for membership of the circle of trust.
+     * The assertion signature is what ties the two together, so dropping it lets any trusted IdP
+     * assert as any other. The relaxation therefore also requires
+     * {@link #WANT_ARTIFACT_RESPONSE_SIGNED} to be {@code true}, and the response resolved from an
+     * artifact has to be issued by the IdP it was resolved against - see
+     * {@code SPACSUtils.getResponseFromArtifact}. Set it only for an IdP you trust with the
+     * identities of every other IdP the service provider trusts.
+     *
+     * <p>The literal {@code true} relaxes the requirement and nothing else does - the value is read
+     * exactly as {@link #WANT_ARTIFACT_RESPONSE_SIGNED} has to be, which
+     * {@code SPACSUtils.getResponseFromArtifact} compares byte for byte when it decides whether to
+     * verify the {@code ArtifactResponse} at all.
+     */
+    String SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS = "allowUnsignedArtifactAssertions";
+
+    /**
+     * Deployment-wide fallback for {@link #SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS}, consulted for a
+     * hosted SP that does not set that attribute. Defaults to {@code false} - the signature is
+     * required on every binding. Read the same way, so the literal {@code true} and nothing else
+     * relaxes anything.
+     *
+     * <p>It cannot relax anything on its own: {@link #WANT_ARTIFACT_RESPONSE_SIGNED} is empty in
+     * both SP templates and gates the relaxation ahead of this property, so the extended metadata
+     * of an SP that is to accept unsigned artifact assertions has to be edited in any case.
+     *
+     * <p>The key is registered in {@code validserverconfig.properties}. That is not only what lets
+     * Server Defaults accept it: an upgrade deletes every Server Defaults key missing from that
+     * file ({@code UpgradeServerDefaultsStep}), which would take the fallback away on the next
+     * upgrade and break artifact SSO on every SP relying on it.
+     */
+    String SP_ALLOW_UNSIGNED_ARTIFACT_ASSERTIONS_PROPERTY =
+            "openam.saml.sp.artifact.allow.unsigned.assertions";
+
+    /**
+     * Key under which {@code SAML2Utils.verifyResponse} reports the bearer assertions it accepted,
+     * as a map of assertion id to the instant in milliseconds until which it is accepted - the
+     * {@code NotOnOrAfter} of its bearer subject confirmation plus {@code assertionTimeSkew} - and
+     * so until which its one-time marker has to last. Never {@code null} as {@code verifyResponse}
+     * fills it, a bearer subject confirmation without a {@code NotOnOrAfter} being rejected before
+     * it gets here. Every one of them is claimed by {@code SPACSUtils.markAssertionAsConsumed} once
+     * the response has been accepted, because every one of them is checked against the one-time
+     * cache on the way in. See
+     * GHSA-3j2f-qhrc-rjfj.
+     */
+    String BEARER_ASSERTION_IDS = "BearerAssertionIDs";
 
     /**
      * Property name used to store the remote IdP's SAML response as an attribute of the HttpServletRequest.

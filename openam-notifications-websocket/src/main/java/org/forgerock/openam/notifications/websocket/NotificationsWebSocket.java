@@ -58,11 +58,13 @@ import org.slf4j.LoggerFactory;
  *     {
  *         "id": "some-id-here", # this is optional
  *         "action": "subscribe",
- *         "topic": "/some/topic/string"
+ *         "topic": "/agent/session"
  *     }
  * </pre>
  * <p>
  * When the <code>id</code> is present in the request, it shall be echoed back with any response messages.
+ * <p>
+ * Only <code>/agent/*</code> topics may be subscribed to; all other topics are internal.
  *
  * @since 14.0.0
  */
@@ -74,6 +76,8 @@ public final class NotificationsWebSocket {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationsWebSocket.class);
     private static final long TIMEOUT_MILLISECONDS = 1000 * 60;
+    // Clients may only subscribe to agent topics; other topics are internal.
+    private static final String ALLOWED_TOPIC_PREFIX = "/agent/";
 
     private final NotificationBroker broker;
     private final TimeService timeService;
@@ -187,6 +191,11 @@ public final class NotificationsWebSocket {
         }
 
         String topic = json.get("topic").asString();
+
+        if (!topic.startsWith(ALLOWED_TOPIC_PREFIX)) {
+            sendError(session, id, "topic not permitted");
+            return;
+        }
 
         subscription.bindTo(Topic.of(topic));
         sendMessage(session, id, topic, "subscription registered");

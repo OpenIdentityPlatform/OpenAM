@@ -141,6 +141,11 @@
             <param-value>JATO</param-value>
         </init-param>
     </filter>
+    <!-- A filter-mapping that names no <dispatcher> runs on REQUEST dispatches only. The roots
+         of the ones mapped narrower than /*, from here down to the CORSFilter mappings, are
+         mirrored by FSUtils.REQUEST_ONLY_FILTER_ROOTS, which turns a federation forward into
+         them into a redirect so that the browser's own request runs the filter; map a filter
+         on a new root without a dispatcher and add the root there too. -->
     <filter-mapping>
         <filter-name>JatoAuditFilter</filter-name>
         <url-pattern>/service/*</url-pattern>
@@ -242,10 +247,12 @@
         <url-pattern>/oauth2/*</url-pattern>
     </filter-mapping>
 
-    <!-- A filter-mapping that names no <dispatcher> applies to REQUEST only, so a
-         RequestDispatcher forward or include, an async dispatch or an error-page dispatch
-         reaches the endpoint with the filter skipped. Naming any type replaces that default,
-         so the security filters below list every type. -->
+    <!-- All five dispatcher types are declared: naming any <dispatcher> replaces the default
+         REQUEST-only mapping, so every type this filter must cover has to be listed or an
+         internal forward/include/async/error dispatch would bypass this security filter.
+         The url-patterns below are mirrored by FSUtils.INTERNAL_FORWARD_ROOTS, which refuses a
+         federation forward into them even on a container that ignores this configuration; add
+         a security filter here and add its root there too. -->
     <filter-mapping>
         <filter-name>AuthNFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>

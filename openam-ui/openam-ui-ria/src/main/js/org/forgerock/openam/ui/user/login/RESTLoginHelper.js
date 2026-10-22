@@ -31,13 +31,34 @@ define([
     "org/forgerock/openam/ui/user/UserModel",
     "org/forgerock/openam/ui/user/login/logout",
     "org/forgerock/openam/ui/common/util/uri/query",
-    "org/forgerock/openam/ui/user/login/gotoUrl"
+    "org/forgerock/openam/ui/user/login/gotoUrl",
+    "org/forgerock/openam/ui/common/util/uri/redirectUrl"
 ], ($, _, AbstractConfigurationAware, Configuration, ServiceInvoker, ViewManager, Constants, URIUtils,
-    fetchUrl, SessionToken, AuthNService, SessionService, UserModel, logout, query, gotoUrl) => {
+    fetchUrl, SessionToken, AuthNService, SessionService, UserModel, logout, query, gotoUrl, redirectUrl) => {
     var obj = new AbstractConfigurationAware();
+
+    // RESTLoginView#handleParams has stored the gotoOnFail of the address bar as it stands, and CommonConfig
+    // (EVENT_LOGIN_REQUEST, in commons-ui) sends a failed login to it unless it is replaced here, so only the
+    // server's verdict on it may stay: the failure URL /json/authenticate answered with, which is that gotoOnFail
+    // when it passed the goto URL list. With no answer, or one that is not http(s), it is dropped.
+    function keepOnlyTheFailureUrlTheServerAnswered (failureUrl) {
+        const urlParams = Configuration.globalData.auth.urlParams;
+        if (!_.has(urlParams, "gotoOnFail")) {
+            return;
+        }
+        if (redirectUrl.isHttpUrl(failureUrl)) {
+            urlParams.gotoOnFail = failureUrl;
+        } else {
+            delete urlParams.gotoOnFail;
+        }
+    }
 
     obj.login = function (params, successCallback, errorCallback) {
         var self = this;
+        const loginFailed = (reason, failureUrl) => {
+            keepOnlyTheFailureUrlTheServerAnswered(failureUrl);
+            errorCallback(reason);
+        };
         AuthNService.getRequirements(params).then(function (requirements) {
             // populate the current set of requirements with the values we have from params
             var populatedRequirements = _.clone(requirements);
@@ -55,7 +76,7 @@ define([
                             successCallback(user);
                             AuthNService.resetProcess();
                         });
-                    }, errorCallback);
+                    }, loginFailed);
                 } else if (result.hasOwnProperty("authId")) {
                     // re-render login form for next set of required inputs
                     if (ViewManager.currentView === "LoginView") {
@@ -71,12 +92,12 @@ define([
                         location.href = href;
                     }
                 }
-            }, function (failedStage, errorMsg) {
+            }, function (failedStage, errorMsg, failureUrl) {
                 if (failedStage > 1) {
                     // re-render login form, sending back to the start of the process.
                     ViewManager.refresh();
                 }
-                errorCallback(errorMsg);
+                loginFailed(errorMsg, failureUrl);
             });
         });
     };
@@ -131,20 +152,12 @@ define([
         const promise = $.Deferred();
         let context = "";
 
-        const goto = query.parseParameters().goto;
+        // RESTLoginView#handleParams has already stored this goto as it stands in the address bar, and that is
+        // what the browser is sent to after login unless it is replaced here, so only the server's verdict on it
+        // may stay. /json/authenticate does not judge it: it reads a goto from the request body only.
+        const goto = query.parseParameters(URIUtils.getCurrentCompositeQueryString()).goto;
 
-        if (goto) {
-            AuthNService.validateGotoUrl(goto).then((data) => {
-                if (data.successURL.indexOf("/") === 0 &&
-                    data.successURL.indexOf(`/${Constants.context}`) !== 0) {
-                    context = `/${Constants.context}`;
-                }
-                gotoUrl.set(encodeURIComponent(context + data.successURL));
-                promise.resolve();
-            }, () => {
-                promise.reject();
-            });
-        } else {
+        const useSuccessUrl = () => {
             if (successUrl !== Constants.CONSOLE_PATH) {
                 if (!Configuration.globalData.auth.urlParams) {
                     Configuration.globalData.auth.urlParams = {};
@@ -155,6 +168,27 @@ define([
                 }
             }
             promise.resolve();
+        };
+        const dropGoto = () => {
+            gotoUrl.remove();
+            useSuccessUrl();
+        };
+
+        if (goto) {
+            AuthNService.validateGotoUrl(goto).then((data) => {
+                if (!data || !redirectUrl.isHttpUrl(data.successURL)) {
+                    dropGoto();
+                    return;
+                }
+                if (data.successURL.indexOf("/") === 0 &&
+                    data.successURL.indexOf(`/${Constants.context}`) !== 0) {
+                    context = `/${Constants.context}`;
+                }
+                gotoUrl.set(encodeURIComponent(context + data.successURL));
+                promise.resolve();
+            }, dropGoto);
+        } else {
+            useSuccessUrl();
         }
         return promise;
     };

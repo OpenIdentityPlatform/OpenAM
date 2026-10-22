@@ -391,7 +391,7 @@ Enable the HTML monitoring interface using this attribute.
 `ssoadm` attribute: `iplanet-am-monitoring-http-enabled`
 
 Monitoring HTTP interface authentication file path::
-Set this to path to indicate the file indicating the user name and password used to protect access to monitoring information. The default user name password combination is `demo` and `changeit`. You can encode a new password using the xref:openam-cli-tools.adoc#ampassword-1[ampassword(1)]command.
+Set this to path to indicate the file indicating the user name and password used to protect access to monitoring information. The default user name password combination is `demo` and `changeit`, which does not authenticate on a new installation: the `demo` account is created inactive because that password is published in the installer source. Give monitoring an account of its own and encode its password using the xref:openam-cli-tools.adoc#ampassword-1[ampassword(1)]command.
 
 +
 `ssoadm` attribute: `iplanet-am-monitoring-authfile-path`
@@ -2715,6 +2715,9 @@ If enabled, every request whose `response_type` includes `code` must supply a `c
 This property is *enabled by default*.
 
 +
+This property does not apply to the OAuth 2.0 device flow. A device code is bound to PKCE only when the client sends a `code_challenge` to the `/oauth2/device/code` endpoint, and in that case every poll of the token endpoint must supply the matching `code_verifier`.
+
++
 [NOTE]
 ====
 Independently of this setting, if an authorization code was issued together with a `code_challenge`, OpenAM always requires and validates the corresponding `code_verifier` when the code is exchanged at the token endpoint, as mandated by link:https://tools.ietf.org/html/rfc7636#section-4.6[RFC 7636 §4.6, window=\_top]. Disabling this property only stops OpenAM from *forcing* all clients to use PKCE; it never relaxes verification for codes that were issued with a challenge. This prevents PKCE downgrade attacks.
@@ -4995,7 +4998,16 @@ Object Deserialisation Class Whitelist::
 List of classes that are considered valid when OpenAM performs object deserialization operations.
 
 +
+Collection and map classes added to this list should be hash- or array-based (for example `java.util.HashMap`, `java.util.ArrayList`): sorted collections such as `java.util.TreeSet` and `java.util.TreeMap` are not covered by the `maxcollectiondepth` and `maxarray` resource limits below and are therefore excluded from the default list. Hash-based collections other than `java.util.HashMap`, `java.util.HashSet` and their subclasses, such as `java.util.Hashtable` or `java.util.concurrent.ConcurrentHashMap`, are not covered by the `maxweakhashkeys` limit below and must not be added either.
+
++
 property: `openam.deserialisation.classes.whitelist`
+
++
+Object deserialization is also bounded by resource limits, which you can override as an advanced server property in JEP 290 limit syntax. Limits that are not set keep their defaults: `maxdepth=20;maxrefs=100000;maxarray=100000;maxbytes=10485760;maxcollectiondepth=2;maxexpandedrefs=100000;maxweakhashkeys=32`. The byte limit applies to the data after decompression, and `maxarray` applies to the internal capacity of maps and sets, which is larger than their element count. `maxexpandedrefs` bounds the total volume of the object reconstruction: the serialized stream is scanned in a single pass before anything is deserialized, and the object graph is measured as it would expand into a tree from the root, counting each object that is shared or back-referenced once for every path that reaches it. `maxweakhashkeys` bounds the keys of one hash map, or the elements of one hash set, that are not all strings, case-insensitive keys, integers, longs, booleans, IP addresses or constants of one enum: such keys that share a hash code cannot be ordered and are compared with each other on every insertion. A collection or map used as a key is always rejected. Whatever `maxdepth` is set to, the scan also rejects a stream nested more than 200 levels deep, so that a hostile stream cannot exhaust the call stack of the request thread. `maxcollectiondepth` bounds how deeply collections, maps and object arrays may be nested inside one another; raise it only if a legitimate payload nests collections more deeply. The admin console applies a minimum of 3 to its own page state unless `maxcollectiondepth` is set explicitly; an explicit `maxcollectiondepth` below 3 therefore breaks the administration console's page state.
+
++
+property: `openam.deserialisation.limits`
 
 --
 

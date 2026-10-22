@@ -28,17 +28,18 @@
 
 <%--
    Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <%@ page import="com.sun.identity.federation.common.FSUtils" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
 <%@ page import="com.sun.identity.saml2.meta.SAML2MetaUtils" %>
 <%@ page import="com.sun.identity.saml2.profile.DoManageNameID" %>
 <%@ page import="java.util.HashMap" %>
-<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%--
     idpMNIRequestInit.jsp initiates the ManageNameIDRequest at
@@ -110,9 +111,6 @@
         }
 
         String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-        if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
-            relayState = null;
-        }
         String affiliationID =
             request.getParameter(SAML2Constants.AFFILIATION_ID);
 
@@ -141,8 +139,10 @@
                                           metaAlias, spEntityID, paramsMap);
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE) &&
-                ESAPI.validator().isValidInput("HTTP URL Value: " + relayState, relayState, "URL", 2000, true)) {
+            // The metaAlias that drove the request above is the one the RelayState is measured against:
+            // isValidForRequest would prefer the one in the URI, which need not be the same alias.
+            if (relayState != null
+                    && RelayStateValidator.isValidForMetaAlias(request, metaAlias, relayState, SAML2Constants.IDP_ROLE)) {
                 response.sendRedirect(relayState);
             } else {
                 %>

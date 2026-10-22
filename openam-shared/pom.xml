@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>16.1.4-SNAPSHOT</version>
+        <version>16.2.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -170,4 +170,38 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/IOUtilsJvmSerialFilterTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <!-- jdk.serialFilter can be set only once per JVM, so this test needs a JVM of its own -->
+                    <execution>
+                        <id>jvm-serial-filter</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <argLine>${java.surefire.options} -Djdk.serialFilter=!java.util.Collections$SingletonList</argLine>
+                            <includes>
+                                <include>**/IOUtilsJvmSerialFilterTest.java</include>
+                            </includes>
+                            <excludes combine.self="override" />
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

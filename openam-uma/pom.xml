@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.openidentityplatform.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>16.1.4-SNAPSHOT</version>
+        <version>16.2.0-SNAPSHOT</version>
     </parent>
 
     <name>OpenAM UMA</name>
@@ -52,6 +52,14 @@
         <dependency>
             <groupId>org.openidentityplatform.commons.http-framework</groupId>
             <artifactId>core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openidentityplatform.commons.http-framework</groupId>
+            <artifactId>client-apache-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>

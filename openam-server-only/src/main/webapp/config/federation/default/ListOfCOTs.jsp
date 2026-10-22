@@ -28,6 +28,7 @@
 
  <%--
      Portions Copyrighted 2013 ForgeRock AS
+     Portions Copyright 2026 3A Systems, LLC.
   --%>
 
 
@@ -37,6 +38,7 @@
  %>
 <%@ page import="com.sun.identity.authentication.service.AuthUtils" %>
 <%@ page import="com.sun.identity.authentication.service.AuthD" %>
+<%@ page import="com.sun.identity.federation.common.FSUtils" %>
 
 <%@ include file="Header.jsp"%>
 
@@ -62,9 +64,6 @@
             metaAlias = "";
     }
     String LRURL = request.getParameter(LRURLKey);
-    if (!ESAPI.validator().isValidInput("URL Value: " + LRURL, LRURL, "URL", 2000, true)){
-        LRURL = null;
-    }
     String actionURL = LibertyManager.getConsentHandlerURL(request);
     String providerID = LibertyManager.getEntityID(metaAlias);
     String providerRole = LibertyManager.getProviderRole(metaAlias);
@@ -74,21 +73,38 @@
         response.sendError(response.SC_INTERNAL_SERVER_ERROR,"Not able to get Provider ID");
         return;
     }
-    if(LRURL == null || LRURL.length() <= 0) {
-        LRURL = LibertyManager.getHomeURL(providerID, providerRole);
-    }
-    if (LRURL != null) {
-        String orgDN = AuthUtils.getDomainNameByRequest(request, new Hashtable(0));
-        AuthD authD = AuthD.getAuth();
-        if (authD.isGotoUrlValid(LRURL, orgDN)) {
+    if (LRURL != null && LRURL.length() > 0) {
+        // LRURL arrives on the request and ends up in a redirect, so it has to be checked. The realm whose
+        // goto whitelist judges it is determined by this server rather than by the caller: the metaAlias this
+        // page is entered with is a request parameter, so a realm derived from it would be as caller
+        // controlled as the URL being judged - the caller would name whichever realm has a permissive
+        // whitelist and have it vouch for their own redirect. getDomainNameByRequest() with no query
+        // parameters to read resolves the realm from the name this server was reached by, which answers the
+        // root realm unless the deployment maps a host name per realm. A relative URL is kept whether that
+        // realm configures a goto list or not; an absolute one pointing back at this server is kept only
+        // while it configures none, since a list that is configured decides on its own.
+        String orgDN = AuthUtils.getDomainNameByRequest(request, new HashMap<String, String>());
+        if (!AuthD.getAuth().isGotoUrlValid(request, LRURL, orgDN)) {
+            // The configured home URL is used instead, the way an absent LRURL is answered, so say in the log
+            // why the one on the request was dropped.
+            FSUtils.debug.warning("ListOfCOTs.jsp: the LRURL is not a permitted redirect target, "
+                + "falling back to the home URL of the provider");
             LRURL = null;
         }
+    } else {
+        LRURL = null;
+    }
+    if (LRURL == null) {
+        // The home URL comes from the provider's own metadata rather than from the request, so it is an
+        // administrator configured destination and is not measured against this server's origin.
+        LRURL = LibertyManager.getHomeURL(providerID, providerRole);
     }
     if (cotSet == null) {
-        if (LRURL != null) {
+        // An empty home URL would make this a redirect to the current URI, i.e. back to this page.
+        if (LRURL != null && LRURL.length() > 0) {
             response.sendRedirect(LRURL);
         } else {
-            response.sendError(response.SC_INTERNAL_SERVER_ERROR, "Not able to validate the RelayState URL");
+            response.sendError(response.SC_INTERNAL_SERVER_ERROR, "Not able to determine the return URL");
         }
         return;
     }
@@ -106,8 +122,10 @@
 
     <tr>
     <td align="center">
-        <input type="hidden" name="LRURL" value="<%= LRURL %>">
-        <input type="hidden" name="metaAlias" value="<%= metaAlias%>">
+        <input type="hidden" name="LRURL" value="<%= LRURL == null ? "" :
+            ESAPI.encoder().encodeForHTMLAttribute(LRURL) %>">
+        <input type="hidden" name="metaAlias" value="<%=
+            ESAPI.encoder().encodeForHTMLAttribute(metaAlias) %>">
         <input type="hidden" name="action" >
         <select name="<%=COTKey%>" size="1" >
 

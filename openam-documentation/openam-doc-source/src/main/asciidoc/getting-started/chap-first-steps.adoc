@@ -337,7 +337,9 @@ Now that you have completed the steps above, you can access the protected web pa
 +
 At this point, the policy agent intercepts your request for the page. Your browser does not return a cookie indicating an OpenAM session, so the policy agent redirects you to OpenAM to authenticate.
 
-. Log in as the built-in default OpenAM demonstration user `demo` with password `changeit`.
+. Log in as the built-in OpenAM demonstration user `demo` with password `changeit`.
++
+The `demo` account is created *inactive*, because `changeit` is a published default password and an active account carrying it would be usable by anyone who knows the product. Before this step, activate it in the OpenAM console under Realms > Top Level Realm > Identities > demo, keeping `changeit` as its password so that the steps below work as written. When you have finished the tutorial, delete the account — outside of a tutorial, an account whose password is published in the product source has no place in a deployment. See xref:../admin-guide/chap-securing.adoc#avoid-obvious-defaults["Avoiding Obvious Defaults"] in the __Administration Guide__.
 +
 
 [#figure-openam-login]

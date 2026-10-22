@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.security.whitelist;
 
@@ -36,6 +37,10 @@ import org.forgerock.openam.shared.security.whitelist.ValidDomainExtractor;
 /**
  * Extracts the valid goto URL domains from the Authentication service configuration and caches the result. If the
  * configuration changes, a service listener should clear the corresponding cache entry resulting in a config reload.
+ *
+ * <p>Per {@link ValidDomainExtractor#extractValidDomains(Object)} an empty collection means the realm was read and
+ * has no resources in its Validation Service - what a fresh installation looks like - while <code>null</code> means
+ * the configuration store could not be reached, so nothing is known about what the realm allows.
  */
 public class ValidGotoUrlExtractor implements ValidDomainExtractor<String> {
 

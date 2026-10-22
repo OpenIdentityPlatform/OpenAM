@@ -30,6 +30,11 @@ An OpenAM __Fedlet__ is a small web application that that acts as a lightweight 
 
 Fedlets are easy to integrate into Java web applications. The Fedlet does not require an entire OpenAM installation alongside your application, but instead can redirect to OpenAM for single sign-on, and to retrieve SAML assertions.
 
+[NOTE]
+====
+Examples in this chapter authenticate as the demonstration user `demo` with the password `changeit`. A new installation creates that account inactive, so activate it and give it a password of your own before you begin, and substitute that password in the examples. See xref:../admin-guide/chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"] in the __Administration Guide__.
+====
+
 [#sec-fedlet-java]
 === Using Fedlets in Java Web Applications
 

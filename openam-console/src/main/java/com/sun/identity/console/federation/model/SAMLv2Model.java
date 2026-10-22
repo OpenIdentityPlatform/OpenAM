@@ -25,6 +25,7 @@
  * $Id: SAMLv2Model.java,v 1.34 2009/11/24 21:48:40 madan_ranganath Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.console.federation.model;
@@ -224,6 +225,8 @@ public interface SAMLv2Model
         "wantAssertionEncrypted";
     public static final String WANT_ARTIF_RESP_SIGN = 
         "wantArtifactResponseSigned";
+    public static final String ALLOW_UNSIGNED_ARTIF_ASSERTIONS =
+        "allowUnsignedArtifactAssertions";
     public static final String WANT_POST_RESP_SIGN =
         "wantPOSTResponseSigned";
     public static final String SP_META_ALIAS =

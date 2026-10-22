@@ -60,7 +60,7 @@ $ ssoadm \
  --password-file /tmp/pwd.txt \
  --attributevalues iplanet-am-monitoring-http-enabled=true
 ----
-The default authentication file allows you to authenticate over HTTP as user `demo`, password `changeit`. The user name and password are kept in the file specified, with the password encrypted:
+The default authentication file names user `demo` with the password `changeit`. The user name and password are kept in the file specified, with the password encrypted:
 
 [source, console]
 ----
@@ -75,6 +75,11 @@ $ cat openam/openam/opensso_mon_auth
 demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u
 ----
 You can encrypt a new password using the `ampassword` command. After changing the authentication file, you must restart OpenAM for the changes to take effect.
+
+[IMPORTANT]
+====
+A new installation creates the `demo` account *inactive*, because `changeit` is published in the OpenAM installer source, so monitoring authentication over HTTP fails as shipped. Monitoring is disabled by default, so nothing is broken until you enable it. Before you do, give monitoring an account of its own rather than reusing `demo`: create a user, encrypt its password with `ampassword`, and write that user name and password into the authentication file.
+====
 
 [#figure-web-based-monitoring]
 image::images/web-based-monitoring.png[]

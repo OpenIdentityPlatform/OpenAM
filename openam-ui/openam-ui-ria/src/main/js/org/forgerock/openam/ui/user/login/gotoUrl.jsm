@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 
 /**
@@ -32,6 +33,12 @@ export function get () {
 
 export function exists () {
     return _.has(Configuration, "globalData.auth.urlParams.goto");
+}
+
+export function remove () {
+    if (exists()) {
+        delete Configuration.globalData.auth.urlParams.goto;
+    }
 }
 
 export function toHref () {

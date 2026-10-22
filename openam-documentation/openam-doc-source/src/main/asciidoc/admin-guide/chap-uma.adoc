@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -1633,6 +1633,8 @@ For more information, see xref:#managing-pending-uma-requests["Managing Pending 
 ==== Managing Pending UMA Permission Requests
 
 OpenAM supports an UMA workflow in which a user can request access to a resource that has not been explicitly shared with them. The resource owner receives a notification of the request and can choose to allow or deny access.
+
+When OpenAM notifies a resource owner of a pending request, or a requesting party of its approval, it shows the `name` of each scope that is a URI by fetching the scope description from it. OpenAM fetches a scope URI only when it uses `http` or `https` and its host does not resolve to a loopback, private, link-local or other special-purpose address (link:https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-7q42-6xr7-9rmw[GHSA-7q42-6xr7-9rmw, window=\_blank]); a host is refused when __any__ of its addresses is internal. The addresses are checked again when OpenAM connects, and redirects are not followed. When `org.forgerock.openam.httpclienthandler.system.proxy.enabled` is `true`, only the check before the fetch applies, also for hosts that bypass the proxy (`http.nonProxyHosts`). Other scope URIs appear in the email as they are, and each one is logged as a warning to the `UmaProvider` debug file. To let resource servers publish scope descriptions on an internal address, set the advanced server property `org.openidentityplatform.uma.scope-description.allow-any-address` to `true`; the scheme restriction still applies.
 
 [#to-view-pending-resource-access-requests]
 .To View and Manage Pending Access Requests

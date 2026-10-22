@@ -24,6 +24,7 @@
 --%>
 <%--
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -43,6 +44,8 @@
 <%@ page import="com.iplanet.sso.SSOToken" %>
 <%@ page import="com.sun.identity.authentication.service.AuthD" %>
 <%@ page import="com.sun.identity.idm.AMIdentity" %>
+<%@ page import="com.sun.identity.authentication.service.AuthUtils" %>
+<%@ page import="java.util.HashMap" %>
 <%
    // Internationalization stuff. You can use any internationalization framework
    String lang = request.getParameter("lang");
@@ -82,19 +85,36 @@
    String OAuth2IdP = "";
    
    String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+   // The realm is taken from the session, and failing that from the realm the authentication framework put on
+   // the request; it is deliberately not read from the request parameters, which would let the caller name a
+   // realm whose goto whitelist happens to be permissive.
+   String realm = null;
    SSOTokenManager manager = SSOTokenManager.getInstance();
    try {
        SSOToken ssoToken = manager.createSSOToken(request);
-       String realm = ssoToken.getProperty("Organization");
-       boolean isValidGotoUrl = AuthD.getAuth().isGotoUrlValid(gotoURL, realm)
-               && ESAPI.validator().isValidInput("URLContext", gotoURL, "HTTPURI", 2000, false);
-       if (!isValidGotoUrl) {
-           OAuthUtil.debugError("OAuthLogout: invalid or empty goto URL ignored on Logout page: " + gotoURL);
+       realm = ssoToken.getProperty("Organization");
+       if (realm == null || realm.length() == 0) {
+           // Resolved here rather than only below, so that the two URLs this page judges are measured against
+           // the same realm: a session carrying no Organization would otherwise have the goto URL fall to the
+           // origin check while the logout URL was still read against the realm the request resolves to.
+           realm = AuthUtils.getDomainNameByRequest(request, new HashMap<String, String>());
+       }
+       // gotoURL is assigned to window.location, so the realm has to accept it as a goto URL. The ESAPI
+       // "HTTPURI" type this used to rely on accepts //attacker.example.com, and isGotoUrlValid(url, realm)
+       // accepts everything while the realm has no goto whitelist, so neither of them closed the redirect.
+       if (!AuthD.getAuth().isGotoUrlValid(request, gotoURL, realm)) {
+           // The URL stays out of the message: it has been refused, and a value carrying CRLF would
+           // forge lines in the plain text debug file.
+           OAuthUtil.debugError("OAuthLogout: the goto URL is not a permitted redirect target, "
+                   + "the default logout URL is used instead");
            gotoURL = ServiceURI + "/UI/Logout";
        }
    } catch (SSOException e) {
        OAuthUtil.debugMessage("OAuthLogout: using default goto URL because we failed to get a session");
        gotoURL = ServiceURI + "/UI/Logout";
+   }
+   if (realm == null || realm.length() == 0) {
+       realm = AuthUtils.getDomainNameByRequest(request, new HashMap<String, String>());
    }
    gotoURL = ESAPI.encoder().encodeForJavaScript(gotoURL);
    
@@ -102,16 +122,19 @@
    if (logoutURL == null) {
       logoutURL = "";
    } else {
-       boolean isValidURL = ESAPI.validator().
-               isValidInput("URLContext", logoutURL, "URL", 255, false); 
-       if (!isValidURL) {   
-           OAuthUtil.debugError("OAuthLogout: wrong logoutURL URL attempted to be used "
-                   + "in the Logout page: " + logoutURL);
+       // logoutURL is loaded in an iframe, so the realm has to accept it as a goto URL.
+       if (!AuthD.getAuth().isGotoUrlValid(request, logoutURL, realm)) {
+           // The URL stays out of the message, for the same reason as the goto URL above.
+           OAuthUtil.debugError("OAuthLogout: the logout URL is not a permitted redirect target, "
+                   + "it is not loaded");
            logoutURL = "wronglogoutURL";
        } else {
-           int loc1 = logoutURL.indexOf("//") + 2;
-           OAuth2IdP = logoutURL.substring(loc1, logoutURL.indexOf("/", loc1));
-           doYouWantToLogout = doYouWantToLogout.replace("#IDP#", OAuth2IdP);
+           // A logout URL naming no authority is resolved against this server, and the base ESAPI "URL"
+           // check - which rejected everything - meant this branch never had to name a host at all.
+           String logoutHost = OAuthUtil.getUrlHost(logoutURL);
+           OAuth2IdP = logoutHost != null ? logoutHost : request.getServerName();
+           doYouWantToLogout = doYouWantToLogout.replace("#IDP#",
+                   ESAPI.encoder().encodeForHTML(OAuth2IdP));
        }
    }
    logoutURL = ESAPI.encoder().encodeForJavaScript(logoutURL);

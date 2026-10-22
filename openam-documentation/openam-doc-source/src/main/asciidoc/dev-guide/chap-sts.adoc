@@ -28,6 +28,11 @@ This chapter covers tasks developers perform when working with OpenAM's Security
 
 The Security Token Service transforms security tokens upon request. For example, you can call the Security Token Service to convert a username and password token to a SAML v2.0 token. For a complete description of the Security Token Service, including operational flow, supported token types, configuration, and deployment, see xref:../admin-guide/chap-sts.adoc#chap-sts["Configuring the Security Token Service"] in the __Administration Guide__.
 
+[NOTE]
+====
+Examples in this chapter transform a username token holding the demonstration user `demo` with the password `changeit`. A new installation creates that account inactive, so activate it and give it a password of your own before you begin, and substitute that password in the examples. See xref:../admin-guide/chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"] in the __Administration Guide__.
+====
+
 This section covers tasks that developers perform when working with the Security Token Service:
 
 * xref:#sts-publish["Publishing STS Instances"]

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems LLC.
 ////
 
 :figure-caption!:
@@ -28,6 +28,11 @@ OpenAM provides a REST Security Token Service (STS) and a SOAP STS that allow Op
 Web services and requestors (that is, consumers or clients) are typically deployed across different security domains and topologies. Each domain may require a specific security token type to assert authenticated identities. STS provides a means to exchange tokens across these different domains without re-authenticating or re-establishing trust relationships while allowing the requestor access to a web service's protected resources.
 
 This chapter covers configuration of both OpenAM's REST and SOAP STS components. Developers should refer to the xref:../dev-guide/chap-sts.adoc#chap-sts["Working With the Security Token Service"] in the __Developer's Guide__ for information about how to publish REST and SOAP STS instances programmatically and how to invoke these services.
+
+[NOTE]
+====
+Examples in this chapter transform a username token holding the demonstration user `demo` with the password `changeit`. A new installation creates that account inactive, so activate it and give it a password of your own before you begin, and substitute that password in the examples. See xref:chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"].
+====
 
 [#sts-features]
 === Key Features of the OpenAM STS
@@ -574,6 +579,8 @@ The following are example mappings:
 * `USERNAME|service|myLDAPChain` configures STS to authenticate input `USERNAME` tokens to the `myLDAPChain` authentication chain.
 
 * `X509|module|CertModule|x509_token_auth_target_header_key=ClientCert` configures STS to obtain an X.509 certificate from the `ClientCert` header, use it as the input token, and authenticate it using the `CertModule` authentication module.
+
+A mapping that specifies `module` works only in a realm where module-based authentication is enabled, which it is not by default on a new installation. Otherwise, name a chain that contains the module and specify `service`. See xref:chap-auth-services.adoc#auth-core-security["Core Authentication Attributes - Security"].
 ====
 
 Client Certificate Header Key::
@@ -940,6 +947,8 @@ The following are example mappings:
 * `USERNAME|service|myLDAPChain` configures STS to authenticate input `USERNAME` tokens to the `myLDAPChain` authentication chain.
 
 * `X509|module|CertModule|x509_token_auth_target_header_key=ClientCert` configures STS to obtain an X.509 certificate from the `ClientCert` header, use it as the input token, and authenticate it using the `CertModule` authentication module.
++
+A mapping that specifies `module` works only in a realm where module-based authentication is enabled, which it is not by default on a new installation. Otherwise, name a chain that contains the module and specify `service`. See xref:chap-auth-services.adoc#auth-core-security["Core Authentication Attributes - Security"].
 
 
 Url of OpenAM::

@@ -24,7 +24,7 @@
  *
  * $Id: FSConsentHandler.java,v 1.2 2008/06/25 05:46:42 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.login;           
@@ -69,7 +69,12 @@ public class FSConsentHandler extends HttpServlet {
         {
             FSUtils.debug.message(
                 "FSConsentHandler:: user pressed cancel proceding to lrurl");
-            lrurl = request.getParameter(IFSConstants.LRURL);
+            // The RelayState reaches forwardRequest straight from the request here, so it
+            // needs the same allow-list check doPostLogin applies before it becomes a target.
+            // An absent one gets the provider home URL, as on the continue branch: the stock
+            // ListOfCOTs.jsp names its field LRURL, so its Cancel never sends a RelayState.
+            lrurl = FSPostLogin.checkedRelayState(request,
+                request.getParameter(IFSConstants.LRURL));
         } else {
             try {
                 FSPostLogin postLogin = new FSPostLogin();
@@ -87,12 +92,16 @@ public class FSConsentHandler extends HttpServlet {
         if (lrurl != null) {
             if (FSUtils.debug.messageEnabled()) {
                 FSUtils.debug.message("FSConsentHandler:: Redirecting to  "
-                    + lrurl );
+                    + FSUtils.forLog(lrurl) );
             }
             FSUtils.forwardRequest(request, response, lrurl);
         } else {
             FSUtils.debug.error(
                 "FSConsentHandler:: LRURL is null in request ");
+            // Nothing safe to forward to. Without this the response is never written and the
+            // container commits an empty 200, which is what the caller would have to treat as
+            // a successful logout.
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 

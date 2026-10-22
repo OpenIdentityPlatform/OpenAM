@@ -20,11 +20,14 @@
   with the fields enclosed by brackets [] replaced by
   your own identifying information:
   "Portions Copyrighted [year] [name of copyright owner]"
+
+  Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <%@ page import="com.sun.identity.shared.encode.Base64" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
-<%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="com.sun.identity.shared.encode.URLEncDec" %>
+<%@ page import="org.forgerock.openam.saml2.plugins.RelayStateValidator" %>
 <%@ page import="org.owasp.esapi.ESAPI"%>
 <%@ page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="java.util.List" %>
@@ -60,9 +63,15 @@
         <%
             }
 
+            // No hosted entity is named on purpose, so that this server's own origin is what decides. The value
+            // being checked is not a RelayState the caller supplied: SAML2IDPProxyFRImpl.buildReturnURL composes
+            // it from the URL of the request that started the SSO, so it always names this server and would be on
+            // no relayStateUrlList - consulting one would reject every proxied SSO on a deployment that has one.
+            // The metaAlias request parameter is left out for the same reason: this page carries none of its own,
+            // so honouring it would only let the caller pick which configuration is consulted.
             relayState = (String) hts.getAttribute("_RELAYSTATE_");
             if (relayState == null || relayState.isEmpty() ||
-                    !SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
+                    !RelayStateValidator.isValidForEntity(request, null, null, relayState, SAML2Constants.IDP_ROLE)) {
         %>
             <jsp:forward page="<%= errorURL %>" />
         <%
@@ -76,8 +85,10 @@
             }
 
             String spRequester = (String) hts.getAttribute("_SPREQUESTER_");
-            if (spRequester == null) response.sendRedirect(errorURL);
-            if (spRequester.isEmpty()) response.sendRedirect(errorURL);
+            if (spRequester == null || spRequester.isEmpty()) {
+                response.sendRedirect(errorURL);
+                return;
+            }
 
             samlIdP = request.getParameter("_saml_idp");
             if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + samlIdP, samlIdP,
@@ -91,18 +102,18 @@
                 hts.removeAttribute("_SPREQUESTER_");
                 hts.removeAttribute("_REQAUTHNCONTEXT_");
 
-                if (relayState.indexOf("?") == -1) {
-                    relayState += "?";
-                } else {
-                    relayState += "&";
-                }
-                response.sendRedirect(relayState + "_saml_idp=" + samlIdP);
+                // The parameter has to stay in front of the fragment and has to be encoded: samlIdP is
+                // Base64, whose '+' would otherwise be read back as a space. The page must not carry on
+                // writing its own body into the redirect either.
+                response.sendRedirect(URLEncDec.appendQueryParameter(relayState, "_saml_idp", samlIdP));
+                return;
             }
 
         %>
         <h2>Welcome to the Federation Broker</h2>
-        <p>You are here because you initiated a request in the Service Provider <b><%= spRequester %></b> and
-            <br>You asked for the <%= requestedAuthnContext == null ? "<b>default</b> " : "" %>Assurance level <b><%= requestedAuthnContext != null ? StringUtils.join(requestedAuthnContext, " ") : "" %></b>:
+        <p>You are here because you initiated a request in the Service Provider <b><%= ESAPI.encoder().encodeForHTML(spRequester) %></b> and
+            <br>You asked for the <%= requestedAuthnContext == null ? "<b>default</b> " : "" %>Assurance level <b><%= requestedAuthnContext != null
+                ? ESAPI.encoder().encodeForHTML(StringUtils.join(requestedAuthnContext, " ")) : "" %></b>:
         </p>
         <p>Please select your preferred IdP:</p>
         <form action="" method="POST">
@@ -111,7 +122,7 @@
                         for(String  preferredIDP : lista) {
                           String preferredIDPB64 = Base64.encode(preferredIDP.getBytes());
                    %>
-                   <input type="radio" name="_saml_idp" value="<%= preferredIDPB64 %>"> <%= preferredIDP %>
+                   <input type="radio" name="_saml_idp" value="<%= preferredIDPB64 %>"> <%= ESAPI.encoder().encodeForHTML(preferredIDP) %>
                    <br>
                    <%
                         }

@@ -92,6 +92,15 @@ public class DeviceCodeGrantTypeHandler extends GrantTypeHandler {
             throw new AuthorizationDeclinedException();
         }
 
+        // RFC 7636 4.6: a device code issued with a code_challenge is only redeemable with the matching
+        // code_verifier. Checked on every poll and before the expiry check and the try/finally below, so that
+        // a request without the verifier neither learns whether the user has approved the code, nor counts as
+        // the client's poll, nor deletes a code that the legitimate client could still redeem.
+        if (PkceVerifier.hasChallenge(deviceCode.getCodeChallenge())) {
+            PkceVerifier.verify(deviceCode.getCodeChallenge(), deviceCode.getCodeChallengeMethod(),
+                    request.<String>getParameter(OAuth2Constants.Custom.CODE_VERIFIER));
+        }
+
         // RFC 8628 section 3.5: an expired device code gets expired_token even if the user has approved it
         if (deviceCode.getExpiryTime() < currentTimeMillis()) {
             tryDeleteDeviceCode(clientId, code, request);

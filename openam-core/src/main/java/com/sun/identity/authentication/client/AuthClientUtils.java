@@ -74,6 +74,7 @@ import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 
 import org.forgerock.openam.core.realms.Realm;
+import org.forgerock.openam.security.whitelist.GotoUrlValidator;
 import org.forgerock.openam.security.whitelist.ValidGotoUrlExtractor;
 import org.forgerock.openam.session.SessionServiceURLService;
 import org.forgerock.openam.shared.security.whitelist.RedirectUrlValidator;
@@ -643,7 +644,7 @@ public class AuthClientUtils {
             if (manager.isValidToken(ssoToken)) {
                 utilDebug.message("Valid SSOToken");
 
-                return REDIRECT_URL_VALIDATOR.getRedirectUrl(ssoToken.getProperty(ISAuthConstants.ORGANIZATION),
+                return GotoUrlValidator.getRedirectUrl(request, ssoToken.getProperty(ISAuthConstants.ORGANIZATION),
                         REDIRECT_URL_VALIDATOR.getAndDecodeParameter(request, RedirectUrlValidator.GOTO),
                         ssoToken.getProperty("successURL"));
             }

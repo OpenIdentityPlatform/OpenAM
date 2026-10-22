@@ -48,6 +48,7 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -599,6 +600,47 @@ public class SOAPClient {
         return buf.toString();
     }
 
+    /**
+     * Resolves the exception class named in the <code>faultstring</code> of a
+     * SOAP fault. The name comes from the response, so the class is loaded
+     * without running its static initialiser and is accepted only if it is one
+     * of the exceptions the generated JAX-RPC ties name in a fault, or
+     * <code>java.rmi.RemoteException</code>; anything else would let whoever
+     * controls the response run the initialiser and a constructor of any
+     * class on the classpath.
+     *
+     * @param className the class name from the fault.
+     * @return the exception class, or <code>null</code> if the name is not
+     *         acceptable; the caller then falls back to a plain
+     *         <code>Exception</code> carrying the fault message.
+     */
+    static Class<? extends Exception> resolveFaultExceptionClass(
+        String className) {
+        if (className == null
+            || !FAULT_EXCEPTION_CLASSES.contains(className)) {
+            if (debug.warningEnabled()) {
+                debug.warning("SOAPClient: refusing fault exception class "
+                    + className);
+            }
+            return null;
+        }
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(className, false,
+                SOAPClient.class.getClassLoader());
+        } catch (ClassNotFoundException | LinkageError e) {
+            debug.error("SOAPClient: unknown fault exception class "
+                + className, e);
+            return null;
+        }
+        if (!Exception.class.isAssignableFrom(clazz)) {
+            debug.warning("SOAPClient: fault class " + className
+                + " is not an Exception");
+            return null;
+        }
+        return clazz.asSubclass(Exception.class);
+    }
+
     class SOAPContentHandler implements org.xml.sax.ContentHandler {
         Locator locator;
         
@@ -801,22 +843,18 @@ public class SOAPClient {
             // If exception is thrown, construct the exception
             if (isException) {
                 exception = null;
-                try {
-                    Class clazz = Class.forName(exceptionClassName);
-                    if (clazz != null) {
-                        exception = createResourceBasedException(clazz);
-                        if (exception == null) {
-                            exception = createCodeBasedException(clazz);
-                        }
-                        if (exception == null) {
-                            exception = createSMSCodeBasedException(clazz);
-                        }
-                        if (exception == null) {
-                            exception = createMessageBasedException(clazz);
-                        }
+                Class clazz = resolveFaultExceptionClass(exceptionClassName);
+                if (clazz != null) {
+                    exception = createResourceBasedException(clazz);
+                    if (exception == null) {
+                        exception = createCodeBasedException(clazz);
                     }
-                } catch (ClassNotFoundException e) {
-                    debug.error("JAXRPCHelper.endDocument", e);
+                    if (exception == null) {
+                        exception = createSMSCodeBasedException(clazz);
+                    }
+                    if (exception == null) {
+                        exception = createMessageBasedException(clazz);
+                    }
                 }
                 if (exception == null) {
                     if (exceptionMessage != null) {
@@ -1075,7 +1113,24 @@ public class SOAPClient {
     static final String ERROR_STRING = "errorString";
     
     static final String RMIREMOTEEXCEPTION = "java.rmi.RemoteException";
-    
+
+    /**
+     * Exception classes a SOAP fault may name: the generated JAX-RPC ties
+     * write one of these declared names as a literal, never a runtime
+     * subclass.
+     */
+    static final Set<String> FAULT_EXCEPTION_CLASSES =
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "com.iplanet.sso.SSOException",
+            "com.iplanet.am.sdk.remote.AMRemoteException",
+            "com.sun.identity.idm.IdRepoException",
+            "com.sun.identity.sm.SMSException",
+            "com.sun.identity.saml.common.SAMLException",
+            "com.sun.identity.liberty.ws.security.SecurityTokenException",
+            "com.sun.identity.entity.EntityException",
+            "com.sun.identity.federation.common.FSRemoteException",
+            RMIREMOTEEXCEPTION)));
+
     static final String SMSEXCEPTION = "com.sun.identity.sm.SMSException";
     
     static final String RESOURCE_BUNDLE_NAME = "resourceBundleName";

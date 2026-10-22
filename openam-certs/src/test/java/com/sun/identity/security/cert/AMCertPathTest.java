@@ -31,11 +31,11 @@ public class AMCertPathTest extends CertTestBase {
 
     @Test
     public void verify_selfSignedCertWithCrlDp_returnsFalse() throws Exception {
-        // withNoFetch asserts the loopback CRL DP listener (baked into ATTACKER_CERT) saw
-        // zero connections — proving the guard fires before any fetch is attempted.
-        withNoFetch(() ->
+        // withNoFetch hands over a self-signed certificate whose CRL DP is a listener of its
+        // own, then asserts it saw zero connections — proving the guard fires before any fetch.
+        withNoFetch(attackerCert ->
             withTestTrustStore(CA_CERT, () -> assertFalse(
-                    new AMCertPath(null).verify(new X509Certificate[]{ATTACKER_CERT}, false, false),
+                    new AMCertPath(null).verify(new X509Certificate[]{attackerCert}, false, false),
                     "Phase 1 PKIX check must reject a self-signed cert not in the trust store")));
     }
 

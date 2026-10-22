@@ -221,6 +221,39 @@ public interface Constants {
             "org.openidentityplatform.openam.httponly.allowTokenInBody";
 
     /**
+     * Property string controlling what an unconfigured goto URL whitelist means.
+     * <p>
+     * The <code>Valid goto URL Resources</code> list of the Validation Service is empty on a fresh
+     * installation. Defaults to <code>false</code>, meaning that with no list configured a
+     * <code>goto</code> or <code>gotoOnFail</code> URL is only honoured when it points back at this
+     * server, so an unconfigured realm cannot be used as an open redirect. Set to <code>true</code>
+     * to restore the legacy behaviour, in which an empty list accepts any URL - only do that where
+     * cross domain goto URLs are needed and configuring the Validation Service is not an option.
+     * A configured list is authoritative either way, and so is a list that could not be read at
+     * all: a configuration store that cannot be reached never counts as a realm without a list.
+     * The same list, and so this property, also decides the SAML 1.x <code>TARGET</code> and the
+     * <code>wreply</code> of a WS-Federation relying party sign-in.
+     */
+    static final String GOTO_ALLOW_ANY_URL_WITHOUT_WHITELIST =
+            "org.openidentityplatform.openam.auth.goto.allowAnyUrlWithoutWhitelist";
+
+    /**
+     * Property string controlling what an unconfigured federation redirect whitelist means.
+     * <p>
+     * The <code>relayStateUrlList</code> of a SAML2 entity and the <code>wreplyList</code> of a
+     * WS-Federation one are empty unless configured. Defaults to <code>false</code>, meaning that
+     * with no list configured a <code>RelayState</code> or <code>wreply</code> URL is only honoured
+     * when it points back at this server. Set to <code>true</code> to restore the legacy behaviour,
+     * in which an empty list accepts any URL - only do that where cross domain redirects are needed
+     * and populating the list of the hosted entity is not an option. A configured list is
+     * authoritative either way, and so is a list that could not be read at all: a configuration
+     * store that cannot be reached, or a metaAlias whose hosted entity could not be resolved, never
+     * counts as an entity without a list.
+     */
+    static final String FEDERATION_ALLOW_ANY_URL_WITHOUT_WHITELIST =
+            "org.openidentityplatform.openam.federation.allowAnyUrlWithoutWhitelist";
+
+    /**
      * Property string for cookie encoding.
      */
     static final String AM_COOKIE_ENCODE = "com.iplanet.am.cookie.encode";
@@ -1370,6 +1403,43 @@ public interface Constants {
      * in OpenAM, for example, in the JATO framework
      */
     public static final String DESERIALISATION_CLASSES_WHITELIST = "openam.deserialisation.classes.whitelist";
+
+    /**
+     * Property that defines the resource limits applied during deserialisation of Java classes in OpenAM, in the
+     * JEP 290 limit syntax, for example {@code maxdepth=20;maxrefs=100000;maxexpandedrefs=100000}.
+     * <p>
+     * The value is a {@code ;}-separated list of {@code name=value} pairs, where each value is a positive
+     * integer. The recognised names (case-sensitive) and the defaults they keep when not set are:
+     * <ul>
+     *     <li>{@code maxdepth} - maximum object graph depth, default 20;</li>
+     *     <li>{@code maxrefs} - maximum number of object references, default 100000;</li>
+     *     <li>{@code maxarray} - maximum array length, including the internal capacity of maps and sets,
+     *     default 100000;</li>
+     *     <li>{@code maxbytes} - maximum number of bytes read, after decompression, default 10485760
+     *     (10 MiB);</li>
+     *     <li>{@code maxcollectiondepth} - maximum depth to which collections, maps and object arrays may be
+     *     nested inside one another, default 2;</li>
+     *     <li>{@code maxexpandedrefs} - maximum total size of the object graph once it is expanded into a tree
+     *     from the root, counting each shared or back-referenced object once for every path that reaches it,
+     *     default 100000. This is checked by a single linear pass over the stream before anything is
+     *     deserialised, and it bounds the overall volume of the reconstruction, including graphs that share
+     *     structure through back-references;</li>
+     *     <li>{@code maxweakhashkeys} - maximum number of keys of one hash map (or elements of one hash set)
+     *     when they are not all strings, case-insensitive keys, integers, longs, booleans, IP addresses or
+     *     constants of one enum, default 32. Keys that share a hash code and cannot be ordered are compared
+     *     with each other on every insertion, so this bounds that work. A collection or map used as a key is
+     *     always rejected.</li>
+     * </ul>
+     * An unknown name, a pair without {@code =}, or a value that is not a positive integer is ignored with a
+     * warning, and the limit keeps its default. The property is read on every deserialisation, so a change
+     * takes effect without a restart.
+     * <p>
+     * The administration console's page state nests collections three levels deep and its deserialisation calls
+     * therefore raise {@code maxcollectiondepth} to at least 3 - but only while {@code maxcollectiondepth} is
+     * not set here. A value set explicitly applies to every caller as is, so setting {@code maxcollectiondepth}
+     * below 3 breaks the administration console's page state.
+     */
+    public static final String DESERIALISATION_LIMITS = "openam.deserialisation.limits";
 
     /**
      * Property used by the XML builder to retrieve a configuration specific name for an attribute schema.

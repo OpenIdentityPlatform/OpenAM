@@ -167,8 +167,14 @@ public class AuthorizeResource extends ConsentRequiredResource {
             hook.beforeAuthorizeHandling(request, getRequest(), getResponse());
         }
 
-        final boolean consentGiven = "allow".equalsIgnoreCase(request.<String>getParameter("decision"));
-        final boolean saveConsent = "on".equalsIgnoreCase(request.<String>getParameter("save_consent"));
+        // Read from the body alone. getParameter would give the query string priority, and the consent page
+        // posts back to the authorization request's own URL - ConsentRequiredResource.getDataModel builds the
+        // form's target out of the path plus that query string. A client_id link carrying
+        // &decision=allow&save_consent=on would therefore override what the resource owner actually clicked,
+        // turning a deliberate "Deny" into a granted and permanently saved consent. The consent page sends
+        // both as form fields, and the documented direct POST sends them with --data.
+        final boolean consentGiven = "allow".equalsIgnoreCase(request.getBodyParameter("decision"));
+        final boolean saveConsent = "on".equalsIgnoreCase(request.getBodyParameter("save_consent"));
 
         try {
             final AuthorizationToken authorizationToken = authorizationService.authorize(request, consentGiven,

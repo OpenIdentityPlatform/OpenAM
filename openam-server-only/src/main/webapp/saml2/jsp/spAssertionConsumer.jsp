@@ -25,6 +25,7 @@
    $Id: spAssertionConsumer.jsp,v 1.17 2010/01/23 00:07:06 exu Exp $
 
    Portions Copyrighted 2012-2016 ForgeRock AS.
+   Portions Copyright 2026 3A Systems, LLC.
 --%>
 
 <%@page
@@ -50,6 +51,7 @@ java.util.logging.Level,
 org.forgerock.guice.core.InjectorHolder,
 org.forgerock.openam.audit.AuditEventPublisher,
 org.forgerock.openam.saml2.audit.SAML2Auditor,
+org.forgerock.openam.saml2.plugins.RelayStateValidator,
 org.forgerock.openam.audit.AuditEventFactory,
 java.io.PrintWriter
 "
@@ -312,6 +314,24 @@ java.io.PrintWriter
     // redirect to relay state
     String finalUrl = SPACSUtils.getRelayState(relayState, realm, hostEntityId, metaManager);
 
+    // getRelayState() falls back to the raw request value when the cache holds nothing for it, and
+    // validateRelayStateURL() accepts any URL while the hosted entity has no relayStateUrlList, so the
+    // RelayState is checked by the fail safe validator instead: without a whitelist it only accepts URLs
+    // pointing back at this server. The default relay state and the intermediate URL are administrator
+    // configured destinations, they are deliberately not put through the whitelist.
+    if (finalUrl != null && finalUrl.length() != 0
+            && !RelayStateValidator.isValidForEntity(request, realm, hostEntityId, finalUrl,
+                    SAML2Constants.SP_ROLE)
+            && !finalUrl.equals(SPACSUtils.getDefaultRelayState(realm, hostEntityId, metaManager))) {
+        SAMLUtils.sendError(request, response,
+            response.SC_BAD_REQUEST, "requestProcessingError",
+            SAML2Utils.bundle.getString("requestProcessingError") + " "
+                + SAML2Utils.bundle.getString("invalidRelayStateUrl"));
+        saml2Auditor.auditAccessFailure(String.valueOf(response.SC_BAD_REQUEST),
+            SAML2Utils.bundle.getString("invalidRelayStateUrl"));
+        return;
+    }
+
     String realFinalUrl = finalUrl;
     if (finalUrl != null && finalUrl.length() != 0) {
         try {
@@ -326,12 +346,11 @@ java.io.PrintWriter
     String realRedirectUrl = null;
     if (redirectUrl != null && redirectUrl.length() != 0) {
         if (realFinalUrl != null && realFinalUrl.length() != 0) {
-            if (redirectUrl.indexOf("?") != -1) {
-                redirectUrl += "&goto=";
-            } else {
-                redirectUrl += "?goto=";
-            }
-            redirectUrl += URLEncDec.encode(realFinalUrl);
+            // The parameter goes on through the helper rather than by hand: an intermediate page configured as
+            // .../land#home would otherwise take the goto inside its fragment and never see it, and a page that
+            // already carries a goto of its own would keep that one, since getParameter answers with the first
+            // occurrence.
+            redirectUrl = URLEncDec.appendQueryParameter(redirectUrl, SAML2Constants.GOTO, realFinalUrl);
             try {
                 realRedirectUrl = sessionProvider.rewriteURL(newSession, redirectUrl);
             } catch (SessionException se) {
@@ -355,17 +374,8 @@ java.io.PrintWriter
           <% 
         }  
     } else {
-        // log it
-	    try {
-	        SAML2Utils.validateRelayStateURL(realm, hostEntityId, realRedirectUrl, SAML2Constants.SP_ROLE);
-        } catch (SAML2Exception se) {
-	        SAMLUtils.sendError(request, response,
-                response.SC_BAD_REQUEST, "requestProcessingError",
-	            SAML2Utils.bundle.getString("requestProcessingError") + " " + se.getMessage());
-            saml2Auditor.auditAccessFailure(se.getErrorCode(), se.getLocalizedMessage());
-            return;
-        }
-
+        // The RelayState was validated above; realRedirectUrl adds only the administrator configured
+        // intermediate URL around it, so there is nothing left to check here.
         saml2Auditor.auditAccessSuccess();
         response.sendRedirect(realRedirectUrl);
     }

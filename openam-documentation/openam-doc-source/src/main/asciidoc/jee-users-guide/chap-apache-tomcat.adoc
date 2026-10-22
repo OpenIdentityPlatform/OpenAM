@@ -222,7 +222,7 @@ Build Machine: runner
 =======================================
 ----
 
-. (Optional) If you have a policy configured, you can test your policy agent. For example, try to browse to a resource that your policy agent protects. You should be redirected to OpenAM to authenticate, for example, as user `demo`, password `changeit`. After you authenticate, OpenAM then redirects you back to the resource you tried to access.
+. (Optional) If you have a policy configured, you can test your policy agent. For example, try to browse to a resource that your policy agent protects. You should be redirected to OpenAM to authenticate, for example, as user `demo`, password `changeit`. After you authenticate, OpenAM then redirects you back to the resource you tried to access A new installation creates that account inactive; see xref:../admin-guide/chap-securing.adoc#defaults-in-documentation-examples["Preparing to Follow the Examples in This Documentation"] in the __Administration Guide__.
 
 ====
 

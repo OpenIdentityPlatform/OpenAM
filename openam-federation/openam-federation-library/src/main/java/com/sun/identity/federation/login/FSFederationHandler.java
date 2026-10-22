@@ -24,7 +24,7 @@
  *
  * $Id: FSFederationHandler.java,v 1.3 2008/08/29 04:57:15 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.login;
@@ -73,14 +73,21 @@ public class FSFederationHandler extends HttpServlet {
             }
             String lrURL = request.getParameter(IFSConstants.LRURL);
             if (lrURL != null) {
+                // Same allow-list check doPostLogin applies: this RelayState is forwarded
+                // straight from the request parameter.
+                lrURL = FSPostLogin.checkedRelayState(request, lrURL);
+            }
+            if (lrURL != null) {
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message("FSFederationHandler::Redirecting to "
-                        + lrURL);
+                        + FSUtils.forLog(lrURL));
                 }
                 FSUtils.forwardRequest(request, response, lrURL);
             } else {
                 FSUtils.debug.error(
                     "FSFederationHandler::LRURL is null in reqest ");
+                // Nothing safe to forward to; an unwritten response commits an empty 200.
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
         } else {
             if (FSUtils.needSetLBCookieAndRedirect(request, response, false)) {
@@ -108,18 +115,28 @@ public class FSFederationHandler extends HttpServlet {
                     if (lrURL != null) {
                         if(FSUtils.debug.messageEnabled()) {
                             FSUtils.debug.message(
-                                "FSFederationHandler:: Redirecting to" + lrURL 
+                                "FSFederationHandler:: Redirecting to"
+                                + FSUtils.forLog(lrURL)
                                 + " after postLogin" );
                         }
                         response.sendRedirect(lrURL);
-                    } else {
+                    } else if (!response.isCommitted()) {
                          FSUtils.debug.error("FSFederationHandler:: "
                              + " LRURL is null from postlogin ");
+                         // Nothing to send the caller to; an unwritten response commits an
+                         // empty 200 that reads as a successful federation. Same answer the
+                         // cancel branch gives for the same condition. A LECP request is
+                         // already answered with the envelope by then, hence the isCommitted
+                         // check: there the null URL is the correct outcome, not a failure.
+                         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     }
                 }
             } catch (FSPostLoginException fsPostExp) {
                 FSUtils.debug.error(
                     "FSFederationHandler::FSPostLogin Exception:", fsPostExp);
+                if (!response.isCommitted()) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                }
             }
         }
     }

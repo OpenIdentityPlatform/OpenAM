@@ -13,7 +13,7 @@
  *
  * Copyright 2014-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.oauth2.core;
@@ -22,7 +22,6 @@ import static com.sun.identity.shared.DateUtils.stringToDate;
 import static org.forgerock.oauth2.core.Utils.isEmpty;
 import static org.forgerock.oauth2.core.Utils.splitResponseType;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Custom.*;
-import static org.forgerock.openam.oauth2.OAuth2Constants.DeviceCode.USER_CODE;
 import static org.forgerock.openam.oauth2.OAuth2Constants.Params.*;
 import static org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation.FRAGMENT;
 import static org.forgerock.openam.oauth2.OAuth2Constants.UrlLocation.QUERY;
@@ -356,10 +355,12 @@ public class ResourceOwnerSessionValidator {
 
         removeLoginPrompt(request.<Request>getRequest());
 
+        // The user code a device flow submission carries is deliberately left out of the goto. It used to be
+        // appended here so that the endpoint could act on it when the browser came back as a GET, which is
+        // exactly the shape GHSA-545c-rm35-2jj2 turns on: /oauth2/device/user no longer authorizes anything on
+        // a GET, so the code would only survive into the query string of the form served after login, where it
+        // could disagree with the code the user then types and get the submission refused.
         String gotoUrl = request.<Request>getRequest().getResourceRef().toString();
-        if (request.getParameter(USER_CODE) != null) {
-            gotoUrl += (gotoUrl.indexOf('?') > -1 ? "&" : "?") + USER_CODE + "=" + request.getParameter(USER_CODE);
-        }
         String acrValues = request.getParameter(ACR_VALUES);
         String realm = request.getParameter(OAuth2Constants.Custom.REALM);
         String moduleName = request.getParameter(MODULE);

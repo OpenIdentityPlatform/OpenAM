@@ -216,7 +216,7 @@ When you first configure OpenAM, there are many options to evaluate, plus a numb
 
 * Initially, only the top-level realm exists. Other realms and fully qualified domain name realm/DNS aliases must be configured separately.
 
-* The top-level realm includes a demo user, `demo`, with the default password `changeit`.
+* The top-level realm includes a demo user, `demo`, with the default password `changeit`. The account is created *inactive*, because that password is published in the OpenAM installer source; activate it and give it a password of your own if you intend to use it, and delete it otherwise.
 
 * Default keystores exist in the `config-dir/openam/` path, with several self-signed keys and identical passwords. For more information about the default keystores in OpenAM and their demo key aliases, see xref:../admin-guide/chap-certs-keystores.adoc#chap-certs-keystores["Managing Certificates and Keystores"] in the __Administration Guide__.
 

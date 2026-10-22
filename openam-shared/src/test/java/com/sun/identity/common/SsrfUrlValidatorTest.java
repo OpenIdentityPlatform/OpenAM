@@ -18,6 +18,9 @@ package com.sun.identity.common;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -99,6 +102,11 @@ public class SsrfUrlValidatorTest {
                 {"https://[2002:808:808:0:0:5efe:c0a8:101]/x"},
                 {"https://[::ffff:127.0.0.1]/x"},               // IPv4-mapped -> 127.0.0.1
                 {"https://[::c0a8:0101]/x"},                    // IPv4-compatible -> 192.168.1.1
+                {"https://[fd00::1]/x"},                        // IPv6 unique local
+                {"https://[2002:a9fe:a9fe::]/x"},               // 6to4 -> 169.254.169.254
+                {"https://[::169.254.169.254]/x"},              // IPv4-compatible -> 169.254.169.254
+                {"https://2852039166/x"},                       // 169.254.169.254 as an integer
+                {"https://127.1/x"},                            // short-form loopback
         };
     }
 
@@ -139,6 +147,102 @@ public class SsrfUrlValidatorTest {
                 "public https host must be accepted when requireHttps=true");
         assertFalse(SsrfUrlValidator.isSafeRemoteUrl("https://[64:ff9b::7f00:0001]/x", true),
                 "transition-address bypass must stay blocked when requireHttps=true");
+    }
+
+    @Test
+    public void everyResolvedAddressIsJudged() throws Exception {
+        assertTrue(SsrfUrlValidator.isSafeRemoteAddresses(addresses("8.8.8.8", "8.8.4.4"), true),
+                "two public addresses");
+        assertFalse(SsrfUrlValidator.isSafeRemoteAddresses(addresses("8.8.8.8", "127.0.0.1"), true),
+                "a blocked address after a public one must still refuse the host");
+    }
+
+    @Test
+    public void anEmptyAddressListIsRefused() {
+        assertFalse(SsrfUrlValidator.isSafeRemoteAddresses(new InetAddress[0], true),
+                "an empty list has nothing to judge");
+        assertFalse(SsrfUrlValidator.isSafeRemoteAddresses(null, true),
+                "neither has a missing one");
+    }
+
+    /**
+     * allowSiteLocal is how AMCRLStore keeps an internal PKI's CRL distribution point reachable in
+     * its default mode. It relaxes the private/site-local and unique-local clauses, also behind a
+     * transition address, and nothing else.
+     */
+    @DataProvider(name = "admittedOnlyWithAllowSiteLocal")
+    public Object[][] admittedOnlyWithAllowSiteLocal() {
+        return new Object[][]{
+                {"10.1.2.3"},                       // RFC1918
+                {"172.16.5.4"},                     // RFC1918
+                {"192.168.1.1"},                    // RFC1918
+                {"fec0::1"},                        // deprecated IPv6 site-local
+                {"fd00::1"},                        // IPv6 unique local, fc00::/7
+                {"2002:a00:5::"},                   // 6to4 -> 10.0.0.5
+                {"64:ff9b::a00:5"},                 // NAT64 WKP -> 10.0.0.5
+        };
+    }
+
+    @Test(dataProvider = "admittedOnlyWithAllowSiteLocal")
+    public void allowSiteLocalAdmitsTheAddress(String literal) throws Exception {
+        assertTrue(SsrfUrlValidator.isSafeRemoteAddresses(addresses(literal), true),
+                "admitted with allowSiteLocal: " + literal);
+        assertFalse(SsrfUrlValidator.isSafeRemoteAddresses(addresses(literal), false),
+                "refused without it: " + literal);
+    }
+
+    /**
+     * Everything but the site-local and unique-local clauses stays in force under allowSiteLocal —
+     * including for a site-local or unique-local address whose interface identifier embeds a
+     * blocked IPv4 address, and for every transition spelling of one.
+     */
+    @DataProvider(name = "refusedEvenWithAllowSiteLocal")
+    public Object[][] refusedEvenWithAllowSiteLocal() {
+        return new Object[][]{
+                // The embedded IPv4 address is still judged.
+                {"2002:a9fe:a9fe::"},                       // 6to4 -> 169.254.169.254
+                {"64:ff9b::7f00:1"},                        // NAT64 WKP -> 127.0.0.1
+                {"2001:0:4136:e378:8000:63bf:5601:5601"},   // Teredo -> 169.254.169.254
+                {"2001:db8::5efe:a9fe:a9fe"},               // ISATAP -> 169.254.169.254
+                {"::a9fe:a9fe"},                            // IPv4-compatible -> 169.254.169.254
+                // A site-local or unique-local prefix does not vouch for what it embeds.
+                {"fd00::5efe:a9fe:a9fe"},                   // ULA + ISATAP -> 169.254.169.254
+                {"fec0::5efe:7f00:1"},                      // site-local + ISATAP -> 127.0.0.1
+                // The InetAddress predicates, the IPv4 special ranges and the RFC 8215 /48.
+                {"127.0.0.1"},
+                {"169.254.169.254"},
+                {"224.0.0.1"},
+                {"255.255.255.255"},
+                {"64:ff9b:1::808:808"},
+                // Shared address space is not private address space.
+                {"100.100.100.200"},                        // 100.64.0.0/10, cloud metadata
+                {"2002:6464:64c8::"},                       // 6to4 -> 100.100.100.200
+                // Cloud metadata endpoints that sit inside fc00::/7.
+                {"fd00:ec2::254"},                          // AWS instance metadata
+                {"fd20:ce::254"},                           // Google Cloud metadata server
+                {"fd00:c1::a9fe:a9fe"},                     // Oracle Cloud instance metadata
+        };
+    }
+
+    @Test(dataProvider = "refusedEvenWithAllowSiteLocal")
+    public void allowSiteLocalKeepsTheRestOfThePolicy(String literal) throws Exception {
+        assertFalse(SsrfUrlValidator.isSafeRemoteAddresses(addresses(literal), true),
+                "refused even with allowSiteLocal: " + literal);
+    }
+
+    @Test
+    public void allowSiteLocalAppliesUnderADeclaredNat64Prefix() throws Exception {
+        try {
+            setNat64Prefixes("2001:db8:122:344::/96");
+            assertTrue(SsrfUrlValidator.isSafeRemoteAddresses(
+                    addresses("2001:db8:122:344::a00:5"), true),
+                    "a declared NSP onto 10.0.0.5 is a site-local address");
+            assertFalse(SsrfUrlValidator.isSafeRemoteAddresses(
+                    addresses("2001:db8:122:344::a9fe:a9fe"), true),
+                    "a declared NSP onto 169.254.169.254 stays refused");
+        } finally {
+            clearNat64Prefixes();
+        }
     }
 
     /**
@@ -236,5 +340,14 @@ public class SsrfUrlValidatorTest {
      */
     private static void clearNat64Prefixes() {
         setNat64Prefixes(null);
+    }
+
+    /** Literal addresses only, so no DNS resolution is performed. */
+    private static InetAddress[] addresses(String... literals) throws UnknownHostException {
+        InetAddress[] result = new InetAddress[literals.length];
+        for (int i = 0; i < literals.length; i++) {
+            result[i] = InetAddress.getByName(literals[i]);
+        }
+        return result;
     }
 }

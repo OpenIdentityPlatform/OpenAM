@@ -75,10 +75,17 @@ public class FSPreLogin {
     private String errorPage = null;
     private String homePage = null;
     private String commonLoginPage = null;
-    private static IDFFMetaManager metaManager = null;
-    
-    static {
-        metaManager = FSUtils.getIDFFMetaManager();
+
+    /**
+     * Resolved per call rather than latched in the class initialiser.
+     * {@code FSUtils.getIDFFMetaManager} returns <code>null</code> while the SMS is
+     * unreachable and retries on the next call, so a manager captured when this class was
+     * first touched stayed <code>null</code> for the life of the JVM and
+     * {@link #setMetaInfo} then sent every /preLogin to the error page until a restart.
+     * @return the meta manager, or <code>null</code> if it still cannot be created.
+     */
+    private static IDFFMetaManager getMetaManager() {
+        return FSUtils.getIDFFMetaManager();
     }
     
     /**
@@ -240,6 +247,7 @@ public class FSPreLogin {
         try {
             String hostedEntityID = null;
             String hostedProviderRole = IFSConstants.SP;
+            IDFFMetaManager metaManager = getMetaManager();
             if (metaManager != null) {
                 hostedProviderRole =
                     metaManager.getProviderRoleByMetaAlias(metaAlias);
@@ -464,7 +472,10 @@ public class FSPreLogin {
            
             Map headerMap = setHeaderMap(httpRequest);
             FSLoginHelper loginHelper = new FSLoginHelper(httpRequest);
-            String targetURL = httpRequest.getParameter(IFSConstants.GOTOKEY);
+            // the AuthnRequest carries it to the IdP and back, and the assertion consumer
+            // redirects to it
+            String targetURL = FSPostLogin.allowedRelayState(httpRequest,
+                httpRequest.getParameter(IFSConstants.GOTOKEY));
             if (targetURL == null || targetURL.length() <= 0 ) {
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message("FSPreLogin::createSSOMap."
@@ -574,6 +585,12 @@ public class FSPreLogin {
                 return;
             }
            
+            // NOTE: cookieMap is keyed by cookie name, so asking it about an HttpServletRequest
+            // is always false and isTokenValid can never become true here - presumably the
+            // session cookie name was meant, the way fedCookieName is used below. Left as it
+            // stands rather than corrected in a security fix, because correcting it activates
+            // the "token valid and fedCookie present" branch further down, which has never run.
+            // The RelayState guard added to this method sits in the branch that does run.
             if (cookieMap.containsKey(request)) {
                 isTokenValid = true;
                 FSUtils.debug.message(
@@ -614,9 +631,20 @@ public class FSPreLogin {
                         + "In case where ISToken invalid and"
                         + "fedcookie no");
                 }
-                if (gotoOnFedCookieNoURL != null) {
+                if (gotoOnFedCookieNoURL != null
+                    && FSPostLogin.isRelayStateAllowed(request, gotoOnFedCookieNoURL))
+                {
                     response.sendRedirect(gotoOnFedCookieNoURL);
                 } else {
+                    if (gotoOnFedCookieNoURL != null && FSUtils.debug.warningEnabled()) {
+                        // Straight from a request parameter on a pre-authentication endpoint:
+                        // unchecked this was a 302 to any host the caller named. Rejected means
+                        // the ordinary login URL, which is where this branch goes anyway when
+                        // the parameter is absent.
+                        FSUtils.debug.warning("FSPreLogin::doPreLogin gotoOnFedCookieNoURL \""
+                            + FSUtils.forLog(gotoOnFedCookieNoURL) + "\" is not permitted by the "
+                            + "provider's RelayState allow-list; using the login URL");
+                    }
                     returnURL = getLoginURL(false,metaAlias,request);
                     if (FSUtils.debug.messageEnabled()) {
                         FSUtils.debug.message(
