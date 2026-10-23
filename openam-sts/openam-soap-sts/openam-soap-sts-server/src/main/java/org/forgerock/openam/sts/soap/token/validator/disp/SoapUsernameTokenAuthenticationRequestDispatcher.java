@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A-Systems LLC.
+ * Portions Copyrighted 2025-2026 3A-Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.token.validator.disp;
@@ -50,7 +50,7 @@ public class SoapUsernameTokenAuthenticationRequestDispatcher implements TokenAu
     }
 
     @Override
-    public String dispatch(URL url, AuthTargetMapping.AuthTarget target, UsernameToken token) throws TokenValidationException {
+    public HttpURLConnectionWrapper.ConnectionResult dispatch(URL url, AuthTargetMapping.AuthTarget target, UsernameToken token) throws TokenValidationException {
         try {
             Map<String, String> headerMap = new HashMap<>();
             headerMap.put(AMSTSConstants.CONTENT_TYPE, AMSTSConstants.APPLICATION_JSON);
@@ -67,7 +67,7 @@ public class SoapUsernameTokenAuthenticationRequestDispatcher implements TokenAu
                 throw new TokenValidationException(responseCode, "Non-200 response from posting Username token " +
                         "to rest authN: " + connectionResult.getResult());
             } else {
-                return connectionResult.getResult();
+                return connectionResult;
             }
         } catch (IOException e) {
             throw new TokenValidationException(ResourceException.INTERNAL_ERROR,

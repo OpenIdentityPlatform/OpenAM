@@ -16,6 +16,9 @@ export OPENAM_ADMIN_USERNAME=amadmin
 export OPENAM_ADMIN_PASSWORD=passw0rd
 ```
 
+The server works with OpenAM's default HttpOnly session cookies (`com.sun.identity.cookie.httponly=true`): it takes the SSO token from the session cookie when `/json/authenticate` does not return `tokenId` in the body, so `org.openidentityplatform.openam.httponly.allowTokenInBody` does not need to be enabled.
+If the OpenAM session cookie is not named `iPlanetDirectoryPro` (`com.iplanet.am.cookie.name`), set `OPENAM_TOKEN_HEADER` to that name.
+
 Clone and run from source:
 
 ```bash

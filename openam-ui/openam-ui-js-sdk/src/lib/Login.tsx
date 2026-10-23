@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2025 3A Systems LLC.
+ * Copyright 2025-2026 3A Systems LLC.
  */
 
 import { useEffect, useState } from "react";
@@ -44,9 +44,11 @@ const Login: React.FC<LoginProps> = ({ loginService }) => {
             && 'callbacks' in response && Array.isArray(response.callbacks);
     }
 
+    // With an HttpOnly session cookie (the server default) a completed authentication carries no
+    // tokenId in the body: the session travels in the cookie, so successUrl alone marks success.
     function isSuccessfulAuth(response: unknown): response is SuccessfulAuth {
-        return typeof response === 'object' && response !== null && 'tokenId' in response
-            && 'successUrl' in response && typeof response.tokenId === 'string' && typeof response.successUrl === 'string';
+        return typeof response === 'object' && response !== null
+            && 'successUrl' in response && typeof response.successUrl === 'string';
     }
 
     const doRedirect = (url: string) => {

@@ -28,7 +28,7 @@
 
 /**
  * Portions Copyrighted 2013 ForgeRock, Inc.
- * Portions Copyrighted 2025-2026 3A Systems LLC.
+ * Portions Copyrighted 2021-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.idpdiscovery;
 
@@ -63,11 +63,8 @@ public class CookieUtils {
         SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_SECURE).
            equalsIgnoreCase("true"));
 
-    static boolean cookieHttpOnly =
-        (SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_HTTPONLY) 
-            != null) &&
-        (SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_HTTPONLY).
-            equalsIgnoreCase("true"));
+    static boolean cookieHttpOnly = isHttpOnlyEnabled(
+        SystemProperties.get(IDPDiscoveryConstants.AM_COOKIE_HTTPONLY));
 
     static String cookieSameSite = SystemPropertiesManager.get(
         Constants.AM_COOKIE_SAMESITE);
@@ -121,6 +118,18 @@ public class CookieUtils {
      */
     public static boolean isCookieHttpOnly() {
         return cookieHttpOnly;
+    }
+
+    /**
+     * Interprets a value of "com.sun.identity.cookie.httponly" with the same rule as
+     * {@code com.sun.identity.shared.encode.CookieUtils#isHttpOnlyEnabled(String)}: only
+     * {@code false} (in any case, surrounding whitespace ignored) turns {@code HttpOnly} off.
+     *
+     * @param value the property value, may be {@code null}.
+     * @return {@code false} only if the value is {@code false}.
+     */
+    static boolean isHttpOnlyEnabled(String value) {
+        return value == null || !"false".equalsIgnoreCase(value.trim());
     }
 
     /**
