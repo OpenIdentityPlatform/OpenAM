@@ -24,7 +24,7 @@
  *
  * $Id: FSIDPProxyImpl.java,v 1.3 2008/06/25 05:46:54 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -79,7 +79,7 @@ public class FSIDPProxyImpl implements FSIDPProxy {
         try {
             Map attributes = IDFFMetaUtils.getAttributes(
                 FSUtils.getIDFFMetaManager().getSPDescriptorConfig(
-                    "/", authnRequest.getProviderId()));
+                    "/", authnRequest.getProviderId()).getValue());
             String useIntroductionForProxying = 
                 IDFFMetaUtils.getFirstAttributeValue(
                     attributes, IFSConstants.USE_INTRODUCTION_FOR_IDP_PROXY);

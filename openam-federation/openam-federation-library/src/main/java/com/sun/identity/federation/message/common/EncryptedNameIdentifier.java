@@ -24,6 +24,7 @@
  *
  * $Id: EncryptedNameIdentifier.java,v 1.4 2008/06/25 05:46:46 qcheng Exp $
  * Portions Copyrighted 2014 ForgeRock AS
+ * Portions Copyrighted 2026 3A Systems LLC
  */
 
 package com.sun.identity.federation.message.common;
@@ -32,6 +33,8 @@ import com.sun.identity.federation.common.FSException;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.key.EncInfo;
 import com.sun.identity.federation.key.KeyUtil;
 import com.sun.identity.federation.meta.IDFFMetaException;
@@ -221,11 +224,13 @@ public class EncryptedNameIdentifier {
         
         BaseConfigType providerConfig = null;
         try {
-            providerConfig = FSUtils.getIDFFMetaManager().
+            SPDescriptorConfigElement spConfigElem = FSUtils.getIDFFMetaManager().
                 getSPDescriptorConfig(realm, providerID);
+            providerConfig = (spConfigElem == null) ? null : spConfigElem.getValue();
             if (providerConfig == null) {
-                providerConfig = FSUtils.getIDFFMetaManager().
+                IDPDescriptorConfigElement idpConfigElem = FSUtils.getIDFFMetaManager().
                     getIDPDescriptorConfig(realm, providerID);
+                providerConfig = (idpConfigElem == null) ? null : idpConfigElem.getValue();
             }
         } catch (Exception ae) {
             FSUtils.debug.error("EncryptedNameIdentifier.getDecryptedName" +

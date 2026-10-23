@@ -13,6 +13,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2011-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems LLC
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -33,6 +34,34 @@
     <!-- Build -->
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.jvnet.jaxb</groupId>
+                <artifactId>jaxb-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>xjc-saml2</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaDirectory>src/main/xsd</schemaDirectory>
+                    <schemaIncludes>
+                        <include>entity-config-schema.xsd</include>
+                        <include>saml-schema-assertion-2.0.xsd</include>
+                        <include>saml-schema-metadata-2.0.xsd</include>
+                        <include>schema.xsd</include>
+                        <include>sstc-saml-metadata-ext-query.xsd</include>
+                        <include>sstc-saml-metadata-x509-query.xsd</include>
+                        <include>sstc-metadata-attr.xsd</include>
+                        <include>sstc-saml-attribute-ext.xsd</include>
+                        <include>sstc-saml-idp-discovery.xsd</include>
+                    </schemaIncludes>
+                    <bindingDirectory>src/main/xjb</bindingDirectory>
+                    <extension>true</extension>
+                </configuration>
+            </plugin>
 <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -74,10 +103,5 @@
 			<groupId>org.glassfish.metro</groupId>
 			<artifactId>wsit-impl</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb1-impl</artifactId>
-		</dependency>
     </dependencies>
 </project>
-

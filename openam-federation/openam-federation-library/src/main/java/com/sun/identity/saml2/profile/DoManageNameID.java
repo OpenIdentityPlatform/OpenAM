@@ -25,7 +25,7 @@
  * $Id: DoManageNameID.java,v 1.26 2009/11/24 21:53:27 madan_ranganath Exp $
  *
  * Portions copyright 2013-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
@@ -34,10 +34,8 @@ import static org.forgerock.openam.utils.Time.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.Key;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -76,6 +74,8 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2SDKUtils;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.AffiliationDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.ManageNameIDServiceElement;
@@ -231,7 +231,7 @@ public class DoManageNameID {
                 getMNIServiceElement(realm, remoteEntityID, 
                 hostEntityRole, binding);
             if (binding == null) {
-                binding = mniService.getBinding();
+                binding = mniService.getValue().getBinding();
             }
 
             if (binding == null) {
@@ -242,7 +242,7 @@ public class DoManageNameID {
 
             String mniURL = null;
             if (mniService != null) {
-                mniURL = mniService.getLocation();
+                mniURL = mniService.getValue().getLocation();
             }
             
             if (mniURL == null) {
@@ -291,9 +291,11 @@ public class DoManageNameID {
 
                 BaseConfigType config = null;
                 if (hostEntityRole.equalsIgnoreCase(SAML2Constants.SP_ROLE)) {
-                    config = metaManager.getIDPSSOConfig(realm, remoteEntityID);
+                    IDPSSOConfigElement configElem = metaManager.getIDPSSOConfig(realm, remoteEntityID);
+                    config = (configElem == null) ? null : configElem.getValue();
                 } else {
-                    config = metaManager.getSPSSOConfig(realm, remoteEntityID);
+                    SPSSOConfigElement configElem = metaManager.getSPSSOConfig(realm, remoteEntityID);
+                    config = (configElem == null) ? null : configElem.getValue();
                 }
                 mniURL = SAML2Utils.fillInBasicAuthInfo(config, mniURL);
                 if (!doMNIBySOAP(mniRequest, mniURL, metaAlias, hostEntityRole,
@@ -368,7 +370,7 @@ public class DoManageNameID {
                     getMNIServiceElement(realm, remoteEntityID,
                                        hostEntityRole, null);
                 if (mniService != null) {
-                    binding = mniService.getBinding();
+                    binding = mniService.getValue().getBinding();
                 }
             }
         } catch (SessionException e) {
@@ -478,10 +480,10 @@ public class DoManageNameID {
         Set<X509Certificate> signingCerts;
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
             SPSSODescriptorElement spSSODesc = metaManager.getSPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(spSSODesc, remoteEntity, SAML2Constants.SP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(spSSODesc.getValue(), remoteEntity, SAML2Constants.SP_ROLE);
         } else {
             IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, remoteEntity, SAML2Constants.IDP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc.getValue(), remoteEntity, SAML2Constants.IDP_ROLE);
         }
 
         if (!signingCerts.isEmpty()) {
@@ -591,10 +593,10 @@ public class DoManageNameID {
         Set<X509Certificate> signingCerts;
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
             SPSSODescriptorElement spSSODesc = metaManager.getSPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(spSSODesc, remoteEntity, SAML2Constants.SP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(spSSODesc.getValue(), remoteEntity, SAML2Constants.SP_ROLE);
         } else {
             IDPSSODescriptorElement idpSSODesc = metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc, remoteEntity, SAML2Constants.IDP_ROLE);
+            signingCerts = KeyUtil.getVerificationCerts(idpSSODesc.getValue(), remoteEntity, SAML2Constants.IDP_ROLE);
         }
         
         if (!signingCerts.isEmpty()) {
@@ -745,9 +747,9 @@ public class DoManageNameID {
             ManageNameIDServiceElement mniService =
                 getMNIServiceElement(realm, remoteEntityID, 
                 hostRole, SAML2Constants.HTTP_REDIRECT);
-            String mniURL = mniService.getResponseLocation();
+            String mniURL = mniService.getValue().getResponseLocation();
             if (mniURL == null){
-                mniURL = mniService.getLocation();
+                mniURL = mniService.getValue().getLocation();
             }
             ManageNameIDResponse mniResponse = processManageNameIDRequest(
                 mniRequest, metaAlias, remoteEntityID, paramsMap, mniURL, 
@@ -1852,12 +1854,12 @@ public class DoManageNameID {
         if (hostEntityRole.equalsIgnoreCase(SAML2Constants.IDP_ROLE)) {
             SPSSODescriptorElement spSSODesc =
                 metaManager.getSPSSODescriptor(realm, remoteEntity);
-            encInfo = KeyUtil.getEncInfo(spSSODesc, remoteEntity,
+            encInfo = KeyUtil.getEncInfo(spSSODesc.getValue(), remoteEntity,
                 SAML2Constants.SP_ROLE);
         } else {
             IDPSSODescriptorElement idpSSODesc = 
                  metaManager.getIDPSSODescriptor(realm, remoteEntity);
-            encInfo = KeyUtil.getEncInfo(idpSSODesc, remoteEntity,
+            encInfo = KeyUtil.getEncInfo(idpSSODesc.getValue(), remoteEntity,
                  SAML2Constants.IDP_ROLE);
         }
 
@@ -1974,16 +1976,16 @@ public class DoManageNameID {
             return null;
         }
 
-        List list = idpSSODesc.getManageNameIDService();
+        List<ManageNameIDServiceElement> list = idpSSODesc.getValue().getManageNameIDService();
 
         if ((list != null) && !list.isEmpty()) {
             if (binding == null) {
-                return (ManageNameIDServiceElement)list.get(0);
+                return list.get(0);
             }
-            Iterator it = list.iterator();
+            Iterator<ManageNameIDServiceElement> it = list.iterator();
             while (it.hasNext()) {
-                mni = (ManageNameIDServiceElement)it.next();  
-                if (binding.equalsIgnoreCase(mni.getBinding())) {
+                mni = it.next();
+                if (binding.equalsIgnoreCase(mni.getValue().getBinding())) {
                     break;
                 }
             }
@@ -2015,7 +2017,7 @@ public class DoManageNameID {
             return null;
         }
 
-        List list = spSSODesc.getManageNameIDService();
+        List list = spSSODesc.getValue().getManageNameIDService();
 
         if ((list != null) && !list.isEmpty()) {
             if (binding == null) {
@@ -2024,7 +2026,7 @@ public class DoManageNameID {
             Iterator it = list.iterator();
             while (it.hasNext()) {
                 mni = (ManageNameIDServiceElement)it.next();  
-                if (binding.equalsIgnoreCase(mni.getBinding())) {
+                if (binding.equalsIgnoreCase(mni.getValue().getBinding())) {
                     break;
                 }
             }
@@ -2290,9 +2292,9 @@ public class DoManageNameID {
             }
             ManageNameIDServiceElement mniService = getMNIServiceElement(realm,
                 remoteEntityID, hostEntityRole, SAML2Constants.HTTP_POST);
-            String mniURL = mniService.getResponseLocation();
+            String mniURL = mniService.getValue().getResponseLocation();
             if (mniURL == null){
-                mniURL = mniService.getLocation();
+                mniURL = mniService.getValue().getLocation();
             }
 
             ///common for post, redirect, soap

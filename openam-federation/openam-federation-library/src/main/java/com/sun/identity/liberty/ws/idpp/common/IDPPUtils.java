@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.liberty.ws.idpp.common;
 
@@ -40,6 +41,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.security.SecureRandom;
+
+import com.sun.identity.liberty.ws.disco.jaxb.ResourceIDType;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.shared.encode.Base64;
@@ -57,11 +60,11 @@ import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.plugin.datastore.DataStoreProviderManager;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.shared.xml.XMLUtils;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
 import javax.xml.parsers.ParserConfigurationException;
 
 /**
@@ -187,23 +190,23 @@ public class IDPPUtils {
                                                    String resourceID,
                                                    boolean includeCommonAttr)
      throws JAXBException, IDPPException {
-         QueryElement query = idppFactory.createQueryElement(); 
+         QueryElement query = idppFactory.createQueryElement(idppFactory.createQueryType());
          if(queryExpressions == null || resourceID == null
             || queryExpressions.size() == 0) {
             debug.error("IDPPUtils:createQueryElement: Either query" +
             " expressions or resource id is null.");
             throw new IDPPException("ResourceID or query expressions are null");
          }
-         query.setResourceID(createResourceIDElement(resourceID));
-         query.setId(SAMLUtils.generateID());
+         query.getValue().setResourceID(createResourceIDElement(resourceID));
+         query.getValue().setId(SAMLUtils.generateID());
          for (int i =0; i < queryExpressions.size(); i++) {
-              QueryType.QueryItemType item = 
-              idppFactory.createQueryTypeQueryItemType();
+              QueryType.QueryItem item =
+              idppFactory.createQueryTypeQueryItem();
               item.setId(SAMLUtils.generateID()); 
               item.setIncludeCommonAttributes(includeCommonAttr);
               item.setItemID(SAMLUtils.generateID());
               item.setSelect(addIDPPPrefix((String)queryExpressions.get(i)));
-              query.getQueryItem().add(item);
+              query.getValue().getQueryItem().add(item);
          }
          return query; 
      }
@@ -219,7 +222,7 @@ public class IDPPUtils {
             debug.error("IDPPUtils:getQueryDataElements:response is null");
             throw new IDPPException("response is null");
          }
-         return response.getData();
+         return response.getValue().getData();
      }
      
      /**
@@ -234,8 +237,8 @@ public class IDPPUtils {
             throw new IDPPException("ResourceID is null");
          }
          ResourceIDElement resourceIDElement = 
-               idppFactory.createResourceIDElement();
-         resourceIDElement.setValue(resourceID);
+               idppFactory.createResourceIDElement(new ResourceIDType());
+         resourceIDElement.getValue().setValue(resourceID);
          return resourceIDElement;
      }
 

@@ -34,7 +34,9 @@ import org.openidentityplatform.openam.federation.plugins.ValidRelayStateExtract
 import org.testng.annotations.Test;
 
 import com.sun.identity.federation.common.IFSConstants;
+import com.sun.identity.federation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
+import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.meta.IDFFMetaException;
@@ -56,8 +58,7 @@ public class ValidRelayStateExtractorTest {
         List<AttributeType> attributes = attributeList(
             IFSConstants.RELAY_STATE_URL_LIST, "https://trusted.example.com/*");
         IDFFMetaManager metaManager = mock(IDFFMetaManager.class);
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
+        SPDescriptorConfigElement config = new SPDescriptorConfigElement(baseConfig(attributes));
         when(metaManager.getSPDescriptorConfig(REALM, ENTITY)).thenReturn(config);
 
         ValidDomainExtractor<IDFFEntityInfo> extractor = new ValidRelayStateExtractor(metaManager);
@@ -71,8 +72,7 @@ public class ValidRelayStateExtractorTest {
         List<AttributeType> attributes = attributeList(
             IFSConstants.RELAY_STATE_URL_LIST, "https://idp-trusted.example.com/*");
         IDFFMetaManager metaManager = mock(IDFFMetaManager.class);
-        IDPDescriptorConfigElement config = mock(IDPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
+        IDPDescriptorConfigElement config = new IDPDescriptorConfigElement(baseConfig(attributes));
         when(metaManager.getIDPDescriptorConfig(REALM, ENTITY)).thenReturn(config);
 
         ValidRelayStateExtractor extractor = new ValidRelayStateExtractor(metaManager);
@@ -86,8 +86,7 @@ public class ValidRelayStateExtractorTest {
     public void shouldReturnNullWhenRelayStateAttributeAbsent() throws Exception {
         List<AttributeType> attributes = attributeList("someOtherAttribute", "value");
         IDFFMetaManager metaManager = mock(IDFFMetaManager.class);
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
+        SPDescriptorConfigElement config = new SPDescriptorConfigElement(baseConfig(attributes));
         when(metaManager.getSPDescriptorConfig(REALM, ENTITY)).thenReturn(config);
 
         ValidRelayStateExtractor extractor = new ValidRelayStateExtractor(metaManager);
@@ -122,8 +121,7 @@ public class ValidRelayStateExtractorTest {
         List<AttributeType> attributes = new ArrayList<>();
         attributes.add(attribute);
         IDFFMetaManager metaManager = mock(IDFFMetaManager.class);
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
+        SPDescriptorConfigElement config = new SPDescriptorConfigElement(baseConfig(attributes));
         when(metaManager.getSPDescriptorConfig(REALM, ENTITY)).thenReturn(config);
 
         assertFailsClosed(new ValidRelayStateExtractor(metaManager));
@@ -161,8 +159,7 @@ public class ValidRelayStateExtractorTest {
         // has to ask again each call and recover without a JVM restart.
         List<AttributeType> attributes = attributeList(
             IFSConstants.RELAY_STATE_URL_LIST, "https://trusted.example.com/*");
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
+        SPDescriptorConfigElement config = new SPDescriptorConfigElement(baseConfig(attributes));
         IDFFMetaManager recovered = mock(IDFFMetaManager.class);
         when(recovered.getSPDescriptorConfig(REALM, ENTITY)).thenReturn(config);
 
@@ -190,8 +187,7 @@ public class ValidRelayStateExtractorTest {
         List<AttributeType> attributes = attributeList(
             IFSConstants.RELAY_STATE_URL_LIST, "https://trusted.example.com/*");
         IDFFMetaManager metaManager = mock(IDFFMetaManager.class);
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
+        SPDescriptorConfigElement config = new SPDescriptorConfigElement(baseConfig(attributes));
         when(metaManager.getSPDescriptorConfig(REALM, ENTITY)).thenReturn(config);
 
         ValidRelayStateExtractor extractor = new ValidRelayStateExtractor(metaManager);
@@ -210,6 +206,17 @@ public class ValidRelayStateExtractorTest {
         } catch (ConfigurationUnavailableException expected) {
             // an unreadable allow-list is not an absent one
         }
+    }
+
+    /** The extended configuration holding these attributes, as a descriptor config wraps it. */
+    private static BaseConfigType baseConfig(List<AttributeType> attributes) {
+        List<AttributeElement> elements = new ArrayList<>();
+        for (AttributeType attribute : attributes) {
+            elements.add(new AttributeElement(attribute));
+        }
+        BaseConfigType config = mock(BaseConfigType.class);
+        when(config.getAttribute()).thenReturn(elements);
+        return config;
     }
 
     /** Builds the raw attribute list that {@code IDFFMetaUtils.getAttributes} iterates over. */

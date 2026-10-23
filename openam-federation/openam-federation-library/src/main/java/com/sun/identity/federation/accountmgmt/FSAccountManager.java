@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAccountManager.java,v 1.5 2008/06/25 05:46:39 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  * Portions Copyrighted 2026 3A Systems, LLC
  */
@@ -34,6 +36,8 @@ import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.LogUtil;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaUtils;
 import com.sun.identity.plugin.datastore.DataStoreProvider;
@@ -87,13 +91,17 @@ public class FSAccountManager {
                 metaManager.getEntityIDByMetaAlias(metaAlias);
             BaseConfigType hostedConfig = null;
             if (role != null && role.equalsIgnoreCase(IFSConstants.IDP)) {
-                hostedConfig = 
+                IDPDescriptorConfigElement idpConfig =
                     metaManager.getIDPDescriptorConfig(realm, hostedEntityID);
+                hostedConfig =
+                    (idpConfig == null) ? null : idpConfig.getValue();
             } else if (role != null &&
                 role.equalsIgnoreCase(IFSConstants.SP))
             {
-                hostedConfig = 
+                SPDescriptorConfigElement spConfig =
                     metaManager.getSPDescriptorConfig(realm, hostedEntityID);
+                hostedConfig =
+                    (spConfig == null) ? null : spConfig.getValue();
                 SP_PROVIDER_ID = hostedEntityID;
                 SP_FILTER = "|" + SP_PROVIDER_ID + "|";
             }

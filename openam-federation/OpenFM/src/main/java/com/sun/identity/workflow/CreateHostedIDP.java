@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: CreateHostedIDP.java,v 1.9 2008/06/25 05:50:01 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 
@@ -114,7 +116,7 @@ public class CreateHostedIDP
                 IDPSSOConfigElement ssoConfig =
                     manager.getIDPSSOConfig(realm, entityId);
 
-                Map attribConfig = SAML2MetaUtils.getAttributes(ssoConfig);
+                Map attribConfig = SAML2MetaUtils.getAttributes(ssoConfig.getValue());
                 List mappedAttributes = (List)attribConfig.get(
                     SAML2Constants.ATTRIBUTE_MAP);
                 mappedAttributes.addAll(attrMapping);
