@@ -25,6 +25,7 @@
  * $Id: FQDNUtils.java,v 1.6 2008/08/19 19:08:59 veiming Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 package com.sun.identity.common;
 
@@ -32,9 +33,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.forgerock.guice.core.InjectorHolder;
+import org.forgerock.openam.core.realms.RealmDnsAliases;
 import org.forgerock.openam.utils.StringUtils;
 
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.Constants;
 
 /**
@@ -42,7 +46,8 @@ import com.sun.identity.shared.Constants;
  * (virtual) host name.
  *
  * The list of valid FQDNs are maintained by
- * {@link com.iplanet.services.naming.service.NamingService#updateFqdnMappings(Set)}.
+ * {@link com.iplanet.services.naming.service.NamingService#updateFqdnMappings(Set)}. The DNS aliases of the realms are
+ * valid as well, see {@link RealmDnsAliases}.
  */
 public enum FqdnValidator {
 
@@ -91,13 +96,24 @@ public enum FqdnValidator {
 
     /**
      * Returns <code>true</code> if a host name is valid. <code>hostname</code> is valid if it is contained in the list
-     * of fully qualified host names. Or, it is the default host name where OpenAM is installed.
+     * of fully qualified host names, or it is the default host name where OpenAM is installed, or it is a DNS alias
+     * of a realm.
      * 
      * @param hostname host name.
      * @return true if a host name is valid.
      */
     public boolean isHostnameValid(String hostname) {
-        return hostname != null && fqdnMap.values().contains(hostname.toLowerCase());
+        if (hostname == null) {
+            return false;
+        }
+        String lowerCaseHostname = hostname.toLowerCase();
+        return fqdnMap.values().contains(lowerCaseHostname) || isRealmDnsAlias(lowerCaseHostname);
+    }
+
+    private boolean isRealmDnsAlias(String hostname) {
+        // The realms can only be read once OpenAM is configured
+        return AMSetupServlet.isCurrentConfigurationValid()
+                && InjectorHolder.getInstance(RealmDnsAliases.class).contains(hostname);
     }
 
     /**
