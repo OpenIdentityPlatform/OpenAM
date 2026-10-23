@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.core.realms;
@@ -44,7 +44,10 @@ public class RealmGuiceModule extends PrivateModule {
     protected void configure() {
         requestStaticInjection(Realm.class);
 
+        bind(RealmDnsAliases.class);
+
         expose(RealmLookup.class);
+        expose(RealmDnsAliases.class);
     }
 
     @Provides
