@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect;
@@ -103,6 +103,7 @@ public class OpenIDConnectProviderConfiguration {
         configuration.put("token_endpoint_auth_methods_supported", providerSettings.getEndpointAuthMethodsSupported());
         configuration.put("device_authorization_endpoint", uris.getDeviceAuthorizationEndpoint());
         configuration.put("revocation_endpoint", uris.getRevocationEndpoint());
+        configuration.put("introspection_endpoint", uris.getIntrospectionEndpoint());
 
         return new JsonValue(configuration);
     }
