@@ -43,11 +43,10 @@ let demoToken;
  * Authenticates in a throwaway context so the session cookie dies with it.
  *
  * /json/authenticate sets an iPlanetDirectoryPro cookie, and LocalSSOTokenSessionModule reads the
- * cookie before falling back to the header of the same name. Authenticating on the shared `request`
- * fixture would therefore leave a cookie that silently outranks every explicit token header this
- * spec sends: logging in as demo would downgrade the admin calls to demo (403), and any cookie at
- * all would stop the unauthenticated case from being unauthenticated. Every request below is
- * expected to carry exactly the identity named in its header, so the jar has to stay empty.
+ * cookie before falling back to the header of the same name. Logging in on beforeAll's `request`
+ * fixture would leave the demo cookie in its jar, where it would silently outrank the admin token
+ * header of the realm and policy set-up calls that follow (403). Every request is expected to carry
+ * exactly the identity named in its header, so the jar has to stay empty.
  */
 async function tokenFor(username, password) {
   const context = await apiRequest.newContext();
@@ -60,7 +59,7 @@ async function tokenFor(username, password) {
 
 /**
  * Every PolicyId in an exported PolicySet. XACMLPrivilegeUtils.privilegeNameToPolicyId returns the
- * privilege name unchanged, so these are the policy names. Anchored so PolicySetId does not match.
+ * privilege name unchanged, so these are the policy names.
  */
 function policyIds(xml) {
   return [...xml.matchAll(/\bPolicyId="([^"]+)"/g)].map((match) => match[1]);
@@ -236,8 +235,8 @@ test.describe("XACML policy export", () => {
 
 /*
  * /xacml/policies exists in resource version 1.0 only. A request without Accept-API-Version gets the
- * latest version, so XACML clients that never send the header (ssoadm and the CLI-era exporters)
- * keep working, while a version that does not exist is not served.
+ * latest version, so clients that never send the header keep working, while a version that does
+ * not exist is not served.
  */
 test.describe("XACML export versioning", () => {
   test("exports when no Accept-API-Version header is sent", async ({ request }) => {
@@ -250,8 +249,9 @@ test.describe("XACML export versioning", () => {
     const response = await exportPolicies(request, { headers: { "Accept-API-Version": "resource=1.0" } });
 
     expect(response.status()).toBe(200);
-    // Defect in the value; the target is "protocol=1.0,resource=1.0", the form /json sends. The
-    // version filter writes the header object's string form, header name included, as the value.
+    // Defect in the value; the target is "protocol=1.0,resource=1.0". /json sends the bare
+    // "protocol=...,resource=..." value, while this version filter writes the header object's string
+    // form, header name included.
     expect(response.headers()["content-api-version"])
       .toBe("[Content-API-Version: protocol=1.0,resource=1.0]");
   });
