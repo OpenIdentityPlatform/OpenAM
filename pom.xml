@@ -232,7 +232,6 @@
                         <!--very large for central may cause broken pipe error-->
                         <excludeArtifact>openam-distribution-kit</excludeArtifact>
                         <!--ignore jakarta converted artifacts-->
-                        <excludeArtifact>activemq-client</excludeArtifact>
                         <excludeArtifact>cc</excludeArtifact>
                         <excludeArtifact>jato-shaded</excludeArtifact>
                         <excludeArtifact>jaxrpc-impl</excludeArtifact>
@@ -1661,9 +1660,9 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.openidentityplatform.openam.jakarta</groupId>
-        <artifactId>activemq-client</artifactId>
-        <version>${project.version}</version>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-client-jakarta</artifactId>
+        <version>${activemq.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
