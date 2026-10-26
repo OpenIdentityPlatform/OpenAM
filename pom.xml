@@ -120,7 +120,7 @@
     <java-ipv6.version>0.17</java-ipv6.version>
     <hikaricp.version>2.4.1</hikaricp.version>
     <h2database.version>2.2.220</h2database.version>
-    <activemq.version>5.16.8</activemq.version>
+    <activemq.version>5.19.11</activemq.version>
     <jakarta.inject.version>2.0.1</jakarta.inject.version>
     <jetty.jspc.version>11.0.24</jetty.jspc.version>
     <amazon.sns.version>1.10.72</amazon.sns.version>
