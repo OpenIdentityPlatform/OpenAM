@@ -264,6 +264,10 @@ test.describe("XACML export versioning", () => {
   });
 });
 
+/*
+ * Runs before the import cases, so SUB_REALM holds no policy yet while root always holds POLICY_NAME:
+ * the content check tells the sub realm's export from root's, whatever the filename says.
+ */
 test.describe("XACML export realm styles", () => {
   test("answers 404 to the realms/root path spelling", async ({ request }) => {
     const response = await exportPolicies(request, { path: "/xacml/realms/root/policies" });
@@ -280,6 +284,7 @@ test.describe("XACML export realm styles", () => {
     expect(response.status()).toBe(200);
     expect(response.headers()["content-disposition"])
       .toBe(`attachment; filename=${SUB_REALM}-realm-policies.xml`);
+    expect(policyIds(await response.text())).not.toContain(POLICY_NAME);
   });
 
   test("honours the realm query parameter", async ({ request }) => {
@@ -288,6 +293,7 @@ test.describe("XACML export realm styles", () => {
     expect(response.status()).toBe(200);
     expect(response.headers()["content-disposition"])
       .toBe(`attachment; filename=${SUB_REALM}-realm-policies.xml`);
+    expect(policyIds(await response.text())).not.toContain(POLICY_NAME);
   });
 });
 
