@@ -237,11 +237,6 @@
                         <excludeArtifact>jato-shaded</excludeArtifact>
                         <excludeArtifact>jaxrpc-impl</excludeArtifact>
                         <excludeArtifact>jaxrpc-spi</excludeArtifact>
-                        <excludeArtifact>org.restlet</excludeArtifact>
-                        <excludeArtifact>org.restlet.ext.jackson</excludeArtifact>
-                        <excludeArtifact>org.restlet.ext.json</excludeArtifact>
-                        <excludeArtifact>org.restlet.ext.servlet</excludeArtifact>
-                        <excludeArtifact>org.restlet.ext.xml</excludeArtifact>
                         <excludeArtifact>bcpkix-shaded</excludeArtifact>
                       </excludeArtifacts>
                   </configuration>
@@ -1393,39 +1388,33 @@
       </dependency>
       <!-- Session HA Module Dependencies-->
       <dependency>
-        <groupId>org.openidentityplatform.openam.jakarta</groupId>
+        <groupId>org.restlet.jee</groupId>
         <artifactId>org.restlet</artifactId>
-        <version>${project.version}</version>
+        <version>${restlet.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.openidentityplatform.openam.jakarta</groupId>
+        <groupId>org.restlet.jee</groupId>
         <artifactId>org.restlet.ext.jackson</artifactId>
-        <version>${project.version}</version>
+        <version>${restlet.version}</version>
+        <!-- The modules that use Jackson declare the Jackson artifacts themselves. The upstream POM would add
+             jackson-module-jaxb-annotations (javax.xml.bind) and woodstox-core-asl, and its stax2-api and
+             snakeyaml would change the versions that the declared Jackson modules resolve to. -->
         <exclusions>
           <exclusion>
-            <groupId>javax.xml.stream</groupId>
-            <artifactId>stax-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.openidentityplatform.openam.jakarta</groupId>
+        <groupId>org.restlet.jee</groupId>
         <artifactId>org.restlet.ext.json</artifactId>
-        <version>${project.version}</version>
+        <version>${restlet.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.openidentityplatform.openam.jakarta</groupId>
+        <groupId>org.restlet.jee</groupId>
         <artifactId>org.restlet.ext.xml</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openidentityplatform.openam.jakarta</groupId>
-        <artifactId>org.restlet.ext.servlet</artifactId>
-        <version>${project.version}</version>
+        <version>${restlet.version}</version>
       </dependency>
       <dependency>
         <groupId>org.restlet.jee</groupId>

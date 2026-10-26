@@ -52,6 +52,7 @@ import org.restlet.engine.adapter.HttpServerHelper;
 import org.restlet.engine.adapter.ServerCall;
 import org.restlet.engine.component.ComponentContext;
 import org.forgerock.openam.rest.jakarta.servlet.internal.ServletCall;
+import org.forgerock.openam.rest.jakarta.servlet.internal.ServletServerAdapter;
 import org.forgerock.openam.rest.jakarta.servlet.internal.ServletWarClient;
 import org.restlet.representation.Representation;
 import org.restlet.routing.Route;
@@ -531,7 +532,7 @@ public class ServerServlet extends HttpServlet {
             // Change the default adapter
             Context serverContext = server.getContext();
             serverContext.getParameters().add("adapter",
-                    "org.restlet.ext.servlet.internal.ServletServerAdapter");
+                    ServletServerAdapter.class.getName());
 
             // Attach the hosted application(s) to the right path
             String uriPattern = this.getContextPath(request)
