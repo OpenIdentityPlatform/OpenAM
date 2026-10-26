@@ -118,7 +118,7 @@ import org.restlet.routing.VirtualHost;
  *
  *         &lt;servlet&gt;
  *                 &lt;servlet-name&gt;Restlet1&lt;/servlet-name&gt;
- *                 &lt;servlet-class&gt;org.restlet.ext.servlet.ServerServlet&lt;/servlet-class&gt;
+ *                 &lt;servlet-class&gt;org.forgerock.openam.rest.jakarta.servlet.ServerServlet&lt;/servlet-class&gt;
  *                 &lt;init-param&gt;
  *                         &lt;param-name&gt;org.restlet.application&lt;/param-name&gt;
  *                         &lt;param-value&gt;test.MyApplication1&lt;/param-value&gt;
@@ -132,7 +132,7 @@ import org.restlet.routing.VirtualHost;
  *
  *         &lt;servlet&gt;
  *                 &lt;servlet-name&gt;Restlet2&lt;/servlet-name&gt;
- *                 &lt;servlet-class&gt;org.restlet.ext.servlet.ServerServlet&lt;/servlet-class&gt;
+ *                 &lt;servlet-class&gt;org.forgerock.openam.rest.jakarta.servlet.ServerServlet&lt;/servlet-class&gt;
  *                 &lt;init-param&gt;
  *                         &lt;param-name&gt;org.restlet.application&lt;/param-name&gt;
  *                         &lt;param-value&gt;test.MyApplication2&lt;/param-value&gt;
@@ -162,7 +162,7 @@ import org.restlet.routing.VirtualHost;
  *         &lt;!-- Servlet to Restlet adapter declaration (Mandatory) --&gt;
  *         &lt;servlet&gt;
  *                 &lt;servlet-name&gt;RestletAdapter&lt;/servlet-name&gt;
- *                 &lt;servlet-class&gt;org.restlet.ext.servlet.ServerServlet&lt;/servlet-class&gt;
+ *                 &lt;servlet-class&gt;org.forgerock.openam.rest.jakarta.servlet.ServerServlet&lt;/servlet-class&gt;
  *
  *                 &lt;!-- Your component class name (Optional - For mode 2) --&gt;
  *                 &lt;init-param&gt;

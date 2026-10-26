@@ -350,3 +350,27 @@ test.describe("OAuth2 consent posted directly by a non-browser client", () => {
   });
 
 });
+
+/**
+ * WebFinger (/.well-known/webfinger) has a servlet of its own in web.xml, outside /oauth2. Its resource reads the
+ * deployment URL from the servlet request, and that request can only be reached when the servlet is the in-repo
+ * Restlet ServerServlet: on any other one, every request fails with a 500.
+ */
+test.describe("OpenID Connect issuer discovery through WebFinger", () => {
+
+  test("Should answer with the OpenID Connect issuer", async ({ request }) => {
+    const resource = `acct:${USERNAME}@${new URL(OPENAM_BASE).hostname}`;
+    const rel = "http://openid.net/specs/connect/1.0/issuer";
+
+    const response = await request.get(`${OPENAM_BASE}/.well-known/webfinger`, {
+      params: { resource, rel },
+    });
+
+    expect(response.status()).toBe(200);
+
+    const discovery = await response.json();
+    expect(discovery.subject).toBe(resource);
+    expect(discovery.links).toContainEqual({ rel, href: `${OPENAM_BASE}/oauth2` });
+  });
+
+});
