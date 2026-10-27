@@ -344,58 +344,6 @@ jobs:
           cd e2e
           npx playwright test xui --reporter=list
 
-      # A Playwright failure usually reports only what came back over the wire -- a bare 500, or
-      # Restlet's `server_error` wrapper -- so the exception that caused it is only reachable here.
-      # `docker logs` is Tomcat's stdout; OpenAM's own diagnostics (Entitlement, OAuth2Provider,
-      # CoreSystem ...) are files under $OPENAM_DATA_DIR, and that is where a stack trace lands.
-      - name: Collect container logs
-        if: ${{ failure() }}
-        continue-on-error: true
-        shell: bash
-        run: |
-          mkdir -p container-logs
-
-          for c in openam-idp openam-sp opendj-idp opendj-sp; do
-            docker logs "$c" > "container-logs/$c.docker.log" 2>&1 \
-              || echo "no logs for $c (container absent?)"
-          done
-
-          for c in openam-idp openam-sp; do
-            # Located rather than hard-coded: the debug directory is derived from the deployment
-            # URI, so it moves if OPENAM_PATH does. The conventional path is the fallback.
-            # `|| true` throughout: the runner gives this step `-eo pipefail`, and a container that
-            # never started must not abort collection for the one that did.
-            dirs=$(docker exec "$c" find /usr/openam -maxdepth 4 -type d -name debug 2>/dev/null || true)
-            [ -n "$dirs" ] || dirs=/usr/openam/config/openam/debug
-            for dir in $dirs; do
-              dest="container-logs/$c/$(basename "$(dirname "$dir")")-debug"
-              mkdir -p "$dest"
-              docker cp "$c:$dir/." "$dest/" || true
-            done
-          done
-
-          # Echoed as well as uploaded: the tail is nearly always the answer, and reading it in the
-          # job log beats downloading an artifact.
-          echo "::group::OpenAM debug files (tail)"
-          (find container-logs -type f -size +0 -path '*-debug/*' || true) | while read -r f; do
-            echo "----- $f -----"
-            tail -n 400 "$f"
-          done
-          echo "::endgroup::"
-
-          du -sh container-logs/* || true
-
-      - name: Upload failure artifacts
-        uses: actions/upload-artifact@v7
-        if: ${{ failure() }}
-        with:
-          name: failure-ui
-          retention-days: 1
-          path: |
-            e2e/playwright-report/**
-            e2e/test-results/**
-            container-logs/**
-
       - name: Stopping containers and removing the network
         shell: bash
         run: |
@@ -549,6 +497,66 @@ jobs:
           http://openam3.example.org:8080/openam/json/authenticate | grep tokenId'
 
           docker inspect --format="{{json .State.Health.Status}}" test-openam3 | grep -q \"healthy\"
+
+      # A Playwright failure usually reports only what came back over the wire -- a bare 500, or
+      # Restlet's `server_error` wrapper -- so the exception that caused it is only reachable here.
+      # `docker logs` is Tomcat's stdout; OpenAM's own diagnostics (Entitlement, OAuth2Provider,
+      # CoreSystem ...) are files under $OPENAM_DATA_DIR, and that is where a stack trace lands.
+      # Placed after the multi-server test so that a failure there is covered as well. All the
+      # containers run with --rm, so at most one of the two sets is still there: a failure before
+      # the multi-server test skips it, and the step before it removes the first set.
+      - name: Collect container logs
+        if: ${{ failure() }}
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p container-logs
+
+          for c in openam-idp openam-sp opendj-idp opendj-sp test-openam1 test-openam2 test-openam3; do
+            if ! docker container inspect "$c" > /dev/null 2>&1; then
+              echo "$c: absent"
+              continue
+            fi
+            docker logs "$c" > "container-logs/$c.docker.log" 2>&1 || true
+
+            # OpenDJ writes no OpenAM debug files.
+            case "$c" in opendj-*) continue ;; esac
+            # Located rather than hard-coded: the debug directory is derived from the deployment
+            # URI, so it moves if OPENAM_PATH does. The conventional path is the fallback.
+            # `|| true` throughout: the runner gives this step `-eo pipefail`, and a container that
+            # fails here must not abort collection for the others.
+            dirs=$(docker exec "$c" find /usr/openam -maxdepth 4 -type d -name debug 2>/dev/null || true)
+            [ -n "$dirs" ] || dirs=/usr/openam/config/openam/debug
+            for dir in $dirs; do
+              # Named after the whole path, so that two debug directories with the same parent
+              # name cannot overwrite each other's files.
+              dest="container-logs/$c/$(echo "${dir#/}" | tr / _)"
+              mkdir -p "$dest"
+              docker cp "$c:$dir/." "$dest/" || true
+            done
+          done
+
+          # Echoed as well as uploaded: the tail is nearly always the answer, and reading it in the
+          # job log beats downloading an artifact.
+          echo "::group::OpenAM debug files (tail)"
+          (find container-logs -type f -size +0 -path '*_debug/*' || true) | while read -r f; do
+            echo "----- $f -----"
+            tail -n 400 "$f"
+          done
+          echo "::endgroup::"
+
+          du -sh container-logs/* || true
+
+      - name: Upload failure artifacts
+        uses: actions/upload-artifact@v7
+        if: ${{ failure() }}
+        with:
+          name: failure-ui
+          retention-days: 1
+          path: |
+            e2e/playwright-report/**
+            e2e/test-results/**
+            container-logs/**
 
       - name: Scan image for vulnerabilities (Trivy)
         # trivy resolves the image from the local Docker daemon, so only the runner's
