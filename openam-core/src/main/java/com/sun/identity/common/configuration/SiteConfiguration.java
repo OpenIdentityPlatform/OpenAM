@@ -25,6 +25,7 @@
  * $Id: SiteConfiguration.java,v 1.12 2010/01/15 18:10:55 veiming Exp $
  *
  * Portions Copyrighted 2010-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.common.configuration;
@@ -191,12 +192,14 @@ public class SiteConfiguration extends ConfigurationBase {
         if (sc != null) {
             ServiceConfig cfg = sc.getSubConfig(siteName);
             if (cfg != null) {
+                String siteURL = getSitePrimaryURL(ssoToken, siteName);
                 Set svrs = listServers(ssoToken, siteName);
                 if ((svrs != null) && !svrs.isEmpty()) {
                     removeServersFromSite(ssoToken, siteName, svrs);
                 }
                 sc.removeSubConfig(siteName);
                 deleted = true;
+                removeOrganizationAlias(ssoToken, siteURL);
             }
         }
 
@@ -484,6 +487,10 @@ public class SiteConfiguration extends ConfigurationBase {
             set.add(siteURL);
             map.put(ATTR_PRIMARY_SITE_URL, set);
             accessPoint.setAttributes(map);
+
+            for (Object replacedURL : existingSet) {
+                removeOrganizationAlias(ssoToken, (String) replacedURL);
+            }
         }
     }
 
@@ -794,7 +801,7 @@ public class SiteConfiguration extends ConfigurationBase {
         return sites.contains(siteName);
     }
     
-    private static Set<String> getAllSiteURLs(SSOToken ssoToken)
+    static Set<String> getAllSiteURLs(SSOToken ssoToken)
         throws SMSException, SSOException {
         Set urls = new HashSet();
         Set sites = getSites(ssoToken);

@@ -25,6 +25,7 @@
  * $Id: ConfigurationBase.java,v 1.4 2009/07/07 06:14:12 veiming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package com.sun.identity.common.configuration;
@@ -207,6 +208,38 @@ public abstract class ConfigurationBase {
                     ocm.setAttributes(ServiceManager.REALM_SERVICE, allAttrs);
                 }
             }
+        }
+    }
+
+    /**
+     * Removes the host name of a server or site URL that is no longer in use from the DNS aliases of the top-level
+     * realm, unless the URL of a remaining server or site has the same host name.
+     *
+     * @param ssoToken Single Sign-On Token which is used to access to the service management datastore.
+     * @param url The URL of the deleted server or site, or the replaced URL of a site.
+     * @throws SMSException if errors access in the service management datastore.
+     * @throws SSOException if the <code>ssoToken</code> is not valid.
+     */
+    protected static void removeOrganizationAlias(SSOToken ssoToken, String url) throws SMSException, SSOException {
+        String hostName = getHostName(url);
+        if (hostName == null) {
+            return;
+        }
+        Set<String> urls = new HashSet<>(ServerConfiguration.getServers(ssoToken));
+        urls.addAll(SiteConfiguration.getAllSiteURLs(ssoToken));
+        for (String remainingUrl : urls) {
+            if (hostName.equalsIgnoreCase(getHostName(remainingUrl))) {
+                return;
+            }
+        }
+        updateOrganizationAlias(ssoToken, url, false);
+    }
+
+    private static String getHostName(String url) {
+        try {
+            return new URL(url).getHost();
+        } catch (MalformedURLException e) {
+            return null;
         }
     }
 

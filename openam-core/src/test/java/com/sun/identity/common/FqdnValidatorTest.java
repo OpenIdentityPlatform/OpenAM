@@ -95,6 +95,7 @@ public class FqdnValidatorTest extends PowerMockTestCase {
     public void shouldNotReadRealmDnsAliasesForHostInFqdnMap() {
         assertThat(FqdnValidator.getInstance().isHostnameValid("lb.example.com")).isTrue();
         assertThat(FqdnValidator.getInstance().isHostnameValid("openam.example.com")).isTrue();
+        assertThat(FqdnValidator.getInstance().isHostnameValid("openam")).isFalse();
 
         verifyZeroInteractions(realmDnsAliases);
     }

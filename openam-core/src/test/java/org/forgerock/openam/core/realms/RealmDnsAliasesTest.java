@@ -235,7 +235,7 @@ public class RealmDnsAliasesTest {
     }
 
     @Test
-    public void shouldRejectHostWhenServiceListenerCannotBeRegistered() {
+    public void shouldRejectHostWhenIdRepoServiceCannotBeObtained() {
         failNextIdRepoServiceLookup = true;
 
         assertThat(realmDnsAliases.contains("acme.example.com")).isFalse();
