@@ -1420,12 +1420,6 @@
         <groupId>org.restlet.jee</groupId>
         <artifactId>org.restlet.ext.freemarker</artifactId>
         <version>${restlet.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.restlet.jee</groupId>
