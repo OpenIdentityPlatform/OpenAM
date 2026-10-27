@@ -38,6 +38,8 @@ const APPLICATION_NAME = "iPlanetAMWebAgentService";
 
 let adminToken;
 let demoToken;
+// Set once SUB_REALM exists, so that afterAll deletes only a realm this worker created.
+let subRealmId;
 
 /**
  * Authenticates in a throwaway context so the session cookie dies with it.
@@ -90,11 +92,11 @@ function exportPolicies(request, { path = "/xacml/policies", token = adminToken,
   return request.get(`${OPENAM_BASE}${path}`, options);
 }
 
-function importPolicies(request, body, params) {
-  const options = {
-    headers: { "iPlanetDirectoryPro": adminToken, "Content-Type": "application/xml" },
-    data: body,
-  };
+function importPolicies(request, body, { token = adminToken, params } = {}) {
+  const options = { headers: { "Content-Type": "application/xml" }, data: body };
+  if (token) {
+    options.headers["iPlanetDirectoryPro"] = token;
+  }
   if (params) {
     options.params = params;
   }
@@ -131,7 +133,26 @@ async function createSubRealm(request) {
   if (!response.ok()) {
     throw new Error(`Failed to create realm "${SUB_REALM}": ${response.status()} ${await response.text()}`);
   }
+  subRealmId = (await response.json())._id;
   console.log(`Realm "${SUB_REALM}" created`);
+}
+
+/**
+ * Deleting the realm also deletes the policies, applications and resource types the import cases
+ * put there.
+ */
+async function deleteSubRealm(request) {
+  const response = await request.delete(`${OPENAM_BASE}/json/global-config/realms/${subRealmId}`, {
+    headers: {
+      "iPlanetDirectoryPro": adminToken,
+      "Accept-API-Version": "protocol=1.0,resource=1.0",
+    },
+  });
+
+  if (!response.ok()) {
+    throw new Error(`Failed to delete realm "${SUB_REALM}": ${response.status()} ${await response.text()}`);
+  }
+  console.log(`Realm "${SUB_REALM}" deleted`);
 }
 
 /**
@@ -191,6 +212,14 @@ test.beforeAll(async ({ request }) => {
   await ensurePolicyExists(request, OTHER_POLICY_NAME);
 });
 
+// Keeps a long-lived server from collecting one realm per run. The root fixtures stay, since
+// ensurePolicyExists reuses them.
+test.afterAll(async ({ request }) => {
+  if (subRealmId) {
+    await deleteSubRealm(request);
+  }
+});
+
 test.describe("XACML policy export", () => {
   test("exports the root realm as an XACML 3.0 attachment", async ({ request }) => {
     const response = await exportPolicies(request);
@@ -239,10 +268,13 @@ test.describe("XACML policy export", () => {
  * not exist is not served.
  */
 test.describe("XACML export versioning", () => {
-  test("exports when no Accept-API-Version header is sent", async ({ request }) => {
+  test("serves resource version 1.0 when no Accept-API-Version header is sent", async ({ request }) => {
     const response = await exportPolicies(request);
 
     expect(response.status()).toBe(200);
+    // The value has the defect described in the next test.
+    expect(response.headers()["content-api-version"])
+      .toBe("[Content-API-Version: protocol=1.0,resource=1.0]");
   });
 
   test("answers a known Accept-API-Version with Content-API-Version", async ({ request }) => {
@@ -299,12 +331,7 @@ test.describe("XACML export realm styles", () => {
 
 test.describe("XACML export filters", () => {
   test("restricts the export to a matching filter", async ({ request }) => {
-    const query = new URLSearchParams();
-    query.append("filter", `name=${POLICY_NAME}`);
-
-    const response = await request.get(`${OPENAM_BASE}/xacml/policies?${query}`, {
-      headers: { "iPlanetDirectoryPro": adminToken },
-    });
+    const response = await exportPolicies(request, { params: { filter: `name=${POLICY_NAME}` } });
 
     expect(response.status()).toBe(200);
     // name=X is an equality match, so OTHER_POLICY_NAME, which starts with POLICY_NAME, stays out.
@@ -318,9 +345,7 @@ test.describe("XACML export filters", () => {
       const query = new URLSearchParams();
       values.forEach((value) => query.append("filter", value));
 
-      const response = await request.get(`${OPENAM_BASE}/xacml/policies?${query}`, {
-        headers: { "iPlanetDirectoryPro": adminToken },
-      });
+      const response = await exportPolicies(request, { params: query });
 
       expect(response.status()).toBe(200);
       expect(policyIds(await response.text()), `filters ${values.join(" & ")}`).toEqual([]);
@@ -329,12 +354,34 @@ test.describe("XACML export filters", () => {
 });
 
 test.describe("XACML policy import", () => {
-  // Runs before the round-trip case, which imports the same policy into the same realm for real.
+  // The rejection and dryrun cases run before the round-trip case, which imports the same policy into
+  // the same realm for real, so that they can check that it has not landed there.
+  test("rejects an import by a user without delegation permission with 403", async ({ request }) => {
+    const exported = await (await exportPolicies(request)).text();
+
+    const response = await importPolicies(request, exported, { token: demoToken, params: { realm: `/${SUB_REALM}` } });
+
+    expect(response.status()).toBe(403);
+    await expectXmlError(response, 403);
+    expect(await exportedPolicyIds(request, SUB_REALM)).not.toContain(POLICY_NAME);
+  });
+
+  test("answers an unauthenticated import with 500", async ({ request }) => {
+    const exported = await (await exportPolicies(request)).text();
+
+    const response = await importPolicies(request, exported, { token: null, params: { realm: `/${SUB_REALM}` } });
+
+    // Defect; the target is 401 with <code>401, as for the unauthenticated export.
+    expect(response.status()).toBe(500);
+    await expectXmlError(response, 500);
+    expect(await exportedPolicyIds(request, SUB_REALM)).not.toContain(POLICY_NAME);
+  });
+
   test("reports the steps of a dryrun without persisting them", async ({ request }) => {
     const exported = await (await exportPolicies(request)).text();
     expect(await exportedPolicyIds(request, SUB_REALM)).not.toContain(POLICY_NAME);
 
-    const response = await importPolicies(request, exported, { realm: `/${SUB_REALM}`, dryrun: "true" });
+    const response = await importPolicies(request, exported, { params: { realm: `/${SUB_REALM}`, dryrun: "true" } });
 
     expect(response.status()).toBe(200);
     expect(response.headers()["content-type"]).toBe("application/json");
@@ -347,7 +394,7 @@ test.describe("XACML policy import", () => {
   test("round-trips an export from the root realm into a sub realm", async ({ request }) => {
     const exported = await (await exportPolicies(request)).text();
 
-    const response = await importPolicies(request, exported, { realm: `/${SUB_REALM}` });
+    const response = await importPolicies(request, exported, { params: { realm: `/${SUB_REALM}` } });
 
     expect(response.status()).toBe(200);
     const steps = await response.json();
@@ -358,11 +405,30 @@ test.describe("XACML policy import", () => {
     expect(await exportedPolicyIds(request, SUB_REALM)).toContain(POLICY_NAME);
   });
 
+  test("rejects a document that holds no policies with 400", async ({ request }) => {
+    const response = await importPolicies(request,
+      '<PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicySetId="empty" Version="1.0"'
+      + ' PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:deny-overrides">'
+      + "<Target/></PolicySet>");
+
+    expect(response.status()).toBe(400);
+    await expectXmlError(response, 400);
+    // A parse failure is a 400 as well; the message shows that this document was read.
+    expect(await response.text()).toContain("No policies found in XACML document");
+  });
+
+  test("rejects a malformed document with 400", async ({ request }) => {
+    const response = await importPolicies(request, '<PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17">');
+
+    expect(response.status()).toBe(400);
+    await expectXmlError(response, 400);
+  });
+
   test("answers an empty document with 500", async ({ request }) => {
     const response = await importPolicies(request, "");
 
-    // Defect; the target is 400 with <code>400, as for a document that holds no policies. The empty
-    // body reaches the import handler as a null entity and fails with a NullPointerException.
+    // Defect; the target is 400 with <code>400, as for the two documents above. The empty body
+    // reaches the import handler as a null entity and fails with a NullPointerException.
     expect(response.status()).toBe(500);
     await expectXmlError(response, 500);
   });
