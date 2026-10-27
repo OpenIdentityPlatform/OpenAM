@@ -48,7 +48,7 @@ public class OpenIDConnectProviderDiscovery {
      * @param resource The resource.
      * @param rel The rel.
      * @param deploymentUrl The deployment url of the OpenId Connect provider.
-     * @param request The OAuth2 request.
+     * @param request The OAuth2 request. Not used; kept so that the signature does not change.
      * @return A {@code Map} of the OpenId Connect provider urls.
      * @throws BadRequestException If the request is malformed.
      */
@@ -75,7 +75,7 @@ public class OpenIDConnectProviderDiscovery {
         //resource is of the form of https://example.com/ or https://example.com/joe
         final boolean isUrl = ("https".equalsIgnoreCase(object.getScheme())
                 || "http".equalsIgnoreCase(object.getScheme())) && !object.isOpaque();
-        //resource is not uri so only option is it is an email of form acct:joe@example.com
+        //resource is of the form acct:joe@example.com
         final boolean isAccount = "acct".equalsIgnoreCase(object.getScheme()) && resource.indexOf('@') >= 0;
         if (!isUrl && !isAccount) {
             logger.error("Invalid parameters.");
