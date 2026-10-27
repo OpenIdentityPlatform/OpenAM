@@ -97,7 +97,7 @@ public enum FqdnValidator {
     /**
      * Returns <code>true</code> if a host name is valid. <code>hostname</code> is valid if it is contained in the list
      * of fully qualified host names, or it is the default host name where OpenAM is installed, or it is a DNS alias
-     * of a realm.
+     * of a realm that the fully qualified domain name map does not map to another host name.
      * 
      * @param hostname host name.
      * @return true if a host name is valid.
@@ -107,7 +107,9 @@ public enum FqdnValidator {
             return false;
         }
         String lowerCaseHostname = hostname.toLowerCase();
-        return fqdnMap.values().contains(lowerCaseHostname) || isRealmDnsAlias(lowerCaseHostname);
+        // A mapped host name is redirected to the host name it is mapped to, even if it is a DNS alias of a realm
+        return fqdnMap.values().contains(lowerCaseHostname)
+                || (!fqdnMap.containsKey(lowerCaseHostname) && isRealmDnsAlias(lowerCaseHostname));
     }
 
     private boolean isRealmDnsAlias(String hostname) {

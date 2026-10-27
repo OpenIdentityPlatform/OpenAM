@@ -27,9 +27,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdConstants;
+import com.sun.identity.security.AMSecurityPropertiesException;
 import com.sun.identity.sm.OrganizationConfigManagerFactory;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -55,6 +58,8 @@ public class RealmDnsAliasesTest {
     private final Map<String, Set<String>> aliasesByRealm = new HashMap<>();
     private int realmReads;
     private boolean failNextRealmRead;
+    private boolean failNextAdminTokenLookup;
+    private boolean failNextIdRepoServiceLookup;
     private String realmReadDuringChange;
     private RealmDnsAliases realmDnsAliases;
 
@@ -68,10 +73,12 @@ public class RealmDnsAliasesTest {
         aliasesByRealm.put("/acme/sub", asSet("sub.acme.example.com"));
         realmReads = 0;
         failNextRealmRead = false;
+        failNextAdminTokenLookup = false;
+        failNextIdRepoServiceLookup = false;
         realmReadDuringChange = null;
 
-        realmDnsAliases = new RealmDnsAliases(() -> adminToken, organizationConfigManagerFactory,
-                () -> idRepoService) {
+        realmDnsAliases = new RealmDnsAliases(this::getAdminToken, organizationConfigManagerFactory,
+                this::getIdRepoService) {
             @Override
             Set<String> getSubRealms(SSOToken token) throws SMSException {
                 realmReads++;
@@ -218,6 +225,81 @@ public class RealmDnsAliasesTest {
         realmDnsAliases.contains("acme.example.com");
 
         assertThat(realmDnsAliases.contains("acme.example.com")).isTrue();
+    }
+
+    @Test
+    public void shouldRejectHostWhenAdminTokenCannotBeObtained() {
+        failNextAdminTokenLookup = true;
+
+        assertThat(realmDnsAliases.contains("acme.example.com")).isFalse();
+    }
+
+    @Test
+    public void shouldRejectHostWhenServiceListenerCannotBeRegistered() {
+        failNextIdRepoServiceLookup = true;
+
+        assertThat(realmDnsAliases.contains("acme.example.com")).isFalse();
+    }
+
+    @Test
+    public void shouldRegisterServiceListenerAfterIdRepoServiceCouldNotBeObtained() {
+        failNextIdRepoServiceLookup = true;
+        realmDnsAliases.contains("acme.example.com");
+
+        realmDnsAliases.contains("acme.example.com");
+
+        verify(idRepoService, times(1)).addListener(any(ServiceListener.class));
+    }
+
+    @Test
+    public void shouldReadRealmsAgainOnceServiceListenerIsRegisteredAfterFailedRegistration() {
+        given(idRepoService.addListener(any(ServiceListener.class))).willReturn(null, "LISTENER_ID");
+        assertThat(realmDnsAliases.contains("acme.example.com")).isTrue();
+        // no listener is registered yet, so the change is not notified
+        aliasesByRealm.put("/acme", asSet());
+
+        assertThat(realmDnsAliases.contains("acme.example.com")).isFalse();
+    }
+
+    @Test
+    public void shouldNotReadRealmsWhileServiceListenerIsBeingRegistered() throws Exception {
+        AtomicBoolean firstRegistration = new AtomicBoolean(true);
+        AtomicInteger realmReadsDuringRegistration = new AtomicInteger();
+        Thread concurrentRequest = new Thread(() -> realmDnsAliases.contains("acme.example.com"));
+        given(idRepoService.addListener(any(ServiceListener.class))).willAnswer(invocation -> {
+            if (firstRegistration.compareAndSet(true, false)) {
+                // the concurrent request either reads the realms or waits for the registration to complete
+                concurrentRequest.start();
+                while (concurrentRequest.isAlive() && concurrentRequest.getState() != Thread.State.BLOCKED
+                        && concurrentRequest.getState() != Thread.State.WAITING) {
+                    concurrentRequest.join(10);
+                }
+                realmReadsDuringRegistration.set(realmReads);
+            }
+            return "LISTENER_ID";
+        });
+
+        realmDnsAliases.contains("acme.example.com");
+        concurrentRequest.join();
+
+        assertThat(realmReadsDuringRegistration.get()).isEqualTo(0);
+    }
+
+    private SSOToken getAdminToken() {
+        if (failNextAdminTokenLookup) {
+            failNextAdminTokenLookup = false;
+            throw new AMSecurityPropertiesException("The admin token cannot be obtained");
+        }
+        return adminToken;
+    }
+
+    private ServiceConfigManager getIdRepoService() {
+        if (failNextIdRepoServiceLookup) {
+            failNextIdRepoServiceLookup = false;
+            // as RealmGuiceModule.provideIdRepoService reports an SMSException
+            throw new RuntimeException(new SMSException("Configuration store is unavailable"));
+        }
+        return idRepoService;
     }
 
     private void realmConfigurationChanged() {

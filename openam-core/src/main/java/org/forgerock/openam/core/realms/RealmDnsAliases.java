@@ -42,6 +42,10 @@ import org.slf4j.LoggerFactory;
  * without searching the configuration store.
  *
  * <p>The aliases are read again after any change to the realm configuration.</p>
+ *
+ * <p>In the coexistence mode with an AMSDK data store, the aliases of a realm are read from its AMSDK organization,
+ * which is written only after the realm configuration has changed. If the aliases are read in between, the previous
+ * aliases are kept until the next change to the realm configuration.</p>
  */
 @Singleton
 public class RealmDnsAliases {
@@ -75,20 +79,34 @@ public class RealmDnsAliases {
         if (hostname == null) {
             return false;
         }
-        init();
-        return getAliases().contains(hostname.toLowerCase());
-    }
-
-    private void init() {
-        if (initialised.compareAndSet(false, true)) {
-            if (idRepoServiceProvider.get().addListener(new RealmsChangeListener()) == null) {
-                logger.warn("RealmDnsAliases: Failed to add ServiceListener. "
-                        + "Realm DNS aliases will not be refreshed on config changes.");
-            }
+        try {
+            init();
+            return getAliases().contains(hostname.toLowerCase());
+        } catch (SMSException | RuntimeException e) {
+            logger.warn("RealmDnsAliases: Unable to read the DNS aliases of the realms", e);
+            return false;
         }
     }
 
-    private Set<String> getAliases() {
+    private void init() {
+        if (initialised.get()) {
+            return;
+        }
+        synchronized (this) {
+            if (initialised.get()) {
+                return;
+            }
+            if (idRepoServiceProvider.get().addListener(new RealmsChangeListener()) == null) {
+                logger.warn("RealmDnsAliases: Failed to add ServiceListener, will retry on the next request");
+                return;
+            }
+            // Discards the aliases read while no listener was registered
+            configVersion.incrementAndGet();
+            initialised.set(true);
+        }
+    }
+
+    private Set<String> getAliases() throws SMSException {
         Snapshot current = snapshot;
         if (current != null && current.configVersion == configVersion.get()) {
             return current.aliases;
@@ -96,20 +114,15 @@ public class RealmDnsAliases {
         return reload();
     }
 
-    private synchronized Set<String> reload() {
+    private synchronized Set<String> reload() throws SMSException {
         // Taken before reading, so that a change notified while reading makes the next call read again
         long version = configVersion.get();
         if (snapshot != null && snapshot.configVersion == version) {
             return snapshot.aliases;
         }
-        try {
-            Set<String> aliases = readAliases();
-            snapshot = new Snapshot(version, aliases);
-            return aliases;
-        } catch (SMSException e) {
-            logger.warn("RealmDnsAliases: Unable to read the DNS aliases of the realms", e);
-            return Collections.emptySet();
-        }
+        Set<String> aliases = readAliases();
+        snapshot = new Snapshot(version, aliases);
+        return aliases;
     }
 
     private Set<String> readAliases() throws SMSException {

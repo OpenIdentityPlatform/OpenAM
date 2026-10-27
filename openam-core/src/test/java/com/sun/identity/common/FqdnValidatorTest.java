@@ -78,6 +78,13 @@ public class FqdnValidatorTest extends PowerMockTestCase {
     }
 
     @Test
+    public void shouldRedirectFqdnMapKeyThatIsAlsoARealmDnsAlias() {
+        given(realmDnsAliases.contains("openam")).willReturn(true);
+
+        assertThat(FqdnValidator.getInstance().getFullyQualifiedHostName("openam")).isEqualTo("openam.example.com");
+    }
+
+    @Test
     public void shouldRedirectHostThatIsNeitherInFqdnMapNorARealmDnsAlias() {
         assertThat(FqdnValidator.getInstance().isHostnameValid("attacker.example.org")).isFalse();
         assertThat(FqdnValidator.getInstance().getFullyQualifiedHostName("attacker.example.org"))
