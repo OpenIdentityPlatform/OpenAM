@@ -12,12 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect;
 
-import static org.forgerock.openam.oauth2.OAuth2Constants.Params.REALM;
 import static org.forgerock.openam.utils.CollectionUtils.getFirstItem;
 
 import jakarta.inject.Inject;
@@ -27,13 +26,11 @@ import jakarta.inject.Singleton;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.json.JsonValue;
-import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.ServerException;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.oauth2.IdentityManager;
 import org.forgerock.openam.oauth2.OAuth2Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +45,6 @@ public class OpenIDConnectProvider {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
     private final SSOTokenManager tokenManager;
-    private final IdentityManager identityManager;
     private final CTSPersistentStore cts;
     private final TokenAdapter<JsonValue> tokenAdapter;
 
@@ -56,36 +52,15 @@ public class OpenIDConnectProvider {
      * Constructs a new OpenAMOpenIDConnectProvider.
      *
      * @param tokenManager An instance of the SSOTokenManager.
-     * @param identityManager An instance of the IdentityManager.
      * @param cts An instance of the CTSPersistentStore.
      * @param tokenAdapter An instance of the TokenAdapter to convert CTS tokens into JsonValue.
      */
     @Inject
-    public OpenIDConnectProvider(SSOTokenManager tokenManager, IdentityManager identityManager,
-            CTSPersistentStore cts, @Named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER)
-            TokenAdapter<JsonValue> tokenAdapter) {
+    public OpenIDConnectProvider(SSOTokenManager tokenManager, CTSPersistentStore cts,
+            @Named(OAuth2Constants.CoreTokenParams.OAUTH_TOKEN_ADAPTER) TokenAdapter<JsonValue> tokenAdapter) {
         this.tokenManager = tokenManager;
-        this.identityManager = identityManager;
         this.cts = cts;
         this.tokenAdapter = tokenAdapter;
-    }
-
-    /**
-     * Determines whether a user has a valid session.
-     *
-     * @param userId The user's id.
-     * @param request The OAuth2 request.
-     * @return {@code true} if the user is valid.
-     */
-    public boolean isUserValid(String userId, OAuth2Request request) {
-        try {
-            identityManager.getResourceOwnerIdentity(userId,
-                    request.<String>getParameter(REALM));
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
     }
 
     /**

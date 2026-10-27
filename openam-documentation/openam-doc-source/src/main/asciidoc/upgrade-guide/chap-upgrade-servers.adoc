@@ -111,6 +111,11 @@ Starting with this release OpenAM no longer ships the Restlet Servlet extension 
 Custom code that calls `org.restlet.ext.servlet.ServletUtils` must call `org.forgerock.openam.rest.jakarta.servlet.ServletUtils` instead, which has the same `getRequest` and `getResponse` methods.
 ====
 
+[IMPORTANT]
+====
+Starting with this release WebFinger (`/.well-known/webfinger`) answers OpenID Connect issuer discovery requests again; earlier 16.x releases answered every request with HTTP status 500. It no longer looks up the account named in the `resource` parameter: for any `acct:` or `http(s)` resource it returns the issuer of the deployment, the same for every account. Releases 15.x and earlier answered HTTP status 404 for an account that did not exist, which told an anonymous caller whether the account existed.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====
