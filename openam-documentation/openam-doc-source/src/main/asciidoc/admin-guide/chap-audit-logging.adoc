@@ -662,7 +662,7 @@ For example, for Apache ActiveMQ, the JNDI lookup name is `ConnectionFactory`.
 +
 The JMS client must implement Jakarta Messaging, the `jakarta.jms` package. OpenAM already includes the Jakarta Messaging API. A JMS client built for the older `javax.jms` package does not work with OpenAM.
 +
-For example, for Apache ActiveMQ 5.x, use `activemq-client-jakarta` rather than `activemq-client`, together with the `hawtbuf` `.jar` file it depends on.
+For example, for Apache ActiveMQ 5.18 or 5.19, use `activemq-client-jakarta` rather than `activemq-client`, together with the `hawtbuf` `.jar` file it depends on. Earlier 5.x releases provide no Jakarta Messaging client. Starting with Apache ActiveMQ 6.0, `activemq-client` itself implements Jakarta Messaging; it also depends on `hawtbuf`.
 +
 If you use Apache Tomcat, place the `.jar` files in `/path/to/tomcat/webapps/openam/WEB-INF/lib`.
 
