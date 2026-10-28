@@ -605,6 +605,9 @@ public class ServerConfiguration extends ConfigurationBase {
             }
         }
 
+        if (deleted) {
+            removeOrganizationAlias(ssoToken, instanceName);
+        }
         return deleted;
     }
 

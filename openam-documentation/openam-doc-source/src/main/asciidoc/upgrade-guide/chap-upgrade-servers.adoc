@@ -104,6 +104,13 @@ Starting with this release the signature on a SAML v1.x assertion or response is
 A trusted asserting party therefore now needs its signing certificate alias configured. Signed assertions and responses from a partner whose alias is blank are rejected, and a certificate in the `KeyInfo` element must be the one of that alias. There is no property to restore the previous behaviour. Before promoting the upgrade, import each asserting party's signing certificate into OpenAM's keystore and enter its alias in the trusted partner configuration. See xref:../admin-guide/chap-saml-1.adoc#saml-1-configure-trusted-ap["To Configure a Trusted Asserting Party"] in the __Administration Guide__.
 ====
 
+[IMPORTANT]
+====
+Starting with this release a host name that is a DNS alias of a realm is accepted as a valid host name, as if it had its own `com.sun.identity.server.fqdnMap[<alias>]=<alias>` entry, unless the FQDN map maps it to another host name. The DNS aliases of the top-level realm hold the RDN value of the root suffix (for example `openam`) and the host name of every server and site that was created, so these host names are accepted as well.
+
+OpenAM now removes the host name of a server or site from the DNS aliases of the top-level realm when the server or site is deleted, or when the primary URL of the site changes, unless the URL of another server or site has the same host name. If the host name cannot be removed at that moment, for example because the DNS aliases or the URLs of the other servers and sites cannot be read or updated, the server or site is still deleted or its URL still changed, OpenAM logs an error in the `amSetupServlet` debug log, and the host name stays. Servers and sites deleted before the upgrade, and site URLs changed before it, have left their host names behind. Before promoting the upgrade, review the DNS aliases of every realm and remove the host names that are no longer in use or no longer under your control. If you added a server or site host name to the DNS aliases of the top-level realm yourself, for example the host name of a load balancer, add it again after you delete the last server or site that has it.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====
