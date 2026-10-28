@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyght owner]"
  *
  * $Id: AgentProvider.java,v 1.41 2009/11/16 21:52:58 mallas Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 
@@ -531,11 +533,11 @@ public class AgentProvider extends ProviderConfig {
            config.put(SERVICE_TYPE, serviceType);
         }
 
-        Set secMechSet = new HashSet();
+        Set<String> secMechSet = new HashSet<>();
         if(secMech != null) {
-           Iterator iter = secMech.iterator();
+           Iterator<String> iter = secMech.iterator();
            while(iter.hasNext()) {
-               secMechSet.add((String)iter.next());
+               secMechSet.add(iter.next());
            }
         }
 

@@ -38,7 +38,9 @@ import com.sun.identity.federation.common.FederationStaticsLock;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.MetaManagerFailureFixture;
+import com.sun.identity.federation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
+import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.meta.IDFFMetaManager;
 
@@ -145,9 +147,14 @@ public class LibertyManagerTest {
         attributes.add(attribute(IFSConstants.ERROR_PAGE_URL, ERROR_PAGE_URL));
         attributes.add(attribute(IFSConstants.REGISTRATION_DONE_URL, REGISTRATION_DONE_URL));
 
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
-        when(config.getMetaAlias()).thenReturn(META_ALIAS);
+        List<AttributeElement> elements = new ArrayList<AttributeElement>();
+        for (AttributeType attribute : attributes) {
+            elements.add(new AttributeElement(attribute));
+        }
+        BaseConfigType baseConfig = mock(BaseConfigType.class);
+        when(baseConfig.getAttribute()).thenReturn(elements);
+        when(baseConfig.getMetaAlias()).thenReturn(META_ALIAS);
+        SPDescriptorConfigElement config = new SPDescriptorConfigElement(baseConfig);
 
         IDFFMetaManager metaManager = mock(IDFFMetaManager.class);
         when(metaManager.getSPDescriptorConfig(REALM, SP)).thenReturn(config);

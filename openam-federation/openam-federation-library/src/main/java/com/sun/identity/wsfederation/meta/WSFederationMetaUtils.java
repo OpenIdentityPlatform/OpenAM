@@ -25,7 +25,7 @@
  * $Id: WSFederationMetaUtils.java,v 1.5 2009/10/28 23:58:59 exu Exp $
  *
  * Portions Copyrighted 2012-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.wsfederation.meta;
 
@@ -44,10 +44,11 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import jakarta.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.ValidationEvent;
 
 import org.forgerock.openam.utils.CollectionUtils;
 import org.forgerock.openam.utils.StringUtils;
@@ -59,6 +60,13 @@ import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
+import com.sun.identity.common.MixedContentWhitespaceListener;
+import com.sun.identity.wsfederation.jaxb.xmlsig.CanonicalizationMethodType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.DigestMethodType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.KeyInfoType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.KeyValueType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.SignatureMethodType;
+import com.sun.identity.wsfederation.jaxb.xmlsig.TransformType;
 
 import org.xml.sax.InputSource;
 
@@ -93,7 +101,15 @@ public final class WSFederationMetaUtils {
     private static final String PROP_JAXB_FORMATTED_OUTPUT =
         "jaxb.formatted.output";
     private static final String PROP_NAMESPACE_PREFIX_MAPPER =
-        "com.sun.xml.bind.namespacePrefixMapper";
+        "org.glassfish.jaxb.namespacePrefixMapper";
+    private static final MixedContentWhitespaceListener MIXED_CONTENT_WHITESPACE_LISTENER =
+        new MixedContentWhitespaceListener()
+            .add(KeyInfoType.class, KeyInfoType::getContent)
+            .add(KeyValueType.class, KeyValueType::getContent)
+            .add(SignatureMethodType.class, SignatureMethodType::getContent)
+            .add(DigestMethodType.class, DigestMethodType::getContent)
+            .add(CanonicalizationMethodType.class, CanonicalizationMethodType::getContent)
+            .add(TransformType.class, TransformType::getContent);
 
     private static NamespacePrefixMapperImpl nsPrefixMapper =
         new NamespacePrefixMapperImpl();
@@ -123,6 +139,19 @@ public final class WSFederationMetaUtils {
     }
 
     /**
+     * Creates an unmarshaller that fails on the first error and drops the formatting whitespace of
+     * mixed-content types, as the JAXB 1 runtime did. The JAXB 3 runtime otherwise recovers from
+     * errors such as an unexpected element by dropping the element, and keeps the whitespace, which
+     * the formatted marshaller indents again on every save.
+     */
+    private static Unmarshaller createUnmarshaller() throws JAXBException {
+        Unmarshaller u = jaxbContext.createUnmarshaller();
+        u.setEventHandler(event -> event.getSeverity() == ValidationEvent.WARNING);
+        u.setListener(MIXED_CONTENT_WHITESPACE_LISTENER);
+        return u;
+    }
+
+    /**
      * Converts a <code>String</code> object to a JAXB object.
      * @param str a <code>String</code> object
      * @return a JAXB object converted from the <code>String</code> object.
@@ -132,7 +161,7 @@ public final class WSFederationMetaUtils {
     public static Object convertStringToJAXB(String str)
         throws JAXBException {
 
-       Unmarshaller u = jaxbContext.createUnmarshaller();
+       Unmarshaller u = createUnmarshaller();
        return u.unmarshal(XMLUtils.createSAXSource(new InputSource(new StringReader(str))));
     }
 
@@ -146,7 +175,7 @@ public final class WSFederationMetaUtils {
     public static Object convertInputStreamToJAXB(InputStream is)
         throws JAXBException {
 
-       Unmarshaller u = jaxbContext.createUnmarshaller();
+       Unmarshaller u = createUnmarshaller();
        return u.unmarshal(XMLUtils.createSAXSource(new InputSource(is)));
     }
 
@@ -160,7 +189,7 @@ public final class WSFederationMetaUtils {
     public static Object convertNodeToJAXB(Node node)
         throws JAXBException {
 
-       Unmarshaller u = jaxbContext.createUnmarshaller();
+       Unmarshaller u = createUnmarshaller();
        //no need to get SAXSource, since the node is already created by using
        //a secure XML parser
        return u.unmarshal(node);
@@ -234,7 +263,7 @@ public final class WSFederationMetaUtils {
         Map<String,List<String>> attrMap = new HashMap<String,List<String>>();
         List list = config.getAttribute();
         for(Iterator iter = list.iterator(); iter.hasNext();) {
-            AttributeType avp = (AttributeType)iter.next();
+            AttributeType avp = ((AttributeElement)iter.next()).getValue();
             attrMap.put(avp.getName(), avp.getValue());
         }
 
@@ -268,7 +297,7 @@ public final class WSFederationMetaUtils {
             objFactory = 
             new com.sun.identity.wsfederation.jaxb.entityconfig.ObjectFactory();
 
-        List attributeList = config.getAttribute();
+        List<AttributeElement> attributeList = config.getAttribute();
 
         attributeList.clear();
 
@@ -276,9 +305,9 @@ public final class WSFederationMetaUtils {
         for (String key : map.keySet())
         {
             AttributeElement
-                avp = objFactory.createAttributeElement();
-            avp.setName(key);
-            avp.getValue().addAll(map.get(key));
+                avp = objFactory.createAttributeElement(objFactory.createAttributeType());
+            avp.getValue().setName(key);
+            avp.getValue().getValue().addAll(map.get(key));
             
             attributeList.add(avp);
         }
@@ -295,8 +324,8 @@ public final class WSFederationMetaUtils {
         List<AttributeElement> list = config.getAttribute();
 
         for (AttributeElement avp : list) {
-            if (avp.getName().equals(key)) {
-                return CollectionUtils.getFirstItem(avp.getValue());
+            if (avp.getValue().getName().equals(key)) {
+                return CollectionUtils.getFirstItem(avp.getValue().getValue());
             }
         }
 
@@ -431,11 +460,62 @@ public final class WSFederationMetaUtils {
      * @return The Base URL of the OpenAM deployment.
      */
     public static String getEndpointBaseUrl(IDPSSOConfigElement idpConfig, HttpServletRequest request) {
-        String endpointBaseUrl = getAttribute(idpConfig, WSFederationConstants.ENDPOINT_BASE_URL);
+        String endpointBaseUrl = getAttribute(idpConfig.getValue(), WSFederationConstants.ENDPOINT_BASE_URL);
         if (StringUtils.isEmpty(endpointBaseUrl)) {
             endpointBaseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
                     + request.getContextPath();
         }
         return endpointBaseUrl;
+    }
+
+    /**
+     * Returns the value of the <code>&lt;TokenSigningCertificate&gt;</code>
+     * element for the given standard metadata.
+     * @param fed The standard metadata for the entity.
+     * @return byte array containing the decoded value of the
+     * <code>&lt;TokenSigningCertificate&gt;</code> element
+     */
+    public static byte[] findTokenSigningCertificate(
+        com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement fed)
+    {
+        for ( Object o: fed.getValue().getAny() )
+        {
+            if ( o instanceof
+                com.sun.identity.wsfederation.jaxb.wsfederation.TokenSigningKeyInfoElement )
+            {
+                com.sun.identity.wsfederation.jaxb.wsse.SecurityTokenReferenceType str =
+                    ((com.sun.identity.wsfederation.jaxb.wsfederation.TokenSigningKeyInfoElement)o)
+                        .getValue().getSecurityTokenReference().getValue();
+                for ( Object o1: str.getAny() )
+                {
+                    // lax any content unmarshals X509Data as the element wrapper, not the raw type
+                    com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType x509Data = null;
+                    if ( o1 instanceof com.sun.identity.wsfederation.jaxb.xmlsig.X509DataElement )
+                    {
+                        x509Data = ((com.sun.identity.wsfederation.jaxb.xmlsig.X509DataElement)o1)
+                            .getValue();
+                    }
+                    else if ( o1 instanceof com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType )
+                    {
+                        x509Data = (com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType)o1;
+                    }
+                    if ( x509Data != null )
+                    {
+                        for ( Object o2:
+                            x509Data.getX509IssuerSerialOrX509SKIOrX509SubjectName())
+                        {
+                            if ( o2 instanceof
+                                com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType.X509Certificate )
+                            {
+                                return ((com.sun.identity.wsfederation.jaxb.xmlsig.X509DataType.X509Certificate)o2)
+                                    .getValue();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

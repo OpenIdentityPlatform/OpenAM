@@ -529,8 +529,8 @@ public class WSFederationUtils {
             throw new WSFederationException(se);
         }
 
-        IDPAttributeMapper attrMapper = getIDPAttributeMapper(WSFederationMetaUtils.getAttributes(idpConfig));
-        IDPAccountMapper accountMapper = getIDPAccountMapper(WSFederationMetaUtils.getAttributes(idpConfig));
+        IDPAttributeMapper attrMapper = getIDPAttributeMapper(WSFederationMetaUtils.getAttributes(idpConfig.getValue()));
+        IDPAccountMapper accountMapper = getIDPAccountMapper(WSFederationMetaUtils.getAttributes(idpConfig.getValue()));
 
         List attributes = attrMapper.getAttributes(session, idpEntityId, spEntityId, realm);
 
@@ -547,13 +547,13 @@ public class WSFederationUtils {
 
         NameIdentifier nameIdentifier = accountMapper.getNameID(session, realm, idpEntityId, spEntityId);
 
-        int notBeforeSkew = WSFederationMetaUtils.getIntAttribute(idpConfig,
+        int notBeforeSkew = WSFederationMetaUtils.getIntAttribute(idpConfig.getValue(),
                 SAML2Constants.ASSERTION_NOTBEFORE_SKEW_ATTRIBUTE, SAML2Constants.NOTBEFORE_ASSERTION_SKEW_DEFAULT);
 
-        int effectiveTime = WSFederationMetaUtils.getIntAttribute(idpConfig,
+        int effectiveTime = WSFederationMetaUtils.getIntAttribute(idpConfig.getValue(),
                 SAML2Constants.ASSERTION_EFFECTIVE_TIME_ATTRIBUTE, SAML2Constants.ASSERTION_EFFECTIVE_TIME);
 
-        String certAlias = WSFederationMetaUtils.getAttribute(idpConfig, SAML2Constants.SIGNING_CERT_ALIAS);
+        String certAlias = WSFederationMetaUtils.getAttribute(idpConfig.getValue(), SAML2Constants.SIGNING_CERT_ALIAS);
 
         if (wantAssertionSigned && certAlias == null) {
             // SP wants us to sign the assertion, but we don't have a signing cert

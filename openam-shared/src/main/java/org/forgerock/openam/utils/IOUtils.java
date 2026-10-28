@@ -567,8 +567,6 @@ public final class IOUtils {
                     "com.sun.identity.console.service.model.SMDiscoEntryData",
                     "com.sun.identity.console.session.model.SMSessionData",
                     "com.sun.identity.shared.datastruct.OrderedSet",
-                    "com.sun.xml.bind.util.ListImpl",
-                    "com.sun.xml.bind.util.ProxyListImpl",
                     "java.lang.Boolean",
                     "java.lang.Integer",
                     "java.lang.Number",

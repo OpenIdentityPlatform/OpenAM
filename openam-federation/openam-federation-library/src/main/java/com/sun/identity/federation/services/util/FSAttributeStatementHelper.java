@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSAttributeStatementHelper.java,v 1.3 2008/06/25 05:47:04 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC.
  *
  */
 
@@ -80,7 +82,7 @@ public class FSAttributeStatementHelper {
         BaseConfigType hostConfig = null;
         try {
             if (metaManager != null) {
-                hostConfig = metaManager.getIDPDescriptorConfig(realm,entityID);
+                hostConfig = IDFFMetaUtils.unwrap(metaManager.getIDPDescriptorConfig(realm,entityID));
             }
         } catch (IDFFMetaException fae) {
             FSUtils.debug.error("FSAttributeStatementHelper.getAutoFed" +

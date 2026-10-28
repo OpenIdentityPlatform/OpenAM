@@ -25,7 +25,7 @@
  * $Id: ImportEntityModelImpl.java,v 1.11 2009/11/10 01:19:49 exu Exp $
  *
  * Portions Copyrighted 2012-2014 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.console.federation.model;
 
@@ -46,7 +46,8 @@ import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.workflow.WorkflowException;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.w3c.dom.Document;
 
@@ -138,14 +139,14 @@ public class ImportEntityModelImpl extends AMModelBase
             if (extendedMetaData != null) {
                 configElt = getEntityConfigElement();
 
-                if (configElt != null && configElt.isHosted()) {
-                    List config = 
-                       configElt.getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
+                if (configElt != null && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
+                    List<JAXBElement<BaseConfigType>> config =
+                       configElt.getValue().getIDPSSOConfigOrSPSSOConfigOrAuthnAuthorityConfig();
                     if (!config.isEmpty()) {
-                        BaseConfigType bConfig = (BaseConfigType)
-                            config.iterator().next();
-                        
-                        // get the realm from the extended meta and use 
+                        BaseConfigType bConfig =
+                            config.iterator().next().getValue();
+
+                        // get the realm from the extended meta and use
                         // for import
                         realm = SAML2MetaUtils.getRealmByMetaAlias(
                             bConfig.getMetaAlias());                     
@@ -189,7 +190,7 @@ public class ImportEntityModelImpl extends AMModelBase
             Object obj = WSFederationMetaUtils.convertStringToJAXB(standardMetaData);
        
             if (obj instanceof com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataElement) {
-                obj = ((com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataElement)obj).getAny().get(0);
+                obj = ((com.sun.identity.wsfederation.jaxb.wsfederation.FederationMetadataElement)obj).getValue().getAny().get(0);
             }
 
             if (obj instanceof com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement) {
@@ -236,18 +237,18 @@ public class ImportEntityModelImpl extends AMModelBase
             if (extendedMetaData != null) {
                 configElt = getIDFFEntityConfigElement();
                 
-                if ((configElt != null) && configElt.isHosted()) {
+                if ((configElt != null) && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
                     IDPDescriptorConfigElement idpConfig = 
                         IDFFMetaUtils.getIDPDescriptorConfig(configElt);
                     if (idpConfig != null) {
                         SAML2MetaUtils.getRealmByMetaAlias(
-                            idpConfig.getMetaAlias());
+                            idpConfig.getValue().getMetaAlias());
                     } else {
                         SPDescriptorConfigElement spConfig =
                             IDFFMetaUtils.getSPDescriptorConfig(configElt);
                         if (spConfig != null) {
                             SAML2MetaUtils.getRealmByMetaAlias(
-                                spConfig.getMetaAlias());
+                                spConfig.getValue().getMetaAlias());
                         }
                     }
                 }
@@ -310,12 +311,11 @@ public class ImportEntityModelImpl extends AMModelBase
                  * see note at the end of this class for how we decide
                  * the realm value
                  */
-                if (configElt != null && configElt.isHosted()) {
-                    List config = configElt.getIDPSSOConfigOrSPSSOConfig();
+                if (configElt != null && Boolean.TRUE.equals(configElt.getValue().isHosted())) {
+                    List<JAXBElement<com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType>> config = configElt.getValue().getIDPSSOConfigOrSPSSOConfig();
                     if (!config.isEmpty()) {
-                        com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType bConfig = 
-                            (com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType)
-                            config.iterator().next();
+                        com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType bConfig =
+                            config.iterator().next().getValue();
                         realm = WSFederationMetaUtils.getRealmByMetaAlias(
                             bConfig.getMetaAlias());
                     }
