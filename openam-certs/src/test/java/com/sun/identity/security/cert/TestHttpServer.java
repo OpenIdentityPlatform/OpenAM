@@ -91,8 +91,15 @@ final class TestHttpServer implements Closeable {
         return redirectTo(302, location);
     }
 
+    /**
+     * Reads the request body before answering. On JDK 11 a response sent without a body does
+     * not drain the request body, and the server then closes the connection with it still
+     * unread, which resets the connection; on Windows the reset discards the response the
+     * fetcher has already received, so a POST to a redirect fails at random there.
+     */
     static HttpHandler redirectTo(int status, String location) {
         return exchange -> {
+            exchange.getRequestBody().readAllBytes();
             exchange.getResponseHeaders().set("Location", location);
             exchange.sendResponseHeaders(status, -1);
             exchange.close();
@@ -119,10 +126,12 @@ final class TestHttpServer implements Closeable {
      * multiplied wait.
      *
      * <p>The location is read when the request arrives rather than taken up front, so a handler
-     * can point at the server it is installed on, whose port is only known afterwards.
+     * can point at the server it is installed on, whose port is only known afterwards. The
+     * request body is read first, as in {@link #redirectTo(int, String)}.
      */
     static HttpHandler redirectAfter(long millis, Supplier<String> location) {
         return exchange -> {
+            exchange.getRequestBody().readAllBytes();
             try {
                 Thread.sleep(millis);
             } catch (InterruptedException e) {
