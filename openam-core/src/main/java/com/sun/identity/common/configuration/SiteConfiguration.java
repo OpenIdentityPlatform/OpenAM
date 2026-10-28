@@ -192,8 +192,8 @@ public class SiteConfiguration extends ConfigurationBase {
         if (sc != null) {
             ServiceConfig cfg = sc.getSubConfig(siteName);
             if (cfg != null) {
-                String siteURL = getSitePrimaryURL(ssoToken, siteName);
                 Set svrs = listServers(ssoToken, siteName);
+                String siteURL = getSitePrimaryURL(ssoToken, siteName);
                 if ((svrs != null) && !svrs.isEmpty()) {
                     removeServersFromSite(ssoToken, siteName, svrs);
                 }

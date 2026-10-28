@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willAnswer;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
@@ -35,6 +36,7 @@ import java.util.Set;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
@@ -59,7 +61,9 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
     private Map<String, String> siteIds;
     private Map<String, String> sitePrimaryUrls;
     private Map<String, Set<String>> siteSecondaryUrls;
+    private Set<String> sitesWithoutAccessPoint;
     private Set<String> rootRealmAliases;
+    private OrganizationConfigManager rootRealm;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -68,6 +72,7 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
         siteIds = new LinkedHashMap<>();
         sitePrimaryUrls = new HashMap<>();
         siteSecondaryUrls = new HashMap<>();
+        sitesWithoutAccessPoint = new HashSet<>();
         addServer(ServerConfiguration.DEFAULT_SERVER_CONFIG, ServerConfiguration.DEFAULT_SERVER_ID, null);
 
         ServiceConfigManager platformService = mock(ServiceConfigManager.class);
@@ -79,7 +84,7 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
         ServiceConfig sitesConfig = sitesConfig();
         given(globalConfig.getSubConfig(ConfigurationBase.CONFIG_SITES)).willReturn(sitesConfig);
 
-        OrganizationConfigManager rootRealm = mock(OrganizationConfigManager.class);
+        rootRealm = mock(OrganizationConfigManager.class);
         whenNew(OrganizationConfigManager.class).withArguments(token, "/").thenReturn(rootRealm);
         given(rootRealm.getAttributes(ServiceManager.REALM_SERVICE)).willAnswer(invocation -> {
             Map<String, Set<String>> attributes = new HashMap<>();
@@ -125,6 +130,18 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
         ServerConfiguration.deleteServerInstance(token, "http://openam.example.com:9090/openam");
 
         assertThat(rootRealmAliases).containsOnly("openam", "openam.example.com");
+    }
+
+    @Test
+    public void shouldRemoveHostOfLastDeletedServerThatTheAliasesHaveInOtherCase() throws Exception {
+        addServer("http://A.example.com:8080/openam", "01", null);
+        addServer("http://a.example.com:9090/openam", "02", null);
+        rootRealmAliases = asSet("openam", "A.example.com");
+
+        ServerConfiguration.deleteServerInstance(token, "http://A.example.com:8080/openam");
+        ServerConfiguration.deleteServerInstance(token, "http://a.example.com:9090/openam");
+
+        assertThat(rootRealmAliases).containsOnly("openam");
     }
 
     @Test
@@ -196,6 +213,56 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
         assertThat(rootRealmAliases).containsOnly("openam", "openam.example.com", "lb.example.com");
     }
 
+    @Test
+    public void shouldDeleteServerWhenRootRealmAliasesCannotBeUpdated() throws Exception {
+        addServer("http://openam.example.com:8080/openam", "01", null);
+        addServer("http://old.example.com:8080/openam", "02", null);
+        rootRealmAliases = asSet("openam", "openam.example.com", "old.example.com");
+        willThrow(new SMSException("Unable to update the realm"))
+                .given(rootRealm).setAttributes(eq(ServiceManager.REALM_SERVICE), anyMap());
+
+        boolean deleted = ServerConfiguration.deleteServerInstance(token, "http://old.example.com:8080/openam");
+
+        assertThat(deleted).isTrue();
+        assertThat(servers).doesNotContainKey("http://old.example.com:8080/openam");
+        assertThat(rootRealmAliases).contains("old.example.com");
+    }
+
+    @Test
+    public void shouldDeleteSiteWhenAnotherSiteHasNoAccessPoint() throws Exception {
+        addSite("site1", "03", "https://lb.example.com:443/openam");
+        addSiteWithoutAccessPoint("site2", "04");
+        addServer("http://openam.example.com:8080/openam", "01", null);
+        rootRealmAliases = asSet("openam", "openam.example.com", "lb.example.com");
+
+        boolean deleted = SiteConfiguration.deleteSite(token, "site1");
+
+        assertThat(deleted).isTrue();
+        assertThat(siteIds).doesNotContainKey("site1");
+        assertThat(rootRealmAliases).contains("lb.example.com");
+    }
+
+    @Test
+    public void shouldReplaceSitePrimaryUrlWhenRootRealmAliasesCannotBeRead() throws Exception {
+        addSite("site1", "03", "https://old-lb.example.com:443/openam");
+        addServer("http://openam.example.com:8080/openam", "01", "site1");
+        rootRealmAliases = asSet("openam", "openam.example.com", "old-lb.example.com");
+        given(rootRealm.getAttributes(ServiceManager.REALM_SERVICE))
+                .willThrow(new SMSException("Unable to read the realm"));
+
+        SiteConfiguration.setSitePrimaryURL(token, "site1", "https://lb.example.com:443/openam");
+
+        assertThat(sitePrimaryUrls).containsEntry("site1", "https://lb.example.com:443/openam");
+        assertThat(rootRealmAliases).contains("old-lb.example.com");
+    }
+
+    @Test(expectedExceptions = ConfigurationException.class)
+    public void shouldRejectDeletingSiteWithoutAccessPointAsInvalidSite() throws Exception {
+        addSiteWithoutAccessPoint("site1", "03");
+
+        SiteConfiguration.deleteSite(token, "site1");
+    }
+
     private void addServer(String name, String serverId, String siteName) {
         Map<String, Set<String>> attributes = new HashMap<>();
         attributes.put(ConfigurationBase.ATTR_SERVER_ID, asSet(serverId));
@@ -207,6 +274,12 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
         siteIds.put(siteName, siteId);
         sitePrimaryUrls.put(siteName, primaryUrl);
         siteSecondaryUrls.put(siteName, asSet(secondaryUrls));
+    }
+
+    /** A site whose creation stopped before its access point was written. */
+    private void addSiteWithoutAccessPoint(String siteName, String siteId) {
+        siteIds.put(siteName, siteId);
+        sitesWithoutAccessPoint.add(siteName);
     }
 
     private ServiceConfig validConfig() {
@@ -254,6 +327,9 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
     private ServiceConfig siteConfig(String siteName) throws Exception {
         if (!siteIds.containsKey(siteName)) {
             return null;
+        }
+        if (sitesWithoutAccessPoint.contains(siteName)) {
+            return validConfig();
         }
         String siteId = siteIds.get(siteName);
         ServiceConfig accessPoint = validConfig();

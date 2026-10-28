@@ -42,7 +42,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -203,8 +205,7 @@ public abstract class ConfigurationBase {
                     ocm.setAttributes(ServiceManager.REALM_SERVICE, allAttrs);
                 }
             } else {
-                if (values.contains(hostName)) {
-                    values.remove(hostName);
+                if (values.removeIf(hostName::equalsIgnoreCase)) {
                     ocm.setAttributes(ServiceManager.REALM_SERVICE, allAttrs);
                 }
             }
@@ -213,26 +214,30 @@ public abstract class ConfigurationBase {
 
     /**
      * Removes the host name of a server or site URL that is no longer in use from the DNS aliases of the top-level
-     * realm, unless the URL of a remaining server or site has the same host name.
+     * realm, unless the URL of a remaining server or site has the same host name. The server, site or URL is already
+     * gone when this is called, so a failure is only logged and leaves the host name in the aliases.
      *
      * @param ssoToken Single Sign-On Token which is used to access to the service management datastore.
      * @param url The URL of the deleted server or site, or the replaced URL of a site.
-     * @throws SMSException if errors access in the service management datastore.
-     * @throws SSOException if the <code>ssoToken</code> is not valid.
      */
-    protected static void removeOrganizationAlias(SSOToken ssoToken, String url) throws SMSException, SSOException {
+    protected static void removeOrganizationAlias(SSOToken ssoToken, String url) {
         String hostName = getHostName(url);
         if (hostName == null) {
             return;
         }
-        Set<String> urls = new HashSet<>(ServerConfiguration.getServers(ssoToken));
-        urls.addAll(SiteConfiguration.getAllSiteURLs(ssoToken));
-        for (String remainingUrl : urls) {
-            if (hostName.equalsIgnoreCase(getHostName(remainingUrl))) {
-                return;
+        try {
+            Set<String> urls = new HashSet<>(ServerConfiguration.getServers(ssoToken));
+            urls.addAll(SiteConfiguration.getAllSiteURLs(ssoToken));
+            for (String remainingUrl : urls) {
+                if (hostName.equalsIgnoreCase(getHostName(remainingUrl))) {
+                    return;
+                }
             }
+            updateOrganizationAlias(ssoToken, url, false);
+        } catch (SMSException | SSOException | RuntimeException e) {
+            Debug.getInstance(SetupConstants.DEBUG_NAME).warning("ConfigurationBase.removeOrganizationAlias: "
+                    + "Unable to remove " + hostName + " from the DNS aliases of the top-level realm", e);
         }
-        updateOrganizationAlias(ssoToken, url, false);
     }
 
     private static String getHostName(String url) {
