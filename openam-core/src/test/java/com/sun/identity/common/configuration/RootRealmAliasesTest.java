@@ -263,6 +263,19 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
         SiteConfiguration.deleteSite(token, "site1");
     }
 
+    @Test
+    public void shouldDeleteSiteWhoseAccessPointHasNoPrimaryUrl() throws Exception {
+        addSiteWithoutPrimaryUrl("site1", "03");
+        addServer("http://openam.example.com:8080/openam", "01", "site1");
+        rootRealmAliases = asSet("openam", "openam.example.com");
+
+        boolean deleted = SiteConfiguration.deleteSite(token, "site1");
+
+        assertThat(deleted).isTrue();
+        assertThat(siteIds).doesNotContainKey("site1");
+        assertThat(rootRealmAliases).containsOnly("openam", "openam.example.com");
+    }
+
     private void addServer(String name, String serverId, String siteName) {
         Map<String, Set<String>> attributes = new HashMap<>();
         attributes.put(ConfigurationBase.ATTR_SERVER_ID, asSet(serverId));
@@ -280,6 +293,11 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
     private void addSiteWithoutAccessPoint(String siteName, String siteId) {
         siteIds.put(siteName, siteId);
         sitesWithoutAccessPoint.add(siteName);
+    }
+
+    /** A site whose primary URL was removed from its access point by hand, as {@code ssoadm set-sub-cfg} can do. */
+    private void addSiteWithoutPrimaryUrl(String siteName, String siteId) {
+        addSite(siteName, siteId, null);
     }
 
     private ServiceConfig validConfig() {
@@ -336,7 +354,9 @@ public class RootRealmAliasesTest extends PowerMockTestCase {
         given(accessPoint.getAttributes()).willAnswer(invocation -> {
             Map<String, Set<String>> attributes = new HashMap<>();
             attributes.put(ConfigurationBase.ATTR_PRIMARY_SITE_ID, asSet(siteId));
-            attributes.put(ConfigurationBase.ATTR_PRIMARY_SITE_URL, asSet(sitePrimaryUrls.get(siteName)));
+            if (sitePrimaryUrls.get(siteName) != null) {
+                attributes.put(ConfigurationBase.ATTR_PRIMARY_SITE_URL, asSet(sitePrimaryUrls.get(siteName)));
+            }
             return attributes;
         });
         willAnswer(invocation -> {

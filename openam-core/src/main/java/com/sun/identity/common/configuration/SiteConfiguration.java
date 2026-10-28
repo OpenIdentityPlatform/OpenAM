@@ -193,13 +193,19 @@ public class SiteConfiguration extends ConfigurationBase {
             ServiceConfig cfg = sc.getSubConfig(siteName);
             if (cfg != null) {
                 Set svrs = listServers(ssoToken, siteName);
-                String siteURL = getSitePrimaryURL(ssoToken, siteName);
+                // A site whose access point has no primary URL is still deleted, as listServers does not read it
+                Set primaryURLs = (Set) cfg.getSubConfig(SUBCONFIG_ACCESS_URL).getAttributes()
+                        .get(ATTR_PRIMARY_SITE_URL);
+                String siteURL = ((primaryURLs == null) || primaryURLs.isEmpty())
+                        ? null : (String) primaryURLs.iterator().next();
                 if ((svrs != null) && !svrs.isEmpty()) {
                     removeServersFromSite(ssoToken, siteName, svrs);
                 }
                 sc.removeSubConfig(siteName);
                 deleted = true;
-                removeOrganizationAlias(ssoToken, siteURL);
+                if (siteURL != null) {
+                    removeOrganizationAlias(ssoToken, siteURL);
+                }
             }
         }
 

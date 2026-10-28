@@ -235,7 +235,7 @@ public abstract class ConfigurationBase {
             }
             updateOrganizationAlias(ssoToken, url, false);
         } catch (SMSException | SSOException | RuntimeException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).warning("ConfigurationBase.removeOrganizationAlias: "
+            Debug.getInstance(SetupConstants.DEBUG_NAME).error("ConfigurationBase.removeOrganizationAlias: "
                     + "Unable to remove " + hostName + " from the DNS aliases of the top-level realm", e);
         }
     }
