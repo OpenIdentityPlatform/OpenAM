@@ -112,17 +112,17 @@
         </dependency>
 
         <dependency>
-            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.json</artifactId>
         </dependency>
 
         <!-- Restlet -->
         <dependency>
-            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet.ext.jackson</artifactId>
         </dependency>
         <dependency>
@@ -135,10 +135,6 @@
                 </exclusion>
             </exclusions>
             <!--scope>provided</scope-->
-        </dependency>
-        <dependency>
-            <groupId>org.openidentityplatform.openam.jakarta</groupId>
-            <artifactId>org.restlet.ext.servlet</artifactId>
         </dependency>
         <dependency>
             <groupId>org.openidentityplatform.openam</groupId>

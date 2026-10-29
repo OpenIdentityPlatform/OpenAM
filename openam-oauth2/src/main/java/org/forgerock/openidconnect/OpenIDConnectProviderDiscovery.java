@@ -12,19 +12,18 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openidconnect;
 
 import org.forgerock.oauth2.core.OAuth2Request;
 import org.forgerock.oauth2.core.exceptions.BadRequestException;
-import org.forgerock.oauth2.core.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,31 +37,23 @@ import java.util.Set;
 public class OpenIDConnectProviderDiscovery {
 
     private final Logger logger = LoggerFactory.getLogger("OAuth2Provider");
-    private final OpenIDConnectProvider openIDConnectProvider;
-
-    /**
-     * Constructs a new OpenIDConnectProviderDiscovery.
-     *
-     * @param openIDConnectProvider An instance of the OpenIDConnectProvider.
-     */
-    @Inject
-    public OpenIDConnectProviderDiscovery(OpenIDConnectProvider openIDConnectProvider) {
-        this.openIDConnectProvider = openIDConnectProvider;
-    }
 
     /**
      * Returns the response to a request to discover the OpenId Connect provider.
+     * <p>
+     * The account that the resource names is not looked up. The request is anonymous and the issuer is the same
+     * for every account, so an answer that differed for an account that does not exist would only tell the
+     * caller which accounts exist.
      *
      * @param resource The resource.
      * @param rel The rel.
      * @param deploymentUrl The deployment url of the OpenId Connect provider.
-     * @param request The OAuth2 request.
+     * @param request The OAuth2 request. Not used; kept so that the signature does not change.
      * @return A {@code Map} of the OpenId Connect provider urls.
      * @throws BadRequestException If the request is malformed.
-     * @throws NotFoundException If the user cannot be found.
      */
     public Map<String, Object> discover(String resource, String rel, String deploymentUrl, OAuth2Request request)
-            throws BadRequestException, NotFoundException {
+            throws BadRequestException {
 
         if (resource == null || resource.isEmpty()) {
             logger.error("No resource provided in discovery.");
@@ -74,40 +65,21 @@ public class OpenIDConnectProviderDiscovery {
             throw new BadRequestException("No or invalid rel provided in discovery.");
         }
 
-        String userid = null;
-
-        //test if the resource is a uri
+        final URI object;
         try {
-            final URI object = new URI(resource);
-            if (object.getScheme().equalsIgnoreCase("https") || object.getScheme().equalsIgnoreCase("http")) {
-                //resource is of the form of https://example.com/
-                if (!object.getPath().isEmpty()) {
-                    //resource is of the form of https://example.com/joe
-                    userid = object.getPath();
-                    userid = userid.substring(1,userid.length());
-                }
-            } else if (object.getScheme().equalsIgnoreCase("acct")) {
-                //resource is not uri so only option is it is an email of form acct:joe@example.com
-                String s = new String(resource);
-                s = s.replaceFirst("acct:", "");
-                final int firstAt = s.indexOf('@');
-                userid = s.substring(0,firstAt);
-            } else {
-                logger.error("Invalid parameters.");
-                throw new BadRequestException("Invalid parameters.");
-            }
-        } catch (Exception e) {
+            object = new URI(resource);
+        } catch (URISyntaxException e) {
             logger.error("Invalid parameters.", e);
             throw new BadRequestException("Invalid parameters.");
         }
-
-        if (userid != null) {
-            //check if user exists on the server.
-
-            if (!openIDConnectProvider.isUserValid(userid, request)) {
-                logger.error("Invalid parameters.");
-                throw new NotFoundException("Invalid parameters.");
-            }
+        //resource is of the form of https://example.com/ or https://example.com/joe
+        final boolean isUrl = ("https".equalsIgnoreCase(object.getScheme())
+                || "http".equalsIgnoreCase(object.getScheme())) && !object.isOpaque();
+        //resource is of the form acct:joe@example.com
+        final boolean isAccount = "acct".equalsIgnoreCase(object.getScheme()) && resource.indexOf('@') >= 0;
+        if (!isUrl && !isAccount) {
+            logger.error("Invalid parameters.");
+            throw new BadRequestException("Invalid parameters.");
         }
 
         final Map<String, Object> response = new HashMap<String, Object>();

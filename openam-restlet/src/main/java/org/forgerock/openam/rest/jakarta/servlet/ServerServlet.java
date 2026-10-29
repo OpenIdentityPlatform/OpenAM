@@ -52,6 +52,7 @@ import org.restlet.engine.adapter.HttpServerHelper;
 import org.restlet.engine.adapter.ServerCall;
 import org.restlet.engine.component.ComponentContext;
 import org.forgerock.openam.rest.jakarta.servlet.internal.ServletCall;
+import org.forgerock.openam.rest.jakarta.servlet.internal.ServletServerAdapter;
 import org.forgerock.openam.rest.jakarta.servlet.internal.ServletWarClient;
 import org.restlet.representation.Representation;
 import org.restlet.routing.Route;
@@ -117,7 +118,7 @@ import org.restlet.routing.VirtualHost;
  *
  *         &lt;servlet&gt;
  *                 &lt;servlet-name&gt;Restlet1&lt;/servlet-name&gt;
- *                 &lt;servlet-class&gt;org.restlet.ext.servlet.ServerServlet&lt;/servlet-class&gt;
+ *                 &lt;servlet-class&gt;org.forgerock.openam.rest.jakarta.servlet.ServerServlet&lt;/servlet-class&gt;
  *                 &lt;init-param&gt;
  *                         &lt;param-name&gt;org.restlet.application&lt;/param-name&gt;
  *                         &lt;param-value&gt;test.MyApplication1&lt;/param-value&gt;
@@ -131,7 +132,7 @@ import org.restlet.routing.VirtualHost;
  *
  *         &lt;servlet&gt;
  *                 &lt;servlet-name&gt;Restlet2&lt;/servlet-name&gt;
- *                 &lt;servlet-class&gt;org.restlet.ext.servlet.ServerServlet&lt;/servlet-class&gt;
+ *                 &lt;servlet-class&gt;org.forgerock.openam.rest.jakarta.servlet.ServerServlet&lt;/servlet-class&gt;
  *                 &lt;init-param&gt;
  *                         &lt;param-name&gt;org.restlet.application&lt;/param-name&gt;
  *                         &lt;param-value&gt;test.MyApplication2&lt;/param-value&gt;
@@ -161,7 +162,7 @@ import org.restlet.routing.VirtualHost;
  *         &lt;!-- Servlet to Restlet adapter declaration (Mandatory) --&gt;
  *         &lt;servlet&gt;
  *                 &lt;servlet-name&gt;RestletAdapter&lt;/servlet-name&gt;
- *                 &lt;servlet-class&gt;org.restlet.ext.servlet.ServerServlet&lt;/servlet-class&gt;
+ *                 &lt;servlet-class&gt;org.forgerock.openam.rest.jakarta.servlet.ServerServlet&lt;/servlet-class&gt;
  *
  *                 &lt;!-- Your component class name (Optional - For mode 2) --&gt;
  *                 &lt;init-param&gt;
@@ -531,7 +532,7 @@ public class ServerServlet extends HttpServlet {
             // Change the default adapter
             Context serverContext = server.getContext();
             serverContext.getParameters().add("adapter",
-                    "org.restlet.ext.servlet.internal.ServletServerAdapter");
+                    ServletServerAdapter.class.getName());
 
             // Attach the hosted application(s) to the right path
             String uriPattern = this.getContextPath(request)

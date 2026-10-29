@@ -30,7 +30,6 @@
 
     <modules>
         <module>jaxrpc-parent</module>
-        <module>restlet-parent-jakarta</module>
         <module>jato-shaded</module>
         <module>cc</module>
     </modules>
