@@ -106,6 +106,13 @@ A trusted asserting party therefore now needs its signing certificate alias conf
 
 [IMPORTANT]
 ====
+Starting with this release a host name that is a DNS alias of a realm is accepted as a valid host name, as if it had its own `com.sun.identity.server.fqdnMap[<alias>]=<alias>` entry, unless the FQDN map maps it to another host name. The DNS aliases of the top-level realm hold the RDN value of the root suffix (for example `openam`) and the host name of every server and site that was created, so these host names are accepted as well.
+
+OpenAM now removes the host name of a server or site from the DNS aliases of the top-level realm when the server or site is deleted, or when the primary URL of the site changes, unless the URL of another server or site has the same host name. If the host name cannot be removed at that moment, for example because the DNS aliases or the URLs of the other servers and sites cannot be read or updated, the server or site is still deleted or its URL still changed, OpenAM logs an error in the `amSetupServlet` debug log, and the host name stays. Servers and sites deleted before the upgrade, and site URLs changed before it, have left their host names behind. Before promoting the upgrade, review the DNS aliases of every realm and remove the host names that are no longer in use or no longer under your control. If you added a server or site host name to the DNS aliases of the top-level realm yourself, for example the host name of a load balancer, add it again after you delete the last server or site that has it.
+====
+
+[IMPORTANT]
+====
 Starting with this release OpenAM no longer ships the Restlet Servlet extension (`org.restlet.ext.servlet`). OpenAM serves its Restlet endpoints, including WebFinger (`/.well-known/*`), through `org.forgerock.openam.rest.jakarta.servlet.ServerServlet`. The `web.xml` file of earlier releases names `org.restlet.ext.servlet.ServerServlet` for the `WebFinger` servlet, so if your customized `.war` file keeps its own copy of `web.xml`, replace every `org.restlet.ext.servlet.ServerServlet` in it with `org.forgerock.openam.rest.jakarta.servlet.ServerServlet` before you deploy. Otherwise the container cannot load that servlet, and every request to its URL patterns fails.
 
 Custom code that calls `org.restlet.ext.servlet.ServletUtils` must call `org.forgerock.openam.rest.jakarta.servlet.ServletUtils` instead, which has the same `getRequest` and `getResponse` methods. Custom code that embeds Restlet in its own servlet through `org.restlet.ext.servlet.ServletAdapter` has no drop-in replacement, because OpenAM ships no counterpart of that class.
