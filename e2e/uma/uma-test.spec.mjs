@@ -220,7 +220,8 @@ test.describe("/uma/authz_request", () => {
       headers: { Authorization: `Bearer ${aat}`, "Content-Type": "application/json" },
       data: { ticket },
     });
-    // No policy grants the requesting party anything yet, so UMA asks for claims rather than issuing an RPT.
+    // The request carries no claim_tokens and the UMA provider requires trust elevation by default, so the endpoint
+    // asks for an id_token claim before any policy is evaluated.
     await expectJson(response, 403, NEED_INFO);
   });
 

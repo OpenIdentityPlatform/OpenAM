@@ -37,7 +37,7 @@ const JSON_TYPE_NO_CHARSET = "application/json";
 
 
 // Parse via text, not response.json(): a stray HTML error page should fail as a readable diff naming the
-// status and content-type, not as a bare SyntaxError. The incumbent rendered its 500 as text/html on HEAD.
+// status and content-type, not as a bare SyntaxError.
 async function readJson(response) {
   const text = await response.text();
   try {
