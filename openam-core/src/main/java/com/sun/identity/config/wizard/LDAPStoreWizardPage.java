@@ -25,23 +25,22 @@
  * $Id: LDAPStoreWizardPage.java,v 1.7 2008/06/25 05:42:42 qcheng Exp $
  *
  * Portions Copyrighted 2011-2014 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.config.wizard;
 
 import com.sun.identity.config.pojos.LDAPStore;
-import com.sun.identity.config.util.ProtectedPage;
-import org.openidentityplatform.openam.click.control.ActionLink;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 
 /*
  * LDAPStoreWizardPage is the base for Step 3.
  */
-public class LDAPStoreWizardPage extends ProtectedPage {
+public class LDAPStoreWizardPage extends ProtectedSetupPage {
 
     public LDAPStore store = null;
 
-    public ActionLink clearLink = 
-        new ActionLink("clearStore", this, "clearStore");
     private String type = "config";
     private String typeTitle = "Configuration";
     private String storeSessionName = "customConfigStore";
@@ -82,6 +81,7 @@ public class LDAPStoreWizardPage extends ProtectedPage {
         this.storeSessionName = storeSessionName;
     }
 
+    @Override
     public void onInit() {
         addModel("type", getType());
         addModel("typeTitle", getTypeTitle());
@@ -91,12 +91,13 @@ public class LDAPStoreWizardPage extends ProtectedPage {
 
         store = ensureConfig();
         addModel("store", store);
-	super.onInit();
+        super.onInit();
     }
 
+    @ConfiguratorAction
     public boolean clearStore() {
         getContext().removeSessionAttribute( getStoreSessionName());
-        setPath(null);
+        skipRender();
         return false;
     }
 

@@ -25,6 +25,7 @@
  * $Id: Step5.java,v 1.9 2009/01/05 23:17:10 veiming Exp $
  *
  * Portions Copyrighted 2011-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 
 package com.sun.identity.config.wizard;
@@ -32,10 +33,10 @@ package com.sun.identity.config.wizard;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.openidentityplatform.openam.click.control.ActionLink;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
+import org.openidentityplatform.openam.config.servlet.ProtectedSetupPage;
 
 import com.sun.identity.config.SessionAttributeNames;
-import com.sun.identity.config.util.ProtectedPage;
 
 /**
  * Wizard Step # 5: Site Name, URL and Session HA Failover indicator.
@@ -45,18 +46,9 @@ import com.sun.identity.config.util.ProtectedPage;
  * as this information will be replicated by the underlying store.
  *
  */
-public class Step5 extends ProtectedPage {
+public class Step5 extends ProtectedSetupPage {
 
-    public ActionLink clearLink = new ActionLink(
-            "clear", this, "clear");
-    public ActionLink validateLink = new ActionLink(
-            "validateURL", this, "validateURL");
-    public ActionLink validateSiteLink = new ActionLink(
-            "validateSite", this, "validateSite");
-
-    public Step5() {
-    }
-
+    @Override
     public void onInit() {
         String host = (String) getContext().getSessionAttribute(
                 SessionAttributeNames.LB_SITE_NAME);
@@ -77,10 +69,11 @@ public class Step5 extends ProtectedPage {
      *
      * @return boolean indicator to view.
      */
+    @ConfiguratorAction
     public boolean clear() {
         getContext().removeSessionAttribute(SessionAttributeNames.LB_SITE_NAME);
         getContext().removeSessionAttribute(SessionAttributeNames.LB_PRIMARY_URL);
-        setPath(null);
+        skipRender();
         return false;
     }
 
@@ -91,6 +84,7 @@ public class Step5 extends ProtectedPage {
      * port = primary loadURL
      * Just a little confusing!
      */
+    @ConfiguratorAction
     public boolean validateSite() {
         boolean returnVal = false;
         String siteName = toString("host");
@@ -102,7 +96,6 @@ public class Step5 extends ProtectedPage {
                     SessionAttributeNames.LB_SITE_NAME, siteName);
             writeValid("ok.label");
         }
-        setPath(null);
         return returnVal;
     }
 
@@ -113,6 +106,7 @@ public class Step5 extends ProtectedPage {
      * port = primary loadURL
      * Just a little confusing!
      */
+    @ConfiguratorAction
     public boolean validateURL() {
         boolean returnVal = false;
         String primaryURL = toString("port");
@@ -139,7 +133,6 @@ public class Step5 extends ProtectedPage {
                 returnVal = true;
             }
         }
-        setPath(null);
         return returnVal;
     }
 
