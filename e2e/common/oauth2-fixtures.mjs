@@ -50,6 +50,38 @@ function adminHeaders(adminToken, version) {
 }
 
 /**
+ * Creates the realm service if it is absent, and returns the response holding its configuration.
+ *
+ * Only a 404 means "absent". Falling through on a 401 or a 500 would report the same failure one call later as
+ * a failed create, pointing the reader at creation instead of the real cause.
+ *
+ * A concurrent spec file may create the service between our GET and our POST, and that is success, not failure.
+ * The losing create gets a 409 from the exists() check. When both creates pass that check before either writes
+ * (SmsSingletonProvider checks, then creates), the answer depends on the configuration store: the embedded one
+ * ignores the duplicate add and both answer 201, an external one answers 500. So the outcome is judged on a
+ * re-read, not on the create's status.
+ */
+async function ensureRealmService(adminToken, request, service, data) {
+  const url = `${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/${service}`;
+  const headers = adminHeaders(adminToken, CONFIG_VERSION);
+  const existing = await request.get(url, { headers });
+  if (existing.ok()) {
+    return existing;
+  }
+  if (existing.status() !== 404) {
+    throw new Error(`${service} service not readable: ${existing.status()} ${await existing.text()}`);
+  }
+  const created = await request.post(`${url}?_action=create`, { headers, data });
+  const reread = await request.get(url, { headers });
+  if (!reread.ok()) {
+    throw new Error(`Failed to create the ${service} service: ${created.status()} ${await created.text()}`
+      + ` (re-read: ${reread.status()})`);
+  }
+  console.log(created.ok() ? `${service} service created` : `${service} service created by a concurrent spec file`);
+  return reread;
+}
+
+/**
  * Ensures the realm has an OAuth2 provider, and returns the response holding its configuration.
  *
  * This lives here rather than in a single spec file because Playwright runs spec FILES in parallel: if the
@@ -59,26 +91,9 @@ function adminHeaders(adminToken, version) {
  * provider with, so the provider ends up the same whichever spec file creates it first.
  */
 export async function ensureOAuth2Provider(adminToken, request) {
-  const url = `${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/oauth-oidc`;
-  const existing = await request.get(url, { headers: adminHeaders(adminToken, CONFIG_VERSION) });
-  if (existing.ok()) {
-    return existing;
-  }
-  if (existing.status() !== 404) {
-    throw new Error(`OAuth2 provider not readable: ${existing.status()} ${await existing.text()}`);
-  }
-  const created = await request.post(`${url}?_action=create`, {
-    headers: adminHeaders(adminToken, CONFIG_VERSION),
-    data: {
-      advancedOAuth2Config: { clientsCanSkipConsent: true, supportedScopes: [SCOPE], defaultScopes: [SCOPE] },
-    },
+  return ensureRealmService(adminToken, request, "oauth-oidc", {
+    advancedOAuth2Config: { clientsCanSkipConsent: true, supportedScopes: [SCOPE], defaultScopes: [SCOPE] },
   });
-  // A concurrent spec file may have created it between our GET and POST -- that is success, not failure.
-  if (!created.ok() && created.status() !== 409) {
-    throw new Error(`Failed to create OAuth2 provider: ${created.status()} ${await created.text()}`);
-  }
-  console.log("OAuth2 provider service created");
-  return request.get(url, { headers: adminHeaders(adminToken, CONFIG_VERSION) });
 }
 
 /**
@@ -100,9 +115,6 @@ export async function ensureOAuth2Provider(adminToken, request) {
 export async function ensureProviderConfig(adminToken, request) {
   const url = `${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/oauth-oidc`;
   const current = await ensureOAuth2Provider(adminToken, request);
-  if (!current.ok()) {
-    throw new Error(`OAuth2 provider not readable: ${current.status()} ${await current.text()}`);
-  }
   const config = await current.json();
   const supported = config.advancedOAuth2Config?.supportedScopes ?? [];
   const missingScopes = REQUIRED_SCOPES.filter((scope) => !supported.includes(scope));
@@ -152,26 +164,7 @@ async function assertProviderConfig(adminToken, request, writeError) {
  * `404 No UMA provider for realm /`, and the resource_set registration endpoint has nothing to point at.
  */
 export async function ensureUmaProvider(adminToken, request) {
-  const url = `${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/uma`;
-  const existing = await request.get(url, { headers: adminHeaders(adminToken, CONFIG_VERSION) });
-  if (existing.ok()) {
-    console.log("UMA provider service already exists");
-    return;
-  }
-  // Only a 404 means "absent". Falling through on a 401 or a 500 would report the same failure one call
-  // later as `Failed to create UMA provider`, pointing the reader at creation instead of the real cause.
-  if (existing.status() !== 404) {
-    throw new Error(`UMA provider not readable: ${existing.status()} ${await existing.text()}`);
-  }
-  const created = await request.post(`${url}?_action=create`, {
-    headers: adminHeaders(adminToken, CONFIG_VERSION),
-    data: {},
-  });
-  // A concurrent spec file may have created it between our GET and POST -- that is success, not failure.
-  if (!created.ok() && created.status() !== 409) {
-    throw new Error(`Failed to create UMA provider: ${created.status()} ${await created.text()}`);
-  }
-  console.log("UMA provider service created");
+  await ensureRealmService(adminToken, request, "uma", {});
 }
 
 /**

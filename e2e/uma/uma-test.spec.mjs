@@ -108,11 +108,11 @@ test.describe("/uma/.well-known/uma-configuration", () => {
 
   test("is public and advertises the UMA endpoints", async ({ request }) => {
     const response = await request.get(`${OPENAM_BASE}/uma/.well-known/uma-configuration`);
-    const config = await response.json();
-    console.log(`[uma] uma-configuration -> ${response.status()} keys=${Object.keys(config).length}`);
-
-    expect(response.status()).toBe(200);
+    const text = await response.text();
+    expect(response.status(), text).toBe(200);
     expect(response.headers()["content-type"]).toBe(JSON_TYPE);
+    const config = JSON.parse(text);
+    console.log(`[uma] uma-configuration -> ${response.status()} keys=${Object.keys(config).length}`);
     const sorted = Object.fromEntries(Object.entries(config)
       .map(([key, value]) => [key, Array.isArray(value) ? [...value].sort() : value]));
     expect(sorted).toEqual({
@@ -150,11 +150,12 @@ test.describe("/uma/permission_request", () => {
       headers: { Authorization: `Bearer ${pat}`, "Content-Type": "application/json" },
       data: { resource_set_id: resourceSetId, scopes: ["read"] },
     });
-    const body = await response.json();
-    console.log(`[uma] permission_request -> ${response.status()} ${JSON.stringify(body)}`);
+    const text = await response.text();
+    console.log(`[uma] permission_request -> ${response.status()} ${text}`);
 
-    expect(response.status()).toBe(201);
+    expect(response.status(), text).toBe(201);
     expect(response.headers()["content-type"]).toBe(JSON_TYPE);
+    const body = JSON.parse(text);
     expect(body.ticket).toBeTruthy();
     expect(Object.keys(body)).toEqual(["ticket"]);
   });
@@ -182,13 +183,27 @@ test.describe("/uma/permission_request", () => {
     });
   });
 
+  test("rejects scopes outside the resource set in the UMA error shape", async ({ request }) => {
+    // The set is registered with read and write; delete is not among them.
+    const resourceSetId = await registerResourceSet(request, "uma e2e scope album");
+    const response = await request.post(`${OPENAM_BASE}/uma/permission_request`, {
+      headers: { Authorization: `Bearer ${pat}`, "Content-Type": "application/json" },
+      data: { resource_set_id: resourceSetId, scopes: ["delete"] },
+    });
+    await expectJson(response, 400, {
+      error: "invalid_scope",
+      error_description: "Requested scopes are not in allowed scopes for resource set.",
+    });
+  });
+
   test("rejects an unauthenticated permission request in the CREST shape", async ({ request }) => {
     const response = await request.post(`${OPENAM_BASE}/uma/permission_request`, {
       headers: { "Content-Type": "application/json" },
       data: { resource_set_id: "irrelevant", scopes: ["read"] },
     });
-    // The protection filter's answer on master: CREST-shaped, with no challenge header. This is contract by
-    // decision, with no target named.
+    // The protection filter's answer on master: CREST-shaped, with no challenge header. The missing header is a
+    // master defect: RFC 6750 section 3 requires `WWW-Authenticate: Bearer` on this 401, and that is the target.
+    // Until then its absence is pinned, here and in the authz_request test below.
     await expectJson(response, 401, UNAUTHORIZED);
     expect(response.headers()["www-authenticate"]).toBeUndefined();
   });
@@ -236,6 +251,19 @@ test.describe("/uma/authz_request", () => {
     });
   });
 
+  test("rejects a request with no ticket", async ({ request }) => {
+    const response = await request.post(`${OPENAM_BASE}/uma/authz_request`, {
+      headers: { Authorization: `Bearer ${aat}`, "Content-Type": "application/json" },
+      data: {},
+    });
+    // The missing ticket fails as an OAuth2 BadRequestException, not as an UmaException: same description as an
+    // unknown ticket, but the OAuth2 error code.
+    await expectJson(response, 400, {
+      error: "bad_request",
+      error_description: "Unable to retrieve Permission Ticket",
+    });
+  });
+
   test("rejects a token without the uma_authorization scope", async ({ request }) => {
     const response = await request.post(`${OPENAM_BASE}/uma/authz_request`, {
       headers: { Authorization: `Bearer ${pat}`, "Content-Type": "application/json" },
@@ -253,6 +281,7 @@ test.describe("/uma/authz_request", () => {
       data: { ticket: "irrelevant" },
     });
     await expectJson(response, 401, UNAUTHORIZED);
+    // Same master defect as the permission_request 401: the target is `WWW-Authenticate: Bearer`.
     expect(response.headers()["www-authenticate"]).toBeUndefined();
   });
 });

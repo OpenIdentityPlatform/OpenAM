@@ -108,6 +108,37 @@ test.describe("/.well-known/webfinger", () => {
     }
   });
 
+  test("answers 400 bad_request to a resource that is neither an account nor a URL", async ({ request }) => {
+    // An acct: resource needs an @, and a URL resource must be a non-opaque http or https URI.
+    const cases = {
+      "acct without @": `acct:${USERNAME}`,
+      "other scheme": `mailto:${USERNAME}@${HOST}`,
+      "opaque http": `http:${USERNAME}@${HOST}`,
+    };
+    for (const [name, resource] of Object.entries(cases)) {
+      const response = await request.get(`${OPENAM_BASE}/.well-known/webfinger`, {
+        params: { resource, rel: ISSUER_REL },
+      });
+      await expectJson(response, 400, { error: "bad_request", error_description: "Invalid parameters." },
+        name, JSON_TYPE_NO_CHARSET);
+    }
+  });
+
+  test("answers a JRD to a URL resource", async ({ request }) => {
+    const resource = `${OPENAM_BASE}/`;
+    const response = await request.get(`${OPENAM_BASE}/.well-known/webfinger`, {
+      params: { resource, rel: ISSUER_REL },
+    });
+    await expectJson(response, 200, issuerJrd(resource));
+  });
+
+  test("compares rel case-insensitively and echoes it as sent", async ({ request }) => {
+    const resource = `acct:${USERNAME}@${HOST}`;
+    const rel = "HTTP://OpenID.net/specs/connect/1.0/Issuer";
+    const response = await request.get(`${OPENAM_BASE}/.well-known/webfinger`, { params: { resource, rel } });
+    await expectJson(response, 200, { subject: resource, links: [{ rel, href: `${OPENAM_BASE}/oauth2` }] });
+  });
+
   test("answers 404 to the realms/root path spelling", async ({ request }) => {
     // RestletRealmRouter takes `realms` as a sub-realm name, so this spelling is a 404 today. The target is 200
     // with the same JRD as the bare path, as for /xacml/realms/root in xacml-test.spec.mjs; a flip changes this.
@@ -140,5 +171,6 @@ test.describe("/.well-known/webfinger", () => {
     });
     expect(response.status()).toBe(405);
     expect(response.headers()["allow"]).toBe("GET");
+    expect(response.headers()["content-type"]).toBe(JSON_TYPE);
   });
 });
