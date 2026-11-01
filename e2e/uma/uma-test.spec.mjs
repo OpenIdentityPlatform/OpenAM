@@ -196,6 +196,20 @@ test.describe("/uma/permission_request", () => {
     });
   });
 
+  test("rejects a token without the uma_protection scope", async ({ request }) => {
+    // A registered resource set and one of its scopes, so only the token can fail the request: the AAT carries
+    // uma_authorization, not uma_protection.
+    const resourceSetId = await registerResourceSet(request, "uma e2e aat album");
+    const response = await request.post(`${OPENAM_BASE}/uma/permission_request`, {
+      headers: { Authorization: `Bearer ${aat}`, "Content-Type": "application/json" },
+      data: { resource_set_id: resourceSetId, scopes: ["read"] },
+    });
+    // Scope enforcement lives in the protection filter, so this is CREST-shaped like the 401 below.
+    await expectJson(response, 403, {
+      code: 403, reason: "Forbidden", message: "The resource requested requires scope: uma_protection",
+    });
+  });
+
   test("rejects an unauthenticated permission request in the CREST shape", async ({ request }) => {
     const response = await request.post(`${OPENAM_BASE}/uma/permission_request`, {
       headers: { "Content-Type": "application/json" },
