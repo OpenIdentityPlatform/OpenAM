@@ -15,14 +15,15 @@
  */
 
 /*
- * Characterization tests for the /xacml policy export and import endpoints, recorded against the
- * Restlet application that serves them. This is the only layer that exercises the real
- * authentication filter, the real delegation check and the real XML serialization together.
+ * Characterization tests for the /xacml policy export and import endpoints, first recorded against
+ * the Restlet application and kept when #1075 moved /xacml to the OpenAM (CHF) servlet. This is the
+ * only layer that exercises the real authentication filter, the real delegation check and the real
+ * XML serialization together.
  *
- * The tests pin the black-box contract so that moving /xacml off Restlet can be checked for parity:
- * a test that passes unchanged after the move is the proof, and an expectation the move changes has
- * to be a deliberate divergence listed in that change. Where the current behaviour is a defect, the
- * test pins what the server does today and its comment names the target behaviour.
+ * The tests pin the black-box contract. A test that passed unchanged across the move is the proof of
+ * parity; an expectation the move changed is a deliberate divergence, listed in the upgrade guide, and
+ * its comment names the Restlet answer. Where the current behaviour is a defect, the test pins what
+ * the server does today and its comment names the target behaviour.
  */
 
 import { test, expect, request as apiRequest } from "@playwright/test";
@@ -413,9 +414,12 @@ test.describe("XACML policy import", () => {
 
   test("reads a document posted with the console's form content type", async ({ request }) => {
     // The console posts the file's text through jQuery, which sends its default form content type.
+    // A '%' that two hex digits do not follow fails form decoding, which answers 500 for a body sent
+    // with the bare form content type. With "; charset=UTF-8" CHF does not parse the body as a form.
     const exported = await (await exportPolicies(request)).text();
+    const withPercent = exported.replace(/^(<\?xml[^>]*\?>)?/, "$1<!-- 100% -->");
 
-    const response = await importPolicies(request, exported, {
+    const response = await importPolicies(request, withPercent, {
       contentType: "application/x-www-form-urlencoded; charset=UTF-8",
       params: { realm: `/${SUB_REALM}`, dryrun: "true" },
     });
