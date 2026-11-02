@@ -18,6 +18,8 @@
 package org.forgerock.openam.xacml.v3.rest;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.forgerock.json.JsonValue.field;
@@ -62,6 +64,7 @@ import com.google.common.io.ByteStreams;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.delegation.DelegationPermission;
+import com.sun.identity.delegation.DelegationPermissionFactory;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.xacml3.XACMLExportImport;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
@@ -73,6 +76,8 @@ public class XacmlServiceTest {
 
     private XACMLExportImport importExport;
     private AdminTokenAction adminTokenAction;
+    private DelegationPermissionFactory permissionFactory;
+    private DelegationPermission permission;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -81,11 +86,14 @@ public class XacmlServiceTest {
         SSOToken adminToken = mock(SSOToken.class);
         given(adminToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("my-uuid");
         given(adminTokenAction.run()).willReturn(adminToken);
+        permissionFactory = mock(DelegationPermissionFactory.class);
+        permission = mock(DelegationPermission.class);
+        given(permissionFactory.newInstance(any(), any(), any(), any(), any(), any(), any())).willReturn(permission);
     }
 
     private XacmlServiceTestWrapper service(boolean permitted) {
         return new XacmlServiceTestWrapper(importExport, adminTokenAction, mock(Debug.class), mock(RestLog.class),
-                mock(DelegationEvaluator.class), permitted);
+                mock(DelegationEvaluator.class), permissionFactory, permitted);
     }
 
     private static Realm realm(String path) {
@@ -145,7 +153,10 @@ public class XacmlServiceTest {
         Response response = service.importXACML(context("/"),
                 post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>"));
 
-        assertThat(service.getLastAction()).isEqualTo("MODIFY");
+        verify(permissionFactory).newInstance("/", "rest", "1.0", "policies", "MODIFY", singleton("MODIFY"),
+                emptyMap());
+        assertThat(service.getLastPermission()).isSameAs(permission);
+        assertThat(service.getLastResourceName()).isEqualTo("policies");
         assertThat(response.getStatus()).isEqualTo(Status.OK);
         assertThat(response.getHeaders().getFirst("Content-Type")).isEqualTo("application/json");
         assertThat((List<Object>) response.getEntity().getJson()).containsExactly(
@@ -264,16 +275,19 @@ public class XacmlServiceTest {
 
     @Test
     public void exportReturnsAnXacmlAttachment() throws Exception {
-        given(importExport.exportXACML(eq("/"), any(Subject.class), any(List.class))).willReturn(new PolicySet());
+        given(importExport.exportXACML(eq("/sub"), any(Subject.class), any(List.class))).willReturn(new PolicySet());
 
         XacmlServiceTestWrapper service = service(true);
-        Response response = service.exportXACML(context("/"), get("http://localhost/xacml/policies"));
+        Response response = service.exportXACML(context("/sub"), get("http://localhost/xacml/policies"));
 
-        assertThat(service.getLastAction()).isEqualTo("READ");
+        verify(permissionFactory).newInstance("/sub", "rest", "1.0", "policies", "READ", singleton("READ"),
+                emptyMap());
+        assertThat(service.getLastPermission()).isSameAs(permission);
+        assertThat(service.getLastResourceName()).isEqualTo("policies");
         assertThat(response.getStatus()).isEqualTo(Status.OK);
         assertThat(response.getHeaders().getFirst("Content-Type")).isEqualTo("application/xacml+xml; version=3.0");
         assertThat(response.getHeaders().getFirst("Content-Disposition"))
-                .isEqualTo("attachment; filename=realm-policies.xml");
+                .isEqualTo("attachment; filename=sub-realm-policies.xml");
         assertThat(response.getEntity().getString()).contains("<ns2:PolicySet")
                 .contains("xmlns:ns2=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\"");
     }
@@ -314,6 +328,17 @@ public class XacmlServiceTest {
     }
 
     @Test
+    public void exportRuntimeFailureAnswers500Xml() throws Exception {
+        given(importExport.exportXACML(any(), any(Subject.class), any(List.class)))
+                .willThrow(new IllegalStateException("boom"));
+
+        Response response = service(true).exportXACML(context("/"), get("http://localhost/xacml/policies"));
+
+        assertXmlError(response, 500);
+        assertThat(response.getEntity().getString()).doesNotContain("boom");
+    }
+
+    @Test
     public void exportWithoutPermissionAnswers403Xml() throws Exception {
         assertXmlError(service(false).exportXACML(context("/"), get("http://localhost/xacml/policies")), 403);
         verify(importExport, never()).exportXACML(any(), any(), any());
@@ -324,7 +349,7 @@ public class XacmlServiceTest {
         RestLog restLog = mock(RestLog.class);
         DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
         XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, mock(Debug.class), restLog,
-                evaluator);
+                evaluator, permissionFactory);
         SSOToken adminToken = mock(SSOToken.class);
         DelegationPermission delegationPermission = mock(DelegationPermission.class);
         given(evaluator.isAllowed(adminToken, delegationPermission, Collections.EMPTY_MAP)).willReturn(true);
@@ -340,7 +365,7 @@ public class XacmlServiceTest {
         RestLog restLog = mock(RestLog.class);
         DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
         XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, mock(Debug.class), restLog,
-                evaluator);
+                evaluator, permissionFactory);
         SSOToken adminToken = mock(SSOToken.class);
         DelegationPermission delegationPermission = mock(DelegationPermission.class);
         given(evaluator.isAllowed(adminToken, delegationPermission, Collections.EMPTY_MAP)).willReturn(false);

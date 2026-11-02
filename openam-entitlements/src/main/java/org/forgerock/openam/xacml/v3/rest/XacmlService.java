@@ -96,6 +96,7 @@ public class XacmlService {
     private final Debug debug;
     private final RestLog restLog;
     private final DelegationEvaluator evaluator;
+    private final DelegationPermissionFactory permissionFactory;
 
     /**
      * Constructor with dependencies exposed for unit testing.
@@ -105,15 +106,18 @@ public class XacmlService {
      * @param debug The debug instance for logging.
      * @param restLog The REST audit logger.
      * @param evaluator The delegation evaluator.
+     * @param permissionFactory The factory of the delegation permissions that are checked.
      */
     @Inject
     public XacmlService(XACMLExportImport importExport, PrivilegedAction<SSOToken> adminTokenAction,
-            @Named("frRest") Debug debug, RestLog restLog, DelegationEvaluator evaluator) {
+            @Named("frRest") Debug debug, RestLog restLog, DelegationEvaluator evaluator,
+            DelegationPermissionFactory permissionFactory) {
         this.importExport = importExport;
         this.admin = adminTokenAction;
         this.debug = debug;
         this.restLog = restLog;
         this.evaluator = evaluator;
+        this.permissionFactory = permissionFactory;
     }
 
     /**
@@ -277,17 +281,25 @@ public class XacmlService {
     @VisibleForTesting
     boolean checkPermission(Context context, String action) throws ResourceException {
         try {
-            // Null without a session (OptionalSSOTokenSessionModule admits the request); createSSOToken then fails,
-            // which keeps master's 500 for an unauthenticated request (user decision: no 401 in this PR).
-            String tokenId = ServerContextHelper.getCookieFromServerContext(context);
-            SSOToken token = SSOTokenManager.getInstance().createSSOToken(tokenId);
-            DelegationPermission permission = new DelegationPermissionFactory().newInstance(realm(context), REST,
+            SSOToken token = sessionToken(context);
+            DelegationPermission permission = permissionFactory.newInstance(realm(context), REST,
                     VERSION, POLICIES, action, Collections.singleton(action), Collections.<String, String>emptyMap());
             return checkPermission(permission, token, POLICIES);
         } catch (SSOException | DelegationException e) {
             debug.warning("XacmlService permission evaluation failed", e);
             throw new InternalServerErrorException("XacmlService permission evaluation failed", e);
         }
+    }
+
+    /**
+     * Creates the SSO token of the caller from the session cookie of the request.
+     */
+    @VisibleForTesting
+    SSOToken sessionToken(Context context) throws SSOException {
+        // Null without a session (OptionalSSOTokenSessionModule admits the request); createSSOToken then fails,
+        // which keeps master's 500 for an unauthenticated request (user decision: no 401 in this PR).
+        String tokenId = ServerContextHelper.getCookieFromServerContext(context);
+        return SSOTokenManager.getInstance().createSSOToken(tokenId);
     }
 
     /**
