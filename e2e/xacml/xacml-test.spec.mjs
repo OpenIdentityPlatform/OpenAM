@@ -92,8 +92,8 @@ function exportPolicies(request, { path = "/xacml/policies", token = adminToken,
   return request.get(`${OPENAM_BASE}${path}`, options);
 }
 
-function importPolicies(request, body, { token = adminToken, params } = {}) {
-  const options = { headers: { "Content-Type": "application/xml" }, data: body };
+function importPolicies(request, body, { token = adminToken, params, contentType = "application/xml" } = {}) {
+  const options = { headers: { "Content-Type": contentType }, data: body };
   if (token) {
     options.headers["iPlanetDirectoryPro"] = token;
   }
@@ -234,6 +234,17 @@ test.describe("XACML policy export", () => {
     expect(policyIds(body)).toEqual(expect.arrayContaining([POLICY_NAME, OTHER_POLICY_NAME]));
   });
 
+  test("answers HEAD like GET without a body", async ({ request }) => {
+    const response = await request.head(`${OPENAM_BASE}/xacml/policies`, {
+      headers: { "iPlanetDirectoryPro": adminToken },
+    });
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe("application/xacml+xml; version=3.0");
+    expect(response.headers()["content-disposition"]).toBe("attachment; filename=realm-policies.xml");
+    expect((await response.body()).length).toBe(0);
+  });
+
   test("answers an unauthenticated export with 500", async ({ request }) => {
     const response = await exportPolicies(request, { token: null });
 
@@ -272,20 +283,16 @@ test.describe("XACML export versioning", () => {
     const response = await exportPolicies(request);
 
     expect(response.status()).toBe(200);
-    // The value has the defect described in the next test.
-    expect(response.headers()["content-api-version"])
-      .toBe("[Content-API-Version: protocol=1.0,resource=1.0]");
+    expect(response.headers()["content-api-version"]).toBe("protocol=1.0,resource=1.0");
   });
 
   test("answers a known Accept-API-Version with Content-API-Version", async ({ request }) => {
     const response = await exportPolicies(request, { headers: { "Accept-API-Version": "resource=1.0" } });
 
     expect(response.status()).toBe(200);
-    // Defect in the value; the target is "protocol=1.0,resource=1.0". /json sends the bare
-    // "protocol=...,resource=..." value, while this version filter writes the header object's string
-    // form, header name included.
-    expect(response.headers()["content-api-version"])
-      .toBe("[Content-API-Version: protocol=1.0,resource=1.0]");
+    // The bare value, as /json sends it. Restlet wrote the header object's string form,
+    // `[Content-API-Version: protocol=1.0,resource=1.0]`.
+    expect(response.headers()["content-api-version"]).toBe("protocol=1.0,resource=1.0");
   });
 
   test("answers 404 for a resource version that does not exist", async ({ request }) => {
@@ -301,13 +308,23 @@ test.describe("XACML export versioning", () => {
  * the content check tells the sub realm's export from root's, whatever the filename says.
  */
 test.describe("XACML export realm styles", () => {
-  test("answers 404 to the realms/root path spelling", async ({ request }) => {
+  test("resolves the realms/root path spelling", async ({ request }) => {
     const response = await exportPolicies(request, { path: "/xacml/realms/root/policies" });
 
-    // Defect; the target is 200 with the root realm's realm-policies.xml attachment, as /json
-    // accepts this spelling. The /xacml realm router takes every segment before /policies as a
-    // sub-realm name, so it looks up a realm called "realms" and does not find it.
-    expect(response.status()).toBe(404);
+    // The spelling /json accepts. Restlet took every segment before /policies as a sub-realm name and
+    // answered 404 for a realm called "realms".
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-disposition"]).toBe("attachment; filename=realm-policies.xml");
+    expect(policyIds(await response.text())).toContain(POLICY_NAME);
+  });
+
+  test("resolves a sub realm under the realms/root path spelling", async ({ request }) => {
+    const response = await exportPolicies(request, { path: `/xacml/realms/root/realms/${SUB_REALM}/policies` });
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-disposition"])
+      .toBe(`attachment; filename=${SUB_REALM}-realm-policies.xml`);
+    expect(policyIds(await response.text())).not.toContain(POLICY_NAME);
   });
 
   test("resolves a legacy path realm", async ({ request }) => {
@@ -391,6 +408,20 @@ test.describe("XACML policy import", () => {
     expect(await exportedPolicyIds(request, SUB_REALM)).not.toContain(POLICY_NAME);
   });
 
+  test("reads a document posted with the console's form content type", async ({ request }) => {
+    // The console posts the file's text through jQuery, which sends its default form content type.
+    const exported = await (await exportPolicies(request)).text();
+
+    const response = await importPolicies(request, exported, {
+      contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+      params: { realm: `/${SUB_REALM}`, dryrun: "true" },
+    });
+
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toContainEqual({ name: POLICY_NAME, type: "Privilege", status: "A" });
+    expect(await exportedPolicyIds(request, SUB_REALM)).not.toContain(POLICY_NAME);
+  });
+
   test("round-trips an export from the root realm into a sub realm", async ({ request }) => {
     const exported = await (await exportPolicies(request)).text();
 
@@ -424,12 +455,11 @@ test.describe("XACML policy import", () => {
     await expectXmlError(response, 400);
   });
 
-  test("answers an empty document with 500", async ({ request }) => {
+  test("rejects an empty document with 400", async ({ request }) => {
     const response = await importPolicies(request, "");
 
-    // Defect; the target is 400 with <code>400, as for the two documents above. The empty body
-    // reaches the import handler as a null entity and fails with a NullPointerException.
-    expect(response.status()).toBe(500);
-    await expectXmlError(response, 500);
+    // As for the two documents above: an empty body is an XML parse failure.
+    expect(response.status()).toBe(400);
+    await expectXmlError(response, 400);
   });
 });

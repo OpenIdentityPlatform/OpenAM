@@ -123,6 +123,21 @@ Custom code that calls `org.restlet.ext.servlet.ServletUtils` must call `org.for
 Starting with this release WebFinger (`/.well-known/webfinger`) answers OpenID Connect issuer discovery requests again; earlier 16.x releases answered every request with HTTP status 500. It no longer looks up the account named in the `resource` parameter: for any `acct:` or `http(s)` resource it returns the issuer of the deployment, the same for every account. Releases 15.x and earlier answered HTTP status 404 for an account that did not exist, which told an anonymous caller whether the account existed.
 ====
 
+[IMPORTANT]
+====
+Starting with this release OpenAM serves the XACML policy endpoint (`/xacml/*`) through the `OpenAM` servlet instead of the `ForgeRockRest` servlet. If your customized `.war` file keeps its own copy of `web.xml`, move the `<servlet-mapping>` whose `<url-pattern>` is `/xacml/*` from the `ForgeRockRest` servlet to the `OpenAM` servlet before you deploy. Otherwise every request to `/xacml/*` answers HTTP status 404.
+
+The endpoint otherwise behaves as before, with these changes:
+
+* `/xacml/realms/root/policies` and `/xacml/realms/root/realms/<realm>/policies` address the top-level realm and its subrealms, as the same spellings do under `/json`. Earlier releases answered 404. `/xacml/<realm>/policies` and the `realm` query parameter work as before.
+* The `Content-API-Version` response header is `protocol=1.0,resource=1.0`. Earlier releases sent `[Content-API-Version: protocol=1.0,resource=1.0]`.
+* An import request with an empty body answers 400. Earlier releases answered 500.
+* A `realm` query parameter that names no realm answers 400 with a JSON body. Earlier releases answered 404.
+* A `HEAD` request is answered like a `GET` request, without a body, and every 405 response carries an `Allow` header that lists the supported methods. The same applies to the other endpoints that OpenAM builds from annotated classes: `/json/docs/api` now answers `HEAD`, and `/json/authenticate`, which supports only `POST`, sends `Allow: POST` with its 405 responses.
+
+Custom code that refers to `org.forgerock.openam.rest.service.XACMLServiceEndpointApplication`, `org.forgerock.openam.rest.service.XMLRestStatusService`, `org.forgerock.openam.rest.service.ResourceApiVersionRestlet` or `org.forgerock.openam.entitlement.rest.XacmlRouterProvider` must be changed, because these classes no longer exist. `org.forgerock.openam.xacml.v3.rest.XacmlService` is no longer a Restlet resource.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====
