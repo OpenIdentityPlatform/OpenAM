@@ -38,6 +38,7 @@ import jakarta.inject.Named;
 
 import org.forgerock.http.header.AcceptLanguageHeader;
 import org.forgerock.http.header.ContentTypeHeader;
+import org.forgerock.http.header.HeaderUtil;
 import org.forgerock.http.header.MalformedHeaderException;
 import org.forgerock.http.protocol.Form;
 import org.forgerock.http.protocol.Request;
@@ -90,6 +91,8 @@ public class XacmlService {
     static final String JSON_CONTENT_TYPE = "application/json";
 
     private static final String ROOT_REALM = "/";
+    /** The characters besides controls and space that RFC 7230 excludes from a token. */
+    private static final String HEADER_SEPARATORS = "()<>@,;:\\\"/[]?={}";
 
     private final XACMLExportImport importExport;
     private final PrivilegedAction<SSOToken> admin;
@@ -217,7 +220,7 @@ public class XacmlService {
             response.getHeaders().put(ContentTypeHeader.NAME, XACML_CONTENT_TYPE);
             // OPENAM-4974
             response.getHeaders().put("Content-Disposition",
-                    "attachment; filename=" + getPolicyAttachmentFileName(realm));
+                    "attachment; filename=" + tokenOrQuoted(getPolicyAttachmentFileName(realm)));
             return response;
         } catch (ResourceException e) {
             return xmlError(e);
@@ -270,6 +273,15 @@ public class XacmlService {
             result = realm.substring(1).replace('/', '-') + "-realm-policies";
         }
         return result + ".xml";
+    }
+
+    /**
+     * Writes a header parameter value as is when it is an RFC 7230 token, else as a quoted-string, as the
+     * Restlet {@code Disposition} of earlier releases did. Realm names may hold a space, ';' or '"'.
+     */
+    private static String tokenOrQuoted(String value) {
+        boolean token = value.chars().allMatch(c -> c > ' ' && c < 0x7f && HEADER_SEPARATORS.indexOf(c) < 0);
+        return token ? value : HeaderUtil.quote(value);
     }
 
     /**

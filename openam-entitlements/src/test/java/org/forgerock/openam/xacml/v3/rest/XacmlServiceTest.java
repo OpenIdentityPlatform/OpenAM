@@ -61,8 +61,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.google.common.io.ByteStreams;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.delegation.DelegationPermissionFactory;
 import com.sun.identity.entitlement.EntitlementException;
@@ -305,6 +307,22 @@ public class XacmlServiceTest {
     }
 
     @Test
+    public void exportQuotesAnAttachmentNameThatIsNotAToken() throws Exception {
+        given(importExport.exportXACML(any(), any(Subject.class), any(List.class))).willReturn(new PolicySet());
+
+        // ssoadm and the legacy console accept realm names that hold these characters.
+        assertThat(service(true).exportXACML(context("/my realm"), get("http://localhost/xacml/policies"))
+                .getHeaders().getFirst("Content-Disposition"))
+                .isEqualTo("attachment; filename=\"my realm-realm-policies.xml\"");
+        assertThat(service(true).exportXACML(context("/a;b"), get("http://localhost/xacml/policies"))
+                .getHeaders().getFirst("Content-Disposition"))
+                .isEqualTo("attachment; filename=\"a;b-realm-policies.xml\"");
+        assertThat(service(true).exportXACML(context("/a\"b"), get("http://localhost/xacml/policies"))
+                .getHeaders().getFirst("Content-Disposition"))
+                .isEqualTo("attachment; filename=\"a\\\"b-realm-policies.xml\"");
+    }
+
+    @Test
     public void exportPassesEveryFilterValueInOrder() throws Exception {
         ArgumentCaptor<List> filters = ArgumentCaptor.forClass(List.class);
         given(importExport.exportXACML(eq("/sub"), any(Subject.class), filters.capture()))
@@ -342,6 +360,42 @@ public class XacmlServiceTest {
     public void exportWithoutPermissionAnswers403Xml() throws Exception {
         assertXmlError(service(false).exportXACML(context("/"), get("http://localhost/xacml/policies")), 403);
         verify(importExport, never()).exportXACML(any(), any(), any());
+    }
+
+    @Test
+    public void exportWhosePermissionEvaluationFailsAnswers500Xml() throws Exception {
+        DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
+        given(evaluator.isAllowed(any(), any(), any())).willThrow(new DelegationException("evaluation failed"));
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, mock(Debug.class),
+                mock(RestLog.class), evaluator, permissionFactory) {
+            @Override
+            SSOToken sessionToken(Context context) {
+                return mock(SSOToken.class);
+            }
+        };
+
+        Response response = xacmlService.exportXACML(context("/"), get("http://localhost/xacml/policies"));
+
+        assertXmlError(response, 500);
+        verify(importExport, never()).exportXACML(any(), any(), any());
+    }
+
+    @Test
+    public void importWithoutAValidSessionAnswers500Xml() throws Exception {
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, mock(Debug.class),
+                mock(RestLog.class), mock(DelegationEvaluator.class), permissionFactory) {
+            @Override
+            SSOToken sessionToken(Context context) throws SSOException {
+                throw new SSOException("no session");
+            }
+        };
+
+        Response response = xacmlService.importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>"));
+
+        // Earlier releases answered an unauthenticated request with 500 as well, not with 401 or 403.
+        assertXmlError(response, 500);
+        verify(importExport, never()).importXacml(any(), any(), any(), anyBoolean());
     }
 
     @Test
