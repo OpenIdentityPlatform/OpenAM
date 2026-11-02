@@ -235,7 +235,9 @@ test.describe("XACML policy export", () => {
   });
 
   test("answers HEAD like GET without a body", async ({ request }) => {
-    // Restlet answered 500 to HEAD; CHF serves it with the GET method and the container drops the body.
+    // Restlet answered HEAD with 200 and its headers but no body, so the response stayed uncommitted, and the
+    // NullPointerException that followed RestletHandler returning null made CHF overwrite the status with 500.
+    // CHF serves HEAD with the GET method and the container drops the body.
     const response = await request.head(`${OPENAM_BASE}/xacml/policies`, {
       headers: { "iPlanetDirectoryPro": adminToken },
     });
