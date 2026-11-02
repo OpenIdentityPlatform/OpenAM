@@ -83,7 +83,7 @@ public class XacmlServiceTest {
         given(adminTokenAction.run()).willReturn(adminToken);
     }
 
-    private XacmlService service(boolean permitted) {
+    private XacmlServiceTestWrapper service(boolean permitted) {
         return new XacmlServiceTestWrapper(importExport, adminTokenAction, mock(Debug.class), mock(RestLog.class),
                 mock(DelegationEvaluator.class), permitted);
     }
@@ -141,9 +141,11 @@ public class XacmlServiceTest {
         given(importExport.importXacml(eq("/"), any(InputStream.class), any(Subject.class), eq(false)))
                 .willReturn(steps);
 
-        Response response = service(true).importXACML(context("/"),
+        XacmlServiceTestWrapper service = service(true);
+        Response response = service.importXACML(context("/"),
                 post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>"));
 
+        assertThat(service.getLastAction()).isEqualTo("MODIFY");
         assertThat(response.getStatus()).isEqualTo(Status.OK);
         assertThat(response.getHeaders().getFirst("Content-Type")).isEqualTo("application/json");
         assertThat((List<Object>) response.getEntity().getJson()).containsExactly(
@@ -218,8 +220,11 @@ public class XacmlServiceTest {
         given(importExport.importXacml(any(), any(), any(), anyBoolean()))
                 .willThrow(new IllegalStateException("boom"));
 
-        assertXmlError(service(true).importXACML(context("/"),
-                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>")), 500);
+        Response response = service(true).importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>"));
+
+        assertXmlError(response, 500);
+        assertThat(response.getEntity().getString()).doesNotContain("boom");
     }
 
     /** Master's no-token import answers 500 this way: the message lookup of a code without a bundle key throws. */
@@ -230,8 +235,22 @@ public class XacmlServiceTest {
                 .willThrow(new MissingResourceException("no key", "b", "500"));
         given(importExport.importXacml(any(), any(), any(), anyBoolean())).willThrow(failure);
 
-        assertXmlError(service(true).importXACML(context("/"),
-                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>")), 500);
+        Response response = service(true).importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>"));
+
+        assertXmlError(response, 500);
+        assertThat(response.getEntity().getString()).doesNotContain("no key");
+    }
+
+    @Test
+    public void importIgnoresDryrunInAFormEncodedBody() throws Exception {
+        List<ImportStep> steps = singletonList(step(DiffStatus.ADD, "p", "privilege"));
+        given(importExport.importXacml(any(), any(), any(), anyBoolean())).willReturn(steps);
+
+        service(true).importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/x-www-form-urlencoded", "dryrun=true"));
+
+        verify(importExport).importXacml(eq("/"), any(), any(), eq(false));
     }
 
     @Test
@@ -247,8 +266,10 @@ public class XacmlServiceTest {
     public void exportReturnsAnXacmlAttachment() throws Exception {
         given(importExport.exportXACML(eq("/"), any(Subject.class), any(List.class))).willReturn(new PolicySet());
 
-        Response response = service(true).exportXACML(context("/"), get("http://localhost/xacml/policies"));
+        XacmlServiceTestWrapper service = service(true);
+        Response response = service.exportXACML(context("/"), get("http://localhost/xacml/policies"));
 
+        assertThat(service.getLastAction()).isEqualTo("READ");
         assertThat(response.getStatus()).isEqualTo(Status.OK);
         assertThat(response.getHeaders().getFirst("Content-Type")).isEqualTo("application/xacml+xml; version=3.0");
         assertThat(response.getHeaders().getFirst("Content-Disposition"))

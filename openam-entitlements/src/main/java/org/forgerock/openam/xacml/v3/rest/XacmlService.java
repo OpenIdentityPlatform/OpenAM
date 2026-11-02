@@ -138,8 +138,8 @@ public class XacmlService {
             if (!checkPermission(context, "MODIFY")) {
                 return xmlError(new ForbiddenException());
             }
-            // Only the query is read: Request.getForm() would also consume a form-encoded body, and the console
-            // posts the XML document with that content type.
+            // Only the query is read: Request.getForm() would also parse a form-encoded body and merge its
+            // parameters, and the console posts the XML document with that content type.
             boolean dryRun = "true".equalsIgnoreCase(new Form().fromRequestQuery(request).getFirst("dryrun"));
             List<ImportStep> steps;
             try {
@@ -171,7 +171,7 @@ public class XacmlService {
             return xmlError(e);
         } catch (RuntimeException e) {
             debug.error("XacmlService :: import failed", e);
-            return xmlError(new InternalServerErrorException(e.getMessage(), e));
+            return xmlError(new InternalServerErrorException("Failed to import XACML policies", e));
         }
     }
 
@@ -219,7 +219,7 @@ public class XacmlService {
             return xmlError(e);
         } catch (RuntimeException e) {
             debug.error("XacmlService :: export failed", e);
-            return xmlError(new InternalServerErrorException(e.getMessage(), e));
+            return xmlError(new InternalServerErrorException("Failed to export XACML policies", e));
         }
     }
 

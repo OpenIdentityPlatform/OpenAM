@@ -30,6 +30,7 @@ import com.sun.identity.shared.debug.Debug;
 public class XacmlServiceTestWrapper extends XacmlService {
 
     private final boolean permitted;
+    private String lastAction;
 
     /**
      * Constructor with dependencies exposed for unit testing.
@@ -49,6 +50,14 @@ public class XacmlServiceTestWrapper extends XacmlService {
 
     @Override
     boolean checkPermission(Context context, String action) {
+        lastAction = action;
         return permitted;
+    }
+
+    /**
+     * @return The action of the last permission check, or null if none was made.
+     */
+    String getLastAction() {
+        return lastAction;
     }
 }
