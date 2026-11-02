@@ -12,20 +12,24 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.xacml.v3.rest;
+
+import org.forgerock.openam.forgerockrest.utils.RestLog;
+import org.forgerock.services.context.Context;
 
 import com.sun.identity.delegation.DelegationEvaluator;
 import com.sun.identity.entitlement.xacml3.XACMLExportImport;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.forgerockrest.utils.RestLog;
-import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
 
 /**
  * Allow testing of XacmlService without the unpleasantness of mocking a dozen static functions and classes.
  */
 public class XacmlServiceTestWrapper extends XacmlService {
+
+    private final boolean permitted;
 
     /**
      * Constructor with dependencies exposed for unit testing.
@@ -33,14 +37,18 @@ public class XacmlServiceTestWrapper extends XacmlService {
      * @param importExport Non null utility functions.
      * @param adminTokenAction Non null admin action function.
      * @param debug The debug instance for logging.
+     * @param restLog The REST audit logger.
+     * @param evaluator The delegation evaluator.
+     * @param permitted What the permission check answers.
      */
     public XacmlServiceTestWrapper(XACMLExportImport importExport, AdminTokenAction adminTokenAction, Debug debug,
-            RestLog restLog, DelegationEvaluator evaluator, JacksonRepresentationFactory jacksonRepresentationFactory) {
-        super(importExport, adminTokenAction, debug, restLog, evaluator, jacksonRepresentationFactory);
+            RestLog restLog, DelegationEvaluator evaluator, boolean permitted) {
+        super(importExport, adminTokenAction, debug, restLog, evaluator);
+        this.permitted = permitted;
     }
 
     @Override
-    protected boolean checkPermission(String ignored) {
-        return true;
+    boolean checkPermission(Context context, String action) {
+        return permitted;
     }
 }

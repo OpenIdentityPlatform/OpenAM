@@ -12,55 +12,55 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.xacml.v3.rest;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.forgerock.json.resource.ResourceException.*;
-import static org.mockito.Mockito.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.json.JsonValue.field;
+import static org.forgerock.json.JsonValue.object;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Locale;
+import java.util.MissingResourceException;
 
 import javax.security.auth.Subject;
 
+import org.forgerock.http.header.ContentTypeHeader;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.http.protocol.Response;
+import org.forgerock.http.protocol.Status;
+import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
-import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.openam.utils.JsonValueBuilder;
+import org.forgerock.openam.rest.RealmContext;
 import org.forgerock.openam.xacml.v3.DiffStatus;
 import org.forgerock.openam.xacml.v3.ImportStep;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.forgerock.services.context.Context;
+import org.forgerock.services.context.RootContext;
 import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.restlet.Request;
-import org.restlet.Response;
-import org.restlet.data.Disposition;
-import org.restlet.data.Form;
-import org.restlet.data.Status;
-import org.restlet.ext.jackson.JacksonRepresentation;
-import org.restlet.representation.Representation;
-import org.restlet.resource.ResourceException;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iplanet.sso.SSOException;
+import com.google.common.io.ByteStreams;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.xacml3.XACMLExportImport;
@@ -69,350 +69,264 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({RestLog.class})
-public class XacmlServiceTest  {
+public class XacmlServiceTest {
 
-    private static final ConcurrentMap<String, Object> REQUEST_ATTRIBUTES = new ConcurrentHashMap<String, Object>() {{
-        put("realm", "/");
-    }};
-
-    private AdminTokenAction adminTokenAction;
-    private XacmlService service;
     private XACMLExportImport importExport;
-    private Debug debug;
-    private Response response;
-    private Request request;
+    private AdminTokenAction adminTokenAction;
 
-    private Answer<SSOToken> ssoTokenAnswer = new Answer<SSOToken>() {
-        @Override
-        public SSOToken answer(InvocationOnMock invocation) throws Throwable {
-            SSOToken ssoToken = mock(SSOToken.class);
-            doReturn("my-uuid").when(ssoToken).getProperty(Constants.UNIVERSAL_IDENTIFIER);
-            return ssoToken;
+    @BeforeMethod
+    public void setUp() throws Exception {
+        importExport = mock(XACMLExportImport.class);
+        adminTokenAction = mock(AdminTokenAction.class);
+        SSOToken adminToken = mock(SSOToken.class);
+        given(adminToken.getProperty(Constants.UNIVERSAL_IDENTIFIER)).willReturn("my-uuid");
+        given(adminTokenAction.run()).willReturn(adminToken);
+    }
+
+    private XacmlService service(boolean permitted) {
+        return new XacmlServiceTestWrapper(importExport, adminTokenAction, mock(Debug.class), mock(RestLog.class),
+                mock(DelegationEvaluator.class), permitted);
+    }
+
+    private static Realm realm(String path) {
+        Realm realm = mock(Realm.class);
+        given(realm.asPath()).willReturn(path);
+        return realm;
+    }
+
+    private static Context context(String realmPath) {
+        return new RealmContext(new RootContext(), realm(realmPath));
+    }
+
+    private static Request post(String uri, String contentType, String body) throws URISyntaxException {
+        Request request = new Request().setMethod("POST").setUri(uri);
+        if (contentType != null) {
+            request.getHeaders().put("Content-Type", contentType);
         }
-    };
-    private Form query;
-    private JacksonRepresentationFactory jacksonRepresentationFactory =
-            new JacksonRepresentationFactory(new ObjectMapper());
-
-    @Before
-    public void setup() throws Exception {
-        this.importExport = mock(XACMLExportImport.class);
-        this.debug = mock(Debug.class);
-        this.adminTokenAction = mock(AdminTokenAction.class);
-        doAnswer(ssoTokenAnswer).when(adminTokenAction).run();
-        this.service = new XacmlServiceTestWrapper(importExport, adminTokenAction, this.debug, null, null,
-                jacksonRepresentationFactory);
-        this.request = mock(Request.class);
-        doReturn(REQUEST_ATTRIBUTES).when(request).getAttributes();
-        this.response = mock(Response.class);
-        service.setRequest(request);
-        service.setResponse(response);
-        query = new Form();
-        service = spy(service);
-        doReturn(query).when(service).getQuery();
-    }
-
-    @Test
-    public void testImportXACML() throws Exception {
-        //given
-        Representation representation = mock(Representation.class);
-        InputStream is = new ByteArrayInputStream("Hello World".getBytes());
-        doReturn(is).when(representation).getStream();
-
-        ImportStep importStepPrivilege = mock(ImportStep.class);
-        doReturn(DiffStatus.ADD).when(importStepPrivilege).getDiffStatus();
-        doReturn("policy1").when(importStepPrivilege).getName();
-        doReturn("privilege").when(importStepPrivilege).getType();
-
-        ImportStep importStepApplication = mock(ImportStep.class);
-        doReturn(DiffStatus.UPDATE).when(importStepApplication).getDiffStatus();
-        doReturn("iPlanetAMWebAgentService").when(importStepApplication).getName();
-        doReturn("application").when(importStepApplication).getType();
-
-        ImportStep importStepResourceType = mock(ImportStep.class);
-        doReturn(DiffStatus.UPDATE).when(importStepResourceType).getDiffStatus();
-        doReturn("URL").when(importStepResourceType).getName();
-        doReturn("resourceType").when(importStepResourceType).getType();
-
-        List<ImportStep> steps = Arrays.asList(importStepPrivilege, importStepApplication, importStepResourceType);
-        doReturn(steps).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(false));
-
-        //when
-        Representation result = service.importXACML(representation);
-
-        //then
-        assertThat(result).isInstanceOf(JacksonRepresentation.class);
-
-        Map<String, Object> resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(0).asMap();
-        assertThat(resultMap).contains(entry("status", "A"), entry("name", "policy1"), entry("type", "privilege"));
-
-        resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(1).asMap();
-        assertThat(resultMap).contains(
-                entry("status", "U"), entry("name", "iPlanetAMWebAgentService"), entry("type", "application"));
-
-        resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(2).asMap();
-        assertThat(resultMap).contains(entry("status", "U"), entry("name", "URL"), entry("type", "resourceType"));
-
-        verify(response).setStatus(Status.SUCCESS_OK);
-    }
-
-    @Test
-    public void testImportXACMLDryRun() throws Exception {
-        //given
-        query.add("dryrun", "true");
-        Representation representation = mock(Representation.class);
-        InputStream is = new ByteArrayInputStream("Hello World".getBytes());
-        doReturn(is).when(representation).getStream();
-
-        ImportStep importStepPrivilege = mock(ImportStep.class);
-        doReturn(DiffStatus.ADD).when(importStepPrivilege).getDiffStatus();
-        doReturn("policy1").when(importStepPrivilege).getName();
-        doReturn("privilege").when(importStepPrivilege).getType();
-
-        ImportStep importStepApplication = mock(ImportStep.class);
-        doReturn(DiffStatus.UPDATE).when(importStepApplication).getDiffStatus();
-        doReturn("iPlanetAMWebAgentService").when(importStepApplication).getName();
-        doReturn("application").when(importStepApplication).getType();
-
-        ImportStep importStepResourceType = mock(ImportStep.class);
-        doReturn(DiffStatus.UPDATE).when(importStepResourceType).getDiffStatus();
-        doReturn("URL").when(importStepResourceType).getName();
-        doReturn("resourceType").when(importStepResourceType).getType();
-
-        List<ImportStep> steps = Arrays.asList(importStepPrivilege, importStepApplication, importStepResourceType);
-        doReturn(steps).when(importExport).importXacml(eq("/"), eq(is), any(Subject.class), eq(true));
-
-        //when
-        Representation result = service.importXACML(representation);
-
-        //then
-        assertThat(result).isInstanceOf(JacksonRepresentation.class);
-
-        Map<String, Object> resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(0).asMap();
-        assertThat(resultMap).contains(entry("status", "A"), entry("name", "policy1"), entry("type", "privilege"));
-
-        resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(1).asMap();
-        assertThat(resultMap).contains(
-                entry("status", "U"), entry("name", "iPlanetAMWebAgentService"), entry("type", "application"));
-
-        resultMap = JsonValueBuilder.toJsonArray(result.getText()).get(2).asMap();
-        assertThat(resultMap).contains(entry("status", "U"), entry("name", "URL"), entry("type", "resourceType"));
-
-        verify(response).setStatus(Status.SUCCESS_OK);
-    }
-
-    @Test
-    public void testImportXACMLIOException() throws Exception {
-        //given
-        Representation representation = mock(Representation.class);
-        doThrow(new IOException()).when(representation).getStream();
-
-        try {
-            //when
-            service.importXACML(representation);
-
-            //then
-            fail("Expect exception");
-        } catch (ResourceException e) {
-            assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
+        if (body != null) {
+            request.setEntity(body.getBytes(StandardCharsets.UTF_8));
         }
+        return request;
+    }
+
+    private static Request get(String uri) throws URISyntaxException {
+        return new Request().setMethod("GET").setUri(uri);
+    }
+
+    private static ImportStep step(DiffStatus status, String name, String type) {
+        ImportStep step = mock(ImportStep.class);
+        given(step.getDiffStatus()).willReturn(status);
+        given(step.getName()).willReturn(name);
+        given(step.getType()).willReturn(type);
+        return step;
+    }
+
+    private static String read(InputStream stream) throws IOException {
+        return new String(ByteStreams.toByteArray(stream), StandardCharsets.UTF_8);
+    }
+
+    private static void assertXmlError(Response response, int code) throws IOException {
+        assertThat(response.getStatus().getCode()).isEqualTo(code);
+        ContentTypeHeader type = ContentTypeHeader.valueOf(response);
+        assertThat(type.getType()).isEqualTo("application/xml");
+        assertThat(type.getCharset()).isEqualTo(StandardCharsets.UTF_8);
+        assertThat(response.getEntity().getString()).contains("<error>").contains("<code>" + code + "</code>");
     }
 
     @Test
-    public void testImportXACMLNoPolicies() throws Exception {
-        //given
-        Representation representation = mock(Representation.class);
-        InputStream is = new ByteArrayInputStream("Hello World".getBytes());
-        doReturn(is).when(representation).getStream();
-        doReturn(Collections.emptyList()).
-                when(importExport).importXacml(eq("/"), eq(is), any(), eq(false));
+    public void importReturnsTheStepsAsJson() throws Exception {
+        List<ImportStep> steps = Arrays.asList(step(DiffStatus.ADD, "policy1", "privilege"),
+                step(DiffStatus.UPDATE, "iPlanetAMWebAgentService", "application"),
+                step(DiffStatus.UPDATE, "URL", "resourceType"));
+        given(importExport.importXacml(eq("/"), any(InputStream.class), any(Subject.class), eq(false)))
+                .willReturn(steps);
 
-        try {
-            //when
-            service.importXACML(representation);
+        Response response = service(true).importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>"));
 
-            //then
-            fail("Expect exception");
-        } catch (ResourceException e) {
-            assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
-            assertThat(e.getMessage()).startsWith("No policies found in XACML document");
-        }
+        assertThat(response.getStatus()).isEqualTo(Status.OK);
+        assertThat(response.getHeaders().getFirst("Content-Type")).isEqualTo("application/json");
+        assertThat((List<Object>) response.getEntity().getJson()).containsExactly(
+                object(field("status", "A"), field("name", "policy1"), field("type", "privilege")),
+                object(field("status", "U"), field("name", "iPlanetAMWebAgentService"),
+                        field("type", "application")),
+                object(field("status", "U"), field("name", "URL"), field("type", "resourceType")));
     }
 
     @Test
-    public void testImportXACMLImportFailure() throws Exception {
-        //given
-        Representation representation = mock(Representation.class);
-        InputStream is = new ByteArrayInputStream("Hello World".getBytes());
-        doReturn(is).when(representation).getStream();
-        EntitlementException failure = new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
-        doThrow(failure).when(importExport).importXacml(eq("/"), eq(is), any(), eq(false));
+    public void importReadsDryrunFromTheQuery() throws Exception {
+        List<ImportStep> steps = singletonList(step(DiffStatus.ADD, "p", "privilege"));
+        given(importExport.importXacml(any(), any(), any(), anyBoolean())).willReturn(steps);
 
-        try {
-            //when
-            service.importXACML(representation);
+        service(true).importXACML(context("/sub"),
+                post("http://localhost/xacml/policies?dryrun=true", "application/xml", "<PolicySet/>"));
 
-            //then
-            fail("Expect exception");
-        } catch (ResourceException e) {
-            assertThat(e.getStatus().getCode()).isEqualTo(BAD_REQUEST);
-            assertThat(e.getMessage()).startsWith("JSON Exception.");
-        }
+        verify(importExport).importXacml(eq("/sub"), any(InputStream.class), any(Subject.class), eq(true));
     }
 
     @Test
-    public void testExportXACML() throws Exception {
-        //given
-        query.add(XacmlService.QUERY_PARAM_STRING, "test1");
-        query.add(XacmlService.QUERY_PARAM_STRING, "test2");
-        PolicySet policySet = new PolicySet();
-        doReturn(policySet).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
+    public void importPassesTheBodyOfAFormEncodedPost() throws Exception {
+        ArgumentCaptor<InputStream> body = ArgumentCaptor.forClass(InputStream.class);
+        List<ImportStep> steps = singletonList(step(DiffStatus.ADD, "p", "privilege"));
+        given(importExport.importXacml(any(), body.capture(), any(), anyBoolean())).willReturn(steps);
 
-        //when
-        Representation result = service.exportXACML();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        result.write(baos);
-        String xml = new String(baos.toByteArray(), "UTF-8");
+        Response response = service(true).importXACML(context("/"),
+                post("http://localhost/xacml/policies?dryrun=true",
+                        "application/x-www-form-urlencoded; charset=UTF-8", "<PolicySet a=\"b&c\"/>"));
 
-        //then
-        assertThat(xml).contains("<ns2:PolicySet");
-        assertThat(xml).contains("xmlns:ns2=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\"");
-        verify(response).setStatus(Status.SUCCESS_OK);
-        ArgumentCaptor<List> listCaptor = ArgumentCaptor.forClass(List.class);
-        verify(importExport).exportXACML(eq("/"), any(Subject.class), listCaptor.capture());
-        assertThat(listCaptor.getValue()).containsExactly("test1", "test2");
+        assertThat(response.getStatus()).isEqualTo(Status.OK);
+        assertThat(read(body.getValue())).isEqualTo("<PolicySet a=\"b&c\"/>");
+        verify(importExport).importXacml(eq("/"), any(), any(), eq(true));
     }
 
     @Test
-    public void testDispositionOfRootRealmExport() throws Exception {
-        //given
-        query.add(XacmlService.QUERY_PARAM_STRING, "test1");
-        query.add(XacmlService.QUERY_PARAM_STRING, "test2");
-        PolicySet policySet = new PolicySet();
-        doReturn(policySet).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
+    public void importPassesAnEmptyStreamForAnEmptyBody() throws Exception {
+        ArgumentCaptor<InputStream> body = ArgumentCaptor.forClass(InputStream.class);
+        given(importExport.importXacml(any(), body.capture(), any(), anyBoolean())).willReturn(emptyList());
 
-        //when
-        Representation result = service.exportXACML("/");
-        Disposition disposition = result.getDisposition();
+        service(true).importXACML(context("/"), post("http://localhost/xacml/policies", "application/xml", null));
 
-        assertThat(disposition.getFilename()).isEqualTo("realm-policies.xml");
-        assertThat(disposition.getType()).isEqualTo(disposition.TYPE_ATTACHMENT);
+        assertThat(body.getValue()).isNotNull();
+        assertThat(body.getValue().read()).isEqualTo(-1);
     }
 
     @Test
-    public void testDispositionOfSubRealmExport() throws Exception {
-        //given
-        query.add(XacmlService.QUERY_PARAM_STRING, "test1");
-        query.add(XacmlService.QUERY_PARAM_STRING, "test2");
-        PolicySet policySet = new PolicySet();
-        doReturn(policySet).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
+    public void importWithoutPoliciesAnswers400Xml() throws Exception {
+        given(importExport.importXacml(any(), any(), any(), anyBoolean())).willReturn(emptyList());
 
-        //when
-        Representation result = service.exportXACML("/sub");
-        Disposition disposition = result.getDisposition();
+        Response response = service(true).importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>"));
 
-        assertThat(disposition.getFilename()).isEqualTo("sub-realm-policies.xml");
-        assertThat(disposition.getType()).isEqualTo(disposition.TYPE_ATTACHMENT);
+        assertXmlError(response, 400);
+        assertThat(response.getEntity().getString()).contains("No policies found in XACML document");
     }
 
     @Test
-    public void testDispositionOfSubSubRealmExport() throws Exception {
-        //given
-        query.add(XacmlService.QUERY_PARAM_STRING, "test1");
-        query.add(XacmlService.QUERY_PARAM_STRING, "test2");
-        PolicySet policySet = new PolicySet();
-        doReturn(policySet).when(importExport).exportXACML(eq("/"), any(Subject.class), any(List.class));
+    public void importEntitlementFailureAnswers400Xml() throws Exception {
+        given(importExport.importXacml(any(), any(), any(), anyBoolean()))
+                .willThrow(new EntitlementException(EntitlementException.JSON_PARSE_ERROR));
 
-        //when
-        Representation result = service.exportXACML("/sub1/sub2");
-        Disposition disposition = result.getDisposition();
+        Response response = service(true).importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>"));
 
-        assertThat(disposition.getFilename()).isEqualTo("sub1-sub2-realm-policies.xml");
-        assertThat(disposition.getType()).isEqualTo(disposition.TYPE_ATTACHMENT);
+        assertXmlError(response, 400);
+        assertThat(response.getEntity().getString()).contains("JSON Exception.");
     }
 
     @Test
-    public void testExportXACMLEntitlementException() throws Exception {
-        //given
-        EntitlementException ee = new EntitlementException(EntitlementException.JSON_PARSE_ERROR);
-        doThrow(ee).when(importExport).exportXACML(eq("/"), any(), any());
+    public void importRuntimeFailureAnswers500Xml() throws Exception {
+        given(importExport.importXacml(any(), any(), any(), anyBoolean()))
+                .willThrow(new IllegalStateException("boom"));
 
-        try {
-            //when
-            Representation result = service.exportXACML();
+        assertXmlError(service(true).importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>")), 500);
+    }
 
-            //then
-            fail("Expect exception");
-        } catch (ResourceException e) {
-            assertThat(e.getStatus().getCode()).isEqualTo(INTERNAL_ERROR);
-            assertThat(e.getMessage()).startsWith("JSON Exception.");
-        }
+    /** Master's no-token import answers 500 this way: the message lookup of a code without a bundle key throws. */
+    @Test
+    public void importMessageLookupFailureAnswers500Xml() throws Exception {
+        EntitlementException failure = mock(EntitlementException.class);
+        given(failure.getLocalizedMessage(any(Locale.class)))
+                .willThrow(new MissingResourceException("no key", "b", "500"));
+        given(importExport.importXacml(any(), any(), any(), anyBoolean())).willThrow(failure);
+
+        assertXmlError(service(true).importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>")), 500);
     }
 
     @Test
-    public void testPermissionsCheckSuccess() {
-        RestLog restLog = PowerMockito.mock(RestLog.class);
+    public void importWithoutPermissionAnswers403Xml() throws Exception {
+        Response response = service(false).importXACML(context("/"),
+                post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>"));
 
+        assertXmlError(response, 403);
+        verify(importExport, never()).importXacml(any(), any(), any(), anyBoolean());
+    }
+
+    @Test
+    public void exportReturnsAnXacmlAttachment() throws Exception {
+        given(importExport.exportXACML(eq("/"), any(Subject.class), any(List.class))).willReturn(new PolicySet());
+
+        Response response = service(true).exportXACML(context("/"), get("http://localhost/xacml/policies"));
+
+        assertThat(response.getStatus()).isEqualTo(Status.OK);
+        assertThat(response.getHeaders().getFirst("Content-Type")).isEqualTo("application/xacml+xml; version=3.0");
+        assertThat(response.getHeaders().getFirst("Content-Disposition"))
+                .isEqualTo("attachment; filename=realm-policies.xml");
+        assertThat(response.getEntity().getString()).contains("<ns2:PolicySet")
+                .contains("xmlns:ns2=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\"");
+    }
+
+    @Test
+    public void exportNamesTheAttachmentAfterTheRealm() throws Exception {
+        given(importExport.exportXACML(any(), any(Subject.class), any(List.class))).willReturn(new PolicySet());
+
+        assertThat(service(true).exportXACML(context("/sub"), get("http://localhost/xacml/policies"))
+                .getHeaders().getFirst("Content-Disposition"))
+                .isEqualTo("attachment; filename=sub-realm-policies.xml");
+        assertThat(service(true).exportXACML(context("/sub/subsub"), get("http://localhost/xacml/policies"))
+                .getHeaders().getFirst("Content-Disposition"))
+                .isEqualTo("attachment; filename=sub-subsub-realm-policies.xml");
+    }
+
+    @Test
+    public void exportPassesEveryFilterValueInOrder() throws Exception {
+        ArgumentCaptor<List> filters = ArgumentCaptor.forClass(List.class);
+        given(importExport.exportXACML(eq("/sub"), any(Subject.class), filters.capture()))
+                .willReturn(new PolicySet());
+
+        service(true).exportXACML(context("/sub"),
+                get("http://localhost/xacml/policies?filter=test1&filter=test2"));
+
+        assertThat(filters.getValue()).containsExactly("test1", "test2");
+    }
+
+    @Test
+    public void exportEntitlementFailureAnswers500Xml() throws Exception {
+        given(importExport.exportXACML(any(), any(Subject.class), any(List.class)))
+                .willThrow(new EntitlementException(EntitlementException.JSON_PARSE_ERROR));
+
+        Response response = service(true).exportXACML(context("/"), get("http://localhost/xacml/policies"));
+
+        assertXmlError(response, 500);
+        assertThat(response.getEntity().getString()).contains("JSON Exception.");
+    }
+
+    @Test
+    public void exportWithoutPermissionAnswers403Xml() throws Exception {
+        assertXmlError(service(false).exportXACML(context("/"), get("http://localhost/xacml/policies")), 403);
+        verify(importExport, never()).exportXACML(any(), any(), any());
+    }
+
+    @Test
+    public void permissionCheckGrantedIsAudited() throws Exception {
+        RestLog restLog = mock(RestLog.class);
         DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
-        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator,
-                jacksonRepresentationFactory);
-
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, mock(Debug.class), restLog,
+                evaluator);
         SSOToken adminToken = mock(SSOToken.class);
         DelegationPermission delegationPermission = mock(DelegationPermission.class);
-        String urlLastSegment = "blah";
+        given(evaluator.isAllowed(adminToken, delegationPermission, Collections.EMPTY_MAP)).willReturn(true);
 
-        try {
-            // when
-            when(evaluator.isAllowed(adminToken, delegationPermission, Collections.EMPTY_MAP)).thenReturn(true);
+        boolean result = xacmlService.checkPermission(delegationPermission, adminToken, "blah");
 
-            boolean result = xacmlService.checkPermission(delegationPermission, adminToken, urlLastSegment);
-
-            assertThat(result).isTrue();
-            verify(restLog).auditAccessGranted(anyString(), anyString(), anyString(), any(SSOToken.class));
-
-        } catch (DelegationException de) {
-            // then
-            fail("Did not expect DelegationException");
-        } catch (SSOException ssoe) {
-            //then
-            fail("Did not expect SSOException");
-        } catch (Exception e) {
-            fail("Did not expect " + e.getClass().getName() + " with message " + e.getMessage());
-        }
+        assertThat(result).isTrue();
+        verify(restLog).auditAccessGranted(anyString(), anyString(), anyString(), any(SSOToken.class));
     }
 
     @Test
-    public void testPermissionsCheckFail() {
-        RestLog restLog = PowerMockito.mock(RestLog.class);
-
+    public void permissionCheckDeniedIsAudited() throws Exception {
+        RestLog restLog = mock(RestLog.class);
         DelegationEvaluator evaluator = mock(DelegationEvaluator.class);
-        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, this.debug, restLog, evaluator,
-                jacksonRepresentationFactory);
-
+        XacmlService xacmlService = new XacmlService(importExport, adminTokenAction, mock(Debug.class), restLog,
+                evaluator);
         SSOToken adminToken = mock(SSOToken.class);
         DelegationPermission delegationPermission = mock(DelegationPermission.class);
-        String urlLastSegment = "blah";
+        given(evaluator.isAllowed(adminToken, delegationPermission, Collections.EMPTY_MAP)).willReturn(false);
 
-        try {
-            // when
-            when(evaluator.isAllowed(adminToken, delegationPermission, Collections.EMPTY_MAP)).thenReturn(false);
+        boolean result = xacmlService.checkPermission(delegationPermission, adminToken, "blah");
 
-            boolean result = xacmlService.checkPermission(delegationPermission, adminToken, urlLastSegment);
-
-            assertThat(result).isFalse();
-            verify(restLog).auditAccessDenied(anyString(), anyString(), anyString(), any(SSOToken.class));
-
-        } catch (DelegationException de) {
-            // then
-            fail("Did not expect DelegationException");
-        } catch (SSOException ssoe) {
-            //then
-            fail("Did not expect SSOException");
-        } catch (Exception e) {
-            fail("Did not expect " + e.getClass().getName() + " with message " + e.getMessage());
-        }
+        assertThat(result).isFalse();
+        verify(restLog).auditAccessDenied(anyString(), anyString(), anyString(), any(SSOToken.class));
     }
-
 }
