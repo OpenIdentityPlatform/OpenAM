@@ -135,7 +135,7 @@ The endpoint otherwise behaves as before, with these changes:
 * A `realm` query parameter that names no realm answers 400 with a JSON body. Earlier releases answered 404.
 * A `HEAD` request to `/xacml/policies` is answered like a `GET` request, without a body. Earlier releases answered HTTP status 500.
 * Every 405 response carries an `Allow` header that lists the supported methods. The same applies to the other endpoints that OpenAM builds from annotated classes: `/json/api` now answers `HEAD` like `GET` and sends `Allow: GET` with its 405 responses, and `/json/authenticate`, which supports only `POST`, sends `Allow: POST` with its 405 responses.
-* Errors raised before a request reaches the XACML service, such as an unknown realm in the path, an unsupported method or an unsupported `Accept-API-Version`, no longer carry the XML error document; their status codes are unchanged.
+* Errors raised before a request reaches the XACML service, such as an unknown realm in the path, an unsupported method or an invalid `Accept-API-Version` value, no longer carry the XML error document. Their status codes are unchanged, except that an invalid `Accept-API-Version` value answers 400 instead of 500.
 
 Custom code that refers to `org.forgerock.openam.rest.service.XACMLServiceEndpointApplication`, `org.forgerock.openam.rest.service.XMLRestStatusService`, `org.forgerock.openam.rest.service.ResourceApiVersionRestlet` or `org.forgerock.openam.entitlement.rest.XacmlRouterProvider` must be changed, because these classes no longer exist. `org.forgerock.openam.xacml.v3.rest.XacmlService` is no longer a Restlet resource.
 ====
