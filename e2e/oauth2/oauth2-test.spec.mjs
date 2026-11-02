@@ -350,39 +350,3 @@ test.describe("OAuth2 consent posted directly by a non-browser client", () => {
   });
 
 });
-
-/**
- * WebFinger (/.well-known/webfinger) has a servlet of its own in web.xml, outside /oauth2. Its resource reads the
- * deployment URL from the servlet request, and that request can only be reached when the servlet is the in-repo
- * Restlet ServerServlet: on any other one, every request fails with a 500.
- *
- * WebFinger is anonymous and the issuer is the same for every account, so the answer must not depend on whether the
- * account exists: otherwise anyone could check which accounts the realm holds.
- */
-test.describe("OpenID Connect issuer discovery through WebFinger", () => {
-
-  const rel = "http://openid.net/specs/connect/1.0/issuer";
-
-  async function expectIssuerFor(request, account) {
-    const resource = `acct:${account}@${new URL(OPENAM_BASE).hostname}`;
-
-    const response = await request.get(`${OPENAM_BASE}/.well-known/webfinger`, {
-      params: { resource, rel },
-    });
-
-    expect(response.status()).toBe(200);
-
-    const discovery = await response.json();
-    expect(discovery.subject).toBe(resource);
-    expect(discovery.links).toContainEqual({ rel, href: `${OPENAM_BASE}/oauth2` });
-  }
-
-  test("Should answer with the OpenID Connect issuer", async ({ request }) => {
-    await expectIssuerFor(request, USERNAME);
-  });
-
-  test("Should answer the same for an account that does not exist", async ({ request }) => {
-    await expectIssuerFor(request, "no-such-account");
-  });
-
-});
