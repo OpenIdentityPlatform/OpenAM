@@ -12,48 +12,57 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.xacml.v3.rest;
 
-import static org.forgerock.json.resource.ResourceException.*;
+import static org.forgerock.util.Utils.closeSilently;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
+
+import javax.security.auth.Subject;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import javax.security.auth.Subject;
-import jakarta.servlet.http.HttpServletRequest;
 
+import org.forgerock.http.header.AcceptLanguageHeader;
+import org.forgerock.http.header.ContentTypeHeader;
+import org.forgerock.http.header.HeaderUtil;
+import org.forgerock.http.header.MalformedHeaderException;
+import org.forgerock.http.protocol.Form;
+import org.forgerock.http.protocol.Request;
+import org.forgerock.http.protocol.Response;
+import org.forgerock.http.protocol.Status;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.utils.RestLog;
-import org.forgerock.openam.rest.representations.JacksonRepresentationFactory;
-import org.forgerock.openam.rest.service.RestletRealmRouter;
-import org.forgerock.openam.rest.service.XACMLServiceEndpointApplication;
+import org.forgerock.openam.forgerockrest.utils.XMLResourceExceptionHandler;
+import org.forgerock.openam.http.annotations.Contextual;
+import org.forgerock.openam.http.annotations.Get;
+import org.forgerock.openam.http.annotations.Post;
+import org.forgerock.openam.rest.RealmContext;
+import org.forgerock.openam.rest.ServerContextHelper;
 import org.forgerock.openam.xacml.v3.ImportStep;
+import org.forgerock.services.context.Context;
 import org.forgerock.util.annotations.VisibleForTesting;
-import org.restlet.Request;
-import org.restlet.data.Disposition;
-import org.restlet.data.Status;
-import org.forgerock.openam.rest.jakarta.servlet.ServletUtils;
-import org.restlet.representation.OutputRepresentation;
-import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
-import org.restlet.resource.Post;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.ServerResource;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -69,44 +78,54 @@ import com.sun.identity.entitlement.xacml3.XACMLExportImport;
 import com.sun.identity.entitlement.xacml3.XACMLPrivilegeUtils;
 import com.sun.identity.entitlement.xacml3.core.PolicySet;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
- * Provides XACML based services
+ * Serves XACML 3.0 export and import of the policies of a realm, as a CHF annotated endpoint.
  */
-public class XacmlService extends ServerResource {
+public class XacmlService {
 
     private static final String REST = "rest";
     private static final String VERSION = "1.0";
+    private static final String POLICIES = "policies";
 
     public static final String QUERY_PARAM_STRING = "filter";
 
-    private static final String FORGEROCK_AUTH_CONTEXT = "org.forgerock.authentication.context";
+    static final String XACML_CONTENT_TYPE = "application/xacml+xml; version=3.0";
+    static final String XML_ERROR_CONTENT_TYPE = "application/xml;charset=UTF-8";
+    static final String JSON_CONTENT_TYPE = "application/json";
+
     private static final String ROOT_REALM = "/";
+    /** The characters besides controls and space that RFC 7230 excludes from a token. */
+    private static final String HEADER_SEPARATORS = "()<>@,;:\\\"/[]?={}";
 
     private final XACMLExportImport importExport;
     private final PrivilegedAction<SSOToken> admin;
     private final Debug debug;
     private final RestLog restLog;
     private final DelegationEvaluator evaluator;
-    private final JacksonRepresentationFactory jacksonRepresentationFactory;
+    private final DelegationPermissionFactory permissionFactory;
 
     /**
      * Constructor with dependencies exposed for unit testing.
-     *  @param importExport Non null utility functions.
+     *
+     * @param importExport Non null utility functions.
      * @param adminTokenAction Non null admin action function.
      * @param debug The debug instance for logging.
-     * @param jacksonRepresentationFactory The factory for {@code JacksonRepresentation} instances.
+     * @param restLog The REST audit logger.
+     * @param evaluator The delegation evaluator.
+     * @param permissionFactory The factory of the delegation permissions that are checked.
      */
     @Inject
     public XacmlService(XACMLExportImport importExport, PrivilegedAction<SSOToken> adminTokenAction,
             @Named("frRest") Debug debug, RestLog restLog, DelegationEvaluator evaluator,
-            JacksonRepresentationFactory jacksonRepresentationFactory) {
+            DelegationPermissionFactory permissionFactory) {
         this.importExport = importExport;
         this.admin = adminTokenAction;
         this.debug = debug;
         this.restLog = restLog;
         this.evaluator = evaluator;
-        this.jacksonRepresentationFactory = jacksonRepresentationFactory;
+        this.permissionFactory = permissionFactory;
     }
 
     /**
@@ -120,24 +139,42 @@ public class XacmlService extends ServerResource {
 
     /**
      * Expects to receive XACML formatted XML which will be read and imported.
+     *
+     * @param context The request context.
+     * @param request The request, whose entity is the XACML document.
+     * @return A JSON array of the import steps, or an XML error.
      */
     @Post
-    public Representation importXACML(Representation entity) {
-        boolean dryRun = "true".equalsIgnoreCase(getQuery().getFirstValue("dryrun"));
-        List<ImportStep> steps;
-
+    public Response importXACML(@Contextual Context context, @Contextual Request request) {
         try {
-            if (!checkPermission("MODIFY")) {
-                // not allowed
-                throw new ResourceException(new Status(FORBIDDEN));
+            if (!checkPermission(context, "MODIFY")) {
+                return xmlError(new ForbiddenException());
             }
-
-            String realm = RestletRealmRouter.getRealmFromRequest(getRequest());
-            steps = importExport.importXacml(realm, entity.getStream(), getAdminToken(), dryRun);
-
+            // Only the query is read: Request.getForm() would also parse a form-encoded body and merge its
+            // parameters, and the console posts the XML document with that content type.
+            boolean dryRun = "true".equalsIgnoreCase(new Form().fromRequestQuery(request).getFirst("dryrun"));
+            InputStream body;
+            try {
+                // Undoes a gzip or deflate Content-Encoding, as the DecoderService of the Restlet application did.
+                body = request.getEntity().newDecodedContentInputStream();
+            } catch (UnsupportedEncodingException e) {
+                return xmlError(new BadRequestException("Unsupported Content-Encoding: " + e.getMessage(), e));
+            } catch (IOException e) {
+                debug.warning("Reading XACML import failed", e);
+                return xmlError(new BadRequestException(e.getLocalizedMessage(), e));
+            }
+            List<ImportStep> steps;
+            try {
+                steps = importExport.importXacml(realm(context), body, getAdminToken(), dryRun);
+            } catch (EntitlementException e) {
+                debug.warning("Importing XACML to policies failed", e);
+                // getLocalizedMessage may throw for a code without a bundle key; the outer catch turns that into 500.
+                return xmlError(new BadRequestException(e.getLocalizedMessage(locale(request)), e));
+            } finally {
+                closeSilently(body);
+            }
             if (steps.isEmpty()) {
-                throw new ResourceException(new Status(BAD_REQUEST,
-                        "No policies found in XACML document", null, null));
+                return xmlError(new BadRequestException("No policies found in XACML document"));
             }
 
             List<Map<String, String>> result = new ArrayList<>();
@@ -148,27 +185,17 @@ public class XacmlService extends ServerResource {
                 stepResult.put("type", step.getType());
                 result.add(stepResult);
             }
-            getResponse().setStatus(Status.SUCCESS_OK);
-
-            return jacksonRepresentationFactory.create(result);
-
-        } catch (EntitlementException e) {
-            debug.warning("Importing XACML to policies failed", e);
-            throw new ResourceException(new Status(BAD_REQUEST, e, e
-                    .getLocalizedMessage(getRequestLocale()), null, null));
-        } catch (IOException e) {
-            debug.warning("Reading XACML import failed", e);
-            throw new ResourceException(new Status(BAD_REQUEST, e, e
-                    .getLocalizedMessage(), null, null));
+            Response response = new Response(Status.OK);
+            response.getEntity().setJson(result);
+            // After setJson, which forces "application/json; charset=UTF-8"; the contract has no charset.
+            response.getHeaders().put(ContentTypeHeader.NAME, JSON_CONTENT_TYPE);
+            return response;
+        } catch (ResourceException e) {
+            return xmlError(e);
+        } catch (RuntimeException e) {
+            debug.error("XacmlService :: import failed", e);
+            return xmlError(new InternalServerErrorException("Failed to import XACML policies", e));
         }
-    }
-
-    /**
-     * Get the client's preferred locale, or the server default if not specified.
-     */
-    private Locale getRequestLocale() {
-        final HttpServletRequest httpRequest = ServletUtils.getRequest(getRequest());
-        return httpRequest == null ? Locale.getDefault() : httpRequest.getLocale();
     }
 
     /**
@@ -181,57 +208,70 @@ public class XacmlService extends ServerResource {
      * See {@link SearchFilterFactory} for more details on the format of these
      * Search Filters.
      *
-     * @return XACML of the matching Privileges.
+     * @param context The request context.
+     * @param request The request.
+     * @return XACML of the matching Privileges, or an XML error.
      */
     @Get
-    public Representation exportXACML() {
-        String realm = RestletRealmRouter.getRealmFromRequest(getRequest());
-        return exportXACML(realm);
+    public Response exportXACML(@Contextual Context context, @Contextual Request request) {
+        try {
+            String realm = realm(context);
+            if (!checkPermission(context, "READ")) {
+                return xmlError(new ForbiddenException());
+            }
+            List<String> queryFilters = new Form().fromRequestQuery(request).get(QUERY_PARAM_STRING);
+            List<String> filters = queryFilters == null ? new ArrayList<String>() : new ArrayList<>(queryFilters);
+
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            try {
+                PolicySet policySet = importExport.exportXACML(realm, getAdminToken(), filters);
+                XACMLPrivilegeUtils.writeXMLToStream(policySet, buffer);
+            } catch (EntitlementException e) {
+                debug.warning("Reading Policies failed", e);
+                return xmlError(new InternalServerErrorException(e.getLocalizedMessage(locale(request)), e));
+            }
+
+            Response response = new Response(Status.OK);
+            response.getEntity().setBytes(buffer.toByteArray());
+            response.getHeaders().put(ContentTypeHeader.NAME, XACML_CONTENT_TYPE);
+            // OPENAM-4974
+            response.getHeaders().put("Content-Disposition",
+                    "attachment; filename=" + tokenOrQuoted(getPolicyAttachmentFileName(realm)));
+            return response;
+        } catch (ResourceException e) {
+            return xmlError(e);
+        } catch (RuntimeException e) {
+            debug.error("XacmlService :: export failed", e);
+            return xmlError(new InternalServerErrorException("Failed to export XACML policies", e));
+        }
     }
 
-    /**
-     * This version of exportXACML here for testing - it saves trying to mock the static getRealmFromRequest
-     * @param realm The realm
-     * @return Representation object wrapping the converted XACML
-     */
-    @VisibleForTesting
-    Representation exportXACML(String realm) {
+    private static String realm(Context context) {
+        return RealmContext.getRealm(context).asPath();
+    }
 
-        List<String> filters = new ArrayList<String>(Arrays.asList(getQuery().getValuesArray(QUERY_PARAM_STRING)));
-        PolicySet policySet;
-
+    private static Locale locale(Request request) {
         try {
-            if (!checkPermission("READ")) {
-                throw new ResourceException(new Status(FORBIDDEN));
-            }
-
-            policySet = importExport.exportXACML(realm, getAdminToken(), filters);
-            getResponse().setStatus(Status.SUCCESS_OK);
-
-        } catch (EntitlementException e) {
-            debug.warning("Reading Policies failed", e);
-            throw new ResourceException(new Status(INTERNAL_ERROR, e.getLocalizedMessage(getRequestLocale()), null,
-                    null));
+            AcceptLanguageHeader header = request.getHeaders().get(AcceptLanguageHeader.class);
+            return header == null ? Locale.getDefault() : header.getLocales().getPreferredLocale();
+        } catch (MalformedHeaderException e) {
+            return Locale.getDefault();
         }
-        final PolicySet finalPolicySet = policySet;
+    }
 
-        Representation result = new OutputRepresentation(XACMLServiceEndpointApplication.APPLICATION_XML_XACML3) {
-            @Override
-            public void write(OutputStream outputStream) throws IOException {
-                try {
-                    XACMLPrivilegeUtils.writeXMLToStream(finalPolicySet, outputStream);
-                } catch (EntitlementException e) {
-                    throw new IOException(e);
-                }
-            }
-        };
-        // OPENAM-4974
-        Disposition disposition = new Disposition();
-        disposition.setType(Disposition.TYPE_ATTACHMENT);
-        disposition.setFilename(getPolicyAttachmentFileName(realm));
-        result.setDisposition(disposition);
-
-        return result;
+    private Response xmlError(ResourceException exception) {
+        Response response = new Response(Status.valueOf(exception.getCode()));
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            Transformer transformer = XMLUtils.getTransformerFactory().newTransformer();
+            transformer.transform(new DOMSource(XMLResourceExceptionHandler.asXMLDOM(
+                    exception.toJsonValue().asMap())), new StreamResult(out));
+            response.getEntity().setBytes(out.toByteArray());
+        } catch (TransformerException e) {
+            throw new IllegalStateException("Could not write XML to response", e);
+        }
+        response.getHeaders().put(ContentTypeHeader.NAME, XML_ERROR_CONTENT_TYPE);
+        return response;
     }
 
     /**
@@ -252,63 +292,47 @@ public class XacmlService extends ServerResource {
     }
 
     /**
-     * Check if this user has permission to perform the given action (which will be "read" in the case of export
-     * and "modify" in the case of import).
+     * Writes a header parameter value as is when it is an RFC 7230 token, else as a quoted-string, as the
+     * Restlet {@code Disposition} of earlier releases did. Realm names may hold a space, ';' or '"'.
+     */
+    private static String tokenOrQuoted(String value) {
+        boolean token = value.chars().allMatch(c -> c > ' ' && c < 0x7f && HEADER_SEPARATORS.indexOf(c) < 0);
+        return token ? value : HeaderUtil.quote(value);
+    }
+
+    /**
+     * Check if this user has permission to perform the given action (which will be "READ" in the case of export
+     * and "MODIFY" in the case of import).
      *
      * @return true if the user has permission, false otherwise.
      */
     @VisibleForTesting
-    boolean checkPermission(String action) throws EntitlementException {
-
+    boolean checkPermission(Context context, String action) throws ResourceException {
         try {
-            Request restletRequest = getRequest();
-            String urlLastSegment = restletRequest.getResourceRef().getLastSegment();
-            String realm = RestletRealmRouter.getRealmFromRequest(restletRequest);
-
-            final Map<String, String> context = (Map<String, String>)
-                    ServletUtils.getRequest(getRequest()).getAttribute(FORGEROCK_AUTH_CONTEXT);
-            final String tokenId = context.get("tokenId");
-            final SSOToken token = SSOTokenManager.getInstance().createSSOToken(tokenId);
-
-            return checkPermission(action, urlLastSegment, realm, token);
-
-        } catch (SSOException e) {
+            SSOToken token = sessionToken(context);
+            DelegationPermission permission = permissionFactory.newInstance(realm(context), REST,
+                    VERSION, POLICIES, action, Collections.singleton(action), Collections.<String, String>emptyMap());
+            return checkPermission(permission, token, POLICIES);
+        } catch (SSOException | DelegationException e) {
             debug.warning("XacmlService permission evaluation failed", e);
-            throw new EntitlementException(INTERNAL_ERROR, e);
+            throw new InternalServerErrorException("XacmlService permission evaluation failed", e);
         }
     }
 
     /**
-     * This "lower level" version of checkPermission is really only here to make testing easier.
-     *
-     * @return true if the user has the "action" permission (action being "READ" or "MODIFY"), false otherwise.
+     * Creates the SSO token of the caller from the session cookie of the request.
      */
-    private boolean checkPermission(String action, String urlLastSegment, String realm, SSOToken token)
-            throws EntitlementException {
-
-        boolean result;
-        try {
-            final Set<String> actions = new HashSet<String>(Arrays.asList(action));
-            final DelegationPermissionFactory permissionFactory = new DelegationPermissionFactory();
-            final DelegationPermission permissionRequest = permissionFactory.newInstance(realm, REST, VERSION,
-                    urlLastSegment, action, actions, Collections.<String, String>emptyMap());
-
-            result = checkPermission(permissionRequest, token, urlLastSegment);
-
-        } catch (SSOException e) {
-            debug.warning("XacmlService permission evaluation failed", e);
-            throw new EntitlementException(INTERNAL_ERROR, e);
-        } catch (DelegationException e) {
-            debug.warning("XacmlService permission evaluation failed", e);
-            throw new EntitlementException(INTERNAL_ERROR, e);
-        }
-
-        return result;
+    @VisibleForTesting
+    SSOToken sessionToken(Context context) throws SSOException {
+        // Null without a session (OptionalSSOTokenSessionModule admits the request); createSSOToken then fails,
+        // which keeps master's 500 for an unauthenticated request (user decision: no 401 in this PR).
+        String tokenId = ServerContextHelper.getCookieFromServerContext(context);
+        return SSOTokenManager.getInstance().createSSOToken(tokenId);
     }
 
     /**
-     * This is the most atomic of the checkPermissions and finally gives us something we can test without having to mock
-     * out most of the universe.
+     * This is the most atomic of the checkPermissions and finally gives us something we can test without having to
+     * mock out most of the universe.
      *
      * @param permissionRequest the permission request, forged from the realm, URL segment, action and other things
      * @param token the user's SSO token

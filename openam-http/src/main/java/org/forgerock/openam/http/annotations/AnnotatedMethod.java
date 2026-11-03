@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.http.annotations;
@@ -65,6 +66,10 @@ public class AnnotatedMethod {
         this.requestParameter = requestParameter;
         this.numberOfParameters = numberOfParameters;
         this.responseAdapter = responseAdapter;
+    }
+
+    boolean isSupported() {
+        return method != null;
     }
 
     Promise<Response, NeverThrowsException> invoke(Context context, Request request) {
