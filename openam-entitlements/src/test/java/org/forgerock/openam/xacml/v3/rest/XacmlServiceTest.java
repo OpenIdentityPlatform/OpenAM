@@ -22,6 +22,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.forgerock.json.JsonValue.field;
 import static org.forgerock.json.JsonValue.object;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,15 +34,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.zip.GZIPOutputStream;
 
 import javax.security.auth.Subject;
 
@@ -119,8 +123,29 @@ public class XacmlServiceTest {
         return request;
     }
 
+    private static Request gzipPost(String uri, String xml) throws IOException, URISyntaxException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzip = new GZIPOutputStream(bytes)) {
+            gzip.write(xml.getBytes(StandardCharsets.UTF_8));
+        }
+        Request request = post(uri, "application/xml", null);
+        request.setEntity(bytes.toByteArray());
+        request.getHeaders().put("Content-Encoding", "gzip");
+        return request;
+    }
+
     private static Request get(String uri) throws URISyntaxException {
         return new Request().setMethod("GET").setUri(uri);
+    }
+
+    /** Stubs the import to read the body it gets: the service closes that stream once the import returns. */
+    private List<String> importedBodies(List<ImportStep> steps) throws EntitlementException {
+        List<String> bodies = new ArrayList<>();
+        given(importExport.importXacml(any(), any(), any(), anyBoolean())).willAnswer(invocation -> {
+            bodies.add(read(invocation.getArgument(1)));
+            return steps;
+        });
+        return bodies;
     }
 
     private static ImportStep step(DiffStatus status, String name, String type) {
@@ -181,28 +206,70 @@ public class XacmlServiceTest {
 
     @Test
     public void importPassesTheBodyOfAFormEncodedPost() throws Exception {
-        ArgumentCaptor<InputStream> body = ArgumentCaptor.forClass(InputStream.class);
-        List<ImportStep> steps = singletonList(step(DiffStatus.ADD, "p", "privilege"));
-        given(importExport.importXacml(any(), body.capture(), any(), anyBoolean())).willReturn(steps);
+        List<String> bodies = importedBodies(singletonList(step(DiffStatus.ADD, "p", "privilege")));
 
         Response response = service(true).importXACML(context("/"),
                 post("http://localhost/xacml/policies?dryrun=true",
                         "application/x-www-form-urlencoded; charset=UTF-8", "<PolicySet a=\"b&c\"/>"));
 
         assertThat(response.getStatus()).isEqualTo(Status.OK);
-        assertThat(read(body.getValue())).isEqualTo("<PolicySet a=\"b&c\"/>");
+        assertThat(bodies).containsExactly("<PolicySet a=\"b&c\"/>");
         verify(importExport).importXacml(eq("/"), any(), any(), eq(true));
     }
 
     @Test
     public void importPassesAnEmptyStreamForAnEmptyBody() throws Exception {
-        ArgumentCaptor<InputStream> body = ArgumentCaptor.forClass(InputStream.class);
-        given(importExport.importXacml(any(), body.capture(), any(), anyBoolean())).willReturn(emptyList());
+        List<String> bodies = importedBodies(emptyList());
 
         service(true).importXACML(context("/"), post("http://localhost/xacml/policies", "application/xml", null));
 
-        assertThat(body.getValue()).isNotNull();
-        assertThat(body.getValue().read()).isEqualTo(-1);
+        assertThat(bodies).containsExactly("");
+    }
+
+    @Test
+    public void importDecodesAGzipBody() throws Exception {
+        List<String> bodies = importedBodies(singletonList(step(DiffStatus.ADD, "p", "privilege")));
+
+        Response response = service(true).importXACML(context("/"),
+                gzipPost("http://localhost/xacml/policies", "<PolicySet a=\"b\"/>"));
+
+        assertThat(response.getStatus()).isEqualTo(Status.OK);
+        assertThat(bodies).containsExactly("<PolicySet a=\"b\"/>");
+    }
+
+    @Test
+    public void importClosesTheDecodedBody() throws Exception {
+        ArgumentCaptor<InputStream> body = ArgumentCaptor.forClass(InputStream.class);
+        List<ImportStep> steps = singletonList(step(DiffStatus.ADD, "p", "privilege"));
+        given(importExport.importXacml(any(), body.capture(), any(), anyBoolean())).willReturn(steps);
+
+        service(true).importXACML(context("/"), gzipPost("http://localhost/xacml/policies", "<PolicySet/>"));
+
+        assertThatThrownBy(() -> body.getValue().read()).isInstanceOf(IOException.class);
+    }
+
+    @Test
+    public void importWithAnUnsupportedContentEncodingAnswers400Xml() throws Exception {
+        Request request = post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>");
+        request.getHeaders().put("Content-Encoding", "br");
+
+        Response response = service(true).importXACML(context("/"), request);
+
+        assertXmlError(response, 400);
+        assertThat(response.getEntity().getString()).contains("Unsupported Content-Encoding: br");
+        verify(importExport, never()).importXacml(any(), any(), any(), anyBoolean());
+    }
+
+    @Test
+    public void importWhoseGzipBodyIsNotGzipAnswers400Xml() throws Exception {
+        Request request = post("http://localhost/xacml/policies", "application/xml", "<PolicySet/>");
+        request.getHeaders().put("Content-Encoding", "gzip");
+
+        Response response = service(true).importXACML(context("/"), request);
+
+        assertXmlError(response, 400);
+        assertThat(response.getEntity().getString()).contains("Not in GZIP format");
+        verify(importExport, never()).importXacml(any(), any(), any(), anyBoolean());
     }
 
     @Test

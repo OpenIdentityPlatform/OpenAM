@@ -17,7 +17,12 @@
 
 package org.forgerock.openam.xacml.v3.rest;
 
+import static org.forgerock.util.Utils.closeSilently;
+
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -148,14 +153,25 @@ public class XacmlService {
             // Only the query is read: Request.getForm() would also parse a form-encoded body and merge its
             // parameters, and the console posts the XML document with that content type.
             boolean dryRun = "true".equalsIgnoreCase(new Form().fromRequestQuery(request).getFirst("dryrun"));
+            InputStream body;
+            try {
+                // Undoes a gzip or deflate Content-Encoding, as the DecoderService of the Restlet application did.
+                body = request.getEntity().newDecodedContentInputStream();
+            } catch (UnsupportedEncodingException e) {
+                return xmlError(new BadRequestException("Unsupported Content-Encoding: " + e.getMessage(), e));
+            } catch (IOException e) {
+                debug.warning("Reading XACML import failed", e);
+                return xmlError(new BadRequestException(e.getLocalizedMessage(), e));
+            }
             List<ImportStep> steps;
             try {
-                steps = importExport.importXacml(realm(context), request.getEntity().getRawContentInputStream(),
-                        getAdminToken(), dryRun);
+                steps = importExport.importXacml(realm(context), body, getAdminToken(), dryRun);
             } catch (EntitlementException e) {
                 debug.warning("Importing XACML to policies failed", e);
                 // getLocalizedMessage may throw for a code without a bundle key; the outer catch turns that into 500.
                 return xmlError(new BadRequestException(e.getLocalizedMessage(locale(request)), e));
+            } finally {
+                closeSilently(body);
             }
             if (steps.isEmpty()) {
                 return xmlError(new BadRequestException("No policies found in XACML document"));

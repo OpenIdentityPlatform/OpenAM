@@ -26,6 +26,8 @@
  * the server does today and its comment names the target behaviour.
  */
 
+import { gzipSync } from "node:zlib";
+
 import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, ADMIN_PASS, ADMIN_USER, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
 
@@ -93,8 +95,8 @@ function exportPolicies(request, { path = "/xacml/policies", token = adminToken,
   return request.get(`${OPENAM_BASE}${path}`, options);
 }
 
-function importPolicies(request, body, { token = adminToken, params, contentType = "application/xml" } = {}) {
-  const options = { headers: { "Content-Type": contentType }, data: body };
+function importPolicies(request, body, { token = adminToken, params, contentType = "application/xml", headers = {} } = {}) {
+  const options = { headers: { "Content-Type": contentType, ...headers }, data: body };
   if (token) {
     options.headers["iPlanetDirectoryPro"] = token;
   }
@@ -421,6 +423,20 @@ test.describe("XACML policy import", () => {
 
     const response = await importPolicies(request, withPercent, {
       contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+      params: { realm: `/${SUB_REALM}`, dryrun: "true" },
+    });
+
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toContainEqual({ name: POLICY_NAME, type: "Privilege", status: "A" });
+    expect(await exportedPolicyIds(request, SUB_REALM)).not.toContain(POLICY_NAME);
+  });
+
+  test("reads a gzip-compressed document", async ({ request }) => {
+    // The body is decoded before it is parsed, as the DecoderService of the Restlet application did.
+    const exported = await (await exportPolicies(request)).text();
+
+    const response = await importPolicies(request, gzipSync(exported), {
+      headers: { "Content-Encoding": "gzip" },
       params: { realm: `/${SUB_REALM}`, dryrun: "true" },
     });
 

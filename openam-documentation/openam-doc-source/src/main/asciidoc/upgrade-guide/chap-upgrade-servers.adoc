@@ -132,6 +132,7 @@ The endpoint otherwise behaves as before, with these changes:
 * `/xacml/realms/root/policies` and `/xacml/realms/root/realms/<realm>/policies` address the top-level realm and its subrealms, as the same spellings do under `/json`. Earlier releases answered 404. `/xacml/<realm>/policies` and the `realm` query parameter work as before.
 * The `Content-API-Version` response header is `protocol=1.0,resource=1.0`. Earlier releases sent `[Content-API-Version: protocol=1.0,resource=1.0]`.
 * An import request with an empty body answers 400. Earlier releases answered 500.
+* An import request body compressed with `Content-Encoding: gzip` is decoded as before. `Content-Encoding: deflate` is read as a raw DEFLATE stream, the form that earlier releases accepted as `deflate-no-wrap`, instead of the zlib format, so a body in the zlib format answers 400. `deflate-no-wrap`, `zip` and `identity`, which earlier releases also accepted, answer 400. Compress import requests with `gzip`.
 * A `realm` query parameter that names no realm answers 400 with a JSON body. Earlier releases answered 404.
 * A `HEAD` request to `/xacml/policies` is answered like a `GET` request, without a body. Earlier releases answered HTTP status 500.
 * Every 405 response carries an `Allow` header that lists the supported methods. The same applies to the other endpoints that OpenAM builds from annotated classes: `/json/api` now answers `HEAD` like `GET` and sends `Allow: GET` with its 405 responses, and `/json/authenticate`, which supports only `POST`, sends `Allow: POST` with its 405 responses.
