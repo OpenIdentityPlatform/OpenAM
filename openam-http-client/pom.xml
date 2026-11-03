@@ -67,7 +67,7 @@
             <artifactId>core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.openam.jakarta</groupId>
+            <groupId>org.restlet.jee</groupId>
             <artifactId>org.restlet</artifactId>
         </dependency>
         <dependency>

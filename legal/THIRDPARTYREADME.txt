@@ -327,9 +327,6 @@ Copyright: Copyright 2005-2012 Restlet S.A.S.
 Version: org.restlet.ext.json-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 
-Version: org.restlet.ext.servlet-2.3.4.jar
-Copyright: Copyright 2005-2012 Restlet S.A.S.
-
 Version: org.restlet.ext.slf4j-2.3.4.jar
 Copyright: Copyright 2005-2012 Restlet S.A.S.
 

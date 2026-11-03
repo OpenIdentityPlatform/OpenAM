@@ -80,15 +80,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.openidentityplatform.openam.jakarta</groupId>
-            <artifactId>activemq-client</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!--activemq dependencies-->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
-            <version>1.0.1</version>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client-jakarta</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

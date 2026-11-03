@@ -1092,7 +1092,7 @@
 
     <servlet>
         <servlet-name>WebFinger</servlet-name>
-        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+        <servlet-class>org.forgerock.openam.rest.jakarta.servlet.ServerServlet</servlet-class>
 
         <!-- Your application class name (Optional - For mode 3) -->
         <init-param>
