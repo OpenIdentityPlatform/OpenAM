@@ -39,6 +39,19 @@ Make sure you try upgrading OpenAM in a test environment before applying the upg
 
 [IMPORTANT]
 ====
+Starting with this release, a failed write of an account-lockout counter or counter reset switches the affected identity to counters held in memory on that OpenAM server. Previously, a rejected counter write could prevent subsequent authentication failures from being counted at all. Other identities continue using the configured data store, and a read failure alone does not activate this fallback.
+
+The switch remains in effect until that server restarts, even if the write failure was transient and the store later recovers. Counters are independent on each server and are lost on restart. A successful login resets the in-memory counter but does not restore persistence. Positive lockout durations are preserved; a configured duration of zero changes from physical account deactivation to a temporary lock of 30 minutes. Once that lock expires, another sequence of failed attempts can lock the account again.
+
+Setting `inetuserstatus` to `Active` or clearing `sunAMAuthInvalidAttemptsData` in the directory does not clear an existing fallback lock. Allow the temporary lock to expire; restarting the affected server also discards its fallback counters. An existing physical account restriction in physical-locking mode remains effective and must still be cleared separately.
+
+Special identities, including `amadmin`, follow the same policy without name-based exemptions. Their rejected counter writes previously prevented lockout. With the current default account-lockout settings, five failed passwords can now lock `amadmin` on the affected server for 30 minutes. Review administrator access and recovery procedures before upgrading.
+
+Two related corrections also apply to writable stores and explicitly configured in-memory counters: a failure threshold of one now starts a timed lock on the first failure, and a duration multiplier of zero preserves the lock duration for later cycles instead of reducing it to zero.
+====
+
+[IMPORTANT]
+====
 If you are upgrading from an unsupported version of OpenAM to a later version, you must first upgrade to a supported version. In some cases, you may need to upgrade again depending on the upgrade path.
 ====
 

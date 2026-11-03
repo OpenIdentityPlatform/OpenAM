@@ -22,17 +22,21 @@ import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.sun.identity.authentication.spi.AMAuthCallBackImpl;
 import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.common.AccountLockoutInfo;
+import com.sun.identity.common.ISAccountLockout;
+import org.powermock.reflect.Whitebox;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import org.forgerock.openam.utils.TimeTravelUtil;
@@ -197,17 +201,26 @@ public class AMAccountLockoutTest extends PowerMockTestCase {
         FrozenTimeService.INSTANCE.fastForward(31, MINUTES);
         CountDownLatch resetting = new CountDownLatch(1);
         CountDownLatch releaseReset = new CountDownLatch(1);
-        AtomicInteger lookups = new AtomicInteger();
-        when(auth.getIdentity(eq(IdType.USER), anyString(), eq("/"))).thenAnswer(call -> {
-            if (Thread.currentThread().getName().equals("delayed-expiry") && lookups.incrementAndGet() == 2) {
+        Map<String, AccountLockoutInfo> counters = Whitebox.getInternalState(ISAccountLockout.class, "memoryLockouts");
+        AccountLockoutInfo counter = spy(counters.get(userDN));
+        counters.put(userDN, counter);
+        AtomicInteger checks = new AtomicInteger();
+        doAnswer(call -> {
+            boolean locked = (Boolean) call.callRealMethod();
+            // Pause between the expiry decision and reset, regardless of directory lookups.
+            if (Thread.currentThread().getName().equals("delayed-expiry") && checks.incrementAndGet() == 2) {
                 resetting.countDown();
                 assertTrue(releaseReset.await(10, TimeUnit.SECONDS));
             }
-            return identity;
-        });
+            return locked;
+        }).when(counter).isLockout();
         ExecutorService delayed = Executors.newSingleThreadExecutor(
                 task -> new Thread(task, "delayed-expiry"));
-        ExecutorService next = Executors.newSingleThreadExecutor();
+        Thread[] nextThread = new Thread[1];
+        ExecutorService next = Executors.newSingleThreadExecutor(task -> {
+            nextThread[0] = new Thread(task, "new-cycle");
+            return nextThread[0];
+        });
         try {
             Future<Boolean> expiry = delayed.submit(
                     () -> new AMAccountLockout(state).isLockedOut("alice"));
@@ -216,11 +229,19 @@ public class AMAccountLockoutTest extends PowerMockTestCase {
                 new AMAccountLockout(state).isLockedOut("alice");
                 failAttempts(5);
             });
-            try {
-                newCycle.get(1, TimeUnit.SECONDS);
-            } catch (TimeoutException expected) {
-                // A serialized expiry reset holds the counter until releaseReset.
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+            boolean contended = false;
+            while (!newCycle.isDone() && System.nanoTime() < deadline) {
+                StackTraceElement[] stack = nextThread[0].getStackTrace();
+                if (nextThread[0].getState() == Thread.State.BLOCKED && stack.length > 0
+                        && stack[0].getClassName().equals(ISAccountLockout.class.getName())
+                        && stack[0].getMethodName().equals("getAcInfo")) {
+                    contended = true;
+                    break;
+                }
+                Thread.sleep(1);
             }
+            assertTrue(contended || newCycle.isDone(), "New cycle did not reach the counter");
             releaseReset.countDown();
             assertFalse(expiry.get(10, TimeUnit.SECONDS));
             newCycle.get(10, TimeUnit.SECONDS);
@@ -228,8 +249,83 @@ public class AMAccountLockoutTest extends PowerMockTestCase {
         } finally {
             releaseReset.countDown();
             delayed.shutdownNow();
+            assertTrue(delayed.awaitTermination(10, TimeUnit.SECONDS));
             next.shutdownNow();
+            assertTrue(next.awaitTermination(10, TimeUnit.SECONDS));
         }
+    }
+
+    @Test
+    public void expiryResetReusesResolvedIdentityOutsideTheCounterMonitor() throws Exception {
+        failAttempts(5);
+        FrozenTimeService.INSTANCE.fastForward(31, MINUTES);
+        Map<String, AccountLockoutInfo> counters = Whitebox.getInternalState(ISAccountLockout.class, "memoryLockouts");
+        AccountLockoutInfo counter = counters.get(userDN);
+        clearInvocations(auth);
+        when(auth.getIdentity(eq(IdType.USER), anyString(), eq("/"))).thenAnswer(call -> {
+            assertFalse(Thread.holdsLock(counter), "Directory lookup must not hold the fallback monitor");
+            return identity;
+        });
+        assertFalse(new AMAccountLockout(state).isLockedOut("alice"));
+        assertEquals(counter.getFailCount(), 0);
+        verify(auth, times(1)).getIdentity(IdType.USER, "alice", "/");
+    }
+
+    @Test
+    public void physicalModeWithoutFallbackDoesNotReadTheDirectory() throws Exception {
+        Map<String, AccountLockoutInfo> counters = Whitebox.getInternalState(ISAccountLockout.class, "memoryLockouts");
+        Map<String, AccountLockoutInfo> saved = new HashMap<>(counters);
+        counters.clear();
+        try {
+            assertFalse(new AMAccountLockout(state).isLockedOut("alice"));
+            verify(auth, never()).getIdentity(any(), anyString(), anyString());
+        } finally {
+            counters.putAll(saved);
+        }
+    }
+
+    @Test
+    public void disabledLockoutDoesNotReadTheDirectoryEvenWithFallback() throws Exception {
+        failAttempts(5);
+        when(state.getLoginFailureLockoutMode()).thenReturn(false);
+        clearInvocations(auth);
+        assertFalse(new AMAccountLockout(state).isLockedOut("alice"));
+        verify(auth, never()).getIdentity(any(), anyString(), anyString());
+    }
+
+    @DataProvider
+    public Object[][] memorySettings() {
+        return new Object[][] {{5, 1}, {1, 1}, {5, 0}};
+    }
+
+    @Test(dataProvider = "memorySettings")
+    public void configuredMemoryModeLocksAndExpiresWithoutTheStore(int count, int multiplier) throws Exception {
+        when(state.getLoginFailureLockoutStoreInDS()).thenReturn(false);
+        when(state.getLoginFailureLockoutDuration()).thenReturn(MINUTES.toMillis(10));
+        when(state.getLoginFailureLockoutCount()).thenReturn(count);
+        when(state.getLoginFailureLockoutMultiplier()).thenReturn(multiplier);
+        String name = "memory-" + UUID.randomUUID();
+        for (int cycle = 0; cycle < 2; cycle++) {
+            for (int i = 0; i < count; i++) {
+                new AMAccountLockout(state).invalidPasswd(name);
+            }
+            assertTrue(new AMAccountLockout(state).isLockedOut(name));
+            assertTrue(new AMAccountLockout(state).isAccountLocked(name));
+            FrozenTimeService.INSTANCE.fastForward(11, MINUTES);
+            assertFalse(new AMAccountLockout(state).isAccountLocked(name));
+        }
+        verify(identity, never()).store();
+    }
+
+    @Test
+    public void timedModeRetainsItsLockCheckBehaviorForInactiveIdentities() throws Exception {
+        when(state.getLoginFailureLockoutDuration()).thenReturn(MINUTES.toMillis(10));
+        when(identity.isActive()).thenReturn(false);
+        failAttempts(5);
+        assertTrue(new AMAccountLockout(state).isAccountLocked("alice"));
+        FrozenTimeService.INSTANCE.fastForward(11, MINUTES);
+        // This helper's timed branch historically checks the counter; profile validation is separate.
+        assertFalse(new AMAccountLockout(state).isAccountLocked("alice"));
     }
 
     private void failAttempts(int count) {

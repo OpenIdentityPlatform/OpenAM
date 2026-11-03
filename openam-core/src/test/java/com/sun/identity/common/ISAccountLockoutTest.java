@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.sun.identity.authentication.spi.AMAuthCallBackImpl;
 import com.sun.identity.idm.AMIdentity;
@@ -47,6 +48,7 @@ import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.testng.annotations.DataProvider;
 
 @PrepareForTest(AMAuthCallBackImpl.class)
 public class ISAccountLockoutTest extends PowerMockTestCase {
@@ -201,26 +203,53 @@ public class ISAccountLockoutTest extends PowerMockTestCase {
     public void staleSnapshotsDoNotLoseConcurrentFallbackAttempts() throws Exception {
         AccountLockoutInfo stale = read(10);
         failAttempt(10);
-        ExecutorService executor = Executors.newFixedThreadPool(4);
-        CountDownLatch start = new CountDownLatch(1);
-        List<Future<?>> futures = new ArrayList<>();
+        CountDownLatch counted = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        AtomicInteger debugCalls = new AtomicInteger();
+        when(ISAccountLockout.debug.messageEnabled()).thenAnswer(call -> {
+            // The second call is after reading and incrementing the local fail_count.
+            if (Thread.currentThread().getName().equals("first-increment")
+                    && debugCalls.incrementAndGet() == 2) {
+                counted.countDown();
+                assertTrue(release.await(10, TimeUnit.SECONDS));
+            }
+            return false;
+        });
+        ExecutorService first = Executors.newSingleThreadExecutor(task -> new Thread(task, "first-increment"));
+        Thread[] secondThread = new Thread[1];
+        ExecutorService second = Executors.newSingleThreadExecutor(task -> {
+            secondThread[0] = new Thread(task, "second-increment");
+            return secondThread[0];
+        });
         try {
-            for (int i = 0; i < 4; i++) {
-                futures.add(executor.submit(() -> {
-                    start.await();
-                    lockout(10).invalidPasswd(userDN, "alice", identity, stale);
-                    return null;
-                }));
+            Future<?> one = first.submit(() -> lockout(10).invalidPasswd(userDN, "alice", identity, stale));
+            assertTrue(counted.await(10, TimeUnit.SECONDS));
+            Future<?> two = second.submit(() -> lockout(10).invalidPasswd(userDN, "alice", identity, stale));
+            // Wait for actual contention, or completion if the monitor was removed.
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+            boolean contended = false;
+            while (!two.isDone() && System.nanoTime() < deadline) {
+                StackTraceElement[] stack = secondThread[0].getStackTrace();
+                if (secondThread[0].getState() == Thread.State.BLOCKED && stack.length > 0
+                        && stack[0].getClassName().equals(ISAccountLockout.class.getName())
+                        && stack[0].getMethodName().equals("invalidPasswd")) {
+                    contended = true;
+                    break;
+                }
+                Thread.sleep(1);
             }
-            start.countDown();
-            for (Future<?> future : futures) {
-                future.get(10, TimeUnit.SECONDS);
-            }
-            assertEquals(read(10).getFailCount(), 5);
-            assertTrue(lockout(10).isLockedOut(read(10)));
+            assertTrue(contended || two.isDone(), "Second increment did not reach the counter");
+            release.countDown();
+            one.get(10, TimeUnit.SECONDS);
+            two.get(10, TimeUnit.SECONDS);
+            assertEquals(read(10).getFailCount(), 3);
             assertEquals(writes, 1);
         } finally {
-            executor.shutdownNow();
+            release.countDown();
+            first.shutdownNow();
+            assertTrue(first.awaitTermination(10, TimeUnit.SECONDS));
+            second.shutdownNow();
+            assertTrue(second.awaitTermination(10, TimeUnit.SECONDS));
         }
     }
 
@@ -272,6 +301,7 @@ public class ISAccountLockoutTest extends PowerMockTestCase {
             verify(ISAccountLockout.debug, times(1)).error(anyString(), any(Throwable.class));
         } finally {
             executor.shutdownNow();
+            assertTrue(executor.awaitTermination(10, TimeUnit.SECONDS));
         }
     }
 
@@ -295,6 +325,104 @@ public class ISAccountLockoutTest extends PowerMockTestCase {
         assertFalse(lockout(0).isLockedOut(read(0)));
     }
 
+    @DataProvider
+    public Object[][] notificationStages() {
+        return new Object[][] {{false, false}, {true, false}, {false, true}, {true, true}};
+    }
+
+    @Test(dataProvider = "notificationStages")
+    public void blockedNotificationDoesNotBlockCounterReaders(boolean callback, boolean transition) throws Exception {
+        rejectWrites = !transition;
+        failAttempts(4, 10);
+        rejectWrites = true;
+        ISAccountLockout triggering = spy(lockout(10));
+        AMAuthCallBackImpl plugin = AMAuthCallBackImpl.getInstance("/");
+        CountDownLatch notifying = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        org.mockito.stubbing.Answer<Void> block = call -> {
+            notifying.countDown();
+            assertTrue(release.await(10, TimeUnit.SECONDS));
+            return null;
+        };
+        if (callback) {
+            doAnswer(block).when(plugin).processedAccounttLockout(any(Long.class), eq("alice"));
+        } else {
+            doAnswer(block).when(triggering).sendLockOutNotice("alice");
+        }
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<?> trigger = executor.submit(() -> triggering.invalidPasswd(
+                    userDN, "alice", identity, triggering.getAcInfo(userDN, identity)));
+            assertTrue(notifying.await(10, TimeUnit.SECONDS));
+            Future<Boolean> reader = executor.submit(() -> lockout(10).isLockedOut(read(10)));
+            assertTrue(reader.get(2, TimeUnit.SECONDS), "The lock must be visible before notification completes");
+            release.countDown();
+            trigger.get(10, TimeUnit.SECONDS);
+            triggering.invalidPasswd(userDN, "alice", identity, read(10));
+            verify(triggering, times(1)).sendLockOutNotice("alice");
+            verify(plugin, times(1)).processedAccounttLockout(any(Long.class), eq("alice"));
+        } finally {
+            release.countDown();
+            executor.shutdownNow();
+            assertTrue(executor.awaitTermination(10, TimeUnit.SECONDS));
+        }
+    }
+
+    @Test
+    public void writableStoreLocksOnTheFirstFailureWhenThresholdIsOne() {
+        rejectWrites = false;
+        ISAccountLockout lockout = lockout(10, 1, 1);
+        lockout.invalidPasswd(userDN, "alice", identity, lockout.getAcInfo(userDN, identity));
+        assertTrue(lockout.isLockedOut(lockout.getAcInfo(userDN, identity)));
+        assertEquals(writes, 1);
+    }
+
+    @Test
+    public void writableStoreKeepsTheDurationWhenTheMultiplierIsZero() {
+        rejectWrites = false;
+        ISAccountLockout lockout = lockout(10, 2, 0);
+        for (int i = 0; i < 2; i++) {
+            lockout.invalidPasswd(userDN, "alice", identity, lockout.getAcInfo(userDN, identity));
+        }
+        FrozenTimeService.INSTANCE.fastForward(11, MINUTES);
+        lockout.resetLockoutAttempts(userDN, identity, lockout.getAcInfo(userDN, identity), false);
+        assertEquals(lockout.getAcInfo(userDN, identity).getActualLockoutDuration(), MINUTES.toMillis(10));
+        for (int i = 0; i < 2; i++) {
+            lockout.invalidPasswd(userDN, "alice", identity, lockout.getAcInfo(userDN, identity));
+        }
+        assertTrue(lockout.isLockedOut(lockout.getAcInfo(userDN, identity)));
+    }
+
+    @Test
+    public void multiplierAppliesOnceWhenTheThresholdWriteFails() {
+        rejectWrites = false;
+        for (int i = 0; i < 5; i++) {
+            ISAccountLockout lockout = lockout(10, 5, 2);
+            lockout.invalidPasswd(userDN, "alice", identity, lockout.getAcInfo(userDN, identity));
+        }
+        FrozenTimeService.INSTANCE.fastForward(11, MINUTES);
+        for (int i = 0; i < 4; i++) {
+            ISAccountLockout lockout = lockout(10, 5, 2);
+            lockout.invalidPasswd(userDN, "alice", identity, lockout.getAcInfo(userDN, identity));
+        }
+        rejectWrites = true;
+        ISAccountLockout lockout = lockout(10, 5, 2);
+        lockout.invalidPasswd(userDN, "alice", identity, lockout.getAcInfo(userDN, identity));
+        assertEquals(read(10).getActualLockoutDuration(), MINUTES.toMillis(20));
+    }
+
+    @Test
+    public void readFailureAloneKeepsPersisting() throws Exception {
+        rejectWrites = false;
+        when(identity.getAttribute(anyString()))
+                .thenThrow(new IdRepoException("Unavailable"))
+                .thenAnswer(call -> stored.get(call.getArgument(0)));
+        failAttempt(10);
+        failAttempt(10);
+        assertEquals(writes, 2);
+        assertEquals(read(10).getFailCount(), 2);
+    }
+
     private void failAttempts(int attempts, long minutes) {
         for (int i = 0; i < attempts; i++) {
             failAttempt(minutes);
@@ -311,7 +439,11 @@ public class ISAccountLockoutTest extends PowerMockTestCase {
     }
 
     private ISAccountLockout lockout(long minutes) {
-        return new ISAccountLockout(true, MINUTES.toMillis(5), 5, null, 3, null, null,
-                MINUTES.toMillis(minutes), 1, ATTRIBUTE, "amAuth");
+        return lockout(minutes, 5, 1);
+    }
+
+    private ISAccountLockout lockout(long minutes, int count, int multiplier) {
+        return new ISAccountLockout(true, MINUTES.toMillis(5), count, null, 3, null, null,
+                MINUTES.toMillis(minutes), multiplier, ATTRIBUTE, "amAuth");
     }
 }

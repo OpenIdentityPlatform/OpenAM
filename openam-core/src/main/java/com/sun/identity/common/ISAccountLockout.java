@@ -96,6 +96,8 @@ public class ISAccountLockout {
     private boolean needToSetInvalidAttemptsObjectClass = true;
     static Debug debug = Debug.getInstance("amAccountLockout");
     private AMAuthCallBackImpl callbackImpl = null;
+    // Helpers belong to a request. Defer its notification until the shared counter monitor is released.
+    private long lockoutEventAt;
     static Map loginFailHash = Collections.synchronizedMap(new HashMap());
 
     private static final long DEFAULT_MEMORY_LOCKOUT_DURATION = 30L * 60 * 1000;
@@ -208,6 +210,15 @@ public class ISAccountLockout {
     public boolean isMemoryLocking(String userDN) {
         return memoryLocking || memoryLockouts.containsKey(userDN);
     }
+
+    /**
+     * Returns whether any identity on this server has switched to fallback counters.
+     *
+     * @return whether a physical-mode lock check may need to resolve a fallback identity
+     */
+    public boolean hasMemoryLockouts() {
+        return !memoryLockouts.isEmpty();
+    }
     /**
      * Determines the number of times user failed authentication
      * updates the accountInfo object with the user information and count of
@@ -222,12 +233,16 @@ public class ISAccountLockout {
     public int invalidPasswd(String userDN, String userName,
         AMIdentity amIdentity, AccountLockoutInfo acInfo) {
         AccountLockoutInfo memoryInfo = memoryLockouts.get(userDN);
+        int warning;
         if (memoryInfo != null) {
             synchronized (memoryInfo) {
-                return recordInvalidPasswd(userDN, userName, amIdentity, memoryInfo, false);
+                warning = recordInvalidPasswd(userDN, userName, amIdentity, memoryInfo, false);
             }
+        } else {
+            warning = recordInvalidPasswd(userDN, userName, amIdentity, acInfo, storeInvalidAttemptsInDS);
         }
-        return recordInvalidPasswd(userDN, userName, amIdentity, acInfo, storeInvalidAttemptsInDS);
+        notifyLockout(userName, amIdentity);
+        return warning;
     }
 
     private int recordInvalidPasswd(String userDN, String userName, AMIdentity amIdentity,
@@ -310,31 +325,31 @@ public class ISAccountLockout {
             if (!isMemoryLocking(userDN)) {
                 inactivateUserAccount(amIdentity);
             }
-            try {
-                sendLockOutNotice(userName);
-                /*
-                 * The callback implementation instance is retrieved for
-                 * the user's organization. This will be used to notify the
-                 * custom plug-ins that a certain event occured on an account.
-                 */
-                callbackImpl = AMAuthCallBackImpl.getInstance(
-                    amIdentity.getRealm());
-                // Requesting callback to plugin for account lockout event.
-                callbackImpl.processedAccounttLockout(new Long(now), userName);
-            } catch (AMAuthCallBackException e) {
-                if (debug.getState() >= IDebug.ERROR) {
-                    debug.error("ISAccountLockout invalidPasswd : " +
-                        "error getting callback implementation " +
-                        "instance or error from callback module", e);
-                }
-            } catch(Exception ex) {
-                debug.message("Error activating account/sending"
-                    + "notification ", ex);
-            }
+            lockoutEventAt = now;
         }
         
         setWarningCount(fail_count,failureLockoutCount);
         return userWarningCount;
+    }
+
+    private void notifyLockout(String userName, AMIdentity amIdentity) {
+        long at = lockoutEventAt;
+        if (at <= 0) {
+            return;
+        }
+        lockoutEventAt = 0;
+        try {
+            sendLockOutNotice(userName);
+            callbackImpl = AMAuthCallBackImpl.getInstance(amIdentity.getRealm());
+            callbackImpl.processedAccounttLockout(at, userName);
+        } catch (AMAuthCallBackException e) {
+            if (debug.getState() >= IDebug.ERROR) {
+                debug.error("ISAccountLockout invalidPasswd : "
+                        + "error getting callback implementation instance or error from callback module", e);
+            }
+        } catch (Exception ex) {
+            debug.message("Error activating account/sending notification ", ex);
+        }
     }
     
     private AccountLockoutInfo useMemoryLocking(String userDN, AccountLockoutInfo acInfo, Exception cause) {

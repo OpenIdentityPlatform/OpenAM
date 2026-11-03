@@ -239,11 +239,15 @@ class AMAccountLockout {
      * @return <code>true</code> if account is locked.
      */
     public boolean isLockedOut(String userName) {
+        if (!isAccountLockout.isLockoutEnabled()) {
+            return false;
+        }
         // has this user been locked out.
         String normUserDN = normalizeDN(userName);
         boolean locked = false;
         try {
-            if (isAccountLockout.isMemoryLocking() || isAccountLockout.getStoreInvalidAttemptsInDS()) {
+            if (isAccountLockout.isMemoryLocking()
+                    || (isAccountLockout.getStoreInvalidAttemptsInDS() && isAccountLockout.hasMemoryLockouts())) {
                 locked = isMemoryLockout(normUserDN);
             }
         } catch (Exception e) {
@@ -273,7 +277,7 @@ class AMAccountLockout {
                 DEBUG.message("isLockedOut:acInfo=" + acInfo);
             }
             if (acInfo != null && isAccountLockout.isMemoryLocking(userDN)) {
-                locked = checkMemoryLockout(aUserName);
+                locked = checkMemoryLockout(userDN, amIdentity);
             }
 
             if (DEBUG.messageEnabled()) {
@@ -315,7 +319,7 @@ class AMAccountLockout {
                 }
             }
             if (!locked && acInfo != null && isAccountLockout.isMemoryLocking(userDN)) {
-                locked = checkMemoryLockout(aUserName);
+                locked = checkMemoryLockout(userDN, amIdentity);
             }
 
             if (DEBUG.messageEnabled()) {
@@ -329,13 +333,14 @@ class AMAccountLockout {
         return locked;
     }
 
-    private boolean checkMemoryLockout(String userName) {
+    private boolean checkMemoryLockout(String userDN, AMIdentity amIdentity) {
         // A fallback counter is shared across requests. Keep expiry and reset atomic with increments,
         // otherwise a delayed expiry check could erase a subsequent lockout cycle.
         synchronized (acInfo) {
             boolean locked = isAccountLockout.isLockedOut(acInfo);
             if (!locked && acInfo.isLockout()) {
-                resetPasswdLockout(userName, false);
+                isAccountLockout.resetLockoutAttempts(userDN, amIdentity, acInfo, false);
+                warnUser = 0;
             }
             return locked;
         }
