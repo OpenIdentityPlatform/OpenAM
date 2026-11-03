@@ -232,6 +232,22 @@ public class ISAccountLockout {
      */
     public int invalidPasswd(String userDN, String userName,
         AMIdentity amIdentity, AccountLockoutInfo acInfo) {
+        return invalidPasswd(userDN, userName, amIdentity, acInfo, null);
+    }
+
+    /**
+     * Records a failed authentication, using the login realm for notifications when configured
+     * memory counters do not require an identity lookup.
+     *
+     * @param userDN the normalized counter key
+     * @param userName the user name
+     * @param amIdentity the resolved identity, or null for configured memory counters
+     * @param acInfo the current counter state
+     * @param loginRealm the login realm used when no identity has been resolved
+     * @return the warning count
+     */
+    public int invalidPasswd(String userDN, String userName, AMIdentity amIdentity,
+            AccountLockoutInfo acInfo, String loginRealm) {
         AccountLockoutInfo memoryInfo = memoryLockouts.get(userDN);
         int warning;
         if (memoryInfo != null) {
@@ -241,7 +257,7 @@ public class ISAccountLockout {
         } else {
             warning = recordInvalidPasswd(userDN, userName, amIdentity, acInfo, storeInvalidAttemptsInDS);
         }
-        notifyLockout(userName, amIdentity);
+        notifyLockout(userName, amIdentity, loginRealm);
         return warning;
     }
 
@@ -332,7 +348,7 @@ public class ISAccountLockout {
         return userWarningCount;
     }
 
-    private void notifyLockout(String userName, AMIdentity amIdentity) {
+    private void notifyLockout(String userName, AMIdentity amIdentity, String loginRealm) {
         long at = lockoutEventAt;
         if (at <= 0) {
             return;
@@ -340,7 +356,11 @@ public class ISAccountLockout {
         lockoutEventAt = 0;
         try {
             sendLockOutNotice(userName);
-            callbackImpl = AMAuthCallBackImpl.getInstance(amIdentity.getRealm());
+            String realm = amIdentity != null ? amIdentity.getRealm() : loginRealm;
+            if (realm == null) {
+                return;
+            }
+            callbackImpl = AMAuthCallBackImpl.getInstance(realm);
             callbackImpl.processedAccounttLockout(at, userName);
         } catch (AMAuthCallBackException e) {
             if (debug.getState() >= IDebug.ERROR) {

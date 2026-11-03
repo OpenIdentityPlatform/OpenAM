@@ -23,6 +23,7 @@ import static org.testng.Assert.*;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -296,6 +297,116 @@ public class AMAccountLockoutTest extends PowerMockTestCase {
     @DataProvider
     public Object[][] memorySettings() {
         return new Object[][] {{5, 1}, {1, 1}, {5, 0}};
+    }
+
+    @DataProvider
+    public Object[][] disabledLockoutSettings() {
+        return new Object[][] {
+            {"persisted", "mode"}, {"persisted", "count"}, {"persisted", "window"},
+            {"fallback", "mode"}, {"fallback", "count"}, {"fallback", "window"},
+            {"physical-fallback", "mode"}, {"physical-fallback", "count"}, {"physical-fallback", "window"},
+            {"memory", "mode"}, {"memory", "count"}, {"memory", "window"}
+        };
+    }
+
+    @Test(dataProvider = "disabledLockoutSettings")
+    public void disablingLockoutStopsBothTimedChecksWithoutClearingTheCounter(String storage, String setting)
+            throws Exception {
+        when(state.getLoginFailureLockoutDuration())
+                .thenReturn(storage.equals("physical-fallback") ? 0L : MINUTES.toMillis(10));
+        if (storage.equals("memory")) {
+            when(state.getLoginFailureLockoutStoreInDS()).thenReturn(false);
+        } else if (storage.equals("persisted")) {
+            Map<String, Set<String>> stored = new HashMap<>();
+            Map<String, Set<String>> pending = new HashMap<>();
+            when(identity.getAttribute(anyString())).thenAnswer(call -> stored.get(call.getArgument(0)));
+            doAnswer(call -> { pending.putAll(call.getArgument(0)); return null; })
+                    .when(identity).setAttributes(anyMap());
+            doAnswer(call -> { stored.putAll(pending); pending.clear(); return null; }).when(identity).store();
+        }
+        for (int i = 0; i < 5; i++) {
+            new AMAccountLockout(state).invalidPasswd(userDN);
+        }
+        assertTrue(new AMAccountLockout(state).isLockedOut(userDN));
+        assertTrue(new AMAccountLockout(state).isAccountLocked(userDN));
+        setLockoutEnabled(setting, false);
+        assertFalse(new AMAccountLockout(state).isLockedOut(userDN));
+        assertFalse(new AMAccountLockout(state).isAccountLocked(userDN));
+        setLockoutEnabled(setting, true);
+        assertTrue(new AMAccountLockout(state).isLockedOut(userDN));
+        assertTrue(new AMAccountLockout(state).isAccountLocked(userDN));
+        FrozenTimeService.INSTANCE.fastForward(31, MINUTES);
+        assertFalse(new AMAccountLockout(state).isLockedOut(userDN));
+        assertFalse(new AMAccountLockout(state).isAccountLocked(userDN));
+    }
+
+    @DataProvider
+    public Object[][] disabledPhysicalLockSettings() {
+        return new Object[][] {
+            {"mode", false}, {"count", false}, {"window", false},
+            {"mode", true}, {"count", true}, {"window", true}
+        };
+    }
+
+    @Test(dataProvider = "disabledPhysicalLockSettings")
+    public void disablingLockoutPreservesPhysicalRestrictions(String setting, boolean custom) throws Exception {
+        when(state.getLoginLockoutAttrName()).thenReturn("customLock");
+        when(state.getLoginLockoutAttrValue()).thenReturn("blocked");
+        failAttempts(5);
+        setLockoutEnabled(setting, false);
+        if (custom) {
+            when(identity.getAttribute("customLock")).thenReturn(Collections.singleton("blocked"));
+        } else {
+            when(identity.isActive()).thenReturn(false);
+        }
+        assertTrue(new AMAccountLockout(state).isAccountLocked("alice"));
+    }
+
+    private void setLockoutEnabled(String setting, boolean enabled) {
+        if (setting.equals("mode")) {
+            when(state.getLoginFailureLockoutMode()).thenReturn(enabled);
+        } else if (setting.equals("count")) {
+            when(state.getLoginFailureLockoutCount()).thenReturn(enabled ? 5 : 0);
+        } else {
+            when(state.getLoginFailureLockoutTime()).thenReturn(enabled ? MINUTES.toMillis(5) : 0L);
+        }
+    }
+
+    @DataProvider
+    public Object[][] notificationRealms() {
+        return new Object[][] {{"/"}, {"/other"}, {"o=other,dc=example"}};
+    }
+
+    @Test(dataProvider = "notificationRealms")
+    public void configuredMemoryModeNotifiesTheLoginRealmWithoutResolvingAnIdentity(String realm) throws Exception {
+        when(state.getOrgDN()).thenReturn(realm);
+        when(state.getLoginFailureLockoutStoreInDS()).thenReturn(false);
+        when(state.getLoginFailureLockoutDuration()).thenReturn(MINUTES.toMillis(10));
+        AMAuthCallBackImpl plugin = mock(AMAuthCallBackImpl.class);
+        when(AMAuthCallBackImpl.getInstance(realm)).thenReturn(plugin);
+        for (int i = 0; i < 4; i++) {
+            new AMAccountLockout(state).invalidPasswd(userDN);
+        }
+        verifyZeroInteractions(plugin);
+        long lockedAt = FrozenTimeService.INSTANCE.now();
+        new AMAccountLockout(state).invalidPasswd(userDN);
+        assertTrue(new AMAccountLockout(state).isLockedOut(userDN));
+        new AMAccountLockout(state).invalidPasswd(userDN);
+        verify(plugin, times(1)).processedAccounttLockout(eq(lockedAt), eq(userDN));
+        verify(auth, never()).getIdentity(any(), anyString(), anyString());
+        verify(identity, never()).store();
+    }
+
+    @Test
+    public void resolvedIdentityKeepsItsOwnCallbackRealm() throws Exception {
+        when(state.getOrgDN()).thenReturn("/other");
+        when(auth.getIdentity(eq(IdType.USER), anyString(), eq("/other"))).thenReturn(identity);
+        AMAuthCallBackImpl identityPlugin = AMAuthCallBackImpl.getInstance("/");
+        AMAuthCallBackImpl loginPlugin = mock(AMAuthCallBackImpl.class);
+        when(AMAuthCallBackImpl.getInstance("/other")).thenReturn(loginPlugin);
+        failAttempts(5);
+        verify(identityPlugin, times(1)).processedAccounttLockout(any(Long.class), eq("alice"));
+        verifyZeroInteractions(loginPlugin);
     }
 
     @Test(dataProvider = "memorySettings")

@@ -377,6 +377,37 @@ public class ISAccountLockoutTest extends PowerMockTestCase {
         assertEquals(writes, 1);
     }
 
+    @DataProvider
+    public Object[][] healthyNotificationSettings() {
+        return new Object[][] {{true, 0L}, {true, 10L}, {false, 10L}};
+    }
+
+    @Test(dataProvider = "healthyNotificationSettings")
+    public void healthyStoreAndConfiguredMemoryNotifyOnceAtTheThreshold(boolean persist, long minutes)
+            throws Exception {
+        rejectWrites = false;
+        ISAccountLockout lockout = spy(lockout(minutes));
+        lockout.setStoreInvalidAttemptsInDS(persist);
+        doNothing().when(lockout).sendLockOutNotice("alice");
+        AMAuthCallBackImpl plugin = AMAuthCallBackImpl.getInstance("/");
+        for (int i = 0; i < 4; i++) {
+            lockout.invalidPasswd(userDN, "alice", identity, lockout.getAcInfo(userDN, identity));
+        }
+        verify(lockout, never()).sendLockOutNotice(anyString());
+        verifyZeroInteractions(plugin);
+        long lockedAt = FrozenTimeService.INSTANCE.now();
+        lockout.invalidPasswd(userDN, "alice", identity, lockout.getAcInfo(userDN, identity));
+        if (minutes == 0) {
+            assertTrue(lockout.isAccountLocked(identity));
+        } else {
+            assertTrue(lockout.isLockedOut(lockout.getAcInfo(userDN, identity)));
+        }
+        lockout.invalidPasswd(userDN, "alice", identity, lockout.getAcInfo(userDN, identity));
+        verify(lockout, times(1)).sendLockOutNotice("alice");
+        verify(plugin, times(1)).processedAccounttLockout(eq(lockedAt), eq("alice"));
+        assertEquals(writes, persist ? (minutes == 0 ? 7 : 6) : 0);
+    }
+
     @Test
     public void writableStoreKeepsTheDurationWhenTheMultiplierIsZero() {
         rejectWrites = false;

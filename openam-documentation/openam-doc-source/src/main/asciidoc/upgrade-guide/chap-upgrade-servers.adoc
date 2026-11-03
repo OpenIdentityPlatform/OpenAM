@@ -48,6 +48,10 @@ Setting `inetuserstatus` to `Active` or clearing `sunAMAuthInvalidAttemptsData` 
 Special identities, including `amadmin`, follow the same policy without name-based exemptions. Their rejected counter writes previously prevented lockout. With the current default account-lockout settings, five failed passwords can now lock `amadmin` on the affected server for 30 minutes. Review administrator access and recovery procedures before upgrading.
 
 Two related corrections also apply to writable stores and explicitly configured in-memory counters: a failure threshold of one now starts a timed lock on the first failure, and a duration multiplier of zero preserves the lock duration for later cycles instead of reducing it to zero.
+
+Disabling account lockout, or setting its failure count or failure interval to zero, stops enforcing existing temporary locks consistently across authentication index types. This does not clear the counters or restore persistence: re-enabling lockout before a temporary lock expires enforces that lock again. Physical account restrictions remain subject to the existing account and profile checks.
+
+Explicitly configured in-memory counters now invoke the account-lockout callback plugins for the login realm when the failure threshold is reached, without resolving the user from the identity store. Previously, this path sent the lockout notification but skipped the plugin callback because no identity had been resolved.
 ====
 
 [IMPORTANT]

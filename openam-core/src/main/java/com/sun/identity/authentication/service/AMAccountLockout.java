@@ -127,7 +127,7 @@ class AMAccountLockout {
                     userDN = normalizeDN(username);
                 }
                 acInfo = isAccountLockout.getAcInfo(userDN, amIdentity, acInfo);
-                warnUser = isAccountLockout.invalidPasswd(userDN, username, amIdentity, acInfo);
+                warnUser = isAccountLockout.invalidPasswd(userDN, username, amIdentity, acInfo, loginState.getOrgDN());
             }
         } catch (Exception ex) {
             if (DEBUG.messageEnabled()) {
@@ -318,7 +318,8 @@ class AMAccountLockout {
                     resetPasswdLockout(aUserName, false);
                 }
             }
-            if (!locked && acInfo != null && isAccountLockout.isMemoryLocking(userDN)) {
+            if (!locked && acInfo != null && isAccountLockout.isLockoutEnabled()
+                    && isAccountLockout.isMemoryLocking(userDN)) {
                 locked = checkMemoryLockout(userDN, amIdentity);
             }
 
