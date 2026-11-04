@@ -300,7 +300,9 @@ jobs:
 
       - uses: actions/checkout@v7
         with:
-          sparse-checkout: e2e
+          sparse-checkout: |
+            e2e
+            .github/actions/setup-trivy
 
       - name: Install Playwright
         run: |
@@ -558,12 +560,16 @@ jobs:
             e2e/test-results/**
             container-logs/**
 
+      - name: Set up Trivy
+        uses: ./.github/actions/setup-trivy
+
       - name: Scan image for vulnerabilities (Trivy)
         # trivy resolves the image from the local Docker daemon, so only the runner's
         # linux/amd64 manifest is scanned; cache: false keeps the ~1GB trivy DBs from
         # evicting the m2-repository caches out of the repo's 10GB actions-cache quota
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
+          skip-setup-trivy: true
           image-ref: ${{ env.OPENAM_IMAGE }}
           format: sarif
           output: trivy-results.sarif

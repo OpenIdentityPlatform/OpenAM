@@ -34,11 +34,14 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v7
+      - name: Set up Trivy
+        uses: ./.github/actions/setup-trivy
       - name: Scan openidentityplatform/openam:latest (Trivy)
         # unlike the build.yml gate, unfixed CVEs are reported too: surfacing them in
         # the already-released image is the point of this workflow
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
+          skip-setup-trivy: true
           image-ref: openidentityplatform/openam:latest
           format: sarif
           output: trivy-latest.sarif

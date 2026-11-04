@@ -1,0 +1,44 @@
+# The contents of this file are subject to the terms of the Common Development and
+# Distribution License (the License). You may not use this file except in compliance with the
+# License.
+#
+# You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+# specific language governing permission and limitations under the License.
+#
+# When distributing Covered Software, include this CDDL Header Notice in each file and include
+# the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+# Header, with the fields enclosed by brackets [] replaced by your own identifying
+# information: "Portions copyright [year] [name of copyright owner]".
+#
+# Copyright 2026 3A Systems, LLC.
+
+name: Set up Trivy
+description: Install a checksum-pinned Trivy binary from GitHub Releases on Linux x64
+runs:
+  using: composite
+  steps:
+    - name: Download and verify Trivy
+      shell: bash
+      env:
+        # Update the version and the Linux-64bit archive checksum together.
+        TRIVY_VERSION: '0.70.0'
+        TRIVY_SHA256: 8b4376d5d6befe5c24d503f10ff136d9e0c49f9127a4279fd110b727929a5aa9
+      run: |
+        set -euo pipefail
+        if [[ "$RUNNER_OS" != Linux || "$RUNNER_ARCH" != X64 ]]; then
+          echo "This action requires a Linux x64 runner" >&2
+          exit 1
+        fi
+        download_dir=$(mktemp -d)
+        trap 'rm -rf "$download_dir"' EXIT
+        cd "$download_dir"
+        # Bypass setup-trivy's get.trivy.dev redirect service.
+        curl --fail --show-error --silent --location \
+          --retry 3 --retry-all-errors --connect-timeout 15 --max-time 300 \
+          "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
+          --output trivy.tar.gz
+        echo "$TRIVY_SHA256  trivy.tar.gz" | sha256sum --check --strict
+        tar -xzf trivy.tar.gz trivy
+        install -D -m 755 trivy "$RUNNER_TEMP/trivy-bin/trivy"
+        "$RUNNER_TEMP/trivy-bin/trivy" --version
+        echo "$RUNNER_TEMP/trivy-bin" >> "$GITHUB_PATH"
