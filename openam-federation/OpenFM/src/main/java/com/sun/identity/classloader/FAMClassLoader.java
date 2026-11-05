@@ -28,7 +28,7 @@
 
 /**
  * Portions Copyrighted 2013 ForgeRock AS
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.classloader;
 
@@ -210,6 +210,9 @@ public class FAMClassLoader {
         "com.sun.codemodel.",
         "com.sun.relaxng.",
         "com.sun.xml.xsom.",
+        // the bundled 2009-era Metro jars carry their own javax-based JAXB2;
+        // jakarta.xml.bind/org.glassfish.jaxb are NOT in the child jars and
+        // must stay visible from the webapp classloader
         "com.sun.xml.bind.",
         "com.sun.xml.bind.v2.",
         "com.sun.xml.messaging.",
@@ -250,6 +253,9 @@ public class FAMClassLoader {
         "com.sun.codemodel.",
         "com.sun.relaxng.",
         "com.sun.xml.xsom.",
+        // the bundled 2009-era Metro jars carry their own javax-based JAXB2;
+        // jakarta.xml.bind/org.glassfish.jaxb are NOT in the child jars and
+        // must stay visible from the webapp classloader
         "com.sun.xml.bind.",
         "com.sun.xml.bind.v2.",
         "com.sun.xml.messaging.",

@@ -24,7 +24,7 @@
  *
  * $Id: FSTerminationReturnServlet.java,v 1.4 2008/12/19 06:50:48 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 
@@ -139,12 +139,12 @@ public class FSTerminationReturnServlet extends HttpServlet {
             String realm = IDFFMetaUtils.getRealmByMetaAlias(providerAlias);
             if (hostedRole != null && 
                 hostedRole.equalsIgnoreCase(IFSConstants.IDP)) {
-                hostedConfig = metaManager.getIDPDescriptorConfig(
-                    realm, hostedEntityId);
+                hostedConfig = IDFFMetaUtils.unwrap(metaManager.getIDPDescriptorConfig(
+                    realm, hostedEntityId));
             } else if (hostedRole != null &&
                 hostedRole.equalsIgnoreCase(IFSConstants.SP)) {
-                hostedConfig = metaManager.getSPDescriptorConfig(
-                    realm, hostedEntityId);
+                hostedConfig = IDFFMetaUtils.unwrap(metaManager.getSPDescriptorConfig(
+                    realm, hostedEntityId));
             }
             if (hostedRole == null || hostedConfig == null) {
                 throw new IDFFMetaException((String) null);

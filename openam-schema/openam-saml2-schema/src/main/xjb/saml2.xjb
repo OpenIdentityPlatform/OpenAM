@@ -24,15 +24,31 @@
 
    $Id: binding.xjb,v 1.3 2008/06/25 05:48:42 qcheng Exp $
 
+   Portions Copyrighted 2026 3A Systems LLC
+
 -->
 
 <!--
     Portions Copyrighted 2010 ForgeRock AS
 -->
 
-<jxb:bindings version="1.0"
-               xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
-               xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<jxb:bindings
+        version="3.0"
+        xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+        jxb:extensionBindingPrefixes="xjc">
+
+
+    <jxb:globalBindings >
+        <jxb:javaType name="java.util.Calendar"
+                      xmlType="xs:dateTime"
+                      parseMethod="jakarta.xml.bind.DatatypeConverter.parseDateTime"
+                      printMethod="jakarta.xml.bind.DatatypeConverter.printDateTime"/>
+
+        <xjc:javaType name="java.lang.String" xmlType="xs:anyURI"
+                    adapter="jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter" />
+    </jxb:globalBindings>
 
   <jxb:bindings schemaLocation="../xsd/xenc-schema.xsd" node="/xs:schema">
     <jxb:schemaBindings>
@@ -45,6 +61,9 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='KeySize']">
+       <jxb:class name="KeySize"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/xmldsig-core-schema.xsd" node="/xs:schema">
@@ -58,6 +77,12 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='X509Data']">
+       <jxb:class name="X509DataElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='X509Certificate']">
+       <jxb:class name="X509Certificate"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/saml-schema-assertion-2.0.xsd" node="/xs:schema">
@@ -71,6 +96,12 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='Attribute']">
+        <jxb:class name="AttributeElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AttributeValue']">
+       <jxb:class name="AttributeValueElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/saml-schema-metadata-2.0.xsd" node="/xs:schema">
@@ -84,6 +115,68 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='AttributeAuthorityDescriptor']">
+        <jxb:class name="AttributeAuthorityDescriptorElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AuthnAuthorityDescriptor']">
+        <jxb:class name="AuthnAuthorityDescriptorElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='EntityDescriptor']">
+        <jxb:class name="EntityDescriptorElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='IDPSSODescriptor']">
+        <jxb:class name="IDPSSODescriptorElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SPSSODescriptor']">
+        <jxb:class name="SPSSODescriptorElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='XACMLPDPDescriptor']">
+        <jxb:class name="XACMLPDPDescriptorElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='XACMLAuthzDecisionQueryDescriptor']">
+        <jxb:class name="XACMLAuthzDecisionQueryDescriptorElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AssertionConsumerService']">
+        <jxb:class name="AssertionConsumerServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='KeyDescriptor']">
+        <jxb:class name="KeyDescriptorElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='EntitiesDescriptor']">
+        <jxb:class name="EntitiesDescriptorElement"/>
+    </jxb:bindings>
+
+    <jxb:bindings node="//xs:element[@name='AssertionIDRequestService']">
+        <jxb:class name="AssertionIDRequestServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AttributeService']">
+        <jxb:class name="AttributeServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AuthnQueryService']">
+        <jxb:class name="AuthnQueryServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='ManageNameIDService']">
+        <jxb:class name="ManageNameIDServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SingleSignOnService']">
+        <jxb:class name="SingleSignOnServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='ArtifactResolutionService']">
+        <jxb:class name="ArtifactResolutionServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SingleLogoutService']">
+        <jxb:class name="SingleLogoutServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='NameIDMappingService']">
+        <jxb:class name="NameIDMappingServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='XACMLAuthzService']">
+        <jxb:class name="XACMLAuthzServiceElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='EncryptionMethod']">
+        <jxb:class name="EncryptionMethodElement"/>
+    </jxb:bindings>
+
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/sstc-saml-metadata-ext-query.xsd" node="/xs:schema">
@@ -97,6 +190,9 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='AttributeQueryDescriptor']">
+        <jxb:class name="AttributeQueryDescriptorElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/sstc-saml-metadata-x509-query.xsd" node="/xs:schema">
@@ -123,6 +219,36 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='AffiliationConfig']">
+        <jxb:class name="AffiliationConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AttributeAuthorityConfig']">
+        <jxb:class name="AttributeAuthorityConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AttributeQueryConfig']">
+        <jxb:class name="AttributeQueryConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AuthnAuthorityConfig']">
+        <jxb:class name="AuthnAuthorityConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='EntityConfig']">
+        <jxb:class name="EntityConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='IDPSSOConfig']">
+        <jxb:class name="IDPSSOConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='XACMLPDPConfig']">
+        <jxb:class name="XACMLPDPConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='XACMLAuthzDecisionQueryConfig']">
+        <jxb:class name="XACMLAuthzDecisionQueryConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SPSSOConfig']">
+        <jxb:class name="SPSSOConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Attribute']">
+        <jxb:class name="AttributeElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/sstc-metadata-attr.xsd" node="/xs:schema">
@@ -136,6 +262,10 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+
+    <jxb:bindings node="//xs:element[@name='EntityAttributes']">
+        <jxb:class name="EntityAttributesElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/sstc-saml-attribute-ext.xsd" node="/xs:schema">

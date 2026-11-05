@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSDefaultRealmAttributeMapper.java,v 1.2 2008/06/25 05:46:53 qcheng Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 
@@ -92,7 +94,7 @@ public class FSDefaultRealmAttributeMapper implements FSRealmAttributeMapper {
                 SPDescriptorConfigElement spConfig =
                     metaManager.getSPDescriptorConfig(realm, hostEntityId);
                 if (spConfig != null) {
-                    Map attributes = IDFFMetaUtils.getAttributes(spConfig);
+                    Map attributes = IDFFMetaUtils.getAttributes(spConfig.getValue());
                     configMap = FSServiceUtils.parseAttributeConfig((List)
                         attributes.get(IFSConstants.SP_ATTRIBUTE_MAP));
                 }

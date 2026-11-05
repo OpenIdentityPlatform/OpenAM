@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
+import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeType;
 import com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
@@ -128,7 +129,7 @@ public class ValidWReplyExtractorTest {
         AttributeType attribute = mock(AttributeType.class);
         when(attribute.getName()).thenReturn(WSFederationConstants.WREPLY_URL_LIST);
         when(attribute.getValue()).thenReturn(wreplyList);
-        when(config.getAttribute()).thenReturn(Arrays.asList(attribute));
+        when(config.getAttribute()).thenReturn(Arrays.asList(new AttributeElement(attribute)));
         return config;
     }
 

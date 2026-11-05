@@ -25,14 +25,13 @@
  * $Id: AuthnQueryUtil.java,v 1.8 2008/12/03 00:32:31 hengming Exp $
  *
  * Portions Copyrighted 2010-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 package com.sun.identity.saml2.profile;
 
 import static org.forgerock.openam.utils.Time.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.security.PrivateKey;
@@ -133,12 +132,12 @@ public class AuthnQueryUtil {
         }
 
         String location = null;
-        List authnService = aad.getAuthnQueryService();
-        for(Iterator iter = authnService.iterator(); iter.hasNext(); ) {
+        List<AuthnQueryServiceElement> authnService = aad.getValue().getAuthnQueryService();
+        for(Iterator<AuthnQueryServiceElement> iter = authnService.iterator(); iter.hasNext(); ) {
             AuthnQueryServiceElement authnService1 =
-                (AuthnQueryServiceElement)iter.next();
-            if (binding.equalsIgnoreCase(authnService1.getBinding())) {
-                location = authnService1.getLocation();
+                    iter.next();
+            if (binding.equalsIgnoreCase(authnService1.getValue().getBinding())) {
+                location = authnService1.getValue().getLocation();
                 break;
             }
         }
@@ -395,7 +394,8 @@ public class AuthnQueryUtil {
             throw new SAML2Exception(SAML2Utils.bundle.getString(
                 "authnQueryIssuerNotFound"));
         }
-        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(spSSODesc, spEntityID, SAML2Constants.SP_ROLE);
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(
+                spSSODesc.getValue(), spEntityID, SAML2Constants.SP_ROLE);
 
         if (!signingCerts.isEmpty()) {
             boolean valid = authnQuery.isSignatureValid(signingCerts);
@@ -451,7 +451,8 @@ public class AuthnQueryUtil {
 
         AuthnAuthorityConfigElement config =
             metaManager.getAuthnAuthorityConfig(realm, authnAuthorityEntityID);
-        authnServiceURL = SAML2Utils.fillInBasicAuthInfo(config,
+        authnServiceURL = SAML2Utils.fillInBasicAuthInfo(
+            (config == null) ? null : config.getValue(),
             authnServiceURL);
         
         SOAPMessage resMsg = null;
@@ -507,7 +508,7 @@ public class AuthnQueryUtil {
                 "responseNotSigned"));
         }
 
-        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(aad, authnAuthorityEntityID,
+        Set<X509Certificate> signingCerts = KeyUtil.getVerificationCerts(aad.getValue(), authnAuthorityEntityID,
                 SAML2Constants.AUTHN_AUTH_ROLE);
 
         if (signingCerts.isEmpty()) {
@@ -544,7 +545,7 @@ public class AuthnQueryUtil {
             return;
         }
 
-        signingCerts = KeyUtil.getVerificationCerts(aad, authnAuthorityEntityID, SAML2Constants.IDP_ROLE);
+        signingCerts = KeyUtil.getVerificationCerts(aad.getValue(), authnAuthorityEntityID, SAML2Constants.IDP_ROLE);
 
         for(Iterator iter = assertions.iterator(); iter.hasNext(); ) {
             Assertion assertion = (Assertion)iter.next();

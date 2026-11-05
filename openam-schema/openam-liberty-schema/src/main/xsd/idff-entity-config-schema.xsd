@@ -23,6 +23,8 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
+   Portions Copyrighted 2026 3A Systems LLC
+
    $Id: idff-entity-config-schema.xsd,v 1.2 2008/06/25 05:48:40 qcheng Exp $
 
 -->
@@ -58,7 +60,7 @@
     <element name="IDPDescriptorConfig" type="idff:BaseConfigType"/>
     <element name="SPDescriptorConfig" type="idff:BaseConfigType"/>
     <element name="AffiliationDescriptorConfig" type="idff:BaseConfigType"/>
-    <complexType name="BaseConfigType" abstract="true">
+    <complexType name="BaseConfigType" abstract="false">
         <sequence>
             <element ref="idff:Attribute" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>

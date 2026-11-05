@@ -28,6 +28,8 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.common.WSFederationUtils;
 import com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.wsfederation.jaxb.entityconfig.SPSSOConfigElement;
+import com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
 
@@ -107,7 +109,8 @@ public class ValidWReplyExtractor implements ValidDomainExtractor<ValidWReplyExt
      * @throws WSFederationMetaException If the configuration could not be read.
      */
     BaseConfigType getSPSSOConfig(final String realm, final String entityId) throws WSFederationMetaException {
-        return WSFederationUtils.getMetaManager().getSPSSOConfig(realm, entityId);
+        final SPSSOConfigElement config = WSFederationUtils.getMetaManager().getSPSSOConfig(realm, entityId);
+        return (config == null) ? null : config.getValue();
     }
 
     /**
@@ -119,7 +122,8 @@ public class ValidWReplyExtractor implements ValidDomainExtractor<ValidWReplyExt
      * @throws WSFederationMetaException If the configuration could not be read.
      */
     BaseConfigType getIDPSSOConfig(final String realm, final String entityId) throws WSFederationMetaException {
-        return WSFederationUtils.getMetaManager().getIDPSSOConfig(realm, entityId);
+        final IDPSSOConfigElement config = WSFederationUtils.getMetaManager().getIDPSSOConfig(realm, entityId);
+        return (config == null) ? null : config.getValue();
     }
 
     /**

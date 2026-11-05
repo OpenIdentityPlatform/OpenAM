@@ -25,7 +25,7 @@
  * $Id: CreateFedlet.java,v 1.20 2010/01/08 22:41:43 exu Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.workflow;
@@ -278,8 +278,11 @@ public class CreateFedlet extends Task {
         }
     }
 
-    private static String flipHostedParameter(String xml, boolean bHosted) {
-        int idx = xml.indexOf("<EntityConfig ");
+    static String flipHostedParameter(String xml, boolean bHosted) {
+        // JAXB 3 gives the entity config namespace a generated prefix when its context holds an
+        // element in no namespace, so match the root element by its local name.
+        Matcher root = Pattern.compile("<([\\w.-]+:)?EntityConfig\\s").matcher(xml);
+        int idx = root.find() ? root.start() : -1;
         if (idx != -1) {
             idx = xml.indexOf("hosted=\"", idx);
          

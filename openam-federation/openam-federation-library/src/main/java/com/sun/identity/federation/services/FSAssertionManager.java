@@ -42,6 +42,7 @@ import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.LogUtil;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.message.FSAssertion;
 import com.sun.identity.federation.message.FSAssertionArtifact;
 import com.sun.identity.federation.message.FSAuthenticationStatement;
@@ -187,8 +188,8 @@ public final class FSAssertionManager {
         assertionTimeout = IFSConstants.ASSERTION_TIMEOUT_DEFAULT * 1000;
         artifactTimeout = IFSConstants.ARTIFACT_TIMEOUT_DEFAULT * 1000;
         try {
-            BaseConfigType idpConfig = FSUtils.getIDFFMetaManager().
-                getIDPDescriptorConfig(realm, hostEntityId);
+            BaseConfigType idpConfig = IDFFMetaUtils.unwrap(FSUtils.getIDFFMetaManager().
+                getIDPDescriptorConfig(realm, hostEntityId));
             attributes = IDFFMetaUtils.getAttributes(idpConfig);
             try {
                 cleanupInterval = Integer.parseInt(
@@ -492,8 +493,10 @@ public final class FSAssertionManager {
         if (metaManager != null) {
             BaseConfigType idpConfig = null;
             try {
-                idpConfig = metaManager.getIDPDescriptorConfig(
-                    realm, hostEntityId);
+                IDPDescriptorConfigElement idpConfigElement =
+                    metaManager.getIDPDescriptorConfig(realm, hostEntityId);
+                idpConfig = (idpConfigElement == null)
+                    ? null : idpConfigElement.getValue();
             } catch (IDFFMetaException e) {
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message(

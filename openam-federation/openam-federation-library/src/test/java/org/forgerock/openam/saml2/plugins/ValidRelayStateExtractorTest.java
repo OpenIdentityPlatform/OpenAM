@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.sun.identity.saml2.common.SAML2Constants;
+import com.sun.identity.saml2.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeType;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.meta.SAML2MetaException;
@@ -117,7 +118,7 @@ public class ValidRelayStateExtractorTest {
         AttributeType attribute = mock(AttributeType.class);
         when(attribute.getName()).thenReturn(SAML2Constants.RELAY_STATE_URL_LIST);
         when(attribute.getValue()).thenReturn(relayStateUrlList);
-        when(config.getAttribute()).thenReturn(Arrays.asList(attribute));
+        when(config.getAttribute()).thenReturn(Arrays.asList(new AttributeElement(attribute)));
         return config;
     }
 
