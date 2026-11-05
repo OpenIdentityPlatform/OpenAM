@@ -21,6 +21,7 @@
  * listed in its PR.
  */
 
+import { createHash } from "node:crypto";
 import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
 import {
@@ -36,7 +37,7 @@ const NONCE = "n-0S6_WzA2Mj";
 /** Content-Type of the successful JSON answers: discovery, the JWK set and idtokeninfo. */
 const JSON_TYPE = "application/json;charset=UTF-8";
 
-/** Content-Type of the idtokeninfo error answers. Unlike the successful ones, they carry no charset. */
+/** Content-Type of the error answers: idtokeninfo's 400s, the unknown realm's 404. Unlike the 200s, no charset. */
 const ERROR_TYPE = "application/json";
 
 /** Every member the discovery document has on master, sorted. */
@@ -58,34 +59,18 @@ async function expectJson(response, status, body) {
   expect(JSON.parse(text)).toEqual(body);
 }
 
-let demoToken;
-/** Cookie jar holding the demo session -- /oauth2/authorize authenticates by cookie, not by header. */
-let demoCtx;
-let tokens;
+/** The base64url left half of the SHA-256 digest: at_hash and c_hash for an HS256 id_token (OIDC Core 3.3.2.11). */
+function leftHalfHash(value) {
+  return createHash("sha256").update(value, "ascii").digest().subarray(0, 16).toString("base64url");
+}
 
+let adminToken;
+
+// File level: discovery advertises the provider's scopes, so every test needs the provider configured.
 test.beforeAll(async ({ request }) => {
-  const adminToken = await getAdminToken(request);
+  adminToken = await getAdminToken(request);
   expect(adminToken, "amadmin login failed").toBeTruthy();
   await ensureProviderConfig(adminToken, request);
-  await ensureOidcClient(adminToken, request, OIDC_CLIENT_ID);
-
-  const loginCtx = await apiRequest.newContext();
-  try {
-    demoToken = await getAuthToken(loginCtx, USERNAME, PASSWORD);
-  } finally {
-    await loginCtx.dispose();
-  }
-  expect(demoToken, "demo login failed").toBeTruthy();
-  demoCtx = await sessionContext(apiRequest, demoToken);
-
-  // One id_token for the whole file: the issuance test and idtokeninfo both need a real one.
-  tokens = await authorizationCodeTokens(demoCtx, {
-    clientId: OIDC_CLIENT_ID, clientSecret: OIDC_CLIENT_SECRET, scope: "openid profile", nonce: NONCE,
-  });
-});
-
-test.afterAll(async () => {
-  await demoCtx?.dispose();
 });
 
 test.describe("OIDC discovery", () => {
@@ -118,7 +103,8 @@ test.describe("OIDC discovery", () => {
 
   test("the realm-prefixed discovery path answers the same document", async ({ request }) => {
     // On master RestletRealmRouter resolves the realm-prefixed spelling. The CHF flip re-implements realm
-    // routing, so both spellings have to keep answering the same document.
+    // routing, so both spellings have to keep answering the same document. Alone this cannot tell routing from
+    // a router that drops the realm segment; the unknown-realm test below can.
     const bare = await request.get(`${OPENAM_BASE}/oauth2/.well-known/openid-configuration`);
     const modern = await request.get(`${OPENAM_BASE}/oauth2/realms/${REALM}/.well-known/openid-configuration`);
     for (const response of [bare, modern]) {
@@ -126,6 +112,16 @@ test.describe("OIDC discovery", () => {
       expect(response.headers()["content-type"]).toBe(JSON_TYPE);
     }
     expect(await modern.json()).toEqual(await bare.json());
+  });
+
+  test("the discovery path of an unknown realm answers 404", async ({ request }) => {
+    // A router that drops the realm segment would answer the root document here.
+    const response = await request.get(
+      `${OPENAM_BASE}/oauth2/realms/${REALM}/realms/no-such-realm/.well-known/openid-configuration`);
+    await expectJson(response, 404, {
+      code: 404, reason: "Not Found",
+      message: "No mapping organization found for organization identifier: /no-such-realm",
+    });
   });
 
   test("/oauth2/connect/jwk_uri publishes a usable JWK set", async ({ request }) => {
@@ -155,6 +151,37 @@ test.describe("OIDC discovery", () => {
 
 test.describe("OIDC id_token issuance and idtokeninfo", () => {
 
+  /** Cookie jar holding the demo session -- /oauth2/authorize authenticates by cookie, not by header. */
+  let demoCtx;
+  /** The authorization code the token response came from. */
+  let code;
+  let tokens;
+
+  // Only this describe runs the authorize + token exchange, so a broken /oauth2/authorize or
+  // /oauth2/access_token does not turn the discovery and jwk_uri tests red.
+  test.beforeAll(async ({ request }) => {
+    await ensureOidcClient(adminToken, request, OIDC_CLIENT_ID);
+
+    let demoToken;
+    const loginCtx = await apiRequest.newContext();
+    try {
+      demoToken = await getAuthToken(loginCtx, USERNAME, PASSWORD);
+    } finally {
+      await loginCtx.dispose();
+    }
+    expect(demoToken, "demo login failed").toBeTruthy();
+    demoCtx = await sessionContext(apiRequest, demoToken);
+
+    // One id_token for the whole describe: the issuance test and idtokeninfo both need a real one.
+    ({ code, tokens } = await authorizationCodeTokens(demoCtx, {
+      clientId: OIDC_CLIENT_ID, clientSecret: OIDC_CLIENT_SECRET, scope: "openid profile", nonce: NONCE,
+    }));
+  });
+
+  test.afterAll(async () => {
+    await demoCtx?.dispose();
+  });
+
   test("the authorization_code flow issues an id_token bound to the request", async () => {
     console.log(`[oidc] token keys=${Object.keys(tokens).join(",")}`);
     expect(Object.keys(tokens).sort()).toEqual([
@@ -176,8 +203,8 @@ test.describe("OIDC id_token issuance and idtokeninfo", () => {
     expect(claims.nonce).toBe(NONCE);
     expect(claims.realm).toBe("/");
     // at_hash/c_hash bind the id_token to the access token and the code it came from.
-    expect(claims.at_hash).toBeTruthy();
-    expect(claims.c_hash).toBeTruthy();
+    expect(claims.at_hash).toBe(leftHalfHash(tokens.access_token));
+    expect(claims.c_hash).toBe(leftHalfHash(code));
     expect(claims.exp).toBeGreaterThan(claims.iat);
   });
 
@@ -186,11 +213,12 @@ test.describe("OIDC id_token issuance and idtokeninfo", () => {
       headers: { Authorization: basicAuth(OIDC_CLIENT_ID, OIDC_CLIENT_SECRET) },
       form: { id_token: tokens.id_token },
     });
-    const claims = await response.json();
+    const text = await response.text();
+    expect(response.status(), text).toBe(200);
+    expect(response.headers()["content-type"]).toBe(JSON_TYPE);
+    const claims = JSON.parse(text);
     console.log(`[oidc] idtokeninfo -> ${response.status()} sub=${claims.sub}`);
 
-    expect(response.status()).toBe(200);
-    expect(response.headers()["content-type"]).toBe(JSON_TYPE);
     expect(claims.sub).toBe(USERNAME);
     expect(claims.aud).toBe(OIDC_CLIENT_ID);
     expect(claims.iss).toBe(`${OPENAM_BASE}/oauth2`);
@@ -215,5 +243,39 @@ test.describe("OIDC id_token issuance and idtokeninfo", () => {
     await expectJson(response, 400, {
       error: "bad_request", error_description: "invalid id_token: not right number of dots, 2",
     });
+  });
+
+  // idtokeninfo authenticates the client of an HMAC-signed id_token (idTokenInfoClientAuthenticationEnabled
+  // defaults to true). Master answers a failed client authentication with the same 400 and description as an
+  // id_token whose audience is no registered client.
+  test("/oauth2/idtokeninfo rejects a wrong client secret", async ({ request }) => {
+    const response = await request.post(`${OPENAM_BASE}/oauth2/idtokeninfo`, {
+      headers: { Authorization: basicAuth(OIDC_CLIENT_ID, "wrong-secret") },
+      form: { id_token: tokens.id_token },
+    });
+    await expectJson(response, 400, {
+      error: "invalid_client", error_description: "no registered client matches audience of id_token",
+    });
+  });
+
+  test("/oauth2/idtokeninfo rejects a caller without client credentials", async ({ request }) => {
+    const response = await request.post(`${OPENAM_BASE}/oauth2/idtokeninfo`, {
+      form: { id_token: tokens.id_token },
+    });
+    await expectJson(response, 400, {
+      error: "invalid_client", error_description: "no registered client matches audience of id_token",
+    });
+  });
+
+  test("/oauth2/idtokeninfo rejects an id_token with a forged signature", async ({ request }) => {
+    // Flip the FIRST signature character: the low bits of the last one are padding, so changing it can leave
+    // the decoded signature unchanged.
+    const [header, payload, signature] = tokens.id_token.split(".");
+    const forged = `${header}.${payload}.${signature[0] === "A" ? "B" : "A"}${signature.slice(1)}`;
+    const response = await request.post(`${OPENAM_BASE}/oauth2/idtokeninfo`, {
+      headers: { Authorization: basicAuth(OIDC_CLIENT_ID, OIDC_CLIENT_SECRET) },
+      form: { id_token: forged },
+    });
+    await expectJson(response, 400, { error: "bad_request", error_description: "invalid id_token" });
   });
 });

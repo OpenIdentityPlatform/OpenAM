@@ -203,7 +203,8 @@ export async function ensureOidcClient(adminToken, request, clientId) {
     ],
     "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "client_secret_basic",
     // HS256 signs the id_token with the client secret, so idtokeninfo can verify it without a client JWKS.
-    // With RS256 the server looks for the CLIENT's public key and fails with server_error.
+    // With RS256 idtokeninfo verifies with the CLIENT's registered public key; this client registers none,
+    // so idtokeninfo rejects the id_token with 400 "invalid id_token".
     "com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg": "HS256",
     "isConsentImplied": true,
     "sunIdentityServerDeviceStatus": "Active",
@@ -365,7 +366,10 @@ export function sessionContext(apiRequest, ssoToken, extraCookies = []) {
 }
 
 /**
- * Runs a full authorization_code + PKCE exchange and returns the token response.
+ * Runs a full authorization_code + PKCE exchange.
+ *
+ * Returns `{code, tokens}`: the authorization code the authorize step issued, and the token response. The code
+ * is kept apart from the token response so a caller can compare that response's member set whole.
  *
  * @param context a request context whose jar carries the resource owner's session
  */
@@ -386,7 +390,13 @@ export async function authorizationCodeTokens(context, { clientId, clientSecret,
   if (authorize.status() !== 302) {
     throw new Error(`authorize did not redirect: ${authorize.status()} ${await authorize.text()}`);
   }
-  const code = new URL(authorize.headers()["location"]).searchParams.get("code");
+  // An authorize-side error is a 302 too: to redirect_uri?error=... or to the login page. Report its Location
+  // here; without a code the token endpoint would only answer invalid_grant, which hides the cause.
+  const location = authorize.headers()["location"];
+  const code = new URL(location, OPENAM_BASE).searchParams.get("code");
+  if (!code) {
+    throw new Error(`authorize redirected without a code: ${location}`);
+  }
 
   const token = await context.post(`${OPENAM_BASE}/oauth2/access_token`, {
     headers: { Authorization: basicAuth(clientId, clientSecret) },
@@ -395,7 +405,7 @@ export async function authorizationCodeTokens(context, { clientId, clientSecret,
   if (!token.ok()) {
     throw new Error(`token exchange failed: ${token.status()} ${await token.text()}`);
   }
-  return token.json();
+  return { code, tokens: await token.json() };
 }
 
 /** A token for the given resource-server client at the requested scope, via the ROPC grant. */
