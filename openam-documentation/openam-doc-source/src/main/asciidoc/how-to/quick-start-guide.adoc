@@ -24,7 +24,7 @@ Copyright 2026 3A Systems, LLC.
 OpenAM Getting Started
 
 ____
-https://doc.openidentityplatform.org/openam/getting-started/ (pdf)
+xref:../getting-started/index.adoc[OpenAM Getting Started Guide]
 ____
 
 OpenAM 13.5 Getting Started

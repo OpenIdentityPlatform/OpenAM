@@ -319,7 +319,7 @@ Open the OpenAM admin console as described earlier. Select *Top Level Realm*. Fr
 
 Save the Rest STS instance conversion settings.
 
-You can read more about installing and configuring OpenAM in the documentation: https://doc.openidentityplatform.org/openam/[https://doc.openidentityplatform.org/openam/]
+You can read more about installing and configuring OpenAM in the documentation: xref:ROOT:index.adoc[OpenAM documentation]
 
 [[openam-and-zero-trust-confirming-critical-operations-configure-the-openig-authorization-gateway]]
 === Configure the OpenIG authorization gateway

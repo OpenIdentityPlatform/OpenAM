@@ -21,7 +21,9 @@ Copyright 2026 3A Systems, LLC.
 [#how-to-develop-a-custom-authentication-module]
 == Creating a Custom Authentication Module
 
-Source code: https://github.com/OpenIdentityPlatform/OpenAM/tree/master/openam-samples/custom-authentication-module[OpenAM Sample Custom Authentication Module]
+Related source code: https://github.com/OpenIdentityPlatform/OpenAM/tree/master/openam-samples/custom-authentication-module[OpenAM Sample Custom Authentication Module].
+
+The listings below preserve the wiki tutorial's variant of the sample: package `com.forgerock.openam.examples`, user `test`, and configuration attribute `sampleauth-service-specific-attribute`. The repository sample instead uses class `org.forgerock.openam.examples.SampleAuth`, user `demo`, and attribute `specificAttribute`. Follow the listings and registration command below together; if you build the repository sample, register `org.forgerock.openam.examples.SampleAuth` and use its configuration files and credentials.
 
 OpenAM comes complete with a wide variety of built-in custom xref:authentication-modules.adoc[authentication modules], but sometimes customer requirements step outside the functionality provided by the built-in modules. In these instances, it is time to consider writing your own custom authentication module. The OpenAM developer can use the source of the built-in modules as their starting point or start from scratch. If the customer requirement is a very close match to existing functionality then using a built-in module as a starting point will be a good idea. The OpenAM developer should start from scratch if the customer requirements does not match any of the built-in modules. In this HowTo we look at how to create and configure custom authentication modules.
 
@@ -43,8 +45,9 @@ In short - we have following requirements
 We will stick with using the basic complier in this HowTo to keep things simple. In order to compile your custom authentication module either on the command line or in your favourite IDE you will need the following OpenAM jar files.
 
 * openam-core++*++.jar
+* openam-shared++*++.jar
 
-In addition you will also require the J2EE Servlet API, you can obtain these from within your favourite container or here. If you use tomcat then you can find the Servlet API files in the TOMCAT++_++HOME/lib/servlet-api.jar file.
+Copy these JAR files from the deployed OpenAM application's `WEB-INF/lib` directory into the `lib` directory used by the compilation command below.
 
 [[how-to-develop-a-custom-authentication-module-design-your-custom-authentication-module]]
 === Design your custom authentication module
@@ -472,7 +475,7 @@ public class SampleAuthPrincipal implements Principal, Serializable {
 * i18nFileName refers to the properties file and i18nKey to the key in the properties file
 * sampleauth-service-specific-attribute configurable via OpenAM is defined here
 
-The 'iplanet-am-auth-sampleauth-auth-level' is the obligatory authentication level attribute. Here naming is very important. The name of the attribute must be: 'iplanet-am-auth-' {plus} lowercase(modulename) {plus} '-auth-level'. If the attribute name does not follow the pattern your authentication module will not function the way you want it to. (There is also a second naming convention - please refer to the source code (wink) )
+The 'iplanet-am-auth-sampleauth-auth-level' is the obligatory authentication level attribute. Here naming is very important. The name of the attribute must be: 'iplanet-am-auth-' {plus} lowercase(modulename) {plus} '-auth-level'. If the attribute name does not follow the pattern your authentication module will not function the way you want it to. (There is also a second naming convention; please refer to the source code.)
 
 [[how-to-develop-a-custom-authentication-module-properties-file]]
 ==== Properties file
@@ -499,7 +502,7 @@ Next we need to compile the custom authentication module.
 
 [source,bash]
 ----
-$ javac -d ../classes/ -classpath lib/servlet-api.jar:lib/amserver.jar:lib/opensso-sharedlib.jar:lib/opensso.jar SampleAuth.java SampleAuthPrincipal.java
+$ javac -d ../classes/ -classpath 'lib/*' SampleAuth.java SampleAuthPrincipal.java
 ----
 
 This will create our class file that we need to install into OpenAM. Next we should package the classes files up into a jar file.
@@ -513,7 +516,8 @@ $ jar cf ../sampleauth.jar .
 [[how-to-develop-a-custom-authentication-module-install-your-custom-authentication-module]]
 === Install your custom authentication module
 
-++###++Copy the jar file
+[[how-to-develop-a-custom-authentication-module-copy-the-jar-file]]
+==== Copy the jar file
 
 We copy the jar file into the WEB-INF/lib directory within the openam web application deployed into Tomcat.
 
@@ -535,7 +539,7 @@ $ cp amAuthSampleAuth.properties $TOMCAT_HOME/webapps/openam/WEB-INF/classes/
 [[how-to-develop-a-custom-authentication-module-copy-the-authentication-module-xml-file]]
 ==== Copy the authentication module XML file
 
-We copy the properties file into the config/auth/default directory within the openam web application deployed into Tomcat.
+We copy the authentication module XML file into the config/auth/default directory within the openam web application deployed into Tomcat.
 
 [source,bash]
 ----

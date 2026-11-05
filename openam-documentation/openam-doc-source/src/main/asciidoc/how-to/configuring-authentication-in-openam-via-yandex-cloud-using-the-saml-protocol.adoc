@@ -226,4 +226,4 @@ For production use, OpenAM must be deployed using a secure SSL connection, for e
 
 Next, you can use the OpenIG authorization gateway to set up single sign-on (SSO) for your applications.
 
-For more details on configuring OpenAM and OpenIG, please refer to the documentation at https://doc.openidentityplatform.org/openam[https://doc.openidentityplatform.org/openam] and https://doc.openidentityplatform.org/openig[https://doc.openidentityplatform.org/openig].
+For more details on configuring OpenAM and OpenIG, please refer to the documentation at xref:ROOT:index.adoc[OpenAM documentation] and https://doc.openidentityplatform.org/openig[https://doc.openidentityplatform.org/openig].

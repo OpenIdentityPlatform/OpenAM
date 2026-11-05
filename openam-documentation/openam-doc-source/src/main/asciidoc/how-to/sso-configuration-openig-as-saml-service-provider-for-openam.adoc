@@ -366,5 +366,5 @@ We have successfully configured OpenIG as a Service Provider and implemented SAM
 
 For more details on configuring OpenAM and OpenIG, please refer to the documentation:
 
-* https://doc.openidentityplatform.org/openam/[https://doc.openidentityplatform.org/openam]
+* xref:ROOT:index.adoc[OpenAM documentation]
 * http://doc.openidentityplatform.org/openig[http://doc.openidentityplatform.org/openig]

@@ -266,7 +266,7 @@ image:images/how-to/openam-openig-mcp/4-openam-realm-services.png[OpenAM Realm S
 
 Add the value `profile` to the `Scopes` and `Default Clients Scopes` settings. This scope will allow you to obtain basic information about the user. Enable the `Issue Refresh Tokens` and `Issue Refresh Tokens on Refreshing Access Tokens` options. Also, allow dynamic client registration by enabling the `Allow Open Dynamic Client Registration` option. This will allow the MCP client (VS Code) to automatically register with OpenAM without requiring any additional action from the user.
 
-For more information on configuring OpenAM, please refer to the https://doc.openidentityplatform.org/openam/[documentation].
+For more information on configuring OpenAM, please refer to the xref:ROOT:index.adoc[documentation].
 
 [[how-to-protect-model-context-protocol-mcp-servers-with-openam-and-openig-configuring-openig]]
 === Configuring OpenIG
@@ -560,4 +560,4 @@ image:images/how-to/openam-openig-mcp/14-copilot-successful-response.png[Copilot
 
 In this article, we demonstrated the practical integration of OpenAM and OpenIG to provide secure access to the MCP server based on OAuth 2.1. OpenAM acts as a reliable authentication and authorization center, issuing and validating tokens, while OpenIG filters requests, blocking unauthorized access and proxying traffic to protected resources. This approach minimizes the risk of sensitive data leaks - from internal repositories to customer databases.
 
-Download the source code from GitHub, test the configuration, and integrate it into your projects. For in-depth study, refer to the official documentation: https://doc.openidentityplatform.org/openam/[OpenAM] and https://doc.openidentityplatform.org/openig/[OpenIG].
+Download the source code from GitHub, test the configuration, and integrate it into your projects. For in-depth study, refer to the official documentation: xref:ROOT:index.adoc[OpenAM] and https://doc.openidentityplatform.org/openig/[OpenIG].
