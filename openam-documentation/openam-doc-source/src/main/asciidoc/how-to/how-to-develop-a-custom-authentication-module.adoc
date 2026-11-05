@@ -499,18 +499,19 @@ It's a simple properties file. Be careful to match all the identifier.
 === Compile your custom authentication module
 
 Next we need to compile the custom authentication module.
+Run these commands from the directory containing `SampleAuth.java`, `SampleAuthPrincipal.java`, and `lib/`.
+Keep `amAuthSampleAuth.properties`, `SampleAuth.xml`, and `amAuthSampleAuth.xml` in this directory for the installation steps below.
 
 [source,bash]
 ----
-$ javac -d ../classes/ -classpath 'lib/*' SampleAuth.java SampleAuthPrincipal.java
+$ javac -d classes -classpath 'lib/*' SampleAuth.java SampleAuthPrincipal.java
 ----
 
 This will create our class file that we need to install into OpenAM. Next we should package the classes files up into a jar file.
 
 [source,bash]
 ----
-$ cd classes
-$ jar cf ../sampleauth.jar .
+$ jar cf sampleauth.jar -C classes .
 ----
 
 [[how-to-develop-a-custom-authentication-module-install-your-custom-authentication-module]]

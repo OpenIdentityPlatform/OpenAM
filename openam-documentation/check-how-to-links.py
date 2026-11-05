@@ -36,15 +36,22 @@ def main():
             if target == "ROOT:index.adoc":
                 continue
             page, _, anchor = target.partition("#")
+            checked += 1
             if anchor.startswith("++") and anchor.endswith("++"):
                 anchor = anchor[2:-2]
+            elif re.search(r"\w--\w", anchor):
+                # Asciidoctor turns an intraword double hyphen into an em dash.
+                errors.append(f"{article.name}: fragment needs ++...++: {target}")
+                continue
             destination = article.parent / page if page else article
-            checked += 1
             if not destination.is_file():
                 errors.append(f"{article.name}: missing page: {target}")
                 continue
             if anchor:
                 text = destination.read_text(encoding="utf-8")
+                # Comment, listing and literal blocks do not define anchors.
+                text = re.sub(r"^(/{4,}|-{4,}|\.{4,})[ \t]*\n.*?^\1[ \t]*$", "",
+                              text, flags=re.MULTILINE | re.DOTALL)
                 ids = re.findall(r"^\[\[([^\],]+)", text, re.MULTILINE)
                 # In shorthand attributes, a dot starts a role and % starts an option.
                 ids += re.findall(r"^\[#([^\].,%]+)", text, re.MULTILINE)

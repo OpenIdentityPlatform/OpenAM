@@ -63,7 +63,9 @@ jobs:
       run: mvn --batch-mode --errors --update-snapshots verify --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
     - name: Check How-To documentation links
       if: matrix.os == 'ubuntu-latest' && matrix.java == '11'
-      run: python3 openam-documentation/check-how-to-links.py
+      run: |
+        python3 -m unittest discover -s openam-documentation -p 'test_*.py'
+        python3 openam-documentation/check-how-to-links.py
     - name: Upload artifacts
       uses: actions/upload-artifact@v7
       with:

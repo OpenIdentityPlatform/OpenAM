@@ -653,7 +653,7 @@ index 33b1571..d4b2b40 100644
 -For more details on configuring OpenAM and OpenIG, please refer to the documentation at [https://doc.openidentityplatform.org/openam](https://doc.openidentityplatform.org/openam) and [https://doc.openidentityplatform.org/openig](https://doc.openidentityplatform.org/openig).
 +Please use the documentation site for the current version.
 diff --git a/Home.md b/Home.md
-index a4f95a6..b15e472 100644
+index a4f95a6..95687d4 100644
 --- a/Home.md
 +++ b/Home.md
 @@ -6,7 +6,7 @@
@@ -694,7 +694,7 @@ index a4f95a6..b15e472 100644
 +* [Login and Password Authentication](https://doc.openidentityplatform.org/openam/how-to/login-and-password-authentication)
 +* [Passwordless Authentication Methods](https://doc.openidentityplatform.org/openam/how-to/passwordless-authentication-methods)
 +* [Stateful vs Stateless Authentication](https://doc.openidentityplatform.org/openam/how-to/stateful-vs-stateless-authentication)
-+* [Adaptive-Authentication: How to Improve Security Without Annoying Users](https://doc.openidentityplatform.org/openam/how-to/adaptive-authentication-how-to-improve-security-without-annoying-users)
++* [Adaptive Authentication: How to Improve Security Without Annoying Users](https://doc.openidentityplatform.org/openam/how-to/adaptive-authentication-how-to-improve-security-without-annoying-users)
 +* [How to Add Authorization and Protect Your Application With OpenAM and OpenIG Stack](https://doc.openidentityplatform.org/openam/how-to/how-to-add-authorization-and-protect-your-application-with-openam-and-openig-stack)
 +* [How to Setup OAuth2 OIDC Federation in OpenAM](https://doc.openidentityplatform.org/openam/how-to/how-to-setup-oauth2-oidc-federation-in-openam)
 +* [How to Setup SAMLv2 Federation in OpenAM](https://doc.openidentityplatform.org/openam/how-to/how-to-setup-samlv2-federation-in-openam)
@@ -737,11 +737,11 @@ index a4f95a6..b15e472 100644
 +* [How to Enable CORS](https://doc.openidentityplatform.org/openam/how-to/how-to-enable-cors)
 +* [Migrate OpenAM to Apache Cassandra without Single Point of Failure](https://doc.openidentityplatform.org/openam/how-to/migrate-openam-to-apache-cassandra-without-single-point-of-failure)
 +* [How to Use Apache Cassandra as User and Session DataStore in OpenAM](https://doc.openidentityplatform.org/openam/how-to/how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam)
-+* [How to Develop a Custom Authentication Module](https://doc.openidentityplatform.org/openam/how-to/how-to-develop-a-custom-authentication-module)
++* [Creating a Custom Authentication Module](https://doc.openidentityplatform.org/openam/how-to/how-to-develop-a-custom-authentication-module)
 +* [How to Create Custom OpenAM DataStore Integration](https://doc.openidentityplatform.org/openam/how-to/how-to-create-custom-openam-datastore-integration)
 +* [OpenAM QR Authentication Module](https://doc.openidentityplatform.org/openam/how-to/openam-qr-authentication-module)
 +* [Persistent Cookie module](https://doc.openidentityplatform.org/openam/how-to/persistent-cookie-module)
-+* [ReCaptcha Authentication Module](https://doc.openidentityplatform.org/openam/how-to/captcha-module)
++* [Captcha module](https://doc.openidentityplatform.org/openam/how-to/captcha-module)
 +* [OpenAM Monitoring Using Prometheus](https://doc.openidentityplatform.org/openam/how-to/openam-monitoring-using-prometheus)
 +* [Setup Tracing with OpenTelemetry and Jaeger](https://doc.openidentityplatform.org/openam/how-to/setup-tracing-with-opentelemetry-and-jaeger)
  * [IAM Benchmark: OpenAM vs WSO2 vs SimpleSAMLphp vs Shibboleth](https://thehftguy.com/2015/10/14/iam-benchmarks-openam-vs-wso2-vs-simplesamlphp-vs-shibboleth-2/)
