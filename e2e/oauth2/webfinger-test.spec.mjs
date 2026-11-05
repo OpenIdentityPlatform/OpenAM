@@ -17,17 +17,16 @@
 /*
  * Cover for /.well-known/webfinger (OIDC issuer discovery, RFC 7033).
  *
- * /.well-known/* has a servlet of its own in web.xml: the in-repo Restlet ServerServlet running the WebFinger
- * application. It answers since the servlet swap in #1201.
+ * /.well-known/* is served by the OpenAM (CHF) servlet through WebFingerHttpRouteProvider. Realms resolve the way the
+ * former Restlet application resolved them (host name, one sub-realm per path segment, ?realm= wins), plus the /json
+ * spelling realms/root[/realms/<sub>].
  *
  * The issuer answer does not depend on whether the account exists, because otherwise anyone could check which
  * accounts the realm holds.
- *
- * The spec pins the contract before the flip to CHF.
  */
 
-import { test, expect } from "@playwright/test";
-import { OPENAM_BASE, USERNAME } from "../common/openam-commons.mjs";
+import { test, expect, request as apiRequest } from "@playwright/test";
+import { OPENAM_BASE, ADMIN_PASS, ADMIN_USER, getAuthToken, USERNAME } from "../common/openam-commons.mjs";
 
 const ISSUER_REL = "http://openid.net/specs/connect/1.0/issuer";
 const HOST = new URL(OPENAM_BASE).hostname;
@@ -139,13 +138,14 @@ test.describe("/.well-known/webfinger", () => {
     await expectJson(response, 200, { subject: resource, links: [{ rel, href: `${OPENAM_BASE}/oauth2` }] });
   });
 
-  test("answers 404 to the realms/root path spelling", async ({ request }) => {
-    // RestletRealmRouter takes `realms` as a sub-realm name, so this spelling is a 404 today. The target is 200
-    // with the same JRD as the bare path, as for /xacml/realms/root in xacml-test.spec.mjs; a flip changes this.
+  test("answers the realms/root path spelling like the bare path", async ({ request }) => {
+    // Divergence from master, which answered 404 because RestletRealmRouter took `realms` as a sub-realm name.
+    // The target, as for /xacml/realms/root in xacml-test.spec.mjs, is the JRD of the bare path.
+    const resource = `acct:${USERNAME}@${HOST}`;
     const response = await request.get(`${OPENAM_BASE}/.well-known/realms/root/webfinger`, {
-      params: { resource: `acct:${USERNAME}@${HOST}`, rel: ISSUER_REL },
+      params: { resource, rel: ISSUER_REL },
     });
-    expect(response.status()).toBe(404);
+    await expectJson(response, 200, issuerJrd(resource));
   });
 
   test("answers 404 to an unrouted child of /.well-known", async ({ request }) => {
@@ -172,5 +172,125 @@ test.describe("/.well-known/webfinger", () => {
     expect(response.status()).toBe(405);
     expect(response.headers()["allow"]).toBe("GET");
     expect(response.headers()["content-type"]).toBe(JSON_TYPE);
+  });
+
+  test("answers 404 for a path segment that names no realm", async ({ request }) => {
+    // The path segments before webfinger are sub-realms of the host's realm, checked before discovery runs.
+    const response = await request.get(`${OPENAM_BASE}/.well-known/bogus/webfinger`, {
+      params: { resource: `acct:${USERNAME}@${HOST}`, rel: ISSUER_REL },
+    });
+    await expectJson(response, 404, { error: "Not Found", error_description: 'Realm "/bogus" not found' });
+  });
+
+  test("answers an empty realm parameter like the root realm", async ({ request }) => {
+    const resource = `acct:${USERNAME}@${HOST}`;
+    const response = await request.get(`${OPENAM_BASE}/.well-known/webfinger`, {
+      params: { resource, rel: ISSUER_REL, realm: "" },
+    });
+    await expectJson(response, 200, issuerJrd(resource));
+  });
+
+  test("answers HEAD like GET without a body", async ({ request }) => {
+    const response = await request.head(`${OPENAM_BASE}/.well-known/webfinger`, {
+      params: { resource: `acct:${USERNAME}@${HOST}`, rel: ISSUER_REL },
+    });
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe(JSON_TYPE);
+    expect((await response.body()).length).toBe(0);
+  });
+
+  test("uses the first value of a repeated parameter", async ({ request }) => {
+    // A last-value reading would answer the second subject, or the 400 of the wrong rel.
+    const first = `acct:first@${HOST}`;
+    const query = [
+      ["resource", first],
+      ["resource", `acct:second@${HOST}`],
+      ["rel", ISSUER_REL],
+      ["rel", "http://example.com/not-the-issuer-rel"],
+    ].map(([name, value]) => `${name}=${encodeURIComponent(value)}`).join("&");
+    const response = await request.get(`${OPENAM_BASE}/.well-known/webfinger?${query}`);
+    await expectJson(response, 200, issuerJrd(first));
+  });
+});
+
+// Unique per run, so that a failure is never a leftover of an earlier run.
+const SUB_REALM = `webfingertest${Date.now().toString(36)}`;
+
+test.describe("/.well-known/webfinger in a sub-realm", () => {
+  let adminToken;
+  // Set once SUB_REALM exists, so that afterAll deletes only a realm this worker created.
+  let subRealmId;
+
+  test.beforeAll(async () => {
+    // A throwaway context: the session cookie of /json/authenticate must not ride on the WebFinger requests.
+    const context = await apiRequest.newContext();
+    try {
+      adminToken = await getAuthToken(context, ADMIN_USER, ADMIN_PASS);
+      // global-config, as in xacml-test.spec.mjs: the deprecated /json/realms/{realm}/realms rejects this body.
+      const response = await context.post(`${OPENAM_BASE}/json/global-config/realms?_action=create`, {
+        headers: {
+          "iPlanetDirectoryPro": adminToken,
+          "Content-Type": "application/json",
+          "Accept-API-Version": "protocol=1.0,resource=1.0",
+        },
+        data: { name: SUB_REALM, parentPath: "/", active: true, aliases: [] },
+      });
+      if (!response.ok()) {
+        throw new Error(`Failed to create realm "${SUB_REALM}": ${response.status()} ${await response.text()}`);
+      }
+      subRealmId = (await response.json())._id;
+    } finally {
+      await context.dispose();
+    }
+  });
+
+  test.afterAll(async () => {
+    if (!subRealmId) {
+      return;
+    }
+    const context = await apiRequest.newContext();
+    try {
+      const response = await context.delete(`${OPENAM_BASE}/json/global-config/realms/${subRealmId}`, {
+        headers: { "iPlanetDirectoryPro": adminToken, "Accept-API-Version": "protocol=1.0,resource=1.0" },
+      });
+      if (!response.ok()) {
+        throw new Error(`Failed to delete realm "${SUB_REALM}": ${response.status()} ${await response.text()}`);
+      }
+    } finally {
+      await context.dispose();
+    }
+  });
+
+  const resource = `acct:${USERNAME}@${HOST}`;
+
+  test("answers a JRD for the sub-realm named by ?realm=", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/.well-known/webfinger`, {
+      params: { resource, rel: ISSUER_REL, realm: `/${SUB_REALM}` },
+    });
+    await expectJson(response, 200, issuerJrd(resource));
+  });
+
+  test("answers a JRD for the sub-realm named by a path segment", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/.well-known/${SUB_REALM}/webfinger`, {
+      params: { resource, rel: ISSUER_REL },
+    });
+    await expectJson(response, 200, issuerJrd(resource));
+  });
+
+  test("answers a JRD for the sub-realm under the realms/root path spelling", async ({ request }) => {
+    // Divergence from master (404, `realms` taken as a sub-realm name); the /json spelling is the target.
+    const response = await request.get(`${OPENAM_BASE}/.well-known/realms/root/realms/${SUB_REALM}/webfinger`, {
+      params: { resource, rel: ISSUER_REL },
+    });
+    await expectJson(response, 200, issuerJrd(resource));
+  });
+
+  test("answers a JRD for the sub-realm named directly under realms/", async ({ request }) => {
+    // Divergence from master (404). RealmRoutingFactory looks a realms/<name> segment up by alias or name, as
+    // under /json.
+    const response = await request.get(`${OPENAM_BASE}/.well-known/realms/${SUB_REALM}/webfinger`, {
+      params: { resource, rel: ISSUER_REL },
+    });
+    await expectJson(response, 200, issuerJrd(resource));
   });
 });
