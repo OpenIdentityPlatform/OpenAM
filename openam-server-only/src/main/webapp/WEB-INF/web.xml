@@ -1174,15 +1174,15 @@
         <servlet-name>OpenAM</servlet-name>
         <url-pattern>/sts-tokengen/*</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpenAM</servlet-name>
+        <url-pattern>/xacml/*</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>ForgeRockRest</servlet-name>
         <servlet-class>org.forgerock.openam.rest.RestEndpointServlet</servlet-class>
     </servlet>
-    <servlet-mapping>
-        <servlet-name>ForgeRockRest</servlet-name>
-        <url-pattern>/xacml/*</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ForgeRockRest</servlet-name>
         <url-pattern>/oauth2/*</url-pattern>

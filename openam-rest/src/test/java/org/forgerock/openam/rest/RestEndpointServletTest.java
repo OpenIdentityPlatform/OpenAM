@@ -21,14 +21,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.reset;
 import static org.mockito.Mockito.*;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Arrays;
 import java.util.Collections;
 
-import org.forgerock.http.Filter;
 import org.forgerock.openam.rest.service.RestletServiceServlet;
 import org.mockito.ArgumentMatchers;
 import org.testng.annotations.BeforeClass;
@@ -40,49 +37,25 @@ public class RestEndpointServletTest {
 
     private RestEndpointServlet restEndpointServlet;
 
-    private RestletServiceServlet restletXACMLServiceServlet;
     private RestletServiceServlet restletOAuth2ServiceServlet;
     private RestletServiceServlet restletUMAServiceServlet;
-    private HttpServlet restletXACMLHttpServlet;
-    private Filter authenticationFilter;
 
     @BeforeClass
     public void setupMocks() {
-        restletXACMLServiceServlet = mock(RestletServiceServlet.class);
         restletOAuth2ServiceServlet = mock(RestletServiceServlet.class);
         restletUMAServiceServlet = mock(RestletServiceServlet.class);
-        restletXACMLHttpServlet = mock(HttpServlet.class);
-        authenticationFilter = mock(Filter.class);
     }
 
     @BeforeMethod
     public void setUp() {
+        reset(restletOAuth2ServiceServlet, restletUMAServiceServlet);
 
-        reset(restletXACMLServiceServlet, restletOAuth2ServiceServlet, restletUMAServiceServlet,
-                restletXACMLHttpServlet, authenticationFilter);
-
-        restEndpointServlet = new RestEndpointServlet(restletXACMLServiceServlet, restletOAuth2ServiceServlet,
-                restletUMAServiceServlet, restletXACMLHttpServlet, authenticationFilter);
-    }
-
-    @Test
-    public void shouldCallInit() throws ServletException {
-
-        //Given
-
-        //When
-        restEndpointServlet.init();
-
-        //Then
-        verifyZeroInteractions(restletXACMLServiceServlet);
-        verifyZeroInteractions(restletOAuth2ServiceServlet);
-        verifyZeroInteractions(restletUMAServiceServlet);
+        restEndpointServlet = new RestEndpointServlet(restletOAuth2ServiceServlet, restletUMAServiceServlet);
     }
 
     @DataProvider(name = "restletPaths")
     public Object[][] restletPathData() {
         return new Object[][] {
-                {"/xacml", restletXACMLHttpServlet},
                 {"/oauth2", restletOAuth2ServiceServlet},
                 {"/uma", restletUMAServiceServlet}
         };
@@ -99,19 +72,23 @@ public class RestEndpointServletTest {
         given(request.getAttributeNames()).willReturn(Collections.enumeration(Collections.<String>emptySet()));
         given(request.getServletPath()).willReturn(path);
 
-        restEndpointServlet.init();
-
         //When
         restEndpointServlet.service(request, response);
 
         //Then
         verify(servlet).service(ArgumentMatchers.<HttpServletRequest>anyObject(), eq(response));
-        for (HttpServlet s : Arrays.asList(restletXACMLHttpServlet, restletOAuth2ServiceServlet,
-                restletUMAServiceServlet)) {
-            if (s != servlet) {
-                verifyZeroInteractions(s);
-            }
-        }
+    }
+
+    @Test
+    public void unknownServletPathAnswers404() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        given(request.getServletPath()).willReturn("/xacml");
+
+        restEndpointServlet.service(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
+        verifyZeroInteractions(restletOAuth2ServiceServlet, restletUMAServiceServlet);
     }
 
     @Test
@@ -123,7 +100,6 @@ public class RestEndpointServletTest {
         restEndpointServlet.destroy();
 
         //Then
-        verify(restletXACMLServiceServlet).destroy();
         verify(restletOAuth2ServiceServlet).destroy();
         verify(restletUMAServiceServlet).destroy();
     }

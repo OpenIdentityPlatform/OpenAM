@@ -13,7 +13,7 @@
  *
  * Copyright 2015-2016 ForgeRock AS.
  * Portions Copyrighted 2019 Open Source Solution Technology Corporation.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.entitlement.guice;
@@ -39,15 +39,12 @@ import org.forgerock.openam.entitlement.rest.PolicyParser;
 import org.forgerock.openam.entitlement.rest.PolicyResource;
 import org.forgerock.openam.entitlement.rest.PolicyStoreProvider;
 import org.forgerock.openam.entitlement.rest.PrivilegePolicyStoreProvider;
-import org.forgerock.openam.entitlement.rest.XacmlRouterProvider;
 import org.forgerock.openam.entitlement.rest.query.QueryAttribute;
 import org.forgerock.openam.entitlement.service.DefaultPrivilegeManagerFactory;
 import org.forgerock.openam.entitlement.service.PrivilegeManagerFactory;
 import org.forgerock.openam.errors.ExceptionMappingHandler;
-import org.restlet.routing.Router;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
@@ -67,9 +64,6 @@ public class EntitlementRestGuiceModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
-        bind(Key.get(Router.class, Names.named("XacmlRouter"))).toProvider(XacmlRouterProvider.class)
-                .in(Singleton.class);
 
         // PolicyResource configuration
         bind(PrivilegeManager.class).to(PolicyPrivilegeManager.class);

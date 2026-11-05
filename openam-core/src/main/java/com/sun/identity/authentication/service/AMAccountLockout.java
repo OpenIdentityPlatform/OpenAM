@@ -25,6 +25,7 @@
  * $Id: AMAccountLockout.java,v 1.10 2009/03/06 22:09:20 hengming Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.authentication.service;
 
@@ -125,10 +126,8 @@ class AMAccountLockout {
                 } else {
                     userDN = normalizeDN(username);
                 }
-                if (acInfo == null) {
-                    acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
-                }
-                warnUser = isAccountLockout.invalidPasswd(userDN, username, amIdentity, acInfo);
+                acInfo = isAccountLockout.getAcInfo(userDN, amIdentity, acInfo);
+                warnUser = isAccountLockout.invalidPasswd(userDN, username, amIdentity, acInfo, loginState.getOrgDN());
             }
         } catch (Exception ex) {
             if (DEBUG.messageEnabled()) {
@@ -198,9 +197,7 @@ class AMAccountLockout {
                     userDN = normalizeDN(token);
                 }
 
-                if (acInfo == null) {
-                    acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
-                }
+                acInfo = isAccountLockout.getAcInfo(userDN, amIdentity, acInfo);
                 isAccountLockout.resetLockoutAttempts(userDN, amIdentity, acInfo, resetDuration);
                 warnUser = 0;
             }
@@ -242,11 +239,15 @@ class AMAccountLockout {
      * @return <code>true</code> if account is locked.
      */
     public boolean isLockedOut(String userName) {
+        if (!isAccountLockout.isLockoutEnabled()) {
+            return false;
+        }
         // has this user been locked out.
         String normUserDN = normalizeDN(userName);
         boolean locked = false;
         try {
-            if (isAccountLockout.isMemoryLocking()) {
+            if (isAccountLockout.isMemoryLocking()
+                    || (isAccountLockout.getStoreInvalidAttemptsInDS() && isAccountLockout.hasMemoryLockouts())) {
                 locked = isMemoryLockout(normUserDN);
             }
         } catch (Exception e) {
@@ -269,19 +270,14 @@ class AMAccountLockout {
                 userDN = aUserName;
             }
 
-            if (acInfo == null) {
-                acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
-            }
+            acInfo = isAccountLockout.getAcInfo(userDN, amIdentity, acInfo);
 
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("isLockedOut:userDN=" + userDN);
                 DEBUG.message("isLockedOut:acInfo=" + acInfo);
             }
-            if (acInfo != null) {
-                locked = isAccountLockout.isLockedOut(acInfo);
-                if (!locked && acInfo.isLockout()) {
-                    resetPasswdLockout(aUserName, false);
-                }
+            if (acInfo != null && isAccountLockout.isMemoryLocking(userDN)) {
+                locked = checkMemoryLockout(userDN, amIdentity);
             }
 
             if (DEBUG.messageEnabled()) {
@@ -310,25 +306,21 @@ class AMAccountLockout {
             if (isAccountLockout.getStoreInvalidAttemptsInDS()) {
                 userDN = normalizeDN(IdentityUtils.getDN(amIdentity));
             }
-            if (acInfo == null) {
-                acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
-            }
+            acInfo = isAccountLockout.getAcInfo(userDN, amIdentity, acInfo);
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("userDN=" + userDN);
                 DEBUG.message("acInfo=" + acInfo);
             }
-            if (isAccountLockout.isMemoryLocking() && acInfo != null) {
-                locked = acInfo.isLockout();
-            } else {
-                if (isAccountValid(amIdentity)) {
-                    locked = isAccountLockout.isAccountLocked(amIdentity);
-                    if (locked) {
-                        resetPasswdLockout(aUserName, false);
-                    }
-                } else {
-                    locked = true;
+            // Fallback supplements physical locking; it must not bypass an administrator's lock.
+            if (!isAccountLockout.isMemoryLocking() || acInfo == null) {
+                locked = !isAccountValid(amIdentity) || isAccountLockout.isAccountLocked(amIdentity);
+                if (locked) {
                     resetPasswdLockout(aUserName, false);
                 }
+            }
+            if (!locked && acInfo != null && isAccountLockout.isLockoutEnabled()
+                    && isAccountLockout.isMemoryLocking(userDN)) {
+                locked = checkMemoryLockout(userDN, amIdentity);
             }
 
             if (DEBUG.messageEnabled()) {
@@ -340,6 +332,19 @@ class AMAccountLockout {
             }
         }
         return locked;
+    }
+
+    private boolean checkMemoryLockout(String userDN, AMIdentity amIdentity) {
+        // A fallback counter is shared across requests. Keep expiry and reset atomic with increments,
+        // otherwise a delayed expiry check could erase a subsequent lockout cycle.
+        synchronized (acInfo) {
+            boolean locked = isAccountLockout.isLockedOut(acInfo);
+            if (!locked && acInfo.isLockout()) {
+                isAccountLockout.resetLockoutAttempts(userDN, amIdentity, acInfo, false);
+                warnUser = 0;
+            }
+            return locked;
+        }
     }
 
     /**
