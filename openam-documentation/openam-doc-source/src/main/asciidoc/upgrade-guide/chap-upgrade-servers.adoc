@@ -165,9 +165,10 @@ Starting with this release OpenAM serves WebFinger (`/.well-known/*`) through th
 
 The endpoint otherwise behaves as before, with these changes:
 
-* `/.well-known/realms/root/webfinger`, `/.well-known/realms/root/realms/<realm>/webfinger` and `/.well-known/realms/<realm>/webfinger` address the top-level realm and its subrealms, as the same spellings do under `/json`. Releases 15.x and earlier answered 404. `/.well-known/<realm>/webfinger` and the `realm` query parameter work as before.
+* `/.well-known/realms/root/webfinger`, `/.well-known/realms/root/realms/<realm>/webfinger` and `/.well-known/realms/<realm>/webfinger` address the top-level realm and its subrealms, as the same spellings do under `/json`. Releases 15.x and earlier answered 404, unless a top-level realm is named `realms`: a path that starts with `/.well-known/realms/` addressed that realm before and now always means one of these spellings, so address that realm as `/.well-known/realms/root/realms/realms/webfinger` or with the `realm` query parameter. `/.well-known/<realm>/webfinger` and the `realm` query parameter work as before.
 * An unknown realm in one of the `realms/` spellings answers 404 with a `code`, `reason` and `message` JSON body. An unknown realm in the `realm` query parameter or in a `/.well-known/<realm>/webfinger` path answers 404 with an `error` and `error_description` body, as before.
 * The access audit events of WebFinger requests no longer carry the user ID and the session tracking ID of a session cookie that the request sends.
+* WebFinger requests no longer set the `realm` and `realmObject` servlet request attributes, so a custom Base URL Source extension or servlet filter that reads them finds no value there.
 
 Custom code that refers to `org.forgerock.openidconnect.restlet.WebFinger`, `org.forgerock.openidconnect.restlet.OpenIDConnectDiscovery` or `org.forgerock.oauth2.restlet.OAuth2StatusService` must be changed, because these classes no longer exist.
 ====

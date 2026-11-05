@@ -19,7 +19,7 @@
  *
  * /.well-known/* is served by the OpenAM (CHF) servlet through WebFingerHttpRouteProvider. Realms resolve the way the
  * former Restlet application resolved them (host name, one sub-realm per path segment, ?realm= wins), plus the /json
- * spelling realms/root[/realms/<sub>].
+ * spellings realms/root[/realms/<sub>] and realms/<sub>.
  *
  * The issuer answer does not depend on whether the account exists, because otherwise anyone could check which
  * accounts the realm holds.
