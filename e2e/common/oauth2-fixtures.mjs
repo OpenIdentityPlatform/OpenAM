@@ -15,7 +15,7 @@
  */
 
 /*
- * Shared OAuth2/UMA fixtures for the e2e specs. Every helper is idempotent and safe when several spec files
+ * Shared OAuth2/OIDC/UMA fixtures for the e2e specs. Every helper is idempotent and safe when several spec files
  * call it in parallel -- Playwright runs spec FILES in parallel, so "create if absent, widen if present" is
  * the only safe shape here.
  */
@@ -30,11 +30,16 @@ export const REDIRECT_URI = "http://app.invalid/cb";
  * Client ids are PER SPEC FILE, not shared. Playwright runs spec files in parallel, and rewriting a client
  * invalidates the tokens already issued against it -- so two files sharing one client flake as soon as their
  * beforeAll hooks interleave. Each file owning its own clients removes the coupling entirely.
+ *
+ * The secrets are deliberately long. OpenAM signs id_tokens with HS256 (the default
+ * idTokenSignedResponseAlg) using the client secret, and HMAC-SHA256 needs a >=256-bit key -- a short secret
+ * makes the token endpoint fail with a bare `server_error` that says nothing about the cause.
  */
+export const OIDC_CLIENT_SECRET = "oidc-secret-0123456789-0123456789-0123456789";
 export const RS_CLIENT_SECRET = "rs-secret-0123456789-0123456789-0123456789";
 
-/** Scopes the /uma spec needs the provider to issue. */
-const REQUIRED_SCOPES = ["uma_protection", "uma_authorization"];
+/** Scopes the specs need the provider to issue. */
+const REQUIRED_SCOPES = ["openid", "profile", "uma_protection", "uma_authorization"];
 
 /**
  * Where the provider stores a consent decision. Any non-empty value keeps `isSaveConsentEnabled` true;
@@ -100,7 +105,7 @@ export async function ensureOAuth2Provider(adminToken, request) {
  * Brings the realm's OAuth2 provider up to what the specs need -- creating it first if absent -- and does
  * nothing at all once it is already there. Two invariants, checked independently:
  *
- *   1. `uma_protection` / `uma_authorization` are issuable (only ever ADDS scopes).
+ *   1. every scope of `REQUIRED_SCOPES` is issuable (only ever ADDS scopes).
  *   2. `coreOAuth2Config.savedConsentAttribute` is non-empty. The realm-config endpoint answers
  *      `501 Patch not supported`, so a full-object PUT is the only way to change one field, and that PUT
  *      stores a read-back `""` as absent. That would silently turn the consent page's save-consent control
@@ -180,6 +185,29 @@ async function ensureClient(adminToken, request, clientId, data) {
     throw new Error(`Failed to write client ${clientId}: ${written.status()} ${await written.text()}`);
   }
   console.log(`OAuth2 client "${clientId}" written (${written.status()})`);
+}
+
+export async function ensureOidcClient(adminToken, request, clientId) {
+  await ensureClient(adminToken, request, clientId, {
+    "userpassword": OIDC_CLIENT_SECRET,
+    "com.forgerock.openam.oauth2provider.clientType": "Confidential",
+    "com.forgerock.openam.oauth2provider.redirectionURIs": [`[0]=${REDIRECT_URI}`],
+    "com.forgerock.openam.oauth2provider.scopes": ["[0]=openid", "[1]=profile"],
+    "com.forgerock.openam.oauth2provider.defaultScopes": ["[0]=openid"],
+    "com.forgerock.openam.oauth2provider.grantTypes": [
+      "[0]=authorization_code", "[1]=implicit", "[2]=refresh_token",
+      "[3]=urn:ietf:params:oauth:grant-type:device_code",
+    ],
+    "com.forgerock.openam.oauth2provider.responseTypes": [
+      "[0]=code", "[1]=token", "[2]=id_token", "[3]=code token", "[4]=token id_token",
+    ],
+    "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "client_secret_basic",
+    // HS256 signs the id_token with the client secret, so idtokeninfo can verify it without a client JWKS.
+    // With RS256 the server looks for the CLIENT's public key and fails with server_error.
+    "com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg": "HS256",
+    "isConsentImplied": true,
+    "sunIdentityServerDeviceStatus": "Active",
+  });
 }
 
 export async function ensureResourceServerClient(adminToken, request, clientId) {
@@ -306,6 +334,68 @@ export async function deleteResourceSet(request, pat, id) {
   } catch (ignored) {
     // The suite already reported whatever went wrong; leaking one resource set is not worth a red run.
   }
+}
+
+/**
+ * A fixed PKCE pair. `authorizationCodeTokens` always sends the S256 challenge, so the flow works whether or
+ * not the provider enforces PKCE. The shared provider does not enforce it: `device-flow-test.spec.mjs` posts
+ * `/device/code` without a challenge.
+ */
+export async function pkce() {
+  const verifier = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+  return { verifier, challenge: Buffer.from(digest).toString("base64url") };
+}
+
+/**
+ * A Playwright request context whose cookie jar holds the given session, and nothing else.
+ *
+ * On /oauth2/authorize the `iPlanetDirectoryPro` HEADER does not authenticate -- only the COOKIE does.
+ */
+export function sessionContext(apiRequest, ssoToken, extraCookies = []) {
+  const domain = new URL(OPENAM_BASE).hostname;
+  return apiRequest.newContext({
+    storageState: {
+      cookies: [{ name: "iPlanetDirectoryPro", value: ssoToken }, ...extraCookies].map((cookie) => ({
+        ...cookie, domain, path: "/", expires: -1, httpOnly: false, secure: false, sameSite: "Lax",
+      })),
+      origins: [],
+    },
+  });
+}
+
+/**
+ * Runs a full authorization_code + PKCE exchange and returns the token response.
+ *
+ * @param context a request context whose jar carries the resource owner's session
+ */
+export async function authorizationCodeTokens(context, { clientId, clientSecret, scope, nonce } = {}) {
+  const { verifier, challenge } = await pkce();
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: clientId,
+    redirect_uri: REDIRECT_URI,
+    scope,
+    state: "fixture-state",
+    code_challenge: challenge,
+    code_challenge_method: "S256",
+  });
+  if (nonce) params.set("nonce", nonce);
+
+  const authorize = await context.get(`${OPENAM_BASE}/oauth2/authorize?${params}`, { maxRedirects: 0 });
+  if (authorize.status() !== 302) {
+    throw new Error(`authorize did not redirect: ${authorize.status()} ${await authorize.text()}`);
+  }
+  const code = new URL(authorize.headers()["location"]).searchParams.get("code");
+
+  const token = await context.post(`${OPENAM_BASE}/oauth2/access_token`, {
+    headers: { Authorization: basicAuth(clientId, clientSecret) },
+    form: { grant_type: "authorization_code", code, redirect_uri: REDIRECT_URI, code_verifier: verifier },
+  });
+  if (!token.ok()) {
+    throw new Error(`token exchange failed: ${token.status()} ${await token.text()}`);
+  }
+  return token.json();
 }
 
 /** A token for the given resource-server client at the requested scope, via the ROPC grant. */
