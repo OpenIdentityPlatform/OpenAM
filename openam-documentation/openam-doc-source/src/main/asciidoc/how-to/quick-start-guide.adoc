@@ -1,0 +1,200 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#quick-start-guide]
+== Quick Start Guide
+
+OpenAM Getting Started
+
+____
+https://doc.openidentityplatform.org/openam/getting-started/ (pdf)
+____
+
+OpenAM 13.5 Getting Started
+
+____
+https://github.com/OpenIdentityPlatform/OpenAM/wiki/old/OpenAM-13.5-Getting-Started.pdf
+____
+
+[[quick-start-guide-preparations]]
+=== Preparations
+
+[[quick-start-guide-install-docker]]
+==== Install Docker
+
+Install Docker for your platform, if you did not do this before, from https://docs.docker.com/install/#supported-platforms.
+
+[[quick-start-guide-prepare-hosts-file]]
+==== Prepare Hosts File
+
+First, you need to add to your _hosts_ file the local IP and FQDN mappings. _openam.example.org_ - for OpenAm and _example.org_ for Apache Http Server. Your hosts file should contain the following line:
+
+[source,bash]
+----
+127.0.0.1    openam.example.org example.org
+----
+
+To add the above line to the hosts file on Windows:
+
+[arabic]
+. Press the Windows key.
+. Type Notepad in the search field.
+. In the search results, right-click Notepad and select Run as administrator.
+. From Notepad, open the following file: c:++\++Windows++\++System32++\++Drivers++\++etc++\++hosts.
+. Make the necessary changes to the file.
+. Select File ++>++ Save to save your changes
+
+[[quick-start-guide-openam-configuration]]
+=== OpenAM Configuration
+
+[[quick-start-guide-running-openam-image]]
+==== Running OpenAM Image
+
+Create Docker network for OpenAM
+
+[source,bash]
+----
+docker network create openam-quickstart
+----
+
+Run OpenAM image
+
+[source,bash]
+----
+docker run -h openam.example.org -p 8080:8080 --network openam-quickstart --name openam openidentityplatform/openam
+----
+
+Change the name in the above command if you run into errors saying the container is already in use.
+
+[[quick-start-guide-basic-openam-setup]]
+==== Basic OpenAM Setup
+
+Open your browser, goto url http://openam.example.org:8080/openam. image:images/how-to/quickstart/openam-conf-start.png[OpenAM Configuration Start]
+
+Click *Create Default Configuration*.
+
+image:images/how-to/quickstart/openam-conf-license.png[OpenAM License Agreement]
+
+Accept License Agreement
+
+image:images/how-to/quickstart/openam-conf-passwords.png[OpenAM Set Passwords]
+
+Set password for default admin user and policy agent
+
+Press *Create Configuration*. After configuration successfully created, press *Proceed to Login* or open http://openam.example.com:8080/openam/console link in browser.
+
+[[quick-start-guide-policy-configuration]]
+==== Policy Configuration
+
+image:images/how-to/quickstart/openam-console-realm.png[OpenAM Console Realm]
+
+In administration console select realm, then go to *Authorization -++>++ Policy Sets*, select *Default Policy Set* and add new Policy
+
+Set Policy Name as you wish, Resource Type set URL, and add new Resource _++*++://example.org:++*++/++*++_ and click *Create* to save new policy.
+
+image:images/how-to/quickstart/openam-console-newpolicy.png[OpenAM Console New Policy]
+
+On new policy settings select Actions tab and add two actions *GET* and *POST*
+
+image:images/how-to/quickstart/openam-console-policy-actions.png[OpenAM Policy Actions]
+
+Then select Subjects tab and set type to *Authenticated Users*
+
+image:images/how-to/quickstart/openam-console-policy-subjects.png[OpenAM Policy Subjects]
+
+Click *Save Changes* to save your policy
+
+[[quick-start-guide-agent-configuration]]
+==== Agent Configuration
+
+Then, in left menu, go to *Applications -++>++ Web Agents* and create new Agent
+
+image:images/how-to/quickstart/openam-console-webagents.png[OpenAM Web Agents]
+
+Set name as you wish, for example `apache++_++agent`, set agent password.
+
+image:images/how-to/quickstart/openam-console-webagents-create.png[OpenAM Create Web Agent]
+
+Server URL set http://openam.example.org:8080/openam
+
+Agent URL set http://example.org:80
+
+Click *Create* to save new Web Agent
+
+Click *General* tab to return to main menu.
+
+[[quick-start-guide-cookie-domain-configuration]]
+==== Cookie Domain Configuration
+
+Navigate to *Configure -++>++ Global Services -++>++ Platform -++>++ Cookie Domain*.
+
+Set cookie domain to _.example.org_, save your settings.
+
+[[quick-start-guide-apache-http-server-configuration]]
+=== Apache HTTP Server Configuration
+
+Create Dockerfile in your _/home/user/openam-quickstart/apache/_ folder with following content
+
+[source,dockerfile]
+----
+FROM httpd:2.4.34
+
+ENV PA_PASSWORD password
+
+RUN echo "deb [trusted=yes] http://archive.kernel.org/debian-archive/debian/ jessie main" >> /etc/apt/sources.list
+
+RUN apt-get update || true
+
+RUN apt-get install -y curl unzip
+
+RUN curl -L -o /tmp/Apache_v24_Linux_64bit_4.1.1.zip https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases/download/4.1.1/Apache_v24_Linux_64bit_4.1.1.zip
+
+RUN unzip /tmp/Apache_v24_Linux_64bit_4.1.1.zip -d /usr/
+
+RUN rm /tmp/Apache_v24_Linux_64bit_4.1.1.zip
+
+RUN echo $PA_PASSWORD > /tmp/pwd.txt
+
+RUN cat /tmp/pwd.txt
+
+RUN cat /etc/issue
+
+RUN /usr/web_agents/apache24_agent/bin/agentadmin --s "/usr/local/apache2/conf/httpd.conf" "http://openam.example.org:8080/openam" "http://example.org:80" "/" "apache_agent" "/tmp/pwd.txt" --acceptLicence --changeOwner
+----
+
+Set ENV PA++_++PASSWORD as you previously set for your WebAgent in OpenAm
+
+Build Apache Docker image
+
+[source,bash]
+----
+docker build --network=host -t apache_agent -f /home/user/openam-quickstart/apache/Dockerfile /home/user/openam-quickstart/apache/
+----
+
+And then run image
+
+[source,bash]
+----
+docker run -it --name apache_agent -p 80:80 -h example.org --shm-size 2G --network openam-quickstart  apache_agent
+----
+
+Change apache++_++agent to httpd in the above command. apache++_++agent is not available on docker hub.
+
+Open in browser link http://example.org, and you will be redirected to OpenAM Authentication. After authentication you should see default Apache HTTP Server page image:images/how-to/quickstart/apache-default.png[Apache Default Page]

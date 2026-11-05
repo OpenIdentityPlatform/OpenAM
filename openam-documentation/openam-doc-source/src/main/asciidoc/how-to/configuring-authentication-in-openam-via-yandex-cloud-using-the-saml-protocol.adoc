@@ -1,0 +1,229 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol]
+== Configuring authentication in OpenAM via Yandex Cloud using the SAML protocol
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-introduction]]
+=== Introduction
+
+In this article, we will configure authentication in OpenAM using user accounts via Yandex Cloud. This will allow you to configure authentication in your corporate applications via OpenAM using Yandex Cloud as the Identity Provider (IdP) and OpenAM as the Service Provider (SP).
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-configuring-yandex-cloud]]
+=== Configuring Yandex Cloud
+
+[arabic]
+. Go to the https://org.cloud.yandex.ru/[Yandex Cloud Organization] service.
+. Open the *Identity Hub* tab.
+. In the left pane, select the https://center.yandex.cloud/organization/apps[Applications] section.
+. Click the *Create Application* button
+. Select the SAML (Security Assertion Markup Language) application type
+. Enter the application name, for example, *openam-saml*
+. Click the *Create Application* button
+
+image:images/how-to/yandex-cloud-idp-saml/0-yandex-cloud-new-app.png[Yandex Cloud Create New App]
+
+After creating the application, open its settings and click the *Download Certificate* button. We will need it for further configuration of OpenAM.
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-service-provider-configuration]]
+==== Service Provider Configuration
+
+[arabic]
+. Open the Yandex settings for the *openam-saml* application and configure the settings:
+. *SP Entity ID:* `http://localhost:8080/openam`
+. *ACS URL:* `http://localhost:8080/openam/Consumer/metaAlias/sp`
+. Save the changes.
+
+image:images/how-to/yandex-cloud-idp-saml/1-yandex-cloud-app-settings.png[Yandex Cloud Application Settings]
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-adding-users]]
+==== Adding users
+
+Add a user pool:
+
+[arabic]
+. In the *Identity Hub* section, select *User Pools* from the menu on the left.
+. Click the *Create User Pool* button.
+. Enter the pool details and click *Create User Pool*.
+
+image:images/how-to/yandex-cloud-idp-saml/2-yandex-cloud-new-user-pool.png[Yandex Clound New User Pool]
+
+Add a user to the pool
+
+[arabic]
+. In the *Identity Hub* section of the left-hand menu, select *Users*
+. Click the *Add User* button
+. In the pop-up menu, select *Create New User*
+. Remember the password, as you will need it to log in to OpenAM
+. Enter the user details and click *Add User*
+
+image:images/how-to/yandex-cloud-idp-saml/3-yandex-cloud-new-user.png[Yandex Cloud New User]
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-configuring-openam]]
+=== Configuring OpenAM
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-installing-openam]]
+==== Installing OpenAM
+
+For simplicity, deploy OpenAM in a Docker container with the command
+
+[source,bash]
+----
+docker run -p 8080:8080 --name openam openidentityplatform/openam
+----
+
+And perform the initial setup
+
+[source,bash]
+----
+docker exec -w '/usr/openam/ssoconfiguratortools' openam bash -c \
+'echo "ACCEPT_LICENSES=true
+SERVER_URL=http://localhost:8080
+DEPLOYMENT_URI=/$OPENAM_PATH
+BASE_DIR=$OPENAM_DATA_DIR
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=
+ADMIN_PWD=passw0rd
+AMLDAPUSERPASSWD=p@passw0rd
+COOKIE_DOMAIN=localhost
+ACCEPT_LICENSES=true
+DATA_STORE=embedded
+DIRECTORY_SSL=SIMPLE
+DIRECTORY_SERVER=localhost
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=dc=openam,dc=example,dc=org
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
+----
+
+Add the certificate you downloaded earlier for the Yandex Cloud application you created to the OpenAM keystore.
+
+To do this, copy the certificate to the container.
+
+[source,bash]
+----
+docker cp openam-saml.cer openam:/usr/openam/config/openam
+----
+
+The password for the keystore is located in the file `/usr/openam/config/openam/.storepass`.
+
+You can view it using the command
+
+[source,bash]
+----
+docker exec openam bash -c 'cat /usr/openam/config/openam/.storepass'
+----
+
+Import the certificate into the OpenAM keystore
+
+[source,bash]
+----
+docker exec -it -w '/usr/openam/config/openam' openam bash -c 'keytool -importcert \
+        -alias "yandex-cloud-cert" \
+        -keystore keystore.jceks \
+        -storetype JCEKS \
+        -file openam-saml.cer'
+----
+
+Enter the password and confirm that the certificate is trusted.
+
+Restart the OpenAM container.
+
+[source,bash]
+----
+docker restart openam
+----
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-realm-configuration]]
+==== Realm Configuration
+
+Log in to the administrator console at http://localhost:8080/openam/[http://localhost:8080/openam]. Use the login `amadmin` and password `passw0rd` respectively.
+
+[arabic]
+. Open *Top Level Realm.*
+. In the menu on the left, go to *Authentication → Settings*.
+. Go to the *User Profile* tab and set the *User Profile* setting to *Ignore*.
+. Click *Save Changes.*
++
+image:images/how-to/yandex-cloud-idp-saml/4-openam-realm-settings.png[OpenAM Realm Settings]
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-configuring-the-service-provider]]
+==== Configuring the Service Provider
+
+[arabic]
+. In the administrator console, select *Top Level Realm*
+. On the *Common Tasks* panel, click *Configure SAMLv2 Provider*
+. Next, click *Create Hosted Service Provider*
+. Enter any name for *Circle Of Trust*, for example, `openam-yandex`, and click *Configure.*
++
+image:images/how-to/yandex-cloud-idp-saml/5-openam-create-saml-sp.png[OpenAM Create SAML Service Provider]
+. OpenAM will prompt you to configure Remote Identity Provider. Click Yes.
++
+image:images/how-to/yandex-cloud-idp-saml/6-openam-configure-idp-request.png[OpenAM Configure IDP Request]
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-configuring-the-identity-provider]]
+==== Configuring the Identity Provider
+
+[arabic]
+. Enter the metadata URL from the Yandex application settings and click Configure.
++
+image:images/how-to/yandex-cloud-idp-saml/7-openam-remote-idp.png[OpenAM Configure Remote IDP]
+. Reopen Top Level Realm
+. In the left pane, navigate to *Applications → SAML 2.0*
+. In the *Entity Providers* list, open *http://localhost:8080/openam*
+. On the *Assertion Content* tab, find the *Authentication Context* section
+. Set the *Default Authentication Context* setting to `Password`
+. In the *Authentication Context* table, select the values `Password` and `Password Protected Password`
+. Click *Save*
+. Go to the *Assertion Processing* tab
+. In the *Attribute Mapper* section, set the *Attribute Map* setting to `emailaddress=mail`
+. In the *Auto Federation* section, select the Enabled checkbox and set Attribute to `emailaddress`.
+. Click *Save*.
+. Go to the *Services* tab.
+. In the *SP Service Attributes* section, in the *Assertion Consumer Service* table, select `HTTP-POST`.
++
+image:images/how-to/yandex-cloud-idp-saml/8-openam-assertion-consumer-service.png[OpenAM Assertion Consumer Service]
+. Click *Save*
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-verifying-the-solution]]
+=== Verifying the solution
+
+[arabic]
+. Exit the admin console, Yandex console, or open your browser in incognito mode.
+. Follow the authentication link: http://localhost:8080/openam/spssoinit?metaAlias=/sp&idpEntityID=https%3A%2F%2Fauth.yandex.cloud%2Fsaml%2Fek0pduu9hrclvnque14v&RelayState=http%3A%2F%2Flocalhost%3A8080%2Fopenam
+. The Yandex Cloud authentication window will open.
+. In the email field, enter your user ID: `demo-saml@openam-saml.idp.yandexcloud.net` and click →
+. In the password field, enter the corresponding password for your account
+. Click → image:images/how-to/yandex-cloud-idp-saml/9-yandex-cloud-auth.png[Yandex Cloud Authentication]
+. After successful authentication, you will be redirected to the OpenAM console with your Yandex Cloud credentials.
++
+image:images/how-to/yandex-cloud-idp-saml/10-openam-user-profile.png[OpenAM User Profile]
+
+[[configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol-whats-next]]
+=== What's next
+
+For production use, OpenAM must be deployed using a secure SSL connection, for example on a host and using an FQDN, such as https://openam.example.org/openam.
+
+Next, you can use the OpenIG authorization gateway to set up single sign-on (SSO) for your applications.
+
+For more details on configuring OpenAM and OpenIG, please refer to the documentation at https://doc.openidentityplatform.org/openam[https://doc.openidentityplatform.org/openam] and https://doc.openidentityplatform.org/openig[https://doc.openidentityplatform.org/openig].

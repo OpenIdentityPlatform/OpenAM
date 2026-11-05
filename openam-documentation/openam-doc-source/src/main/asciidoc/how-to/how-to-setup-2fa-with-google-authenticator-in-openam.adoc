@@ -1,0 +1,113 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-setup-2fa-with-google-authenticator-in-openam]
+== How to Setup 2FA with Google Authenticator in OpenAM
+
+* xref:how-to-setup-2fa-with-google-authenticator-in-openam.adoc#how-to-setup-2fa-with-google-authenticator-in-openam-introduction[Introduction]
+* xref:how-to-setup-2fa-with-google-authenticator-in-openam.adoc#how-to-setup-2fa-with-google-authenticator-in-openam-openam-setup[OpenAM Setup]
+** xref:how-to-setup-2fa-with-google-authenticator-in-openam.adoc#how-to-setup-2fa-with-google-authenticator-in-openam-setup-authentication-module[Setup Authentication Module]
+** xref:how-to-setup-2fa-with-google-authenticator-in-openam.adoc#how-to-setup-2fa-with-google-authenticator-in-openam-setup-authentication-chain[Setup Authentication Chain]
+** xref:how-to-setup-2fa-with-google-authenticator-in-openam.adoc#how-to-setup-2fa-with-google-authenticator-in-openam-setup-user-accounts[Setup User Accounts]
+* xref:how-to-setup-2fa-with-google-authenticator-in-openam.adoc#how-to-setup-2fa-with-google-authenticator-in-openam-test-solution[Test Solution]
+
+[[how-to-setup-2fa-with-google-authenticator-in-openam-introduction]]
+=== Introduction
+
+Google Authenticator is one of the most commonly used applications for two-factor authentication (2FA). It runs both on Android and iOS devices. In the following article, we will describe how to set up 2FA in OpenAM with Google Authenticator.
+
+[[how-to-setup-2fa-with-google-authenticator-in-openam-openam-setup]]
+=== OpenAM Setup
+
+[[how-to-setup-2fa-with-google-authenticator-in-openam-setup-authentication-module]]
+==== Setup Authentication Module
+
+For example, we have realm `staff` where we want to set up 2FA with Google Authenticator. Login into admin console as `amadmin` user, go to realm `staff`, and create new `OATH` module `google-authenticator` with the following settings:
+
+image:images/how-to/google-authenticator/new-google-authenticator-module.png[New Google Authenticator Module]
+
+image:images/how-to/google-authenticator/google-authenticator-module-settings.png[Google Authenticator Module Settings]
+
+There are some important settings:
+
+* *One Time Password Length*: Should be 6 as in Google Authenticator by default
+* *Secret Key Attribute Name*: User attribute in where a secret key is stored.
+* *OATH Algorithm to Use*: For Google Authenticator should be https://tools.ietf.org/html/rfc6238[TOTP]
+* *Last Login Time Attribute*: User attribute, where users last login time in UNIX format is stored.
+* *Maximum Allowed Clock Drift*: Should be greater than TOTP time steps, so in the following example it is 3.
+
+[[how-to-setup-2fa-with-google-authenticator-in-openam-setup-authentication-chain]]
+==== Setup Authentication Chain
+
+By default, there is `ldapService` authentication chain, which uses only `DataStore` authentication module. Add `google-authenticator` module in the chain.
+
+image:images/how-to/google-authenticator/authentication-chain.png[Authentication Chain]
+
+[[how-to-setup-2fa-with-google-authenticator-in-openam-setup-user-accounts]]
+==== Setup User Accounts
+
+The next part would be a little bit tricky. To authenticate in Google Authenticator we need to set up user accounts first. Then generate for each user account shared secret. As an example, we will take `test` account and for this account shared secret will be `s3cr3tw0rd`.
+
+Encode into Base16. You can or use online service https://simplycalc.com/base16-encode.php[https://simplycalc.com/base16-encode.php] either use the following Java function:
+
+[source,java]
+----
+private String toBase16(String str) {
+  return String.format("%x", new BigInteger(1, str.getBytes(Charset.defaultCharset())));
+}
+----
+
+Base16 encoded value is `73336372337477307264`.
+
+Open User account properties in Apache Directory Studio (or any other LDAP client application) and add `sunIdentityServerPPEncryptKey` value `73336372337477307264` as shown on the picture below.
+
+image:images/how-to/google-authenticator/apache-ds-user-properties.png[Apache DS User Properties]
+
+Then generate a QR code to register the user in the Google Authenticator application. QR for Google Authenticator is URI in the following format `otpauth://totp/++<++account id++>++@++<++issuer++>++?secret=++<++base32 encoded secret++>++&issuer=++<++Issuer Name++>++`
+
+Encode secret as Base32. You can use or online service https://simplycalc.com/base32-encode.php[https://simplycalc.com/base32-encode.php], ether following Java function:
+
+[source,java]
+----
+import org.apache.commons.codec.binary.Base32;
+
+private String toBase32(String str) {
+    return new Base32().encodeAsString(str.getBytes());
+}
+----
+
+Base32 encoded value is `OMZWG4RTOR3TA4TE`
+
+The final URI will be: `otpauth://totp/test@openam.openidentityplatform.org?secret=OMZWG4RTOR3TA4TE&issuer=Open{plus}Identity{plus}Platform`
+
+Let's use the online service https://www.the-qrcode-generator.com[https://www.the-qrcode-generator.com] to generate a QR code image:
+
+image:images/how-to/google-authenticator/qr-code.png[Google Authenticator QR Code]
+
+Scan QR in Google Authenticator application. A new account will be added.
+
+[[how-to-setup-2fa-with-google-authenticator-in-openam-test-solution]]
+=== Test Solution
+
+Let’s sign in into realm `staff` с with `test` account: image:images/how-to/google-authenticator/auth-staff-login-password.png[Auth Staff Login Password] You will be prompted for OTP from Google Authenticator.
+
+image:images/how-to/google-authenticator/login-staff-otp.png[Auth Staff OTP 2FA]
+
+Enter the code from Google Authenticator, and you will be successfully authenticated.

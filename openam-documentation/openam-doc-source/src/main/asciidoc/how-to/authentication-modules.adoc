@@ -1,0 +1,59 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#authentication-modules]
+== Authentication modules
+
+* Active Directory module
+* Adaptive Risk module
+* Anonymous module
+* xref:captcha-module.adoc[Captcha module]
+* Certificate module
+* Check channel over send and verify one time code module
+* Confirmation module
+* Data Store module
+* Device Id (Save) module
+* Federation module
+* Authenticator (OATH) module
+* Authenticator (Push) module
+* Authenticator (Push) Registration module
+* HOTP module
+* HTTP Basic module
+* HTTP Header Enrichment module
+* JDBC module
+* LDAP module
+* Membership module
+* NTLM module
+* OATH module
+* OAuth 2.0 / OpenID Connect module
+* OAuth-2 (auth) module
+* OAuth-2 (sso) module
+* OAuth-2 (token) module
+* OpenID Connect id++_++token bearer module
+* xref:persistent-cookie-module.adoc[Persistent Cookie module]
+* RADIUS module
+* reCaptcha module
+* SAE module
+* SAML2 module
+* Windows Desktop SSO module
+* Windows NT module
+* WSSAuth module
+
+How-to Write a custom authentication module

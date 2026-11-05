@@ -1,0 +1,130 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#openam-monitoring-using-prometheus]
+== OpenAM Monitoring Using Prometheus
+
+[[openam-monitoring-using-prometheus-preface]]
+=== Preface
+
+https://github.com/OpenIdentityPlatform/OpenAM[OpenAM] can expose SNMP metrics. To expose these metrics to Prometheus we will use https://github.com/prometheus/snmp_exporter[snmp++_++exporter] tool, provided by the Prometheus community.
+
+To follow the current manual Docker and Docker Compose should be installed
+
+Configuration files located in this project https://github.com/maximthomas/openam-prometheus[https://github.com/maximthomas/openam-prometheus]
+
+Just clone it and run with docker-compose:
+
+[source,bash]
+----
+git clone https://github.com/maximthomas/openam-prometheus.git
+----
+
+[source,bash]
+----
+cd ./openam-prometheus
+----
+
+[source,bash]
+----
+docker-compose up
+----
+
+[[openam-monitoring-using-prometheus-setup-openam-and-snmp-monitoring]]
+=== Setup OpenAM and SNMP Monitoring
+
+Open OpenAM URL and create a basic configuration (see xref:quick-start-guide.adoc[OpenAM Quick Start Gude])
+
+Enable SNMP in OpenAM. Login into OpenAM console, goto *Configure -++>++ Global Services -++>++ Monitoring*
+
+image:images/how-to/openam-prometheus/openam-monitoring.png[OpenAM monitoring]
+
+Enable checkboxes *Monitoring Status* and *Monitoring SNMP interface status*
+
+Restart OpenAM instance
+
+[[openam-monitoring-using-prometheus-setup-snmp-exporter]]
+=== Setup SNMP Exporter
+
+Open SNMP exporter URL
+
+http://localhost:9116/
+
+image:images/how-to/openam-prometheus/snmp-exporter.png[SNMP exporter]
+
+Fill the fields: Target: OpenAM hostname and port, for example `openam:8085` Module: SNMP exporter module, for example `openam`
+
+Press the Submit, then you should see something like this:
+
+....
+# HELP authenticationFailureCount Count of unsuccessful authentications - 1.3.6.1.4.1.42.2.230.3.1.1.2.1.10.2
+# TYPE authenticationFailureCount counter
+authenticationFailureCount 0
+# HELP authenticationFailureRate Current Auth failure rate / second based on a fixed preconfigured window. - 1.3.6.1.4.1.42.2.230.3.1.1.2.1.10.4
+# TYPE authenticationFailureRate gauge
+authenticationFailureRate 0
+# HELP authenticationSuccessCount Count of successful authentications - 1.3.6.1.4.1.42.2.230.3.1.1.2.1.10.1
+# TYPE authenticationSuccessCount counter
+authenticationSuccessCount 0
+# HELP authenticationSuccessRate Current Auth success rate / second based on a fixed preconfigured window. - 1.3.6.1.4.1.42.2.230.3.1.1.2.1.10.3
+# TYPE authenticationSuccessRate gauge
+authenticationSuccessRate 0
+# HELP averageDuration Average duration of tokens of the specified type in OpenAM in seconds - 1.3.6.1.4.1.36733.1.2.3.5.1.2
+# TYPE averageDuration counter
+averageDuration{tokenTableIndex="1"} 1532
+averageDuration{tokenTableIndex="10"} 0
+averageDuration{tokenTableIndex="11"} 0
+averageDuration{tokenTableIndex="12"} 0
+averageDuration{tokenTableIndex="13"} 0
+averageDuration{tokenTableIndex="14"} 0
+averageDuration{tokenTableIndex="15"} 0
+averageDuration{tokenTableIndex="16"} 340
+......
+....
+
+[[openam-monitoring-using-prometheus-setup-prometheus]]
+=== Setup Prometheus
+
+If you have an existing prometheus instance add to `prometheus.yml` job `openam` with a target to SNMP exporter host and port:
+
+[source,yaml]
+----
+  - job_name: "openam"
+    params:
+      target: ["openam:8085"]
+      module: ["openam"]
+    metrics_path: /snmp
+    static_configs:
+      - targets: ["snmp-exporter:9116"]
+----
+
+Run Prometheus and check targets:
+
+http://localhost:9090/targets You should see something like this:
+
+image:images/how-to/openam-prometheus/prometheus-target.png[Prometheus target]
+
+Then go to Graph and you will be able to add OpenAM metrics to monitor.
+
+http://localhost:9090/graph
+
+image:images/how-to/openam-prometheus/prometheus-graph.png[Prometheus graph]
+
+If you have any additional questions, https://github.com/OpenIdentityPlatform/OpenAM/discussions[feel free to ask us]!

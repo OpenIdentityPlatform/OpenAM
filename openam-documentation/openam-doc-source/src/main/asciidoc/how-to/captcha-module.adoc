@@ -1,0 +1,86 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#captcha-module]
+== Captcha module
+
+[[captcha-module-recaptcha-authentication-module]]
+=== ReCaptcha Authentication Module
+
+ReCaptcha authentication module allows use Google ReCaptcha to make sure that authenticating user is a real person and not a Robot.
+
+This module included in OpenAM distribution since https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.1[14.1.1 version]
+
+To use this module, at first you should receive recevie ReCaptcha's *key* and *secret key* from *Google*.
+
+[[captcha-module-setup-authentication-module-gobally]]
+==== Setup Authentication Module Gobally
+
+To configure the reCaptcha module globally in the AM console, navigate to Configuration ++>++ Authentication, and then, click *ReCaptcha*. Module settings are shown on the picture below: image:images/how-to/recaptcha/recaptcha-settings.png[ReCaptcha Settings]
+
+[[captcha-module-setup-authentication-chain]]
+==== Setup Authentication Chain
+
+image:images/how-to/recaptcha/recaptcha-auth-chain.png[ReCaptcha Authentication Chain] In this picture, at first, user solves recaptcha, and then recaptcha module allows him to authenticate in DataStore authentication module. As there is no Pricipal at authentication chain start, if user solves ReCaptcha, it returns ignore and skips user to DataStore authentication module. If users does not solve ReCaptcha, authentication starts over.
+
+[[captcha-module-ssoadm-service-name-sunamauthrecaptchaservice]]
+==== xref:../reference/openam-cli-tools.adoc[ssoadm] service name: *sunAMAuthReCaptchaService*
+
+[[captcha-module-key]]
+===== Key
+
+Specifies the key, obtained from Google in ReCaptcha administartion console
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.key*
+
+[[captcha-module-secret-key]]
+===== Secret Key
+
+Specifies the secret key, obtained from Google in ReCaptcha administartion console
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.secret*
+
+[[captcha-module-recaptcha-javascript-url]]
+===== ReCaptcha JavaScript URL
+
+Google's ReCaptcha JavaScript library URL
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.jsUrl*
+
+[[captcha-module-recaptcha-verify-url]]
+===== ReCaptcha Verify URL
+
+Google's ReCaptcha verification endpoint
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.verifyUrl*
+
+[[captcha-module-recaptcha-verify-url-connect-timeout]]
+===== ReCaptcha Verify URL connect timeout
+
+Google's ReCaptcha verification endpoint connect timeout (default 1500 ms)
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.connect.timeout*
+
+[[captcha-module-recaptcha-verify-url-read-timeout]]
+===== ReCaptcha Verify URL read timeout
+
+Google's ReCaptcha verification endpoint read timeout (default 2500 ms)
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *org.openidentityplatform.openam.authentication.modules.recaptcha.ReCaptcha.read.timeout*

@@ -1,0 +1,148 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#migrate-openam-to-apache-cassandra-without-single-point-of-failure]
+== Migrate OpenAM to Apache Cassandra without Single Point of Failure
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-initial-data-storage-scheme]]
+=== Initial Data Storage Scheme
+
+[width="100%",cols="25%,25%,25%,25%",]
+|===
+|Data Type |Storage Method |Fautl Tolerance Method |Disadvantages
+|OpenAM configuration .3+|OpenDJ (localhost:1389) .3+|Multi-master replication  |Configuration update on a single node affects all nodes by replication.
+|CTS-Core Token Service (Session persistence) .2+a|
+Syncronisation payload processed on all nodes
+
+Read performance from single node restricted by single node performance.
+
+Replication failure could cause other nodes to read-only mode
+
+|Accounts repository (except AD)
+|===
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-data-storage-scheme-for-the-number-of-credentials-5-million]]
+=== Data Storage Scheme for the Number of Credentials ++>++5 Million
+
+[width="100%",cols="25%,25%,25%,25%",]
+|===
+|Data Type |Storage Method |Fault Tolerance Method |Disadvantages
+|OpenAM configuration |OpenDJ (localhost:1389) |Local independent storage as a part of the distribution (war file) |Updating the configuration on one node does not affect other nodes (the nodes are completely independent)
+|CTS-Core Token Service (Session persistence) .2+|Cassandra Cluster (tcp:9042) .2+|Cluster without a single point of failure with geo-distribution and distribution by rack .2+a|
+Synchronization write payload is processed only on the nodes with the required replication level
+
+The reading load from one node is not limited to the performance of one node, but distributed according to the replication level.
+
+Node failure does cause replication stop according to the replication level
+
+|Accounts repository (except AD)
+|===
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-migration-plan]]
+==== Migration Plan
+
+. Cluster hardware resources planning
+. Deploy the cluster according to the required level of fault tolerance
+. Provide network access OpenAM-++>++ tcp:9042
+. Migration stages (can be done independently):
+.. Switch "CTS - Core Token Service (sessions)"
+.. Switch "Accounts repository (except AD)" with legacy data migration
+.. Switch "OpenAM configuration"
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-fault-tolerance-level-planning]]
+==== Fault Tolerance Level Planning
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-datacenter]]
+===== Datacenter
+
+Defines geo-distributed storage fault tolerance.
+
+* Minimum number of data centers: 1
+* The recommended number of data centers:
+** at least two
+** at least the same number of data centers used for application servers (OpenAM)
+* Allowed data center fault tolerance mode:
+** Hot Spare: used for data processing for application servers (OpenAM)
+** Cold Spare: not used for data processing for application servers (OpenAM)
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-rack]]
+===== Rack
+
+Minimum fault tolerance unit within a data center for data distribution within a data center, haves:
+
+* Independent disk subsystem array
+* Independent virtualization hypervisor (host system)
+
+Amount calculation:
+
+* Minimum quantity inside hot spare data center: 1, but not less than replication level inside the data center
+* Minimum quantity inside cold spare datacenter: 1, but not less than replication level inside the datacenter
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-node]]
+===== Node
+
+Defines the unit of information storage and load inside the data center rack
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-an-example-of-a-recommended-minimum-configuration]]
+==== An Example of a Recommended Minimum Configuration
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-test]]
+===== Test
+
+[cols=",,,,,,",]
+|===
+|DataCenter |Type |Amount of Copies |Rack |% data |Node |% data
+|dc01 |host |1 |rack01 |100% |dc01-rack01-node01 |100%
+|===
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-production]]
+===== Production
+
+[cols=",,,,,,",]
+|===
+|DataCenter |Type |Amount of Copies |Rack |data % |Node |data %
+|dc01 |hot |1 |rack01 ^|100% |dc01-rack01-node01 ^|50%
+|  |  |  |  ^|  |dc01-rack01-node02 ^|50%
+|  |  |1 |rack02 ^|100% |dc01-rack02-node01 ^|50%
+|  |  |  |  ^|  |dc01-rack02-node02 ^|50%
+|dc02 |hot |1 |rack01 ^|100% |dc02-rack01-node01 ^|50%
+|  |  |  |  ^|  |dc02-rack01-node02 ^|50%
+|  |  |1 |rack02 ^|100% |dc02-rack02-node01 ^|50%
+|  |  |  |  ^|  |dc02-rack02-node02 ^|50%
+|===
+
+
+
+Allowed:
+
+* Increase the data center amount without service interruption
+* Increase the rack amount without service interruption
+* Increase the node amount without service interruption
+* Change the number of data copies inside the data center without service interruption
+
+[[migrate-openam-to-apache-cassandra-without-single-point-of-failure-hardware-requirements-for-a-single-node]]
+==== Hardware Requirements For a Single Node
+
+[cols=",,,",]
+|===
+|Environment |CPU |RAM |Disk
+|Test |++>++=2 |++>++=8 |16G HDD
+|Production |++>++=8 |++>++=32 ballon=off |64G SSD RAID
+|===

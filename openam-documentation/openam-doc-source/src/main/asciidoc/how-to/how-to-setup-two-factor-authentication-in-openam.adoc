@@ -1,0 +1,94 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-setup-two-factor-authentication-in-openam]
+== How to Setup Two Factor Authentication in OpenAM
+
+[[how-to-setup-two-factor-authentication-in-openam-introduction]]
+=== Introduction
+
+In the following article, we will set up OpenAM authentication with a Time-Based One-Time Password (TOTP, https://tools.ietf.org/html/rfc6238[RFC 6238]).
+
+[[how-to-setup-two-factor-authentication-in-openam-openam-setup]]
+=== OpenAM Setup
+
+[[how-to-setup-two-factor-authentication-in-openam-openam-installation]]
+==== OpenAM Installation
+
+If you have not already had OpenAM installed, you can do it as described xref:quick-openam-docker-configuration-from-a-command-line.adoc[here].
+
+[[how-to-setup-two-factor-authentication-in-openam-authentication-module-setup]]
+==== Authentication Module Setup
+
+Open the OpenAM administration console using the link http://openam.example.org:8080/openam/console[http://openam.example.org:8080/openam/console]. In the login field enter the `amadmin` value, in the password field enter the value from the `ADMIN++_++PWD` parameter of the setup command, in this case, `passw0rd`.
+
+Open the root realm, in the left menu, select Authentication → Modules, and press the `Add Module` button. In the form enter the name of the module, for example, `totp` and choose the module type `Authenticator (OATH)`. Press the `Create` button.
+
+image:images/how-to/openam-2fa/0-openam-new-module.png[OpenAM new module]
+
+Set the `OATH Algorithm to Use` setting to `TOTP`, set the `Name of the Issuer` field to any non-empty value, for example, `OpenAM` and click the `Save Changes` button.
+
+image:images/how-to/openam-2fa/1-oath-module-settings.png[OATH module settings]
+
+[[how-to-setup-two-factor-authentication-in-openam-device-registration-authentication-chain-setup]]
+==== Device Registration Authentication Chain Setup
+
+In the administration console in the realm settings in the left menu select Authentication → Chains and in the chain list press the `Add Chain` button. Enter the authentication chain name `totp-register` and press the `Create` button. In the chain settings press the `Add a Module` button and add the `totp` authentication module as shown in the picture below. Press the `OK` button and next `Save Changes`.
+
+image:images/how-to/openam-2fa/2-device-registration-chain.png[Devide registration chain]
+
+[[how-to-setup-two-factor-authentication-in-openam-login-authentication-chain-setup]]
+==== Login Authentication Chain Setup
+
+In the administration console in the realm settings in the left menu select Authentication → Chains and in the chain list press the `Add Chain` button. Enter the authentication chain name `totp-login` and press the `Create` button. Add the login and password `DataStore` authentication module. Next, add the one-time password `totp` authentication module. Press the `Save Changes` button.
+
+image:images/how-to/openam-2fa/3-2fa-login-chain.png[2FA login chain]
+
+[[how-to-setup-two-factor-authentication-in-openam-test-the-solution]]
+=== Test the Solution
+
+Download on your mobile device Microsoft Authenticator or Google Authenticator application.
+
+[[how-to-setup-two-factor-authentication-in-openam-setting-up-a-test-user]]
+==== Setting Up a Test User
+
+In the OpenAM admin console, navigate to the root realm and select `Subjects` from the left menu. Set the password for the `demo` user. To do this, select it in the list of users, and click the `Edit` link under Password. Enter and save the new password. Next, log out of the administrator console.
+
+[[how-to-setup-two-factor-authentication-in-openam-device-registration]]
+==== Device Registration
+
+Log in to the console with the `demo` user account. To do this, log out of the administrator console or open a browser in Incognito mode. Go to the URL http://openam.example.org:8080/openam/XUI/#login/[http://openam.example.org:8080/openam/XUI/#login/] and log in to OpenAM with the `demo` user credentials. After successful authentication, open the registration chain link in the browser http://openam.example.org:8080/openam/XUI/#login&service=totp-register[http://openam.example.org:8080/openam/XUI/#login&service=totp-register].
+
+Press the `Register Device` button. There will be a QR code in the browser. Open the authenticator application on your mobile device and tap the add account button. Scan the QR code from the browser. A `demo` user account for OpenAM will be added to the authenticator mobile app.
+
+image:images/how-to/openam-2fa/4-qr-device-registration.png[QR device registration]
+
+Next, click the `Login Using Verification Code` button in the browser. Enter the code from the mobile app and click `Submit`.
+
+image:images/how-to/openam-2fa/5-enter-totp.png[Enter TOTP form]
+
+The application has been registered.
+
+[[how-to-setup-two-factor-authentication-in-openam-one-time-password-authentication]]
+==== One-Time Password Authentication
+
+Log out of the OpenAM console or open your browser in Incognito mode. Open the http://openam.example.org:8080/openam/XUI/#login&service=totp-login[http://openam.example.org:8080/openam/XUI/#login&service=totp-login] link in the browser.
+
+Enter the username and password for the user `demo`. After entering the username and password, OpenAM will prompt for a one-time password from the mobile app. Open the mobile app, select the `demo` user account, enter the one-time password from the mobile app in the browser, and press the `Submit` button. After entering the correct one-time password, authentication will be completed successfully.

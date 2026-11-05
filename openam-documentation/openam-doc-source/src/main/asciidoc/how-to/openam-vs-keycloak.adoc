@@ -1,0 +1,177 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#openam-vs-keycloak]
+== OpenAM vs Keycloak
+
+[[openam-vs-keycloak-general-information]]
+=== General Information
+
+[cols=",,",options="header",]
+|===
+| |*OpenAM* |*Keycloak*
+|Initial release |2008 |2014
+|Maintainer |Open Identity Platform Community |Red Hat
+|Current version |16.0.4 |26.4.7
+|Release and patches |Regular |Regular
+|Open Source |✅ |✅
+|Programming Language |Java |Java
+|Supported Java version |11{plus} LTS |17{plus} LTS
+|License |CDDL |Apache License 2.0
+|Multiple languages supported |✅ |✅
+|===
+
+[[openam-vs-keycloak-single-sign-on-sso-and-federation]]
+=== Single Sign On (SSO) and Federation
+
+[cols=",,",options="header",]
+|===
+| |OpenAM |Keycloak
+|Applications deployment behind an auth gateway |✅ https://doc.openidentityplatform.org/openam/deployment-planning/chap-topologies#logical-topology[doc] |✅ https://www.krakend.io/docs/authorization/keycloak/[doc]
+|API gateway control |✅ xref:how-to-add-authorization-and-protect-your-application-with-openam-and-openig-stack.adoc[doc] |⛔️
+|Apache Web Server Policy Agent |✅ https://doc.openidentityplatform.org/openam/web-users-guide/chap-apache[doc] |⛔️
+|IIS Policy Agent |✅ https://doc.openidentityplatform.org/openam/web-users-guide/chap-msiis-7[doc] |⛔️
+|J2EE Policy Agent (for Tomcat, Jetty, etc) |✅ https://doc.openidentityplatform.org/openam/jee-users-guide/[doc] |⛔️
+|OAuth 2.0/OIDC federation |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_github[Google example] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_github[GitHub example]
+|SAMLv2 federation |✅ xref:saml-authentication-in-wordpress-via-openam.adoc[WordPress example] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_github[doc]
+|===
+
+[[openam-vs-keycloak-authentication]]
+==== Authentication
+
+Supported authentication methods:
+
+[cols=",,",options="header",]
+|===
+|*Authentication method* |*OpenAM* |*Keycloak*
+|Login and password authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#data-store-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_authentication-flows[doc]
+|Microsoft Active Directory authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#active-directory-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_user-storage-federation[doc]
+|Authentication for demo access |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#anonymous-module-ref[doc] |⛔️
+|Adaptive authentication |✅ link:++https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#adaptive-risk--module-ref++[doc] |⛔️
+|Authentication in an LDAPv3-compatible directory |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#ldap-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_user-storage-federation[doc]
+|Persistent cookie authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#persistent-cookie-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#enabling-remember-me[doc]
+|RDBMS authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#jdbc-module-ref[doc] |✅ https://www.keycloak.org/server/db[doc]
+|Self-registration |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#membership-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#con-user-registration_server_administration_guide[doc]
+|HTTP Header enrichment authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#msisdn-module-ref[doc] |⛔️
+|Windows NT authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#windows-nt-module-ref[doc] |⛔️
+|OAuth 2.0/OIDC authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#oauth-2[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#con-oidc_server_administration_guide[doc]
+|Kerberos authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#windows-desktop-sso-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_kerberos[doc]
+|OIDC id++_++token authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#openid-connect-id_token-bearer-module-ref[doc] |⛔️
+|RADIUS authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#radius-module-ref[doc] |⛔️
+|HOTP via SMS or email |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#hotp-module-ref[doc] |⛔️
+|One time password with HOTP or TOTP authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#oath-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#one-time-password-otp-policies[doc]
+|Custom scripted authentication provider |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#scripted-module-module-ref[doc] |⛔️
+|SAMLv2 authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#saml2-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_saml[doc]
+|ReCaptcha |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#recaptcha-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#proc-enabling-recaptcha_server_administration_guide[doc]
+|QR-code authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#qr-code-confirm-from-other-session-module-ref[doc] |⛔️
+|NTLM authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#ntlm-module-ref[doc] |⛔️
+|Docker HTTP Basic Authentication |⛔️ |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#docker-authentication-flow[doc]
+|HTTP Basic Authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#http-basic-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#docker-authentication-flow[doc]
+|Recovery codes authentication |✅ https://doc.openidentityplatform.org/openam/admin-guide/chap-auth-services#authn-mfa-accessing-recovery-codes[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_recovery-codes[doc]
+|WebAuthn |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#webauthn-registration-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#webauthn_server_administration_guide[doc]
+|X509 certificate authentication |✅ https://doc.openidentityplatform.org/openam/reference/chap-auth-modules#certificate-module-ref[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_x509[doc]
+|Custom authentication provider |✅ https://doc.openidentityplatform.org/openam/dev-guide/chap-customizing#sec-auth-spi[doc] |✅ https://www.keycloak.org/docs/latest/server_development/index.html#implementing-an-authenticator[doc]
+|===
+
+[[openam-vs-keycloak-isolation-realms]]
+=== Isolation (realms)
+
+Realm support for isolation of identities and authentication processes
+
+[cols=",,",options="header",]
+|===
+| |*OpenAM* |*Keycloak*
+|Realms support |✅ https://doc.openidentityplatform.org/openam/admin-guide/chap-realms[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#_configuring-realms[doc]
+|Realm hierarchy |✅ |⛔️
+|===
+
+[[openam-vs-keycloak-interfaces]]
+=== Interfaces
+
+[cols=",,",options="header",]
+|===
+|*Interface* |*OpenAM* |*Keycloak*
+|Administrator GUI |✅ |✅
+|Admin REST API |✅ |✅
+|Admin UI customization |⛔️ |✅ https://www.keycloak.org/ui-customization/creating-your-own-console[doc]
+|Authentication GUI |✅ |✅
+|Authentication GUI customization |✅ https://doc.openidentityplatform.org/openam/install-guide/chap-custom-ui[doc] |✅ https://www.keycloak.org/guides#ui-customization[doc]
+|Authentication REST API |✅ https://doc.openidentityplatform.org/openam/dev-guide/chap-client-dev#sec-rest[doc] |⛔️
+|Authentication XML-RPC API |✅ https://doc.openidentityplatform.org/openam/dev-guide/chap-client-dev#sec-sdk[doc] |⛔️
+|===
+
+[[openam-vs-keycloak-authentication-sessions]]
+=== Authentication Sessions
+
+[cols=",,",options="header",]
+|===
+| |*OpenAM* |*Keycloak*
+|xref:stateful-vs-stateless-authentication.adoc[Stateful] |Random session ID |JWT
+|xref:stateful-vs-stateless-authentication.adoc[Stateless] |JWT |JWT
+|REST Security Token Service |✅  |✅
+|SOAP Security Token Service |✅  |⛔️
+|===
+
+[[openam-vs-keycloak-identity-repositories]]
+=== Identity Repositories
+
+[cols=",,",options="header",]
+|===
+|Repository type |*OpenAM* |*Keycloak*
+|LDAP (OpenDJ, OpenLDAP, etc.) |✅  |✅
+|Active Directory |✅  |✅
+|Apache Cassandra |✅  |⛔️
+|MariaDB Server |✅  |✅
+|Microsoft SQL Server |✅ |✅
+|MySQL |✅  |✅
+|Oracle Database |✅  |✅
+|PostgreSQL |✅  |✅
+|Flat file |✅  |⛔️
+|Custom identity repository |✅ https://doc.openidentityplatform.org/openam/dev-guide/chap-customizing#sec-identity-repo-spi[doc]  |✅ https://www.keycloak.org/docs/latest/server_development/index.html#_user-storage-spi[doc]
+|===
+
+[[openam-vs-keycloak-audit-logging-and-monitoring]]
+=== Audit logging and Monitoring
+
+[cols=",,",options="header",]
+|===
+| |*OpenAM* |*Keycloak*
+|Audit Logging |✅ https://doc.openidentityplatform.org/openam/reference/chap-audit-log-messages[doc] |✅ https://www.keycloak.org/docs/latest/server_admin/index.html#configuring-auditing-to-track-events[doc]
+|HTTP-based Monitoring |✅ https://doc.openidentityplatform.org/openam/admin-guide/chap-monitoring#monitoring-web-pages[doc] |✅ https://www.keycloak.org/server/management-interface[doc]
+|SNMP Monitoring |✅ https://doc.openidentityplatform.org/openam/admin-guide/chap-monitoring#monitoring-snmp[doc] |⛔️
+|JMX Monitoring |✅ https://doc.openidentityplatform.org/openam/admin-guide/chap-monitoring#monitoring-jmx[doc] |⛔️
+|===
+
+[[openam-vs-keycloak-useful-links]]
+=== Useful Links
+
+[[openam-vs-keycloak-openam]]
+==== OpenAM:
+
+* https://www.openidentityplatform.org/openam[Official website]
+* https://github.com/OpenIdentityPlatform/OpenAM[GitHub repository]
+* https://doc.openidentityplatform.org/openam/[Documentation]
+
+[[openam-vs-keycloak-keycloak]]
+==== Keycloak:
+
+* https://www.keycloak.org/[Official website]
+* https://github.com/keycloak/keycloak[GitHub repository]
+* https://www.keycloak.org/documentation[Documentation]

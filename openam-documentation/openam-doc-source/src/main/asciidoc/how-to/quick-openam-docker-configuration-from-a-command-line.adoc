@@ -1,0 +1,94 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#quick-openam-docker-configuration-from-a-command-line]
+== Quick OpenAM Docker Configuration From a Command Line
+
+Let OpenAM hostname is `openam.example.org` Before starting, add the hostname and IP address to the `hosts` file, for example `127.0.0.0.1 openam.example.org`.
+
+On Windows systems, the `hosts` file is located at `C:++\++Windows/System32/drivers/etc/hosts` , on Linux and Mac it is located at `/etc/hosts`.
+
+Next, start the OpenAM Docker container. Run the following command:
+
+[source,bash]
+----
+docker run -h openam.example.org -p 8080:8080 --name openam openidentityplatform/openam
+----
+
+There is no need to configure OpenAM manually via UI. The following command helps to automate the process:
+
+[source,bash]
+----
+ docker exec -w '/usr/openam/ssoconfiguratortools' openam bash -c \
+'echo "ACCEPT_LICENSES=true
+SERVER_URL=http://openam.example.org:8080
+DEPLOYMENT_URI=/$OPENAM_PATH
+BASE_DIR=$OPENAM_DATA_DIR
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=
+ADMIN_PWD=passw0rd
+AMLDAPUSERPASSWD=p@passw0rd
+COOKIE_DOMAIN=example.org
+ACCEPT_LICENSES=true
+DATA_STORE=embedded
+DIRECTORY_SSL=SIMPLE
+DIRECTORY_SERVER=openam.example.org
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=dc=openam,dc=example,dc=org
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
+----
+
+For external LDAP server OpenDJ use:
+
+[source,bash]
+----
+docker exec -w '/usr/openam/ssoconfiguratortools' openam bash -c \
+          'echo "ACCEPT_LICENSES=true
+          SERVER_URL=http://openam.example.org:8080
+          DEPLOYMENT_URI=/$OPENAM_PATH
+          BASE_DIR=$OPENAM_DATA_DIR
+          locale=en_US
+          PLATFORM_LOCALE=en_US
+          AM_ENC_KEY=
+          ADMIN_PWD=ampassword
+          AMLDAPUSERPASSWD=password
+          COOKIE_DOMAIN=example.org
+          DATA_STORE=dirServer
+          DIRECTORY_SSL=SIMPLE
+          DIRECTORY_SERVER=opendj
+          DIRECTORY_PORT=1389
+          DIRECTORY_ADMIN_PORT=4444
+          DIRECTORY_JMX_PORT=1689
+          ROOT_SUFFIX=dc=example,dc=com
+          DS_DIRMGRDN=cn=Directory Manager
+          DS_DIRMGRPASSWD=password
+          USERSTORE_TYPE=LDAPv3ForOpenDS
+          USERSTORE_SSL=SIMPLE
+          USERSTORE_HOST=opendj
+          USERSTORE_PORT=1389
+          USERSTORE_SUFFIX=dc=example,dc=com
+          USERSTORE_MGRDN=cn=Directory Manager
+          USERSTORE_PASSWD=password
+          " > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
+----

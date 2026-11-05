@@ -1,0 +1,253 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#saml-authentication-in-wordpress-via-openam]
+== SAML Authentication in WordPress via OpenAM
+
+[[saml-authentication-in-wordpress-via-openam-introduction]]
+=== Introduction
+
+https://en.wikipedia.org/wiki/SAML_2.0[SAMLv2], despite its venerable age, is the de facto standard for https://en.wikipedia.org/wiki/Single_sign-on[SSO (Single Sign On)] in an enterprise environment. And in the following article, we will set up a SAML login to WordPress using http://github.com/OpenIdentityPlatform/OpenAM[OpenAM] authentication. That is, when authenticating to WordPress, users will be redirected to OpenAM and, after authenticating to OpenAM will be automatically authenticated to WordPress. Given OpenAM's flexibility in customizing authentication methods, you can customize WordPress login not only by login and password but also, for example, using built-in Windows authentication (NTLMv2 or Kerberos), adding a second authentication factor (biometrics or one-time password) or even by scanning a QR code in a special mobile app.
+
+Instead of WordPress, it can be almost any application that supports SAMLv2. The OpenAM configuration will be nearly identical. Only the settings for the application itself will differ.
+
+[[saml-authentication-in-wordpress-via-openam-some-terminology]]
+=== Some terminology
+
+*Service Provider (SP)* - The application whose services users will use after authentication.
+
+*Identity Provider (IdP)* - the application that authenticates users and provides the Service Provider with information about the authenticated accounts.
+
+In our case, the Identity Provider is OpenAM and the Service Provider is WordPress.
+
+[[saml-authentication-in-wordpress-via-openam-test-environment]]
+=== Test environment
+
+For demonstration purposes, all applications will be run in Docker containers via the Docker Compose utility.
+
+Add the OpenAM and WordPress hostnames `127.0.0.0.1 openam.example.org wordpress.example.org` to the `hosts` file.
+
+On systems running Windows, the `hosts` file is `C:++\++Windows++\++System32++\++drivers++\++etc++\++hosts`. On Linux and Mac systems, `/etc/hosts`.
+
+Create a `docker-compose.yml` file with the following contents:
+
+[source,yaml]
+----
+services:
+  openam:
+    image: openidentityplatform/openam:latest
+    restart: always
+    hostname: openam.example.org
+    ports:
+      - "8080:8080"
+    volumes:
+      - openam-data:/usr/openam/config
+      - ./openam-config.properties:/usr/openam/openam-config.properties:ro
+      - ./openam-init.sh:/usr/local/tomcat/bin/openam-init.sh:ro
+    command: |
+      bash /usr/local/tomcat/bin/openam-init.sh
+
+  wordpress:
+    image: wordpress
+    restart: always
+    hostname: wordpress.example.org
+    ports:
+      - 8081:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress:/var/www/html
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:
+  openam-data:
+----
+
+To configure OpenAM immediately configured at startup, create an OpenAM `openam-config.properties` configuration file:
+
+[source,properties]
+----
+ACCEPT_LICENSES=true
+SERVER_URL=http://openam.example.org:8080
+DEPLOYMENT_URI=/openam
+BASE_DIR=/usr/openam/config
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=
+ADMIN_PWD=passw0rd
+AMLDAPUSERPASSWD=p@passw0rd
+COOKIE_DOMAIN=openam.example.org
+ACCEPT_LICENSES=true
+DATA_STORE=embedded
+DIRECTORY_SSL=SIMPLE
+DIRECTORY_SERVER=openam.example.org
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=dc=openam,dc=example,dc=org
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=passw0rd
+----
+
+and an initial configuration script `openam-init.sh`
+
+[source,bash]
+----
+#!/bin/bash
+
+/usr/local/tomcat/bin/catalina.sh run &
+SERVER_PID=$!
+
+# Wait for OpenAM to respond to isAlive.jsp
+until curl -f -s -o /dev/null http://localhost:8080/openam/isAlive.jsp; do
+    echo "Waiting for OpenAM to fully initialize..."
+    sleep 5
+done
+
+if [[ -f /usr/openam/config/boot.json ]]; then
+    echo "OpenAM has already been configured."
+else
+    echo "Setting up OpenAM..."
+    java -jar /usr/openam/ssoconfiguratortools/openam-configurator-tool*.jar --file /usr/openam/openam-config.properties
+fi
+
+wait $SERVER_PID
+----
+
+Start the containers with the `docker compose up` command.
+
+[[saml-authentication-in-wordpress-via-openam-wordpress-configuration]]
+=== WordPress Configuration
+
+[[saml-authentication-in-wordpress-via-openam-initial-wordpress-configuration]]
+==== Initial WordPress Configuration
+
+If you already have WordPress configured, you can skip this section. If not, open the http://wordpress.example.org:8081/wp-admin/install.php[http://wordpress.example.org:8081/wp-admin/install.php] link in your browser. Select the language and go to settings. Fill in the settings and be sure to remember the generated password. You will need it to log in to the administrator console.
+
+image:images/how-to/saml-wordpress/0-wordpress-setup-settings.png[Initial WordPress Configuration]
+
+Press the `Install WordPress` button.
+
+After completing the configuration, navigate to the login form and enter the administrator username and password specified during installation. The administrator console will open.
+
+[[saml-authentication-in-wordpress-via-openam-install-the-samlv2-plugin]]
+==== Install the SAMLv2 Plugin
+
+In the administrator console, select Plugins. Click the `Add New Plugin` button and install the miniOrange SAML Single Sign On - SSO Login plugin.
+
+image:images/how-to/saml-wordpress/1-wordpress-saml-plugin.png[WordPress plugin for SAML]
+
+Once installed, activate the plugin by clicking the Activate button in the plugin window. In the left panel, you will see the settings item for the installed plugin.
+
+Go to the `Service Provider Metadata` section in the plugin settings panel and copy the Metadata URL. Change the port from 8081 to 80 because OpenAM will load metadata from the WordPress Docker container, available on port 80 within the Docker environment: `http://wordpress.example.org:80/?option=mosaml++_++metadata`.
+
+image:images/how-to/saml-wordpress/2-wordpress-saml-sp-metadata.png[SAML SP WordPress Metadata]
+
+[[saml-authentication-in-wordpress-via-openam-openam-setup]]
+=== OpenAM Setup
+
+[[saml-authentication-in-wordpress-via-openam-create-a-hosted-identity-provider]]
+==== Create a Hosted Identity Provider
+
+Go to the OpenAM administrator console at http://openam.example.org:8080/openam/XUI/#login/[http://openam.example.org:8080/openam/XUI/#login/].
+
+Enter the OpenAM administrator login and password. In our case, it will be `amadmin` and `passw0rd` respectively.
+
+In the console, open `Top Level Realm`, click `Configure SAMLv2 Provider` → `Create Hosted Identity Provider`.
+
+image:images/how-to/saml-wordpress/3-openam-configure-saml-provider.png[OpenAM Configure SAMLv2 Provider]
+
+image:images/how-to/saml-wordpress/4-openam-create-hosted-idp.png[OpenAM Create Hosted Identity Provider]
+
+Complete the settings as shown in the screenshot and click the "Configure" button.
+
+image:images/how-to/saml-wordpress/5-openam-saml-idp-settings.png[OpenAM SAML Identity Provider Settings]
+
+In the administrator console click `Top Level Realm` and in the left menu select `Applications` → `SAML 2.0`
+
+image:images/how-to/saml-wordpress/6-openam-saml.png[OpenAM SAML]
+
+In the `Entity Providers` section, open the settings for Identity Provider `http://openam.example.org:8080/openam`. On the `Assertion Content` tab, go to `Name ID Format` → `NameID Value Map` and add the value `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=uid`
+
+image:images/how-to/saml-wordpress/7-openam-saml-nameid-value-map.png[OpenAM SAML NameID Value Map]
+
+Press the `Save` button.
+
+[[saml-authentication-in-wordpress-via-openam-configure-remote-service-provider]]
+==== Configure Remote Service Provider
+
+Next, register WordPress as a remote service provider. In the OpenAM administrator console, select `Top Level Realm`, then `Configure SAMLv2 Provider` → `Configure Remote Service Provider`.
+
+image:images/how-to/saml-wordpress/8-openam-create-remote-sp.png[OpenAM Create Remote Service Provider]
+
+Fill out the Remote Service Provider settings as shown in the screenshot. The metadata URL should be as in the SAMLv2 WordPress plugin configuration step: `http://wordpress.example.org:80/?option=mosaml++_++metadata`.
+
+image:images/how-to/saml-wordpress/9-openam-saml-sp-settings.png[OpenAM SAML Service Provider Settings]
+
+[[saml-authentication-in-wordpress-via-openam-wordpress-openam-identity-provider-configuration]]
+=== WordPress OpenAM Identity Provider Configuration
+
+Go back to the WordPress administration console.
+
+Open the miniOrange SAML plugin settings.
+
+Click the `Service Provider Setup` tab.
+
+In the `Configure Service Provider` section, click the `Upload IDP Metadata` tab.
+
+Fill in the fields as shown in the screenshot below. The SAML metadata URL for OpenAM will be:`http://openam.example.org:8080/openam/saml2/jsp/exportmetadata.jsp`
+
+image:images/how-to/saml-wordpress/10-wordpress-saml-sp-settings.png[WordPress SAML Service Provider Settings]
+
+Press the `Fetch Metadata` button.
+
+The configuration is now complete.
+
+[[saml-authentication-in-wordpress-via-openam-test-the-solution]]
+=== Test the Solution
+
+Now let's test the solution. Log out of the WordPress administration console, OpenAM administration console or open a browser window in Incognito mode. Open the http://wordpress.example.org:8081/wp-admin/[http://wordpress.example.org:8081/wp-admin/] link. The OpenAM login button will appear in the WordPress login window.
+
+image:images/how-to/saml-wordpress/11-wordpress-login.png[WordPress Login]
+
+Click this button. You will be redirected to OpenAM authentication. Enter the user name `demo` and password `changeit`. The `demo` user is created during the initial installation of OpenAM. In a production environment, you should delete this user or change it's the default password.
+
+image:images/how-to/saml-wordpress/12-openam-login.png[OpenAM Login]
+
+Press the `LOG IN` button.
+
+You will be authenticated to WordPress with the `demo` user account.
+
+image:images/how-to/saml-wordpress/13-wordpress-demo-authenticated.png[WordPress Successful Authentication]

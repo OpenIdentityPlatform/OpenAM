@@ -1,0 +1,106 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-openam-works-simple-explanation]
+== How OpenAM Works Simple Explanation
+
+* xref:how-openam-works-simple-explanation.adoc#how-openam-works-simple-explanation-introduction[Introduction]
+* xref:how-openam-works-simple-explanation.adoc#how-openam-works-simple-explanation-openam-ecosystem[OpenAM Ecosystem]
+* xref:how-openam-works-simple-explanation.adoc#how-openam-works-simple-explanation-how-resource-protection-works[How Resource Protection Works]
+* xref:how-openam-works-simple-explanation.adoc#how-openam-works-simple-explanation-how-user-authentication-works[How User Authentication Works]
+* xref:how-openam-works-simple-explanation.adoc#how-openam-works-simple-explanation-conclusion[Conclusion]
+
+[[how-openam-works-simple-explanation-introduction]]
+=== Introduction
+
+It’s not obvious to understand how to setup Access Management and (Single Sign On) SSO with OpenAM at glance. There’s an explanation of how OpenAM SSO and authentication works in the article below.
+
+[[how-openam-works-simple-explanation-openam-ecosystem]]
+=== OpenAM Ecosystem
+
+There are several components in the Open Identity Platform in addition to OpenAM to setup Access Management system.
+
+[[how-openam-works-simple-explanation-components]]
+==== Components
+
+[[how-openam-works-simple-explanation-openam]]
+===== OpenAM
+
+The core component of the authentication management system. It is responsible for the authentication process, user management, session, and access policy management.
+
+[[how-openam-works-simple-explanation-configuration-datastore]]
+===== Configuration DataStore
+
+Stores OpenAM configuration data - general settings, realms, authentication modules and so on. For storage, its configuration data OpenAM uses OpenDJ - open source directory server, the part of Open Identity Platform.
+
+[[how-openam-works-simple-explanation-web-agent]]
+===== Web Agent
+
+It could be a web server plugin or a standalone web application. Web agent works as PEP (Policy Enforcement Point). Web server plugin should be installed on the server, which process requests to protected resources. Web Agent decides whether an authenticated user could access to a certain resource or not.
+
+Open Identity Platform provides Web Agent as a standalone web application - OpenIG and some web server plugins - for Microsoft Internet Information Services, Apache Tomcat, and Apache HTTP Server.
+
+[[how-openam-works-simple-explanation-user-data-store]]
+===== User Data Store
+
+Storage for the different kinds of identities, which OpenAM uses for authentication. By default, OpenAM uses OpenDJ as a user data store, but also could use Microsoft Active Directory, or any LDAP compatible server. OpenAM also supports any relational database via JDBC and Cassandra as a user data store.
+
+[[how-openam-works-simple-explanation-session-data-store]]
+===== Session Data Store
+
+Persistent storage for session information. If OpenAM restarts or a request switch to another instance of OpenAM, then session information could be restored from the session data store.
+
+[[how-openam-works-simple-explanation-scheme]]
+==== Scheme
+
+Simple OpenAM scheme shown on the picture below.
+
+image:images/how-to/openam-simple/openam-scheme.png[OpenAM Scheme]
+
+[[how-openam-works-simple-explanation-how-resource-protection-works]]
+=== How Resource Protection Works
+
+User tries to access a protected resource, Web Agent asks OpenAM whether user request satisfies the security policy or not.
+
+If the request satisfies policy OpenAM returns session to Web Agent. Web Agent enriches the user request with session data and forwards request to the protected resource and proxies protected server response back to the user.
+
+If the user is not authenticated or the user session violates a policy, Web Agent redirects the user to authentication to the OpenAM server for authentication or additional authorization.
+
+The process is shown on the image below:
+
+image:images/how-to/openam-simple/openam-protected-access.png[OpenAM Scheme]
+
+[[how-openam-works-simple-explanation-how-user-authentication-works]]
+=== How User Authentication Works
+
+While authentication OpenAM asks the user to provide his credentials. OpenAM checks if the user exists User Data Store and validates credentials.
+
+If provided credentials are valid, OpenAM creates a new authenticated session in the Session Data Store and enriches the session with user data and authentication process details.
+
+If credentials are invalid, OpenAM denies authentication.
+
+After successful authentication, the user is redirected to the protected resource. This process is shown in the diagram below.
+
+image:images/how-to/openam-simple/openam-authentication.png[OpenAM Scheme]
+
+[[how-openam-works-simple-explanation-conclusion]]
+=== Conclusion
+
+Of course, this document does not fully cover all OpenAM functionality as Federation Authentication, adaptive authentication, how to organize high availability and many more other functionalities. Its purpose just is just to make a more familiar and basic understanding of how OpenAM works.

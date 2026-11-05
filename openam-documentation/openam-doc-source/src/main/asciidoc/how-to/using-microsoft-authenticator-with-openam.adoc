@@ -1,0 +1,129 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#using-microsoft-authenticator-with-openam]
+== Using Microsoft Authenticator with OpenAM
+
+This article is intended for technical specialists or security system architects who want to implement two-factor authentication (2FA) in an access control system to enhance the security of user accounts.
+
+Adding a second factor makes it significantly more difficult for attackers to compromise accounts.
+
+[[using-microsoft-authenticator-with-openam-stack-used]]
+=== Stack Used
+
+*OpenAM* is an open-source access management system. It is designed for centralized management of authentication, authorization, and user accounts.
+
+*Microsoft Authenticator* is a mobile application designed to be used as an additional authentication factor. It supports push notifications, one-time passwords (TOTP), and biometric authentication.
+
+In this article, we will deploy OpenAM, configure modules and authentication chains for use with Microsoft Authenticator, and show you how to add a second factor authentication for a user.
+
+We will use authentication with one-time passwords generated using the TOTP (time-based one-time password) protocol. Such passwords do not need to be sent to the client device via SMS or PUSH notifications. These passwords are generated using a specific cryptographic algorithm directly on the device.
+
+[[using-microsoft-authenticator-with-openam-installing-openam]]
+=== Installing OpenAM
+
+If you do not have OpenAM installed yet, you can deploy a Docker container as described in the xref:quick-openam-docker-configuration-from-a-command-line.adoc[OpenAM wiki article]
+
+[[using-microsoft-authenticator-with-openam-configuring-openam]]
+=== Configuring OpenAM
+
+We will configure the module and authentication chain.
+
+The authentication module in OpenAM is responsible for a specific authentication method. This can be authentication with a username and password, via the Kerberos protocol, or using biometrics. Modules can be organized into chains. This allows you to build chains of modules to authenticate users in multiple stages or using different methods. For example, if seamless authentication via the Kerberos protocol fails, you can ask the user for their login and password.
+
+[[using-microsoft-authenticator-with-openam-configuring-the-totp-authentication-module]]
+==== *Configuring the TOTP Authentication Module*
+
+Open the administrator console at http://openam.example.org:8080/openam/console[http://openam.example.org:8080/openam/console]
+
+In the login field, enter `amadmin`. In the password field, enter the administrator password specified during installation.
+
+Open the root realm, select Authentication → Modules in the left menu, and click the `Add Module` button. In the form that appears, enter the module name, for example `totp`, and the module type - `Authenticator (OATH)`. Click the `Create` button.
+
+image:images/how-to/ms-authenticator/0-openam-new-totp-module.png[OpenAM new TOTP module]
+
+Set the `OATH Algorithm to Use` setting to `TOTP`, enter any non-empty value in the `Name of the Issuer` field, for example `OpenAM`, and click `Save Changes`.
+
+image:images/how-to/ms-authenticator/1-openam-totp-module-settings.png[OpenAM TOTP module settings]
+
+[[using-microsoft-authenticator-with-openam-configuring-the-device-registration-chain]]
+==== *Configuring the Device Registration Chain*
+
+The registration chain is required so that authenticated users can add a second authentication factor using Microsoft Authenticator.
+
+In the administrator console, in the realm settings in the left menu, select Authentication → Chains and click the `Add Chain` button in the list that opens.
+
+Enter the chain name `totp-register` and click the `Create` button.
+
+In the chain settings, click the `Add a Module` button and add the created `totp` authentication module as shown in the figure. Click the `OK` button and then `Save Changes`.
+
+image:images/how-to/ms-authenticator/2-openam-totp-registration-chain.png[OpenAM TOTP registration chain]
+
+[[using-microsoft-authenticator-with-openam-configuring-the-authentication-chain]]
+==== *Configuring the Authentication Chain*
+
+In this chain, we will configure authentication so that after authenticating with a username and password, the user is required to enter a one-time password from the Microsoft Authenticator mobile app.
+
+In the administrator console, in the realm settings in the left menu, select Authentication → Chains and click the `Add Chain` button in the list that opens.
+
+Enter the chain name `totp-login` and click the `Create` button. First, add the `DataStore` login and password authentication module. Then add the `totp` one-time code authentication module.
+
+Click `Save Changes`.
+
+image:images/how-to/ms-authenticator/3-openam-totp-authentication-chain.png[OpenAM TOTP authentication chain]
+
+[[using-microsoft-authenticator-with-openam-setting-up-microsoft-authenticator]]
+=== Setting up Microsoft Authenticator.
+
+Download the https://www.microsoft.com/en/security/mobile-authenticator-app[Microsoft Authenticator] app from the appropriate app store for your device.
+
+[[using-microsoft-authenticator-with-openam-registering-a-device]]
+==== Registering a Device
+
+Sign in to the console with a test user account. To do this, either sign out of the administrator console or open your browser in incognito mode. Go to the URL http://openam.example.org:8080/openam/XUI/#login/[http://openam.example.org:8080/openam/XUI/#login/] and log in to OpenAM with the `demo` account. The default password is `changeit`.
+
+After successful authentication, open the device registration chain link in your browser: http://openam.example.org:8080/openam/XUI/#login&service=totp-register[http://openam.example.org:8080/openam/XUI/#login&service=totp-register].
+
+image:images/how-to/ms-authenticator/4-openam-register-device.png[OpenAM register a device]
+
+Open the Microsoft Authenticator app and tap the `Add account` button.
+
+image:images/how-to/ms-authenticator/5-ms-authenticator-add-account.png[Microsoft Authenticator Add account]
+
+Select `Other account`.
+
+image:images/how-to/ms-authenticator/6-ms-authenticator-other-account.png[Microsoft Authenticator Other account]
+
+You will be prompted to scan a QR code. Scan the QR code displayed in the OpenAM browser window. After scanning, the OpenAM account will be added to the Microsoft Authenticator app.
+
+image:images/how-to/ms-authenticator/7-ms-authenticator-account-list.png[Microsoft Authenticator Account List]
+
+Locate the newly added account. A one-time password will be displayed.
+
+image:images/how-to/ms-authenticator/8-ms-authenticator-otp.png[Microsoft Authenticator One-Time Password]
+
+In your browser, click the `Login Using Verification Code` button.
+
+Enter the one-time password from the mobile app and click the `Submit` button.
+
+[[using-microsoft-authenticator-with-openam-authentication-with-one-time-password]]
+==== Authentication with One-Time Password
+
+Exit the OpenAM console or open your browser in incognito mode. Follow the link http://openam.example.org:8080/openam/XUI/#login&service=totp-login[http://openam.example.org:8080/openam/XUI/#login&service=totp-login]. Enter the username and password for the `demo` account. After entering the username and password, OpenAM will request a one-time password from the mobile app. Open the mobile app, select the `demo` user account. Enter the one-time password from the mobile app in the browser, and click the `Submit` button. If the one-time password is correct, you will be authenticated successfully.
