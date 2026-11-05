@@ -73,15 +73,18 @@ final class WebFingerRealms {
         return (context, request) -> {
             Realm current = context.asContext(RealmContext.class).getRealm();
             String segment = context.asContext(UriRouterContext.class).getUriTemplateVariables().get(SUB_REALM);
-            if (segment.contains("/")) {
-                // A decoded %2F: Realm.of rejects it with an IllegalArgumentException; master answered 404.
-                return newResultPromise(realmNotFound(segment));
-            }
+            Realm realm;
             try {
-                return next.handle(new RealmContext(context, Realm.of(current, segment)), request);
+                realm = Realm.of(current, segment);
             } catch (RealmLookupException e) {
                 return newResultPromise(realmNotFound(e.getRealm()));
+            } catch (IllegalArgumentException e) {
+                // CHF has decoded the segment: Realm.of rejects a '/' (%2F), the DN parser of the lookup a DN special
+                // character such as ',' (%2C). Master looked the raw segment up, found no realm and answered 404.
+                String parent = current.asPath();
+                return newResultPromise(realmNotFound((parent.endsWith("/") ? parent : parent + "/") + segment));
             }
+            return next.handle(new RealmContext(context, realm), request);
         };
     }
 

@@ -68,9 +68,12 @@ public class WebFingerHttpRouteProviderTest {
         realmTestHelper = new RealmTestHelper();
         realmTestHelper.setupRealmClass();
         realmTestHelper.mockDnsAlias("openam.example.org");          // the host resolves to the root realm
-        sub = realmTestHelper.mockRealm("sub");
+        // A bare name is also looked up: the real lookup finds it among the sub-realms (realms/<sub>).
+        sub = realmTestHelper.mockRealmAlias("sub", "sub");
         realmTestHelper.mockInvalidRealm("bogus");
         realmTestHelper.mockInvalidRealm("sub", "bogus");
+        realmTestHelper.mockMalformedRealm("a,b");                  // the DN parser rejects the comma
+        realmTestHelper.mockMalformedRealm("sub", "a,b");
         realmTestHelper.mockInvalidRealm("nonsense");
         realmTestHelper.mockInvalidRealm("webfinger");
         // Stands in for the real filter: records the context and calls the next handler.
@@ -89,12 +92,16 @@ public class WebFingerHttpRouteProviderTest {
         realmTestHelper.tearDownRealmClass();
     }
 
-    /** Mounts the handler at ".well-known" the way HttpRouterProvider does. */
     private Response call(String method, String pathAndQuery) throws Exception {
+        return call(method, "openam.example.org", pathAndQuery);
+    }
+
+    /** Mounts the handler at ".well-known" the way HttpRouterProvider does. */
+    private Response call(String method, String host, String pathAndQuery) throws Exception {
         Router top = new Router();
         top.addRoute(requestUriMatcher(STARTS_WITH, ".well-known"), provider.createHandler(endpoint));
         Request request = new Request().setMethod(method)
-                .setUri("http://openam.example.org:8080/.well-known" + pathAndQuery);
+                .setUri("http://" + host + ":8080/.well-known" + pathAndQuery);
         return top.handle(new RootContext(), request).getOrThrowUninterruptibly();
     }
 
@@ -110,8 +117,10 @@ public class WebFingerHttpRouteProviderTest {
             {"/webfinger" + QUERY, "/"},
             {"/realms/root/webfinger" + QUERY, "/"},
             {"/realms/root/realms/sub/webfinger" + QUERY, "/sub"},
+            {"/realms/sub/webfinger" + QUERY, "/sub"},
             {"/sub/webfinger" + QUERY, "/sub"},
             {"/webfinger" + QUERY + "&realm=/sub", "/sub"},
+            {"/webfinger" + QUERY + "&realm=/sub&realm=/", "/sub"},
             // The realm parameter wins over the path, as at the last hop of RestletRealmRouter.
             {"/sub/webfinger" + QUERY + "&realm=/", "/"},
             {"/realms/root/realms/sub/webfinger" + QUERY + "&realm=/", "/"},
@@ -124,6 +133,29 @@ public class WebFingerHttpRouteProviderTest {
 
         assertThat(response.getStatus()).isEqualTo(Status.OK);
         assertThat(realmSeenByEndpoint().asPath()).isEqualTo(realm);
+    }
+
+    @Test
+    public void resolvesTheRealmOfTheHostName() throws Exception {
+        realmTestHelper.mockDnsAlias("sub.example.org", "sub");
+
+        Response response = call("GET", "sub.example.org", "/webfinger" + QUERY);
+
+        assertThat(response.getStatus()).isEqualTo(Status.OK);
+        assertThat(realmSeenByEndpoint().asPath()).isEqualTo("/sub");
+    }
+
+    @Test
+    public void theRealmsKeywordWinsOverATopLevelRealmNamedRealms() throws Exception {
+        // Master resolved this path as the sub-realm x of a top-level realm named "realms"; /json resolves x.
+        realmTestHelper.mockRealm("realms");
+        realmTestHelper.mockRealm("realms", "x");
+        realmTestHelper.mockRealmAlias("x", "x");
+
+        Response response = call("GET", "/realms/x/webfinger" + QUERY);
+
+        assertThat(response.getStatus()).isEqualTo(Status.OK);
+        assertThat(realmSeenByEndpoint().asPath()).isEqualTo("/x");
     }
 
     @Test
@@ -141,6 +173,11 @@ public class WebFingerHttpRouteProviderTest {
             {"/webfinger" + QUERY + "&realm=/bogus", "/bogus"},
             {"/bogus/webfinger" + QUERY, "/bogus"},
             {"/sub/bogus/webfinger" + QUERY, "/sub/bogus"},
+            // CHF decodes the segment. Master looked the raw segment up, a valid but unknown realm, and answered 404.
+            {"/a%2Cb/webfinger" + QUERY, "/a,b"},
+            {"/sub/a%2Cb/webfinger" + QUERY, "/sub/a,b"},
+            {"/a%2Fb/webfinger" + QUERY, "/a/b"},
+            {"/sub/a%2Fb/webfinger" + QUERY, "/sub/a/b"},
         };
     }
 
@@ -167,16 +204,6 @@ public class WebFingerHttpRouteProviderTest {
         assertThat(json.containsKey("error_description")).isFalse();
         verify(endpoint, never()).handle(any(), any());
         verify(auditFilter, never()).filter(any(), any(), any());
-    }
-
-    @Test
-    public void answersAnEncodedSlashInARealmSegmentWith404() throws Exception {
-        realmTestHelper.mockInvalidRealm("a%2Fb");                     // in case the router keeps the segment encoded
-
-        Response response = call("GET", "/a%2Fb/webfinger" + QUERY);
-
-        assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND);
-        verify(endpoint, never()).handle(any(), any());
     }
 
     @Test
