@@ -62,6 +62,27 @@ class HowToLinksTest(unittest.TestCase):
         result = self.check_link("visible", "----\n[[hidden]]\n----\n[#visible]\n")
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
+    def test_block_closes_only_on_its_own_delimiter(self):
+        for definition in ("-----\n----\n[[hidden]]\ntext\n-----\n",
+                           "----\n....\n[[hidden]]\ntext\n----\n"):
+            with self.subTest(definition=definition):
+                result = self.check_link("hidden", definition)
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+                self.assertIn("broken anchor", result.stdout)
+
+    def test_anchor_between_two_verbatim_blocks_is_a_destination(self):
+        result = self.check_link("visible", "----\na\n----\n\n[[visible]]\ntext\n\n----\nb\n----\n")
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_longer_and_padded_delimiters_open_and_close_blocks(self):
+        for definition in ("-----\n[[hidden]]\ntext\n-----\n",
+                           "----\n[[hidden]]\ntext\n----  \n",
+                           "---- \n[[hidden]]\ntext\n----\t\n"):
+            with self.subTest(definition=repr(definition)):
+                result = self.check_link("hidden", definition)
+                self.assertEqual(1, result.returncode, result.stdout + result.stderr)
+                self.assertIn("broken anchor", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
