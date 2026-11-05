@@ -338,8 +338,8 @@ export async function deleteResourceSet(request, pat, id) {
 
 /**
  * A fixed PKCE pair. `authorizationCodeTokens` always sends the S256 challenge, so the flow works whether or
- * not the provider enforces PKCE. The shared provider does not enforce it: `device-flow-test.spec.mjs` posts
- * `/device/code` without a challenge.
+ * not the provider enforces PKCE. The provider's `codeVerifierEnforced` defaults to true and no fixture
+ * changes it, so an authorization request without a challenge is rejected.
  */
 export async function pkce() {
   const verifier = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
