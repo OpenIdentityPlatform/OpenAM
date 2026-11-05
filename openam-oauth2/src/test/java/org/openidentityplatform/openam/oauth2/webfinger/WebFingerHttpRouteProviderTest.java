@@ -158,6 +158,18 @@ public class WebFingerHttpRouteProviderTest {
     }
 
     @Test
+    public void answersAnUnknownRealmInTheRealmsSpellingWithACrest404() throws Exception {
+        Response response = call("GET", "/realms/root/realms/bogus/webfinger" + QUERY);
+
+        assertThat(response.getStatus()).isEqualTo(Status.NOT_FOUND);
+        Map<?, ?> json = (Map<?, ?>) response.getEntity().getJson();
+        assertThat(json.get("code")).isEqualTo(404);
+        assertThat(json.containsKey("error_description")).isFalse();
+        verify(endpoint, never()).handle(any(), any());
+        verify(auditFilter, never()).filter(any(), any(), any());
+    }
+
+    @Test
     public void answersAnEncodedSlashInARealmSegmentWith404() throws Exception {
         realmTestHelper.mockInvalidRealm("a%2Fb");                     // in case the router keeps the segment encoded
 

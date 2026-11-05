@@ -161,11 +161,11 @@ Custom code that refers to `org.forgerock.openam.rest.service.XACMLServiceEndpoi
 
 [IMPORTANT]
 ====
-Starting with this release OpenAM serves WebFinger (`/.well-known/*`) through the `OpenAM` servlet instead of a servlet of its own. If your customized `.war` file keeps its own copy of `web.xml`, delete the `WebFinger` servlet and its `<servlet-mapping>`, and map the `<url-pattern>` `/.well-known/*` to the `OpenAM` servlet before you deploy. Otherwise the container cannot load the `WebFinger` servlet, because its application class no longer exists.
+Starting with this release OpenAM serves WebFinger (`/.well-known/*`) through the `OpenAM` servlet instead of a servlet of its own. If your customized `.war` file keeps its own copy of `web.xml`, delete the `WebFinger` servlet and its `<servlet-mapping>`, and map the `<url-pattern>` `/.well-known/*` to the `OpenAM` servlet before you deploy. Otherwise the container cannot load the `WebFinger` servlet, because its classes no longer exist.
 
 The endpoint otherwise behaves as before, with these changes:
 
-* `/.well-known/realms/root/webfinger`, `/.well-known/realms/root/realms/<realm>/webfinger` and `/.well-known/realms/<realm>/webfinger` address the top-level realm and its subrealms, as the same spellings do under `/json`. Earlier releases answered 404. `/.well-known/<realm>/webfinger` and the `realm` query parameter work as before.
+* `/.well-known/realms/root/webfinger`, `/.well-known/realms/root/realms/<realm>/webfinger` and `/.well-known/realms/<realm>/webfinger` address the top-level realm and its subrealms, as the same spellings do under `/json`. Releases 15.x and earlier answered 404. `/.well-known/<realm>/webfinger` and the `realm` query parameter work as before.
 * An unknown realm in one of the `realms/` spellings answers 404 with a `code`, `reason` and `message` JSON body. An unknown realm in the `realm` query parameter or in a `/.well-known/<realm>/webfinger` path answers 404 with an `error` and `error_description` body, as before.
 * The access audit events of WebFinger requests no longer carry the user ID and the session tracking ID of a session cookie that the request sends.
 

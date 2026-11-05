@@ -14,7 +14,6 @@
  * Copyright 2026 3A Systems, LLC.
  */
 
-
 package org.openidentityplatform.openam.oauth2;
 
 import jakarta.inject.Inject;
