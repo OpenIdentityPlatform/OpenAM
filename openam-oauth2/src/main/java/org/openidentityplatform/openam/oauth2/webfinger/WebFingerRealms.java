@@ -105,7 +105,7 @@ final class WebFingerRealms {
     }
 
     /**
-     * The answer of the Restlet {@code OAuth2StatusService} to a realm that does not exist.
+     * The answer of the former Restlet WebFinger application to a realm that does not exist.
      *
      * @param realm The realm as the request named it.
      * @return 404 with the OAuth2 error body.
