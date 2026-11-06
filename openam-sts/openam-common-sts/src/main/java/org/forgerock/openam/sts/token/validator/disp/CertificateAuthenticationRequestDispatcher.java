@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems, LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.sts.token.validator.disp;
@@ -56,7 +56,7 @@ public class CertificateAuthenticationRequestDispatcher implements TokenAuthenti
     }
 
     @Override
-    public String dispatch(URL url, AuthTargetMapping.AuthTarget target, X509Certificate[] certificates) throws TokenValidationException {
+    public HttpURLConnectionWrapper.ConnectionResult dispatch(URL url, AuthTargetMapping.AuthTarget target, X509Certificate[] certificates) throws TokenValidationException {
         /*
         The common practice in the cxf-sts and wss4j is just to use the first element in the array, as this is the leaf
         cert, and all others correspond to CAs, which will be in the targeted destination's trust store. And this dispatcher
@@ -72,7 +72,7 @@ public class CertificateAuthenticationRequestDispatcher implements TokenAuthenti
         return postCertInHeader(url, certificates[0], target);
     }
 
-    private String postCertInHeader(URL url, X509Certificate certificate, AuthTargetMapping.AuthTarget target)
+    private HttpURLConnectionWrapper.ConnectionResult postCertInHeader(URL url, X509Certificate certificate, AuthTargetMapping.AuthTarget target)
             throws TokenValidationException {
 
         final String base64Certificate;
@@ -111,7 +111,7 @@ public class CertificateAuthenticationRequestDispatcher implements TokenAuthenti
                 throw new TokenValidationException(responseCode, "Non-200 response from posting x509 token " +
                         "to rest authN: " + connectionResult.getResult());
             } else {
-                return connectionResult.getResult();
+                return connectionResult;
             }
         } catch (IOException e) {
             throw new TokenValidationException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR,

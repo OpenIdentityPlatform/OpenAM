@@ -63,10 +63,8 @@ public class CookieUtils {
         (SystemPropertiesManager.get(Constants.AM_COOKIE_SECURE).
             equalsIgnoreCase("true"));
 
-    static boolean cookieHttpOnly = 
-        (SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY) != null) &&
-        (SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY).
-            equalsIgnoreCase("true"));
+    static boolean cookieHttpOnly =
+        isHttpOnlyEnabled(SystemPropertiesManager.get(Constants.AM_COOKIE_HTTPONLY));
 
     static boolean httpOnlyAllowTokenInBody =
         SystemPropertiesManager.getAsBoolean(Constants.AM_COOKIE_HTTPONLY_ALLOW_TOKEN_IN_BODY, false);
@@ -156,12 +154,29 @@ public class CookieUtils {
     }
 
     /**
-     * Returns property value of "com.sun.identity.cookie.httponly"
-     * 
+     * Returns property value of "com.sun.identity.cookie.httponly".
+     * <p>
+     * Defaults to {@code true} when the property is not set: OpenAM marks its cookies
+     * {@code HttpOnly} out of the box. Set the property to {@code false} to opt out (for example for
+     * integrations that read the SSO token from {@code document.cookie} in the browser).
+     *
      * @return the property value of "com.sun.identity.cookie.httponly"
      */
     public static boolean isCookieHttpOnly() {
         return cookieHttpOnly;
+    }
+
+    /**
+     * Interprets a value of "com.sun.identity.cookie.httponly". Only {@code false} (in any case,
+     * surrounding whitespace ignored) turns {@code HttpOnly} off; an unset, empty or unrecognised
+     * value keeps it on. The IDP discovery {@code CookieUtils} applies the same rule, so the
+     * {@code _saml_idp} and session cookies agree on every value.
+     *
+     * @param value the property value, may be {@code null}.
+     * @return {@code false} only if the value is {@code false}.
+     */
+    public static boolean isHttpOnlyEnabled(String value) {
+        return value == null || !"false".equalsIgnoreCase(value.trim());
     }
 
     /**

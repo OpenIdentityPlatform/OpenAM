@@ -12,11 +12,12 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems, LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.sts.token.validator;
 
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
 import org.forgerock.openam.sts.TokenTypeId;
 import org.forgerock.openam.sts.config.user.AuthTargetMapping;
 import org.forgerock.openam.sts.TokenValidationException;
@@ -57,7 +58,7 @@ public class AuthenticationHandlerImpl<T> implements AuthenticationHandler<T> {
     public String authenticate(T token, TokenTypeId tokenTypeId) throws TokenValidationException {
         final URL authUrl = authenticationUrlProvider.authenticationUrl(tokenTypeId);
         logger.debug("STSAuthenticationHandler: The authUri: " + authUrl.toString());
-        final String response = requestDispatcher.dispatch(authUrl, authTargetMapping.getAuthTargetMapping(tokenTypeId), token);
+        final HttpURLConnectionWrapper.ConnectionResult response = requestDispatcher.dispatch(authUrl, authTargetMapping.getAuthTargetMapping(tokenTypeId), token);
         return tokenParser.getSessionFromAuthNResponse(response);
     }
 }
