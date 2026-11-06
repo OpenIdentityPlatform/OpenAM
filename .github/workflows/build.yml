@@ -59,8 +59,13 @@ jobs:
       id: maven-profile-flag
     - name: Build with Maven
       env:
-        MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
+        MAVEN_OPTS: ${{ matrix.os == 'ubuntu-latest' && '-Xmx6g' || '-Xmx4g' }} -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
       run: mvn --batch-mode --errors --update-snapshots verify --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
+    - name: Check How-To documentation links
+      if: matrix.os == 'ubuntu-latest' && matrix.java == '11'
+      run: |
+        python3 -m unittest discover -s openam-documentation -p 'test_*.py'
+        python3 openam-documentation/check-how-to-links.py
     - name: Upload artifacts
       uses: actions/upload-artifact@v7
       with:

@@ -1,0 +1,71 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-disable-xui-by-default]
+== How to disable XUI by default
+
+[[how-to-disable-xui-by-default-legacy-ui]]
+=== Legacy UI
+
+[[how-to-disable-xui-by-default-for-one-instance-in-cluster]]
+==== For one instance in cluster
+
+Goto Configuration ++>++ Servers and Sites ++>++ Default Server Settings ++>++ Advanced and add:
+
+....
+XUI.enable=false
+....
+
+or change java system property:
+
+[source,bash]
+----
+-DXUI.enable=false
+----
+
+[[how-to-disable-xui-by-default-for-all-instances-in-cluster]]
+==== For all instances in cluster
+
+Goto Configuration ++>++ Servers and Sites ++>++ Select server ++>++ Advanced and add:
+
+....
+XUI.enable=false
+....
+
+[[how-to-disable-xui-by-default-xui-interface]]
+=== XUI Interface
+
+[[how-to-disable-xui-by-default-for-one-instance-in-cluster-1]]
+==== For one instance in cluster
+
+Goto Deployment ++>++ Servers ++>++ Choose server ++>++ Advanced and add:
+
+....
+XUI.enable=false
+....
+
+[[how-to-disable-xui-by-default-for-all-instances-in-cluster-1]]
+==== For all instances in cluster
+
+Goto Configure ++>++ Server Defaults ++>++ Advanced and add:
+
+....
+XUI.enable=false
+....

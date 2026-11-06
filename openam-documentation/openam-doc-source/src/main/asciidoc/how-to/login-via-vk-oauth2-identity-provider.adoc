@@ -1,0 +1,80 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#login-via-vk-oauth2-identity-provider]
+== Login via VK OAuth2 Identity Provider
+
+[[login-via-vk-oauth2-identity-provider-create-applicaton]]
+=== Create Applicaton
+
+Goto https://vk.com/apps?act=manage and create new VKontakte Application Goto Application Setting. There will be your app App Id and App Secret.
+
+[[login-via-vk-oauth2-identity-provider-setup-openam]]
+=== Setup OpenAM
+
+[[login-via-vk-oauth2-identity-provider-legacy-ui]]
+==== Legacy UI
+
+Login into console. Goto *Access Control* then select target realm. Goto *Authentication*
+
+[[login-via-vk-oauth2-identity-provider-create-authentication-module]]
+===== Create Authentication Module
+
+Under section *Module Instances* create new *Authentication Module*. Enter new module instance name, for example *vkontakte*. Authentication module type is *OAuth 2.0 / OpenID Connect*
+
+Then select module, you've just created from module list and enter following settings:
+
+[cols=",",options="header",]
+|===
+|Setting |Value
+|Client Id |Your VKontakte Application App Id
+|Client Secret |Your VKontakte Application App Secret
+|Authentication Endpoint URL |https://oauth.vk.com/authorize
+|Access Token Endpoint URL |https://oauth.vk.com/access_token
+|User Profile Service URL |https://api.vk.com/method/users.get
+|Scope |_Here you should enter scope, according to VKontakte https://vk.com/dev/permissions[documentation]_ for example *email*
+|OAuth2 Access Token Profile Service Parameter name |access++_++token
+|Proxy URL |_++[++Your OpenAM URL++]++/oauth2c/OAuthProxy.jsp_ for example: https://openam.example.com/openam/oauth2c/OAuthProxy.jsp
+|Account Provider |org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider
+|Account Mapper |org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper
+|Account Mapper Configuration |Attribute configuration that will be used to map the account of the user authenticated in the OAuth 2.0 Provider to the local data store in the OpenAM. Example: id=uid
+|Attribute Mapper |org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper
+|Attribute Mapper Configuration |Attribute configuration that will be used to map the user info obtained from the OAuth 2.0 Provider to the local user data store in the OpenAM. Example: last++_++name=givenName id=uid
+|===
+
+You can setup remaining attributes on your own, depending your authentication process requirement and press *Save* and then *Back to Authentication*
+
+[[login-via-vk-oauth2-identity-provider-create-authentication-chain]]
+===== Create Authentication Chain
+
+Under section *Authentication Chaining* create new Authentication Chain, enter its name, for example, *vkontakte* and add recently created module *vkontakte*
+
+Your authentication chain should look like this:
+
+[cols=",,",options="header",]
+|===
+|Instance |Criteria |Options
+|vkontakte |Required |
+|===
+
+[[login-via-vk-oauth2-identity-provider-test-your-authentication-chain]]
+==== Test your Authentication Chain
+
+Goto ++[++Your OpenAM URL++]++/UI/Login?org=++[++your org++]++&service=++[++facebook auth chain++]++, for example, http://example.openam.com/openam/UI/Login?org=/&service=vkontakte and you should see facebook authentication dialog

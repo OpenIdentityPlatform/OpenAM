@@ -1,0 +1,41 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#what-is-single-sign-on-and-how-does-it-work]
+== What is Single Sign On and How does it Work
+
+* xref:what-is-single-sign-on-and-how-does-it-work.adoc#what-is-single-sign-on-and-how-does-it-work-what-is-single-sign-on[What is Single Sign-On]
+* xref:what-is-single-sign-on-and-how-does-it-work.adoc#what-is-single-sign-on-and-how-does-it-work-how-does-single-sign-on-work[How does Single Sign On Work]
+
+[[what-is-single-sign-on-and-how-does-it-work-what-is-single-sign-on]]
+=== What is Single Sign-On
+
+Single Sign-On (SSO) is a technology that allows users to authenticate into various systems using single credentials.
+
+For example, Acme Corp uses various information systems and each system has its user database and its login processes. So, when Acme Corp hires a new employee, they should create an account for each system. To use each system, an employee should enter his credentials into each system as well. If the employee getting fired or promoted to a new position, all user accounts for the employee should also be changed. With an increasing number of employees and a number of information systems in the organization, user account management becomes more difficult and expensive.
+
+To simplify user account management, Acme Corp starts to use the SSO system. So, when an employee authenticates the operating system, he could use his operating system account to access all other information systems. If the employee got fired or promoted or just wants to change his password, only one user account should be modified. When Acme Corp stars using new software, they just set up it to use SSO for authentication and there’s no need to create user database in this software.
+
+[[what-is-single-sign-on-and-how-does-it-work-how-does-single-sign-on-work]]
+=== How does Single Sign On Work
+
+When an employee tries to login into an information system, SSO checks if he already logged in in SSO. If the employee is not logged in, SSO asks the employee for authentication. After authentication, SSO creates a session for the employee and redirects him to the desired system. If the employee is authenticated in SSO, SSO provides account information to the desired system, the employee tries to access.
+
+image:images/how-to/sso/sso-flowchart.png[Single Sing On Flowchart]

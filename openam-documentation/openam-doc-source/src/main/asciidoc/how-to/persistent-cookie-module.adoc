@@ -1,0 +1,139 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#persistent-cookie-module]
+== Persistent Cookie module
+
+Тhe xref:persistent-cookie-module.adoc[Persistent Cookie module] supports the configuration of cookie lifetimes based on requests and a maximum time. Note that by default, the persistent cookie is called *session-jwt*.
+
+____
+If Secure Cookie is enabled Configuration ++>++ Servers and Sites ++>++ Default Server Settings ++>++ *Security* ++>++ *Cookie*, the xref:persistent-cookie-module.adoc[Persistent Cookie module] only works over HTTPS.
+
+image:images/how-to/Configuration-Servers and Sites-Default Server Settings-Security-Cookie.png[Configuration ++>++ Servers and Sites ++>++ Default Server Settings ++>++ Security ++>++ Cookie]
+____
+
+Before you begin, make sure a public key alias is defined in AM. The xref:persistent-cookie-module.adoc[Persistent Cookie module] encrypts a JSON Web Token (JWT) using a public key from the AM keystore. The keystore must be configured under Realms ++>++ *Realm Name* ++>++ Authentication ++>++ All Core Settings ++>++ Security ++>++ *Persistent Cookie Encryption Certificate Alias*. If the keystore changes and the default test key is no longer present, the public key alias must be updated to reflect the change, otherwise the module will fail. Similarly, in multi-instance deployments, the keypair must be available on all AM instances.
+
+image:images/how-to/Realms-Realm Name-Authentication-All Core Settings-Security.png[Realms ++>++ Realm Name ++>++ Authentication ++>++ All Core Settings ++>++ Security]
+
+To configure the xref:persistent-cookie-module.adoc[Persistent Cookie module] globally in the AM console, navigate to Configuration ++>++ Authentication, and then click *Persistent Cookie*. In the window that appears you should see the following attributes:
+
+image:images/how-to/Module Instances-Persistent Cookie.png[Module Instances ++>++ Persistent Cookie]
+
+____
+For example, to generate an HMAC signing key, run the following:
+
+[source,sh]
+----
+openssl rand -base64 32
+----
+
+or
+
+[source,sh]
+----
+cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1|base64
+----
+
+Default: a random 256-bit secret key.
+____
+
+When the xref:persistent-cookie-module.adoc[Persistent Cookie module] enforces the client IP address, and AM lies behind a load balancer or proxy layer, configure the load balancer or proxy to send the address by using the *X-Forwarded-For* header, and configure OpenAM to consume and forward the header as necessary. For details, see Handling HTTP Request Headers in the xref:../install-guide/index.adoc[Installation Guide].
+
+The xref:persistent-cookie-module.adoc[Persistent Cookie module] belongs with a second module in an Authentication Chaining. To see how this works, navigate to Realms ++>++ *Realm Name* ++>++ Authentication ++>++ Authentication Chaining. Create a new chain and add modules as shown in the figure. The following example shows how a xref:persistent-cookie-module.adoc[Persistent Cookie module] is sufficient. If the persistent cookie does not yet exist, authentication relies on LDAP:
+
+image:images/how-to/Module Instances-Persistent Cookie-Chain.png[Module Instances ++>++ Persistent Cookie ++>++ Chain]
+
+You should now be able to authenticate automatically, as long as the cookie exists for the associated domain.
+
+[[persistent-cookie-module-ssoadm-service-name-iplanetamauthpersistentcookieservice]]
+=== xref:../reference/openam-cli-tools.adoc[ssoadm] service name: *iPlanetAMAuthPersistentCookieService*
+
+[[persistent-cookie-module-idle-timeout]]
+==== Idle Timeout
+
+Specifies the maximum idle time between requests in hours. If that time is exceeded, the cookie is no longer valid.
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-idle-time*
+
+[[persistent-cookie-module-max-life]]
+==== Max Life
+
+Specifies the maximum life of the cookie in hours.
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-max-life*
+
+[[persistent-cookie-module-enforce-client-ip]]
+==== Enforce Client IP
+
+When enabled, enforces that the persistent cookie can only be used from the same client IP to which the cookie was issued.
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-enforce-ip*
+
+[[persistent-cookie-module-use-secure-cookie]]
+==== Use secure cookie
+
+When enabled, adds the "Secure" attribute to the persistent cookie.
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-secure-cookie*
+
+[[persistent-cookie-module-use-http-only-cookie]]
+==== Use HTTP only cookie
+
+When enabled, adds the HttpOnly attribute to the persistent cookie.
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-http-only-cookie*
+
+[[persistent-cookie-module-hmac-signing-key]]
+==== HMAC Signing Key
+
+Specifies a key to use for HMAC signing of the persistent cookie. Values must be base64-encoded and at least 256 bits (32 bytes) long.
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-hmac-key*
+
+[[persistent-cookie-module-check-box-name]]
+==== Check box name
+
+The name of the check box, which means that the function is enabled by the user
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-input*
+
+[[persistent-cookie-module-repository-field]]
+==== Repository field
+
+The name of the field in the repository in which the issued tokens are stored
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-field*
+
+[[persistent-cookie-module-maximum-devices]]
+==== Maximum devices
+
+Maximum number of tokens (devices) per user
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-field-max*
+
+[[persistent-cookie-module-cookie-name]]
+==== Cookie name
+
+default session-jwt
+
+xref:../reference/openam-cli-tools.adoc[ssoadm] attribute: *openam-auth-persistent-cookie-name*
+
+other xref:authentication-modules.adoc[Authentication modules]

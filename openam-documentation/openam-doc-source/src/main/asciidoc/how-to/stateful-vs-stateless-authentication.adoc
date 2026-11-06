@@ -1,0 +1,59 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#stateful-vs-stateless-authentication]
+== Stateful vs Stateless Authentication
+
+[[stateful-vs-stateless-authentication-preface]]
+=== Preface
+
+Authentication is a process that exists in almost every application to Identify the application client whether it is a user or another application. While authentication client sends credentials to the application. The application ensures that credentials are correct, generates an authentication token, and sends it back to the client. To access the application as an identified client, the client uses the received authentication token.
+
+Authentication tokens could be Stateless and Stateful.
+
+[[stateful-vs-stateless-authentication-stateful-authentication]]
+=== Stateful Authentication
+
+After successful authentication, the application generates a random token to send back to the client and then creates a client authenticated session in memory or an internal database. When a client tries to access the application with a given token, the application tries to retrieve session data from session storage, checks if the session valid, and then decides whether the client has access to the desired resource or not.
+
+[[stateful-vs-stateless-authentication-stateless-authentication]]
+=== Stateless Authentication
+
+After successful authentication, the application generates a token with all necessary data, signs it with a public key, and sends it back to a client. There is a standard for token generation, it is JWT (JSON Web Token). The process is described in OpenID Connect (OIDC) specification. When a client tries to access the application with a token, the application verifies the token sign with a private key, checks if the token is expired, retrieves all session data from the token, and makes a decision if a client has access to the desired resource.
+
+[cols=",,",options="header",]
+|===
+| |Stateful |Stateless
+|Session information could be stolen |✅ It is impossible to steal session information from the session identifier because it is just an identifier associated with the session |⛔Session identifier contains all authentication information and it is possible to steal sensitive information, it is not encrypted.
+|Resource consuming |⛔When retrieving session information, the service always gets access to session storage which causes additional resource consumption. |✅The session identifier contains all session information.
+|Easy to implement |⛔When session information is stored in an external database, there is a need to implement session database persistence. |✅Session identifier contains all session information, there is no need to implement additional functionality
+|Easy to scale |⛔While adding new instances, there is a need to implement additional scale to session storage as well |✅ Adding new service instances does not require additional effort
+|Possibility to compromise session data. |✅Only the authentication system is able to retrieve session information from an authentication token, so there are no more vulnerabilities. |⛔To decrypt session information from a token, all parts of the system should share the same key. And, if at least one system is compromised, all parts of the system are under the threat.
+|Authentication token size |✅An authentication token is just an identifier, so session data does not affect its size. |⛔If an authentication session contains a large amount of data, the authentication token also becomes large, which can cause additional load on a network.
+|Restrict access among different parts of an application |✅It is possible to configure the system so different parts of the system will only have access to the data necessary for their work |⛔All parts of the system have access to all session data
+|Possibility to revoke session |✅It is possible to revoke a session at any time |⛔Since the session token contains an expiration date, it is impossible to revoke the authentication session
+|Possibility to modify session data |✅It is possible to modify any session data in session data storage. |⛔Since the session token contains all session data, it is not possible to modify it
+|SSO implementation |✅The integration of different parts of the system is possible without modification of the source code, session information can come through the authentication system gateway. |⛔Changes must be made to each part of the system to retrieve data from an authentication token
+|===
+
+[[stateful-vs-stateless-authentication-conclusion]]
+=== Conclusion
+
+Both approaches make sense, both have their advantages and disadvantages. Stateless authentication is easier to implement and scale, but stateful authentication is more secure and easier to manage.
