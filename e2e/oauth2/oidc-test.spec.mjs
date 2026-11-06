@@ -26,8 +26,9 @@ import { createHash, createHmac } from "node:crypto";
 import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
 import {
-  CLIENT_SESSION_URI, OIDC_CLIENT_SECRET, REALM, authorizationCodeTokens, basicAuth, ensureNoSessionUriOidcClient,
-  ensureOidcClient, ensureProviderConfig, sessionContext,
+  CLIENT_SESSION_URI, OIDC_CLIENT_SECRET, POST_LOGOUT_REDIRECT_URI, POST_LOGOUT_REDIRECT_URI_WITH_QUERY, REALM,
+  REDIRECT_URI, authorizationCodeTokens, basicAuth, ensureNoSessionUriOidcClient, ensureOidcClient,
+  ensureProviderConfig, sessionContext,
 } from "../common/oauth2-fixtures.mjs";
 
 /** This spec's own client -- spec files run in parallel and rewriting a shared client kills its tokens. */
@@ -457,5 +458,118 @@ test.describe("OIDC checkSession", () => {
     expect(page.status()).toBe(200);
     expect(page.headers()["content-type"]).toBe(HTML_TYPE);
     expect(await page.text()).toBe(await (await request.get(CHECK_SESSION)).text());
+  });
+});
+
+test.describe("OIDC endSession", () => {
+
+  const MISMATCH = "The redirection URI provided does not match a pre-registered value.";
+
+  const endSession = (context, params) => context.get(
+    `${OPENAM_BASE}/oauth2/connect/endSession?${new URLSearchParams(params)}`, { maxRedirects: 0 });
+
+  test.beforeAll(async ({ request }) => {
+    await ensureOidcClient(adminToken, request, OIDC_CLIENT_ID);
+  });
+
+  test("/oauth2/connect/endSession requires an id_token_hint", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/oauth2/connect/endSession`, { maxRedirects: 0 });
+    await expectJson(response, 400, {
+      error: "bad_request", error_description: "The endSession endpoint requires an id_token_hint parameter",
+    });
+  });
+
+  test("/oauth2/connect/endSession accepts a valid id_token_hint", async () => {
+    // Each test logs in on its own: no two tests send endSession the same id_token_hint.
+    const { ctx, idToken } = await oidcSession("end-session");
+    try {
+      const response = await endSession(ctx, { id_token_hint: idToken });
+      console.log(`[oidc] endSession -> ${response.status()} location=${response.headers()["location"]}`);
+      // No post_logout_redirect_uri, so there is nothing to redirect to: 204, no body.
+      expect(response.status()).toBe(204);
+      expect((await response.body()).length).toBe(0);
+    } finally {
+      await ctx.dispose();
+    }
+  });
+
+  test("a registered post_logout_redirect_uri redirects, with the state in the query", async () => {
+    const cases = [
+      // Without a state the registered URI comes back verbatim, without even a trailing "?".
+      [POST_LOGOUT_REDIRECT_URI, undefined, POST_LOGOUT_REDIRECT_URI],
+      // The state is percent-encoded: a space as %20, never "+", and a slash as %2F.
+      [POST_LOGOUT_REDIRECT_URI, "st ate/1", `${POST_LOGOUT_REDIRECT_URI}?state=st%20ate%2F1`],
+      // A registered query is kept verbatim and the state is appended with "&".
+      [POST_LOGOUT_REDIRECT_URI_WITH_QUERY, "s2", `${POST_LOGOUT_REDIRECT_URI_WITH_QUERY}&state=s2`],
+    ];
+    for (const [i, [uri, state, location]] of cases.entries()) {
+      const { ctx, idToken } = await oidcSession(`end-session-redirect-${i}`);
+      try {
+        const params = { id_token_hint: idToken, post_logout_redirect_uri: uri };
+        if (state) params.state = state;
+        const response = await endSession(ctx, params);
+        console.log(`[oidc] endSession redirect -> ${response.status()} ${response.headers()["location"]}`);
+        expect(response.status(), location).toBe(302);
+        expect(response.headers()["location"], location).toBe(location);
+      } finally {
+        await ctx.dispose();
+      }
+    }
+  });
+
+  test("an unregistered or relative post_logout_redirect_uri is a 400", async () => {
+    const cases = [
+      ["http://evil.invalid/x", "redirect_uri_mismatch", MISMATCH],
+      // REDIRECT_URI is one of the client's redirection URIs but not a post-logout one: endSession checks only the
+      // post-logout set.
+      [REDIRECT_URI, "redirect_uri_mismatch", MISMATCH],
+      ["/relative/cb", "relative_redirect_uri", "The redirection URI provided is not absolute."],
+    ];
+    for (const [i, [uri, error, description]] of cases.entries()) {
+      const { ctx, idToken } = await oidcSession(`end-session-reject-${i}`);
+      try {
+        const response = await endSession(ctx, { id_token_hint: idToken, post_logout_redirect_uri: uri });
+        console.log(`[oidc] endSession ${uri} -> ${response.status()}`);
+        await expectJson(response, 400, { error, error_description: description });
+        expect(response.headers()["location"], uri).toBeUndefined();
+      } finally {
+        await ctx.dispose();
+      }
+    }
+  });
+
+  test("a malformed id_token_hint or an unparsable post_logout_redirect_uri is a 400", async ({ request }) => {
+    // The hint is verified before the redirect URI is read.
+    const malformed = await endSession(request, {
+      id_token_hint: "not.a-jwt", post_logout_redirect_uri: POST_LOGOUT_REDIRECT_URI,
+    });
+    await expectJson(malformed, 400, {
+      error: "bad_request", error_description: "The id_token_hint is not a valid signed JWT",
+    });
+
+    // With a valid hint, a URI that java.net.URI cannot parse matches nothing the client registered.
+    const { ctx, idToken } = await oidcSession("end-session-unparsable");
+    try {
+      const unparsable = await endSession(ctx, { id_token_hint: idToken, post_logout_redirect_uri: "ht tp://%%%" });
+      await expectJson(unparsable, 400, { error: "redirect_uri_mismatch", error_description: MISMATCH });
+    } finally {
+      await ctx.dispose();
+    }
+  });
+
+  test("PUT on checkSession and endSession is a 405 that names the allowed methods", async ({ request }) => {
+    // Only the status and Allow are pinned: the body is Restlet's own.
+    const cases = [
+      [`/oauth2/realms/${REALM}/connect/checkSession`, ["GET", "POST"]],
+      ["/oauth2/connect/endSession", ["GET"]],
+    ];
+    for (const [path, allowed] of cases) {
+      const response = await request.fetch(`${OPENAM_BASE}${path}`, { method: "PUT", maxRedirects: 0 });
+      const allow = response.headers()["allow"];
+      console.log(`[oidc] PUT ${path} -> ${response.status()} allow=${allow}`);
+      expect(response.status(), path).toBe(405);
+      // Restlet lists the methods in reflection order, so they are compared as a set.
+      expect(allow?.split(",").map((m) => m.trim()).sort(), path).toEqual(allowed);
+    }
   });
 });
