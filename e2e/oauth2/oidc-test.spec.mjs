@@ -15,30 +15,40 @@
  */
 
 /*
- * Protocol cover for the OIDC half of /oauth2: discovery, the JWK set, id_token issuance and idtokeninfo.
- * On master Restlet serves all of them (OAuth2RouterProvider under the ForgeRockRest servlet). This spec pins
- * their black-box contract before /oauth2 moves to CHF. A flip may change a pinned value only as a divergence
+ * Protocol cover for the OIDC half of /oauth2: discovery, the JWK set, id_token issuance, idtokeninfo and the
+ * session endpoints checkSession and endSession. On master Restlet serves all of them (OAuth2RouterProvider under
+ * the ForgeRockRest servlet), except the bare /oauth2/connect/checkSession, which web.xml maps to a JSP. This spec
+ * pins their black-box contract before /oauth2 moves to CHF. A flip may change a pinned value only as a divergence
  * listed in its PR.
  */
 
-import { createHash } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
 import {
-  OIDC_CLIENT_SECRET, REALM, authorizationCodeTokens, basicAuth, ensureOidcClient, ensureProviderConfig,
-  sessionContext,
+  CLIENT_SESSION_URI, OIDC_CLIENT_SECRET, REALM, authorizationCodeTokens, basicAuth, ensureNoSessionUriOidcClient,
+  ensureOidcClient, ensureProviderConfig, sessionContext,
 } from "../common/oauth2-fixtures.mjs";
 
 /** This spec's own client -- spec files run in parallel and rewriting a shared client kills its tokens. */
 const OIDC_CLIENT_ID = "test_client_oidc";
+
+/** Same realm, no clientSessionURI: a client as the admin API creates it by default. */
+const NO_SESSION_URI_CLIENT_ID = "test_client_oidc_nosessionuri";
 
 const NONCE = "n-0S6_WzA2Mj";
 
 /** Content-Type of the successful JSON answers: discovery, the JWK set and idtokeninfo. */
 const JSON_TYPE = "application/json;charset=UTF-8";
 
-/** Content-Type of the error answers: idtokeninfo's 400s, the unknown realm's 404. Unlike the 200s, no charset. */
+/**
+ * Content-Type of the error answers: the 400s of idtokeninfo, checkSession and endSession, and the unknown realm's
+ * 404. Unlike the 200s, no charset.
+ */
 const ERROR_TYPE = "application/json";
+
+/** Content-Type of both checkSession pages: the JSP on the bare path and the Restlet page under realms/. */
+const HTML_TYPE = "text/html;charset=UTF-8";
 
 /** Every member the discovery document has on master, sorted. */
 const DISCOVERY_KEYS = [
@@ -72,6 +82,31 @@ test.beforeAll(async ({ request }) => {
   expect(adminToken, "amadmin login failed").toBeTruthy();
   await ensureProviderConfig(adminToken, request);
 });
+
+/**
+ * Logs demo in and runs the authorization_code flow for this spec's client. Returns a request context whose cookie
+ * jar carries that session and the id_token issued under it. The caller disposes `ctx`.
+ */
+async function oidcSession(nonce) {
+  const loginCtx = await apiRequest.newContext();
+  let ssoToken;
+  try {
+    ssoToken = await getAuthToken(loginCtx, USERNAME, PASSWORD);
+  } finally {
+    await loginCtx.dispose();
+  }
+  expect(ssoToken, "demo login failed").toBeTruthy();
+  const ctx = await sessionContext(apiRequest, ssoToken);
+  try {
+    const { tokens } = await authorizationCodeTokens(ctx, {
+      clientId: OIDC_CLIENT_ID, clientSecret: OIDC_CLIENT_SECRET, scope: "openid", nonce,
+    });
+    return { ctx, idToken: tokens.id_token };
+  } catch (e) {
+    await ctx.dispose();
+    throw e;
+  }
+}
 
 test.describe("OIDC discovery", () => {
 
@@ -277,5 +312,150 @@ test.describe("OIDC id_token issuance and idtokeninfo", () => {
       form: { id_token: forged },
     });
     await expectJson(response, 400, { error: "bad_request", error_description: "invalid id_token" });
+  });
+});
+
+test.describe("OIDC checkSession", () => {
+
+  const CHECK_SESSION = `${OPENAM_BASE}/oauth2/realms/${REALM}/connect/checkSession`;
+
+  const b64 = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
+
+  /** A JWT whose signature verifies against no key: enough for a token checkSession must not accept. */
+  const jwt = (claims) => `${b64({ alg: "HS256", typ: "JWT" })}.${b64(claims)}.c2ln`;
+
+  /** An HS256 JWT signed with the given secret, so it passes checkSession's signature check. */
+  const signedJwt = (claims, secret) => {
+    const signingInput = `${b64({ alg: "HS256", typ: "JWT" })}.${b64(claims)}`;
+    return `${signingInput}.${createHmac("sha256", secret).update(signingInput).digest("base64url")}`;
+  };
+
+  /** checkSession reads the id_token from the Referer's query string, the way the RP's iframe passes it. */
+  const withIdToken = (idToken) => ({ headers: { Referer: `http://rp.invalid/page?id_token=${idToken}` } });
+
+  let session;
+
+  test.beforeAll(async ({ request }) => {
+    await ensureOidcClient(adminToken, request, OIDC_CLIENT_ID);
+    await ensureNoSessionUriOidcClient(adminToken, request, NO_SESSION_URI_CLIENT_ID);
+    session = await oidcSession("check-session");
+  });
+
+  test.afterAll(async () => {
+    await session?.ctx.dispose();
+  });
+
+  test("/oauth2/connect/checkSession serves the session-management iframe", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/oauth2/connect/checkSession`);
+    const html = await response.text();
+    console.log(`[oidc] checkSession -> ${response.status()} ct=${response.headers()["content-type"]} bytes=${html.length}`);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe(HTML_TYPE);
+    // The RP-facing contract of the iframe: it listens for postMessage and answers with a session state.
+    expect(html).toContain("addEventListener");
+    expect(html).toContain("receiveMessage");
+    expect(html).toContain("session_state");
+  });
+
+  test("the bare path is the JSP and the realm-prefixed path is the Restlet page", async ({ request }) => {
+    const jsp = await request.get(`${OPENAM_BASE}/oauth2/connect/checkSession`);
+    const page = await request.get(CHECK_SESSION);
+    const jspHtml = await jsp.text();
+    const pageHtml = await page.text();
+    console.log(`[oidc] checkSession jsp=${jsp.status()} page=${page.status()}`);
+
+    for (const [name, response] of [["jsp", jsp], ["page", page]]) {
+      expect(response.status(), name).toBe(200);
+      expect(response.headers()["content-type"], name).toBe(HTML_TYPE);
+      // The RP frames this page: SecurityHeaders excludes /connect/checkSession, so neither answer carries
+      // X-Frame-Options. Neither carries a cache header.
+      expect(response.headers()["x-frame-options"], name).toBeUndefined();
+      expect(response.headers()["cache-control"], name).toBeUndefined();
+      expect(response.headers()["pragma"], name).toBeUndefined();
+    }
+
+    // The JSP loads sha256.js by a relative path, the Restlet page by the absolute base URL.
+    expect(jspHtml).toContain('<script src="../../js/sha256.js">');
+    expect(pageHtml).toContain(`<script src="${OPENAM_BASE}/js/sha256.js">`);
+
+    // Defect, pinned as master answers it: the JSP quotes the flag, so `!validSession` is false for the string
+    // "false" and the page reads the session cookie even when the session is not valid. Target, as the Restlet
+    // page already emits it: `var validSession = false;`.
+    expect(jspHtml).toContain('var validSession = "false";');
+    expect(pageHtml).toContain("var validSession = false;");
+  });
+
+  test("checkSession answers GET and POST identically", async ({ request }) => {
+    const get = await request.get(CHECK_SESSION);
+    const post = await request.post(CHECK_SESSION, { form: {} });
+    console.log(`[oidc] checkSession GET=${get.status()} POST=${post.status()}`);
+    expect(get.status()).toBe(200);
+    expect(post.status()).toBe(200);
+    expect(post.headers()["content-type"]).toBe(HTML_TYPE);
+    expect(await post.text()).toBe(await get.text());
+  });
+
+  test("an id_token in the Referer supplies the client's origin", async ({ request }) => {
+    const response = await request.get(CHECK_SESSION, withIdToken(session.idToken));
+    const html = await response.text();
+    console.log(`[oidc] checkSession valid id_token -> ${response.status()}`);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe(HTML_TYPE);
+    // The client's registered clientSessionURI becomes the page's postMessage origin check.
+    expect(html).toContain(`var clientURI = "${CLIENT_SESSION_URI}";`);
+  });
+
+  test("an unusable id_token in the Referer leaves the origin empty", async ({ request }) => {
+    // Every case renders the page with an empty origin and an invalid session, so the page accepts no message.
+    const cases = {
+      "no aud claim": jwt({ iss: "x", sub: USERNAME }),
+      "unknown aud": jwt({ aud: "no_such_client", realm: "/" }),
+      "malformed jwt": "not.a-jwt",
+    };
+    for (const [name, idToken] of Object.entries(cases)) {
+      const response = await request.get(CHECK_SESSION, withIdToken(idToken));
+      const html = await response.text();
+      console.log(`[oidc] checkSession ${name} -> ${response.status()}`);
+      expect(response.status(), name).toBe(200);
+      expect(response.headers()["content-type"], name).toBe(HTML_TYPE);
+      expect(html, name).toContain('var clientURI = "";');
+      expect(html, name).toContain("var validSession = false;");
+    }
+  });
+
+  test("a client without a clientSessionURI leaves the origin empty", async ({ request }) => {
+    // Signed locally with the client's secret, the id_token passes the signature check and reaches the client's
+    // clientSessionURI, which the admin API leaves empty by default. The answer is the same page as for an
+    // unusable id_token.
+    const idToken = signedJwt({ aud: NO_SESSION_URI_CLIENT_ID, realm: "/", sub: USERNAME }, OIDC_CLIENT_SECRET);
+    const response = await request.get(CHECK_SESSION, withIdToken(idToken));
+    const html = await response.text();
+    console.log(`[oidc] checkSession client without clientSessionURI -> ${response.status()}`);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe(HTML_TYPE);
+    expect(html).toContain('var clientURI = "";');
+    expect(html).toContain("var validSession = false;");
+  });
+
+  test("checkSession answers a display other than page with a 400", async ({ request }) => {
+    // Defect, pinned as master answers it: check_session_iframe has no display parameter (OpenID Connect Session
+    // Management 1.0), yet the Restlet page resolves one like an authorization page and fails. Target: 200 with
+    // the same page as without the parameter. error_description is not pinned: it is Restlet's status text.
+    for (const display of ["popup", "touch", "wap", "bogus"]) {
+      const response = await request.get(`${CHECK_SESSION}?display=${display}`);
+      const text = await response.text();
+      console.log(`[oidc] checkSession display=${display} -> ${response.status()} ${text}`);
+      expect(response.status(), display).toBe(400);
+      expect(response.headers()["content-type"], display).toBe(ERROR_TYPE);
+      const body = JSON.parse(text);
+      expect(Object.keys(body).sort(), display).toEqual(["error", "error_description"]);
+      expect(body.error, display).toBe("server_error");
+    }
+
+    // page is the only display that renders, and it is the default.
+    const page = await request.get(`${CHECK_SESSION}?display=page`);
+    expect(page.status()).toBe(200);
+    expect(page.headers()["content-type"]).toBe(HTML_TYPE);
+    expect(await page.text()).toBe(await (await request.get(CHECK_SESSION)).text());
   });
 });
