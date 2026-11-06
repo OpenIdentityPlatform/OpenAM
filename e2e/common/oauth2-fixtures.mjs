@@ -27,6 +27,19 @@ export const SCOPE = "profile";
 export const REDIRECT_URI = "http://app.invalid/cb";
 
 /*
+ * The post-logout redirect URIs registered on the OIDC client. endSession accepts a post_logout_redirect_uri
+ * only when the client's registered set contains it exactly, so the variant with a query is registered on its own.
+ */
+export const POST_LOGOUT_REDIRECT_URI = "http://app.invalid/logout";
+export const POST_LOGOUT_REDIRECT_URI_WITH_QUERY = "http://app.invalid/logout?ui=1";
+
+/*
+ * The clientSessionURI registered on the OIDC client: the origin the checkSession page accepts postMessage
+ * calls from. For a client without one the page gets an empty origin and accepts no message.
+ */
+export const CLIENT_SESSION_URI = "http://rp.invalid";
+
+/*
  * Client ids are PER SPEC FILE, not shared. Playwright runs spec files in parallel, and rewriting a client
  * invalidates the tokens already issued against it -- so two files sharing one client flake as soon as their
  * beforeAll hooks interleave. Each file owning its own clients removes the coupling entirely.
@@ -192,6 +205,10 @@ export async function ensureOidcClient(adminToken, request, clientId) {
     "userpassword": OIDC_CLIENT_SECRET,
     "com.forgerock.openam.oauth2provider.clientType": "Confidential",
     "com.forgerock.openam.oauth2provider.redirectionURIs": [`[0]=${REDIRECT_URI}`],
+    "com.forgerock.openam.oauth2provider.postLogoutRedirectURI": [
+      `[0]=${POST_LOGOUT_REDIRECT_URI}`, `[1]=${POST_LOGOUT_REDIRECT_URI_WITH_QUERY}`,
+    ],
+    "com.forgerock.openam.oauth2provider.clientSessionURI": CLIENT_SESSION_URI,
     "com.forgerock.openam.oauth2provider.scopes": ["[0]=openid", "[1]=profile"],
     "com.forgerock.openam.oauth2provider.defaultScopes": ["[0]=openid"],
     "com.forgerock.openam.oauth2provider.grantTypes": [
@@ -207,6 +224,22 @@ export async function ensureOidcClient(adminToken, request, clientId) {
     // so idtokeninfo rejects the id_token with 400 "invalid id_token".
     "com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg": "HS256",
     "isConsentImplied": true,
+    "sunIdentityServerDeviceStatus": "Active",
+  });
+}
+
+/**
+ * A confidential OIDC client without a clientSessionURI, as the admin API creates one by default. It shares
+ * OIDC_CLIENT_SECRET, so a test can sign an HS256 id_token for it that passes checkSession's signature check.
+ */
+export async function ensureNoSessionUriOidcClient(adminToken, request, clientId) {
+  await ensureClient(adminToken, request, clientId, {
+    "userpassword": OIDC_CLIENT_SECRET,
+    "com.forgerock.openam.oauth2provider.clientType": "Confidential",
+    "com.forgerock.openam.oauth2provider.redirectionURIs": [`[0]=${REDIRECT_URI}`],
+    "com.forgerock.openam.oauth2provider.scopes": ["[0]=openid", "[1]=profile"],
+    "com.forgerock.openam.oauth2provider.defaultScopes": ["[0]=openid"],
+    "com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg": "HS256",
     "sunIdentityServerDeviceStatus": "Active",
   });
 }
