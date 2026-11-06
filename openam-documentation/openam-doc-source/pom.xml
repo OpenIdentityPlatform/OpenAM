@@ -110,6 +110,7 @@
                                 </goals>
                                 <configuration>
                                     <documents>
+                                        <document>release-notes</document>
                                         <document>getting-started</document>
                                         <document>how-to</document>
                                         <document>install-guide</document>

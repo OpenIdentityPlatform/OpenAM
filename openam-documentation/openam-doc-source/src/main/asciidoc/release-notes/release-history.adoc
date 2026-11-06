@@ -1,0 +1,129 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:table-caption!:
+
+ifndef::env-site[]
+[#release-history]
+endif::[]
+== Community Release History
+
+ifdef::env-site[]
+anchor:release-history[]
+endif::[]
+
+This overview covers the published community release records through 16.1.4. Dates are the GitHub publication dates, in UTC. The table summarizes selected changes; use each release record for the complete list and assets. Early records contain only commit ranges, so their summaries are drawn from the linked source comparisons. Gaps in version numbers reflect the published records and are not filled with inferred releases.
+
+Review the https://github.com/OpenIdentityPlatform/OpenAM/security/advisories[published security advisories] alongside the history: a fix in an older release is not a guarantee against subsequent bypasses or newly disclosed vulnerabilities. In particular, later 16.1.x releases extend earlier SSRF, script sandbox, deserialization, and PKCE fixes.
+
+=== 16.x
+
+[cols="1,1,4",options="header"]
+|===
+|Release |Published |Selected changes
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.1.4[16.1.4] |2026-10-22 |Account, session, federation, and device flow security fixes; CTS recovery and WindowsDesktopSSO improvements.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.1.3[16.1.3] |2026-09-18 |Further security hardening, consent CSRF handling, ScriptingService upgrade repair, and Jakarta JSP fixes.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.1.2[16.1.2] |2026-07-20 |Security fixes for URL fetching, policy import, scripts, WebAuthn, and LDAP filters; OIDC revocation endpoint discovery.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.1.1[16.1.1] |2026-06-17 |HttpOnly cookies in XUI, access token modification scripts, acr/amr claims, MCP server, and UI JavaScript SDK.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.0.6[16.0.6] |2026-03-24 |Fixes CVE-2026-33439 (JATO deserialization); SameSite cookie handling and OpenDJ updates.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.0.5[16.0.5] |2026-02-04 |Jakarta JSTL update, explicit XML security dependency, secondary-instance Docker tests, and dependency security updates.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.0.4[16.0.4] |2025-12-10 |Jakarta ESAPI dependency, Fedlet index page repair, and dependency security updates.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.0.3[16.0.3] |2025-11-11 |Java 11 minimum and Jakarta EE 9 migration; Java 25 support, shaded Bouncy Castle libraries, and OAuth fixes.
+|===
+
+=== 15.x
+
+[cols="1,1,4",options="header"]
+|===
+|Release |Published |Selected changes
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.2.2[15.2.2] |2025-09-05 |SAML IdP cache and resource-limit security fixes; generated authentication module documentation.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.2.1[15.2.1] |2025-08-09 |JATO class-loading fix, frontend tests in Maven, and dependency security updates.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.2.0[15.2.0] |2025-07-17 |CORS failures return Bad Request; external OpenDJ Docker integration tests and build improvements.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.1.6[15.1.6] |2025-04-23 |Drops Oracle Directory Server Enterprise Edition configuration-store support; Java 24 build support and schema-loading changes.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.1.5[15.1.5] |2025-03-19 |Embedded directory setup and OAuth connection handling fixes; Docker proxy address handling.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.1.4[15.1.4] |2025-02-17 |Generic push authenticator support and updated Java environment documentation.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.1.3[15.1.3] |2024-12-24 |Social login provider updates, Mail.ru provider, and OIDC issuer validation changes.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.1.2[15.1.2] |2024-11-25 |Kerberos JVM export correction, Javadoc publication, and dependency security updates.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.1.1[15.1.1] |2024-10-18 |OAuth scope refresh and default REST API version fixes; AsciiDoc/Antora documentation and Java 23 build support.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.1.0[15.1.0] |2024-09-09 |Java 22 support, Docker JRE 21, and publication to the community documentation site.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.0.4[15.0.4] |2024-07-25 |Fixes CVE-2024-41667 (FreeMarker template injection) and updates dependencies.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.0.3[15.0.3] |2024-07-16 |Documentation packaging and build fixes; dependency updates.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.0.2[15.0.2] |2024-06-26 |Restores community documentation sources and their build and publication.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.0.1[15.0.1] |2024-06-06 |Restores the Version servlet with security fixes and repairs privilege updates.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.0.0[15.0.0] |2024-05-21 |WebAuthn in XUI, generic OATH authenticator support, and ESIA signing changes.
+|===
+
+=== 14.x
+
+[cols="1,1,4",options="header"]
+|===
+|Release |Published |Selected changes
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.8.4[14.8.4] |2024-03-12 |CORS configuration moves to the console; LDAP/AD binding, lockout duration, cache, and CTS fixes.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.8.3[14.8.3] |2024-01-23 |JSON stdout audit logging, REST setGroups action, session/cache performance fixes, and LDAP TLS defaults.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.8.2[14.8.2] |2023-12-12 |Session and identity cache fixes, SAML includeCert handling, and social login redirect repair.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.8.1[14.8.1] |2023-10-31 |Java 21 support, session constraint fixes, and device code polling improvements.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.7.4[14.7.4] |2023-10-10 |Session, policy, SDK, and Fedlet fixes; container-aware Docker memory settings and dependency security updates.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.7.3[14.7.3] |2023-07-20 |SAML verification hardening, session cache and CTS fixes, and ssoadm JAX-RPC repair.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.7.2[14.7.2] |2023-02-21 |NTLMv2 authentication module and session culler, XUI, and dependency fixes.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.7.1[14.7.1] |2023-01-16 |Shaded JATO library and separation of session creation from updates.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.7.0[14.7.0] |2022-12-19 |REST membership management, Cassandra and session/cache improvements, WindowsDesktopSSO fixes, and Docker JRE 17.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.6.6[14.6.6] |2022-06-22 |WindowsDesktopSSO null-token handling, frontend build fixes, and object identifier comparison repair.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.6.5[14.6.5] |2022-06-03 |Java compatibility, OIDC STS validation, Cassandra and CTS improvements, and authentication/policy fixes.
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.6.4[14.6.4] |2021-07-28 |CVE-2021-35464 workaround, embedded Cassandra logging, and Docker/build improvements. https://github.com/OpenIdentityPlatform/OpenAM/compare/7529aa9...53b06c3[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.6.3[14.6.3] |2021-06-21 |Authentication module property cache improvements and Cassandra driver updates. https://github.com/OpenIdentityPlatform/OpenAM/compare/b23cc71...7529aa9[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.6.2[14.6.2] |2021-02-08 |URL matching correction, Netty dependency conflict fix, and embedded Cassandra updates. https://github.com/OpenIdentityPlatform/OpenAM/compare/b5072890b7ba2e71996900c78ce1abb63fce9dc3...367beb855c519014d908e352b29a54527e9c53fe[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.6.1[14.6.1] |2020-12-30 |STS JWT key identifiers and session cache improvements. https://github.com/OpenIdentityPlatform/OpenAM/compare/902cb6c...ad16143[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.5.4[14.5.4] |2020-11-10 |OIDC checkSession iframe handling, JWT validation fix, and dependency updates. https://github.com/OpenIdentityPlatform/OpenAM/compare/76a8030...902cb6c[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.5.3[14.5.3] |2020-09-17 |Reverts session expiry/cache changes from 14.5.2 and repairs release builds. https://github.com/OpenIdentityPlatform/OpenAM/compare/b3bada9...76a8030[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.5.2[14.5.2] |2020-09-14 |Expired-session endSession handling, session upgrade fixes, and Rhino/OpenDJ updates. https://github.com/OpenIdentityPlatform/OpenAM/compare/944c26c...b3bada9[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.5.1[14.5.1] |2020-03-11 |JWT status claims and compressed debug log rotation. https://github.com/OpenIdentityPlatform/OpenAM/compare/8528a59...944c26c[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.4.2[14.4.2] |2019-09-05 |Authentication locale handling, module deletion fixes, JWKS modulus encoding, and XML security updates. https://github.com/OpenIdentityPlatform/OpenAM/compare/99f1ea7129b4e91ba9caab0abcae9bb2f96813ca...8528a5936479c2c56155910d8de597c2f9369317[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.4.1[14.4.1] |2019-07-29 |WebAuthn authentication module and account lockout fixes. https://github.com/OpenIdentityPlatform/OpenAM/compare/c1e880f87c3c480dd720fd424370e3902fce5056...99f1ea7129b4e91ba9caab0abcae9bb2f96813ca[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.3.1[14.3.1] |2019-04-30 |Additional JWT authentication claims and CORS/STS improvements. https://github.com/OpenIdentityPlatform/OpenAM/compare/f43d871c3d24bbe1ac3fd761775270eea8c25943...3e0458622ddde37699e24e2f5538b6b8e31fdc30[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.2.2[14.2.2] |2019-03-15 |Configuration store upgrade fixes and extended STS token claims. https://github.com/OpenIdentityPlatform/OpenAM/compare/9a5ec5fe18338da2342eafe34a9cbd15e85a9dfe...401bbae99d5213bf37897369f4ebb9b41967383f[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.2.1[14.2.1] |2019-03-11 |Configuration store upgrade and SecurID fixes; navigation back through an authentication chain. https://github.com/OpenIdentityPlatform/OpenAM/compare/af3ab3fdee4e6277beecbf8a27600fe82f9d7cf6...9a5ec5fe18338da2342eafe34a9cbd15e85a9dfe[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.17[14.1.17] |2019-02-08 |Cookie domain handling for Tomcat 8.5 and dependency security updates. https://github.com/OpenIdentityPlatform/OpenAM/compare/9fa23dee68585a3203dbeae5365b7cb8aba56579...13d6e0672d28aa33a986744d08e706a42a3068ee[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.16[14.1.16] |2019-01-21 |Bootstrap keystore restart fixes and dependency updates. https://github.com/OpenIdentityPlatform/OpenAM/compare/29b1c4246f7fccd6b98f92d56c31a8ef7b4e6a3a...9fa23dee68585a3203dbeae5365b7cb8aba56579[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.13[14.1.13] |2018-10-26 |SAML redirect path fixes and default organization DN change. https://github.com/OpenIdentityPlatform/OpenAM/compare/8c5bdfe9d829f21f5da86b007f22bafc0a787013...29b1c4246f7fccd6b98f92d56c31a8ef7b4e6a3a[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.12[14.1.12] |2018-10-18 |Wiki maintenance; the tagged comparison contains no additional product change summary. https://github.com/OpenIdentityPlatform/OpenAM/compare/4f8887008e747f916b588599af501ed97a1f8797...8c5bdfe9d829f21f5da86b007f22bafc0a787013[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.11[14.1.11] |2018-10-15 |Jersey dependency update. https://github.com/OpenIdentityPlatform/OpenAM/compare/af65f426f3a505b593d6f5926e01b860150a8a3e...4f8887008e747f916b588599af501ed97a1f8797[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.10[14.1.10] |2018-09-26 |Disables a grid filter that caused the script list to fail. https://github.com/OpenIdentityPlatform/OpenAM/compare/8d426b1facb13fb6e2bd91f03563fdd1de0f439a...af65f426f3a505b593d6f5926e01b860150a8a3e[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.9[14.1.9] |2018-09-21 |OAuth/social login, ESIA, and script sandbox compatibility fixes. https://github.com/OpenIdentityPlatform/OpenAM/compare/b8e94207fbbb4d3c59fc84b6bb4a0ec1d9214c3b...8d426b1facb13fb6e2bd91f03563fdd1de0f439a[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.8[14.1.8] |2018-08-13 |ssoadm repair and build/test fixes. https://github.com/OpenIdentityPlatform/OpenAM/compare/eb8e985653f3835592fcbaa6e8ee854c948c2b6f...b8e94207fbbb4d3c59fc84b6bb4a0ec1d9214c3b[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.7[14.1.7] |2018-08-07 |Policy editor sorting fixes and ESIA scope handling. https://github.com/OpenIdentityPlatform/OpenAM/compare/1d74714b413af342e4f405815b91248b809f60f0...eb8e985653f3835592fcbaa6e8ee854c948c2b6f[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.6[14.1.6] |2018-07-24 |Disabled-XUI redirects and authentication module/policy configuration refresh fixes. https://github.com/OpenIdentityPlatform/OpenAM/compare/ed80fd4f3241d26ddecff4b98bd839c7a6a0e815...1d74714b413af342e4f405815b91248b809f60f0[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.5[14.1.5] |2018-05-27 |Case-sensitive OAuth client identifiers and OpenDJ updates. https://github.com/OpenIdentityPlatform/OpenAM/compare/cfe5ed72df2c9bf9f8ef34d426c69e5c2a4db3c8...ed80fd4f3241d26ddecff4b98bd839c7a6a0e815[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.4[14.1.4] |2018-05-21 |CAPTCHA configuration and IP filtering additions. https://github.com/OpenIdentityPlatform/OpenAM/compare/e83c73fb4d930018048b8290bebaec8f9f8689bf...cfe5ed72df2c9bf9f8ef34d426c69e5c2a4db3c8[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.3[14.1.3] |2018-05-15 |Persistent cookie default adjustment and OpenDJ updates. https://github.com/OpenIdentityPlatform/OpenAM/compare/a702ca8c2b1f8bad38c0410508ff5e3516527135...e83c73fb4d930018048b8290bebaec8f9f8689bf[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.2[14.1.2] |2018-05-08 |Docker authentication module enablement and reCAPTCHA configuration fixes. https://github.com/OpenIdentityPlatform/OpenAM/compare/332f6726fb73651dfbfd04945c5091e43a95686b...a702ca8c2b1f8bad38c0410508ff5e3516527135[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.1.1[14.1.1] |2018-04-28 |reCAPTCHA authentication module and persistent cookie enhancements. https://github.com/OpenIdentityPlatform/OpenAM/compare/6a2ace352e9f21fd2a6dc6335bee746fd50a5827...332f6726fb73651dfbfd04945c5091e43a95686b[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.0.6[14.0.6] |2018-04-10 |OpenDJ updates and cache condition fixes. https://github.com/OpenIdentityPlatform/OpenAM/compare/d8f327d5e6344cfe320b96ebac39c2f30a1c7f11...6c4b3f196ac52c3db284f701f7de3e89aeba9425[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.0.5[14.0.5] |2018-03-17 |Client SDK repair for Java policy agents. https://github.com/OpenIdentityPlatform/OpenAM/compare/4b2a97318a07339b4ebf976ec11b632a2f0fe908...d8f327d5e6344cfe320b96ebac39c2f30a1c7f11[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.0.4[14.0.4] |2018-03-16 |LDAP, policy, and condition cache expiry settings; session constraint performance improvements. https://github.com/OpenIdentityPlatform/OpenAM/compare/13b638c849b90388245ddf04dbb27b4a07230708...4b2a97318a07339b4ebf976ec11b632a2f0fe908[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.0.3[14.0.3] |2018-03-14 |Adds administration tools to Docker. https://github.com/OpenIdentityPlatform/OpenAM/compare/9f8a7b0491d34453a94c7d7c789c662db9a11c16...13b638c849b90388245ddf04dbb27b4a07230708[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.0.2[14.0.2] |2018-03-12 |Docker distribution and packaging fixes. https://github.com/OpenIdentityPlatform/OpenAM/compare/8b9337ebe9e6b1339b75988a4e672b1b0c41ae4b...9f8a7b0491d34453a94c7d7c789c662db9a11c16[Source comparison].
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/14.0.1[14.0.1] |2018-03-11 |Community distribution, OpenDJ updates, and session/cache fixes. https://github.com/OpenIdentityPlatform/OpenAM/compare/d11451dc189974bfc9fbccf4189fc6fa7d8ddc8f...8b9337ebe9e6b1339b75988a4e672b1b0c41ae4b[Source comparison].
+|===
+
+=== Legacy Release
+
+[cols="1,1,4",options="header"]
+|===
+|Release |Published |Selected changes
+|https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/13.0.0[13.0.0] |2020-02-26 |Imported legacy release from OpenRock; see the release record for provenance.
+|===
+
+The imported 13.0.0 record was published here in 2020; that date is not the date the original upstream version was released. Historical entries do not define current support or an upgrade path. Follow xref:./requirements-and-upgrade.adoc[Requirements and Upgrade Considerations] before changing an installation.
