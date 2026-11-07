@@ -126,4 +126,4 @@ Review the https://github.com/OpenIdentityPlatform/OpenAM/security/advisories[pu
 |https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/13.0.0[13.0.0] |2020-02-26 |Imported legacy release from OpenRock; see the release record for provenance.
 |===
 
-The imported 13.0.0 record was published here in 2020; that date is not the date the original upstream version was released. Historical entries do not define current support or an upgrade path. Follow xref:./requirements-and-upgrade.adoc[Requirements and Upgrade Considerations] before changing an installation.
+The imported 13.0.0 record was published here in 2020; that date is not the date the original upstream version was released. Historical entries do not define current support or an upgrade path. Follow xref:requirements-and-upgrade.adoc#release-requirements[Requirements and Upgrade Considerations] before changing an installation.
