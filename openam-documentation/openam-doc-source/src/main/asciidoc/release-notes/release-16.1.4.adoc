@@ -27,7 +27,7 @@ endif::[]
 
 OpenAM 16.1.4 was published on 22 October 2026. These notes describe that released version. Documentation built from a development branch can also describe changes intended for a later release; a `SNAPSHOT` build is not a published release.
 
-The https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.1.4[16.1.4 release record] lists the assets and changes. The https://github.com/OpenIdentityPlatform/OpenAM/compare/16.1.3...16.1.4[comparison with 16.1.3] provides the corresponding source history. For newer releases, consult the https://github.com/OpenIdentityPlatform/OpenAM/releases[release list].
+The https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.1.4[16.1.4 release record] lists the assets and changes. The https://github.com/OpenIdentityPlatform/OpenAM/compare/16.1.3\...16.1.4[comparison with 16.1.3] provides the corresponding source history. For newer releases, consult the https://github.com/OpenIdentityPlatform/OpenAM/releases[release list].
 
 === Selected Changes
 
