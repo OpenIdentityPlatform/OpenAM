@@ -1,0 +1,70 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:table-caption!:
+
+ifndef::env-site[]
+[#release-requirements]
+endif::[]
+== Requirements and Upgrade Considerations
+
+ifdef::env-site[]
+anchor:release-requirements[]
+endif::[]
+
+=== Java and Web Containers
+
+OpenAM 16.1.4 requires Java 11 or later. The supported LTS versions documented for this release are JDK 11, 17, 21, and 25. Choose a Java version supported by both OpenAM and your web container.
+
+[cols="1,1,2",options="header"]
+|===
+|Web container |Java minimum |Notes
+|Apache Tomcat 10.1.x |11 |Use a maintained patch release.
+|Apache Tomcat 11.x |17 |The project Docker image uses Tomcat 11 with JRE 25.
+|===
+
+These requirements are recorded in the https://github.com/OpenIdentityPlatform/OpenAM/blob/16.1.4/openam-documentation/openam-doc-source/src/main/asciidoc/install-guide/chap-prepare-install.adoc[release installation prerequisites], the https://github.com/OpenIdentityPlatform/OpenAM/blob/16.1.4/openam-distribution/openam-distribution-docker/Dockerfile[release Dockerfile], and the https://tomcat.apache.org/whichversion.html[Apache Tomcat version matrix]. The WAR does not supply a Java runtime.
+
+Configure the required JVM module exports and the container's file permissions, memory, and file-descriptor limits as described in xref:../install-guide/chap-prepare-install.adoc#prepare-java[Preparing a Java Environment] and xref:../install-guide/chap-prepare-install.adoc#prepare-apache-tomcat[Preparing Apache Tomcat].
+
+Policy agents have separate releases and platform requirements. The server's container table does not describe agent compatibility. Consult the https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents/releases[Java policy agent releases] and https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases[web policy agent releases] for the agent version you deploy.
+
+=== Plan an Upgrade
+
+Read the release records for every version between your installation and the target release. Test the upgrade with a copy of your configuration and data, including authentication chains, OAuth 2.0 and OIDC clients, SAML sign-on and logout, policy evaluation, agents, custom extensions, scripts, and CTS connectivity.
+
+Back up the deployed WAR, configuration directory, keystores, configuration store, and customizations before replacing files. Retain matching pre-upgrade binaries and data for recovery. Follow the xref:../upgrade-guide/chap-about-upgrades.adoc#upgrade-planning[upgrade planning], xref:../upgrade-guide/chap-about-upgrades.adoc#pre-upgrade-backup[backup guidance], and xref:../upgrade-guide/chap-upgrade-servers.adoc#upgrade-server[server upgrade procedure].
+
+Restrict access to the upgrade interface, plan downtime, and complete the Upgrade wizard or command-line upgrade tool before returning the deployment to service. Replacing the WAR alone does not perform all configuration upgrade steps. The xref:release-history.adoc#release-history[release history] does not imply a tested direct upgrade path from every historical version.
+
+=== Compatibility Checks
+
+* From 15.1.6, Oracle Directory Server Enterprise Edition is no longer supported as a configuration store. Review the https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/15.1.6[release record] if your deployment uses it.
+* From 16.0.3, the server requires Java 11 bytecode support and Jakarta EE 9 APIs. Migrate servlet-dependent custom filters, listeners, and extensions from `javax.servlet` to `jakarta.servlet` and rebuild against the target version. A Java EE container such as Tomcat 9 cannot deploy this WAR unchanged. See the https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.0.3[16.0.3 release record].
+* From 16.1.1, the XUI supports an HttpOnly session cookie. Review custom JavaScript that reads the session cookie; use the documented REST interfaces when the cookie is HttpOnly. Legacy Liberty SOAP services also have new opt-in and authentication requirements; see the xref:../upgrade-guide/chap-upgrade-servers.adoc[server upgrade notes].
+* From 16.1.2, IdP discovery endpoints accept relative and same-origin return URLs; other destinations must match `org.openidentityplatform.openam.idpdiscovery.relaystate.whitelist` (a semicolon-separated list of URL patterns, empty by default). For endpoints hosted by OpenAM, configure this advanced server property as described in xref:../admin-guide/chap-federation.adoc#configure-cot[Modifying a Circle of Trust's Configuration] and the xref:../upgrade-guide/chap-upgrade-servers.adoc[server upgrade notes]. Review security advisories for additional changes to server-side URL fetching, script execution, and class instantiation.
++
+For a standalone IDP Discovery WAR, set the same property in `$HOME/libIDPDiscoveryConfig.properties`, where `$HOME` is the home directory of the user running the web container, and restart the discovery application.
+* From 16.1.3, the configuration upgrade adds missing ScriptingService sub-configurations, including the access token modification script introduced in 16.1.1. Run the upgrade step before using that script. Legacy Liberty ID-FF endpoints also require explicit configuration and message signing; see the https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.1.3[release record] and the xref:../upgrade-guide/chap-upgrade-servers.adoc[server upgrade notes].
+* In 16.1.4, empty redirect allowlists no longer permit arbitrary external destinations. Populate Valid goto URL Resources and the federation return URL lists for legitimate cross-domain redirects. See xref:../admin-guide/chap-auth-services.adoc#configure-valid-goto-url-resources[Valid goto URL Resources] and xref:../admin-guide/chap-federation.adoc#sp-relay-state-url-list[RelayState URL List].
+* The 16.1.4 upgrade deactivates built-in identities that remain active with their shipped passwords. Set deployment-specific passwords and reactivate only the identities you require. Authentication defaults on a new installation differ from those preserved on upgrade; see xref:../upgrade-guide/chap-about-upgrades.adoc#upgrade-authentication-defaults[Authentication Defaults].
+* For 16.1.4, merge the CSRF token handling into customized device authorization pages. Custom clients must send consent decisions in the POST body; links appending `user_code` to the verification URI no longer prefill the code. See the xref:../upgrade-guide/chap-about-upgrades.adoc#upgrade-device-flow-form[device form changes], xref:../upgrade-guide/chap-about-upgrades.adoc#upgrade-device-flow-verification-uri-query[verification URI changes], and xref:../upgrade-guide/chap-about-upgrades.adoc#upgrade-consent-decision-body[consent submission changes].
+
+=== Known Issues and Help
+
+The https://github.com/OpenIdentityPlatform/OpenAM/issues[issue tracker] records reported problems and ongoing work. Read each issue's affected versions, reproduction, and linked fixes before deciding whether it applies to your deployment. Consult the https://github.com/OpenIdentityPlatform/OpenAM/security/advisories[published security advisories] separately for security information and follow-up fixes.
+
+For usage questions, use the https://github.com/OpenIdentityPlatform/OpenAM/discussions[community discussions]. Include the OpenAM, Java, and container versions, relevant configuration, reproduction steps, and sanitized logs in a bug report. Follow the project's https://github.com/OpenIdentityPlatform/OpenAM/security/policy[security policy] to report a suspected vulnerability.
