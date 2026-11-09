@@ -1,0 +1,104 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-setup-kerberos-authentication-with-openam]
+== How to setup Kerberos Authentication with OpenAM
+
+[[how-to-setup-kerberos-authentication-with-openam-introduction]]
+=== Introduction
+
+There are several ways how enterprise users can authenticate in enterprise applications. If there are many enterprise applications users should authenticate into each application and enter login and password. Even if applications use the same user account, it is painful to enter credentials every time. A solution is to use a single sign (SSO) technology. For Windows users it is Kerberos. With Kerberos, users could authenticate to web applications seamlessly using their Active Directory accounts.
+
+[[how-to-setup-kerberos-authentication-with-openam-prerequisites]]
+=== Prerequisites
+
+You have Windows Server and user accounts stored in the Active directory. You must also have OpenAM installed. Here is how to xref:quick-openam-docker-configuration-from-a-command-line.adoc[quickly install OpenAM].
+
+[[how-to-setup-kerberos-authentication-with-openam-windows-setup]]
+=== Windows setup
+
+Create an account for Kerberos authentication in the Active Directory. When creating an account, set checkboxes `User cannot change password` и `Password never expires enabled` as shown in the picture below.
+
+image:images/how-to/kerberos/kerberos-account.png[Kerberos Account Settings]
+
+In user account properties in the Account tab in Account Options enable the checkbox `This account supports Kerberos AES-256 bit encryption`.
+
+On the domain controller create a keytab file openamKerberos.keytab in a current directory. To do this, execute the following command in the Windows terminal:
+
+[source,PowerShell]
+----
+ktpass -out openamKerberos.keytab -princ HTTP/openam.example.com@AD.EXAMPLE.COM -pass +rndPass -maxPass 256 -mapuser openamKerberos -crypto AES256-SHA1 -ptype KRB5_NT_PRINCIPAL
+----
+
+In this command in `-princ` parameter openam.example.com - is your OpenAM hostname and EXAMPLE.COM - your Active Directory domain name should be uppercase.
+
+Copy openamKerberos.keytab file to a directory, where OpenAM can read the file.
+
+On your firewall open network access from OpenAM to TCP/UDP ad.example.com:88
+
+Check keytab file on OpenAM machine:
+
+[source,bash]
+----
+$ klist -k -t openamKerberos.keytab
+Keytab name: FILE:openamKerberos.keytab
+KVNO Timestamp Principal
+---- ------------------- ------------------------------------------------------
+0 01.01.1970 03:00:00 HTTP/openam.example.com@AD.EXAMPLE.COM
+----
+
+[[how-to-setup-kerberos-authentication-with-openam-openam-configuration]]
+=== OpenAM Configuration
+
+[[how-to-setup-kerberos-authentication-with-openam-setup-authentication-module]]
+==== Setup Authentication Module
+
+Go to the OpenAM administrator console at http://openam.example.org:8080/openam/XUI/#login/ In the login field enter the value `amadmin`, in the password field enter the value from the `ADMIN++_++PWD` parameter of the setup command, in this case, `passw0rd`.
+
+Select the root realm and select Authentication → Modules from the menu. Create a new Active Directory authentication module.
+
+Edit the created `sso` authentication module settings.
+
+Set `Service Principal`, as in `ktpass` command. `Keytab File Name` should be `openamKerberos.keytab` file location on the OpenAM server. Set `Kerberos Realm`, `Kerberos Server Name`, and `Trusted Kerberos realms` according to your environment.
+
+image:images/how-to/kerberos/1-kerberos-module.png[SSO Kerberos New Authentication Module]
+
+[[how-to-setup-kerberos-authentication-with-openam-setup-authentication-chain]]
+==== Setup Authentication Chain
+
+Go to the admin console, select the root realm, and select Authentication → Chains from the menu. Create an `sso` authentication chain with the recently created `sso` module.
+
+image:images/how-to/kerberos/2-kerberos-chain.png[SSO Kerberos Authentication Chain Settings]
+
+[[how-to-setup-kerberos-authentication-with-openam-realm-configuration]]
+==== Realm Configuration
+
+Go to Authentication → Chains for realm and on the User Profile tab, set the `User Profile` setting to `Ignore`.
+
+image:images/how-to/kerberos/3-openam-realm-auth-settings.png[OpenAM Realm User Profile Settings]
+
+So, you can authenticate with Kerberos without setting up Active Directory as a User Data Store in OpenAM.
+
+[[how-to-setup-kerberos-authentication-with-openam-test-solution]]
+=== Test Solution
+
+On a Windows machine, authenticate with your Active Directory account and go to http://openam.example.com:8080/openam/XUI/#login/&realm=/&service=sso[http://openam.example.com:8080/openam/XUI/#login/&realm=/&service=sso]
+
+You should be seamlessly authenticated with an Active Directory account without prompting credentials.

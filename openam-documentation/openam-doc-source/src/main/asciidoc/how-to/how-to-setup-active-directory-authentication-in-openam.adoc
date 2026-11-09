@@ -1,0 +1,80 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-setup-active-directory-authentication-in-openam]
+== How To Setup Active Directory Authentication In OpenAM
+
+[[how-to-setup-active-directory-authentication-in-openam-preface]]
+=== Preface
+
+If your organization uses Microsoft Active Directory for user storage, it is a good practice to use Active Directory user accounts to authenticate in all your enterprise applications. OpenAM supports Microsoft Active Directory
+
+But setting up Microsoft Active Directory as a user data store could be tricky. In this article, we'll help you to set up user data store in OpenAM
+
+[[how-to-setup-active-directory-authentication-in-openam-setup-active-directory-user-data-store]]
+=== Setup Active Directory User Data Store
+
+Enterprise users should be in a separate realm.
+
+'''''
+
+*NOTE*
+
+_Of course, you can use an existing realm or even use different data stores in a single realm in OpenAM. But in this manual, we will create a separate realm and a sigle data store for employees_
+
+'''''
+
+So login in OpenAM console as amadmin and create realm `/staff`. Delete default user Data Store in `/staff` realm.
+
+Then create Active Directory data store with type Active Directory.
+
+There are the most important settings in a table below:
+
+[cols=",",options="header",]
+|===
+|Setting |Value
+|*Ldap Server* |AD host and port, for example: ad.example.com:389
+|*LDAP Bind DN* |Bund DN or user name for AD, for example `EXAMPLE++\++Administrator`
+|*LDAP Bind Password* |Bind DN password
+|*LDAP Organization DN* |DN where users are located DC=ad,DC=example,DC=com
+|*LDAP Connection Pool Maximum Size* |128
+|*Attribute Name Mapping* |uid=sAMAccountName userPassword=unicodePwd
+|*LDAPv3 Plug-in Supported Types and Operations* |user=read group=read realm=read
+|*LDAP Users Search Attribute:* |sAMAccountName
+|*LDAP Users Search Filter* |(objectclass=person)
+|*DN Cache* |Enabled
+|===
+
+[[how-to-setup-active-directory-authentication-in-openam-test-data-store-and-authentication]]
+=== Test Data Store and Authentication
+
+If you set all settings correctly, you should see user account form your active directory, in Subjects tab in the realm.
+
+Then test authentication: Open OpenAM URL in your browser, for example
+
+For XUI:
+
+http://openam.example.org:8080/openam/XUI/?org=/staff#login/[http://openam.example.org:8080/openam/XUI/?org=/staff#login/]
+
+For legacy UI:
+
+http://openam.example.org:8080/openam/UI/Login?org=/staff[http://openam.example.org:8080/openam/UI/Login?org=/staff]
+
+Enter your Active Directory credentials, and you should be successfully authenticated

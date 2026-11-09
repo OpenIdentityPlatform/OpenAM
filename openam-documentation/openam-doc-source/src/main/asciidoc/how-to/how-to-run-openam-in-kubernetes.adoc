@@ -1,0 +1,303 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-run-openam-in-kubernetes]
+== How To Run OpenAM in Kubernetes
+
+[[how-to-run-openam-in-kubernetes-preface]]
+=== Preface
+
+This article describes how to deploy https://github.com/OpenIdentityPlatform/OpenAM[OpenAM] with embedded https://github.com/OpenIdentityPlatform/OpenDJ[OpenDJ] on Kubernetes. We will use OpenAM Docker image from Docker Hub Registry https://hub.docker.com/r/openidentityplatform/openam/[https://hub.docker.com/r/openidentityplatform/openam/]
+
+In this tutorial, we will use Minikube as a local Kubernetes cluster. `kubectl` should also be installed
+
+Start Minikube with at least 4 cores, and 8 GB of memory to avoid insufficient resources errors.
+
+....
+minikube start --cpus=4 --memory=8g
+....
+
+[[how-to-run-openam-in-kubernetes-create-openam-service]]
+=== Create OpenAM Service
+
+The following service will be used for DNS lookups between OpenAM Pods and clients.
+
+Create `openam-service.yaml` file with the following contents:
+
+*`openam-service.yaml`*:
+
+[source,yaml]
+----
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: openam
+  name: openam
+spec:
+  clusterIP: None
+  ports:
+  - port: 8080
+  selector:
+    app: openam
+----
+
+Then create service in Kubernetes using `kubectl`:
+
+....
+kubectl apply -f openam-service.yaml
+....
+
+Make sure the service has been created:
+
+....
+kubectl get svc openam
+
+NAME             TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+openam           ClusterIP   None         <none>        8080/TCP   7s
+....
+
+[[how-to-run-openam-in-kubernetes-create-openam-statefulset]]
+=== Create OpenAM StatefulSet
+
+Create `openam-statefulset.yaml` file with the following contents:
+
+*`openam-statefulset.yaml`*:
+
+[source,yaml]
+----
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: openam
+  labels:
+    app: openam
+spec:
+  serviceName: openam
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openam
+  template:
+    metadata:
+      labels:
+        app: openam
+    spec:
+      containers:
+      - name: openam
+        image: openidentityplatform/openam
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 4444
+          protocol: TCP
+        - containerPort: 50389
+          protocol: TCP
+        env:
+          - name: CATALINA_OPTS
+            value: "-Xmx2048m -server -Dcom.iplanet.services.configpath=/home/openam/openam -Dcom.sun.identity.configuration.directory=/home/openam/openam"
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /openam/isAlive.jsp
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /openam/isAlive.jsp
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - name: openam-data
+          mountPath: /usr/openam/config
+  volumeClaimTemplates:
+  - metadata:
+      name: openam-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5Gi
+----
+
+Create OpenAM StatefulSet in Kubernetes
+
+....
+kubectl apply -f openam-statefulset.yaml
+....
+
+Check if StatefulSet is wokring
+
+....
+kubectl get statefulset openam
+
+NAME     READY   AGE
+openam   1/1     5m
+....
+
+Wait for pod is created
+
+Get created Pods
+
+....
+kubectl get pods -l="app=openam"
+NAME       READY   STATUS    RESTARTS   AGE
+openam-0   1/1     Running   0          5m
+....
+
+[[how-to-run-openam-in-kubernetes-openam-setup-and-configuration]]
+=== OpenAM Setup and Configuration
+
+Lets check OpenAM pod status
+
+....
+$ kubectl exec -it openam-0 -- curl -v  http://localhost:8080/openam/isAlive.jsp
+*   Trying 127.0.0.1...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> GET /openam/isAlive.jsp HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.52.1
+> Accept: */*
+>
+< HTTP/1.1 302
+< Location: http://localhost:8080/openam/config/options.htm
+< Content-Length: 0
+< Date: Mon, 16 Dec 2019 07:23:26 GMT
+<
+* Curl_http_done: called premature == 0
+* Connection #0 to host localhost left intact
+....
+
+isAlive response redirects to the configuration page, that means OpenAM is not configured. Let's configure the instance.
+
+In `/etc/hosts` file add the following entry:
+
+....
+127.0.0.1   openam-0.openam.default.svc.cluster.local
+....
+
+Then forward OpenAM port from the service
+
+....
+kubectl port-forward svc/openam 8080
+....
+
+Open http://openam-0.openam.default.svc.cluster.local:8080/openam/[http://openam-0.openam.default.svc.cluster.local:8080/openam/] url in your browser.
+
+You will be redirected to the configuration screen image:images/how-to/quickstart/openam-conf-start.png[OpenAM Configuration Start]
+
+Click *Create Default Configuration*.
+
+image:images/how-to/quickstart/openam-conf-license.png[OpenAM License Agreement]
+
+Accept License Agreement
+
+image:images/how-to/quickstart/openam-conf-passwords.png[OpenAM Set Passwords]
+
+Set password for default admin user and policy agent
+
+Press *Create Configuration*. After configuration successfully created, press *Proceed to Login* or open http://openam-0.openam.default.svc.cluster.local:8080/openam[http://openam-0.openam.default.svc.cluster.local:8080/openam/console] link in browser.
+
+[[how-to-run-openam-in-kubernetes-add-external-access-via-ingress]]
+=== Add External Access via Ingress
+
+[[how-to-run-openam-in-kubernetes-preparation]]
+==== Preparation
+
+For example you need OpenAM address be http://openam.acme.org/openam[http://openam.acme.org/openam]
+
+Goto OpenAM console, *Deployment* -++>++ *Sites* and create new site, for example, http://openam.acme.org:80/openam
+
+image:images/how-to/kubernetes/openam-add-site.png[OpenAM Add Site]
+
+Then goto OpenAM console, *Configure* -++>++ *Global Services* -++>++ *Platform* and add Cookie domain as shown on the picture below
+
+image:images/how-to/kubernetes/openam-add-cookie-domain.png[OpenAM Add Cookie Domain]
+
+[[how-to-run-openam-in-kubernetes-setup-ingress]]
+==== Setup ingress
+
+To make OpenAM accessible form external network we will use Ingress
+
+If you use Minikube, enable ingress using the following command
+
+....
+minikube addons enable ingress
+....
+
+Create `openam-ingerss.yaml` file
+
+*`openam-ingress.yaml`*:
+
+[source,yaml]
+----
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: openam-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /openam
+spec:
+  rules:
+  - http:
+      paths:
+        - path: /openam
+          backend:
+            serviceName: openam
+            servicePort: 8080
+----
+
+And create Ingress for OpenAM service in Kubernetes
+
+....
+kubectl apply -f openam-ingress.yaml
+....
+
+[[how-to-run-openam-in-kubernetes-test-access]]
+==== Test Access
+
+Get your minikube IP
+
+....
+echo $(minikube ip)
+192.168.64.15
+....
+
+And add the following entry to your `/etc/hosts` file
+
+....
+192.168.64.15   openam.acme.org
+....
+
+Then open http://openam.acme.org/openam[http://openam.acme.org/openam] url in your browser, and you should see authentication screen

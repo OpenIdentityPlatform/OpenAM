@@ -1,0 +1,169 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam]
+== How to Use Apache Cassandra as User and Session DataStore in OpenAM
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-introduction]]
+=== Introduction
+
+One of the performance bottlenecks of authentication is User DataStore. This becomes noticeable when the total number of user accounts exceeds `4 000 000`.
+
+To maintain acceptable performance, the most obvious solution is to scale User DataStore horizontally or vertically. But with an increasing amount of data, DataStore scaling does not affect performance.
+
+With the increasing load on the authentication system, the most obvious solution is to scale horizontally or vertically the number of user repository nodes.
+
+Another alternative solution is to use storage specifically designed for working with large amounts of data. One of such storages is https://cassandra.apache.org/[Apache Cassandra]. It has proved itself as a high-availability and high-performance datastore.
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-prepare-apache-cassandra]]
+=== Prepare Apache Cassandra
+
+Allow materialized views for Cassandra 4{plus} (in version 3 enabled by default) in conf/cassandra.yaml:
+
+[source,yaml]
+----
+# Enables materialized view creation on this node.
+# Materialized views are considered experimental and are not recommended for production use.
+enable_materialized_views: true
+----
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-prepare-apache-cassandra-to-use-as-user-datastore]]
+==== Prepare Apache Cassandra to use as User DataStore
+
+Сreate the corresponding Keyspaces and tables, for each OpenAM realm, from template https://raw.githubusercontent.com/OpenIdentityPlatform/OpenAM/master/openam-cassandra/openam-cassandra-datastore/src/test/resources/cassandra/import.cql[import.cql]
+
+[source,bash]
+----
+bin/cqlsh -f import.cql
+----
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-prepare-apache-cassandra-to-use-as-cts]]
+==== Prepare Apache Cassandra to use as CTS
+
+Сreate the corresponding Keyspaces and tables, for OpenAM CTS, from template https://raw.githubusercontent.com/OpenIdentityPlatform/OpenAM/master/openam-cassandra/openam-cassandra-cts/src/test/resources/schema.cqlsh[schema.cqlsh]
+
+[source,bash]
+----
+bin/cqlsh -f schema.cqlsh
+----
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-openam-setup]]
+=== OpenAM Setup
+
+Add cassandra contact-points info in bin/setenv.sh and restart OpenAM:
+
+[source,bash]
+----
+export CATALINA_OPTS=" ... \
+-Ddatastax-java-driver.basic.contact-points.0=ip1:9042 \
+-Ddatastax-java-driver.basic.contact-points.1=ip2:9042 \
+-Ddatastax-java-driver.basic.load-balancing-policy.local-datacenter=datacenter1 \
+-Ddatastax-java-driver.advanced.auth-provider.class=PlainTextAuthProvider \
+-Ddatastax-java-driver.advanced.auth-provider.username=user \
+-Ddatastax-java-driver.advanced.auth-provider.password=password \
+"
+----
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-openam-create-datastore]]
+==== OpenAM create DataStore
+
+Open OpenAM administration console, goto `Realms` select target realm, then goto `DataStores` and create new DataStore.
+
+image:images/how-to/cassandra/create-datastore.png[OpenAM Create Cassandra DataStore]
+
+Then setup following settings:
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-server-settings]]
+===== Server settings
+
+[cols=",",options="header",]
+|===
+|Setting |Value
+|Servers |don't use (leave blank)
+|User name |don't use (leave blank)
+|Password |don't use (leave blank)
+|Password (confirm) |don't use (leave blank)
+|Keyspace |Cassandra keyspace for this realm `realm++_++name`
+|===
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-plugin-configuration]]
+===== Plugin configuration
+
+[cols=",",options="header",]
+|===
+|Setting |Value
+|Database Repository Plugin Class Name |`org.openidentityplatform.openam.cassandra.Repo`
+|Tables |`group=group``user=user``realm=realm`
+|Operations |`realm=read,create,edit,delete,service`` group=read,create,edit,delete` `user=read,create,edit,delete,service`
+|===
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-user-configuration]]
+===== User Configuration
+
+[cols=",",options="header",]
+|===
+|Setting |Value
+|TTL |`realm:attr1=86400`` user:attr2=86400` `group:attr3=86400`
+|Attribute Name of User Status |inetuserstatus
+|User Status Active Value |Active
+|===
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-group-configuration]]
+===== Group Configuration
+
+[cols=",",options="header",]
+|===
+|Setting |Value
+|Attribute Name for Group Membership |memberOf
+|===
+
+Click the `Save` button
+
+You can check datastore. Goto `Subjects -++>++ Users` and create a new user account. For example:
+
+image:images/how-to/cassandra/create-user.png[OpenAM Create Cassandra User Account]
+
+Click `Save` and make sure, the record exists in Cassandra:
+
+....
+cassandra@cqlsh:realm_name> SELECT * FROM realm_name.values ;
+....
+
+[[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-openam-cts-setup]]
+==== OpenAM CTS Setup
+
+Add cassandra external CTS settings in bin/setenv.sh:
+
+[source,bash]
+----
+export CATALINA_OPTS=" ... \
+-Dorg.forgerock.openam.sm.datalayer.module.CTS_ASYNC=org.openidentityplatform.openam.cassandra.CTSAsyncConnectionModule  \
+-Dorg.forgerock.openam.sm.datalayer.module.CTS_MAX_SESSION_TIMEOUT_WORKER=org.openidentityplatform.openam.cassandra.CTSConnectionModule  \
+-Dorg.forgerock.openam.sm.datalayer.module.CTS_SESSION_IDLE_TIMEOUT_WORKER=org.openidentityplatform.openam.cassandra.CTSConnectionModule  \
+-Dorg.forgerock.openam.sm.datalayer.module.CTS_EXPIRY_DATE_WORKER=org.openidentityplatform.openam.cassandra.CTSConnectionModule  \
+-Dorg.forgerock.services.cts.store.root.suffix=cts.tokens  \
+"
+----
+
+restart OpenAM, login and check session info in Cassandra
+
+....
+cassandra@cqlsh:cts> SELECT * FROM cts.tokens ;
+....

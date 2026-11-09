@@ -1,0 +1,188 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#saml-authentication-in-yandex-cloud-via-openam]
+== SAML Authentication in Yandex Cloud via OpenAM
+
+xref:saml-authentication-in-yandex-cloud-via-openam.adoc[Russian version]
+
+[[saml-authentication-in-yandex-cloud-via-openam-getting-started]]
+=== Getting started
+
+To configure SAML authentication, there are the following prerequisites:
+
+[arabic]
+. Docker platform installed and running Docker Engine
+. Locally running OpenAM instance. To launch OpenAM, run the following command.
+
+[source,bash]
+----
+docker run -h openam.example.org -p 8080:8080 --name openam openidentityplatform/openam
+----
+
+Detailed description of the installation and initial configuration of OpenAM at xref:quick-start-guide.adoc[this link]
+
+[[saml-authentication-in-yandex-cloud-via-openam-setting-up-federation-in-openam]]
+=== Setting up Federation in OpenAM
+
+[[saml-authentication-in-yandex-cloud-via-openam-create-and-configure-identity-provider-in-openam]]
+==== Create and Configure Identity Provider in OpenAM
+
+[arabic]
+. Open the administration console
+. Goto desired realm
+. Select *Configure SAMLv2 Provider* in the Common Tasks section
+
+image:images/how-to/saml-yandex-cloud/realm-common-tasks.png[OpenAM Realm Common Tasks]
+
+[arabic, start=4]
+. Then *Create Hosted Identity Provider*
+
+image:images/how-to/saml-yandex-cloud/configure-saml-provider.png[Configure SAML v2 Provider]
+
+[arabic, start=5]
+. Select a Signing Key (for demonstration purposes we will use *test*), enter the Circle of Trust name, and then map user's attributes to OpenAM. For demonstration users will be mapped by email.
+
+image:images/how-to/saml-yandex-cloud/configure-saml-identity-provider.png[Configure SAML Identity Provider]
+
+[arabic, start=6]
+. Press the Configure button.
+
+[[saml-authentication-in-yandex-cloud-via-openam-setting-up-the-user-mapping-in-openam]]
+==== Setting up the User Mapping in OpenAM
+
+[arabic]
+. Open the administration console
+. Goto desired realm
+. From the menu on the left, select the Applications section and navigate to SAML 2.0
+. In the Entity Providers list select `http://openam.example.org:8080/openam`
+. On the Assertion Content tab, under *NameID Format* in the *NameID Value Map* list, add the element `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=mail`
+. Press the Save button
+
+[[saml-authentication-in-yandex-cloud-via-openam-creating-openam-users]]
+==== Creating OpenAM Users
+
+[arabic]
+. Open the administration console
+. Goto desired realm
+. Create a new user and fill the Email Address attribute
+
+[[saml-authentication-in-yandex-cloud-via-openam-creating-and-setting-up-a-federation-in-yandex-cloud-organization]]
+=== Creating and Setting up a Federation in Yandex Cloud Organization
+
+[[saml-authentication-in-yandex-cloud-via-openam-create-a-federation]]
+==== Create a Federation
+
+[arabic]
+. Gotot https://org.cloud.yandex.ru/[Yandex Cloud Organization].
+. On the left panel choose https://org.cloud.yandex.ru/federations[Federations] .
+. Click the *Create Federation* button.
+. Give your federation a name. It must be unique within the folder.
+. You can also add a description, if required.
+. In the Cookie lifetime field, specify the time before the browser asks the user to re-authenticate.
+. In the *IdP Issuer* field, enter a link to the OpenAM: `http://openam.example.org:8080/openam`
+. In the Link to the *IdP login page* field, enter a link: `http://openam.example.org:8080/openam/SSORedirect/metaAlias/idp`
+. Click the *Create federation* button.
+
+[[saml-authentication-in-yandex-cloud-via-openam-add-certificates]]
+==== Add Certificates
+
+While authenticating, the Cloud Organization service should be able to verify the IdP server certificate. To enable this, add the certificate to the federation:
+
+[arabic]
+. Open the OpenAM link `http://openam.example.org:8080/openam/saml2/jsp/exportmetadata.jsp` and copy the `ds:X509Certificate` tag value
+. Save the certificate in a text file with a `.cer` extension in the following format:
+
+[source,bash]
+----
+----BEGIN CERTIFICATE-----
+<value ds:X509Certificate>
+----END CERTIFICATE-----
+----
+
+[arabic]
+. In the left panel, select https://org.cloud.yandex.ru/federations[Federations].
+. Click the the federation for which you want to add the certificate.
+. At the bottom of the page, click *Adding a certificate*.
+. Enter the certificate name and description.
+. Click *Choose a file* and specify the path to the certificate file.
+. Click the *Add* button.
+
+[[saml-authentication-in-yandex-cloud-via-openam-creating-a-remote-service-provider-в-openam]]
+=== Creating a Remote Service Provider в OpenAM
+
+[[saml-authentication-in-yandex-cloud-via-openam-creating-a-metadata-file-for-openam]]
+==== Creating a Metadata file for OpenAM
+
+[arabic]
+. Create a `metadata.xml` file with the following contents where federation++_++ID - is a federation identifier in https://org.cloud.yandex.ru[Yandex Cloud Organization], https://org.cloud.yandex.ru/federations[Federations] section
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://console.cloud.yandex.ru/federations/<federation_ID>">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://console.cloud.yandex.ru/federations/<federation_ID>" index="1"/>
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>
+----
+
+[[saml-authentication-in-yandex-cloud-via-openam-creating-a-service-provider-in-openam]]
+==== Creating a Service Provider in OpenAM
+
+[arabic]
+. Open the administration console
+. Goto desired realm
+. Choose *Configure SAMLv2 Provider* in the Common Tasks section
+. Then click *Configure Remote Service Provider*
+
+image:images/how-to/saml-yandex-cloud/saml-remote-service-provider.png[SAML Remote Service Provider]
+
+[arabic]
+. Load the `metadata.xml` file created in the previous step as metadata.
+. Select the existing Circle Of Trust, created on the *Create and Configure Identity Provider in OpenAM* stage
+. Нажмите Configure
+
+[[saml-authentication-in-yandex-cloud-via-openam-adding-users-to-yandex-cloud-organization]]
+=== Adding Users to Yandex Cloud Organization
+
+If the *Automatically create users* option is enabled, a federation will only add users logging in to a cloud for the first time. You can only add a federated user again manually after deleting them from a federation.
+
+[arabic]
+. https://passport.yandex.ru/[Login to account] that belongs to an organization administrator or owner.
+. Goto https://org.cloud.yandex.ru/[Yandex Cloud Organization] service.
+. In the left panel, select https://org.cloud.yandex.ru/users[Users].
+. In the top-right corner, click *Add federated users*.
+. Select the identity federation to add users from.
+. Enter emails of the OpenAM users
+. Click the *Add* button. This will give the OpenAM users access to the organization.
+
+[[saml-authentication-in-yandex-cloud-via-openam-testing-authentication]]
+=== Testing Authentication
+
+When you finish setting up SSO, test that everything works properly:
+
+[arabic]
+. Open your browser in guest or private browsing mode.
+. Follow the URL to log in to the management console:
++
+`https://console.cloud.yandex.ru/federations/++<++federation++_++ID++>++`
+. Enter OpenAM user credentials and click Login.
+
+On successful authentication, the IdP server will redirect you to URL `https://console.cloud.yandex.ru/federations/++<++federation++_++ID++>++`, which you have set in the `metadata.xml` file for the Service Provider in the OpenAM settings and then to the https://console.cloud.yandex.ru/[management console] home page. In the top-right corner, you will be able to see you are logged in to the console as a federated user.

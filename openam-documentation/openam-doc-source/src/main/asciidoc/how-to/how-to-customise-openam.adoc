@@ -1,0 +1,211 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-customise-openam]
+== How to Customise OpenAM
+
+NOTE: This example was written for OpenAM 14.7.1. Use dependencies and plugins compatible with your OpenAM version.
+
+* xref:how-to-customise-openam.adoc#how-to-customise-openam-introduction[Introduction]
+* xref:how-to-customise-openam.adoc#how-to-customise-openam-create-maven-project[Create Maven Project]
+* xref:how-to-customise-openam.adoc#how-to-customise-openam-run-and-debug-war-file-locally[Run and Debug War File Locally]
+* xref:how-to-customise-openam.adoc#how-to-customise-openam-customisation-example[Customisation Example]
+* xref:how-to-customise-openam.adoc#how-to-customise-openam-conclusion[Conclusion]
+
+[[how-to-customise-openam-introduction]]
+=== Introduction
+
+OpenAM is a reliable and mature product itself out of the box, have rich functionality and a good extension potential. But there is always a question - how to develop and debug the extensions? In the following article we will create a maven project and do simple OpenAM customisation.
+
+[[how-to-customise-openam-create-maven-project]]
+=== Create Maven Project
+
+Create a maven project with the following `pom.xml` file:
+
+[source,xml]
+----
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam</artifactId>
+        <version>14.7.1</version>
+    </parent>
+    <repositories>
+        <repository>
+            <id>ossrh-releases</id>
+            <name>Sonatype OSS</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+    <artifactId>openam-extended</artifactId>
+    <packaging>war</packaging>
+        <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+----
+
+The parent project will be `org.openidentityplatform.openam:openam` so in the following project we can use proper OpenAM dependencies in our project.
+
+Project packaging should be war, as we build a web application that extends OpenAM server application.
+
+To override OpenAM server add `org.openidentityplatform.openam:openam-server` dependency to the build section and overlay to `maven-war-plugin`
+
+[source,xml]
+----
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.openidentityplatform.openam</groupId>
+        <artifactId>openam</artifactId>
+        <version>14.7.1</version>
+    </parent>
+    <repositories>
+        <repository>
+            <id>ossrh-releases</id>
+            <name>Sonatype OSS</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+    <artifactId>openam-extended</artifactId>
+    <packaging>war</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>org.openidentityplatform.openam</groupId>
+            <artifactId>openam-server</artifactId>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <overlays>
+                        <overlay>
+                            <groupId>org.openidentityplatform.openam</groupId>
+                            <artifactId>openam-server</artifactId>
+                        </overlay>
+                    </overlays>
+                 </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+----
+
+Run `mvn package` command and after a successful build, you can see `openam-extended-14.7.1.war` file. This file you can use this instead of the default OpenAM server war file.
+
+[[how-to-customise-openam-run-and-debug-war-file-locally]]
+=== Run and Debug War File Locally
+
+Add to the maven pom to the plugins section `cargo-maven2-plugin`:
+
+[source,xml]
+----
+...
+<plugin>
+    <groupId>org.codehaus.cargo</groupId>
+    <artifactId>cargo-maven2-plugin</artifactId>
+    <configuration>
+        <container>
+            <containerId>tomcat9x</containerId>
+            <type>embedded</type>
+            <systemProperties>
+                                <!--configuration directory path-->
+                <com.iplanet.services.configpath>${basedir}/config</com.iplanet.services.configpath>
+                <com.sun.identity.configuration.directory>${basedir}/config</com.sun.identity.configuration.directory>
+            </systemProperties>
+        </container>
+        <configuration>
+            <properties>
+                                <!--openam port-->
+                <cargo.servlet.port>8080</cargo.servlet.port>
+                <cargo.rmi.port>8206</cargo.rmi.port>
+                <cargo.jvmargs> ${java.surefire.options} -Xms4g -Xmx4g</cargo.jvmargs>
+            </properties>
+        </configuration>
+        <deployables>
+            <deployable>
+                <type>war</type>
+                <properties>
+                    <context>openam</context>
+                </properties>
+                <pingURL>http://localhost:8080/openam</pingURL>
+            </deployable>
+        </deployables>
+    </configuration>
+</plugin>
+...
+----
+
+Add desired OpenAM FQDN to your hosts file like this:
+
+....
+127.0.0.1    openam.example.com
+....
+
+To repackage and run war file execute the following command: `mvn package cargo:run`
+
+You should see in the console something like this
+
+....
+[INFO] [beddedLocalContainer] Tomcat 9.x Embedded started on port [8080]
+[INFO] Press Ctrl-C to stop the container...
+....
+
+Open OpenAM console in the browser with the following link http://openam.example.com:8080/openam[http://openam.example.com:8080/openam] and OpenAM will prompt you to configure a new instance. How to configure a new OpenAM instance is described in xref:quick-start-guide.adoc[Quick Start Guide]. After OpenAM configuration you will be able to use OpenAM locally within your development environment.
+
+OpenAM configuration and log files will be stored in your project in `/config` directory
+
+[[how-to-customise-openam-customisation-example]]
+=== Customisation Example
+
+After configuring OpenAM, let’s do something simple to demonstrate customisation. We will modify the default OpenAM login page. We will add Acme corp logo instead of standard OpenAM logo.
+
+The header template is in `XUI/templates/common/LoginHeaderTemplate.html` file. Create `src/main/webapp/XUI/templates/common/LoginHeaderTemplate.html` file in the project root folder. Then add the following contents:
+
+[source,html]
+----
+<h1>ACME corp.</h1>
+----
+
+Start OpenAM and navigate to the login page. We can see that OpenAM uses the custom header. You can deploy the custom war file on your production web server
+
+[[how-to-customise-openam-conclusion]]
+=== Conclusion
+
+This article has only shown a simple setup in order to demonstrate the overall approach. In future articles we will show a more complex setup, such as developing a custom authentication module.

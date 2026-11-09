@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems, LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.core.realms;
@@ -219,6 +219,26 @@ public class RealmTestHelper {
             RealmLookupException exception = mock(RealmLookupException.class);
             when(exception.getRealm()).thenReturn(realmPath);
             doThrow(exception).when(realmLookup).lookup(realmPath);
+        } catch (RealmLookupException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Mocks a realm whose lookup throws an {@code IllegalArgumentException}, as the real lookup does when the DN
+     * parser rejects a realm name with a DN special character, such as a comma.
+     *
+     * @param realmParts An array of path elements of the realm. Elements cannot contain '/'.
+     */
+    public void mockMalformedRealm(String... realmParts) {
+        Reject.ifNull(realmParts);
+        for (String realm : realmParts) {
+            Reject.ifTrue(realm.contains("/"), "realm part cannot contain '/'");
+        }
+        String realmPath = "/" + StringUtils.join(realmParts, "/");
+        try {
+            doThrow(new IllegalArgumentException("Invalid DN syntax: " + realmPath)).when(realmLookup)
+                    .lookup(realmPath);
         } catch (RealmLookupException e) {
             throw new RuntimeException(e);
         }

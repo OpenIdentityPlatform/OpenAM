@@ -52,17 +52,6 @@ jobs:
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-      # Maven 3.10 leaves maven-metadata-local.xml and _remote.repositories in the
-      # central-publishing staging directory, and Maven Central rejects the bundle.
-      - name: Set up Maven 3.9
-        env:
-          MAVEN_VERSION: 3.9.16
-          MAVEN_SHA512: 831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6
-        run: |
-          curl -fsSL --retry 5 -o "$RUNNER_TEMP/maven.tar.gz" "https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz"
-          echo "$MAVEN_SHA512  $RUNNER_TEMP/maven.tar.gz" | sha512sum -c -
-          tar xzf "$RUNNER_TEMP/maven.tar.gz" -C "$RUNNER_TEMP"
-          echo "$RUNNER_TEMP/apache-maven-$MAVEN_VERSION/bin" >> "$GITHUB_PATH"
       - name: Install gpg secret key
         env:
            GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -81,7 +70,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          MAVEN_OPTS: -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
+          MAVEN_OPTS: -Xmx6g -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
         if: ${{ env.MAVEN_USERNAME!='' && env.MAVEN_PASSWORD!='' }}
         run: mvn --batch-mode -Darguments="-Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}" -DsignTag=true -DtagNameFormat="${{ github.event.inputs.releaseVersion }}" -DreleaseVersion=${{ github.event.inputs.releaseVersion }} -DdevelopmentVersion=${{ github.event.inputs.developmentVersion }} release:prepare clean release:perform --file pom.xml
       - name: Release on GitHub

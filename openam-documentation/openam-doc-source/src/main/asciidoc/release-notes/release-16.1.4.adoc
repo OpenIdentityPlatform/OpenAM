@@ -1,0 +1,77 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:table-caption!:
+
+ifndef::env-site[]
+[#release-16-1-4]
+endif::[]
+== OpenAM 16.1.4
+
+ifdef::env-site[]
+anchor:release-16-1-4[]
+endif::[]
+
+OpenAM 16.1.4 was published on 22 October 2026. These notes describe that released version. Documentation built from a development branch can also describe changes intended for a later release; a `SNAPSHOT` build is not a published release.
+
+The https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.1.4[16.1.4 release record] lists the assets and changes. The https://github.com/OpenIdentityPlatform/OpenAM/compare/16.1.3\...16.1.4[comparison with 16.1.3] provides the corresponding source history. For newer releases, consult the https://github.com/OpenIdentityPlatform/OpenAM/releases[release list].
+
+=== Selected Changes
+
+The release includes the following changes, among others:
+
+* Security fixes for built-in accounts with shipped credentials, notification WebSocket session disclosure, self-registration attribute validation, and SAML assertion verification.
+* Redirect validation for login, SAML, and WS-Federation, plus restrictions on server-side fetching of CRLs, federation metadata, and UMA scope descriptions.
+* OAuth 2.0 device flow fixes for CSRF protection, PKCE, expired device codes, session propagation, and OIDC claims.
+* WindowsDesktopSSO improvements for completing authentication from a Negotiate header, retrying expired service credentials, and rejecting invalid tokens.
+* CTS persistent-search recovery after connection loss, LDAP DN rule parsing fixes, and an update to OpenDJ 5.2.0.
+* Dependency and Docker image security updates, and corrections to the guides and debug logging configuration.
+
+This is a summary. Use the release record to identify individual fixes and their pull requests.
+
+=== Fixed Security Advisories
+
+The following published advisories identify 16.1.4 as a patched version:
+
+* Accounts and sessions: https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-hvfc-4v4r-8p9w[GHSA-hvfc-4v4r-8p9w] (shipped credentials), https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-5c3q-hp86-xjr8[GHSA-5c3q-hp86-xjr8] (WebSocket session disclosure), and https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-jv8f-m88g-h6mm[GHSA-jv8f-m88g-h6mm] (self-registration).
+* Federation message verification and encoding: https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-3j2f-qhrc-rjfj[GHSA-3j2f-qhrc-rjfj] (SAML v2.0 assertions), https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-j56q-q3r3-hg7f[GHSA-j56q-q3r3-hg7f] (SAML 1.x signer binding), and https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-pw99-8h4m-p3gm[GHSA-pw99-8h4m-p3gm] (SAML 1.x form encoding).
+* Redirects: https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-2gwf-vxp5-f9v2[GHSA-2gwf-vxp5-f9v2] (goto/gotoOnFail open redirect and cross-site scripting), https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-fhqm-62hv-4phw[GHSA-fhqm-62hv-4phw] (SAML v2.0 RelayState without a URL list), https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-mgwg-24cx-c8w3[GHSA-mgwg-24cx-c8w3] (unchecked WS-Federation and SAML v2.0 redirects), and https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-rw43-r238-4c7j[GHSA-rw43-r238-4c7j] (SAML 1.x trusted-partner matching).
+* Server-side requests: https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-g5vw-v384-gw9v[GHSA-g5vw-v384-gw9v] (CRLs), https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-rmw3-j353-w9f7[GHSA-rmw3-j353-w9f7] (federation metadata), and https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-7q42-6xr7-9rmw[GHSA-7q42-6xr7-9rmw] (UMA scope descriptions).
+* OAuth 2.0 device authorization and consent: https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-545c-rm35-2jj2[GHSA-545c-rm35-2jj2] (CSRF), https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-h93p-35jm-rj83[GHSA-h93p-35jm-rj83] (PKCE), and https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-v6hq-3cfh-5gr6[GHSA-v6hq-3cfh-5gr6] (consent page encoding).
+* Internal protocols and deserialization: https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-6gg2-2v5m-454x[GHSA-6gg2-2v5m-454x] (SOAP response validation) and https://github.com/OpenIdentityPlatform/OpenAM/security/advisories/GHSA-x7wr-5gxg-v833[GHSA-x7wr-5gxg-v833] (unbounded deserialization).
+
+Review the https://github.com/OpenIdentityPlatform/OpenAM/security/advisories[published security advisories] for affected versions, impact, remediation, and subsequent disclosures. Dependency fixes are also listed in the release record. An older release's fix can be incomplete; check follow-up advisories when selecting an upgrade target.
+
+=== Distributions
+
+The release provides the following assets:
+
+[cols="1,2",options="header"]
+|===
+|Asset |Purpose
+|`OpenAM-16.1.4.war` |Server web application for deployment in a compatible servlet container.
+|`OpenAM-16.1.4.zip` |Distribution archive containing OpenAM components and tools.
+|`OpenAM-ServerOnly-16.1.4.war` |Server-only web application.
+|`openam-console-16.1.4.war` |Separate console web application.
+|`SSOAdminTools-16.1.4.zip` |Administration command-line tools, including `ssoadm`.
+|`SSOConfiguratorTools-16.1.4.zip` |Command-line configuration and upgrade tools.
+|`Fedlet-16.1.4.zip` |Fedlet distribution for SAML service provider integration.
+|`Dockerfile` |Docker image build instructions.
+|===
+
+The project also publishes the https://hub.docker.com/r/openidentityplatform/openam/[OpenAM Docker image]. See the xref:../getting-started/index.adoc[Getting Started Guide] for an evaluation and the xref:../install-guide/index.adoc[Installation Guide] for deployment procedures.
+
+Before installation or upgrade, read xref:requirements-and-upgrade.adoc#release-requirements[Requirements and Upgrade Considerations].

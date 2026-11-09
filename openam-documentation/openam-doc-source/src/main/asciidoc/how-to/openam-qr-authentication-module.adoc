@@ -1,0 +1,103 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#openam-qr-authentication-module]
+== OpenAM QR Authentication Module
+
+* xref:openam-qr-authentication-module.adoc#openam-qr-authentication-module-introduction[Introduction]
+* xref:openam-qr-authentication-module.adoc#openam-qr-authentication-module-process-description[Process Description]
+* xref:openam-qr-authentication-module.adoc#openam-qr-authentication-module-openam-configuration[OpenAM Configuration]
+* xref:openam-qr-authentication-module.adoc#openam-qr-authentication-module-mobile-application-configuration[Mobile Application Configuration]
+* xref:openam-qr-authentication-module.adoc#openam-qr-authentication-module-testing-solution[Testing Solution]
+
+[[openam-qr-authentication-module-introduction]]
+=== Introduction
+
+The most popular authentication method is also the most inconvenient. It is login and password authentication. A user must remember his login and password for each service, could forget the password, a password could be compromised, etc. The following article describes, how to login into the application in the browser on another device, if the user is already authenticated in a mobile application. The article contains step by step guide on how to set up the process in OpenAM.
+
+[[openam-qr-authentication-module-process-description]]
+=== Process Description
+
+* The user has a valid authentication session in the mobile application.
+* The user opens the OpenAM authentication page.
+* OpenAM generates a random code with a limited lifetime and displays it to the user as a QR code.
+* User scan the QR with the mobile application
+* Mobile application sends the code to OpenAM within authenticated session identifier
+* Meanwhile, the browser periodically polls OpenAM to see if the code is received along with the authentication session
+* If the code was received, authentication is successful and an authentication session is created.
+
+[[openam-qr-authentication-module-openam-configuration]]
+==== OpenAM Configuration
+
+At first, we will set up OpenAM, create an authentication module instance and an authentication chain with the instance.
+
+[[openam-qr-authentication-module-create-qr-authentication-module-instance]]
+==== Create QR Authentication Module Instance
+
+Go to the desired realm, then on the left side of the Authentication → Modules menu. The list of modules opens. Press the Add Module button. Enter the name of the module qr and choose QR code confirm from other session module type.
+
+image:images/how-to/openam-qr/new-qr-module.png[New QR module Instance]
+
+Press the Create button.
+
+image:images/how-to/openam-qr/qr-module-settings.png[New QR module Settings]
+
+Set desired QR code lifetime and authentication level and press the Save Changes button.
+
+[[openam-qr-authentication-module-create-authentication-chain]]
+==== Create Authentication Chain
+
+Go to *Authentication → Chains*. And create a new *qr* authentication chain. Add the created *qr* module to the chain.
+
+image:images/how-to/openam-qr/qr-auth-chain.png[QR authentication chain Settings]
+
+[[openam-qr-authentication-module-mobile-application-configuration]]
+=== Mobile Application Configuration
+
+Let's install and configure the mobile application. The following mobile application is only for demonstration and is not intended for production usage. But you can use application source code to build your application or modify application source code for your tasks. The application was developed with https://flutter.dev/[Flutter]
+
+Mobile application source code: https://github.com/OpenIdentityPlatform/openam_demo_authenticator[https://github.com/OpenIdentityPlatform/openam_demo_authenticator]
+
+Run the mobile application:
+
+[source,bash]
+----
+flutter run
+----
+
+[[openam-qr-authentication-module-mobile-application-setup]]
+==== Mobile Application Setup
+
+Press the Settings icon in the upper-right corner of the application and go to the settings menu. Enter OpenAM URL, realm, OpenAM username and password. Press the Back button in the upper-left corner. Settings data will be stored in the device's secure storage.
+
+image:images/how-to/openam-qr/qr-mobile-settings.png[QR mobile application settings]
+
+[[openam-qr-authentication-module-testing-solution]]
+=== Testing Solution
+
+If you were logged in, log out from OpenAM. Open OpenAM URL with QR authentication chain. For example, http://openam.example.org:8080/openam/XUI/#login/&realm=/&service=qr[http://openam.example.org:8080/openam/XUI/#login/&realm=/&service=qr] Replace http://openam.example.org:8080/openam[http://openam.example.org:8080/openam] with your OpenAM URL. You will see a QR code that you need to scan. As well as the same code in the form of text as shown in the image below
+
+image:images/how-to/openam-qr/qr-code-page.png[OpenAM QR code page]
+
+Open the mobile application, press the Login button. The application will authenticate in OpenAM in the specified realm with specified credentials. If authentication succeeds, you'll see the user name and first symbols of the OpenAM authentication token
+
+image:images/how-to/openam-qr/qr-mobile-successful.png[QR mobile mobile authentication successful]
+
+Then press the "Scan QR to authenticate" button, scan the QR code and you will a message about successful authentication. Meanwhile, the browser will authenticate the scanned QR code. If it is not possible to scan a QR code, you can enter the code manually in the "Enter a code from QR" field and press Authenticate. If you entered the code correctly, you will also be authenticated.

@@ -1091,30 +1091,6 @@
     <!-- end of servlet mapping -->
 
     <servlet>
-        <servlet-name>WebFinger</servlet-name>
-        <servlet-class>org.forgerock.openam.rest.jakarta.servlet.ServerServlet</servlet-class>
-
-        <!-- Your application class name (Optional - For mode 3) -->
-        <init-param>
-            <param-name>org.restlet.application</param-name>
-            <param-value>org.forgerock.openidconnect.restlet.WebFinger</param-value>
-        </init-param>
-
-        <!-- List of supported client protocols (Optional - Only in mode 3) -->
-        <init-param>
-            <param-name>org.restlet.clients</param-name>
-            <param-value>RIAP CLAP</param-value>
-        </init-param>
-
-        <!-- Add the Servlet context path to routes (Optional) -->
-        <init-param>
-            <param-name>org.restlet.autoWire</param-name>
-            <param-value>true</param-value>
-        </init-param>
-
-    </servlet>
-
-    <servlet>
         <servlet-name>OAuth2RegisterClient</servlet-name>
         <jsp-file>/oauth2/registerClient.jsp</jsp-file>
     </servlet>
@@ -1135,11 +1111,6 @@
     </servlet-mapping>
 
     <!-- servlet declaration -->
-
-    <servlet-mapping>
-        <servlet-name>WebFinger</servlet-name>
-        <url-pattern>/.well-known/*</url-pattern>
-    </servlet-mapping>
 
     <servlet>
         <servlet-name>OpenAM</servlet-name>
@@ -1177,6 +1148,10 @@
     <servlet-mapping>
         <servlet-name>OpenAM</servlet-name>
         <url-pattern>/xacml/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OpenAM</servlet-name>
+        <url-pattern>/.well-known/*</url-pattern>
     </servlet-mapping>
 
     <servlet>

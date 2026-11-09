@@ -14,3 +14,4 @@
 # Copyright 2015 ForgeRock AS.
 #
 org.forgerock.openam.oauth2.rest.OAuth2RestHttpRouteProvider
+org.openidentityplatform.openam.oauth2.webfinger.WebFingerHttpRouteProvider

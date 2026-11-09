@@ -1,0 +1,222 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-setup-active-directory-authentication-in-a-spring-boot-application]
+== How to Setup Active Directory Authentication in a Spring Boot Application
+
+[[how-to-setup-active-directory-authentication-in-a-spring-boot-application-introduction]]
+=== Introduction
+
+Almost every organization uses https://ru.wikipedia.org/wiki/Active_Directory[Active Directory] to manage employee accounts. And using existing accounts to access corporate applications is a recommendend practice. In this article, we will configure authentication in the https://github.com/OpenIdentityPlatform/spring-security-openam-example[demo Spring Boot application] via an Active Directory server in https://github.com/OpenIdentityPlatform/OpenAM[OpenAM].
+
+[[how-to-setup-active-directory-authentication-in-a-spring-boot-application-openam-configuration]]
+==== OpenAM Configuration
+
+[[how-to-setup-active-directory-authentication-in-a-spring-boot-application-install-openam]]
+==== Install OpenAM
+
+Let OpenAM hostname is `openam.example.org`, and the Spring Boot application hostname is `app.example.org`.
+
+If you already have OpenAM installed, you can skip this step. The easiest way to deploy OpenAM is in a Docker container. Before starting, add the hostname and IP address to the `hosts` file, for example `127.0.0.0.1 app.example.org openam.example.org` .
+
+On Windows systems, the `hosts` file is located at `C:Windows/System32/drivers/etc/hosts` , on Linux and Mac it is located at `/etc/hosts` .
+
+Create a network in Docker for OpenAM
+
+[source,bash]
+----
+docker network create openam
+----
+
+Next, start the Docker container OpenAM Execute the following command:
+
+[source,bash]
+----
+docker run -h openam.example.org -p 8080:8080 --network openam --name openam openidentityplatform/openam
+----
+
+Once the server is up and running, run the initial OpenAM configuration. Run the following command:
+
+[source,bash]
+----
+docker exec -w '/usr/openam/ssoconfiguratortools' openam bash -c \
+'echo "ACCEPT_LICENSES=true
+SERVER_URL=http://openam.example.org:8080
+DEPLOYMENT_URI=/$OPENAM_PATH
+BASE_DIR=$OPENAM_DATA_DIR
+locale=en_US
+PLATFORM_LOCALE=en_US
+AM_ENC_KEY=
+ADMIN_PWD=passw0rd
+AMLDAPUSERPASSWD=p@passw0rd
+COOKIE_DOMAIN=example.org
+ACCEPT_LICENSES=true
+DATA_STORE=embedded
+DIRECTORY_SSL=SIMPLE
+DIRECTORY_SERVER=openam.example.org
+DIRECTORY_PORT=50389
+DIRECTORY_ADMIN_PORT=4444
+DIRECTORY_JMX_PORT=1689
+ROOT_SUFFIX=dc=openam,dc=example,dc=org
+DS_DIRMGRDN=cn=Directory Manager
+DS_DIRMGRPASSWD=passw0rd" > conf.file && java -jar openam-configurator-tool*.jar --file conf.file'
+----
+
+After successful configuration you can proceed to further steps.
+
+Note the `COOKIE++_++DOMAIN` parameter - the authentication session cookie must be set to a common top-level domain for OpenAM and the application.
+
+[[how-to-setup-active-directory-authentication-in-a-spring-boot-application-authentication-module-configuration]]
+==== Authentication Module Configuration
+
+Go to the OpenAM administrator console at
+
+http://openam.example.org:8080/openam/XUI/#login/
+
+In the login field enter the value `amadmin`, in the password field enter the value from the `ADMIN++_++PWD` parameter of the setup command, in this case `passw0rd`.
+
+Select the root realm and select Authentication → Modules from the menu. Create a new Active Directory authentication module.
+
+image:images/how-to/openam-ad-springboot/0-openam-new-ad-module.png[OpenAM new Active Directory Module]
+
+Set the module settings according to the table
+
+[cols=",",options="header",]
+|===
+|Setting |Description
+|Primary Active Directory Server |AD host and port number, for example: ad.example.org:389
+|Users Domain |
+|Bind User DN |Leave blank. If empty, binding authentication is used and you do not need to specify Bind user password, User Search Filter, and DN to Start User Search.
+|===
+
+You can leave other settings unchanged.
+
+[[how-to-setup-active-directory-authentication-in-a-spring-boot-application-authentication-chain-configuration]]
+==== Authentication Chain Configuration
+
+Go to the admin console, select the root realm and select Authentication → Chains from the menu. Create an `activeDirectory` authentication chain with the recently created `activeDirectory` module.
+
+image:images/how-to/openam-ad-springboot/1-openam-ad-auth-chain.png[OpenAM Active Directory Authentication Chain]
+
+[[how-to-setup-active-directory-authentication-in-a-spring-boot-application-configure-realm]]
+==== Configure realm
+
+Go to Authentication → Chains for realm and on the User Profile tab, set the `User Profile` setting to `Ignore`.
+
+image:images/how-to/openam-ad-springboot/2-openam-realm-auth-settings.png[OpenAM Realm User Profile Settings]
+
+So, you can authenticate to Active Directory without setting up Active Directory as a User Data Store in OpenAM.
+
+[[how-to-setup-active-directory-authentication-in-a-spring-boot-application-spring-boot-application-setup]]
+=== Spring Boot Application Setup
+
+The recommended way is to integrate through Spring Security.
+
+The application uses a filter that can be attached to a Spring REST or a Web Controller.
+
+The filter receives a Cookie with the authentication session ID set by OpenAM on successful authentication from the HttpServletRequest. Then the filter calls the OpenAM API to retrieve the user from the session. If the cookie does not exist or the session retrieved from the cookie is not valid, the user is redirected to authentication.
+
+An example filter is in the listing below:
+
+[source,java]
+----
+@Component
+public class OpenAmAuthFilter implements Filter {
+
+    final static String OPENAM_URI = "http://openam.example.org:8080/openam";
+
+    final static String OPENAM_COOKIE_NAME = "iPlanetDirectoryPro";
+
+    final static String REDIRECT_URI_TEMPLATE = OPENAM_URI.concat("/XUI#login/&service=activeDirectory&goto=");
+
+    private final String OPENAM_USER_INFO_URI = OPENAM_URI.concat("/json/users?_action=idFromSession");
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        //reading OpenAM session cookie
+        Optional<Cookie> openamCookie = Optional.empty();
+        if(request.getCookies() != null) {
+            openamCookie = Arrays.stream(request.getCookies())
+                    .filter(c -> c.getName().equals(OPENAM_COOKIE_NAME)).findFirst();
+        }
+        String redirectUri = request.getRequestURL().toString();
+        if(openamCookie.isEmpty()) {
+            response.sendRedirect(REDIRECT_URI_TEMPLATE  + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8));
+        } else {
+            //retrieve userID from by session cookie value from OpenAM
+            String userId = getUserIdFromSession(openamCookie.get().getValue());
+            if (userId == null) {
+                response.sendRedirect(REDIRECT_URI_TEMPLATE + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8));
+                return;
+            }
+            request.setAttribute("openam.userId", userId);
+            filterChain.doFilter(servletRequest, servletResponse);
+        }
+    }
+
+    private String getUserIdFromSession(String sessionId) {
+        RestTemplate restTemplate = new RestTemplate();
+        ParameterizedTypeReference<Map<String, String>> responseType = new ParameterizedTypeReference<>() {};
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(OPENAM_COOKIE_NAME, sessionId);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+        ResponseEntity<Map<String, String>> response
+                = restTemplate.exchange(OPENAM_USER_INFO_URI, HttpMethod.POST, entity, responseType);
+        Map<String, String> body = response.getBody();
+        if (body == null) {
+            return null;
+        }
+        return body.get("id");
+    }
+}
+----
+
+[[how-to-setup-active-directory-authentication-in-a-spring-boot-application-test-solution]]
+=== Test Solution
+
+Let's run a demo Spring Boot application in a Docker container
+
+[source,bash]
+----
+docker run -h app.example.org -p 8081:8081 --network openam --name spring-security-openam-example openidentityplatform/spring-security-openam-example
+----
+
+Exit the console and open the demo application link in your browser. http://app.example.org:8081/ Click the `OpenAM Cookie` link.
+
+image:images/how-to/openam-ad-springboot/3-example-spring-boot-application.png[Example Spring Boot Application]
+
+The filter will not find a valid session and will redirect to OpenAM authentication. Enter the user's credentials from Active Directory.
+
+image:images/how-to/openam-ad-springboot/4-openam-authentication.png[OpenAM Authentication]
+
+After successful authentication, the user will be redirected back to the application. The `openam.userId` attribute of the HttpServletRequest object will be set to the user ID from Active Directory.
+
+image:images/how-to/openam-ad-springboot/5-successful-auth.png[Seccuessful Authentication]
+
+*Further reading*
+
+* xref:openam-and-spring-boot-3-integration-via-oidc-oauth2-protocol.adoc[OpenAM and Spring Boot 3 Integration via OIDC OAuth2 Protocol]
+* xref:openam-and-spring-boot-3-integration-via-samlv2-protocol.adoc[OpenAM and Spring Boot 3 Integration via SAMLv2 Protocol]
+* xref:openam-and-spring-boot-3-integration-via-openam-cookie.adoc[OpenAM and Spring Boot 3 Integration via OpenAM Cookie]
+* xref:how-to-add-authorization-and-protect-your-application-with-openam-and-openig-stack.adoc[How to Add Authorization and Protect Your Application With OpenAM and OpenIG Stack]

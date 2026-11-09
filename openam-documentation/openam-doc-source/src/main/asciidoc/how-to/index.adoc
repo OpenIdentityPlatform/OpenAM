@@ -1,0 +1,81 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+= How-To Guides
+:doctype: book
+:toc:
+:imagesdir: ../
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[abstract]
+Practical tutorials for deploying, integrating, configuring, and extending OpenAM. Examples may target particular product versions; check the prerequisites in each tutorial.
+
+include::./adaptive-authentication-how-to-improve-security-without-annoying-users.adoc[]
+include::./authentication-in-a-single-page-application-via-openam-using-oauth2-oidc-protocol.adoc[]
+include::./authentication-modules.adoc[]
+include::./captcha-module.adoc[]
+include::./config-openam-as-oauth2-service-provider.adoc[]
+include::./configuring-authentication-in-openam-via-yandex-cloud-using-the-saml-protocol.adoc[]
+include::./how-openam-works-simple-explanation.adoc[]
+include::./how-to-run-openam-in-kubernetes.adoc[]
+include::./how-to-setup-active-directory-authentication-in-openam.adoc[]
+include::./how-to-add-authorization-and-protect-your-application-with-openam-and-openig-stack.adoc[]
+include::./how-to-create-custom-openam-datastore-integration.adoc[]
+include::./how-to-customise-openam.adoc[]
+include::./how-to-develop-a-custom-authentication-module.adoc[]
+include::./how-to-protect-model-context-protocol-mcp-servers-with-openam-and-openig.adoc[]
+include::./how-to-setup-2fa-with-google-authenticator-in-openam.adoc[]
+include::./how-to-setup-active-directory-authentication-in-a-spring-boot-application.adoc[]
+include::./how-to-setup-oauth2-oidc-federation-in-openam.adoc[]
+include::./how-to-setup-samlv2-federation-in-openam.adoc[]
+include::./how-to-setup-two-factor-authentication-in-openam.adoc[]
+include::./how-to-setup-webauthn-authentication-in-openam.adoc[]
+include::./how-to-start-openam-and-opendj-in-separate-docker-containers.adoc[]
+include::./how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam.adoc[]
+include::./how-to-disable-xui-by-default.adoc[]
+include::./how-to-make-openam-log-more-verbose.adoc[]
+include::./how-to-setup-kerberos-authentication-with-openam.adoc[]
+include::./login-and-password-authentication.adoc[]
+include::./login-via-gosuslugi-oauth2-identity-provider.adoc[]
+include::./login-via-facebook-oauth2-identity-provider.adoc[]
+include::./login-via-odnoklassniki-oauth2-identity-provider.adoc[]
+include::./login-via-vk-oauth2-identity-provider.adoc[]
+include::./migrate-openam-to-apache-cassandra-without-single-point-of-failure.adoc[]
+include::./openam-monitoring-using-prometheus.adoc[]
+include::./openam-qr-authentication-module.adoc[]
+include::./openam-and-spring-boot-3-integration-via-oidc-oauth2-protocol.adoc[]
+include::./openam-and-spring-boot-3-integration-via-openam-cookie.adoc[]
+include::./openam-and-spring-boot-3-integration-via-samlv2-protocol.adoc[]
+include::./openam-and-zero-trust-confirming-critical-operations.adoc[]
+include::./openam-vs-keycloak.adoc[]
+include::./passwordless-authentication-methods.adoc[]
+include::./persistent-cookie-module.adoc[]
+include::./quick-start-guide.adoc[]
+include::./saml-authentication-in-wordpress-via-openam.adoc[]
+include::./saml-authentication-in-yandex-cloud-via-openam.adoc[]
+include::./sso-configuration-openig-as-saml-service-provider-for-openam.adoc[]
+include::./setup-tracing-with-opentelemetry-and-jaeger.adoc[]
+include::./stateful-vs-stateless-authentication.adoc[]
+include::./bootstrap-openam-and-opendj-docker-containers.adoc[]
+include::./how-to-enable-cors.adoc[]
+include::./how-to-pass-additional-system-property-to-catalina-opts-to-openam-docker-container.adoc[]
+include::./how-to-persist-openam-docker-container-data-between-restarts.adoc[]
+include::./quick-openam-docker-configuration-from-a-command-line.adoc[]
+include::./using-google-authenticator-with-openam.adoc[]
+include::./using-microsoft-authenticator-with-openam.adoc[]
+include::./what-is-single-sign-on-and-how-does-it-work.adoc[]

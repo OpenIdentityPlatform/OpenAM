@@ -1,0 +1,151 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#how-to-start-openam-and-opendj-in-separate-docker-containers]
+== How to Start OpenAM and OpenDJ in Separate Docker Containers
+
+[[how-to-start-openam-and-opendj-in-separate-docker-containers-requeirements]]
+=== Requeirements
+
+To reproduce steps in the following article, Docker and Docker Compose should be installed.
+
+The sample configuration used in the following article could be found https://github.com/maximthomas/openidentityplatform-docker[here]
+
+[[how-to-start-openam-and-opendj-in-separate-docker-containers-openam-perparation]]
+=== OpenAM Perparation
+
+Create `docker-compose.yml` file and add OpenAM service:
+
+[source,yml]
+----
+version: '3.9'
+
+services:
+  openam:
+    image: openidentityplatform/openam:latest
+    ports:
+      - "8080:8080"
+    hostname: openam.example.com
+    volumes:
+      - ./persistence/openam:/usr/openam/config
+----
+
+Add OpenAM FQDN to your `hosts` file on your machine, for example
+
+....
+127.0.0.1   auth.example.com
+....
+
+In the `persistence/openam` folder OpenAM will store its configuration data
+
+[[how-to-start-openam-and-opendj-in-separate-docker-containers-opendj-preparation]]
+=== OpenDJ Preparation
+
+Add OpenDJ service to `docker-compose.yml` file:
+
+[source,yml]
+----
+  opendj:
+    image: openidentityplatform/opendj:latest
+    hostname: opendj.example.com
+    ports:
+      - "1389:1389"
+      - "1636:1636"
+      - "4444:4444"
+    volumes:
+      - ./opendj/bootstrap/data/:/opt/opendj/bootstrap/data #initial data
+      - ./opendj/bootstrap/schema/:/opt/opendj/bootstrap/schema #schema
+      - ./persistence/opendj:/opt/opendj/data #opendj data
+    environment:
+      - BASE_DN=dc=openam,dc=openidentityplatform,dc=org #should be yours base DN
+----
+
+`opendj/boststrap` directory should exist on the host machine and contain two subfolders: `data` - for initial data и `schema` - schema files.
+
+The files could be found https://github.com/maximthomas/openidentityplatform-docker/tree/master/opendj/bootstrap[here]
+
+If base DN id different from `dc=openam,dc=openidentityplatform,dc=org` it should be changed in `opendj/boststrap/data/samlple.ldif` file as well
+
+[[how-to-start-openam-and-opendj-in-separate-docker-containers-start-and-configuration]]
+==== Start and Configuration
+
+[[how-to-start-openam-and-opendj-in-separate-docker-containers-start-services]]
+===== Start Services
+
+Start OpenAM and OpenDJ with the following command:
+
+[source,bash]
+----
+docker-compose up
+----
+
+You shoudl see the following lines in the logs:
+
+....
+openidentityplatform-docker-openam-1  | 15-Jun-2022 10:09:46.063 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+openidentityplatform-docker-openam-1  | 15-Jun-2022 10:09:46.133 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [36437] milliseconds
+openidentityplatform-docker-opendj-1  | OpenDJ is started
+....
+
+[[how-to-start-openam-and-opendj-in-separate-docker-containers-openam-configuration]]
+===== OpenAM Configuration
+
+After OpenAM and OpenDJ are started, open OpenAM URL in the browser, for example http://auth.example.com:8080/openam[http://auth.example.com:8080/openam]
+
+OpenAM configuration window should appear: image:images/how-to/openam-opendj-docker/openam-conf-start.png[OpenAM Configuration Start]
+
+Select Custom Configuration and press Create New Configuration. Read and accept the license agreement.
+
+Enter and confirm amAdmin password, then press the Next button.
+
+image:images/how-to/openam-opendj-docker/openam-conf1-general.png[OpenAM Configuration 1 General]
+
+Leave server settings unchanged and press the Next button.
+
+image:images/how-to/openam-opendj-docker/openam-conf2-server-settings.png[OpenAM Configuration 2 Server Settings]
+
+On the Configuration Data Store Settings step set the following settings:
+
+* *Configuration Data Store* radiobutton to *OpenDJ*,
+* Set *Host Name* to *opendj*, as OpenDJ Docker internal hostname
+* Set *Port* to 1389 as specified for OpenDJ Docker container
+* Set OpenDJ password as specified for OpenDJ Docker container as well (`password` by default).
+
+If you changed base DN for OpenDJ, set the required Root Suffix as well.
+
+Then press the Next button.
+
+image:images/how-to/openam-opendj-docker/openam-conf3-datastore.png[OpenAM Configuration 3 Data Store Settings]
+
+On the User datastore settings set OpenDJ password as it has been set in the previous step and press the Next button.
+
+image:images/how-to/openam-opendj-docker/openam-conf4-userdatastore.png[OpenAM Configuration 5 User Data Store Settings]
+
+If this instance is behind a load balancer, set the site configuration settings. If it's not, just press the Next button.
+
+On the Step 6: Default Policy Agent User, enter and confirm default policy agent password and press the Next button.
+
+Review configuration summary and press the Create Configuration button.
+
+image:images/how-to/openam-opendj-docker/openam-conf-summary.png[OpenAM Configuration Summary]
+
+If everything is ok, proceed to login page.
+
+If you have any additional questions, https://github.com/OpenIdentityPlatform/OpenAM/discussions[feel free to ask us]!

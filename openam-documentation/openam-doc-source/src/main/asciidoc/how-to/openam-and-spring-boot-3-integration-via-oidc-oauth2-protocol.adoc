@@ -1,0 +1,198 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:figure-caption!:
+:example-caption!:
+:table-caption!:
+
+[#openam-and-spring-boot-3-integration-via-oidc-oauth2-protocol]
+== OpenAM and Spring Boot 3 Integration via OIDC OAuth2 Protocol
+
+[[openam-and-spring-boot-3-integration-via-oidc-oauth2-protocol-introduction]]
+=== Introduction
+
+There are several ways to integrate Spring application with OpenAM. In the following tutorial, we will integrate Spring Application with OpenAM using the OIDC/OAuth2 protocol.
+
+[[openam-and-spring-boot-3-integration-via-oidc-oauth2-protocol-openam-configuration]]
+=== OpenAM Configuration
+
+If you have not installed OpenAM yet, you could run OpenAM as a https://hub.docker.com/r/openidentityplatform/openam/[Docker image]. Let’s assume the OpenAM instance URL is `http://openam.example.org:8080/openam`
+
+Go to the target realm and in the Common Tasks section. Open OpenAM console in a browser and create OAuth2 Provider. Press the `Configure OAuth Provider` button, and then the `Configure OpenID Connect` button.
+
+image:images/how-to/openam-spring-boot-oauth/realm-common-tasks.png[Realm Common Tasks]
+
+image:images/how-to/openam-spring-boot-oauth/realm-oidc.png[Realm Setup OIDC]
+
+Ajust the required setting and press the Create button.
+
+image:images/how-to/openam-spring-boot-oauth/configure-oidc.png[OIDC configuration]
+
+Go back to the realm and select in the realm’s dashboard Applications → OAuth 2.0 in the right menu.
+
+image:images/how-to/openam-spring-boot-oauth/realm-applications-oauth.png[Realm OAuth2 Applications]
+
+Create a new Agent, set name (client id) and password (client secret) and press the Next button. Go to the new created agent and set the following settings
+
+* Add `http://localhost:8081/login/oauth2/code/openam` to *Redirection URIs* values (is will be our Spring Security application code endpoint)
+* Add `profile` and `openid` values to *Scope(s)*
+* Set *ID Token Signing Algorithm* setting to RS256.
+
+[[openam-and-spring-boot-3-integration-via-oidc-oauth2-protocol-spring-boot-application]]
+=== Spring Boot Application
+
+Create a new Spring Boot application and add the following Maven dependencies.
+
+[source,xml]
+----
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<!--security dependencies-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-client</artifactId>
+</dependency>
+----
+
+Create a controller and two endpoints: `index` and `protected-oauth`. The `index` endpoint will be accessible for anyone and `protected-oauth` endpoint will be accessible for authenticated with OpenAM users via OIDC protocol.
+
+[source,java]
+----
+@Controller
+public class SampleController {
+
+    @GetMapping
+    public String index() {
+        return "index";
+    }
+
+    @GetMapping("/oauth")
+    public String oauthProtected(HttpServletRequest request, Model model) {
+        Principal token = request.getUserPrincipal();
+        model.addAttribute("userName", token.getName());
+        model.addAttribute("method", "OAuth2/OIDC");
+        return "protected";
+    }
+}
+----
+
+Create the following templates for controllers:
+
+`index.html`
+
+[source,html]
+----
+<!DOCTYPE html>
+<html>
+<body>
+<h1>OpenAM Spring Security Integration</h1>
+<h2>Test Authentication</h2>
+<ul>
+    <li><a href="/protected-oauth">OAuth2/OIDC</a></li>
+</ul>
+</body>
+</html>
+----
+
+`protected.html`
+
+[source,html]
+----
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h1>Protected resource</h1>
+<a href="/">Back</a></li>
+<p><span th:text="${userName}"/> user authenticated with <span th:text="${method}"/></p>
+</body>
+</html>
+----
+
+Create Spring Security configuration
+
+[source,java]
+----
+@Configuration
+@EnableWebSecurity
+public class SecurityConfiguration {
+    @Bean
+    public SecurityFilterChain securityWebFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/", "/oauth2/**")
+                        .permitAll()
+                        .requestMatchers("/protected-oauth").authenticated())
+                .oauth2Login(Customizer.withDefaults()).oauth2Client(Customizer.withDefaults()
+                );
+        return http.build();
+    }
+}
+----
+
+Add the following settings to the `application.yml` file:
+
+[source,yaml]
+----
+server:
+  port: 8081
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          openam:
+            authorization-grant-type: authorization_code
+            client-id: test_client
+            client-secret: changeme
+            scope:
+              - openid
+              - profile
+        provider:
+          openam:
+            authorization-uri: http://openam.example.org:8080/openam/oauth2/authorize
+            token-uri: http://openam.example.org:8080/openam/oauth2/access_token
+            user-name-attribute: sub
+            issuer-uri: http://openam.example.org:8080/openam/oauth2
+----
+
+[[openam-and-spring-boot-3-integration-via-oidc-oauth2-protocol-test-the-solution]]
+=== Test the Solution
+
+Logout form OpenAM if you are logged in.
+
+Run the Spring application an open its URL in a browser: http://localhost:8081
+
+image:images/how-to/openam-spring-boot-oauth/test-app.png[Spring Boot App Index]
+
+Click on the OAuth2/OIDC navigation link, and you will be redirected to the OpenAM authentication page.
+
+image:images/how-to/openam-spring-boot-oauth/openam-auth.png[OpenAM Authentication]
+
+Enter the user’s login and password and then press the LOG IN button.
+
+image:images/how-to/openam-spring-boot-oauth/openam-consent.png[OpenAM Consent]
+
+After pressing the Allow button, you will be redirected to the Spring Security Application as an authenticated user.
+
+image:images/how-to/openam-spring-boot-oauth/test-app-authenticated.png[Spring Boot App Authenticated]
