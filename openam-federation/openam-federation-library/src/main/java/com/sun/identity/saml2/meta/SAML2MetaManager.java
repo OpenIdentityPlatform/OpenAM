@@ -1203,8 +1203,8 @@ public class SAML2MetaManager {
                 BaseConfigType config = elist.iterator().next().getValue();
                 Map<String, List<String>> attr = SAML2MetaUtils.getAttributes(config);
                 List<String> cotAttr = attr.get(SAML2Constants.COT_LIST);
-                List<String> cotList = new ArrayList<>(cotAttr);
-                if ((cotList != null) && !cotList.isEmpty()) {
+                if ((cotAttr != null) && !cotAttr.isEmpty()) {
+                    List<String> cotList = new ArrayList<>(cotAttr);
                     for (Iterator<String> iter = cotList.iterator(); iter.hasNext();) {
                         String cotName = iter.next().trim();
                         if ((cotName != null) && (!cotName.equals(""))) { 
