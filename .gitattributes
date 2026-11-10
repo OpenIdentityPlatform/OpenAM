@@ -1,3 +1,7 @@
 # Keep HTML checked out with LF on all platforms so javadoc doclint
 # (JDK 25/26) does not treat CR (from CRLF) as part of a multi-line tag name.
 *.html text eol=lf
+
+# The JAX-RPC golden files are compared byte for byte, so Git must not convert their
+# line endings (CI also runs on windows-latest, which checks text files out with CRLF).
+**/src/test/resources/com/sun/identity/jaxrpc/golden/** -text
