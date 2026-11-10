@@ -21,6 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.config.upgrade;
 
@@ -28,13 +29,13 @@ import static org.forgerock.openam.utils.Time.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import java.security.AccessController;
-import org.openidentityplatform.openam.click.control.ActionLink;
+import org.openidentityplatform.openam.config.servlet.ConfiguratorAction;
+import org.openidentityplatform.openam.config.servlet.SetupPage;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
@@ -44,14 +45,17 @@ import org.forgerock.openam.upgrade.VersionUtils;
 /**
  * OpenAM upgrade page.
  */
-public class Upgrade extends AjaxPage {
+public class Upgrade extends SetupPage {
 
     private UpgradeServices upgrade;
     private SSOToken adminToken;
     private Debug debug = UpgradeUtils.debug;
-    public ActionLink doUpgradeLink = new ActionLink("doUpgrade", this, "doUpgrade");
-    public ActionLink saveReportLink = new ActionLink("saveReport", this, "saveReport");
     private boolean error = false;
+
+    // No onSecurityCheck() override: the old Upgrade extended AjaxPage directly (not
+    // ProtectedPage), so it stayed reachable regardless of AMSetupServlet.isConfigured() - that's
+    // how the options page (increment 6) reaches it to run an upgrade on an already-configured
+    // install. SetupPage's default onSecurityCheck() (always true) already matches that.
 
     public Upgrade() {
         try {
@@ -65,11 +69,16 @@ public class Upgrade extends AjaxPage {
     }
 
     /**
-     * Creating the UI models in the #onRender method makes sure that these fields are not always reinitialized when an
-     * actionLink is clicked. This is necessary since Click always creates new instances for actionLink events.
+     * Building the UI model in {@code onGet()} (called only when the request is actually going
+     * to render, not on an {@code ?actionLink=} dispatch - see
+     * {@code org.openidentityplatform.openam.config.servlet.ConfiguratorServlet}) makes sure
+     * {@code generateShortUpgradeReport} is not redone on every {@code doUpgrade}/
+     * {@code saveReport} call. This is necessary since Click always creates new instances for
+     * actionLink events, and the old code relied on {@code onRender()} for the identical reason -
+     * {@code onRender()} itself has no equivalent in {@code ConfiguratorServlet}'s lifecycle.
      */
     @Override
-    public void onRender() {
+    public void onGet() {
         if (error) {
             addModel("error", true);
         } else {
@@ -79,6 +88,7 @@ public class Upgrade extends AjaxPage {
         }
     }
 
+    @ConfiguratorAction
     public boolean doUpgrade() {
         try {
             SystemProperties.initializeProperties(Constants.SYS_PROPERTY_INSTALL_TIME, "true");
@@ -89,19 +99,18 @@ public class Upgrade extends AjaxPage {
             writeToResponse(ue.getMessage());
             debug.error("Error occured while upgrading OpenAM", ue);
         } finally {
-            setPath(null);
             UpgradeProgress.closeOutputStream();
         }
         return false;
     }
 
+    @ConfiguratorAction
     public boolean saveReport() {
         getContext().getResponse().setContentType("application/force-download; charset=\"UTF-8\"");
         getContext().getResponse().setHeader(
                 "Content-Disposition", "attachment; filename=\"upgradereport." + currentTimeMillis() + "\"");
         getContext().getResponse().setHeader("Content-Description", "File Transfer");
         writeToResponse(upgrade.generateDetailedUpgradeReport(adminToken, false));
-        setPath(null);
         return false;
     }
 
@@ -111,6 +120,6 @@ public class Upgrade extends AjaxPage {
      * @return true if the license acceptance parameter is present and correct, otherwise false.
      */
     private boolean isLicenseAccepted() {
-        return Boolean.parseBoolean(getContext().getRequestParameter(SetupConstants.ACCEPT_LICENSE_PARAM));
+        return Boolean.parseBoolean(getContext().getRequest().getParameter(SetupConstants.ACCEPT_LICENSE_PARAM));
     }
 }
