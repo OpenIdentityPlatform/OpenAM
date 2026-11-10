@@ -17,19 +17,21 @@
 package org.forgerock.openam.session;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.forgerock.openam.utils.Time.currentTimeMillis;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Field;
 import java.util.Hashtable;
 
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
-import com.iplanet.dpro.session.service.SessionState;
 import com.iplanet.dpro.session.share.SessionInfo;
 
 public class SessionCacheTest {
@@ -71,6 +73,8 @@ public class SessionCacheTest {
         });
 
         given(sessionInfo.getTimeIdle()).willReturn(10l);
+        // Keep the session fresh when the clock crosses a second boundary during a test.
+        given(sessionInfo.getMaxCaching()).willReturn(1L);
         given(sessionInfo.getSessionType()).willReturn("user");
         given(sessionInfo.getState()).willReturn("valid");
         given(sessionInfo.getProperties()).willReturn(new Hashtable<String, String>());
@@ -79,11 +83,24 @@ public class SessionCacheTest {
     }
 
 
-    @Test
-    public void shouldResetIdleTimeResetSetToTrue() throws SessionException {
-        //given
+    @DataProvider(name = "secondsSinceRefresh")
+    public Object[][] secondsSinceRefresh() {
+        return new Object[][] {{0L}, {1L}};
+    }
+
+    private void updateSession(long secondsSinceRefresh) throws SessionException, ReflectiveOperationException {
         session.update(sessionInfo);
-        when(session.getState(true)).thenReturn(SessionState.VALID);
+        // Model crossing a second boundary without sleeping or changing the JVM-wide clock.
+        Field latestRefreshTime = Session.class.getDeclaredField("latestRefreshTime");
+        latestRefreshTime.setAccessible(true);
+        latestRefreshTime.setLong(session, currentTimeMillis() / 1000 - secondsSinceRefresh);
+    }
+
+    @Test(dataProvider = "secondsSinceRefresh")
+    public void shouldResetIdleTimeResetSetToTrue(long secondsSinceRefresh)
+            throws SessionException, ReflectiveOperationException {
+        //given
+        updateSession(secondsSinceRefresh);
 
         //when
         session = cache.getSession(sessionID, false, true);
@@ -91,14 +108,15 @@ public class SessionCacheTest {
 
         //then
         verify(session, times(1)).refresh(true);
+        verify(session, never()).refresh(false);
         assertThat(session.getIdleTime()).isEqualTo(0);
     }
 
-    @Test
-    public void shouldNotResetIdleTimeWhenResetSetToFalse() throws SessionException {
+    @Test(dataProvider = "secondsSinceRefresh")
+    public void shouldNotResetIdleTimeWhenResetSetToFalse(long secondsSinceRefresh)
+            throws SessionException, ReflectiveOperationException {
         //given
-        session.update(sessionInfo);
-        when(session.getState(false)).thenReturn(SessionState.VALID);
+        updateSession(secondsSinceRefresh);
 
         //when
         session = cache.getSession(sessionID, false, false);
@@ -106,14 +124,15 @@ public class SessionCacheTest {
 
         //then
         verify(session, times(0)).refresh(true);
+        verify(session, never()).refresh(false);
         assertThat(session.getIdleTime()).isEqualTo(10);
     }
 
-    @Test
-    public void shouldIgnoreResetIdleTimeWhenInvaliodSessionIsAllowed() throws SessionException {
+    @Test(dataProvider = "secondsSinceRefresh")
+    public void shouldIgnoreResetIdleTimeWhenInvaliodSessionIsAllowed(long secondsSinceRefresh)
+            throws SessionException, ReflectiveOperationException {
         //given
-        session.update(sessionInfo);
-        when(session.getState(true)).thenReturn(SessionState.VALID);
+        updateSession(secondsSinceRefresh);
 
         //when
         session = cache.getSession(sessionID, true, true);
@@ -121,6 +140,7 @@ public class SessionCacheTest {
 
         //then
         verify(session, times(0)).refresh(true);
+        verify(session, never()).refresh(false);
         assertThat(session.getIdleTime()).isEqualTo(10);
     }
 
