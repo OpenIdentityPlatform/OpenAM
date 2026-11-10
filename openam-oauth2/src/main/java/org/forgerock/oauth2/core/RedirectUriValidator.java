@@ -20,6 +20,9 @@ import static org.forgerock.oauth2.core.Utils.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.forgerock.http.MutableUri;
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException;
@@ -74,11 +77,66 @@ public class RedirectUriValidator {
             throw new RedirectUriMismatchException();
         }
         for (URI uri : clientRegistration.getRedirectUris()) {
-            if (uri.equals(request)) {
+            if (uri.equals(request) || isLoopbackMatch(uri, request)) {
                 //GOOD CASE
                 return;
             }
         }
         throw new RedirectUriMismatchException();
     }
+
+    /**
+     * Matches loopback redirect uris for native apps (RFC 8252 section 7.3), which receive the authorization
+     * response on an ephemeral port of the loopback interface. Scheme, host, path and query must match the
+     * registered uri; only the port is flexible. A registered {@code http} redirect uri on {@code localhost},
+     * {@code 127.0.0.1} or {@code [::1]} accepts:
+     * <ul>
+     *     <li>any port when it has no port, e.g. {@code http://127.0.0.1/callback} (RFC 8252 section 7.3);</li>
+     *     <li>any port when its port is {@code *}, e.g. {@code http://localhost:*}{@code /callback};</li>
+     *     <li>a port within a range, e.g. {@code http://localhost:49152-65535/callback}.</li>
+     * </ul>
+     * Port patterns are only supported on {@code localhost} and {@code 127.0.0.1}, as {@link URI} cannot parse
+     * them on an IPv6 literal. All other redirect uris, including loopback ones with a single explicit port,
+     * keep exact matching.
+     *
+     * @param registered A redirect uri registered for the client.
+     * @param request The redirect uri on the request.
+     * @return {@code true} if the request is allowed by the registered loopback redirect uri.
+     */
+    static boolean isLoopbackMatch(URI registered, URI request) {
+        if (!"http".equalsIgnoreCase(request.getScheme()) || request.getRawUserInfo() != null
+                || request.getHost() == null || !isLoopbackHost(request.getHost())
+                || !"http".equalsIgnoreCase(registered.getScheme())
+                || !Objects.equals(pathOf(registered), pathOf(request))
+                || !Objects.equals(registered.getRawQuery(), request.getRawQuery())) {
+            return false;
+        }
+        final int requestPort = request.getPort() == -1 ? 80 : request.getPort();
+        if (registered.getHost() != null) {
+            return registered.getPort() == -1 && registered.getRawUserInfo() == null
+                    && registered.getHost().equalsIgnoreCase(request.getHost());
+        }
+        final Matcher pattern = LOOPBACK_PORT_PATTERN.matcher(String.valueOf(registered.getRawAuthority()));
+        if (!pattern.matches() || !pattern.group(1).equalsIgnoreCase(request.getHost())) {
+            return false;
+        }
+        if (pattern.group(3) == null) {
+            return true;
+        }
+        final int low = Integer.parseInt(pattern.group(3));
+        final int high = Integer.parseInt(pattern.group(4));
+        return low <= requestPort && requestPort <= high;
+    }
+
+    private static boolean isLoopbackHost(String host) {
+        return "localhost".equalsIgnoreCase(host) || "127.0.0.1".equals(host) || "[::1]".equals(host);
+    }
+
+    private static String pathOf(URI uri) {
+        return isEmpty(uri.getRawPath()) ? "/" : uri.getRawPath();
+    }
+
+    /** {@code localhost:*} or {@code 127.0.0.1:low-high}; groups: host, port pattern, low, high. */
+    private static final Pattern LOOPBACK_PORT_PATTERN =
+            Pattern.compile("(?i)(localhost|127\\.0\\.0\\.1):(\\*|(\\d{1,5})-(\\d{1,5}))");
 }

@@ -44,6 +44,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -951,7 +952,8 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     private boolean containsMultipleRedirectUriHosts(Set<URI> redirectUris) {
         String host = redirectUris.iterator().next().getHost();
         for (URI uri : redirectUris) {
-            if (!uri.getHost().equals(host)) {
+            // getHost() is null for loopback port patterns such as http://localhost:*/callback
+            if (!Objects.equals(uri.getHost(), host)) {
                 return false;
             }
         }
