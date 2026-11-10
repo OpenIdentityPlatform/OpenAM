@@ -18,8 +18,11 @@ package com.sun.identity.shared.jaxrpc.golden;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.iplanet.sso.SSOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.testng.annotations.Test;
 
 public class GoldenValuesTest {
@@ -27,7 +30,16 @@ public class GoldenValuesTest {
     @Test
     public void describeIsStable() {
         assertThat(GoldenValues.describe(new Object[] {"arg1", null, new HashSet<>(List.of("set3"))}))
-                .isEqualTo("[java.lang.String:arg1, null, java.util.HashSet:[set3]]");
+                .isEqualTo("[java.lang.String:arg1, null, java.util.HashSet:[java.lang.String:set3]]");
+    }
+
+    @Test
+    public void describeTypesNestedValues() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("l", new LinkedList<>(List.of("x")));
+        map.put("n", null);
+        assertThat(GoldenValues.describe(new Object[] {map})).isEqualTo("[java.util.HashMap:{"
+                + "java.lang.String:l=java.util.LinkedList:[java.lang.String:x], java.lang.String:n=null}]");
     }
 
     @Test

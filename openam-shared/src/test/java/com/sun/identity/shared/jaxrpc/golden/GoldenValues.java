@@ -15,9 +15,11 @@
  */
 package com.sun.identity.shared.jaxrpc.golden;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -139,7 +141,10 @@ public final class GoldenValues {
 
     /**
      * @param args the arguments a target received.
-     * @return {@code [<runtime class name>:<String.valueOf(v)>, null, ...]}.
+     * @return {@code [<runtime class name>:<value>, null, ...]}. A collection or array value is
+     *         {@code [<element>, ...]} and a map value {@code {<key>=<value>, ...}}, every element,
+     *         key and value described the same way, so nested runtime classes and nulls are kept.
+     *         Any other value is {@code String.valueOf(v)}.
      */
     public static String describe(Object[] args) {
         if (args == null) {
@@ -150,14 +155,47 @@ public final class GoldenValues {
             if (i > 0) {
                 sb.append(", ");
             }
-            Object v = args[i];
-            if (v == null) {
-                sb.append("null");
-            } else {
-                sb.append(v.getClass().getName()).append(':').append(String.valueOf(v));
-            }
+            typed(sb, args[i]);
         }
         return sb.append(']').toString();
+    }
+
+    private static void typed(StringBuilder sb, Object v) {
+        if (v == null) {
+            sb.append("null");
+            return;
+        }
+        sb.append(v.getClass().getName()).append(':');
+        String sep = "";
+        if (v instanceof Map) {
+            sb.append('{');
+            for (Map.Entry<?, ?> e : ((Map<?, ?>) v).entrySet()) {
+                sb.append(sep);
+                typed(sb, e.getKey());
+                sb.append('=');
+                typed(sb, e.getValue());
+                sep = ", ";
+            }
+            sb.append('}');
+        } else if (v instanceof Collection) {
+            sb.append('[');
+            for (Object o : (Collection<?>) v) {
+                sb.append(sep);
+                typed(sb, o);
+                sep = ", ";
+            }
+            sb.append(']');
+        } else if (v.getClass().isArray()) {
+            sb.append('[');
+            for (int i = 0; i < Array.getLength(v); i++) {
+                sb.append(sep);
+                typed(sb, Array.get(v, i));
+                sep = ", ";
+            }
+            sb.append(']');
+        } else {
+            sb.append(v);
+        }
     }
 
     private static Exception newInstance(Constructor<?> constructor, Object... args) {

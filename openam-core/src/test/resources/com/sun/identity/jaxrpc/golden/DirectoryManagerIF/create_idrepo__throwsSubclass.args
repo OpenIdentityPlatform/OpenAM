@@ -1,1 +1,1 @@
-[java.lang.String:arg1, java.lang.String:arg2, java.lang.String:arg3, java.util.HashMap:{key4=[val4]}, java.lang.String:arg5]
+[java.lang.String:arg1, java.lang.String:arg2, java.lang.String:arg3, java.util.HashMap:{java.lang.String:key4=java.util.HashSet:[java.lang.String:val4]}, java.lang.String:arg5]

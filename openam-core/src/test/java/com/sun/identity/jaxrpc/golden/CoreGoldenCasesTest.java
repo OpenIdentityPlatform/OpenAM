@@ -67,10 +67,12 @@ public class CoreGoldenCasesTest {
 
     @Test
     public void idsAreUniquePerInterface() {
-        List<String> ids = CoreGoldenCases.forInterface(DirectoryManagerIF.class).stream()
-                .map(GoldenCase::id)
-                .collect(Collectors.toList());
-        assertThat(new HashSet<>(ids)).hasSameSizeAs(ids);
+        for (Class<?> iface : CORE_INTERFACES) {
+            List<String> ids = CoreGoldenCases.forInterface(iface).stream()
+                    .map(GoldenCase::id)
+                    .collect(Collectors.toList());
+            assertThat(new HashSet<>(ids)).as(iface.getSimpleName()).hasSameSizeAs(ids);
+        }
     }
 
     @Test
