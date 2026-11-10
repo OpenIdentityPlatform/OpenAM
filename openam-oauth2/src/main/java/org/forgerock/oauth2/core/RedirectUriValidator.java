@@ -123,9 +123,13 @@ public class RedirectUriValidator {
         if (pattern.group(3) == null) {
             return true;
         }
-        final int low = Integer.parseInt(pattern.group(3));
-        final int high = Integer.parseInt(pattern.group(4));
-        return low <= requestPort && requestPort <= high;
+        try {
+            final int low = Integer.parseInt(pattern.group(3));
+            final int high = Integer.parseInt(pattern.group(4));
+            return low <= requestPort && requestPort <= high;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private static boolean isLoopbackHost(String host) {
