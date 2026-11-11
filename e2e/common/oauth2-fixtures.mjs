@@ -211,6 +211,61 @@ export async function ensureOidcClient(adminToken, request, clientId) {
   });
 }
 
+/**
+ * Only widen the shared provider, as device-flow-test does; restoring its old settings would race
+ * a sibling spec that is still using them. Retry when another spec updates the provider concurrently.
+ */
+export async function ensureDevicePkceProvider(adminToken, request) {
+  const url = `${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/oauth-oidc`;
+  let current = await ensureOAuth2Provider(adminToken, request);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (!current.ok()) {
+      throw new Error(`Device provider not readable: ${current.status()} ${await current.text()}`);
+    }
+    const config = await current.json();
+    const advanced = config.advancedOAuth2Config ?? {};
+    const supported = advanced.supportedScopes ?? [];
+    const defaults = advanced.defaultScopes ?? [];
+    if (advanced.clientsCanSkipConsent === true && supported.includes(SCOPE) && defaults.includes(SCOPE)) return;
+    const updated = await request.put(url, {
+      headers: adminHeaders(adminToken, CONFIG_VERSION),
+      data: {
+        ...config,
+        advancedOAuth2Config: {
+          ...advanced,
+          clientsCanSkipConsent: true,
+          supportedScopes: [...new Set([...supported, SCOPE])],
+          defaultScopes: [...new Set([...defaults, SCOPE])],
+        },
+      },
+    });
+    current = await request.get(url, { headers: adminHeaders(adminToken, CONFIG_VERSION) });
+    if (current.ok()) {
+      const reread = await current.json();
+      const actual = reread.advancedOAuth2Config ?? {};
+      if (actual.clientsCanSkipConsent === true && actual.supportedScopes?.includes(SCOPE)
+          && actual.defaultScopes?.includes(SCOPE)) return;
+    }
+    if (attempt === 2) {
+      throw new Error(`Could not configure device provider: write ${updated.status()}, read ${current.status()}`);
+    }
+  }
+}
+
+/** A public device client owned by the PKCE spec, so provisioning cannot invalidate another spec's codes. */
+export async function ensureDevicePkceClient(adminToken, request, clientId) {
+  await ensureClient(adminToken, request, clientId, {
+    "com.forgerock.openam.oauth2provider.clientType": "Public",
+    "com.forgerock.openam.oauth2provider.scopes": [`[0]=${SCOPE}`],
+    "com.forgerock.openam.oauth2provider.defaultScopes": [`[0]=${SCOPE}`],
+    "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=urn:ietf:params:oauth:grant-type:device_code"],
+    "com.forgerock.openam.oauth2provider.responseTypes": ["[0]=device_code"],
+    "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "none",
+    "isConsentImplied": true,
+    "sunIdentityServerDeviceStatus": "Active",
+  });
+}
+
 export async function ensureResourceServerClient(adminToken, request, clientId) {
   await ensureClient(adminToken, request, clientId, {
     "userpassword": RS_CLIENT_SECRET,
@@ -429,3 +484,4 @@ export async function protectionApiToken(request, clientId, username, password) 
 export async function authorizationApiToken(request, clientId, username, password) {
   return resourceServerToken(request, clientId, username, password, "uma_authorization");
 }
+
