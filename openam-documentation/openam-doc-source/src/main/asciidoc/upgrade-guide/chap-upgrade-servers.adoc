@@ -173,6 +173,11 @@ The endpoint otherwise behaves as before, with these changes:
 Custom code that refers to `org.forgerock.openidconnect.restlet.WebFinger`, `org.forgerock.openidconnect.restlet.OpenIDConnectDiscovery` or `org.forgerock.oauth2.restlet.OAuth2StatusService` must be changed, because these classes no longer exist.
 ====
 
+[IMPORTANT]
+====
+Starting with this release an `http` redirection URI on `localhost`, `127.0.0.1` or `[::1]` that is registered without a port accepts the redirect URI on any port, as described in RFC 8252 section 7.3. Previously it matched only the same URI without a port, that is the default port 80. A loopback redirection URI registered with an explicit port still matches that port only.
+====
+
 [#upgrade-server]
 .To Upgrade From a Supported OpenAM Version
 ====

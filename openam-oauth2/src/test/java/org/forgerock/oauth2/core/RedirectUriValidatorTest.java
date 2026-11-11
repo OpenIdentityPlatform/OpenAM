@@ -1,6 +1,7 @@
 package org.forgerock.oauth2.core;
 
 import static org.mockito.BDDMockito.given;
+import static org.testng.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.net.URI;
@@ -55,6 +56,7 @@ public class RedirectUriValidatorTest {
 				{"http://localhost:49152-65535/callback", "http://localhost:49152/callback"},
 				{"http://localhost:49152-65535/callback", "http://localhost:65535/callback"},
 				{"http://127.0.0.1:8000-9000/cb", "http://127.0.0.1:8765/cb"},
+				{"http://localhost:1-100/callback", "http://localhost/callback"},
 				// an explicit port still matches exactly
 				{"http://localhost:8765/callback", "http://localhost:8765/callback"},
 		};
@@ -82,6 +84,8 @@ public class RedirectUriValidatorTest {
 				{"http://127.0.0.1/callback", "https://127.0.0.1:51004/callback"},
 				{"http://127.0.0.1/callback", "http://127.0.0.2:51004/callback"},
 				{"http://127.0.0.1/callback", "http://user@127.0.0.1:51004/callback"},
+				{"https://127.0.0.1/callback", "http://127.0.0.1:5000/callback"},
+				{"http://user@localhost/callback", "http://localhost:5000/callback"},
 				// never for non-loopback hosts
 				{"http://app.example.com/callback", "http://app.example.com:8443/callback"},
 				{"http://app.example.com:*/callback", "http://app.example.com:8443/callback"},
@@ -97,5 +101,20 @@ public class RedirectUriValidatorTest {
 	public void shouldRejectNonMatchingRedirect(String registered, String requested)
 			throws InvalidRequestException, RedirectUriMismatchException {
 		validate(registered, requested);
+	}
+
+	@DataProvider
+	public Object[][] loopbackPatternHosts() {
+		return new Object[][] {
+				{"http://localhost:*/callback", "localhost"},
+				{"http://127.0.0.1:8000-9000/cb", "127.0.0.1"},
+				{"http://app_1.example.com/callback", null},
+				{"http://user@localhost:*/callback", null},
+		};
+	}
+
+	@Test(dataProvider = "loopbackPatternHosts")
+	public void shouldResolveLoopbackPatternHost(String registered, String host) {
+		assertEquals(RedirectUriValidator.loopbackPatternHost(URI.create(registered)), host);
 	}
 }

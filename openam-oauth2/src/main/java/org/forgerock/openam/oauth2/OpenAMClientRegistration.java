@@ -73,6 +73,7 @@ import org.forgerock.oauth2.core.ClientType;
 import org.forgerock.oauth2.core.OAuth2Jwt;
 import org.forgerock.oauth2.core.OAuth2ProviderSettings;
 import org.forgerock.oauth2.core.PEMDecoder;
+import org.forgerock.oauth2.core.RedirectUriValidator;
 import org.forgerock.oauth2.core.exceptions.ClientAuthenticationFailureFactory;
 import org.forgerock.oauth2.core.exceptions.InvalidClientException;
 import org.forgerock.oauth2.core.exceptions.ServerException;
@@ -927,7 +928,7 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
                 logger.message("Must configure sector identifier uri when multiple redirect uris are specified.");
                 return null;
             } else {
-                host = getRedirectUris().iterator().next().getHost();
+                host = redirectUriHost(getRedirectUris().iterator().next());
             }
             return subValueFromHost(host, id, providerSettings);
         } else {
@@ -950,15 +951,22 @@ public class OpenAMClientRegistration implements OpenIdConnectClientRegistration
     }
 
     private boolean containsMultipleRedirectUriHosts(Set<URI> redirectUris) {
-        String host = redirectUris.iterator().next().getHost();
+        String host = redirectUriHost(redirectUris.iterator().next());
         for (URI uri : redirectUris) {
-            // getHost() is null for loopback port patterns such as http://localhost:*/callback
-            if (!Objects.equals(uri.getHost(), host)) {
+            if (!Objects.equals(redirectUriHost(uri), host)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Returns the host of a redirect uri. {@link URI#getHost()} is {@code null} for a loopback port pattern such as
+     * {@code http://localhost:*}{@code /callback}, so the host is then read from the pattern.
+     */
+    private static String redirectUriHost(URI uri) {
+        return uri.getHost() != null ? uri.getHost() : RedirectUriValidator.loopbackPatternHost(uri);
     }
 
     private String getAttribute(String attributeName) {

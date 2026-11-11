@@ -87,8 +87,9 @@ public class RedirectUriValidator {
 
     /**
      * Matches loopback redirect uris for native apps (RFC 8252 section 7.3), which receive the authorization
-     * response on an ephemeral port of the loopback interface. Scheme, host, path and query must match the
-     * registered uri; only the port is flexible. A registered {@code http} redirect uri on {@code localhost},
+     * response on an ephemeral port of the loopback interface. Scheme, host and path must match the
+     * registered uri; only the port is flexible. As for every redirect uri, the query of the request is not
+     * compared. A registered {@code http} redirect uri on {@code localhost},
      * {@code 127.0.0.1} or {@code [::1]} accepts:
      * <ul>
      *     <li>any port when it has no port, e.g. {@code http://127.0.0.1/callback} (RFC 8252 section 7.3);</li>
@@ -130,6 +131,18 @@ public class RedirectUriValidator {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    /**
+     * Returns the host of a loopback redirect uri registered with a port pattern, e.g. {@code localhost} for
+     * {@code http://localhost:*}{@code /callback}, for which {@link URI#getHost()} is {@code null}.
+     *
+     * @param registered A redirect uri registered for the client.
+     * @return The host, or {@code null} if the uri is not a loopback port pattern.
+     */
+    public static String loopbackPatternHost(URI registered) {
+        final Matcher pattern = LOOPBACK_PORT_PATTERN.matcher(String.valueOf(registered.getRawAuthority()));
+        return pattern.matches() ? pattern.group(1) : null;
     }
 
     private static boolean isLoopbackHost(String host) {

@@ -335,6 +335,32 @@ public class OpenAMClientRegistrationTest {
                 "AES");
     }
 
+    // --- #1230: pairwise sub for loopback redirect uris registered with a port pattern -------------
+
+    @Test
+    public void pairwiseSubForLoopbackPortPatternsIsNotNull() throws Exception {
+        setUpAgentWithAttribute(SUBJECT_TYPE, "pairwise");
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI,
+                "[0]=http://localhost:*/a", "[1]=http://127.0.0.1/b");
+
+        assertThat(clientRegistration.getSubValue("user", providerSettings)).isNotNull();
+    }
+
+    @Test
+    public void pairwiseSubForLoopbackPortPatternUsesTheLoopbackHostAsSector() throws Exception {
+        setUpAgentWithAttribute(SUBJECT_TYPE, "pairwise");
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI, "[0]=http://localhost:8080/callback");
+        final String explicitPortSub = clientRegistration.getSubValue("user", providerSettings);
+
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI, "[0]=http://localhost:*/callback");
+        final String wildcardSub = clientRegistration.getSubValue("user", providerSettings);
+
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI, "[0]=http://127.0.0.1:*/callback");
+        final String otherHostSub = clientRegistration.getSubValue("user", providerSettings);
+
+        assertThat(wildcardSub).isNotNull().isEqualTo(explicitPortSub).isNotEqualTo(otherHostSub);
+    }
+
     private void setUpAgentWithAttribute(String attributeName, String... attributeValues)
             throws IdRepoException, SSOException {
         given(amIdentity.getAttribute(attributeName))
