@@ -15,6 +15,7 @@
  */
 package com.sun.identity.jaxrpc.golden;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -287,7 +288,23 @@ public class GoldenRecorderTest {
         tie.handle(ctx);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ctx.getMessage().writeTo(out);
-        return new Recording(out.toByteArray(), ctx.isFailure() ? 500 : 200);
+        return new Recording(withLfAfterDeclaration(out.toByteArray()), ctx.isFailure() ? 500 : 200);
+    }
+
+    /**
+     * The RI ends the XML declaration with {@code System.lineSeparator()}: its
+     * {@code com.sun.xml.rpc.util.xml.XmlWriter} calls {@code BufferedWriter.newLine()} after it. Writes
+     * LF there instead, so that a recording made on Windows equals the committed one. The separator is
+     * whitespace in the prolog, which no XML parser reports.
+     */
+    private static byte[] withLfAfterDeclaration(byte[] response) {
+        String s = new String(response, ISO_8859_1);
+        String separator = System.lineSeparator();
+        int end = s.indexOf("?>") + 2;
+        if (!s.startsWith("<?xml") || end < 2 || !s.startsWith(separator, end)) {
+            return response;
+        }
+        return (s.substring(0, end) + "\n" + s.substring(end + separator.length())).getBytes(ISO_8859_1);
     }
 
     /**
