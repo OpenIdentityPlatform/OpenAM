@@ -392,6 +392,7 @@ test.describe("OIDC checkSession", () => {
     console.log(`[oidc] checkSession GET=${get.status()} POST=${post.status()}`);
     expect(get.status()).toBe(200);
     expect(post.status()).toBe(200);
+    expect(get.headers()["content-type"]).toBe(HTML_TYPE);
     expect(post.headers()["content-type"]).toBe(HTML_TYPE);
     expect(await post.text()).toBe(await get.text());
   });
@@ -465,7 +466,10 @@ test.describe("OIDC checkSession", () => {
     const page = await request.get(`${CHECK_SESSION}?display=page`);
     expect(page.status()).toBe(200);
     expect(page.headers()["content-type"]).toBe(HTML_TYPE);
-    expect(await page.text()).toBe(await (await request.get(CHECK_SESSION)).text());
+    const reference = await request.get(CHECK_SESSION);
+    expect(reference.status()).toBe(200);
+    expect(reference.headers()["content-type"]).toBe(HTML_TYPE);
+    expect(await page.text()).toBe(await reference.text());
   });
 });
 
