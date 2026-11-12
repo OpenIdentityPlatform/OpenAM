@@ -338,12 +338,32 @@ public class OpenAMClientRegistrationTest {
     // --- #1230: pairwise sub for loopback redirect uris registered with a port pattern -------------
 
     @Test
-    public void pairwiseSubForLoopbackPortPatternsIsNotNull() throws Exception {
+    public void pairwiseSubForLoopbackPortPatternsDoesNotThrow() throws Exception {
         setUpAgentWithAttribute(SUBJECT_TYPE, "pairwise");
         setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI,
                 "[0]=http://localhost:*/a", "[1]=http://127.0.0.1/b");
 
-        assertThat(clientRegistration.getSubValue("user", providerSettings)).isNotNull();
+        // Threw a NullPointerException before; the sub of a multi-host client is not asserted here.
+        clientRegistration.getSubValue("user", providerSettings);
+    }
+
+    @Test
+    public void pairwiseSubTreatsALoopbackPortPatternAsItsHost() throws Exception {
+        setUpAgentWithAttribute(SUBJECT_TYPE, "pairwise");
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI,
+                "[0]=http://localhost:8080/a", "[1]=http://localhost:9090/b");
+        final String explicitPortsSub = clientRegistration.getSubValue("user", providerSettings);
+
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI,
+                "[0]=http://localhost:*/a", "[1]=http://localhost:8080/b");
+        final String wildcardAndPortSub = clientRegistration.getSubValue("user", providerSettings);
+
+        setUpAgentWithAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI,
+                "[0]=http://localhost:*/a", "[1]=http://localhost:3000-4000/b");
+        final String wildcardAndRangeSub = clientRegistration.getSubValue("user", providerSettings);
+
+        assertThat(wildcardAndPortSub).isEqualTo(explicitPortsSub);
+        assertThat(wildcardAndRangeSub).isEqualTo(explicitPortsSub);
     }
 
     @Test

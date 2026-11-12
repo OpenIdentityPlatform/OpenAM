@@ -52,6 +52,8 @@ public class RedirectUriValidatorTest {
 				{"http://localhost:*/callback", "http://localhost:43123/callback"},
 				{"http://127.0.0.1:*/callback", "http://127.0.0.1:1/callback"},
 				{"http://localhost:*/callback", "http://localhost:43123/callback?state=abc"},
+				{"http://LOCALHOST:*/callback", "http://localhost:5000/callback"},
+				{"http://localhost:*/callback", "http://LocalHost:5000/callback"},
 				// port range, inclusive
 				{"http://localhost:49152-65535/callback", "http://localhost:49152/callback"},
 				{"http://localhost:49152-65535/callback", "http://localhost:65535/callback"},
