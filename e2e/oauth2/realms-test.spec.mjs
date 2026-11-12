@@ -16,8 +16,10 @@
 
 /*
  * Protocol cover for /oauth2 in a non-root realm. On master Restlet serves all of /oauth2 (OAuth2RouterProvider
- * under the ForgeRockRest servlet) and RestletRealmRouter resolves the realm. This spec pins that black-box
- * contract before /oauth2 moves to CHF. A flip may change a pinned value only as a divergence listed in its PR.
+ * under the ForgeRockRest servlet), and two Restlet routers resolve the realm: RestletRealmRouter the Host's, the
+ * query's and the legacy segment's, RealmRoutingFactory's router the /realms/... segments. This spec pins that
+ * black-box contract before /oauth2 moves to CHF. A flip may change a pinned value only as a divergence listed in
+ * its PR.
  *
  * Four spellings name the same realm:
  *   nested  /oauth2/realms/root/realms/<sub>/...  the form the realm's discovery document advertises;
@@ -77,7 +79,7 @@ const INVALID_TOKEN = {
   error: "invalid_token",
 };
 
-/** RestletRealmRouter's 404 for a realm that does not exist. */
+/** The Restlet realm routers' 404 for a realm that does not exist. */
 const notFound = (identifier) => ({
   code: 404, reason: "Not Found", message: `No mapping organization found for organization identifier: ${identifier}`,
 });
@@ -422,10 +424,12 @@ test.describe("/oauth2 in a non-root realm", () => {
       const codes = new Set();
       for (const [label, url] of SPELLINGS) {
         const response = await subRealmSession.get(url("/authorize", `?${authorizeQuery()}`), { maxRedirects: 0 });
+        // The status first, so an answer without a Location fails on it. A 302 carries the code: no body of it is read.
+        const text = response.status() === 302 ? "" : await response.text();
+        expect(response.status(), `${label} ${text}`).toBe(302);
         const location = new URL(response.headers()["location"]);
         console.log(`[realms] authorize ${label} -> ${response.status()} ${location.origin}${location.pathname}`
           + ` keys=${[...location.searchParams.keys()]}`);
-        expect(response.status(), label).toBe(302);
         expect(location.origin + location.pathname, label).toBe(REDIRECT_URI);
         expect([...location.searchParams.keys()].sort(), label)
           .toEqual(["client_id", "code", "iss", "scope", "state"]);
@@ -459,9 +463,11 @@ test.describe("/oauth2 in a non-root realm", () => {
   });
 
   test("an unknown realm, an unrouted path and an unknown Host under the sub-realm", async () => {
-    // An unknown realm in the path is RestletRealmRouter's 404, in the nested and the flat form alike, naming the
-    // realm with a leading slash.
-    for (const path of ["/realms/root/realms/nosuchsub/tokeninfo", "/realms/nosuchsub/tokeninfo"]) {
+    // An unknown realm in the path is a 404 naming the realm with a leading slash, whichever router looked it up:
+    // RealmRoutingFactory's on the nested and the flat form, RestletRealmRouter on the legacy one.
+    for (const path of [
+      "/realms/root/realms/nosuchsub/tokeninfo", "/realms/nosuchsub/tokeninfo", "/nosuchsub/tokeninfo",
+    ]) {
       expectRawJson(await raw(rawPath(`${path}?access_token=x`)), 404, notFound("/nosuchsub"), path);
     }
 
@@ -494,11 +500,20 @@ test.describe("/oauth2 in a non-root realm", () => {
     }
   });
 
-  test("the realm segment of the path is matched case-insensitively", async () => {
+  test("the realm segment of the path is matched case-insensitively", async ({ request }) => {
     // Unlike the endpoint segment (/oauth2/Tokeninfo is a 404): the upper-cased realm resolves, and tokeninfo then
-    // rejects the bogus token.
+    // rejects the bogus token. tokeninfo is not realm-scoped, so that leg alone would also pass if the segment fell
+    // back to root.
     const path = `/${SUB_REALM.toUpperCase()}/tokeninfo?access_token=not-a-token`;
     expectRawJson(await raw(rawPath(path)), 401, INVALID_TOKEN, "upper-cased realm");
+
+    // The token endpoint is realm-scoped: the client exists only in the sub-realm, so a token proves the upper-cased
+    // segment resolved to the sub-realm. This test's context never carries a session.
+    const token = await request.post(`${OAUTH2}/${SUB_REALM.toUpperCase()}/access_token`, {
+      headers: { Authorization: basicAuth(CLIENT_ID, CLIENT_SECRET) },
+      form: { grant_type: "client_credentials", scope: SCOPE },
+    });
+    await expectToken(token, CLIENT_TOKEN_KEYS, "upper-cased realm client_credentials");
   });
 
   test("the password grant authenticates a sub-realm resource owner on every spelling", async ({ request }) => {
