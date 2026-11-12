@@ -59,6 +59,9 @@ public class RedirectUriValidatorTest {
 				{"http://localhost:49152-65535/callback", "http://localhost:65535/callback"},
 				{"http://127.0.0.1:8000-9000/cb", "http://127.0.0.1:8765/cb"},
 				{"http://localhost:1-100/callback", "http://localhost/callback"},
+				// the 80-80 range keeps the pre-RFC 8252 match of a port-less loopback uri
+				{"http://localhost:80-80/callback", "http://localhost/callback"},
+				{"http://localhost:80-80/callback", "http://localhost:80/callback"},
 				// an explicit port still matches exactly
 				{"http://localhost:8765/callback", "http://localhost:8765/callback"},
 		};
@@ -77,6 +80,8 @@ public class RedirectUriValidatorTest {
 				{"http://localhost:8765/callback", "http://localhost:8766/callback"},
 				// outside the range
 				{"http://localhost:49152-65535/callback", "http://localhost:49151/callback"},
+				{"http://localhost:80-80/callback", "http://localhost:8080/callback"},
+				{"http://localhost:80/callback", "http://localhost/callback"},
 				{"http://127.0.0.1:8000-9000/cb", "http://127.0.0.1:9001/cb"},
 				// path, host and scheme must match
 				{"http://localhost:*/callback", "http://localhost:43123/other"},
