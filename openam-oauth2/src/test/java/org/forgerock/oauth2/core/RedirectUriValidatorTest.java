@@ -124,4 +124,30 @@ public class RedirectUriValidatorTest {
 	public void shouldResolveLoopbackPatternHost(String registered, String host) {
 		assertEquals(RedirectUriValidator.loopbackPatternHost(URI.create(registered)), host);
 	}
+
+	@DataProvider
+	public Object[][] soleLoopbackPortPatterns() {
+		return new Object[][] {
+				{"http://localhost:*/callback"},
+				{"http://127.0.0.1:49152-65535/callback"},
+				{"http://localhost:80-80/callback"},
+		};
+	}
+
+	@Test(dataProvider = "soleLoopbackPortPatterns", expectedExceptions = InvalidRequestException.class)
+	public void shouldRequireRedirectUriWhenTheSoleRegistrationIsAPortPattern(String registered)
+			throws InvalidRequestException, RedirectUriMismatchException {
+		ClientRegistration registration = mock(ClientRegistration.class);
+		given(registration.getRedirectUris()).willReturn(new HashSet<>(Arrays.asList(URI.create(registered))));
+		new RedirectUriValidator().validate(registration, null);
+	}
+
+	@Test
+	public void shouldAllowAnOmittedRedirectUriWhenTheSoleRegistrationIsPortless()
+			throws InvalidRequestException, RedirectUriMismatchException {
+		ClientRegistration registration = mock(ClientRegistration.class);
+		given(registration.getRedirectUris())
+				.willReturn(new HashSet<>(Arrays.asList(URI.create("http://localhost/callback"))));
+		new RedirectUriValidator().validate(registration, null);
+	}
 }

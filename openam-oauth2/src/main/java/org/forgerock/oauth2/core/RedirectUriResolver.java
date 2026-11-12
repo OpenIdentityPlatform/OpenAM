@@ -74,7 +74,11 @@ public class RedirectUriResolver {
             }
             redirectUri = request.getParameter(REDIRECT_URI);
             if (isEmpty(redirectUri) && redirectUris.size() == 1) {
-                redirectUri = redirectUris.iterator().next().toString();
+                final URI registered = redirectUris.iterator().next();
+                // A loopback port pattern such as http://localhost:*/callback is not a usable destination.
+                if (RedirectUriValidator.loopbackPatternHost(registered) == null) {
+                    redirectUri = registered.toString();
+                }
             }
         }
 

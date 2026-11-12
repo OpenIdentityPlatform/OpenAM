@@ -49,7 +49,9 @@ public class RedirectUriValidator {
             RedirectUriMismatchException {
 
         if (isEmpty(redirectUri)) {
-            if (clientRegistration.getRedirectUris().size() == 1) {
+            // A loopback port pattern is not a usable destination, so it cannot stand in for redirect_uri.
+            if (clientRegistration.getRedirectUris().size() == 1
+                    && loopbackPatternHost(clientRegistration.getRedirectUris().iterator().next()) == null) {
                 return;
             }
 

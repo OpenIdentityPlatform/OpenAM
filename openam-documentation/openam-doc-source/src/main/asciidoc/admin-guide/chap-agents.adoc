@@ -1674,7 +1674,7 @@ For native applications that receive the authorization response on an ephemeral 
 * With a port range, for example `\http://localhost:49152-65535/callback`, any port in the range is accepted.
 
 +
-Port wildcards and ranges are supported on `localhost` and `127.0.0.1` only. Every non-loopback redirection URI must match exactly. A loopback redirection URI registered with an explicit port, for example `+http://127.0.0.1:8080/callback+`, also matches that port only, so that existing registrations keep their behaviour. For a native application that listens on a port assigned by the operating system, register the URI without a port, or with `+*+` or a port range.
+Port wildcards and ranges are supported on `localhost` and `127.0.0.1` only. Every non-loopback redirection URI must match exactly. A loopback redirection URI registered with an explicit port, for example `+http://127.0.0.1:8080/callback+`, also matches that port only, so that existing registrations keep their behaviour. For a native application that listens on a port assigned by the operating system, register the URI without a port, or with `+*+` or a port range. A client whose only redirection URI is a port pattern must send the `redirect_uri` parameter, as a pattern cannot be used as the redirection destination.
 
 Scopes::
 Specify scopes that are to be presented to the resource owner when the resource owner is asked to authorize client access to protected resources.
