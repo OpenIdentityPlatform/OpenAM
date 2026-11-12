@@ -364,10 +364,11 @@ test.describe("/oauth2 in a non-root realm", () => {
   test("the token endpoint authenticates a confidential client on the path spellings", async ({ request }) => {
     // The client's login runs in the sub-realm and checks that realm against the request's
     // (AMLoginContext, through AuthClientUtils.getDomainNameByRequest). On a path spelling the request's realm is
-    // the servlet request attribute RestletRealmRouter writes; without it the check falls back to the query, then
-    // to the host's realm, root, and the client gets 401 invalid_client while ?realm= keeps working. A flip that
-    // resolves the realm elsewhere has to hand it to the login. The check runs only without a valid session, so
-    // this test's context never carries one.
+    // a servlet request attribute with two writers: on the /realms/... spellings (nested, flat) the Restlet router
+    // of RealmRoutingFactory, on the legacy /{subrealm} spelling RestletRealmRouter. Without it the check falls
+    // back to the query, then to the host's realm, root, and the client gets 401 invalid_client while ?realm= keeps
+    // working. A flip that resolves the realm elsewhere has to hand it to the login. The check runs only without
+    // a valid session, so this test's context never carries one.
     for (const [label, url] of PATH_SPELLINGS) {
       const response = await request.post(url("/access_token"), {
         headers: { Authorization: basicAuth(CLIENT_ID, CLIENT_SECRET) },
