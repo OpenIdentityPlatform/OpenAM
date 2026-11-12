@@ -547,13 +547,14 @@ test.describe("OIDC endSession", () => {
   });
 
   test("a malformed id_token_hint or an unparsable post_logout_redirect_uri is a 400", async ({ request }) => {
-    // The hint is verified before the redirect URI is read.
-    const malformed = await endSession(request, {
-      id_token_hint: "not.a-jwt", post_logout_redirect_uri: POST_LOGOUT_REDIRECT_URI,
-    });
-    await expectJson(malformed, 400, {
-      error: "bad_request", error_description: "The id_token_hint is not a valid signed JWT",
-    });
+    // The hint is verified before the redirect URI is read: a malformed hint gets the same answer with a registered,
+    // a relative and an unparsable URI, although refusing the last two needs no client.
+    for (const uri of [POST_LOGOUT_REDIRECT_URI, "/relative/cb", "ht tp://%%%"]) {
+      const malformed = await endSession(request, { id_token_hint: "not.a-jwt", post_logout_redirect_uri: uri });
+      await expectJson(malformed, 400, {
+        error: "bad_request", error_description: "The id_token_hint is not a valid signed JWT",
+      });
+    }
 
     // With a valid hint, a URI that java.net.URI cannot parse matches nothing the client registered.
     const { ctx, idToken } = await oidcSession("end-session-unparsable");
