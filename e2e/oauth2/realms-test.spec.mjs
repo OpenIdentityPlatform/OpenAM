@@ -33,11 +33,13 @@
  */
 
 import { request as httpRequest } from "node:http";
+import { request as httpsRequest } from "node:https";
 import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, PASSWORD, USERNAME, getAdminToken } from "../common/openam-commons.mjs";
 import { REDIRECT_URI, basicAuth, sessionContext } from "../common/oauth2-fixtures.mjs";
 
 const BASE = new URL(OPENAM_BASE);
+const HTTPS = BASE.protocol === "https:";
 const OAUTH2 = `${OPENAM_BASE}/oauth2`;
 
 /** A failed test restarts the worker, which re-imports this file: each worker builds and removes its own realm. */
@@ -107,16 +109,22 @@ const SPELLINGS = [
 /** The spellings that name the realm in the path. */
 const PATH_SPELLINGS = SPELLINGS.filter(([label]) => label !== "query");
 
-/** `/oauth2…` as raw path bytes, context path included, for requests sent with node:http. */
+/** `/oauth2…` as raw path bytes, context path included, for requests sent by raw(). */
 const rawPath = (suffix) => `${BASE.pathname.replace(/\/$/, "")}/oauth2${suffix}`;
 
-/** A raw node:http GET: Playwright cannot send a Host that differs from the connection's. */
+/**
+ * A raw GET over node:http or node:https, following the scheme of OPENAM_BASE: Playwright cannot send a Host that
+ * differs from the connection's. Unlike Playwright's requests (ignoreHTTPSErrors), it verifies the server
+ * certificate: against a stand with a self-signed one, pass its CA in NODE_EXTRA_CA_CERTS.
+ */
 function raw(path, { hostHeader } = {}) {
   return new Promise((resolve, reject) => {
-    const request = httpRequest({
-      hostname: BASE.hostname, port: BASE.port || 80, path, method: "GET",
+    const request = (HTTPS ? httpsRequest : httpRequest)({
+      hostname: BASE.hostname, port: BASE.port || (HTTPS ? 443 : 80), path, method: "GET",
       headers: hostHeader ? { Host: hostHeader } : {},
       setHost: hostHeader === undefined,
+      // Node takes the TLS server name from the Host header; the certificate is the stand's, whatever Host is sent.
+      ...(HTTPS ? { servername: BASE.hostname } : {}),
     }, (response) => {
       let text = "";
       response.setEncoding("utf8");
