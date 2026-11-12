@@ -215,7 +215,7 @@ export async function ensureOidcClient(adminToken, request, clientId) {
  * Give each worker/run its own provider. No root-realm provider GET/PUT is performed,
  * so this setup cannot overwrite settings being changed by the other OAuth/UMA specs.
  */
-export async function createDevicePkceRealm(adminToken, request, realm, clientId) {
+export async function createDevicePkceRealm(adminToken, request, realm, clientId, owner) {
   const realmUrl = `${OPENAM_BASE}/json/realms/root/realms/${realm}`;
   const oauthUrl = `${OPENAM_BASE}/oauth2/realms/root/realms/${realm}`;
   const headers = adminHeaders(adminToken, CONFIG_VERSION);
@@ -250,10 +250,27 @@ export async function createDevicePkceRealm(adminToken, request, realm, clientId
       sunIdentityServerDeviceStatus: "Active",
     },
   }), "create PKCE client");
+  // A fresh realm must provision its resource owner rather than rely on a root demo account.
+  await requireSuccess(await request.post(`${realmUrl}/users?_action=create`, {
+    headers: adminHeaders(adminToken, { "Accept-API-Version": "resource=3.0,protocol=2.1" }),
+    data: {
+      username: owner.username, userpassword: owner.password,
+      sn: "PKCE", cn: "PKCE Test User", givenName: "PKCE",
+    },
+  }), "create PKCE resource owner");
   return { realmUrl, oauthUrl };
 }
 
-export async function deleteDevicePkceRealm(adminToken, request, realm) {
+export async function deleteDevicePkceRealm(adminToken, request, realm, username) {
+  // Realm deletion does not remove entries from its shared LDAP identity store.
+  if (username) {
+    const user = await request.delete(`${OPENAM_BASE}/json/realms/root/realms/${realm}/users/${encodeURIComponent(username)}`, {
+      headers: adminHeaders(adminToken, { "Accept-API-Version": "resource=3.0,protocol=2.1" }),
+    });
+    if (!user.ok() && user.status() !== 404) {
+      throw new Error(`delete PKCE resource owner: ${user.status()} ${await user.text()}`);
+    }
+  }
   const id = Buffer.from(`/${realm}`).toString("base64url");
   const response = await request.delete(`${OPENAM_BASE}/json/global-config/realms/${id}`, {
     headers: adminHeaders(adminToken, CONFIG_VERSION),

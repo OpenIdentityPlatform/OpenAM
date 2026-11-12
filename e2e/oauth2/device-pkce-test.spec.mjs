@@ -16,12 +16,13 @@
 
 import { randomUUID } from "node:crypto";
 import { test, expect } from "@playwright/test";
-import { getAdminToken, USERNAME, PASSWORD } from "../common/openam-commons.mjs";
+import { getAdminToken, PASSWORD } from "../common/openam-commons.mjs";
 import { SCOPE, createDevicePkceRealm, deleteDevicePkceRealm } from "../common/oauth2-fixtures.mjs";
 
 // HTTP coverage for GHSA-h93p-35jm-rj83, part of #1223. Unlike the Java resource tests, these
 // assertions survive removal of Restlet and exercise challenge persistence through the token store.
 const CLIENT_ID = "test_device_pkce_app";
+const USERNAME = `pkce${randomUUID().replaceAll("-", "")}`;
 const DEVICE_GRANT = "urn:ietf:params:oauth:grant-type:device_code";
 let ENDPOINT;
 // RFC 7636 Appendix B's S256 test vector; plain uses the same valid 43-character verifier.
@@ -99,7 +100,7 @@ test.describe("Device authorization PKCE over HTTP", () => {
     adminToken = await getAdminToken(request);
     expect(adminToken, "administrator authentication is required; security coverage must not silently skip").toBeTruthy();
     realm = `devicepkce${randomUUID().replaceAll("-", "")}`;
-    const fixture = await createDevicePkceRealm(adminToken, request, realm, CLIENT_ID);
+    const fixture = await createDevicePkceRealm(adminToken, request, realm, CLIENT_ID, { username: USERNAME, password: PASSWORD });
     ENDPOINT = fixture.oauthUrl;
     // Authenticate in the isolated realm; a root-realm session is not sufficient here.
     const authentication = await request.post(`${fixture.realmUrl}/authenticate`, {
@@ -114,7 +115,7 @@ test.describe("Device authorization PKCE over HTTP", () => {
   });
 
   test.afterAll(async ({ request }) => {
-    if (adminToken && realm) await deleteDevicePkceRealm(adminToken, request, realm);
+    if (adminToken && realm) await deleteDevicePkceRealm(adminToken, request, realm, USERNAME);
   });
 
   for (const method of ["bogus", "s256", "PLAIN", ""]) {
