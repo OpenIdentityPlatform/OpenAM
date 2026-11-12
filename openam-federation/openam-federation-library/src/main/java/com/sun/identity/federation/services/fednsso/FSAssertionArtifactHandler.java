@@ -25,7 +25,7 @@
  * $Id: FSAssertionArtifactHandler.java,v 1.14 2009/11/03 00:49:49 madan_ranganath Exp $
  *
  * Portions Copyrighted 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -1904,7 +1904,7 @@ public class FSAssertionArtifactHandler {
         BaseConfigType proxySPConfig = null;
         try {
             proxySPConfig = metaManager.getSPDescriptorConfig(
-                realm, proxySPEntityId);
+                realm, proxySPEntityId).getValue();
         } catch (Exception e) {
             FSUtils.debug.error("FSAssertionArtifactHandler.sendProxyResponse:"
                 + "Couldn't obtain proxy sp meta:", e);
@@ -1920,7 +1920,7 @@ public class FSAssertionArtifactHandler {
         try {
             localIDPDesc = metaManager.getIDPDescriptor(realm, hostEntityId);
             localIDPConfig = metaManager.getIDPDescriptorConfig(
-                realm, hostEntityId);
+                realm, hostEntityId).getValue();
             localIDPMetaAlias = localIDPConfig.getMetaAlias();
         } catch (Exception e) {
             FSUtils.debug.error("FSAssertionartifactHandler.sendProxyResponse:"

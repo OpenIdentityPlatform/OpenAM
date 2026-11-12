@@ -139,7 +139,7 @@ public class FSLoginHelper {
                 hostDescriptor = metaManager.getSPDescriptor(
                     realm, hostEntityID);
                 hostConfig = metaManager.getSPDescriptorConfig(
-                    realm, hostEntityID);
+                    realm, hostEntityID).getValue();
             } else {
                 FSUtils.debug.error("FSLoginHelper::setMetaInfo " 
                     + "could not get meta manager handle "
@@ -498,8 +498,8 @@ public class FSLoginHelper {
                 while (it.hasNext()) {
                     provider = (String) it.next();
                     providerDesc = metaManager.getIDPDescriptor(realm,provider);
-                    providerConfig = 
-                        metaManager.getIDPDescriptorConfig(realm, provider);
+                    providerConfig =
+                        IDFFMetaUtils.unwrap(metaManager.getIDPDescriptorConfig(realm, provider));
                     if (providerDesc == null || providerConfig == null) {
                         continue;
                     } 

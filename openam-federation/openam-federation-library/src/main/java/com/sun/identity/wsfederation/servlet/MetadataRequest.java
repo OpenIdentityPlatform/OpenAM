@@ -24,7 +24,7 @@
  *
  * $Id: MetadataRequest.java,v 1.2 2009/10/28 23:59:00 exu Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.wsfederation.servlet;
@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 
 /**

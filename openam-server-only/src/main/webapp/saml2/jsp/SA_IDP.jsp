@@ -25,6 +25,7 @@
    $Id: SA_IDP.jsp,v 1.10 2009/06/24 00:22:44 sean_brydon Exp $
 
    Portions Copyrighted 2013-2015 ForgeRock AS.
+   Portions Copyrighted 2026 3A Systems LLC.
 --%>
 
 <%@ page language="java" 
@@ -77,11 +78,11 @@ org.owasp.esapi.ESAPI"
                     SPSSODescriptorElement spDesc =
                         mm.getSPSSODescriptor(realm, tempspId);
                     Iterator acsIter = 
-                        spDesc.getAssertionConsumerService().iterator();
+                        spDesc.getValue().getAssertionConsumerService().iterator();
                     while (acsIter.hasNext()) {
                         AssertionConsumerServiceElement acs =
                             (AssertionConsumerServiceElement) acsIter.next();
-                        if (acs.getLocation().indexOf(targetHost) != -1) {
+                        if (acs.getValue().getLocation().indexOf(targetHost) != -1) {
                             return tempspId;
                         }
                     }

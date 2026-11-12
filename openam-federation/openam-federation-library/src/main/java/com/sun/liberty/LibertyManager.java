@@ -59,6 +59,7 @@ import com.sun.identity.federation.accountmgmt.FSAccountMgmtException;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.login.FSPostLogin;
 import com.sun.identity.federation.message.common.FSMsgException;
 import com.sun.identity.federation.message.FSNameIdentifierMappingRequest;
@@ -1298,8 +1299,10 @@ public class LibertyManager {
             try {
                 IDFFMetaManager metaManager = getMetaManager();
                 if (metaManager != null) {
-                    BaseConfigType providerConfig = 
+                    SPDescriptorConfigElement spConfigElem =
                         metaManager.getSPDescriptorConfig(realm, entityID);
+                    BaseConfigType providerConfig =
+                        (spConfigElem == null) ? null : spConfigElem.getValue();
                     homePage = IDFFMetaUtils.getFirstAttributeValue(
                         IDFFMetaUtils.getAttributes(providerConfig),
                         IFSConstants.PROVIDER_HOME_PAGE_URL);
@@ -2049,8 +2052,9 @@ public class LibertyManager {
             IDFFMetaManager metaManager = getMetaManager();
             hostedDescriptor = metaManager.getSPDescriptor(
                 realm, hostedEntityID);
-            hostedConfig = metaManager.getSPDescriptorConfig(
+            SPDescriptorConfigElement hostedConfigElem = metaManager.getSPDescriptorConfig(
                 realm, hostedEntityID);
+            hostedConfig = (hostedConfigElem == null) ? null : hostedConfigElem.getValue();
         } catch (IDFFMetaException ie) {
             debug.error(classMethod + "couldn't obtain hosted meta:", ie);
             return null;

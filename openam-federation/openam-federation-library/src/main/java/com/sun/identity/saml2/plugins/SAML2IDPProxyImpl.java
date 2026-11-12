@@ -24,7 +24,7 @@
  *
  * $Id: SAML2IDPProxyImpl.java,v 1.5 2009/03/12 20:33:40 huacui Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.saml2.plugins;
@@ -94,7 +94,7 @@ public class SAML2IDPProxyImpl implements SAML2IDPFinder {
                 sm.getSPSSOConfig(realm, authnRequest.getIssuer().getValue());
             Map spConfigAttrsMap = null;
             if (spEntityCfg != null) {
-                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg);
+                spConfigAttrsMap = SAML2MetaUtils.getAttributes(spEntityCfg.getValue());
             }         
             String useIntroductionForProxying = 
                 SPSSOFederate.getParameter(spConfigAttrsMap,

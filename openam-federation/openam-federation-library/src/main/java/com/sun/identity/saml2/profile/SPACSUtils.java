@@ -394,7 +394,7 @@ public class SPACSUtils {
             IDPSSOConfigElement config = null;
             config = sm.getIDPSSOConfig(orgName, idpEntityID);
             location = SAML2Utils.fillInBasicAuthInfo(
-                config, location);
+                config == null ? null : config.getValue(), location);
             resMsg = con.call(msg, location);
         } catch (SAML2Exception s2e) {
             SAML2Utils.debug.error("SPACSUtils.getResponseFromArtifact: "
@@ -498,7 +498,7 @@ public class SPACSUtils {
                 throws SAML2Exception,IOException
     {
         // find the artifact resolution service url
-        List arsList=idp.getArtifactResolutionService();
+        List arsList=idp.getValue().getArtifactResolutionService();
         ArtifactResolutionServiceElement ars = null;
         String location = null;
         String defaultLocation = null;
@@ -507,10 +507,10 @@ public class SPACSUtils {
         boolean isDefault = false;
         for (int i=0; i<arsList.size(); i++) {
             ars = (ArtifactResolutionServiceElement)arsList.get(i);
-            location = ars.getLocation();
+            location = ars.getValue().getLocation();
             //String binding = ars.getBinding();
-            index = ars.getIndex();
-            isDefault = ars.isIsDefault();
+            index = ars.getValue().getIndex();
+            isDefault = Boolean.TRUE.equals(ars.getValue().isIsDefault());
             if (index == endpointIndex) {
                 break;
             }
@@ -633,7 +633,7 @@ public class SPACSUtils {
         String wantArtiRespSigned = SAML2Utils.getAttributeValueFromSPSSOConfig(spConfig,
                 SAML2Constants.WANT_ARTIFACT_RESPONSE_SIGNED);
         if (wantArtiRespSigned != null && wantArtiRespSigned.equals("true")) {
-            Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(idp, idpEntityID,
+            Set<X509Certificate> verificationCerts = KeyUtil.getVerificationCerts(idp.getValue(), idpEntityID,
                     SAML2Constants.IDP_ROLE);
             if (!artiResp.isSigned() || !artiResp.isSignatureValid(verificationCerts)) {
                 if (SAML2Utils.debug.messageEnabled()) {
@@ -752,7 +752,8 @@ public class SPACSUtils {
         Issuer resIssuer = res.getIssuer();
         SPSSODescriptorElement spDesc = sm.getSPSSODescriptor(orgName, hostEntityId);
         if (isArtifactResponseUnbound(idpEntityID, resIssuer,
-                SAML2Utils.isAssertionSignatureRequired(spDesc != null && spDesc.isWantAssertionsSigned(),
+                SAML2Utils.isAssertionSignatureRequired(
+                        spDesc != null && Boolean.TRUE.equals(spDesc.getValue().isWantAssertionsSigned()),
                         SAML2Constants.HTTP_ARTIFACT, spConfig, orgName, hostEntityId))) {
             SAML2Utils.debug.error(method + "the response resolved from the artifact was issued by "
                     + (resIssuer == null ? "no one" : resIssuer.getValue())
@@ -925,7 +926,7 @@ public class SPACSUtils {
             throw se;
         }
 
-        Set<X509Certificate> certificates = KeyUtil.getVerificationCerts(idpDesc, idpEntityID, SAML2Constants.IDP_ROLE);
+        Set<X509Certificate> certificates = KeyUtil.getVerificationCerts(idpDesc.getValue(), idpEntityID, SAML2Constants.IDP_ROLE);
         // GHSA-3j2f-qhrc-rjfj: this only reaches the cleartext assertions of the response. An
         // <EncryptedAssertion> is opaque here; it is decrypted in SAML2Utils.verifyResponse, which
         // applies this same "every assertion signed" rule to the PAOS binding once it has. Do not
@@ -1150,7 +1151,7 @@ public class SPACSUtils {
         boolean needAttributeEncrypted = getNeedAttributeEncrypted(needAssertionEncrypted, spssoconfig);
         boolean needNameIDEncrypted = getNeedNameIDEncrypted(needAssertionEncrypted, spssoconfig);
 
-        Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+        Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig.getValue());
         if (needNameIDEncrypted && encId == null) {
             SAML2Utils.debug.error(classMethod +
                                    "process: NameID was not encrypted.");
@@ -1191,7 +1192,7 @@ public class SPACSUtils {
         }
         String nameIDFormat = nameId.getFormat();
         if (nameIDFormat != null) {
-            List spNameIDFormatList = spDesc.getNameIDFormat();
+            List spNameIDFormatList = spDesc.getValue().getNameIDFormat();
 
             if ((spNameIDFormatList != null) && (!spNameIDFormatList.isEmpty())
                 && (!spNameIDFormatList.contains(nameIDFormat))) {
@@ -2053,7 +2054,7 @@ public class SPACSUtils {
             if (config == null) {
                 return null;
             }
-            Map attrs = SAML2MetaUtils.getAttributes(config);
+            Map attrs = SAML2MetaUtils.getAttributes(config.getValue());
             List value = (List) attrs.get(attrName);
             if (value != null && value.size() != 0) {
                 result = ((String) value.iterator().next()).trim();
@@ -2314,7 +2315,7 @@ public class SPACSUtils {
 
         final EncryptedID encId = assertionSubject.getEncryptedID();
         final SPSSOConfigElement spssoconfig = metaManager.getSPSSOConfig(realm, spEntityId);
-        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig);
+        final Set<PrivateKey> decryptionKeys = KeyUtil.getDecryptionKeys(spssoconfig.getValue());
         final SPAccountMapper acctMapper = SAML2Utils.getSPAccountMapper(realm, spEntityId);
 
         boolean needNameIDEncrypted = false;
@@ -2349,7 +2350,7 @@ public class SPACSUtils {
         final String nameIDFormat = nameId.getFormat();
 
         if (nameIDFormat != null) {
-            List spNameIDFormatList = spDesc.getNameIDFormat();
+            List spNameIDFormatList = spDesc.getValue().getNameIDFormat();
 
             if (CollectionUtils.isNotEmpty(spNameIDFormatList) && !spNameIDFormatList.contains(nameIDFormat)) {
                 Object[] args = {nameIDFormat};

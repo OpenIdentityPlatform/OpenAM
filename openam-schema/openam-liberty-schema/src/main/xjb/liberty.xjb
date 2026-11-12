@@ -22,13 +22,28 @@
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
 
+   Portions Copyrighted 2026 3A Systems LLC
+
    $Id: binding.xjb,v 1.2 2008/06/25 05:48:39 qcheng Exp $
 
 -->
 
-<jxb:bindings version="1.0"
-               xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
-               xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<jxb:bindings
+        version="3.0"
+        xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+        jxb:extensionBindingPrefixes="xjc">
+
+
+    <jxb:globalBindings >
+        <jxb:javaType name="java.util.Calendar"
+                      xmlType="xs:dateTime"
+                      parseMethod="jakarta.xml.bind.DatatypeConverter.parseDateTime"
+                      printMethod="jakarta.xml.bind.DatatypeConverter.printDateTime"/>
+        <xjc:javaType name="java.lang.String" xmlType="xs:anyURI"
+                      adapter="jakarta.xml.bind.annotation.adapters.CollapsedStringAdapter" />
+    </jxb:globalBindings>
 
 
   <jxb:bindings schemaLocation="../xsd/cs-sstc-schema-assertion-01.xsd" node="/xs:schema">
@@ -69,6 +84,22 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+
+    <jxb:bindings node="//xs:element[@name='AffiliationDescriptorConfig']">
+      <jxb:class name="AffiliationDescriptorConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='IDPDescriptorConfig']">
+      <jxb:class name="IDPDescriptorConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SPDescriptorConfig']">
+      <jxb:class name="SPDescriptorConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='EntityConfig']">
+      <jxb:class name="EntityConfigElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Attribute']">
+      <jxb:class name="AttributeElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/lib-arch-authentication-context.xsd" node="/xs:schema">
@@ -96,6 +127,32 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node=".//xs:element[@name='ModifyResponse']">
+        <jxb:class name="ModifyResponseElement"/>
+    </jxb:bindings>
+    <jxb:bindings node=".//xs:element[@name='EncryptResourceID']">
+        <jxb:class name="EncryptResourceIDElement"/>
+    </jxb:bindings>
+    <jxb:bindings node=".//xs:element[@name='AuthenticateRequester']">
+        <jxb:class name="AuthenticateRequesterElement"/>
+    </jxb:bindings>
+    <jxb:bindings node=".//xs:element[@name='AuthorizeRequester']">
+        <jxb:class name="AuthorizeRequesterElement"/>
+    </jxb:bindings>
+    <jxb:bindings node=".//xs:element[@name='AuthenticateSessionContext']">
+        <jxb:class name="AuthenticateSessionContextElement"/>
+    </jxb:bindings>
+<!--
+    <jxb:bindings node=".//xs:element[@name='RequestedServiceType']">
+       <jxb:class name="RequestedServiceType"/>
+    </jxb:bindings>
+-->
+    <jxb:bindings node=".//xs:element[@name='ResourceOffering']">
+        <jxb:class name="ResourceOfferingElement"/>
+    </jxb:bindings>
+    <jxb:bindings node=".//xs:element[@name='EncryptedResourceID']">
+        <jxb:class name="EncryptedResourceIDElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
 
@@ -110,6 +167,12 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node=".//xs:element[@name='GenerateBearerToken']">
+        <jxb:class name="GenerateBearerTokenElement"/>
+    </jxb:bindings>
+    <jxb:bindings node=".//xs:element[@name='SendSingleLogOut']">
+        <jxb:class name="SendSingleLogOutElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
 
@@ -124,6 +187,28 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='Inquiry']">
+        <jxb:class name="InquiryElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Confirm']">
+        <jxb:class name="Confirm"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Text']">
+        <jxb:class name="TextElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='InteractionResponse']">
+        <jxb:class name="InteractionResponseElement"/>
+    </jxb:bindings>
+
+    <jxb:bindings node="//xs:element[@name='RedirectRequest']">
+        <jxb:class name="RedirectRequestElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Status']" schemaLocation="../xsd/lib-arch-iwsf-utility.xsd" >
+        <jxb:class name="StatusElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='UserInteraction']">
+        <jxb:class name="UserInteractionElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
 
@@ -138,6 +223,12 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='EntityDescriptor']">
+      <jxb:class name="EntityDescriptorElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='KeyDescriptor']">
+      <jxb:class name="KeyDescriptorElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
 
@@ -222,6 +313,130 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node="//xs:element[@name='QueryResponse']" schemaLocation="../xsd/lib-svc-dst.xsd">
+        <jxb:class name="QueryResponseElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Query']" schemaLocation="../xsd/lib-svc-dst.xsd">
+        <jxb:class name="QueryElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Modify']" schemaLocation="../xsd/lib-svc-dst.xsd">
+        <jxb:class name="ModifyElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='ModifyResponse']" schemaLocation="../xsd/lib-svc-dst.xsd">
+        <jxb:class name="ModifyResponseElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='ResourceID']" schemaLocation="../xsd/lib-svc-dst.xsd">
+        <jxb:class name="ResourceIDElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AddressCard']">
+        <jxb:class name="AddressCardElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Address']">
+        <jxb:class name="AddressElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='MsgContact']">
+        <jxb:class name="MsgContactElement"/>
+    </jxb:bindings>
+
+    <jxb:bindings node="//xs:element[@name='CommonName']">
+        <jxb:class name="CommonNameElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SN']">
+        <jxb:class name="SNElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='FN']">
+        <jxb:class name="FNElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='MN']">
+        <jxb:class name="MNElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='PersonalTitle']">
+        <jxb:class name="PersonalTitleElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='CN']">
+        <jxb:class name="CNElement"/>
+    </jxb:bindings>
+
+    <jxb:bindings node="//xs:element[@name='Demographics']">
+        <jxb:class name="DemographicsElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='DisplayLanguage']">
+        <jxb:class name="DisplayLanguageElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Birthday']">
+        <jxb:class name="BirthdayElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Age']">
+        <jxb:class name="AgeElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Language']">
+        <jxb:class name="LanguageElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='EmergencyContact']">
+        <jxb:class name="EmergencyContactElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='EmploymentIdentity']">
+        <jxb:class name="EmploymentIdentityElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='JobTitle']">
+        <jxb:class name="JobTitleElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='O']">
+        <jxb:class name="OElement"/>
+    </jxb:bindings>
+
+    <jxb:bindings node="//xs:element[@name='EncryptKey']">
+        <jxb:class name="EncryptKeyElement"/>
+    </jxb:bindings>
+   <jxb:bindings node="//xs:element[@name='Extension']" schemaLocation="../xsd/lib-arch-iwsf-utility.xsd">
+        <jxb:class name="ExtensionElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Facade']">
+        <jxb:class name="FacadeElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='MugShot']">
+        <jxb:class name="MugShotElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='WebSite']">
+        <jxb:class name="WebSiteElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='NamePronounced']">
+        <jxb:class name="NamePronouncedElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='GreetSound']">
+        <jxb:class name="GreetSoundElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='GreetMeSound']">
+        <jxb:class name="GreetMeSoundElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='InformalName']">
+        <jxb:class name="InformalNameElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='LegalIdentity']">
+        <jxb:class name="LegalIdentityElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='Gender']">
+        <jxb:class name="GenderElement"/>
+    </jxb:bindings>
+
+    <jxb:bindings node="//xs:element[@name='DOB']">
+        <jxb:class name="DOBElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='IDValue']">
+        <jxb:class name="IDValueElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='MaritalStatus']">
+        <jxb:class name="MaritalStatusElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='LegalName']">
+        <jxb:class name="LegalNameElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='AltID']">
+        <jxb:class name="AltIDElement"/>
+    </jxb:bindings>
+    <jxb:bindings node="//xs:element[@name='SignKey']">
+        <jxb:class name="SignKeyElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
 
@@ -291,6 +506,12 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node=".//xs:element[@name='X509Data']">
+        <jxb:class name="X509DataElement"/>
+    </jxb:bindings>
+    <jxb:bindings node=".//xs:element[@name='X509Certificate']">
+        <jxb:class name="X509Certificate"/>
+    </jxb:bindings>
   </jxb:bindings>
 
 
@@ -305,6 +526,9 @@
           <jxb:elementName suffix="Element"/>
       </jxb:nameXmlTransform>
     </jxb:schemaBindings>
+    <jxb:bindings node=".//xs:element[@name='DiscoEntry']">
+        <jxb:class name="DiscoEntryElement"/>
+    </jxb:bindings>
   </jxb:bindings>
 
   <jxb:bindings schemaLocation="../xsd/ppextension.xsd" node="/xs:schema">

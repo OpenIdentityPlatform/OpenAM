@@ -138,6 +138,16 @@
             <artifactId>joda-time</artifactId>
         </dependency>
 
+        <!--TODO migrate OpenDJ-core to jaxb3 -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.openidentityplatform.commons</groupId>
             <artifactId>test-utils</artifactId>

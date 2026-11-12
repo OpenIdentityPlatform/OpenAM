@@ -1,0 +1,74 @@
+<!--
+  ~ The contents of this file are subject to the terms of the Common Development and
+  ~ Distribution License (the License). You may not use this file except in compliance with the
+  ~ License.
+  ~
+  ~ You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  ~ specific language governing permission and limitations under the License.
+  ~
+  ~ When distributing Covered Software, include this CDDL Header Notice in each file and include
+  ~ the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  ~ Header, with the fields enclosed by brackets [] replaced by your own identifying
+  ~ information: "Portions copyright [year] [name of copyright owner]".
+  ~
+  ~ Copyright 2026 3A Systems, LLC.
+  -->
+<!--
+  SP metadata with an encryption KeyDescriptor indented the way
+  CreateSAML2HostedProviderTemplate writes it. KeyInfo and EncryptionMethod are
+  mixed-content types, so under JAXB 3 their content lists start with a
+  whitespace String before the KeyName/X509Data/KeySize elements.
+-->
+<EntityDescriptor
+        xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+        entityID="https://sp.example.com/encryption-keysize">
+    <SPSSODescriptor
+            protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <KeyDescriptor use="encryption">
+            <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+                <KeyName>sp.example.com</KeyName>
+                <X509Data>
+                    <X509Certificate>
+                        MIIFejCCBGKgAwIBAgIEER82YjANBgkqhkiG9w0BAQUFADCBhTELMAkGA1UEBhMC
+                        REUxKDAmBgNVBAoTH1RlY2huaXNjaGUgVW5pdmVyc2l0YWV0IERyZXNkZW4xDDAK
+                        BgNVBAsTA1pJSDEcMBoGA1UEAxMTVFUgRHJlc2RlbiBDQSAtIEcwMjEgMB4GCSqG
+                        SIb3DQEJARYRcGtpQHR1LWRyZXNkZW4uZGUwHhcNMTAxMjA4MTY1NjUxWhcNMTUx
+                        MjA3MTY1NjUxWjCBqTELMAkGA1UEBhMCREUxEDAOBgNVBAgTB1NhY2hzZW4xEDAO
+                        BgNVBAcTB0RyZXNkZW4xSTBHBgNVBAoTQFNhZWNoc2lzY2hlIExhbmRlcy0sIFN0
+                        YWF0cy0gdW5kIFVuaXZlcnNpdGFldHNiaWJsaW90aGVrIERyZXNkZW4xCzAJBgNV
+                        BAsTAklUMR4wHAYDVQQDExVsb2dpbi5zbHViLWRyZXNkZW4uZGUwggEiMA0GCSqG
+                        SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDWvW+lzOJGBUl2VquB2WwwWdNabWSjkTcH
+                        fnSq2NT7V6/hhYIA051JeThS5riLRyPxCk6bpQt7vOl+v7+sh4pQnumaTt3uYibo
+                        4JHrHUko2zaNJ+62/5hZKtpSbYbSxUjwwTHv9ENbBZOdj7lxjiTf/xv/DQYXfuAn
+                        fjFnzJ46UfPNRiMXjICFwOX9pBX6Pvi+47JlirhChb8D6D0rX+cu6Yle7sYGDnHR
+                        RbAAx0atENk+fAYonpetFTF0mjOvvKlb99CMkTMi8h8viE2tLD1z+ds6xyCAk34y
+                        BzUakng0+ZZ3xuEK5LhkDJ9CRXSiqAmc2PpzqIcj07HgthGaXd7HAgMBAAGjggHK
+                        MIIBxjAJBgNVHRMEAjAAMAsGA1UdDwQEAwIE8DATBgNVHSUEDDAKBggrBgEFBQcD
+                        ATAdBgNVHQ4EFgQUyKpSOjY02z3nvcEr+Pq2R6An10swHwYDVR0jBBgwFoAUxStT
+                        kxeDyfVGQu1Dat+2gKZH8uAwIgYDVR0RBBswGYEXbmllZGVybEBzbHViLWRyZXNk
+                        ZW4uZGUwgYsGA1UdHwSBgzCBgDA+oDygOoY4aHR0cDovL2NkcDEucGNhLmRmbi5k
+                        ZS90dS1kcmVzZGVuLWNhL3B1Yi9jcmwvZ19jYWNybC5jcmwwPqA8oDqGOGh0dHA6
+                        Ly9jZHAyLnBjYS5kZm4uZGUvdHUtZHJlc2Rlbi1jYS9wdWIvY3JsL2dfY2Fjcmwu
+                        Y3JsMIGkBggrBgEFBQcBAQSBlzCBlDBIBggrBgEFBQcwAoY8aHR0cDovL2NkcDEu
+                        cGNhLmRmbi5kZS90dS1kcmVzZGVuLWNhL3B1Yi9jYWNlcnQvZ19jYWNlcnQuY3J0
+                        MEgGCCsGAQUFBzAChjxodHRwOi8vY2RwMi5wY2EuZGZuLmRlL3R1LWRyZXNkZW4t
+                        Y2EvcHViL2NhY2VydC9nX2NhY2VydC5jcnQwDQYJKoZIhvcNAQEFBQADggEBAI+A
+                        /aJshQD10aJl6Zmc7Kdo6DehIu8ev4v3AhTAnTlHdFDaM4Bn38DMzv2lTniRzxs4
+                        csaCLtCArLzhDimZ4Co4t8fD7zAvfxMPK9KLdS+oGkD3jSuCNWeGYJlXieOarwI5
+                        7YnQZj2aJj/q/h67IN9EhO5TmSE8E91BoZDb/D1HFOnDtNmBWRl2YIDRAPbdYILi
+                        tlvGffPyCHqGDVPGr4/udHHoPLlX5xJOeUPsTqJWvyJH0dZ1QhotnXsZLB+1Zlgi
+                        RjBDLVfeKIoVbNUYlEvIqADoSO32kE60Ria8L84XZ/PRUIMyV7+0OjgatpQxMxQj
+                        +IJTcEjcKl3hPdIic+E=
+                    </X509Certificate>
+                </X509Data>
+            </KeyInfo>
+            <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc">
+                <KeySize xmlns="http://www.w3.org/2001/04/xmlenc#">256</KeySize>
+            </EncryptionMethod>
+        </KeyDescriptor>
+        <AssertionConsumerService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                Location="https://sp.example.com/AssertionConsumer/metaAlias/sp"
+                index="0"/>
+    </SPSSODescriptor>
+</EntityDescriptor>

@@ -24,7 +24,7 @@
  *
  * $Id: FSServiceManager.java,v 1.5 2008/06/25 05:46:56 qcheng Exp $
  *
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services;
@@ -35,6 +35,8 @@ import com.sun.identity.federation.accountmgmt.FSAccountManager;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.message.FSAuthnRequest;
 import com.sun.identity.federation.message.FSAuthnResponse;
 import com.sun.identity.federation.message.FSFederationTerminationNotification;
@@ -243,7 +245,7 @@ public class FSServiceManager {
             SPDescriptorType spDescriptor = 
                 metaManager.getSPDescriptor(realm, spEntityId);
             BaseConfigType spConfig =
-                metaManager.getSPDescriptorConfig(realm, spEntityId);
+                IDFFMetaUtils.unwrap(metaManager.getSPDescriptorConfig(realm, spEntityId));
             String relayState = authnRequest.getRelayState();
             
             if (FSUtils.debug.messageEnabled()) {
@@ -379,7 +381,7 @@ public class FSServiceManager {
                 response, 
                 authnRequest,
                 metaManager.getSPDescriptor(realm, spEntityId),
-                metaManager.getSPDescriptorConfig(realm, spEntityId),
+                IDFFMetaUtils.unwrap(metaManager.getSPDescriptorConfig(realm, spEntityId)),
                 spEntityId,
                 authnRequest.getRelayState());
         } catch(IDFFMetaException ex){
@@ -709,13 +711,19 @@ public class FSServiceManager {
                 if (remoteProviderRole.equalsIgnoreCase(IFSConstants.SP)) {
                     remoteDesc = metaManager.getSPDescriptor(
                         realm, remoteEntityId);
-                    remoteConfig = metaManager.getSPDescriptorConfig(
-                        realm, remoteEntityId);
+                    SPDescriptorConfigElement spConfig =
+                        metaManager.getSPDescriptorConfig(
+                            realm, remoteEntityId);
+                    remoteConfig =
+                        (spConfig == null) ? null : spConfig.getValue();
                 } else {
                     remoteDesc = metaManager.getIDPDescriptor(
                         realm, remoteEntityId);
-                    remoteConfig = metaManager.getIDPDescriptorConfig(
-                        realm, remoteEntityId);
+                    IDPDescriptorConfigElement idpConfig =
+                        metaManager.getIDPDescriptorConfig(
+                            realm, remoteEntityId);
+                    remoteConfig =
+                        (idpConfig == null) ? null : idpConfig.getValue();
                 }
                 handlerRegistration.setRealm(realm);
                 handlerRegistration.setRemoteEntityId(remoteEntityId);

@@ -145,7 +145,7 @@ public class RPSigninRequest extends WSFederationAction {
         }
 
         Map<String,List<String>> spConfigAttributes = 
-            WSFederationMetaUtils.getAttributes(spConfig);
+            WSFederationMetaUtils.getAttributes(spConfig.getValue());
 
         String accountRealmSelection = 
                 spConfigAttributes.get(

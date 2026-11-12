@@ -25,6 +25,7 @@
  * $Id: CreateMetaDataTemplate.java,v 1.38 2009/10/29 00:03:50 exu Exp $
  *
  * Portions Copyrighted 2013-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC.
  */
 package com.sun.identity.federation.cli;
 
@@ -60,7 +61,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 /**
  * Create Meta Data Template.

@@ -18,6 +18,8 @@ package org.forgerock.openam.saml2.plugins;
 
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
+import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
@@ -100,7 +102,8 @@ public class ValidRelayStateExtractor implements ValidDomainExtractor<ValidRelay
      * @throws SAML2MetaException If the configuration could not be read.
      */
     BaseConfigType getSPSSOConfig(final String realm, final String entityId) throws SAML2MetaException {
-        return new SAML2MetaManager().getSPSSOConfig(realm, entityId);
+        final SPSSOConfigElement config = new SAML2MetaManager().getSPSSOConfig(realm, entityId);
+        return (config == null) ? null : config.getValue();
     }
 
     /**
@@ -112,7 +115,8 @@ public class ValidRelayStateExtractor implements ValidDomainExtractor<ValidRelay
      * @throws SAML2MetaException If the configuration could not be read.
      */
     BaseConfigType getIDPSSOConfig(final String realm, final String entityId) throws SAML2MetaException {
-        return new SAML2MetaManager().getIDPSSOConfig(realm, entityId);
+        final IDPSSOConfigElement config = new SAML2MetaManager().getIDPSSOConfig(realm, entityId);
+        return (config == null) ? null : config.getValue();
     }
 
     /**

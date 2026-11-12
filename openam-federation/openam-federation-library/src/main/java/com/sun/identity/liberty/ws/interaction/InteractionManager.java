@@ -72,7 +72,7 @@ import java.util.List;
 import java.util.Map;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
@@ -292,19 +292,17 @@ public class InteractionManager {
             UserInteractionElement ue = createUserInteractionElement(
                     acceptLanguages);
             String id = SAMLUtils.generateID();
-            ue.setId(id);
-            if (ue != null) {
-                try {
-                    Element element = Utils.convertJAXBToElement(ue);
-                    requestMessage.setOtherSOAPHeader(
-                            element,
-                            id);
+            ue.getValue().setId(id);
+            try {
+                Element element = Utils.convertJAXBToElement(ue);
+                requestMessage.setOtherSOAPHeader(
+                        element,
+                        id);
 
-                } catch (JAXBException je) {
-                    debug.error("InteractionManager.sendRequest():"
-                    + "not setting userInteractionHeader:"
-                    + "can not convert JAXBObject to Element", je);
-                } 
+            } catch (JAXBException je) {
+                debug.error("InteractionManager.sendRequest():"
+                        + "not setting userInteractionHeader:"
+                        + "can not convert JAXBObject to Element", je);
             }
         }
 
@@ -693,7 +691,7 @@ public class InteractionManager {
         }
 
         //Check WSC is willing to redirect
-        if (ue.isRedirect() == false) {
+        if (ue.getValue().isRedirect() == false) {
             SOAPFaultException sfe = newRedirectFaultError(
                     QNAME_INTERACTION_REQUIRED);
             if (debug.warningEnabled()) {
@@ -708,7 +706,7 @@ public class InteractionManager {
         }
 
         //Check WSC allowed interaction
-        if (ue.getInteract().equals(QNAME_DO_NOT_INTERACT)) {
+        if (ue.getValue().getInteract().equals(QNAME_DO_NOT_INTERACT)) {
             SOAPFaultException sfe = newRedirectFaultError(
                     QNAME_INTERACTION_REQUIRED);
             if (debug.warningEnabled()) {
@@ -724,7 +722,7 @@ public class InteractionManager {
 
         //Check WSC allowed interaction for data
         if (interactionConfig.wspRedirectsForData()
-                    && ue.getInteract().equals(
+                    && ue.getValue().getInteract().equals(
                     QNAME_DO_NOT_INTERACT_FOR_DATA)) {
             SOAPFaultException sfe = newRedirectFaultError(
                     QNAME_INTERACTION_REQUIRED_FOR_DATA);
@@ -740,7 +738,7 @@ public class InteractionManager {
         }
 
         //Check WSP will not exceed maxInteractionTime specified by WSC
-        BigInteger uemi =  ue.getMaxInteractTime();
+        BigInteger uemi =  ue.getValue().getMaxInteractTime();
         if ( (uemi != null) && (interactionConfig.getWSPRedirectTime() 
                     > uemi.intValue()) ) {
             SOAPFaultException sfe = newRedirectFaultError(
@@ -750,7 +748,7 @@ public class InteractionManager {
                         + "WSP inteaction time =" 
                         + interactionConfig.getWSPRedirectTime() 
                         + " exceeds WSC maxInteractTime= "
-                        + ue.getMaxInteractTime());
+                        + ue.getValue().getMaxInteractTime());
                 debug.warning("InteractionManager.handleInteraction():"
                         + "throwing InteractionSOAPFaultException="
                         + sfe);
@@ -1039,21 +1037,16 @@ public class InteractionManager {
 
     private UserInteractionElement createUserInteractionElement(
             List acceptLanguages) {
-        UserInteractionElement ue = null; 
-        try {
-            ue =objectFactory.createUserInteractionElement();
+        UserInteractionElement ue = null;
+        ue =objectFactory.createUserInteractionElement(objectFactory.createUserInteractionHeaderType());
 
-            ue.setInteract(interactionConfig
-                    .getWSCSpecifiedInteractionChoice());
-            ue.setRedirect(interactionConfig.wscSupportsRedirect());
-            ue.setMaxInteractTime(
-                    java.math.BigInteger.valueOf(interactionConfig
-                    .getWSCSpecifiedMaxInteractionTime()));
-            ue.getLanguage().addAll(acceptLanguages);
-        } catch (JAXBException je) {
-            debug.error("InteractionManager.createUserInteractionElement():"
-                    + " can not create UserInteractionElement", je);
-        }
+        ue.getValue().setInteract(interactionConfig
+                .getWSCSpecifiedInteractionChoice());
+        ue.getValue().setRedirect(interactionConfig.wscSupportsRedirect());
+        ue.getValue().setMaxInteractTime(
+                BigInteger.valueOf(interactionConfig
+                .getWSCSpecifiedMaxInteractionTime()));
+        ue.getValue().getLanguage().addAll(acceptLanguages);
         return ue;
     }
 
@@ -1082,13 +1075,7 @@ public class InteractionManager {
 
     private SOAPFaultException newRedirectFault(String messageID) {
         RedirectRequestElement re = null;
-        try{
-            re = objectFactory.createRedirectRequestElement();
-
-        } catch (JAXBException je) {
-            debug.error("InteractionManager.newRedirectFault():"
-                    + " can not create RedirectRequestElement", je);
-        }
+        re = objectFactory.createRedirectRequestElement(objectFactory.createRedirectRequestType());
 
         CorrelationHeader ch = new CorrelationHeader();
         String responseID = ch.getMessageID();
@@ -1119,7 +1106,7 @@ public class InteractionManager {
                         + redirectUrl);
             }
         }
-        re.setRedirectURL(redirectUrl);
+        re.getValue().setRedirectURL(redirectUrl);
         List details = new ArrayList();
         try {
             details.add(Utils.convertJAXBToElement(re));
@@ -1141,15 +1128,9 @@ public class InteractionManager {
 
     private SOAPFaultException newRedirectFaultError(QName errorCode) {
         StatusElement se = null;
-        try{
-            se = objectFactory.createStatusElement();
+        se = objectFactory.createStatusElement(objectFactory.createStatusType());
 
-        } catch (JAXBException je) {
-            debug.error("InteractionManager.newRedirectFaultError():"
-                    + " can not create StatusElement", je);
-        }
-
-        se.setCode(errorCode);
+        se.getValue().setCode(errorCode);
         List details = new ArrayList();
         try {
             details.add(Utils.convertJAXBToElement(se));
@@ -1186,7 +1167,7 @@ public class InteractionManager {
             RedirectRequestElement rre 
                     = (RedirectRequestElement)details.get(0);
             if (rre != null) {
-                redirectURL = rre.getRedirectURL();
+                redirectURL = rre.getValue().getRedirectURL();
             }
         }
         if (redirectURL == null) {

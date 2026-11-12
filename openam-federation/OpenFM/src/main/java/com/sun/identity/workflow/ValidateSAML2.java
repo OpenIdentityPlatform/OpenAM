@@ -25,6 +25,7 @@
  * $Id: ValidateSAML2.java,v 1.4 2009/11/20 22:45:57 ggennaro Exp $
  *
  * Portions Copyrighted 2014-2016 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems LLC
  */
 
 package com.sun.identity.workflow;
@@ -98,14 +99,14 @@ public class ValidateSAML2 {
                     Object[] param = {idpEntityId};
                     throw new WorkflowException("cannot.locate.idp", param);
                 } else {
-                    if (!idpConfig.getMetaAlias().equals(idpMetaAlias)) {
+                    if (!idpConfig.getValue().getMetaAlias().equals(idpMetaAlias)) {
                         Object[] param = {idpEntityId};
                         throw new WorkflowException("cannot.locate.idp", param);
                     }
                 }
             }
 
-            List ssoServiceList = elt.getSingleSignOnService();
+            List ssoServiceList = elt.getValue().getSingleSignOnService();
             idpBaseURL = getIDPBaseURL(ssoServiceList);
             if (idpBaseURL == null) {
                 Object[] param = {idpEntityId};
@@ -127,8 +128,8 @@ public class ValidateSAML2 {
                 i.hasNext() && (url == null);) {
                 SingleSignOnServiceElement sso =
                     (SingleSignOnServiceElement) i.next();
-                if ((sso != null) && (sso.getBinding() != null)) {
-                    String ssoURL = sso.getLocation();
+                if ((sso != null) && (sso.getValue().getBinding() != null)) {
+                    String ssoURL = sso.getValue().getLocation();
                     int loc = ssoURL.indexOf("/metaAlias/");
                     if (loc != -1) {
                         String tmp = ssoURL.substring(0, loc);
@@ -159,13 +160,13 @@ public class ValidateSAML2 {
                     Object[] param = {spEntityId};
                     throw new WorkflowException("cannot.locate.sp", param);
                 } else {
-                    if (!spConfig.getMetaAlias().equals(spMetaAlias)) {
+                    if (!spConfig.getValue().getMetaAlias().equals(spMetaAlias)) {
                         Object[] param = {spEntityId};
                         throw new WorkflowException("cannot.locate.sp", param);
                     }
                 }
             }
-            List sloServiceList = elt.getSingleLogoutService();
+            List sloServiceList = elt.getValue().getSingleLogoutService();
             spBaseURL = getSPBaseURL(sloServiceList);
             if (spBaseURL == null) {
                 bFedlet = true;
@@ -203,8 +204,8 @@ public class ValidateSAML2 {
                 i.hasNext() && (url == null);) {
                 SingleLogoutServiceElement sso =
                     (SingleLogoutServiceElement) i.next();
-                if ((sso != null) && (sso.getBinding() != null)) {
-                    String ssoURL = sso.getLocation();
+                if ((sso != null) && (sso.getValue().getBinding() != null)) {
+                    String ssoURL = sso.getValue().getLocation();
                     int loc = ssoURL.indexOf("/metaAlias/");
                     if (loc != -1) {
                         String tmp = ssoURL.substring(0, loc);
