@@ -14,15 +14,16 @@
  * Copyright 2026 Aravind Yedmala.
  */
 
+import { randomUUID } from "node:crypto";
 import { test, expect } from "@playwright/test";
-import { OPENAM_BASE, getAdminToken, getAuthToken, USERNAME, PASSWORD } from "../common/openam-commons.mjs";
-import { REALM, SCOPE, ensureDevicePkceProvider, ensureDevicePkceClient } from "../common/oauth2-fixtures.mjs";
+import { getAdminToken, USERNAME, PASSWORD } from "../common/openam-commons.mjs";
+import { SCOPE, createDevicePkceRealm, deleteDevicePkceRealm } from "../common/oauth2-fixtures.mjs";
 
 // HTTP coverage for GHSA-h93p-35jm-rj83, part of #1223. Unlike the Java resource tests, these
 // assertions survive removal of Restlet and exercise challenge persistence through the token store.
 const CLIENT_ID = "test_device_pkce_app";
 const DEVICE_GRANT = "urn:ietf:params:oauth:grant-type:device_code";
-const ENDPOINT = `${OPENAM_BASE}/oauth2/realms/${REALM}`;
+let ENDPOINT;
 // RFC 7636 Appendix B's S256 test vector; plain uses the same valid 43-character verifier.
 const VERIFIER = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
 const WRONG_VERIFIER = "a".repeat(43);
@@ -54,7 +55,8 @@ async function approveCode(request, userCode, sessionToken) {
   // This is the documented non-browser submission, including the session-bound CSRF value.
   const response = await request.post(`${ENDPOINT}/device/user`, {
     form: { user_code: userCode, csrf: sessionToken },
-    headers: { iPlanetDirectoryPro: sessionToken },
+    // Each test has a different request context: carry the owner session explicitly.
+    headers: { Cookie: `iPlanetDirectoryPro=${sessionToken}` },
     maxRedirects: 0,
   });
   expect(response.status(), `device approval: ${await response.text()}`).toBe(200);
@@ -90,14 +92,29 @@ async function expectTokensForUser(request, deviceCode, verifier) {
 
 test.describe("Device authorization PKCE over HTTP", () => {
   let sessionToken;
+  let adminToken;
+  let realm;
 
   test.beforeAll(async ({ request }) => {
-    const adminToken = await getAdminToken(request);
+    adminToken = await getAdminToken(request);
     expect(adminToken, "administrator authentication is required; security coverage must not silently skip").toBeTruthy();
-    await ensureDevicePkceProvider(adminToken, request);
-    await ensureDevicePkceClient(adminToken, request, CLIENT_ID);
-    sessionToken = await getAuthToken(request, USERNAME, PASSWORD);
+    realm = `devicepkce${randomUUID().replaceAll("-", "")}`;
+    const fixture = await createDevicePkceRealm(adminToken, request, realm, CLIENT_ID);
+    ENDPOINT = fixture.oauthUrl;
+    // Authenticate in the isolated realm; a root-realm session is not sufficient here.
+    const authentication = await request.post(`${fixture.realmUrl}/authenticate`, {
+      headers: {
+        "X-OpenAM-Username": USERNAME, "X-OpenAM-Password": PASSWORD,
+        "Content-Type": "application/json", "Accept-API-Version": "resource=2.0,protocol=1.0",
+      },
+    });
+    expect(authentication.status(), "resource-owner authentication").toBe(200);
+    sessionToken = (await authentication.json()).tokenId;
     expect(sessionToken, "resource-owner authentication is required").toBeTruthy();
+  });
+
+  test.afterAll(async ({ request }) => {
+    if (adminToken && realm) await deleteDevicePkceRealm(adminToken, request, realm);
   });
 
   for (const method of ["bogus", "s256", "PLAIN", ""]) {

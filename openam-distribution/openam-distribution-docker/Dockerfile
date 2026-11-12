@@ -35,9 +35,9 @@ RUN mkdir /usr/openam \
 
 RUN if [ ! -f "$CATALINA_HOME/webapps/$OPENAM_PATH.war" ]; then echo file exists; fi
 
-RUN apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=3 update \
- && DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=3 upgrade -y \
- && apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=3 install -y --no-install-recommends curl unzip \
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+ && apt-get install -y --no-install-recommends curl unzip \
  && if [ -z "$VERSION" ] ; then VERSION="$(curl -i -o - --silent https://api.github.com/repos/OpenIdentityPlatform/OpenAM/releases/latest | grep -m1 "\"name\"" | cut -d\" -f4)"; fi \
  && if [ ! -f "$CATALINA_HOME/webapps/$OPENAM_PATH.war" ]; then echo file exists && curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/OpenAM-$VERSION.war --output $CATALINA_HOME/webapps/$OPENAM_PATH.war; fi \
  && if [ ! -f "/usr/openam/ssoconfiguratortools.zip" ]; then curl -L https://github.com/OpenIdentityPlatform/OpenAM/releases/download/$VERSION/SSOConfiguratorTools-$VERSION.zip --output /usr/openam/ssoconfiguratortools.zip; fi \
@@ -51,7 +51,7 @@ RUN apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=3 update \
  && useradd -m -r -u 1001 -g root $OPENAM_USER \
  && install -d -o $OPENAM_USER $OPENAM_DATA_DIR \
  && chown -R $OPENAM_USER:root $CATALINA_HOME \
- && apt-get -o Acquire::ForceIPv4=true -o Acquire::Retries=3 remove -y --purge unzip \
+ && apt-get remove -y --purge unzip \
  && rm -rf /var/lib/apt/lists/* \
  && sed -i '/<\/Host>/i \ \ \ \ <Valve className=\"org.apache.catalina.valves.RemoteIpValve\" httpServerPort=\"8080\" httpsServerPort=\"443\" />' $CATALINA_HOME/conf/server.xml
 

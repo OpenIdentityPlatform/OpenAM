@@ -212,58 +212,55 @@ export async function ensureOidcClient(adminToken, request, clientId) {
 }
 
 /**
- * Only widen the shared provider, as device-flow-test does; restoring its old settings would race
- * a sibling spec that is still using them. Retry when another spec updates the provider concurrently.
+ * Give each worker/run its own provider. No root-realm provider GET/PUT is performed,
+ * so this setup cannot overwrite settings being changed by the other OAuth/UMA specs.
  */
-export async function ensureDevicePkceProvider(adminToken, request) {
-  const url = `${OPENAM_BASE}/json/realms/${REALM}/realm-config/services/oauth-oidc`;
-  let current = await ensureOAuth2Provider(adminToken, request);
-  for (let attempt = 0; attempt < 3; attempt++) {
-    if (!current.ok()) {
-      throw new Error(`Device provider not readable: ${current.status()} ${await current.text()}`);
-    }
-    const config = await current.json();
-    const advanced = config.advancedOAuth2Config ?? {};
-    const supported = advanced.supportedScopes ?? [];
-    const defaults = advanced.defaultScopes ?? [];
-    if (advanced.clientsCanSkipConsent === true && supported.includes(SCOPE) && defaults.includes(SCOPE)) return;
-    const updated = await request.put(url, {
-      headers: adminHeaders(adminToken, CONFIG_VERSION),
-      data: {
-        ...config,
-        advancedOAuth2Config: {
-          ...advanced,
-          clientsCanSkipConsent: true,
-          supportedScopes: [...new Set([...supported, SCOPE])],
-          defaultScopes: [...new Set([...defaults, SCOPE])],
-        },
-      },
-    });
-    current = await request.get(url, { headers: adminHeaders(adminToken, CONFIG_VERSION) });
-    if (current.ok()) {
-      const reread = await current.json();
-      const actual = reread.advancedOAuth2Config ?? {};
-      if (actual.clientsCanSkipConsent === true && actual.supportedScopes?.includes(SCOPE)
-          && actual.defaultScopes?.includes(SCOPE)) return;
-    }
-    if (attempt === 2) {
-      throw new Error(`Could not configure device provider: write ${updated.status()}, read ${current.status()}`);
-    }
+export async function createDevicePkceRealm(adminToken, request, realm, clientId) {
+  const realmUrl = `${OPENAM_BASE}/json/realms/root/realms/${realm}`;
+  const oauthUrl = `${OPENAM_BASE}/oauth2/realms/root/realms/${realm}`;
+  const headers = adminHeaders(adminToken, CONFIG_VERSION);
+  async function requireSuccess(response, operation) {
+    if (!response.ok()) throw new Error(`${operation}: ${response.status()} ${await response.text()}`);
   }
+  await requireSuccess(await request.post(`${OPENAM_BASE}/json/global-config/realms?_action=create`, {
+    headers, data: { name: realm, parentPath: "/", active: true, aliases: [] },
+  }), "create PKCE realm");
+  await requireSuccess(await request.post(`${realmUrl}/realm-config/services/oauth-oidc?_action=create`, {
+    headers,
+    data: {
+      advancedOAuth2Config: { clientsCanSkipConsent: true, supportedScopes: [SCOPE], defaultScopes: [SCOPE] },
+      advancedOIDCConfig: { allowDynamicRegistration: true },
+    },
+  }), "create PKCE provider");
+  // A new realm has no AgentService container. Dynamic registration creates it through
+  // the product's supported registration path before the admin API writes our client.
+  await requireSuccess(await request.post(`${oauthUrl}/connect/register`, {
+    data: { redirect_uris: [REDIRECT_URI], client_name: "PKCE realm bootstrap" },
+  }), "bootstrap PKCE AgentService");
+  await requireSuccess(await request.put(`${realmUrl}/realm-config/agents/OAuth2Client/${clientId}`, {
+    headers: adminHeaders(adminToken, AGENT_VERSION),
+    data: {
+      "com.forgerock.openam.oauth2provider.clientType": "Public",
+      "com.forgerock.openam.oauth2provider.scopes": [`[0]=${SCOPE}`],
+      "com.forgerock.openam.oauth2provider.defaultScopes": [`[0]=${SCOPE}`],
+      "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=urn:ietf:params:oauth:grant-type:device_code"],
+      "com.forgerock.openam.oauth2provider.responseTypes": ["[0]=device_code"],
+      "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "none",
+      isConsentImplied: true,
+      sunIdentityServerDeviceStatus: "Active",
+    },
+  }), "create PKCE client");
+  return { realmUrl, oauthUrl };
 }
 
-/** A public device client owned by the PKCE spec, so provisioning cannot invalidate another spec's codes. */
-export async function ensureDevicePkceClient(adminToken, request, clientId) {
-  await ensureClient(adminToken, request, clientId, {
-    "com.forgerock.openam.oauth2provider.clientType": "Public",
-    "com.forgerock.openam.oauth2provider.scopes": [`[0]=${SCOPE}`],
-    "com.forgerock.openam.oauth2provider.defaultScopes": [`[0]=${SCOPE}`],
-    "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=urn:ietf:params:oauth:grant-type:device_code"],
-    "com.forgerock.openam.oauth2provider.responseTypes": ["[0]=device_code"],
-    "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "none",
-    "isConsentImplied": true,
-    "sunIdentityServerDeviceStatus": "Active",
+export async function deleteDevicePkceRealm(adminToken, request, realm) {
+  const id = Buffer.from(`/${realm}`).toString("base64url");
+  const response = await request.delete(`${OPENAM_BASE}/json/global-config/realms/${id}`, {
+    headers: adminHeaders(adminToken, CONFIG_VERSION),
   });
+  if (!response.ok() && response.status() !== 404) {
+    throw new Error(`delete PKCE realm: ${response.status()} ${await response.text()}`);
+  }
 }
 
 export async function ensureResourceServerClient(adminToken, request, clientId) {
