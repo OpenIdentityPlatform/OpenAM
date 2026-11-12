@@ -509,19 +509,25 @@ test.describe("/oauth2 in a non-root realm", () => {
   });
 
   test("the realm segment of the path is matched case-insensitively", async ({ request }) => {
-    // Unlike the endpoint segment (/oauth2/Tokeninfo is a 404): the upper-cased realm resolves, and tokeninfo then
-    // rejects the bogus token. tokeninfo is not realm-scoped, so that leg alone would also pass if the segment fell
-    // back to root.
-    const path = `/${SUB_REALM.toUpperCase()}/tokeninfo?access_token=not-a-token`;
-    expectRawJson(await raw(rawPath(path)), 401, INVALID_TOKEN, "upper-cased realm");
+    // Unlike the endpoint segment (/oauth2/Tokeninfo is a 404), on every path spelling: RestletRealmRouter matches
+    // the legacy segment, RealmRoutingFactory's router the nested and flat ones, root included.
+    const UPPER = SUB_REALM.toUpperCase();
+    for (const [label, prefix] of [
+      ["legacy", `/${UPPER}`], ["nested", `/realms/ROOT/realms/${UPPER}`], ["flat", `/realms/${UPPER}`],
+    ]) {
+      // The upper-cased realm resolves, and tokeninfo then rejects the bogus token. tokeninfo is not realm-scoped,
+      // so this leg alone would also pass if the segment fell back to root.
+      expectRawJson(await raw(rawPath(`${prefix}/tokeninfo?access_token=not-a-token`)), 401, INVALID_TOKEN,
+        `upper-cased ${label} realm`);
 
-    // The token endpoint is realm-scoped: the client exists only in the sub-realm, so a token proves the upper-cased
-    // segment resolved to the sub-realm. This test's context never carries a session.
-    const token = await request.post(`${OAUTH2}/${SUB_REALM.toUpperCase()}/access_token`, {
-      headers: { Authorization: basicAuth(CLIENT_ID, CLIENT_SECRET) },
-      form: { grant_type: "client_credentials", scope: SCOPE },
-    });
-    await expectToken(token, CLIENT_TOKEN_KEYS, "upper-cased realm client_credentials");
+      // The token endpoint is realm-scoped: the client exists only in the sub-realm, so a token proves the
+      // upper-cased segment resolved to the sub-realm. This test's context never carries a session.
+      const token = await request.post(`${OAUTH2}${prefix}/access_token`, {
+        headers: { Authorization: basicAuth(CLIENT_ID, CLIENT_SECRET) },
+        form: { grant_type: "client_credentials", scope: SCOPE },
+      });
+      await expectToken(token, CLIENT_TOKEN_KEYS, `upper-cased ${label} realm client_credentials`);
+    }
   });
 
   test("the password grant authenticates a sub-realm resource owner on every spelling", async ({ request }) => {
