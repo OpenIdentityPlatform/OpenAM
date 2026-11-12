@@ -427,7 +427,15 @@ test.describe("OIDC checkSession", () => {
   test("a client without a clientSessionURI leaves the origin empty", async ({ request }) => {
     // Signed locally with the client's secret, the id_token passes the signature check and reaches the client's
     // clientSessionURI, which the admin API leaves empty by default. The answer is the same page as for an
-    // unusable id_token.
+    // unusable id_token, so a refused token would pass the assertions below too. The control shows it is not
+    // refused: a token signed the same way for OIDC_CLIENT_ID, which shares the secret and HS256, gets that
+    // client's origin.
+    const control = await request.get(CHECK_SESSION,
+      withIdToken(signedJwt({ aud: OIDC_CLIENT_ID, realm: "/", sub: USERNAME }, OIDC_CLIENT_SECRET)));
+    expect(control.status(), "control").toBe(200);
+    expect(control.headers()["content-type"], "control").toBe(HTML_TYPE);
+    expect(await control.text(), "control").toContain(`var clientURI = "${CLIENT_SESSION_URI}";`);
+
     const idToken = signedJwt({ aud: NO_SESSION_URI_CLIENT_ID, realm: "/", sub: USERNAME }, OIDC_CLIENT_SECRET);
     const response = await request.get(CHECK_SESSION, withIdToken(idToken));
     const html = await response.text();
