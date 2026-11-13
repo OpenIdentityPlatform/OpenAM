@@ -1665,6 +1665,17 @@ Specify client redirection endpoint URIs as described by RFC 6749 in the section
 +
 Redirection URIs are required for OpenID Connect 1.0 clients.
 
++
+For native applications that receive the authorization response on an ephemeral port of the loopback interface, as described in link:https://www.rfc-editor.org/rfc/rfc8252#section-7.3[RFC 8252, section 7.3, window=\_blank], an `http` redirection URI on `localhost`, `127.0.0.1` or `[::1]` can match more than one port. The scheme, host and path must still match exactly:
+
++
+* Without a port, for example `\http://127.0.0.1/callback`, any port is accepted.
+* With `+*+` as the port, for example `+http://localhost:*/callback+`, any port is accepted.
+* With a port range, for example `\http://localhost:49152-65535/callback`, any port in the range is accepted.
+
++
+Port wildcards and ranges are supported on `localhost` and `127.0.0.1` only. Every non-loopback redirection URI must match exactly. A loopback redirection URI registered with an explicit port, for example `+http://127.0.0.1:8080/callback+`, also matches that port only, so that existing registrations keep their behaviour. For a native application that listens on a port assigned by the operating system, register the URI without a port, or with `+*+` or a port range. A client whose only redirection URI is a port pattern must send the `redirect_uri` parameter, as a pattern cannot be used as the redirection destination.
+
 Scopes::
 Specify scopes that are to be presented to the resource owner when the resource owner is asked to authorize client access to protected resources.
 
