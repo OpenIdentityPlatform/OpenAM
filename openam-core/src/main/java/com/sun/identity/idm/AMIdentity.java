@@ -40,6 +40,8 @@ import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.openam.auditors.RepoAuditor;
 import org.forgerock.openam.ldap.LDAPUtils;
+import org.forgerock.openam.session.SessionCache;
+import org.forgerock.openam.session.service.access.SessionQueryManager;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.RDN;
 
@@ -471,6 +473,17 @@ public class AMIdentity {
         IdServices idServices = IdServicesFactory.getDataStoreServices();
         idServices.changePassword(token, type, name, oldPassword,
             newPassword, orgName, getDN());
+
+        try {
+            String callerId = token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
+            if (IdType.USER.equals(type) && callerId != null
+                    && DN.valueOf(callerId).equals(DN.valueOf(univIdWithoutDN))) {
+                new PasswordChangeSessionRevoker(InjectorHolder.getInstance(SessionQueryManager.class),
+                        SessionCache.getInstance()).revoke(callerId, token.getTokenID().toString());
+            }
+        } catch (Exception e) {
+            debug.warning("Unable to revoke sessions after password change", e);
+        }
         
         RepoAuditor auditor = newAuditor(token, orgName, univIdWithoutDN, null);
         if(auditor != null) {
