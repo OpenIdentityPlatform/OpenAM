@@ -27,7 +27,7 @@
  * pointed at .work/krb5.conf and .work/krb5cc by KRB5_CONFIG and KRB5CCNAME.
  *
  * Requires MIT Kerberos client tools (Debian/Ubuntu package krb5-user); skipped without them.
- * Runs before HttpOnly mode is enabled: the curl case reads tokenId from the response body.
+ * Runs in the HttpOnly-disabled stage: the curl case reads tokenId from the response body.
  *
  * /UI/Login is not covered: with the XUI enabled (the default) XUIFilter redirects it to the XUI.
  */

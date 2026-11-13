@@ -12,10 +12,12 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2013-2014 ForgeRock AS. All rights reserved.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.sts.token;
 
+import org.forgerock.openam.sts.HttpURLConnectionWrapper;
 import org.forgerock.openam.sts.TokenValidationException;
 
 /**
@@ -24,10 +26,13 @@ import org.forgerock.openam.sts.TokenValidationException;
  */
 public interface AMTokenParser {
     /**
+     * Takes the session id from the {@code tokenId} of the response body or, when the body has none because the
+     * session cookie is HttpOnly, from the last non-empty session cookie the response sets.
      *
-     * @param authNResponse The value returned by a successful invocation of the rest authN
+     * @param authNResponse The result of a successful invocation of the rest authN
      * @return Returns the string corresponding to the OpenAM session.
      * @throws TokenValidationException Thrown when authentication unsuccessful or the OpenAM session id could not be pulled from the response.
      */
-    String getSessionFromAuthNResponse(String authNResponse) throws TokenValidationException;
+    String getSessionFromAuthNResponse(HttpURLConnectionWrapper.ConnectionResult authNResponse)
+            throws TokenValidationException;
 }
