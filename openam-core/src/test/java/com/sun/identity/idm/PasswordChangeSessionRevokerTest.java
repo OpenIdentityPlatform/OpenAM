@@ -16,14 +16,18 @@
 package com.sun.identity.idm;
 
 import static org.mockito.Mockito.*;
+import static org.testng.Assert.assertEquals;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
 import org.forgerock.openam.session.SessionCache;
 import org.forgerock.openam.session.service.access.SessionQueryManager;
+import org.mockito.ArgumentCaptor;
 import org.testng.annotations.Test;
 
 public class PasswordChangeSessionRevokerTest {
@@ -36,11 +40,13 @@ public class PasswordChangeSessionRevokerTest {
         sessions.put("current", 1L);
         sessions.put("other", 1L);
         when(query.getAllSessionsByUUID("user")).thenReturn(sessions);
-        when(cache.getSession(any(), eq(true), eq(false))).thenReturn(other);
+        when(cache.getSession(any(), eq(false), eq(false))).thenReturn(other);
 
         new PasswordChangeSessionRevoker(query, cache).revoke("user", "current");
 
-        verify(cache, times(1)).getSession(any(), eq(true), eq(false));
+        ArgumentCaptor<SessionID> requestedId = ArgumentCaptor.forClass(SessionID.class);
+        verify(cache).getSession(requestedId.capture(), eq(false), eq(false));
+        assertEquals(requestedId.getValue().toString(), "other");
         verify(other).destroySession(other);
     }
 
@@ -53,11 +59,31 @@ public class PasswordChangeSessionRevokerTest {
         sessions.put("one", 1L);
         sessions.put("two", 1L);
         when(query.getAllSessionsByUUID("user")).thenReturn(sessions);
-        when(cache.getSession(any(), eq(true), eq(false)))
+        when(cache.getSession(any(), eq(false), eq(false)))
                 .thenThrow(new SessionException("failed")).thenReturn(other);
 
         new PasswordChangeSessionRevoker(query, cache).revoke("user", "current");
 
         verify(other).destroySession(other);
+    }
+
+    @Test
+    public void continuesAfterDestroySessionFails() throws Exception {
+        SessionQueryManager query = mock(SessionQueryManager.class);
+        SessionCache cache = mock(SessionCache.class);
+        Session first = mock(Session.class);
+        Session second = mock(Session.class);
+        Map<String, Long> sessions = new LinkedHashMap<>();
+        sessions.put("first", 1L);
+        sessions.put("second", 1L);
+        when(query.getAllSessionsByUUID("user")).thenReturn(sessions);
+        when(cache.getSession(new SessionID("first"), false, false)).thenReturn(first);
+        when(cache.getSession(new SessionID("second"), false, false)).thenReturn(second);
+        doThrow(new SessionException("failed")).when(first).destroySession(first);
+
+        new PasswordChangeSessionRevoker(query, cache).revoke("user", "current");
+
+        verify(first).destroySession(first);
+        verify(second).destroySession(second);
     }
 }

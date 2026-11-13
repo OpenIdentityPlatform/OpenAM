@@ -38,7 +38,7 @@ final class PasswordChangeSessionRevoker {
                 continue;
             }
             try {
-                Session session = cache.getSession(new SessionID(sessionId), true, false);
+                Session session = cache.getSession(new SessionID(sessionId), false, false);
                 session.destroySession(session);
             } catch (Exception e) {
                 DEBUG.warning("Unable to revoke a session after password change", e);

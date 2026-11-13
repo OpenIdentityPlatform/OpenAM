@@ -29,6 +29,7 @@
  */
 package com.sun.identity.idm;
 
+import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +54,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.common.IdRepoUtils;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
@@ -461,6 +463,10 @@ public class AMIdentity {
     /**
      * Changes password for the identity.
      *
+     * <p>For a server-side user changing their own password, other stateful sessions are revoked while the current
+     * master session is preserved. Revocation failures are logged without failing the password change. This does not
+     * cover an administrator changing another user's password or Remote SDK requests handled directly by IdServices.</p>
+     *
      * @param oldPassword old password
      * @param newPassword new password
      * @throws IdRepoException If there are repository related error conditions.
@@ -478,8 +484,13 @@ public class AMIdentity {
             String callerId = token.getProperty(Constants.UNIVERSAL_IDENTIFIER);
             if (IdType.USER.equals(type) && callerId != null
                     && DN.valueOf(callerId).equals(DN.valueOf(univIdWithoutDN))) {
+                String currentSessionId = token.getTokenID().toString();
+                if (token.isTokenRestricted()) {
+                    currentSessionId = token.dereferenceRestrictedTokenID(
+                            AccessController.doPrivileged(AdminTokenAction.getInstance()), currentSessionId);
+                }
                 new PasswordChangeSessionRevoker(InjectorHolder.getInstance(SessionQueryManager.class),
-                        SessionCache.getInstance()).revoke(callerId, token.getTokenID().toString());
+                        SessionCache.getInstance()).revoke(callerId, currentSessionId);
             }
         } catch (Exception e) {
             debug.warning("Unable to revoke sessions after password change", e);
