@@ -153,7 +153,7 @@ async function expectJsonError(response, status, body, label) {
   expect(JSON.parse(text), label).toEqual(body);
 }
 
-/** Pins a token endpoint 200: status, Content-Type, cache headers, member set, type and scope. */
+/** Pins a token endpoint 200: status, Content-Type, cache headers, member set, non-empty tokens, type and scope. */
 async function expectToken(response, keys, label) {
   const text = await response.text();
   const body = response.status() === 200 ? JSON.parse(text) : {};
@@ -164,6 +164,10 @@ async function expectToken(response, keys, label) {
   expect(response.headers()["cache-control"], label).toBe("no-store");
   expect(response.headers()["pragma"], label).toBe("no-cache");
   expect(Object.keys(body).sort(), label).toEqual(keys);
+  expect(body.access_token, label).toEqual(expect.stringMatching(/.+/));
+  if (keys.includes("refresh_token")) {
+    expect(body.refresh_token, label).toEqual(expect.stringMatching(/.+/));
+  }
   expect(body.token_type, label).toBe("Bearer");
   expect(body.scope, label).toBe(SCOPE);
 }
