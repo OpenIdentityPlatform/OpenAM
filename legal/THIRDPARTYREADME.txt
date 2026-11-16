@@ -31,32 +31,12 @@ Copyright: Copyright © 2013 Brian Reavis & Contributors
 Version: sifter-0.4.1-min.js
 Copyright: Copyright © 2013 Brian Reavis & Contributors
 
-Version: Click toolkit (installer)
-Copyright: Copyright (c) 2005-2009 Thomas Fuchs,
-           (c) 2005-2009 Ivan Krstic,
-           (c) 2005-2009 Jon Tirsen,
-           (c) 2005-2009 Sam Stephenson,
-           Copyright (c) 2005-2009 Marty Haught
 
 Version: excanvas.js 3.6.2
 Copyright: Copyright 2006 Google Inc.
 
 Version: js-class.js 3.6.2
 Copyright: Copyright 2006 Google Inc.
-
-Version: click-extras-2.3.0.jar
-Copyright: Copyright (c) 2005-2009 Thomas Fuchs,
-           (c) 2005-2009 Ivan Krstic,
-           (c) 2005-2009 Jon Tirsen,
-           (c) 2005-2009 Sam Stephenson,
-           Copyright (c) 2005-2009 Marty Haught
-
-Version: click-nodeps-2.3.0.jar
-Copyright: Copyright (c) 2005-2009 Thomas Fuchs,
-           (c) 2005-2009 Ivan Krstic,
-           (c) 2005-2009 Jon Tirsen,
-           (c) 2005-2009 Sam Stephenson,
-           Copyright (c) 2005-2009 Marty Haught
 
 Version: commons-codec-1.6.jar
 Copyright: Copyright 2002-2013 The Apache Software Foundation,

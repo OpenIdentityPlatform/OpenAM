@@ -3936,8 +3936,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/ccversion/*</literal></term>
                 <listitem>
-                    <para>Associated with the servlet named click-servlet. There is no associated click-servlet.java
-                        or ClickServlet.java file.</para>
+                    <para>Associated with the servlet named VersionServlet. The associated VersionServlet.java file
+                        forwards every request to /WEB-INF/jsp/Version.jsp, which renders the console version
+                    window.</para>
                 </listitem>
             </varlistentry>
 
