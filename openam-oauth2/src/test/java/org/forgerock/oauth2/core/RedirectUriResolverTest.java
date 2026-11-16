@@ -209,4 +209,42 @@ public class RedirectUriResolverTest {
         //should throw invalid request  exception
 
     }
+
+    @Test(expectedExceptions = InvalidRequestException.class)
+    public void shouldNotResolveToASoleLoopbackPortPattern() throws Exception {
+        //given
+        OAuth2Request request = requestWithoutRedirectUri(URI.create("http://localhost:*/callback"));
+
+        //when
+        resolver.resolve(request);
+    }
+
+    @Test(expectedExceptions = InvalidRequestException.class)
+    public void shouldNotResolveToASoleLoopbackPortRange() throws Exception {
+        //given
+        OAuth2Request request = requestWithoutRedirectUri(URI.create("http://localhost:80-80/callback"));
+
+        //when
+        resolver.resolve(request);
+    }
+
+    @Test
+    public void shouldResolveToASolePortlessLoopbackUri() throws Exception {
+        //given
+        OAuth2Request request = requestWithoutRedirectUri(URI.create("http://localhost/callback"));
+
+        //when
+        String result = resolver.resolve(request);
+
+        //then
+        assertThat(result).isEqualTo("http://localhost/callback");
+    }
+
+    private OAuth2Request requestWithoutRedirectUri(URI registered) throws Exception {
+        OAuth2Request request = mock(OAuth2Request.class);
+        given(request.getParameter(CLIENT_ID)).willReturn("client_id");
+        given(clientRegistration.getRedirectUris()).willReturn(new HashSet<>(Arrays.asList(registered)));
+        given(clientRegistrationStore.get("client_id", request)).willReturn(clientRegistration);
+        return request;
+    }
 }
