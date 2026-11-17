@@ -249,7 +249,18 @@ test.describe("?display= on /oauth2/authorize", () => {
     expect(html.includes("isSaveConsentEnabled: true")).toBe(true);
   });
 
-  test("display=popup composes the wrapper AROUND the consent page", async () => {
+  test("an absent display defaults to the page/ consent template", async () => {
+    const response = await demoCtx.get(`${OAUTH2}/authorize?${authorizeQuery()}`, { maxRedirects: 0 });
+    const html = await response.text();
+    console.log(`[display] absent -> ${response.status()} bytes=${html.length}`);
+
+    expect(response.status()).toBe(200);
+    expect(html.includes("isSaveConsentEnabled: true")).toBe(true);
+    expect(pageDataValue(html, "displayName") === CONSENT_CLIENT_ID,
+      "Absent display must use the page template").toBe(true);
+  });
+
+  test("display=popup composes the wrapper AROUND the consent page", async ({ page }) => {
     const response = await demoCtx.get(`${OAUTH2}/authorize?${authorizeQuery("popup")}`, { maxRedirects: 0 });
     const html = await response.text();
     console.log(`[display] popup -> ${response.status()} bytes=${html.length}`);
@@ -262,11 +273,18 @@ test.describe("?display= on /oauth2/authorize", () => {
     expect(html.includes("<title>Authorize popup</title>")).toBe(true);
     expect(html.includes("function poponload()")).toBe(true);
     // The composition: OAuth2Representation renders popup/authorize.ftl first and interpolates it, unescaped, into
-    // popup.ftl's htmlCode, so the inner page's pageData is readable here. A wrapper rendered without its page would
-    // leave this div empty, and the two assertions below would catch it.
+    // popup.ftl's htmlCode. The model must be inside #print because poponload copies only that container.
     expect(html.includes('<div id="print" style="visibility: hidden">')).toBe(true);
     expect(pageDataValue(html, "displayName") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
     expect(pageDataValue(html, "clientId") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
+    // Parse inert HTML so the wrapper's onload handler and the embedded scripts never run.
+    const modelInsidePrint = await page.evaluate(([source, clientId]) => {
+      const doc = new DOMParser().parseFromString(source, "text/html");
+      const content = doc.getElementById("print")?.innerHTML ?? "";
+      return content.includes(`displayName: "${clientId}"`)
+        && content.includes(`clientId: "${clientId}"`);
+    }, [html, CONSENT_CLIENT_ID]);
+    expect(modelInsidePrint, "Popup container must contain the consent model").toBe(true);
     // popup/authorize.ftl has no saveConsentEnabled guard, so the embedded page is popup/'s and not page/'s.
     expect(html.includes("isSaveConsentEnabled")).toBe(false);
   });
@@ -312,7 +330,10 @@ test.describe("?display= on /oauth2/authorize", () => {
     // copying the query into the model, so a client cannot supply its own (CVE-2026-62280).
     expect(html.includes(`<b>${SCOPE}</b>`)).toBe(true);
     // A real HTML form with the CSRF token and the two decision buttons, posted back to the same URL.
-    expect(html.includes(`<form action="${CONTEXT_PATH}/oauth2/authorize?`)).toBe(true);
+    const target = `${CONTEXT_PATH}/oauth2/authorize?${authorizeQuery("wap")}`;
+    const escapedTarget = target.replaceAll("&", "&amp;");
+    expect(html.includes(`<form action="${escapedTarget}" method="post">`),
+      "WAP action must preserve the complete authorize query").toBe(true);
     expect(/<input type="hidden" name="csrf" value="[^"]+"\/>/.test(html)).toBe(true);
     expect(html.includes('<input type="submit" name="decision" class="button gray" value="Allow"/>')).toBe(true);
   });
@@ -335,13 +356,15 @@ test.describe("?display= on /oauth2/authorize", () => {
   });
 
   test("the display name is case-INSENSITIVE, unlike route matching", async () => {
-    // OAuth2Representation upper-cases the value before Enum.valueOf, so PAGE/page and TOUCH/touch pick the same
-    // folder. Route matching is case-sensitive (/oauth2/Tokeninfo is a 404): two rules on one URL.
+    // OAuth2Representation upper-cases the value before Enum.valueOf; popup wrapper selection separately ignores
+    // case. Route matching is case-sensitive (/oauth2/Tokeninfo is a 404): two rules on one URL.
     const upperPage = await demoCtx.get(`${OAUTH2}/authorize?${authorizeQuery("PAGE")}`, { maxRedirects: 0 });
     const upperPageHtml = await upperPage.text();
     const upperTouch = await demoCtx.get(`${OAUTH2}/authorize?${authorizeQuery("TOUCH")}`, { maxRedirects: 0 });
     const upperTouchHtml = await upperTouch.text();
-    console.log(`[display] PAGE -> ${upperPage.status()} TOUCH -> ${upperTouch.status()}`);
+    const upperPopup = await demoCtx.get(`${OAUTH2}/authorize?${authorizeQuery("POPUP")}`, { maxRedirects: 0 });
+    const upperPopupHtml = await upperPopup.text();
+    console.log(`[display] PAGE -> ${upperPage.status()} TOUCH -> ${upperTouch.status()} POPUP -> ${upperPopup.status()}`);
 
     expect(upperPage.status()).toBe(200);
     expect(upperPageHtml.includes("isSaveConsentEnabled: true")).toBe(true);
@@ -350,6 +373,11 @@ test.describe("?display= on /oauth2/authorize", () => {
     expect(upperTouch.status()).toBe(200);
     expect(pageDataValue(upperTouchHtml, "isplayName") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
     expect(pageDataValue(upperTouchHtml, "displayName") === null, "Touch displayName must be absent").toBe(true);
+
+    expect(upperPopup.status()).toBe(200);
+    expect(upperPopupHtml.includes("<title>Authorize popup</title>")).toBe(true);
+    expect(pageDataValue(upperPopupHtml, "clientId") === CONSENT_CLIENT_ID,
+      "Uppercase popup must include the consent model").toBe(true);
   });
 
   test("display is validated AFTER authentication, not before", async () => {
