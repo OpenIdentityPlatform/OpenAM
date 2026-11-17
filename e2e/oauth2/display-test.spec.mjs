@@ -389,7 +389,7 @@ test.describe("?display= on /oauth2/authorize", () => {
 
 test.describe("?display= on /oauth2/device/user", () => {
 
-  test("the device CONSENT page honours every display, exactly as /authorize does", async ({ request }) => {
+  test("the device CONSENT page honours every display, exactly as /authorize does", async ({ request, page }) => {
     // DeviceCodeVerificationResource extends ConsentRequiredResource and renders the consent page through the same
     // OAuth2Representation, with the model built from the device code's record. A GET never acts on a user code (it
     // is redirected without it), so the page is reached by the POST the code-entry form makes.
@@ -405,12 +405,12 @@ test.describe("?display= on /oauth2/device/user", () => {
         expect(pageDataValue(html, "formTarget") === `\\${target}`, "Consent target must preserve display").toBe(true);
         expect(pageDataValue(html, "userCode") === userCode, "Consent must preserve the user code").toBe(true);
       }],
-      ["popup", (html, target, userCode) => {
+      ["popup", (html, target, userCode, consentHtml) => {
         expect(html.startsWith("<!doctype html>")).toBe(true);
         expect(html.includes("<title>Authorize popup</title>")).toBe(true);
-        expect(pageDataValue(html, "displayName")).toBe(DEVICE_CLIENT_ID);
-        expect(pageDataValue(html, "formTarget") === `\\${target}`, "Consent target must preserve display").toBe(true);
-        expect(pageDataValue(html, "userCode") === userCode, "Consent must preserve the user code").toBe(true);
+        expect(pageDataValue(consentHtml, "displayName")).toBe(DEVICE_CLIENT_ID);
+        expect(pageDataValue(consentHtml, "formTarget") === `\\${target}`, "Consent target must preserve display").toBe(true);
+        expect(pageDataValue(consentHtml, "userCode") === userCode, "Consent must preserve the user code").toBe(true);
       }],
       // The same master defect as on /authorize, on the second endpoint that renders the touch template. Target:
       // `displayName`.
@@ -438,17 +438,22 @@ test.describe("?display= on /oauth2/device/user", () => {
         + ` ct=${response.headers()["content-type"]} bytes=${html.length}`);
       expect(response.status(), display).toBe(200);
       expect(response.headers()["content-type"], display).toBe(HTML_TYPE);
-      assertions(html, `${CONTEXT_PATH}/oauth2/device/user?display=${display}`, userCode);
+      // poponload copies only #print. Parse inert HTML so wrapper handlers and embedded scripts never run.
+      const consentHtml = display === "popup" ? await page.evaluate((source) => {
+        const doc = new DOMParser().parseFromString(source, "text/html");
+        return doc.getElementById("print")?.innerHTML ?? "";
+      }, html) : html;
+      assertions(html, `${CONTEXT_PATH}/oauth2/device/user?display=${display}`, userCode, consentHtml);
       if (display === "wap") {
         expect(html.includes(`<input type="hidden" name="client_id" value="${DEVICE_CLIENT_ID}"/>`)).toBe(true);
         expect(html.includes('<input type="hidden" name="response_type" value="code"/>')).toBe(true);
         expect(html.includes(`<input type="hidden" name="scope" value="${SCOPE}"/>`)).toBe(true);
         expect(/<input type="hidden" name="csrf" value="[^"]+"\/>/.test(html)).toBe(true);
       } else {
-        expect(pageDataValue(html, "clientId")).toBe(DEVICE_CLIENT_ID);
-        expect(pageDataValue(html, "responseType")).toBe("code");
-        expect(pageDataValue(html, "scope")).toBe(SCOPE);
-        expect(Boolean(pageDataValue(html, "csrf")), "Consent must include CSRF").toBe(true);
+        expect(pageDataValue(consentHtml, "clientId")).toBe(DEVICE_CLIENT_ID);
+        expect(pageDataValue(consentHtml, "responseType")).toBe("code");
+        expect(pageDataValue(consentHtml, "scope")).toBe(SCOPE);
+        expect(Boolean(pageDataValue(consentHtml, "csrf")), "Consent must include CSRF").toBe(true);
       }
     }
   });
