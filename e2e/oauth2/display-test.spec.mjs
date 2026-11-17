@@ -25,57 +25,9 @@
  * client name under `isplayName`, and an unknown display answers 400 server_error instead of 400 invalid_request.
  */
 
-import { test, expect } from "@playwright/test";
-import http from "node:http";
-import https from "node:https";
+import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
 import { REALM, REDIRECT_URI, SCOPE, ensureProviderConfig, pkce, sessionContext } from "../common/oauth2-fixtures.mjs";
-
-// Consent HTML and session headers must never enter retained Playwright traces or API-step errors.
-// Only this spec opts out; the transport below implements the get/post/put subset used by the shared helpers.
-test.use({ trace: "off", screenshot: "off" });
-const apiRequest = {
-  async newContext({ storageState } = {}) {
-    const cookies = storageState?.cookies ?? [];
-    return {
-      dispose: async () => {},
-      ...Object.fromEntries(["get", "post", "put"].map((method) => [method, async (url, options = {}) => {
-        try {
-          const target = new URL(url);
-          const headers = { ...options.headers };
-          const cookie = cookies.filter((c) => c.domain === target.hostname && target.pathname.startsWith(c.path))
-            .map((c) => `${c.name}=${c.value}`).join("; ");
-          if (cookie) headers.Cookie = cookie;
-          const body = options.data === undefined ? undefined : JSON.stringify(options.data);
-          if (body !== undefined) headers["Content-Type"] ??= "application/json";
-          const response = await new Promise((resolve, reject) => {
-            const transport = target.protocol === "https:" ? https : http;
-            const req = transport.request(target, {
-              method: method.toUpperCase(), headers, agent: false, rejectUnauthorized: false,
-            }, resolve);
-            req.on("error", reject);
-            req.setTimeout(30_000, () => req.destroy(new Error("Request timed out")));
-            req.end(body);
-          });
-          const chunks = [];
-          for await (const chunk of response) chunks.push(chunk);
-          const text = Buffer.concat(chunks).toString("utf8");
-          return {
-            status: () => response.statusCode,
-            ok: () => response.statusCode >= 200 && response.statusCode < 300,
-            headers: () => response.headers,
-            text: async () => text,
-            json: async () => {
-              try { return JSON.parse(text); } catch { throw new Error("Response is not valid JSON"); }
-            },
-          };
-        } catch {
-          throw new Error(`${method.toUpperCase()} request failed (transport or response read)`);
-        }
-      }])),
-    };
-  },
-};
 
 /** This spec's own clients: Playwright runs spec files in parallel, and a client another file rewrites mid-run
  *  would break this one. */
@@ -121,18 +73,15 @@ async function writeClient(request, clientId, extra) {
       },
     });
   if (!written.ok()) {
-    throw new Error(`Failed to write ${clientId}: ${written.status()}`);
+    throw new Error(`Failed to write ${clientId}: ${written.status()} ${written.statusText()} ${await written.text()}`);
   }
 }
 
-test.beforeAll(async () => {
-  const request = await apiRequest.newContext();
+test.beforeAll(async ({ request }) => {
   adminToken = await getAdminToken(request);
-  expect(typeof adminToken === "string", "Admin login must return an SSO token").toBe(true);
-  expect(Boolean(adminToken)).toBe(true);
-  await ensureProviderConfig(adminToken, request).catch(() => {
-    throw new Error("OAuth2 provider setup failed");
-  });
+  expect(adminToken, "Admin login must return an SSO token").toEqual(expect.any(String));
+  expect(adminToken).toBeTruthy();
+  await ensureProviderConfig(adminToken, request);
   await writeClient(request, CONSENT_CLIENT_ID, {
     "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=authorization_code"],
   });
@@ -147,7 +96,7 @@ test.beforeAll(async () => {
     headers: { iPlanetDirectoryPro: adminToken, "Accept-API-Version": "resource=3.0, protocol=2.1" },
   });
   if (!demo.ok()) {
-    throw new Error(`Failed to read ${USERNAME}: ${demo.status()}`);
+    throw new Error(`Failed to read ${USERNAME}: ${demo.status()} ${demo.statusText()} ${await demo.text()}`);
   }
   demoName = (await demo.json()).cn?.[0];
   if (!demoName) {
@@ -157,8 +106,8 @@ test.beforeAll(async () => {
   const loginCtx = await apiRequest.newContext();
   try {
     demoToken = await getAuthToken(loginCtx, USERNAME, PASSWORD);
-    expect(typeof demoToken === "string", "Resource-owner login must return an SSO token").toBe(true);
-    expect(Boolean(demoToken)).toBe(true);
+    expect(demoToken, "Resource-owner login must return an SSO token").toEqual(expect.any(String));
+    expect(demoToken).toBeTruthy();
   } finally {
     await loginCtx.dispose();
   }
@@ -193,12 +142,13 @@ function pageDataValue(html, key) {
 }
 
 /** ESAPI HTML-encodes the name before FreeMarker interpolates it; decode once as inert text, never markup. */
-async function userNameMatches(page, html, expected) {
-  return page.evaluate(([encoded, name]) => {
+async function userNameValue(page, html) {
+  return page.evaluate((encoded) => {
+    if (encoded === null) return null;
     const text = document.createElement("textarea");
-    text.innerHTML = encoded ?? "";
-    return encoded !== null && text.value === name;
-  }, [pageDataValue(html, "userName"), expected]);
+    text.innerHTML = encoded;
+    return text.value;
+  }, pageDataValue(html, "userName"));
 }
 
 test.describe("?display= on /oauth2/authorize", () => {
@@ -206,34 +156,34 @@ test.describe("?display= on /oauth2/authorize", () => {
   test("display=page renders the page/ consent template", async ({ page }) => {
     const response = await demoCtx.get(`${OAUTH2}/authorize?${authorizeQuery("page")}`, { maxRedirects: 0 });
     const html = await response.text();
-    console.log(`[display] page -> ${response.status()} bytes=${html.length}`);
+    console.log(`[display] page -> ${response.status()} ct=${response.headers()["content-type"]} bytes=${html.length}`);
 
-    expect(response.status()).toBe(200);
+    expect(response.status(), html).toBe(200);
     // Every display is served as text/html, WML included: the template representation's media type does not vary
     // by folder.
-    expect(response.headers()["content-type"] === HTML_TYPE, "Consent response field must match").toBe(true);
+    expect(response.headers()["content-type"]).toBe(HTML_TYPE);
     // AuthorizeEndpointFilter stamps every /authorize answer, the consent page included.
-    expect(response.headers()["cache-control"] === "no-store", "Consent response field must match").toBe(true);
-    expect(response.headers()["pragma"] === "no-cache", "Consent response field must match").toBe(true);
+    expect(response.headers()["cache-control"]).toBe("no-store");
+    expect(response.headers()["pragma"]).toBe("no-cache");
 
-    expect(html.startsWith("<!DOCTYPE html>")).toBe(true);
+    expect(html).toMatch(/^<!DOCTYPE html>/);
     // ConsentRequiredResource builds the model from the request's attributes and query plus its own keys. These are
     // the ones this template reads.
-    expect(pageDataValue(html, "displayName") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
-    expect(pageDataValue(html, "clientId") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
-    expect(await userNameMatches(page, html, demoName), "Consent must name the resource owner").toBe(true);
-    expect(pageDataValue(html, "responseType") === "code", "Consent response field must match").toBe(true);
-    expect(pageDataValue(html, "redirectUri") === REDIRECT_URI, "Consent redirect URI must match").toBe(true);
-    expect(pageDataValue(html, "scope") === SCOPE, "Consent response field must match").toBe(true);
-    expect(pageDataValue(html, "state") === "display", "Consent response field must match").toBe(true);
-    expect(Boolean(pageDataValue(html, "csrf"))).toBe(true);
+    expect(pageDataValue(html, "displayName")).toBe(CONSENT_CLIENT_ID);
+    expect(pageDataValue(html, "clientId")).toBe(CONSENT_CLIENT_ID);
+    expect(await userNameValue(page, html), "Consent must name the resource owner").toBe(demoName);
+    expect(pageDataValue(html, "responseType")).toBe("code");
+    expect(pageDataValue(html, "redirectUri")).toBe(REDIRECT_URI);
+    expect(pageDataValue(html, "scope")).toBe(SCOPE);
+    expect(pageDataValue(html, "state")).toBe("display");
+    expect(pageDataValue(html, "csrf")).toBeTruthy();
     // page/authorize.ftl is the only consent template with the saveConsentEnabled guard, which is why the popup and
     // touch tests assert its absence: the cheapest proof that a different file was rendered.
-    expect(html.includes("isSaveConsentEnabled: true")).toBe(true);
+    expect(html).toContain("isSaveConsentEnabled: true");
     // The post-back target is the request's path and its raw query, display included, so a consent POST stays on the
     // same template. ?js_string escapes the leading slash.
-    expect(pageDataValue(html, "formTarget") === `\\${CONTEXT_PATH}/oauth2/authorize?${authorizeQuery("page")}`,
-      "Consent target must preserve the raw authorize query").toBe(true);
+    expect(pageDataValue(html, "formTarget"), "Consent target must preserve the raw authorize query")
+      .toBe(`\\${CONTEXT_PATH}/oauth2/authorize?${authorizeQuery("page")}`);
   });
 
   test("an EMPTY display= is the page/ template, not a 400", async () => {
@@ -243,10 +193,10 @@ test.describe("?display= on /oauth2/authorize", () => {
     const html = await response.text();
     console.log(`[display] empty -> ${response.status()} bytes=${html.length}`);
 
-    expect(response.status()).toBe(200);
-    expect(html.startsWith("<!DOCTYPE html>")).toBe(true);
-    expect(pageDataValue(html, "displayName") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
-    expect(html.includes("isSaveConsentEnabled: true")).toBe(true);
+    expect(response.status(), html).toBe(200);
+    expect(html).toMatch(/^<!DOCTYPE html>/);
+    expect(pageDataValue(html, "displayName")).toBe(CONSENT_CLIENT_ID);
+    expect(html).toContain("isSaveConsentEnabled: true");
   });
 
   test("an absent display defaults to the page/ consent template", async () => {
@@ -254,10 +204,9 @@ test.describe("?display= on /oauth2/authorize", () => {
     const html = await response.text();
     console.log(`[display] absent -> ${response.status()} bytes=${html.length}`);
 
-    expect(response.status()).toBe(200);
-    expect(html.includes("isSaveConsentEnabled: true")).toBe(true);
-    expect(pageDataValue(html, "displayName") === CONSENT_CLIENT_ID,
-      "Absent display must use the page template").toBe(true);
+    expect(response.status(), html).toBe(200);
+    expect(html).toContain("isSaveConsentEnabled: true");
+    expect(pageDataValue(html, "displayName"), "Absent display must use the page template").toBe(CONSENT_CLIENT_ID);
   });
 
   test("display=popup composes the wrapper AROUND the consent page", async ({ page }) => {
@@ -265,77 +214,78 @@ test.describe("?display= on /oauth2/authorize", () => {
     const html = await response.text();
     console.log(`[display] popup -> ${response.status()} bytes=${html.length}`);
 
-    expect(response.status()).toBe(200);
-    expect(response.headers()["content-type"] === HTML_TYPE, "Consent response field must match").toBe(true);
+    expect(response.status(), html).toBe(200);
+    expect(response.headers()["content-type"]).toBe(HTML_TYPE);
     // popup.ftl's own doctype is lowercase where every other template's is uppercase: the cheapest discriminator for
     // "the wrapper was rendered, not the bare page".
-    expect(html.startsWith("<!doctype html>")).toBe(true);
-    expect(html.includes("<title>Authorize popup</title>")).toBe(true);
-    expect(html.includes("function poponload()")).toBe(true);
+    expect(html).toMatch(/^<!doctype html>/);
+    expect(html).toContain("<title>Authorize popup</title>");
+    expect(html).toContain("function poponload()");
     // The composition: OAuth2Representation renders popup/authorize.ftl first and interpolates it, unescaped, into
     // popup.ftl's htmlCode. The model must be inside #print because poponload copies only that container.
-    expect(html.includes('<div id="print" style="visibility: hidden">')).toBe(true);
-    expect(pageDataValue(html, "displayName") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
-    expect(pageDataValue(html, "clientId") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
+    expect(html).toContain('<div id="print" style="visibility: hidden">');
+    expect(pageDataValue(html, "displayName")).toBe(CONSENT_CLIENT_ID);
+    expect(pageDataValue(html, "clientId")).toBe(CONSENT_CLIENT_ID);
     // Parse inert HTML so the wrapper's onload handler and the embedded scripts never run.
-    const modelInsidePrint = await page.evaluate(([source, clientId]) => {
+    const popupContent = await page.evaluate((source) => {
       const doc = new DOMParser().parseFromString(source, "text/html");
-      const content = doc.getElementById("print")?.innerHTML ?? "";
-      return content.includes(`displayName: "${clientId}"`)
-        && content.includes(`clientId: "${clientId}"`);
-    }, [html, CONSENT_CLIENT_ID]);
-    expect(modelInsidePrint, "Popup container must contain the consent model").toBe(true);
+      return doc.getElementById("print")?.innerHTML ?? "";
+    }, html);
+    expect(popupContent, "Popup container must contain the consent model").toContain(`displayName: "${CONSENT_CLIENT_ID}"`);
+    expect(popupContent, "Popup container must contain the consent model").toContain(`clientId: "${CONSENT_CLIENT_ID}"`);
     // popup/authorize.ftl has no saveConsentEnabled guard, so the embedded page is popup/'s and not page/'s.
-    expect(html.includes("isSaveConsentEnabled")).toBe(false);
+    expect(html).not.toContain("isSaveConsentEnabled");
   });
 
   test("display=touch renders a BLANK client name -- the isplayName typo", async ({ page }) => {
     const response = await demoCtx.get(`${OAUTH2}/authorize?${authorizeQuery("touch")}`, { maxRedirects: 0 });
     const html = await response.text();
-    console.log(`[display] touch -> ${response.status()} bytes=${html.length}`);
+    console.log(`[display] touch -> ${response.status()} bytes=${html.length}`
+      + ` isplayName=${JSON.stringify(pageDataValue(html, "isplayName"))}`
+      + ` displayName=${JSON.stringify(pageDataValue(html, "displayName"))}`);
 
-    expect(response.status()).toBe(200);
-    expect(response.headers()["content-type"] === HTML_TYPE, "Consent response field must match").toBe(true);
+    expect(response.status(), html).toBe(200);
+    expect(response.headers()["content-type"]).toBe(HTML_TYPE);
 
     // Master defect: templates/touch/authorize.ftl writes the client name under `isplayName`, so the key the XUI
     // reads, `displayName`, is missing and the consent heading renders empty. Target: `displayName`, as on page/ and
     // popup/. The model is intact: the value is on the page under the wrong key.
-    expect(pageDataValue(html, "isplayName") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
-    expect(pageDataValue(html, "displayName") === null, "Touch displayName must be absent").toBe(true);
+    expect(pageDataValue(html, "isplayName")).toBe(CONSENT_CLIENT_ID);
+    expect(pageDataValue(html, "displayName"), "Touch displayName must be absent").toBeNull();
 
     // Everything else on the touch page is intact, which makes the missing name a template typo rather than a
     // broken model.
-    expect(pageDataValue(html, "clientId") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
-    expect(await userNameMatches(page, html, demoName), "Consent must name the resource owner").toBe(true);
-    expect(Boolean(pageDataValue(html, "csrf"))).toBe(true);
-    expect(html.includes("isSaveConsentEnabled")).toBe(false);
+    expect(pageDataValue(html, "clientId")).toBe(CONSENT_CLIENT_ID);
+    expect(await userNameValue(page, html), "Consent must name the resource owner").toBe(demoName);
+    expect(pageDataValue(html, "csrf")).toBeTruthy();
+    expect(html).not.toContain("isSaveConsentEnabled");
   });
 
   test("display=wap is WML served as text/html, and DOES render the client name", async () => {
     const response = await demoCtx.get(`${OAUTH2}/authorize?${authorizeQuery("wap")}`, { maxRedirects: 0 });
     const html = await response.text();
-    console.log(`[display] wap -> ${response.status()} bytes=${html.length}`);
+    console.log(`[display] wap -> ${response.status()} ct=${response.headers()["content-type"]} bytes=${html.length}`);
 
-    expect(response.status()).toBe(200);
+    expect(response.status(), html).toBe(200);
     // A WML document goes out as text/html: the template representation's media type does not vary by folder.
-    expect(response.headers()["content-type"] === HTML_TYPE, "Consent response field must match").toBe(true);
-    expect(html.startsWith('<?xml version="1.0"?>')).toBe(true);
-    expect(html.includes('<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.2//EN"')).toBe(true);
-    expect(html.includes("<wml>")).toBe(true);
+    expect(response.headers()["content-type"]).toBe(HTML_TYPE);
+    expect(html).toMatch(/^<\?xml version="1\.0"\?>/);
+    expect(html).toContain('<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.2//EN"');
+    expect(html).toContain("<wml>");
     // No pageData: wap/ renders server-side instead of handing a model to the XUI, so it proves the model reaches the
     // template, not only the browser.
-    expect(html.includes("pageData")).toBe(false);
-    expect(html.includes(`<p>${CONSENT_CLIENT_ID}:</p>`)).toBe(true);
+    expect(html).not.toContain("pageData");
+    expect(html).toContain(`<p>${CONSENT_CLIENT_ID}:</p>`);
     // display_scope, the raw scope descriptions only this template reads. ConsentRequiredResource writes it after
     // copying the query into the model, so a client cannot supply its own (CVE-2026-62280).
-    expect(html.includes(`<b>${SCOPE}</b>`)).toBe(true);
+    expect(html).toContain(`<b>${SCOPE}</b>`);
     // A real HTML form with the CSRF token and the two decision buttons, posted back to the same URL.
     const target = `${CONTEXT_PATH}/oauth2/authorize?${authorizeQuery("wap")}`;
     const escapedTarget = target.replaceAll("&", "&amp;");
-    expect(html.includes(`<form action="${escapedTarget}" method="post">`),
-      "WAP action must preserve the complete authorize query").toBe(true);
-    expect(/<input type="hidden" name="csrf" value="[^"]+"\/>/.test(html)).toBe(true);
-    expect(html.includes('<input type="submit" name="decision" class="button gray" value="Allow"/>')).toBe(true);
+    expect(html, "WAP action must preserve the complete authorize query")
+      .toContain(`<form action="${escapedTarget}" method="post">`);
+    expect(html).toMatch(/<input type="hidden" name="csrf" value="[^"]+"\/>/);
+    expect(html).toContain('<input type="submit" name="decision" class="button gray" value="Allow"/>');
   });
 
   test("an UNKNOWN display is a non-redirecting 400 server_error page", async () => {
@@ -343,16 +293,16 @@ test.describe("?display= on /oauth2/authorize", () => {
     const html = await response.text();
     console.log(`[display] bogus -> ${response.status()} bytes=${html.length}`);
 
-    expect(response.status()).toBe(400);
+    expect(response.status(), html).toBe(400);
     // Rendered in place, not redirected to the client.
-    expect(response.headers()["location"] === undefined, "Unknown display must not redirect").toBe(true);
-    expect(response.headers()["content-type"] === HTML_TYPE, "Consent response field must match").toBe(true);
-    expect(html.includes("<title>OAuth2 Error Page</title>")).toBe(true);
+    expect(response.headers()["location"], "Unknown display must not redirect").toBeUndefined();
+    expect(response.headers()["content-type"]).toBe(HTML_TYPE);
+    expect(html).toContain("<title>OAuth2 Error Page</title>");
     // Master defect. Enum.valueOf's IllegalArgumentException is thrown while the consent page renders, inside
     // AuthorizeResource's ResourceOwnerConsentRequired handler and so past its invalid_request mapping, and
     // ExceptionHandler turns it into ServerException's 400 server_error. Target: 400 invalid_request (RFC 6749
     // §4.1.2.1, an invalid parameter value). The description is Restlet's status text and is not pinned.
-    expect(html.includes('message: "server_error"')).toBe(true);
+    expect(html).toContain('message: "server_error"');
   });
 
   test("the display name is case-INSENSITIVE, unlike route matching", async () => {
@@ -366,18 +316,17 @@ test.describe("?display= on /oauth2/authorize", () => {
     const upperPopupHtml = await upperPopup.text();
     console.log(`[display] PAGE -> ${upperPage.status()} TOUCH -> ${upperTouch.status()} POPUP -> ${upperPopup.status()}`);
 
-    expect(upperPage.status()).toBe(200);
-    expect(upperPageHtml.includes("isSaveConsentEnabled: true")).toBe(true);
-    expect(pageDataValue(upperPageHtml, "displayName") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
+    expect(upperPage.status(), upperPageHtml).toBe(200);
+    expect(upperPageHtml).toContain("isSaveConsentEnabled: true");
+    expect(pageDataValue(upperPageHtml, "displayName")).toBe(CONSENT_CLIENT_ID);
 
-    expect(upperTouch.status()).toBe(200);
-    expect(pageDataValue(upperTouchHtml, "isplayName") === CONSENT_CLIENT_ID, "Consent response field must match").toBe(true);
-    expect(pageDataValue(upperTouchHtml, "displayName") === null, "Touch displayName must be absent").toBe(true);
+    expect(upperTouch.status(), upperTouchHtml).toBe(200);
+    expect(pageDataValue(upperTouchHtml, "isplayName")).toBe(CONSENT_CLIENT_ID);
+    expect(pageDataValue(upperTouchHtml, "displayName"), "Touch displayName must be absent").toBeNull();
 
-    expect(upperPopup.status()).toBe(200);
-    expect(upperPopupHtml.includes("<title>Authorize popup</title>")).toBe(true);
-    expect(pageDataValue(upperPopupHtml, "clientId") === CONSENT_CLIENT_ID,
-      "Uppercase popup must include the consent model").toBe(true);
+    expect(upperPopup.status(), upperPopupHtml).toBe(200);
+    expect(upperPopupHtml).toContain("<title>Authorize popup</title>");
+    expect(pageDataValue(upperPopupHtml, "clientId"), "Uppercase popup must include the consent model").toBe(CONSENT_CLIENT_ID);
   });
 
   test("display is validated AFTER authentication, not before", async () => {
@@ -390,14 +339,13 @@ test.describe("?display= on /oauth2/authorize", () => {
       const response = await anonCtx.get(target, { maxRedirects: 0 });
       const location = response.headers()["location"];
       console.log(`[display] anonymous bogus -> ${response.status()}`);
-      expect(response.status()).toBe(301);
-      let login;
-      try { login = new URL(location); } catch { throw new Error("Login redirect must be a valid URL"); }
-      expect(login.origin + login.pathname === `${OPENAM_BASE}/UI/Login`, "Login URL must match").toBe(true);
-      expect([...login.searchParams.keys()].join(",") === "realm,goto", "Login parameter names must match").toBe(true);
-      expect(login.searchParams.get("realm") === "/", "Login realm must match").toBe(true);
+      expect(response.status(), await response.text()).toBe(301);
+      const login = new URL(location);
+      expect(login.origin + login.pathname, "Login URL must match").toBe(`${OPENAM_BASE}/UI/Login`);
+      expect([...login.searchParams.keys()], "Login parameter names must match").toEqual(["realm", "goto"]);
+      expect(login.searchParams.get("realm"), "Login realm must match").toBe("/");
       // The unknown display survives into goto, so the 400 comes after the user returns.
-      expect(login.searchParams.get("goto") === target, "Login goto must preserve the authorize URL").toBe(true);
+      expect(login.searchParams.get("goto"), "Login goto must preserve the authorize URL").toBe(target);
     } finally {
       await anonCtx.dispose();
     }
