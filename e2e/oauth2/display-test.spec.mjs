@@ -103,7 +103,7 @@ test.beforeAll(async ({ request }) => {
     throw new Error(`${USERNAME} has no cn`);
   }
 
-  const loginCtx = await apiRequest.newContext();
+  const loginCtx = await apiRequest.newContext({ ignoreHTTPSErrors: true });
   try {
     demoToken = await getAuthToken(loginCtx, USERNAME, PASSWORD);
     expect(demoToken, "Resource-owner login must return an SSO token").toEqual(expect.any(String));
@@ -333,7 +333,7 @@ test.describe("?display= on /oauth2/authorize", () => {
     // ResourceOwnerSessionValidator sends an anonymous caller to login before any template is chosen, so an unknown
     // display gets the login 301 here, not the 400 of the test above. Were the display parsed first, an anonymous
     // caller could probe it by status code.
-    const anonCtx = await apiRequest.newContext();
+    const anonCtx = await apiRequest.newContext({ ignoreHTTPSErrors: true });
     try {
       const target = `${OAUTH2}/authorize?${authorizeQuery("bogus")}`;
       const response = await anonCtx.get(target, { maxRedirects: 0 });
