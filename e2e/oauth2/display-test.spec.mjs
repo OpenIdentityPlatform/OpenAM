@@ -15,7 +15,7 @@
  */
 
 /*
- * The ?display= surface of the consent page on /oauth2/authorize.
+ * The ?display= surface of the consent pages on /oauth2/authorize and /oauth2/device/user.
  * OAuth2Representation picks the template folder from the
  * parameter: page/ (also for an absent or empty value), popup/ (composed into popup.ftl), touch/ or wap/. This spec
  * pins that black-box contract before /oauth2 moves to CHF. A flip may change a pinned value only as a divergence
@@ -32,6 +32,7 @@ import { REALM, REDIRECT_URI, SCOPE, ensureProviderConfig, pkce, sessionContext 
 /** This spec's own clients: Playwright runs spec files in parallel, and a client another file rewrites mid-run
  *  would break this one. */
 const CONSENT_CLIENT_ID = "test_client_display";
+const DEVICE_CLIENT_ID = "test_client_display_device";
 
 const OAUTH2 = `${OPENAM_BASE}/oauth2`;
 /** The deployment's context path, so the form-target checks survive a deployment mounted elsewhere. */
@@ -84,6 +85,11 @@ test.beforeAll(async ({ request }) => {
   await ensureProviderConfig(adminToken, request);
   await writeClient(request, CONSENT_CLIENT_ID, {
     "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=authorization_code"],
+  });
+  await writeClient(request, DEVICE_CLIENT_ID, {
+    "com.forgerock.openam.oauth2provider.grantTypes": [
+      "[0]=authorization_code", "[1]=urn:ietf:params:oauth:grant-type:device_code",
+    ],
   });
 
   // The provider enforces PKCE (codeVerifierEnforced defaults to true), so every response_type=code request below
@@ -139,6 +145,34 @@ function authorizeQuery(display) {
 function pageDataValue(html, key) {
   const match = new RegExp(`(?:^|[{,\\s])${key}:\\s*"([^"]*)"`).exec(html);
   return match && match[1];
+}
+
+/** Mints a device code for the consent-requiring device client and returns its user code. */
+async function deviceCode(request) {
+  const response = await request.post(`${OAUTH2}/device/code`, {
+    form: {
+      client_id: DEVICE_CLIENT_ID, scope: SCOPE, response_type: "code",
+      code_challenge: challenge, code_challenge_method: "S256",
+    },
+  });
+  if (!response.ok()) {
+    throw new Error(`device/code failed: ${response.status()}`);
+  }
+  const userCode = (await response.json()).user_code;
+  expect(typeof userCode === "string").toBe(true);
+  expect(Boolean(userCode)).toBe(true);
+  return userCode;
+}
+
+/**
+ * Submits a user code as the code-entry form does, with the demo session cookie and with the session id as the csrf
+ * value (accepted for non-browser clients). display travels in the query; the user code only in the body.
+ */
+function submitUserCode(userCode, display) {
+  return demoCtx.post(`${OAUTH2}/device/user?display=${display}`, {
+    form: { user_code: userCode, csrf: demoToken },
+    maxRedirects: 0,
+  });
 }
 
 /** ESAPI HTML-encodes the name before FreeMarker interpolates it; decode once as inert text, never markup. */
@@ -348,6 +382,112 @@ test.describe("?display= on /oauth2/authorize", () => {
       expect(login.searchParams.get("goto"), "Login goto must preserve the authorize URL").toBe(target);
     } finally {
       await anonCtx.dispose();
+    }
+  });
+
+});
+
+test.describe("?display= on /oauth2/device/user", () => {
+
+  test("the device CONSENT page honours every display, exactly as /authorize does", async ({ request }) => {
+    // DeviceCodeVerificationResource extends ConsentRequiredResource and renders the consent page through the same
+    // OAuth2Representation, with the model built from the device code's record. A GET never acts on a user code (it
+    // is redirected without it), so the page is reached by the POST the code-entry form makes.
+    //
+    // display travels in the query, so the post-back target carries it: through pageData.formTarget on the three XUI
+    // templates, through the form's own action on wap. The user code is not in the target; the XUI templates carry it
+    // as pageData.userCode.
+    for (const [display, assertions] of [
+      ["page", (html, target, userCode) => {
+        expect(html.startsWith("<!DOCTYPE html>")).toBe(true);
+        expect(pageDataValue(html, "displayName")).toBe(DEVICE_CLIENT_ID);
+        expect(html.includes("isSaveConsentEnabled: true")).toBe(true);
+        expect(pageDataValue(html, "formTarget") === `\\${target}`, "Consent target must preserve display").toBe(true);
+        expect(pageDataValue(html, "userCode") === userCode, "Consent must preserve the user code").toBe(true);
+      }],
+      ["popup", (html, target, userCode) => {
+        expect(html.startsWith("<!doctype html>")).toBe(true);
+        expect(html.includes("<title>Authorize popup</title>")).toBe(true);
+        expect(pageDataValue(html, "displayName")).toBe(DEVICE_CLIENT_ID);
+        expect(pageDataValue(html, "formTarget") === `\\${target}`, "Consent target must preserve display").toBe(true);
+        expect(pageDataValue(html, "userCode") === userCode, "Consent must preserve the user code").toBe(true);
+      }],
+      // The same master defect as on /authorize, on the second endpoint that renders the touch template. Target:
+      // `displayName`.
+      ["touch", (html, target, userCode) => {
+        expect(pageDataValue(html, "isplayName")).toBe(DEVICE_CLIENT_ID);
+        expect(pageDataValue(html, "displayName")).toBeNull();
+        expect(pageDataValue(html, "formTarget") === `\\${target}`, "Consent target must preserve display").toBe(true);
+        expect(pageDataValue(html, "userCode") === userCode, "Consent must preserve the user code").toBe(true);
+      }],
+      // wap renders server-side and has no pageData: the target is the form's own action.
+      ["wap", (html, target) => {
+        expect(html.startsWith('<?xml version="1.0"?>')).toBe(true);
+        expect(html.includes(`<p>${DEVICE_CLIENT_ID}:</p>`)).toBe(true);
+        expect(pageDataValue(html, "formTarget")).toBeNull();
+        expect(html.includes(`<form action="${target}" method="post">`)).toBe(true);
+        // Existing defect: neither the target nor a hidden field carries user_code.
+        // Submitting WAP consent loses the device code. Target: a hidden user_code body field.
+        expect(/<input\b[^>]*\bname=["']user_code["']/.test(html)).toBe(false);
+      }],
+    ]) {
+      const userCode = await deviceCode(request);
+      const response = await submitUserCode(userCode, display);
+      const html = await response.text();
+      console.log(`[display] device consent display=${display} -> ${response.status()}`
+        + ` ct=${response.headers()["content-type"]} bytes=${html.length}`);
+      expect(response.status(), display).toBe(200);
+      expect(response.headers()["content-type"], display).toBe(HTML_TYPE);
+      assertions(html, `${CONTEXT_PATH}/oauth2/device/user?display=${display}`, userCode);
+      if (display === "wap") {
+        expect(html.includes(`<input type="hidden" name="client_id" value="${DEVICE_CLIENT_ID}"/>`)).toBe(true);
+        expect(html.includes('<input type="hidden" name="response_type" value="code"/>')).toBe(true);
+        expect(html.includes(`<input type="hidden" name="scope" value="${SCOPE}"/>`)).toBe(true);
+        expect(/<input type="hidden" name="csrf" value="[^"]+"\/>/.test(html)).toBe(true);
+      } else {
+        expect(pageDataValue(html, "clientId")).toBe(DEVICE_CLIENT_ID);
+        expect(pageDataValue(html, "responseType")).toBe("code");
+        expect(pageDataValue(html, "scope")).toBe(SCOPE);
+        expect(Boolean(pageDataValue(html, "csrf")), "Consent must include CSRF").toBe(true);
+      }
+    }
+  });
+
+  test("an unknown display on the device CONSENT page is a 400, as on /authorize", async ({ request }) => {
+    const userCode = await deviceCode(request);
+    const response = await submitUserCode(userCode, "bogus");
+    const html = await response.text();
+    console.log(`[display] device consent bogus -> ${response.status()}`);
+
+    // The same master defect through the same ExceptionHandler, with the same target: 400 invalid_request.
+    expect(response.status()).toBe(400);
+    expect(response.headers()["content-type"]).toBe(HTML_TYPE);
+    expect(response.headers()["location"] === undefined, "Unknown display must not redirect").toBe(true);
+    expect(html.includes("<title>OAuth2 Error Page</title>")).toBe(true);
+    expect(html.includes('message: "server_error"')).toBe(true);
+  });
+
+  test("the device CODE-ENTRY page ignores display entirely -- including a bogus one", async () => {
+    // The counter-example that gives the two consent tests their meaning. DeviceCodeVerificationResource renders
+    // templates/CodeVerificationForm.ftl by its literal path, with no display folder, so ?display= is never parsed
+    // here: an unknown one is a 200, where the consent page one POST later is a 400.
+    const rendered = [];
+    for (const display of ["page", "popup", "touch", "wap", "bogus"]) {
+      const response = await demoCtx.get(`${OAUTH2}/device/user?display=${display}`, { maxRedirects: 0 });
+      const html = await response.text();
+      console.log(`[display] device form display=${display} -> ${response.status()} bytes=${html.length}`);
+      expect(response.status(), display).toBe(200);
+      // CodeVerificationForm.ftl is an XUI shell: it carries no form of its own, only the model the main-device
+      // bundle renders the code box from. That bundle name tells this page from the consent page.
+      expect(html.includes("XUI/main-device"), display).toBe(true);
+      expect(html.includes("<title>OAuth2 Authorization Server</title>"), display).toBe(true);
+      // Every render mints its own csrf token, the one value that differs between them.
+      expect(Boolean(pageDataValue(html, "csrf")), display).toBe(true);
+      rendered.push(html.replace(/csrf: "[^"]*"/, 'csrf: ""'));
+    }
+    // Identical apart from the token: the folder was not consulted.
+    for (const html of rendered) {
+      expect(html === rendered[0], "Code-entry HTML must ignore display after CSRF masking").toBe(true);
     }
   });
 
