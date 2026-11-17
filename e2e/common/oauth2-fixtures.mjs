@@ -458,6 +458,7 @@ export async function pkce() {
 export function sessionContext(apiRequest, ssoToken, extraCookies = []) {
   const domain = new URL(OPENAM_BASE).hostname;
   return apiRequest.newContext({
+    ignoreHTTPSErrors: true,
     storageState: {
       cookies: [{ name: "iPlanetDirectoryPro", value: ssoToken }, ...extraCookies].map((cookie) => ({
         ...cookie, domain, path: "/", expires: -1, httpOnly: false, secure: false, sameSite: "Lax",
