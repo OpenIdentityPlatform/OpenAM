@@ -462,6 +462,9 @@ test.describe("OAuth2 access token errors", () => {
     });
 
     expect(response.status()).toBe(405);
+    expect((await response.json()).error).toBe("method_not_allowed");
+    // Restlet omits Allow. The target is Allow: POST per RFC 9110 section 15.5.6.
+    expect(response.headers()["allow"]).toBeUndefined();
     expect(response.headers()["cache-control"]).toBe("no-store");
     expect(response.headers()["pragma"]).toBe("no-cache");
   });
@@ -498,7 +501,8 @@ test.describe("OAuth2 cache headers", () => {
     });
 
     expect(response.status()).toBe(200);
-    expect(response.headers()["content-type"]).toBe("application/json");
+    const mediaType = response.headers()["content-type"]?.split(";", 1)[0].trim().toLowerCase();
+    expect(mediaType).toBe("application/json");
     expect(response.headers()["cache-control"]).toBe("no-cache, no-store");
     expect(response.headers()["pragma"]).toBeUndefined();
     const tokenInfo = await response.json();
