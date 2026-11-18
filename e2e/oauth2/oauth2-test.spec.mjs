@@ -319,6 +319,7 @@ test.describe("OAuth2 userinfo and tokeninfo transport", () => {
 
   test("Get user info with access token in POST form body", async ({ request }) => {
     const response = await request.post(`${OPENAM_BASE}/oauth2/userinfo`, {
+      maxRedirects: 0,
       form: { access_token: transportAccessToken },
       headers: { Accept: "application/json" },
     });
@@ -331,6 +332,7 @@ test.describe("OAuth2 userinfo and tokeninfo transport", () => {
 
   test("Reject user info request with token in both header and form body", async ({ request }) => {
     const response = await request.post(`${OPENAM_BASE}/oauth2/userinfo`, {
+      maxRedirects: 0,
       form: { access_token: transportAccessToken },
       headers: { Authorization: `Bearer ${transportAccessToken}`, Accept: "application/json" },
     });
@@ -346,6 +348,7 @@ test.describe("OAuth2 userinfo and tokeninfo transport", () => {
 
   test("Get token info with access token in query parameter", async ({ request }) => {
     const response = await request.get(`${OPENAM_BASE}/oauth2/tokeninfo`, {
+      maxRedirects: 0,
       params: { access_token: transportAccessToken },
       headers: { Accept: "application/json" },
     });
@@ -369,6 +372,7 @@ test.describe("OAuth2 userinfo and tokeninfo transport", () => {
 
   test("Get token info with access token in header", async ({ request }) => {
     const response = await request.get(`${OPENAM_BASE}/oauth2/tokeninfo`, {
+      maxRedirects: 0,
       headers: { Authorization: `Bearer ${transportAccessToken}`, Accept: "application/json" },
     });
     expect(response.status()).toBe(200);
@@ -391,6 +395,7 @@ test.describe("OAuth2 userinfo and tokeninfo transport", () => {
 
   test("Reject token info request with token in both header and query parameter", async ({ request }) => {
     const response = await request.get(`${OPENAM_BASE}/oauth2/tokeninfo`, {
+      maxRedirects: 0,
       params: { access_token: transportAccessToken },
       headers: { Authorization: `Bearer ${transportAccessToken}`, Accept: "application/json" },
     });
