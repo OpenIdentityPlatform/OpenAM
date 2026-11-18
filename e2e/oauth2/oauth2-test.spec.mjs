@@ -326,7 +326,12 @@ test.describe("OAuth2 userinfo and tokeninfo transport", () => {
     expect(response.status()).toBe(200);
     expect(response.headers()["content-type"]).toBe("application/json;charset=UTF-8");
     const userInfo = await response.json();
-    expect(Object.keys(userInfo).sort()).toEqual(["family_name", "name", "sub"]);
+    const bearerResponse = await request.get(`${OPENAM_BASE}/oauth2/userinfo`, {
+      maxRedirects: 0,
+      headers: { Authorization: `Bearer ${transportAccessToken}`, Accept: "application/json" },
+    });
+    expect(bearerResponse.status()).toBe(200);
+    expect(userInfo).toEqual(await bearerResponse.json());
     expect(userInfo.sub).toBe(USERNAME);
   });
 
