@@ -14,8 +14,12 @@
  * Copyright 2026 3A Systems, LLC.
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
+import { pkce, sessionContext } from "../common/oauth2-fixtures.mjs";
+
+// Traces can capture bearer tokens in request headers, query strings and form bodies.
+test.use({ trace: "off", screenshot: "off" });
 
 const REALM = "root";
 const CLIENT_ID = "test_client_app";
@@ -138,10 +142,7 @@ async function ensureOAuth2ClientExists(adminToken, request, clientId = CLIENT_I
 test.beforeAll(async ({ request }) => {
   const adminToken = await getAdminToken(request)
 
-  if (!adminToken) {
-    test.skip("Skipping: ADMIN_TOKEN not set");
-
-  }
+  expect(Boolean(adminToken), "Admin authentication must return a session token").toBe(true);
   await ensureOAuth2ServiceExists(adminToken, request);
   await ensureOAuth2ClientExists(adminToken, request);
   await ensureOAuth2ClientExists(adminToken, request, CONSENT_CLIENT_ID, false);
@@ -254,6 +255,162 @@ test.describe("OAuth Service test", () => {
 
   });
 
+});
+
+test.describe("OAuth2 userinfo and tokeninfo transport", () => {
+  const TRANSPORT_CLIENT_ID = "test_client_oauth2_b4a";
+  let transportAccessToken;
+  let tokenLifetime;
+
+  test.beforeAll(async ({ request }) => {
+    const adminToken = await getAdminToken(request);
+    expect(Boolean(adminToken), "Admin authentication must return a session token").toBe(true);
+    await ensureOAuth2ClientExists(adminToken, request, TRANSPORT_CLIENT_ID);
+
+    const userToken = await getAuthToken(request, USERNAME, PASSWORD);
+    expect(Boolean(userToken), "User authentication must return a session token").toBe(true);
+    const context = await sessionContext(apiRequest, userToken);
+    try {
+      const { verifier, challenge } = await pkce();
+      const state = "b4a-transport-state";
+      const authorize = await context.get(`${OPENAM_BASE}/oauth2/authorize`, {
+        params: {
+          response_type: "code",
+          client_id: TRANSPORT_CLIENT_ID,
+          redirect_uri: REDIRECT_URI,
+          scope: SCOPE,
+          state,
+          code_challenge: challenge,
+          code_challenge_method: "S256",
+        },
+        maxRedirects: 0,
+      });
+      expect(authorize.status()).toBe(302);
+      const location = new URL(authorize.headers()["location"], OPENAM_BASE);
+      expect(location.searchParams.has("error")).toBe(false);
+      expect(location.searchParams.get("state")).toBe(state);
+      const code = location.searchParams.get("code");
+      expect(Boolean(code), "Authorization must return a code").toBe(true);
+
+      // This public client authenticates with client_id and PKCE, without Basic authentication.
+      const response = await context.post(`${OPENAM_BASE}/oauth2/access_token`, {
+        headers: { Accept: "application/json" },
+        form: {
+          grant_type: "authorization_code",
+          client_id: TRANSPORT_CLIENT_ID,
+          code,
+          redirect_uri: REDIRECT_URI,
+          code_verifier: verifier,
+        },
+      });
+      expect(response.status()).toBe(200);
+      const tokens = await response.json();
+      expect(typeof tokens.access_token).toBe("string");
+      expect(Boolean(tokens.access_token), "Token exchange must return an access token").toBe(true);
+      expect(tokens.token_type).toBe("Bearer");
+      expect(Number.isInteger(tokens.expires_in)).toBe(true);
+      expect(tokens.expires_in).toBeGreaterThan(0);
+      transportAccessToken = tokens.access_token;
+      tokenLifetime = tokens.expires_in;
+    } finally {
+      await context.dispose();
+    }
+  });
+
+  test("Get user info with access token in POST form body", async ({ request }) => {
+    const response = await request.post(`${OPENAM_BASE}/oauth2/userinfo`, {
+      maxRedirects: 0,
+      form: { access_token: transportAccessToken },
+      headers: { Accept: "application/json" },
+    });
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe("application/json;charset=UTF-8");
+    const userInfo = await response.json();
+    const bearerResponse = await request.get(`${OPENAM_BASE}/oauth2/userinfo`, {
+      maxRedirects: 0,
+      headers: { Authorization: `Bearer ${transportAccessToken}`, Accept: "application/json" },
+    });
+    expect(bearerResponse.status()).toBe(200);
+    expect(userInfo).toEqual(await bearerResponse.json());
+    expect(userInfo.sub).toBe(USERNAME);
+  });
+
+  test("Reject user info request with token in both header and form body", async ({ request }) => {
+    const response = await request.post(`${OPENAM_BASE}/oauth2/userinfo`, {
+      maxRedirects: 0,
+      form: { access_token: transportAccessToken },
+      headers: { Authorization: `Bearer ${transportAccessToken}`, Accept: "application/json" },
+    });
+    // Current Restlet defect: RFC 6750 section 3.1 requires invalid_request for multiple token transports.
+    // Target: https://www.rfc-editor.org/rfc/rfc6750.html#section-3.1
+    expect(response.status()).toBe(400);
+    expect(response.headers()["content-type"]).toBe("application/json");
+    expect(await response.json()).toEqual({
+      error: "server_error",
+      error_description: "Access Token cannot be provided in both form and header",
+    });
+  });
+
+  test("Get token info with access token in query parameter", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/oauth2/tokeninfo`, {
+      maxRedirects: 0,
+      params: { access_token: transportAccessToken },
+      headers: { Accept: "application/json" },
+    });
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe("application/json");
+    const tokenInfo = await response.json();
+    expect(Object.keys(tokenInfo).sort()).toEqual([
+      "access_token", "client_id", "expires_in", "grant_type", "profile", "realm", "scope", "token_type",
+    ]);
+    expect(tokenInfo.access_token === transportAccessToken, "Token info must identify the issued token").toBe(true);
+    expect(tokenInfo.grant_type).toBe("authorization_code");
+    expect(tokenInfo.client_id).toBe(TRANSPORT_CLIENT_ID);
+    expect(tokenInfo.scope).toEqual([SCOPE]);
+    expect(tokenInfo.profile).toBe("");
+    expect(tokenInfo.realm).toBe("/");
+    expect(tokenInfo.token_type).toBe("Bearer");
+    expect(Number.isInteger(tokenInfo.expires_in)).toBe(true);
+    expect(tokenInfo.expires_in).toBeGreaterThan(0);
+    expect(tokenInfo.expires_in).toBeLessThanOrEqual(tokenLifetime);
+  });
+
+  test("Get token info with access token in header", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/oauth2/tokeninfo`, {
+      maxRedirects: 0,
+      headers: { Authorization: `Bearer ${transportAccessToken}`, Accept: "application/json" },
+    });
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe("application/json");
+    const tokenInfo = await response.json();
+    expect(Object.keys(tokenInfo).sort()).toEqual([
+      "access_token", "client_id", "expires_in", "grant_type", "profile", "realm", "scope", "token_type",
+    ]);
+    expect(tokenInfo.access_token === transportAccessToken, "Token info must identify the issued token").toBe(true);
+    expect(tokenInfo.grant_type).toBe("authorization_code");
+    expect(tokenInfo.client_id).toBe(TRANSPORT_CLIENT_ID);
+    expect(tokenInfo.scope).toEqual([SCOPE]);
+    expect(tokenInfo.profile).toBe("");
+    expect(tokenInfo.realm).toBe("/");
+    expect(tokenInfo.token_type).toBe("Bearer");
+    expect(Number.isInteger(tokenInfo.expires_in)).toBe(true);
+    expect(tokenInfo.expires_in).toBeGreaterThan(0);
+    expect(tokenInfo.expires_in).toBeLessThanOrEqual(tokenLifetime);
+  });
+
+  test("Reject token info request with token in both header and query parameter", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/oauth2/tokeninfo`, {
+      maxRedirects: 0,
+      params: { access_token: transportAccessToken },
+      headers: { Authorization: `Bearer ${transportAccessToken}`, Accept: "application/json" },
+    });
+    expect(response.status()).toBe(400);
+    expect(response.headers()["content-type"]).toBe("application/json");
+    expect(await response.json()).toEqual({
+      error: "invalid_request",
+      error_description: "Access Token cannot be provided in both query and header",
+    });
+  });
 });
 
 /**
