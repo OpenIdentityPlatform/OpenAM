@@ -148,6 +148,11 @@ test.beforeAll(async ({ request }) => {
   await ensureOAuth2ServiceExists(adminToken, request);
   await ensureOAuth2ClientExists(adminToken, request);
   await ensureOAuth2ClientExists(adminToken, request, CONSENT_CLIENT_ID, false);
+});
+
+async function ensureTokenCacheClientExists(request) {
+  const adminToken = await getAdminToken(request);
+  expect(Boolean(adminToken), "Admin authentication must return a session token").toBe(true);
   await ensureClient(adminToken, request, TOKEN_CACHE_CLIENT_ID, {
     "userpassword": TOKEN_CACHE_CLIENT_SECRET,
     "com.forgerock.openam.oauth2provider.clientType": "Confidential",
@@ -157,7 +162,7 @@ test.beforeAll(async ({ request }) => {
     "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "client_secret_basic",
     "sunIdentityServerDeviceStatus": "Active",
   });
-});
+}
 
 let accessToken;
 
@@ -439,6 +444,7 @@ test.describe("OAuth2 access token errors", () => {
   });
 
   test("bad client secret returns a Basic challenge", async ({ request }) => {
+    await ensureTokenCacheClientExists(request);
     const response = await request.post(`${OPENAM_BASE}/oauth2/access_token`, {
       maxRedirects: 0,
       form: { grant_type: "client_credentials", scope: SCOPE },
@@ -450,7 +456,7 @@ test.describe("OAuth2 access token errors", () => {
 
     expect(response.status()).toBe(401);
     expect((await response.json()).error).toBe("invalid_client");
-    expect(response.headers()["www-authenticate"]).toMatch(/^Basic realm=/);
+    expect(response.headers()["www-authenticate"]).toBe('Basic realm="/"');
     expect(response.headers()["cache-control"]).toBe("no-store");
     expect(response.headers()["pragma"]).toBe("no-cache");
   });
@@ -475,6 +481,7 @@ test.describe("OAuth2 cache headers", () => {
   let clientAccessToken;
 
   test.beforeAll(async ({ request }) => {
+    await ensureTokenCacheClientExists(request);
     const response = await request.post(`${OPENAM_BASE}/oauth2/access_token`, {
       maxRedirects: 0,
       form: { grant_type: "client_credentials", scope: SCOPE },
