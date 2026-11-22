@@ -16,13 +16,15 @@
 
 import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
-import { pkce, sessionContext } from "../common/oauth2-fixtures.mjs";
+import { basicAuth, ensureClient, pkce, sessionContext } from "../common/oauth2-fixtures.mjs";
 
 // Traces can capture bearer tokens in request headers, query strings and form bodies.
 test.use({ trace: "off", screenshot: "off" });
 
 const REALM = "root";
 const CLIENT_ID = "test_client_app";
+const TOKEN_CACHE_CLIENT_ID = "test_client_oauth2_b4b";
+const TOKEN_CACHE_CLIENT_SECRET = "b4b-secret-0123456789-0123456789-0123456789";
 // A client that does not imply consent, so the resource owner's decision must be posted explicitly. This is
 // the situation issue #1080 reports: a non-browser client cannot obtain a token to post with the decision.
 const CONSENT_CLIENT_ID = "test_consent_app";
@@ -147,6 +149,20 @@ test.beforeAll(async ({ request }) => {
   await ensureOAuth2ClientExists(adminToken, request);
   await ensureOAuth2ClientExists(adminToken, request, CONSENT_CLIENT_ID, false);
 });
+
+async function ensureTokenCacheClientExists(request) {
+  const adminToken = await getAdminToken(request);
+  expect(Boolean(adminToken), "Admin authentication must return a session token").toBe(true);
+  await ensureClient(adminToken, request, TOKEN_CACHE_CLIENT_ID, {
+    "userpassword": TOKEN_CACHE_CLIENT_SECRET,
+    "com.forgerock.openam.oauth2provider.clientType": "Confidential",
+    "com.forgerock.openam.oauth2provider.scopes": [`[0]=${SCOPE}`],
+    "com.forgerock.openam.oauth2provider.defaultScopes": [`[0]=${SCOPE}`],
+    "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=client_credentials"],
+    "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "client_secret_basic",
+    "sunIdentityServerDeviceStatus": "Active",
+  });
+}
 
 let accessToken;
 
@@ -410,6 +426,124 @@ test.describe("OAuth2 userinfo and tokeninfo transport", () => {
       error: "invalid_request",
       error_description: "Access Token cannot be provided in both query and header",
     });
+  });
+});
+
+test.describe("OAuth2 access token errors", () => {
+  test("unknown grant_type returns unsupported_grant_type", async ({ request }) => {
+    const response = await request.post(`${OPENAM_BASE}/oauth2/access_token`, {
+      maxRedirects: 0,
+      form: { grant_type: "no_such_grant", client_id: CLIENT_ID },
+      headers: { Accept: "application/json" },
+    });
+
+    expect(response.status()).toBe(400);
+    expect((await response.json()).error).toBe("unsupported_grant_type");
+    expect(response.headers()["cache-control"]).toBe("no-store");
+    expect(response.headers()["pragma"]).toBe("no-cache");
+  });
+
+  test("bad client secret returns a Basic challenge", async ({ request }) => {
+    await ensureTokenCacheClientExists(request);
+    const response = await request.post(`${OPENAM_BASE}/oauth2/access_token`, {
+      maxRedirects: 0,
+      form: { grant_type: "client_credentials", scope: SCOPE },
+      headers: {
+        Accept: "application/json",
+        Authorization: basicAuth(TOKEN_CACHE_CLIENT_ID, "wrong-secret"),
+      },
+    });
+
+    expect(response.status()).toBe(401);
+    expect((await response.json()).error).toBe("invalid_client");
+    expect(response.headers()["www-authenticate"]).toBe('Basic realm="/"');
+    expect(response.headers()["cache-control"]).toBe("no-store");
+    expect(response.headers()["pragma"]).toBe("no-cache");
+  });
+
+  test("GET access_token returns method not allowed", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/oauth2/access_token`, {
+      maxRedirects: 0,
+      headers: { Accept: "application/json" },
+    });
+
+    expect(response.status()).toBe(405);
+    expect((await response.json()).error).toBe("method_not_allowed");
+    // Restlet omits Allow. The target is Allow: POST per RFC 9110 section 15.5.6.
+    expect(response.headers()["allow"]).toBeUndefined();
+    expect(response.headers()["cache-control"]).toBe("no-store");
+    expect(response.headers()["pragma"]).toBe("no-cache");
+  });
+});
+
+test.describe("OAuth2 cache headers", () => {
+  const authorization = basicAuth(TOKEN_CACHE_CLIENT_ID, TOKEN_CACHE_CLIENT_SECRET);
+  let clientAccessToken;
+
+  test.beforeAll(async ({ request }) => {
+    await ensureTokenCacheClientExists(request);
+    const response = await request.post(`${OPENAM_BASE}/oauth2/access_token`, {
+      maxRedirects: 0,
+      form: { grant_type: "client_credentials", scope: SCOPE },
+      headers: { Accept: "application/json", Authorization: authorization },
+    });
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()["cache-control"]).toBe("no-store");
+    expect(response.headers()["pragma"]).toBe("no-cache");
+    const tokens = await response.json();
+    expect(typeof tokens.access_token).toBe("string");
+    expect(Boolean(tokens.access_token), "Token response must include an access token").toBe(true);
+    expect(tokens.token_type).toBe("Bearer");
+    expect(Number.isInteger(tokens.expires_in)).toBe(true);
+    expect(tokens.expires_in).toBeGreaterThan(0);
+    clientAccessToken = tokens.access_token;
+  });
+
+  test("tokeninfo success carries its cache headers", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/oauth2/tokeninfo`, {
+      maxRedirects: 0,
+      params: { access_token: clientAccessToken },
+      headers: { Accept: "application/json" },
+    });
+
+    expect(response.status()).toBe(200);
+    const mediaType = response.headers()["content-type"]?.split(";", 1)[0].trim().toLowerCase();
+    expect(mediaType).toBe("application/json");
+    expect(response.headers()["cache-control"]).toBe("no-cache, no-store");
+    expect(response.headers()["pragma"]).toBeUndefined();
+    const tokenInfo = await response.json();
+    expect(tokenInfo.client_id).toBe(TOKEN_CACHE_CLIENT_ID);
+    expect(tokenInfo.access_token === clientAccessToken, "Token info must identify the issued token").toBe(true);
+    expect(tokenInfo.expires_in).toBeGreaterThan(0);
+  });
+
+  test("introspect success carries no cache headers", async ({ request }) => {
+    const response = await request.post(`${OPENAM_BASE}/oauth2/introspect`, {
+      maxRedirects: 0,
+      form: { token: clientAccessToken },
+      headers: { Accept: "application/json", Authorization: authorization },
+    });
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()["cache-control"]).toBeUndefined();
+    expect(response.headers()["pragma"]).toBeUndefined();
+    const tokenInfo = await response.json();
+    expect(tokenInfo.active).toBe(true);
+    expect(tokenInfo.client_id).toBe(TOKEN_CACHE_CLIENT_ID);
+  });
+
+  test("userinfo without a resource owner carries no cache headers", async ({ request }) => {
+    const response = await request.get(`${OPENAM_BASE}/oauth2/userinfo`, {
+      maxRedirects: 0,
+      headers: { Accept: "application/json", Authorization: `Bearer ${clientAccessToken}` },
+    });
+
+    // Target: 401 with a Bearer invalid_token challenge for a token that cannot identify an end user.
+    expect(response.status()).toBe(400);
+    expect((await response.json()).error).toBe("unauthorized_client");
+    expect(response.headers()["cache-control"]).toBeUndefined();
+    expect(response.headers()["pragma"]).toBeUndefined();
   });
 });
 

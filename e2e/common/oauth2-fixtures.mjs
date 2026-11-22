@@ -191,7 +191,7 @@ export async function ensureUmaProvider(adminToken, request) {
  * fixtures (different secret, missing scope) would otherwise survive and fail the specs in confusing ways.
  * Repeating the same PUT concurrently from two spec files is harmless.
  */
-async function ensureClient(adminToken, request, clientId, data) {
+export async function ensureClient(adminToken, request, clientId, data) {
   const url = `${OPENAM_BASE}/json/realms/${REALM}/realm-config/agents/OAuth2Client/${clientId}`;
   const written = await request.put(url, { headers: adminHeaders(adminToken, AGENT_VERSION), data });
   if (!written.ok()) {
