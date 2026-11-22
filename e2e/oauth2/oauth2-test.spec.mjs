@@ -659,6 +659,7 @@ test.describe("OAuth2 routing contract", () => {
   const tokenHeaders = { Authorization: basicAuth(clientId, clientSecret) };
   const emptyBody = { "Content-Length": "0" };
 
+  let ignoreHTTPSErrors;
   let credentialed;
   let adminHeaders;
   let subRealmId;
@@ -693,7 +694,7 @@ test.describe("OAuth2 routing contract", () => {
         }
       });`
     )), {
-      workerData: { playwright: import.meta.resolve("playwright"), options },
+      workerData: { playwright: import.meta.resolve("playwright"), options: { ...options, ignoreHTTPSErrors } },
       stdout: true, stderr: true,
     });
     worker.stdout.resume();
@@ -771,7 +772,7 @@ test.describe("OAuth2 routing contract", () => {
         hostname: base.hostname, port: base.port || (https ? 443 : 80),
         path: base.pathname.replace(/\/$/, "") + "/oauth2" + suffix,
         method, headers: { ...headers, Host: host }, setHost: false,
-        ...(https ? { servername: base.hostname } : {}),
+        ...(https ? { servername: base.hostname, rejectUnauthorized: !ignoreHTTPSErrors } : {}),
       }, (response) => {
         let text = "";
         response.setEncoding("utf8");
@@ -792,8 +793,9 @@ test.describe("OAuth2 routing contract", () => {
   const postToken = (request, suffix, label, status, headers = {}) => fetch(request, "/access_token" + suffix,
     label, status, { method: "POST", form: tokenForm, headers: { ...tokenHeaders, ...headers } });
 
-  test.beforeAll(async () => {
-    credentialed = privateContext({ ignoreHTTPSErrors: true });
+  test.beforeAll(async ({ ignoreHTTPSErrors: configuredIgnoreHTTPSErrors }) => {
+    ignoreHTTPSErrors = configuredIgnoreHTTPSErrors;
+    credentialed = privateContext();
     const adminToken = await login(getAdminToken, "Admin authentication");
     await ensureClient(adminToken, credentialed, clientId, {
       "userpassword": clientSecret,
