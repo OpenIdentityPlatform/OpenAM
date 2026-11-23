@@ -31,6 +31,7 @@ test.use({ trace: "off", screenshot: "off" });
 
 test.describe("/oauth2/resource_set", () => {
   const runPrefix = `B5 ${randomUUID()} `;
+  const ownedIds = new Set();
   let request;
   let adminToken;
   let pat;
@@ -50,6 +51,8 @@ test.describe("/oauth2/resource_set", () => {
     pat = await protectionApiToken(request, CLIENT_ID, USERNAME, PASSWORD);
     expect(Boolean(pat), "The resource server must obtain a protection API token").toBe(true);
     await warmUpResourceSetStore(request, pat, async (id) => {
+      expect(id, "Warm-up resource set ID").toBeTruthy();
+      ownedIds.add(id);
       await ensureCleanupResourceType();
       await deleteAndVerify(id, "*");
     }, `${runPrefix}warmup`);
@@ -59,20 +62,30 @@ test.describe("/oauth2/resource_set", () => {
     try {
       if (!pat) return;
 
-      const ownedIds = new Set();
       const failures = [];
       // A POST can leave a stored resource without returning its ID. Discover it by name.
-      // Deletes for one client update the same UMA application, so perform them sequentially.
-      for (const id of await listResourceSetIds()) {
-        try {
-          const response = await request.get(itemUrl(id), { headers: bearer() });
-          if (response.status() === 404) continue;
-          expect(response.status(), "Read resource set for cleanup").toBe(200);
-          const resource = await response.json();
-          if (!resource.name.startsWith(runPrefix)) continue;
+      const listedIds = await listResourceSetIds().catch((error) => {
+        failures.push(`List resource sets for cleanup: ${error.message}`);
+        return [];
+      });
 
-          ownedIds.add(id);
-          await ensureCleanupResourceType();
+      // Deletes for one client update the same UMA application, so perform them sequentially.
+      for (const id of new Set([...ownedIds, ...listedIds])) {
+        try {
+          let resource;
+          if (!ownedIds.has(id)) {
+            const response = await request.get(itemUrl(id), { headers: bearer() });
+            if (response.status() === 404) continue;
+            expect(response.status(), "Read resource set for cleanup").toBe(200);
+            resource = await response.json();
+            if (!resource.name.startsWith(runPrefix)) continue;
+
+            ownedIds.add(id);
+          }
+
+          await ensureCleanupResourceType().catch((error) => {
+            failures.push(`${id}: Prepare UMA resource types for cleanup: ${error.message}`);
+          });
           const deleted = await deleteForCleanup(id, resource);
           if (deleted.status() !== 204 && deleted.status() !== 404) {
             failures.push(`${id}: DELETE returned ${deleted.status()}`);
@@ -82,10 +95,14 @@ test.describe("/oauth2/resource_set", () => {
         }
       }
 
-      const remaining = ownedIds.size
-        ? (await listResourceSetIds()).filter((id) => ownedIds.has(id))
-        : [];
-      expect.soft(remaining, "Resource sets remaining after cleanup").toEqual([]);
+      if (ownedIds.size) {
+        try {
+          const remaining = (await listResourceSetIds()).filter((id) => ownedIds.has(id));
+          expect.soft(remaining, "Resource sets remaining after cleanup").toEqual([]);
+        } catch (error) {
+          failures.push(`Verify resource set cleanup: ${error.message}`);
+        }
+      }
       expect(failures, "Resource set cleanup failures").toEqual([]);
     } finally {
       await request?.dispose();
@@ -100,7 +117,7 @@ test.describe("/oauth2/resource_set", () => {
     return ids;
   }
 
-  async function deleteForCleanup(id, { name, scopes }) {
+  async function deleteForCleanup(id, resource) {
     const response = await remove(id, "*");
     if (response.status() < 500 && (response.status() !== 400 || (await response.json()).error !== "server_error")) {
       return response;
@@ -111,6 +128,7 @@ test.describe("/oauth2/resource_set", () => {
     const type = await request.get(`${RESOURCE_TYPES}/${id}`, { headers });
     if (type.status() !== 404) return response;
 
+    const { name, scopes } = resource ?? await (await read(id)).json();
     const restored = await request.post(`${RESOURCE_TYPES}?_action=create`, {
       headers,
       data: {
@@ -157,6 +175,7 @@ test.describe("/oauth2/resource_set", () => {
     expect(response.status(), "Resource set registration").toBe(201);
     const registration = await response.json();
     expect(registration._id).toBeTruthy();
+    ownedIds.add(registration._id);
     return { id: registration._id, name: registeredName, registration, etag: response.headers()["etag"] };
   }
 
@@ -171,6 +190,7 @@ test.describe("/oauth2/resource_set", () => {
     const error = await gone.json();
     expect(error.error).toBe("not_found");
     expect(error.error_description).toContain(id);
+    ownedIds.delete(id);
   }
 
   async function read(id) {
