@@ -14,6 +14,7 @@
  * Copyright 2026 3A Systems, LLC.
  */
 
+import { randomUUID } from "node:crypto";
 import { test, expect } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
 import {
@@ -23,20 +24,25 @@ import {
 
 const CLIENT_ID = "test_client_rs_b5";
 const RESOURCE_SET = `${OPENAM_BASE}/oauth2/resource_set`;
+const REALM = `${OPENAM_BASE}/json/realms/root`;
+const RESOURCE_TYPES = `${REALM}/resourcetypes`;
 
 test.use({ trace: "off", screenshot: "off" });
 
 test.describe("/oauth2/resource_set", () => {
+  const runPrefix = `B5 ${randomUUID()} `;
   let request;
+  let adminToken;
   let pat;
-  const created = new Set();
+  let cleanupResourceTypeReady = false;
 
   const itemUrl = (id) => `${RESOURCE_SET}/${id}`;
   const bearer = (headers = {}) => ({ Authorization: `Bearer ${pat}`, ...headers });
+  const resourceTypeHeaders = () => ({ iPlanetDirectoryPro: adminToken, "Accept-API-Version": "resource=1.0" });
 
   test.beforeAll(async ({ ignoreHTTPSErrors }) => {
     request = unreportedRequest.newContext({ ignoreHTTPSErrors, maxRedirects: 0 });
-    const adminToken = await getAdminToken(request);
+    adminToken = await getAdminToken(request);
     expect(Boolean(adminToken), "Admin authentication must return a session").toBe(true);
     await ensureProviderConfig(adminToken, request);
     await ensureUmaProvider(adminToken, request);
@@ -44,38 +50,85 @@ test.describe("/oauth2/resource_set", () => {
     pat = await protectionApiToken(request, CLIENT_ID, USERNAME, PASSWORD);
     expect(Boolean(pat), "The resource server must obtain a protection API token").toBe(true);
     await warmUpResourceSetStore(request, pat, async (id) => {
-      created.add(id);
-      await ensureCleanupResourceType(adminToken);
+      await ensureCleanupResourceType();
       await deleteAndVerify(id, "*");
-    });
+    }, `${runPrefix}warmup`);
   });
 
   test.afterAll(async () => {
-    const failures = [];
     try {
-      // Deletes for one client update the same UMA application.
-      for (const id of created) {
+      if (!pat) return;
+
+      const ownedIds = new Set();
+      const failures = [];
+      // A POST can leave a stored resource without returning its ID. Discover it by name.
+      // Deletes for one client update the same UMA application, so perform them sequentially.
+      for (const id of await listResourceSetIds()) {
         try {
-          const response = await remove(id, "*");
-          if (response.status() !== 204 && response.status() !== 404) {
-            failures.push(response.status());
+          const response = await request.get(itemUrl(id), { headers: bearer() });
+          if (response.status() === 404) continue;
+          expect(response.status(), "Read resource set for cleanup").toBe(200);
+          const resource = await response.json();
+          if (!resource.name.startsWith(runPrefix)) continue;
+
+          ownedIds.add(id);
+          await ensureCleanupResourceType();
+          const deleted = await deleteForCleanup(id, resource);
+          if (deleted.status() !== 204 && deleted.status() !== 404) {
+            failures.push(`${id}: DELETE returned ${deleted.status()}`);
           }
-        } catch {
-          failures.push("OpenAM request failed");
+        } catch (error) {
+          failures.push(`${id}: ${error.message}`);
         }
       }
+
+      const remaining = ownedIds.size
+        ? (await listResourceSetIds()).filter((id) => ownedIds.has(id))
+        : [];
+      expect.soft(remaining, "Resource sets remaining after cleanup").toEqual([]);
+      expect(failures, "Resource set cleanup failures").toEqual([]);
     } finally {
       await request?.dispose();
     }
-    expect(failures, "Resource set cleanup failures").toEqual([]);
   });
 
-  async function ensureCleanupResourceType(adminToken) {
+  async function listResourceSetIds() {
+    const list = await request.get(`${RESOURCE_SET}/?_queryId=*`, { headers: bearer() });
+    expect(list.status(), "List resource sets").toBe(200);
+    const ids = await list.json();
+    expect(Array.isArray(ids), "Resource set list must be a JSON array").toBe(true);
+    return ids;
+  }
+
+  async function deleteForCleanup(id, { name, scopes }) {
+    const response = await remove(id, "*");
+    if (response.status() < 500 && (response.status() !== 400 || (await response.json()).error !== "server_error")) {
+      return response;
+    }
+
+    // A failed registration hook may leave no resource type for the deletion hook to remove.
+    const headers = resourceTypeHeaders();
+    const type = await request.get(`${RESOURCE_TYPES}/${id}`, { headers });
+    if (type.status() !== 404) return response;
+
+    const restored = await request.post(`${RESOURCE_TYPES}?_action=create`, {
+      headers,
+      data: {
+        uuid: id, name: `${name} - ${id}`, patterns: ["uma://-*-"],
+        actions: Object.fromEntries(scopes.map((scope) => [scope, true])),
+      },
+    });
+    expect(restored.status(), "Restore the missing UMA resource type for cleanup").toBe(201);
+    return remove(id, "*");
+  }
+
+  async function ensureCleanupResourceType() {
+    if (cleanupResourceTypeReady) return;
+
     // An empty resource type list leaves the last reference in the UMA application.
     // Keep the built-in URL type attached so every test resource set can be removed.
-    const realm = `${OPENAM_BASE}/json/realms/root`;
-    const types = await request.get(`${realm}/resourcetypes`, {
-      headers: { iPlanetDirectoryPro: adminToken, "Accept-API-Version": "resource=1.0" },
+    const types = await request.get(RESOURCE_TYPES, {
+      headers: resourceTypeHeaders(),
       params: { _queryFilter: 'name eq "URL"' },
     });
     expect(types.status(), "Read the built-in URL resource type").toBe(200);
@@ -84,31 +137,27 @@ test.describe("/oauth2/resource_set", () => {
     const { uuid } = result[0];
     expect(uuid).toBeTruthy();
 
-    const url = `${realm}/applications/${CLIENT_ID}`;
+    const url = `${REALM}/applications/${CLIENT_ID}`;
     const headers = { iPlanetDirectoryPro: adminToken, "Accept-API-Version": "resource=2.1" };
     const application = await request.get(url, { headers });
     expect(application.status(), "Read the B5 UMA application").toBe(200);
     const data = await application.json();
-    if (!data.resourceTypeUuids.includes(uuid)) {
+    const resourceTypeUuids = data.resourceTypeUuids ?? [];
+    if (!resourceTypeUuids.includes(uuid)) {
       const updated = await request.put(url, {
-        headers, data: { ...data, resourceTypeUuids: [...data.resourceTypeUuids, uuid] },
+        headers, data: { ...data, resourceTypeUuids: [...resourceTypeUuids, uuid] },
       });
       expect(updated.status(), "Update the B5 UMA application").toBe(200);
     }
+    cleanupResourceTypeReady = true;
   }
 
-  async function rememberCreated(response) {
+  async function create(name, extra) {
+    const { response, name: registeredName } = await registerResourceSet(request, pat, runPrefix + name, extra);
+    expect(response.status(), "Resource set registration").toBe(201);
     const registration = await response.json();
     expect(registration._id).toBeTruthy();
-    created.add(registration._id);
-    return registration;
-  }
-
-  async function create(prefix, extra) {
-    const { response, name } = await registerResourceSet(request, pat, uniqueName(prefix), extra);
-    expect(response.status(), "Resource set registration").toBe(201);
-    const registration = await rememberCreated(response);
-    return { id: registration._id, name, registration, etag: response.headers()["etag"] };
+    return { id: registration._id, name: registeredName, registration, etag: response.headers()["etag"] };
   }
 
   async function remove(id, ifMatch) {
@@ -122,7 +171,6 @@ test.describe("/oauth2/resource_set", () => {
     const error = await gone.json();
     expect(error.error).toBe("not_found");
     expect(error.error_description).toContain(id);
-    created.delete(id);
   }
 
   async function read(id) {
@@ -143,7 +191,7 @@ test.describe("/oauth2/resource_set", () => {
 
   test("creates, reads, lists, updates and deletes a resource set", async () => {
     const type = "http://example.invalid/album";
-    const { id, name, registration, etag } = await create("B5 lifecycle", { type });
+    const { id, name, registration, etag } = await create("lifecycle", { type });
     expect(etag).toBeTruthy();
     expect(registration.user_access_policy_uri).toContain(`#uma/share/${id}`);
 
@@ -151,9 +199,7 @@ test.describe("/oauth2/resource_set", () => {
     expect(await resource.json()).toMatchObject({ name, scopes: ["read", "write"], type });
     expect(resource.headers()["etag"]).toBeTruthy();
 
-    const list = await request.get(`${RESOURCE_SET}/?_queryId=*`, { headers: bearer() });
-    expect(list.status()).toBe(200);
-    expect(await list.json()).toEqual(expect.arrayContaining([id]));
+    expect(await listResourceSetIds()).toContain(id);
 
     const update = { name: `${name} renamed`, scopes: ["read"] };
     const noIfMatch = await request.put(itemUrl(id), { headers: bearer(), data: update });
@@ -169,26 +215,8 @@ test.describe("/oauth2/resource_set", () => {
     await deleteAndVerify(id, "*");
   });
 
-  for (const [scenario, headers] of [
-    ["missing", {}],
-    ["unknown", { Authorization: "Bearer not-a-real-token" }],
-  ]) {
-    test(`rejects registration when the bearer token is ${scenario}`, async () => {
-      const response = await request.post(RESOURCE_SET, {
-        headers, data: { name: uniqueName("B5 unauthenticated"), scopes: ["read"] },
-      });
-      if (response.status() === 201) {
-        await rememberCreated(response);
-      }
-      expect(response.status()).toBe(401);
-      expect(await response.json()).toEqual({ error: "invalid_token", error_description: expect.any(String) });
-      // The target is WWW-Authenticate: Bearer.
-      expect(response.headers()["www-authenticate"]).toBeUndefined();
-    });
-  }
-
   test("rejects stale If-Match on update and delete", async () => {
-    const { id, name } = await create("B5 stale write");
+    const { id, name } = await create("stale write");
     const stale = staleTag(await currentEtag(id));
 
     for (const ifMatch of [`W/${stale}`, stale]) {
@@ -208,7 +236,7 @@ test.describe("/oauth2/resource_set", () => {
   });
 
   test("accepts the weak ETag on update and delete and clears omitted labels", async () => {
-    const { id, name } = await create("B5 matching update", { labels: ["alpha", "beta"] });
+    const { id, name } = await create("matching update", { labels: ["alpha", "beta"] });
     const before = await read(id);
     expect((await before.json()).labels.sort()).toEqual(["alpha", "beta"]);
     const etag = before.headers()["etag"];
@@ -226,14 +254,14 @@ test.describe("/oauth2/resource_set", () => {
     expect(afterUpdate.headers()["etag"]).toBe(updatedEtag);
     expect(await afterUpdate.json()).toMatchObject({ ...update, labels: [] });
 
-    const { id: deleteId } = await create("B5 matching delete", { labels: ["alpha", "beta"] });
+    const { id: deleteId } = await create("matching delete", { labels: ["alpha", "beta"] });
     const deleteEtag = await currentEtag(deleteId);
     expect(deleteEtag).toMatch(/^W\/"-?\d+"$/);
     await deleteAndVerify(deleteId, deleteEtag);
   });
 
   test("returns 304 with the ETag on matching If-None-Match for GET and HEAD", async () => {
-    const { id } = await create("B5 cached resource", { labels: ["alpha", "beta"] });
+    const { id } = await create("cached resource", { labels: ["alpha", "beta"] });
     const etag = await currentEtag(id);
 
     for (const method of ["get", "head"]) {
@@ -254,7 +282,7 @@ test.describe("/oauth2/resource_set", () => {
   });
 
   test("returns the resource representation with 412 on GET with a stale If-Match", async () => {
-    const { id, name } = await create("B5 conditional read", { labels: ["alpha"] });
+    const { id, name } = await create("conditional read", { labels: ["alpha"] });
     const etag = await currentEtag(id);
 
     const wildcard = await request.get(itemUrl(id), { headers: bearer({ "If-Match": "*" }) });
@@ -270,4 +298,26 @@ test.describe("/oauth2/resource_set", () => {
     expect(body).toEqual(representation);
     expect(body.error).toBeUndefined();
   });
+});
+
+test.describe("/oauth2/resource_set bearer authentication", () => {
+  for (const [scenario, headers] of [
+    ["missing", {}],
+    ["unknown", { Authorization: "Bearer not-a-real-token" }],
+  ]) {
+    test(`rejects registration when the bearer token is ${scenario}`, async ({ ignoreHTTPSErrors }) => {
+      const request = unreportedRequest.newContext({ ignoreHTTPSErrors, maxRedirects: 0 });
+      try {
+        const response = await request.post(RESOURCE_SET, {
+          headers, data: { name: uniqueName("B5 unauthenticated"), scopes: ["read"] },
+        });
+        expect(response.status()).toBe(401);
+        expect(await response.json()).toEqual({ error: "invalid_token", error_description: expect.any(String) });
+        // The target is WWW-Authenticate: Bearer.
+        expect(response.headers()["www-authenticate"]).toBeUndefined();
+      } finally {
+        await request.dispose();
+      }
+    });
+  }
 });

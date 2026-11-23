@@ -397,14 +397,16 @@ async function isServerError(response) {
  * (watch the `/internal/policySet` notifications in the Entitlement debug log). Until that settles, every
  * registration answers `server_error` -- for well over a second, so a per-request retry is not enough. Doing
  * the waiting once in setup keeps it out of the tests, and on a warm container the first attempt succeeds and
- * this returns immediately.
+ * this returns immediately. A run-specific name prefix also identifies failed attempts during teardown.
  */
-export async function warmUpResourceSetStore(request, pat, cleanup = (id) => deleteResourceSet(request, pat, id)) {
+export async function warmUpResourceSetStore(
+  request, pat, cleanup = (id) => deleteResourceSet(request, pat, id), namePrefix = "warmup",
+) {
   const deadline = Date.now() + 30_000;
   for (let attempt = 1; ; attempt++) {
     const response = await request.post(`${OPENAM_BASE}/oauth2/resource_set`, {
       headers: { Authorization: `Bearer ${pat}`, "Content-Type": "application/json" },
-      data: { name: uniqueName("warmup"), scopes: ["read"] },
+      data: { name: uniqueName(namePrefix), scopes: ["read"] },
     });
     if (response.status() === 201) {
       if (attempt > 1) {
