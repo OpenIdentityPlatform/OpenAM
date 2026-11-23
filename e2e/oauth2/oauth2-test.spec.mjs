@@ -817,6 +817,8 @@ test.describe("OAuth2 authorize contract", () => {
       expect(hints[0].value === loginHint, "Login hint cookie must match the request hint").toBe(true);
       expect(hints[0].attributes.get("path")).toBe("/");
       expect(hints[0].attributes.has("httponly")).toBe(true);
+      expect(hints[0].attributes.has("max-age"), "Login hint must be a session cookie without Max-Age").toBe(false);
+      expect(hints[0].attributes.has("expires"), "Login hint must be a session cookie without Expires").toBe(false);
 
       const fresh = await authorizeSession();
       const freshResponse = await fresh.get(authorizeUrl({ state: "row9b-b", loginHint }), noRedirects);
