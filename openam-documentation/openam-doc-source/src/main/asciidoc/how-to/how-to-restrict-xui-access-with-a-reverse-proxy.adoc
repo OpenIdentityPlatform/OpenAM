@@ -1,0 +1,279 @@
+////
+The contents of this file are subject to the terms of the Common Development and
+Distribution License (the License). You may not use this file except in compliance with the
+License.
+
+You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+specific language governing permission and limitations under the License.
+
+When distributing Covered Software, include this CDDL Header Notice in each file and include
+the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+Header, with the fields enclosed by brackets [] replaced by your own identifying
+information: "Portions copyright [year] [name of copyright owner]".
+
+Copyright 2026 3A Systems, LLC.
+////
+
+:table-caption!:
+
+ifndef::env-site[]
+[#how-to-restrict-xui-access-with-a-reverse-proxy]
+endif::[]
+== Restrict XUI Access with a Reverse Proxy
+
+ifdef::env-site[]
+anchor:how-to-restrict-xui-access-with-a-reverse-proxy[]
+endif::[]
+
+Use the public reverse proxy to expose the XUI sign-in flow for a policy-agent-protected application. These examples target OpenAM 16.1.4 with XUI enabled, the top-level realm, and a shared cookie domain for OpenAM and the application. They use `/openam` as the example deployment path. Substitute your deployment path throughout.
+
+Configure the agent to send browser redirects to the public HTTPS URL and to reach OpenAM's agent services over the private network. Keep the backend, administrative console, and internal endpoints such as `/sessionservice`, `/policyservice`, `/namingservice`, and `/notifications` off the public listener. Configure the OpenAM site and servlet container for the public URL, and add the application's return URLs to Valid `goto` URL Resources. See xref:../install-guide/chap-install-multiple.adoc[Installation Considerations for Multiple Servers] and xref:../admin-guide/chap-auth-services.adoc#configure-valid-goto-url-resources[Configuring Valid goto URL Resources].
+
+[#xui-proxy-requests]
+=== Requests to Allow
+
+The following paths are relative to the deployment path. A dash in the query column means the request does not need an `_action` selector.
+
+[cols="1,3,2,4",options="header"]
+|===
+|Method |Path |Query |Used for
+
+|`GET` |`/UI/Login`, `/XUI`, `/XUI/`, and XUI assets |—
+|The agent's login redirect, XUI bootstrap, and static assets. In the 16.1.4 trace, `/UI/Login` redirects through `/XUI` before reaching `/XUI/`.
+
+|`GET` |`/json/serverinfo/*` or `/json/realms/root/serverinfo/*` |—
+|Public server settings. The asterisk is a literal path segment.
+
+|`POST` |`/json/realms/root/authenticate` or `/json/authenticate` |Authentication parameters, as needed
+|Sign-in and authentication callbacks, including a password change prompted by the authentication chain.
+
+|`POST` |`/json/users` or `/json/realms/root/users` |`_action=idFromSession`
+|Session identification. The unqualified request can return `401` before login. The realm-qualified request identifies the user after login.
+
+|`POST` |`/json/users` |`_action=validateGoto`
+|Validation of the return URL.
+
+|`POST` |`/json/sessions` |`_action=getSessionInfo` or `_action=logout`
+|Session information and sign-out. XUI appends `&tokenId=…` when it can read the session token. With an HttpOnly session cookie, OpenAM obtains the token from the cookie.
+
+|`GET` |`/json/realms/root/users/\{id}` |—
+|Read the signed-in user's record before the redirect and display the self-service profile.
+|===
+
+Keep the user record GET even for a sign-in-only deployment. In the link:https://github.com/OpenIdentityPlatform/OpenAM/discussions/1241#discussioncomment-19790812[OpenAM 16.1.4 browser trace], denying it returned the browser to XUI and ended the session after authentication had succeeded.
+
+For self-service, enable `PUT /json/realms/root/users/\{id}` to save profile attributes and `POST /json/realms/root/users/\{id}?_action=changePassword` to change the password from the profile. Enable each operation as needed. The XUI route `#profile/details` is a browser fragment. The proxy controls the underlying HTTP requests.
+
+The user record rule allows requests for any matching ID. Before exposing it, verify which records and attributes a regular user's session can access. If the deployment requires access to one's own record only, enforce that restriction in the backend or an identity-aware gateway and verify it with two test accounts.
+
+These rules cover the standard sign-in and profile details flows. For sub-realms, CDSSO, extra profile tabs, or authentication modules with extra browser requests, capture the traffic for the selected feature and allow the specific requests it needs. For example, some CDSSO agents use `/cdcservlet`. See xref:../admin-guide/chap-cdsso.adoc[Configuring Cross-Domain Single Sign-On].
+
+[#xui-proxy-apache]
+=== Apache HTTP Server 2.4
+
+Place these directives in a dedicated HTTPS virtual host for OpenAM. Load `mod_rewrite`, `mod_proxy`, and `mod_proxy_http`, and replace `am-backend.internal:8080` with the private backend. Uncomment the optional rules for the profile operations you want to expose.
+
+[source,apache]
+----
+ProxyRequests Off
+ProxyPreserveHost On
+ProxyErrorOverride Off
+ProxyPassReverse "/openam" "http://am-backend.internal:8080/openam"
+RewriteEngine On
+
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteRule "^(/openam/(?:UI/Login|XUI(?:/(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*/)*(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*)?)?|json/(?:realms/root/)?serverinfo/\*))$" "http://am-backend.internal:8080$1" [P,L]
+
+RewriteCond %{REQUEST_METHOD} =POST
+RewriteRule "^(/openam/json/(?:realms/root/)?authenticate)$" "http://am-backend.internal:8080$1" [P,L]
+
+RewriteCond %{REQUEST_METHOD} =POST
+RewriteCond %{QUERY_STRING} ^_action=idFromSession$
+RewriteRule "^(/openam/json/(?:realms/root/)?users)$" "http://am-backend.internal:8080$1" [P,L]
+
+RewriteCond %{REQUEST_METHOD} =POST
+RewriteCond %{QUERY_STRING} ^_action=validateGoto$
+RewriteRule "^(/openam/json/users)$" "http://am-backend.internal:8080$1" [P,L]
+
+RewriteCond %{REQUEST_METHOD} =POST
+RewriteCond %{QUERY_STRING} ^_action=(getSessionInfo|logout)(&tokenId=[^&;\s]+)?$
+RewriteRule "^(/openam/json/sessions)$" "http://am-backend.internal:8080$1" [P,L]
+
+RewriteCond %{REQUEST_METHOD} =GET
+RewriteCond %{QUERY_STRING} ^$
+RewriteRule "^(/openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*)$" "http://am-backend.internal:8080$1" [P,L]
+
+# Optional profile attribute updates
+# RewriteCond %{REQUEST_METHOD} =PUT
+# RewriteCond %{QUERY_STRING} ^$
+# RewriteCond %{HTTP:If-None-Match} ^$
+# RewriteRule "^(/openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*)$" "http://am-backend.internal:8080$1" [P,L]
+
+# Optional password changes from the profile
+# RewriteCond %{REQUEST_METHOD} =POST
+# RewriteCond %{QUERY_STRING} ^_action=changePassword$
+# RewriteRule "^(/openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*)$" "http://am-backend.internal:8080$1" [P,L]
+
+RewriteRule "^" "-" [F]
+----
+
+[#xui-proxy-iis]
+=== IIS with URL Rewrite and Application Request Routing
+
+Install URL Rewrite and Application Request Routing (ARR), enable ARR proxying, and configure it to preserve the public `Host` header. Place the following `web.config` at the root of a dedicated HTTPS site. Replace `am-backend.internal:8080` with the private backend. Set `enabled="true"` for the optional rules you need. If you enable `PUT`, check that WebDAV and request filtering on this site allow ARR to forward the request. See link:https://learn.microsoft.com/en-us/iis/extensions/url-rewrite-module/reverse-proxy-with-url-rewrite-v2-and-application-request-routing[Reverse Proxy with URL Rewrite and ARR].
+
+[source,xml]
+----
+<configuration>
+  <system.webServer>
+    <httpErrors existingResponse="PassThrough" />
+    <rewrite>
+      <rules>
+        <rule name="OpenAM XUI and public server settings" stopProcessing="true">
+          <match url="^openam/(?:UI/Login|XUI(?:/(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*/)*(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*)?)?|json/(?:realms/root/)?serverinfo/\*)$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_METHOD}" pattern="^GET$" />
+          </conditions>
+          <action type="Rewrite" url="http://am-backend.internal:8080/{R:0}" appendQueryString="true" />
+        </rule>
+        <rule name="OpenAM authentication" stopProcessing="true">
+          <match url="^openam/json/(?:realms/root/)?authenticate$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_METHOD}" pattern="^POST$" />
+          </conditions>
+          <action type="Rewrite" url="http://am-backend.internal:8080/{R:0}" appendQueryString="true" />
+        </rule>
+        <rule name="OpenAM session identification" stopProcessing="true">
+          <match url="^openam/json/(?:realms/root/)?users$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_METHOD}" pattern="^POST$" />
+            <add input="{QUERY_STRING}" pattern="^_action=idFromSession$" ignoreCase="false" />
+          </conditions>
+          <action type="Rewrite" url="http://am-backend.internal:8080/{R:0}" appendQueryString="true" />
+        </rule>
+        <rule name="OpenAM return URL validation" stopProcessing="true">
+          <match url="^openam/json/users$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_METHOD}" pattern="^POST$" />
+            <add input="{QUERY_STRING}" pattern="^_action=validateGoto$" ignoreCase="false" />
+          </conditions>
+          <action type="Rewrite" url="http://am-backend.internal:8080/{R:0}" appendQueryString="true" />
+        </rule>
+        <rule name="OpenAM session information and sign-out" stopProcessing="true">
+          <match url="^openam/json/sessions$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_METHOD}" pattern="^POST$" />
+            <add input="{QUERY_STRING}" pattern="^_action=(getSessionInfo|logout)(&amp;tokenId=[^&amp;;\s]+)?$" ignoreCase="false" />
+          </conditions>
+          <action type="Rewrite" url="http://am-backend.internal:8080/{R:0}" appendQueryString="true" />
+        </rule>
+        <rule name="OpenAM read user profile" stopProcessing="true">
+          <match url="^openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_METHOD}" pattern="^GET$" />
+            <add input="{QUERY_STRING}" pattern="^$" />
+          </conditions>
+          <action type="Rewrite" url="http://am-backend.internal:8080/{R:0}" appendQueryString="true" />
+        </rule>
+        <rule name="OpenAM update user profile" enabled="false" stopProcessing="true">
+          <match url="^openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_METHOD}" pattern="^PUT$" />
+            <add input="{QUERY_STRING}" pattern="^$" />
+            <add input="{HTTP_IF_NONE_MATCH}" pattern="^$" />
+          </conditions>
+          <action type="Rewrite" url="http://am-backend.internal:8080/{R:0}" appendQueryString="true" />
+        </rule>
+        <rule name="OpenAM change profile password" enabled="false" stopProcessing="true">
+          <match url="^openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_METHOD}" pattern="^POST$" />
+            <add input="{QUERY_STRING}" pattern="^_action=changePassword$" ignoreCase="false" />
+          </conditions>
+          <action type="Rewrite" url="http://am-backend.internal:8080/{R:0}" appendQueryString="true" />
+        </rule>
+        <rule name="Deny other requests" stopProcessing="true">
+          <match url=".*" />
+          <action type="CustomResponse" statusCode="403" statusReason="Forbidden"
+                  statusDescription="The request is outside the OpenAM allowlist." />
+        </rule>
+      </rules>
+    </rewrite>
+  </system.webServer>
+</configuration>
+----
+
+[#xui-proxy-nginx]
+=== NGINX
+
+Place this example inside the `http` block. Set the public hostname, certificate and key paths, and private backend address for your deployment. Uncomment the profile rules you need. The `map` directives check the method, normalized path, and query before `location /` proxies the request. Keep the trailing slash on `proxy_pass` so NGINX forwards the normalized path with the original query string. See link:https://nginx.org/en/docs/http/ngx_http_map_module.html[NGINX map] and link:https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass[NGINX proxy_pass].
+
+[source,nginx]
+----
+map $args $openam_xui_query {
+    default other;
+    "" empty;
+    "~^_action=idFromSession$" identify;
+    "~^_action=validateGoto$" validate_goto;
+    "~^_action=(getSessionInfo|logout)(&tokenId=[^&;\s]+)?$" session;
+    "~^_action=changePassword$" change_password;
+}
+
+map $http_if_none_match $openam_xui_profile_update {
+    default 0;
+    "" 1;
+}
+
+map "$request_method:$openam_xui_query:$uri" $openam_xui_allowed {
+    default 0;
+    "~^GET:[^:]+:/openam/(?:UI/Login|XUI(?:/[A-Za-z0-9_-][A-Za-z0-9_.-]*)*/?|json/(?:realms/root/)?serverinfo/\*)\z" 1;
+    "~^POST:[^:]+:/openam/json/(?:realms/root/)?authenticate\z" 1;
+    "~^POST:identify:/openam/json/(?:realms/root/)?users\z" 1;
+    "~^POST:validate_goto:/openam/json/users\z" 1;
+    "~^POST:session:/openam/json/sessions\z" 1;
+    "~^GET:empty:/openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*\z" 1;
+
+    # Optional profile attribute updates
+    # "~^PUT:empty:/openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*\z" $openam_xui_profile_update;
+
+    # Optional password changes from the profile
+    # "~^POST:change_password:/openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*\z" 1;
+}
+
+# Keep session tokens in query strings out of the access log.
+log_format openam_xui '$remote_addr $request_method $uri $status';
+
+server {
+    listen 443 ssl;
+    server_name am.example.test;
+    ssl_certificate /etc/nginx/tls/fullchain.pem;
+    ssl_certificate_key /etc/nginx/tls/privkey.pem;
+    access_log /var/log/nginx/openam-access.log openam_xui;
+
+    location / {
+        if ($openam_xui_allowed = 0) {
+            return 403;
+        }
+
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_intercept_errors off;
+        proxy_cache off;
+        proxy_pass http://am-backend.internal:8080/;
+    }
+}
+----
+
+[#xui-proxy-validation]
+=== Verify Your Deployment
+
+The examples accept simple ASCII asset paths and single-segment user IDs. If your deployment has different IDs or customized assets, adjust the corresponding path pattern for the characters you need. Keep the method, path, and `_action` checks and the final deny rule. Check parent and global proxy rules for any routes that would forward requests before this allowlist runs. If you record proxy requests for troubleshooting, omit query strings that carry session tokens.
+
+. Open the protected application with a fresh browser session and preserve the network log in developer tools. Check that XUI loads, authentication sets the session cookie, the user record request succeeds, and the protected application accepts the session after the redirect.
+. Try an incorrect password and an account whose authentication chain prompts for a password change. Verify that XUI shows the expected failure or completes the callbacks through `/json/realms/root/authenticate`. Then sign out and confirm that opening the protected application requires a new login.
+. If you enable self-service operations, change an allowed profile attribute and the password of a test account. Sign in again with the new password.
+. Check the proxy and backend logs. Public requests for the administrative console, agent services, user collection queries, and unlisted `_action` values should be rejected at the proxy. Use two regular test accounts to verify that reads and optional writes respect the deployment's profile access policy.
+
+Repeat these checks after changing the OpenAM version, realm, authentication chain, agent, or proxy configuration.
