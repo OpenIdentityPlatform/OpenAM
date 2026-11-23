@@ -562,43 +562,32 @@ test.describe("OAuth2 authorize contract", () => {
   const unknownScope = "no_such_scope";
   const noRedirects = { maxRedirects: 0 };
 
+  let adminToken;
   let challenge;
   let demoToken;
-  let demoName;
-
-  test.beforeAll(async ({ ignoreHTTPSErrors }) => {
-    const request = unreportedRequest.newContext({ ignoreHTTPSErrors });
-    try {
-      const adminToken = await getAdminToken(request);
-      expect(Boolean(adminToken), "Admin authentication must return a session token").toBe(true);
-      await ensureProviderConfig(adminToken, request);
-      await ensureClient(adminToken, request, implicitClientId, {
-        "com.forgerock.openam.oauth2provider.clientType": "Public",
-        "com.forgerock.openam.oauth2provider.redirectionURIs": [`[0]=${REDIRECT_URI}`],
-        "com.forgerock.openam.oauth2provider.scopes": [`[0]=${SCOPE}`],
-        "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=implicit"],
-        "com.forgerock.openam.oauth2provider.responseTypes": ["[0]=token"],
-        "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "none",
-        sunIdentityServerDeviceStatus: "Active",
-      });
-      demoName = await readUserCommonName(adminToken, request, USERNAME);
-    } finally {
-      await request.dispose();
-    }
-    challenge = (await pkce()).challenge;
-
-    const loginContext = unreportedRequest.newContext({ ignoreHTTPSErrors });
-    try {
-      demoToken = await getAuthToken(loginContext, USERNAME, PASSWORD);
-      expect(Boolean(demoToken), "Resource-owner authentication must return a session token").toBe(true);
-    } finally {
-      await loginContext.dispose();
-    }
-  });
 
   // Each session starts with its own cookie jar. The consent GET and POST share a jar through both requests.
   const contractTest = test.extend({
-    authorizeSession: async ({}, use) => {
+    authorizeAdminRequest: async ({ ignoreHTTPSErrors }, use) => {
+      const request = unreportedRequest.newContext({ ignoreHTTPSErrors });
+      try {
+        await use(request);
+      } finally {
+        await request.dispose();
+      }
+    },
+
+    authorizeSession: async ({ ignoreHTTPSErrors }, use) => {
+      if (!demoToken) {
+        const loginContext = unreportedRequest.newContext({ ignoreHTTPSErrors });
+        try {
+          demoToken = await getAuthToken(loginContext, USERNAME, PASSWORD);
+          expect(Boolean(demoToken), "Resource-owner authentication must return a session token").toBe(true);
+        } finally {
+          await loginContext.dispose();
+        }
+      }
+
       const contexts = [];
       try {
         await use(async (extraCookies) => {
@@ -610,6 +599,13 @@ test.describe("OAuth2 authorize contract", () => {
         await Promise.all(contexts.map((context) => context.dispose()));
       }
     },
+  });
+
+  contractTest.beforeAll(async ({ authorizeAdminRequest }) => {
+    adminToken = await getAdminToken(authorizeAdminRequest);
+    expect(Boolean(adminToken), "Admin authentication must return a session token").toBe(true);
+    await ensureProviderConfig(adminToken, authorizeAdminRequest);
+    challenge = (await pkce()).challenge;
   });
 
   // Keep the raw query stable because both the login redirect and consent form carry it.
@@ -682,7 +678,8 @@ test.describe("OAuth2 authorize contract", () => {
     expectNoCache(response);
   });
 
-  contractTest("renders consent data and a matching CSRF cookie", async ({ authorizeSession, page }) => {
+  contractTest("renders consent data and a matching CSRF cookie", async ({ authorizeAdminRequest, authorizeSession, page }) => {
+    const demoName = await readUserCommonName(adminToken, authorizeAdminRequest, USERNAME);
     const context = await authorizeSession();
     const url = authorizeUrl({ clientId: CONSENT_CLIENT_ID, state: "row2state" });
     const response = await context.get(url, noRedirects);
@@ -747,17 +744,27 @@ test.describe("OAuth2 authorize contract", () => {
     expectNoCache(response);
   });
 
-  contractTest("redirects invalid_scope for the implicit flow in the callback fragment", async ({ authorizeSession }) => {
-    const context = await authorizeSession();
-    const url = authorizeUrl({
-      clientId: implicitClientId, responseType: "token", scope: unknownScope, state: "row6state",
+  contractTest("redirects invalid_scope for the implicit flow in the callback fragment",
+    async ({ authorizeAdminRequest, authorizeSession }) => {
+      await ensureClient(adminToken, authorizeAdminRequest, implicitClientId, {
+        "com.forgerock.openam.oauth2provider.clientType": "Public",
+        "com.forgerock.openam.oauth2provider.redirectionURIs": [`[0]=${REDIRECT_URI}`],
+        "com.forgerock.openam.oauth2provider.scopes": [`[0]=${SCOPE}`],
+        "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=implicit"],
+        "com.forgerock.openam.oauth2provider.responseTypes": ["[0]=token"],
+        "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "none",
+        sunIdentityServerDeviceStatus: "Active",
+      });
+      const context = await authorizeSession();
+      const url = authorizeUrl({
+        clientId: implicitClientId, responseType: "token", scope: unknownScope, state: "row6state",
+      });
+      const response = await context.get(url, noRedirects);
+      expect(response.status()).toBe(302);
+      const location = response.headers()["location"];
+      expect(Boolean(location?.startsWith(`${REDIRECT_URI}#`)), "Error must use the registered callback fragment").toBe(true);
+      expectInvalidScope(new URLSearchParams(new URL(location).hash.slice(1)), "row6state");
     });
-    const response = await context.get(url, noRedirects);
-    expect(response.status()).toBe(302);
-    const location = response.headers()["location"];
-    expect(Boolean(location?.startsWith(`${REDIRECT_URI}#`)), "Error must use the registered callback fragment").toBe(true);
-    expectInvalidScope(new URLSearchParams(new URL(location).hash.slice(1)), "row6state");
-  });
 
   contractTest("rejects PUT with the authorize filter's method error", async ({ request }) => {
     const response = await request.put(authorizeUrl(), noRedirects);
