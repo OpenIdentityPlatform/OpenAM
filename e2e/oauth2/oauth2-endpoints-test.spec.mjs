@@ -35,7 +35,7 @@ test.describe("/oauth2/resource_set", () => {
   const bearer = (headers = {}) => ({ Authorization: `Bearer ${pat}`, ...headers });
 
   test.beforeAll(async ({ ignoreHTTPSErrors }) => {
-    request = unreportedRequest.newContext({ ignoreHTTPSErrors });
+    request = unreportedRequest.newContext({ ignoreHTTPSErrors, maxRedirects: 0 });
     const adminToken = await getAdminToken(request);
     expect(Boolean(adminToken), "Admin authentication must return a session").toBe(true);
     await ensureProviderConfig(adminToken, request);
@@ -46,7 +46,7 @@ test.describe("/oauth2/resource_set", () => {
     await warmUpResourceSetStore(request, pat, async (id) => {
       created.add(id);
       await ensureCleanupResourceType(adminToken);
-      expect((await remove(id, "*")).status(), "Warm-up resource set cleanup").toBe(204);
+      await deleteAndVerify(id, "*");
     });
   });
 
@@ -112,11 +112,17 @@ test.describe("/oauth2/resource_set", () => {
   }
 
   async function remove(id, ifMatch) {
-    const response = await request.delete(itemUrl(id), { headers: bearer({ "If-Match": ifMatch }) });
-    if (response.status() === 204) {
-      created.delete(id);
-    }
-    return response;
+    return request.delete(itemUrl(id), { headers: bearer({ "If-Match": ifMatch }) });
+  }
+
+  async function deleteAndVerify(id, ifMatch) {
+    expect((await remove(id, ifMatch)).status(), "Resource set deletion").toBe(204);
+    const gone = await request.get(itemUrl(id), { headers: bearer() });
+    expect(gone.status(), "Read the deleted resource set").toBe(404);
+    const error = await gone.json();
+    expect(error.error).toBe("not_found");
+    expect(error.error_description).toContain(id);
+    created.delete(id);
   }
 
   async function read(id) {
@@ -145,9 +151,7 @@ test.describe("/oauth2/resource_set", () => {
     expect(await resource.json()).toMatchObject({ name, scopes: ["read", "write"], type });
     expect(resource.headers()["etag"]).toBeTruthy();
 
-    const list = await request.get(`${RESOURCE_SET}/?_queryId=*`, {
-      headers: bearer(), maxRedirects: 0,
-    });
+    const list = await request.get(`${RESOURCE_SET}/?_queryId=*`, { headers: bearer() });
     expect(list.status()).toBe(200);
     expect(await list.json()).toEqual(expect.arrayContaining([id]));
 
@@ -162,12 +166,7 @@ test.describe("/oauth2/resource_set", () => {
     expect(updated.status()).toBe(200);
     expect(await (await read(id)).json()).toMatchObject(update);
 
-    expect((await remove(id, "*")).status()).toBe(204);
-    const gone = await request.get(itemUrl(id), { headers: bearer() });
-    expect(gone.status()).toBe(404);
-    const error = await gone.json();
-    expect(error.error).toBe("not_found");
-    expect(error.error_description).toContain(id);
+    await deleteAndVerify(id, "*");
   });
 
   for (const [scenario, headers] of [
@@ -215,19 +214,22 @@ test.describe("/oauth2/resource_set", () => {
     const etag = before.headers()["etag"];
     expect(etag).toMatch(/^W\/"-?\d+"$/);
 
+    const update = { name: `${name} updated`, scopes: ["read"] };
     const updated = await request.put(itemUrl(id), {
-      headers: bearer({ "If-Match": etag }), data: { name: `${name} updated`, scopes: ["read"] },
+      headers: bearer({ "If-Match": etag }), data: update,
     });
     expect(updated.status()).toBe(200);
     const updatedEtag = updated.headers()["etag"];
     expect(updatedEtag).toMatch(/^W\/"-?\d+"$/);
     expect(updatedEtag).not.toBe(etag);
-    expect((await (await read(id)).json()).labels).toEqual([]);
+    const afterUpdate = await read(id);
+    expect(afterUpdate.headers()["etag"]).toBe(updatedEtag);
+    expect(await afterUpdate.json()).toMatchObject({ ...update, labels: [] });
 
     const { id: deleteId } = await create("B5 matching delete", { labels: ["alpha", "beta"] });
     const deleteEtag = await currentEtag(deleteId);
     expect(deleteEtag).toMatch(/^W\/"-?\d+"$/);
-    expect((await remove(deleteId, deleteEtag)).status()).toBe(204);
+    await deleteAndVerify(deleteId, deleteEtag);
   });
 
   test("returns 304 with the ETag on matching If-None-Match for GET and HEAD", async () => {
