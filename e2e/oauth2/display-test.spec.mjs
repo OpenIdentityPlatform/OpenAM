@@ -27,7 +27,9 @@
 
 import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
-import { REALM, REDIRECT_URI, SCOPE, ensureProviderConfig, pkce, sessionContext } from "../common/oauth2-fixtures.mjs";
+import {
+  REALM, REDIRECT_URI, SCOPE, ensureProviderConfig, pageDataValue, pkce, readUserCommonName, sessionContext, userNameValue,
+} from "../common/oauth2-fixtures.mjs";
 
 /** This spec's own clients: Playwright runs spec files in parallel, and a client another file rewrites mid-run
  *  would break this one. */
@@ -98,16 +100,7 @@ test.beforeAll(async ({ request }) => {
 
   // The consent page names the resource owner by the provider's display name attribute, cn by default. CI creates
   // demo with cn "Demo Demo"; a local embedded store keeps its own demo entry, so the name is read, not assumed.
-  const demo = await request.get(`${OPENAM_BASE}/json/realms/${REALM}/users/${USERNAME}`, {
-    headers: { iPlanetDirectoryPro: adminToken, "Accept-API-Version": "resource=3.0, protocol=2.1" },
-  });
-  if (!demo.ok()) {
-    throw new Error(`Failed to read ${USERNAME}: ${demo.status()} ${demo.statusText()} ${await demo.text()}`);
-  }
-  demoName = (await demo.json()).cn?.[0];
-  if (!demoName) {
-    throw new Error(`${USERNAME} has no cn`);
-  }
+  demoName = await readUserCommonName(adminToken, request, USERNAME);
 
   const loginCtx = await apiRequest.newContext({ ignoreHTTPSErrors: true });
   try {
@@ -136,17 +129,6 @@ function authorizeQuery(display) {
   return parts.join("&");
 }
 
-/**
- * A value the templates interpolate into the `pageData` object literal, scraped out of the rendered page.
- *
- * Anchored on a preceding delimiter: unanchored, `isplayName` would also match inside `displayName`, and the touch
- * tests could no longer tell the two keys apart.
- */
-function pageDataValue(html, key) {
-  const match = new RegExp(`(?:^|[{,\\s])${key}:\\s*"([^"]*)"`).exec(html);
-  return match && match[1];
-}
-
 /** Mints a device code for the consent-requiring device client and returns its user code. */
 async function deviceCode(request) {
   const response = await request.post(`${OAUTH2}/device/code`, {
@@ -173,16 +155,6 @@ function submitUserCode(userCode, display) {
     form: { user_code: userCode, csrf: demoToken },
     maxRedirects: 0,
   });
-}
-
-/** ESAPI HTML-encodes the name before FreeMarker interpolates it; decode once as inert text, never markup. */
-async function userNameValue(page, html) {
-  return page.evaluate((encoded) => {
-    if (encoded === null) return null;
-    const text = document.createElement("textarea");
-    text.innerHTML = encoded;
-    return text.value;
-  }, pageDataValue(html, "userName"));
 }
 
 test.describe("?display= on /oauth2/authorize", () => {

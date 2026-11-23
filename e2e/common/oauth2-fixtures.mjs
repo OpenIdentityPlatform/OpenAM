@@ -20,6 +20,7 @@
  * the only safe shape here.
  */
 
+import { MessageChannel, Worker } from "node:worker_threads";
 import { OPENAM_BASE } from "./openam-commons.mjs";
 
 export const REALM = "root";
@@ -440,6 +441,42 @@ export async function deleteResourceSet(request, pat, id) {
 }
 
 /**
+ * A value the templates interpolate into the `pageData` object literal, scraped out of the rendered page.
+ *
+ * Anchored on a preceding delimiter: unanchored, `isplayName` would also match inside `displayName`, and the touch
+ * tests could no longer tell the two keys apart.
+ */
+export function pageDataValue(html, key) {
+  const match = new RegExp(`(?:^|[{,\\s])${key}:\\s*"([^"]*)"`).exec(html);
+  return match && match[1];
+}
+
+/** ESAPI HTML-encodes the name before FreeMarker interpolates it; decode once as inert text, never markup. */
+export async function userNameValue(page, html) {
+  return page.evaluate((encoded) => {
+    if (encoded === null) return null;
+    const text = document.createElement("textarea");
+    text.innerHTML = encoded;
+    return text.value;
+  }, pageDataValue(html, "userName"));
+}
+
+/** Reads the resource owner's display name from the default provider attribute, cn. */
+export async function readUserCommonName(adminToken, request, username) {
+  const response = await request.get(`${OPENAM_BASE}/json/realms/${REALM}/users/${username}`, {
+    headers: { iPlanetDirectoryPro: adminToken, "Accept-API-Version": "resource=3.0, protocol=2.1" },
+  });
+  if (!response.ok()) {
+    throw new Error(`Failed to read ${username}: ${response.status()} ${response.statusText()} ${await response.text()}`);
+  }
+  const commonName = (await response.json()).cn?.[0];
+  if (!commonName) {
+    throw new Error(`${username} has no cn`);
+  }
+  return commonName;
+}
+
+/**
  * A fixed PKCE pair. `authorizationCodeTokens` always sends the S256 challenge, so the flow works whether or
  * not the provider enforces PKCE. The provider's `codeVerifierEnforced` defaults to true and no fixture
  * changes it, so an authorization request without a challenge is rejected.
@@ -449,6 +486,94 @@ export async function pkce() {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
   return { verifier, challenge: Buffer.from(digest).toString("base64url") };
 }
+
+/**
+ * Playwright includes outgoing headers in API call errors, even with tracing disabled. Create credentialed
+ * request contexts in a worker without the test runner's reporter instrumentation.
+ */
+export const unreportedRequest = {
+  newContext(options) {
+    const source = `
+      import { parentPort, workerData } from "node:worker_threads";
+      const { request } = await import(workerData.playwright);
+      const context = await request.newContext(workerData.options);
+
+      parentPort.on("message", async ({ url, options, reply }) => {
+        try {
+          const response = await context.fetch(url, options);
+          let result;
+          try {
+            result = {
+              status: response.status(),
+              statusText: response.statusText(),
+              headers: response.headers(),
+              headersArray: response.headersArray(),
+              text: await response.text(),
+            };
+          } finally {
+            await response.dispose();
+          }
+          reply.postMessage(result);
+        } catch {
+          reply.postMessage(null);
+        } finally {
+          reply.close();
+        }
+      });
+    `;
+    const worker = new Worker(new URL("data:text/javascript," + encodeURIComponent(source)), {
+      workerData: { playwright: import.meta.resolve("playwright"), options },
+      stdout: true,
+      stderr: true,
+    });
+    worker.stdout.resume();
+    worker.stderr.resume();
+    const stopped = new Promise((resolve) => {
+      worker.on("error", () => resolve(null));
+      worker.once("exit", () => resolve(null));
+    });
+
+    async function fetch(url, requestOptions) {
+      const { port1, port2 } = new MessageChannel();
+      try {
+        const result = await Promise.race([
+          new Promise((resolve) => {
+            port1.once("message", resolve);
+            worker.postMessage({ url, options: requestOptions, reply: port2 }, [port2]);
+          }),
+          stopped,
+        ]);
+        if (result === null) {
+          throw new Error("OpenAM request failed");
+        }
+        return {
+          ok: () => result.status >= 200 && result.status < 300,
+          status: () => result.status,
+          statusText: () => result.statusText,
+          headers: () => result.headers,
+          headersArray: () => result.headersArray,
+          text: async () => result.text,
+          json: async () => {
+            try {
+              return JSON.parse(result.text);
+            } catch {
+              throw new Error(`OpenAM returned invalid JSON (status ${result.status})`);
+            }
+          },
+        };
+      } finally {
+        port1.close();
+      }
+    }
+
+    return {
+      get: (url, options) => fetch(url, { ...options, method: "GET" }),
+      post: (url, options) => fetch(url, { ...options, method: "POST" }),
+      put: (url, options) => fetch(url, { ...options, method: "PUT" }),
+      dispose: () => worker.terminate(),
+    };
+  },
+};
 
 /**
  * A Playwright request context whose cookie jar holds the given session, and nothing else.

@@ -16,7 +16,10 @@
 
 import { test, expect, request as apiRequest } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
-import { basicAuth, ensureClient, pkce, sessionContext } from "../common/oauth2-fixtures.mjs";
+import {
+  basicAuth, ensureClient, ensureProviderConfig, pageDataValue, pkce, readUserCommonName, sessionContext,
+  unreportedRequest, userNameValue,
+} from "../common/oauth2-fixtures.mjs";
 
 // Traces can capture bearer tokens in request headers, query strings and form bodies.
 test.use({ trace: "off", screenshot: "off" });
@@ -141,13 +144,17 @@ async function ensureOAuth2ClientExists(adminToken, request, clientId = CLIENT_I
   }
 }
 
-test.beforeAll(async ({ request }) => {
-  const adminToken = await getAdminToken(request)
-
-  expect(Boolean(adminToken), "Admin authentication must return a session token").toBe(true);
-  await ensureOAuth2ServiceExists(adminToken, request);
-  await ensureOAuth2ClientExists(adminToken, request);
-  await ensureOAuth2ClientExists(adminToken, request, CONSENT_CLIENT_ID, false);
+test.beforeAll(async ({ ignoreHTTPSErrors }) => {
+  const request = unreportedRequest.newContext({ ignoreHTTPSErrors });
+  try {
+    const adminToken = await getAdminToken(request);
+    expect(Boolean(adminToken), "Admin authentication must return a session token").toBe(true);
+    await ensureOAuth2ServiceExists(adminToken, request);
+    await ensureOAuth2ClientExists(adminToken, request);
+    await ensureOAuth2ClientExists(adminToken, request, CONSENT_CLIENT_ID, false);
+  } finally {
+    await request.dispose();
+  }
 });
 
 async function ensureTokenCacheClientExists(request) {
@@ -545,6 +552,290 @@ test.describe("OAuth2 cache headers", () => {
     expect(response.headers()["cache-control"]).toBeUndefined();
     expect(response.headers()["pragma"]).toBeUndefined();
   });
+});
+
+test.describe("OAuth2 authorize contract", () => {
+  const OAUTH2 = `${OPENAM_BASE}/oauth2`;
+  const AUTHORIZE = `${OAUTH2}/authorize`;
+  const authorizePath = new URL(AUTHORIZE).pathname;
+  const implicitClientId = "test_client_oauth2_b4d_implicit";
+  const unknownScope = "no_such_scope";
+  const noRedirects = { maxRedirects: 0 };
+
+  let challenge;
+  let demoToken;
+  let demoName;
+
+  test.beforeAll(async ({ ignoreHTTPSErrors }) => {
+    const request = unreportedRequest.newContext({ ignoreHTTPSErrors });
+    try {
+      const adminToken = await getAdminToken(request);
+      expect(Boolean(adminToken), "Admin authentication must return a session token").toBe(true);
+      await ensureProviderConfig(adminToken, request);
+      await ensureClient(adminToken, request, implicitClientId, {
+        "com.forgerock.openam.oauth2provider.clientType": "Public",
+        "com.forgerock.openam.oauth2provider.redirectionURIs": [`[0]=${REDIRECT_URI}`],
+        "com.forgerock.openam.oauth2provider.scopes": [`[0]=${SCOPE}`],
+        "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=implicit"],
+        "com.forgerock.openam.oauth2provider.responseTypes": ["[0]=token"],
+        "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "none",
+        sunIdentityServerDeviceStatus: "Active",
+      });
+      demoName = await readUserCommonName(adminToken, request, USERNAME);
+    } finally {
+      await request.dispose();
+    }
+    challenge = (await pkce()).challenge;
+
+    const loginContext = unreportedRequest.newContext({ ignoreHTTPSErrors });
+    try {
+      demoToken = await getAuthToken(loginContext, USERNAME, PASSWORD);
+      expect(Boolean(demoToken), "Resource-owner authentication must return a session token").toBe(true);
+    } finally {
+      await loginContext.dispose();
+    }
+  });
+
+  // Each session starts with its own cookie jar. The consent GET and POST share a jar through both requests.
+  const contractTest = test.extend({
+    authorizeSession: async ({}, use) => {
+      const contexts = [];
+      try {
+        await use(async (extraCookies) => {
+          const context = await sessionContext(unreportedRequest, demoToken, extraCookies);
+          contexts.push(context);
+          return context;
+        });
+      } finally {
+        await Promise.all(contexts.map((context) => context.dispose()));
+      }
+    },
+  });
+
+  // Keep the raw query stable because both the login redirect and consent form carry it.
+  function authorizeUrl({ clientId = CLIENT_ID, responseType = "code", scope = SCOPE,
+    redirectUri = REDIRECT_URI, state, loginHint } = {}) {
+    const query = new URLSearchParams({ response_type: responseType, client_id: clientId, redirect_uri: redirectUri, scope });
+    if (state !== undefined) query.set("state", state);
+    if (loginHint !== undefined) query.set("login_hint", loginHint);
+    if (responseType === "code") {
+      query.set("code_challenge", challenge);
+      query.set("code_challenge_method", "S256");
+    }
+    return `${AUTHORIZE}?${query}`;
+  }
+
+  function expectNoCache(response) {
+    expect(response.headers()["cache-control"]).toBe("no-store");
+    expect(response.headers()["pragma"]).toBe("no-cache");
+  }
+
+  function responseCookies(response, name) {
+    return response.headersArray()
+      .filter((header) => header.name.toLowerCase() === "set-cookie" && header.value.startsWith(`${name}=`))
+      .map((header) => {
+        const [value, ...attributes] = header.value.slice(name.length + 1).split(";");
+        return {
+          value,
+          attributes: new Map(attributes.map((attribute) => {
+            const [key, attributeValue] = attribute.trim().split("=", 2);
+            return [key.toLowerCase(), attributeValue];
+          })),
+        };
+      });
+  }
+
+  function expectErrorPage(response) {
+    expect(response.status()).toBe(400);
+    expect(response.headers()["content-type"]).toBe("text/html;charset=UTF-8");
+    expect("location" in response.headers(), "Error page must have no Location header").toBe(false);
+  }
+
+  function expectCodeCallback(response, state) {
+    expect(response.status()).toBe(302);
+    const location = response.headers()["location"];
+    expect(Boolean(location?.startsWith(`${REDIRECT_URI}?`)), "Redirect must use the registered callback").toBe(true);
+    expect(location.includes("#"), "Code callback must have no fragment").toBe(false);
+    const params = new URL(location).searchParams;
+    expect(Boolean(params.get("code")), "Callback must carry an authorization code").toBe(true);
+    expect(params.get("state")).toBe(state);
+    return params;
+  }
+
+  function expectInvalidScope(params, state) {
+    expect(params.get("error")).toBe("invalid_scope");
+    expect(params.get("error_description")).toBe(`Unknown/invalid scope(s): [${unknownScope}]`);
+    expect(params.get("state")).toBe(state);
+  }
+
+  contractTest("redirects an unauthenticated GET to login with the original request as goto", async ({ request }) => {
+    const url = authorizeUrl({ state: "row1state" });
+    const response = await request.get(url, noRedirects);
+    expect(response.status()).toBe(301);
+    const location = response.headers()["location"];
+    expect(Boolean(location?.startsWith(`${OPENAM_BASE}/UI/Login?realm=%2F&goto=`)), "Login redirect and encoded realm")
+      .toBe(true);
+    const loginUrl = new URL(location);
+    expect(loginUrl.searchParams.get("realm")).toBe("/");
+    expect(loginUrl.searchParams.get("goto")).toBe(url);
+    expect(location).toContain("redirect_uri%3Dhttp%253A%252F%252Fapp.invalid%252Fcb");
+    expectNoCache(response);
+  });
+
+  contractTest("renders consent data and a matching CSRF cookie", async ({ authorizeSession, page }) => {
+    const context = await authorizeSession();
+    const url = authorizeUrl({ clientId: CONSENT_CLIENT_ID, state: "row2state" });
+    const response = await context.get(url, noRedirects);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toBe("text/html;charset=UTF-8");
+    expectNoCache(response);
+    const html = await response.text();
+
+    expect(pageDataValue(html, "clientId")).toBe(CONSENT_CLIENT_ID);
+    expect(pageDataValue(html, "displayName")).toBe(CONSENT_CLIENT_ID);
+    expect(await userNameValue(page, html)).toBe(demoName);
+    expect(pageDataValue(html, "responseType")).toBe("code");
+    expect(pageDataValue(html, "redirectUri")).toBe(REDIRECT_URI);
+    expect(pageDataValue(html, "scope")).toBe(SCOPE);
+    expect(pageDataValue(html, "state")).toBe("row2state");
+    expect(pageDataValue(html, "locale")).toBe("*");
+    expect(html.includes("isSaveConsentEnabled: true"), "Consent page allows saving the decision").toBe(true);
+    expect(html.includes('displayScopes: [ { "name": "profile"'), "Consent page displays the profile scope").toBe(true);
+    // FreeMarker escapes the leading slash in the JavaScript form target.
+    expect(pageDataValue(html, "formTarget")).toBe(`\\${authorizePath}${new URL(url).search}`);
+
+    const cookies = responseCookies(response, "oauth2_csrf");
+    expect(cookies.length, "Response must set one oauth2_csrf cookie").toBe(1);
+    const [cookie] = cookies;
+    const csrf = pageDataValue(html, "csrf");
+    expect(Boolean(csrf), "Consent page must carry a CSRF token").toBe(true);
+    expect(cookie.value === csrf, "CSRF cookie must match the page token").toBe(true);
+    expect(cookie.attributes.get("path")).toBe("/");
+    expect(cookie.attributes.has("httponly")).toBe(true);
+    expect(cookie.attributes.get("samesite")).toBe("Lax");
+  });
+
+  contractTest("renders an invalid_client error without redirecting an unknown client", async ({ authorizeSession }) => {
+    const context = await authorizeSession();
+    const response = await context.get(authorizeUrl({ clientId: "no_such_client", state: "row3state" }), noRedirects);
+    expectErrorPage(response);
+    const html = await response.text();
+    expect(pageDataValue(html, "message")).toBe("invalid_client");
+    expect(pageDataValue(html, "description")).toBe("Client authentication failed");
+    expectNoCache(response);
+  });
+
+  contractTest("renders a redirect_uri_mismatch error without redirecting to an unregistered callback",
+    async ({ authorizeSession }) => {
+      const context = await authorizeSession();
+      const url = authorizeUrl({ redirectUri: "http://unregistered.invalid/cb", state: "row4state" });
+      const response = await context.get(url, noRedirects);
+      expectErrorPage(response);
+      const html = await response.text();
+      expect(pageDataValue(html, "message")).toBe("redirect_uri_mismatch");
+      expect(pageDataValue(html, "description")).toBe("The redirection URI provided does not match a pre-registered value.");
+    });
+
+  contractTest("redirects invalid_scope for the code flow in the callback query", async ({ authorizeSession }) => {
+    const context = await authorizeSession();
+    const response = await context.get(authorizeUrl({ scope: unknownScope, state: "row5state" }), noRedirects);
+    expect(response.status()).toBe(302);
+    const location = response.headers()["location"];
+    expect(Boolean(location?.startsWith(`${REDIRECT_URI}?`)), "Error must use the registered callback query").toBe(true);
+    expect(location.includes("#"), "Error callback must have no fragment").toBe(false);
+    expectInvalidScope(new URL(location).searchParams, "row5state");
+    expectNoCache(response);
+  });
+
+  contractTest("redirects invalid_scope for the implicit flow in the callback fragment", async ({ authorizeSession }) => {
+    const context = await authorizeSession();
+    const url = authorizeUrl({
+      clientId: implicitClientId, responseType: "token", scope: unknownScope, state: "row6state",
+    });
+    const response = await context.get(url, noRedirects);
+    expect(response.status()).toBe(302);
+    const location = response.headers()["location"];
+    expect(Boolean(location?.startsWith(`${REDIRECT_URI}#`)), "Error must use the registered callback fragment").toBe(true);
+    expectInvalidScope(new URLSearchParams(new URL(location).hash.slice(1)), "row6state");
+  });
+
+  contractTest("rejects PUT with the authorize filter's method error", async ({ request }) => {
+    const response = await request.put(authorizeUrl(), noRedirects);
+    expect(response.status()).toBe(405);
+    expect(response.headers()["content-type"]).toBe("application/json");
+    const body = await response.json();
+    expect(body.error).toBe("method_not_allowed");
+    expect(body.error_description).toBe("Required Method: GET or POST found: PUT");
+    expectNoCache(response);
+  });
+
+  contractTest("rejects a nonempty JSON POST with the authorize filter's content type error", async ({ request }) => {
+    const response = await request.post(AUTHORIZE, {
+      ...noRedirects,
+      headers: { "Content-Type": "application/json" },
+      data: { response_type: "code", client_id: CLIENT_ID, redirect_uri: REDIRECT_URI, scope: SCOPE },
+    });
+    expect(response.status()).toBe(400);
+    expect(response.headers()["content-type"]).toBe("application/json");
+    const body = await response.json();
+    expect(body.error).toBe("invalid_request");
+    expect(body.error_description).toBe("Invalid Content Type");
+    expectNoCache(response);
+  });
+
+  contractTest("accepts the consent form and redirects with a code and issuer", async ({ authorizeSession }) => {
+    const context = await authorizeSession();
+    const url = authorizeUrl({ clientId: CONSENT_CLIENT_ID, state: "row9state" });
+    const page = await context.get(url, noRedirects);
+    expect(page.status()).toBe(200);
+    const html = await page.text();
+    const csrf = pageDataValue(html, "csrf");
+    expect(Boolean(csrf), "Consent page must carry a CSRF token").toBe(true);
+    const formTarget = pageDataValue(html, "formTarget")?.replace(/\\\//g, "/");
+    expect(formTarget).toBe(`${authorizePath}${new URL(url).search}`);
+
+    const response = await context.post(new URL(formTarget, OPENAM_BASE).href, {
+      ...noRedirects,
+      form: { decision: "allow", save_consent: "off", csrf },
+    });
+    const params = expectCodeCallback(response, "row9state");
+    expect(params.get("scope")).toBe(SCOPE);
+    expect(params.get("client_id")).toBe(CONSENT_CLIENT_ID);
+    expect(params.get("iss")).toBe(OAUTH2);
+    expectNoCache(response);
+    expect(responseCookies(response, "oidcLoginHint").length, "No login_hint was supplied").toBe(0);
+  });
+
+  contractTest("sets login hint on consent and deletes only an existing hint after success",
+    async ({ authorizeSession }) => {
+      const consent = await authorizeSession();
+      const loginHint = "authorize-contract-hint";
+      const page = await consent.get(authorizeUrl({ clientId: CONSENT_CLIENT_ID, state: "row9b-a", loginHint }), noRedirects);
+      expect(page.status()).toBe(200);
+      const hints = responseCookies(page, "oidcLoginHint");
+      expect(hints.length, "Consent response must set one login hint cookie").toBe(1);
+      expect(hints[0].value === loginHint, "Login hint cookie must match the request hint").toBe(true);
+      expect(hints[0].attributes.get("path")).toBe("/");
+      expect(hints[0].attributes.has("httponly")).toBe(true);
+
+      const fresh = await authorizeSession();
+      const freshResponse = await fresh.get(authorizeUrl({ state: "row9b-b", loginHint }), noRedirects);
+      expectCodeCallback(freshResponse, "row9b-b");
+      expect(responseCookies(freshResponse, "oidcLoginHint").length, "No existing login hint to delete").toBe(0);
+
+      const primed = await authorizeSession([{ name: "oidcLoginHint", value: "previous-hint" }]);
+      const primedResponse = await primed.get(authorizeUrl({ state: "row9b-c", loginHint }), noRedirects);
+      expectCodeCallback(primedResponse, "row9b-c");
+      const deletions = responseCookies(primedResponse, "oidcLoginHint");
+      expect(deletions.length, "Success must emit one login hint deletion").toBe(1);
+      const [deletion] = deletions;
+      expect(deletion.value === "", "Deletion must carry an empty login hint").toBe(true);
+      expect(Date.parse(deletion.attributes.get("expires")) < Date.now(), "Deletion must expire in the past").toBe(true);
+      expect(deletion.attributes.has("max-age"), "Deletion must use the Expires attribute").toBe(false);
+      // Target: expire the Path=/ cookie with Path=/ and HttpOnly. Restlet omits both attributes on deletion.
+      expect(deletion.attributes.has("path")).toBe(false);
+      expect(deletion.attributes.has("httponly")).toBe(false);
+    });
 });
 
 /**
