@@ -661,9 +661,10 @@ test.describe("OAuth2 routing contract", () => {
 
   let ignoreHTTPSErrors;
   let credentialed;
+  let adminToken;
   let adminHeaders;
   let subRealmId;
-  let token;
+  let routingToken;
 
   const realmNotFound = (identifier) => ({
     code: 404, reason: "Not Found",
@@ -789,15 +790,26 @@ test.describe("OAuth2 routing contract", () => {
     });
   }
 
-  const tokenInfo = (prefix = "") => prefix + "/tokeninfo?access_token=" + encodeURIComponent(token);
+  const tokenInfo = (token, prefix = "") => prefix + "/tokeninfo?access_token=" + encodeURIComponent(token);
   const postToken = (request, suffix, label, status, headers = {}) => fetch(request, "/access_token" + suffix,
     label, status, { method: "POST", form: tokenForm, headers: { ...tokenHeaders, ...headers } });
 
   test.beforeAll(async ({ ignoreHTTPSErrors: configuredIgnoreHTTPSErrors }) => {
     ignoreHTTPSErrors = configuredIgnoreHTTPSErrors;
-    credentialed = privateContext();
-    const adminToken = await login(getAdminToken, "Admin authentication");
-    await ensureClient(adminToken, credentialed, clientId, {
+  });
+
+  async function getRoutingAdminToken() {
+    credentialed ??= privateContext();
+    adminToken ??= await login(getAdminToken, "Admin authentication");
+    return adminToken;
+  }
+
+  async function getRoutingToken() {
+    if (routingToken) {
+      return routingToken;
+    }
+    const session = await getRoutingAdminToken();
+    await ensureClient(session, credentialed, clientId, {
       "userpassword": clientSecret,
       "com.forgerock.openam.oauth2provider.clientType": "Confidential",
       "com.forgerock.openam.oauth2provider.scopes": ["[0]=" + SCOPE],
@@ -807,10 +819,17 @@ test.describe("OAuth2 routing contract", () => {
       "sunIdentityServerDeviceStatus": "Active",
     }).catch(() => { throw new Error("Failed to provision routing client"); });
     const issued = await postToken(credentialed, "", "Issue routing token", 200);
-    token = (await issued.json()).access_token;
-    expect(Boolean(token), "Client credentials must yield an access token").toBe(true);
+    routingToken = (await issued.json()).access_token;
+    expect(Boolean(routingToken), "Client credentials must yield an access token").toBe(true);
+    return routingToken;
+  }
 
-    adminHeaders = { iPlanetDirectoryPro: adminToken, "Accept-API-Version": "protocol=1.0,resource=1.0" };
+  async function ensureRoutingRealm() {
+    if (subRealmId) {
+      return;
+    }
+    const session = await getRoutingAdminToken();
+    adminHeaders = { iPlanetDirectoryPro: session, "Accept-API-Version": "protocol=1.0,resource=1.0" };
     const created = await credentialed.post(realmsUrl + "?_action=create", {
       headers: adminHeaders, maxRedirects: 0,
       data: { name: subRealm, parentPath: "/", active: true, aliases: [] },
@@ -820,7 +839,7 @@ test.describe("OAuth2 routing contract", () => {
     }
     expect(created.ok(), "Create routing realm: " + created.status()).toBe(true);
     expect(Boolean(subRealmId), "Realm creation must return an ID").toBe(true);
-  });
+  }
 
   test.afterAll(async () => {
     try {
@@ -836,9 +855,11 @@ test.describe("OAuth2 routing contract", () => {
   });
 
   test("realm query overrides the route realm", async ({ request }) => {
+    const token = await getRoutingToken();
+    await ensureRoutingRealm();
     for (const realm of ["/", "%2F"]) {
       const label = "GET /tokeninfo with realm=" + realm;
-      const response = await fetch(credentialed, tokenInfo() + "&realm=" + realm, label, 200);
+      const response = await fetch(credentialed, tokenInfo(token) + "&realm=" + realm, label, 200);
       expect((await response.json()).realm, label).toBe("/");
     }
     for (const realm of [subRealm, "/" + subRealm]) {
@@ -851,6 +872,7 @@ test.describe("OAuth2 routing contract", () => {
   });
 
   test("unknown realm override fails before the token handler", async () => {
+    const token = await getRoutingToken();
     // The target realm filter returns 400 invalid_request for unknown overrides.
     const get = await fetch(credentialed, "/tokeninfo?realm=bogus&access_token=" + encodeURIComponent(token),
       "GET /tokeninfo with realm=bogus", 404);
@@ -863,17 +885,21 @@ test.describe("OAuth2 routing contract", () => {
   });
 
   test("legacy realm paths resolve and accept a query override", async ({ request }) => {
+    const token = await getRoutingToken();
+    await ensureRoutingRealm();
     const prefix = "/" + subRealm;
     const absent = await fetch(request, prefix + discovery, "GET legacy discovery", 404);
     expect(await absent.json()).toEqual(missingProvider);
-    await fetch(credentialed, tokenInfo(prefix), "GET legacy /tokeninfo", 200);
+    await fetch(credentialed, tokenInfo(token, prefix), "GET legacy /tokeninfo", 200);
     const root = await fetch(request, prefix + discovery + "?realm=/", "GET legacy discovery with realm=/", 200);
     expect((await root.json()).issuer).toBe(oauth2);
   });
 
   test("canonical paths resolve root, flat and nested realms", async ({ request }) => {
-    await fetch(credentialed, tokenInfo("/realms/root"), "GET canonical root /tokeninfo", 200);
-    const bogus = await fetch(credentialed, tokenInfo("/realms/bogus"), "GET canonical unknown realm /tokeninfo", 404);
+    const token = await getRoutingToken();
+    await ensureRoutingRealm();
+    await fetch(credentialed, tokenInfo(token, "/realms/root"), "GET canonical root /tokeninfo", 200);
+    const bogus = await fetch(credentialed, tokenInfo(token, "/realms/bogus"), "GET canonical unknown realm /tokeninfo", 404);
     expect(await bogus.json()).toEqual(realmNotFound("/bogus"));
 
     for (const [label, prefix] of [
@@ -886,8 +912,9 @@ test.describe("OAuth2 routing contract", () => {
   });
 
   test("HEAD reaches GET resources and is rejected by endpoint method filters", async ({ request }) => {
+    const token = await getRoutingToken();
     for (const [endpoint, suffix, contentType] of [
-      ["/tokeninfo", tokenInfo(), "application/json"],
+      ["/tokeninfo", tokenInfo(token), "application/json"],
       [discovery, discovery, "application/json;charset=UTF-8"],
       [jwks, jwks, "application/json;charset=UTF-8"],
     ]) {
@@ -897,7 +924,7 @@ test.describe("OAuth2 routing contract", () => {
       expect(head.headers()["content-type"], endpoint).toBe(contentType);
       expect(head.headers()["content-length"], endpoint).toBeUndefined();
     }
-    const cached = await fetch(credentialed, tokenInfo(), "HEAD /tokeninfo cache", 200, { method: "HEAD" });
+    const cached = await fetch(credentialed, tokenInfo(token), "HEAD /tokeninfo cache", 200, { method: "HEAD" });
     expect(cached.headers()["cache-control"]).toBe("no-cache, no-store");
 
     const session = await login((context) => getAuthToken(context, USERNAME, PASSWORD), "Demo authentication");
@@ -945,15 +972,16 @@ test.describe("OAuth2 routing contract", () => {
   });
 
   test("PATCH validates tokeninfo before rejecting the method", async () => {
+    const token = await getRoutingToken();
     const patch = { method: "PATCH", headers: emptyBody };
-    const authenticated = await raw(tokenInfo(), "PATCH /tokeninfo with token", 405, patch);
+    const authenticated = await raw(tokenInfo(token), "PATCH /tokeninfo with token", 405, patch);
     expect(authenticated.headers.allow).toBe("GET");
     expect(authenticated.headers["cache-control"]).toBe("no-cache, no-store");
 
     const unauthenticated = await raw("/tokeninfo", "PATCH /tokeninfo without token", 401, patch);
     expect(JSON.parse(unauthenticated.text).error).toBe("invalid_token");
 
-    const put = await raw(tokenInfo(), "PUT /tokeninfo with token", 405, { method: "PUT", headers: emptyBody });
+    const put = await raw(tokenInfo(token), "PUT /tokeninfo with token", 405, { method: "PUT", headers: emptyBody });
     expect(put.headers["cache-control"]).toBeUndefined();
 
     const tokenResponse = await raw("/access_token", "PATCH /access_token", 405, patch);
@@ -961,6 +989,7 @@ test.describe("OAuth2 routing contract", () => {
   });
 
   test("API query flags preserve the endpoint responses", async ({ request }) => {
+    const token = await getRoutingToken();
     const plain = await fetch(request, jwks, "GET plain JWKS", 200);
     const keys = await plain.json();
     expect(Array.isArray(keys.keys), "JWKS response must contain a keys array").toBe(true);
@@ -989,6 +1018,7 @@ test.describe("OAuth2 routing contract", () => {
   });
 
   test("method override header and query parameter have different scope", async () => {
+    const token = await getRoutingToken();
     const header = await postToken(credentialed, "", "POST /access_token with override header GET", 405,
       { "X-HTTP-Method-Override": "GET" });
     expect(await header.json()).toEqual(methodNotAllowed("POST", "GET"));
@@ -996,10 +1026,10 @@ test.describe("OAuth2 routing contract", () => {
     const control = await postToken(credentialed, "", "POST /access_token without override", 200);
     expect(Boolean((await control.json()).access_token), "Control POST must issue a token").toBe(true);
 
-    await raw(tokenInfo(), "POST /tokeninfo with override header GET", 200, {
+    await raw(tokenInfo(token), "POST /tokeninfo with override header GET", 200, {
       method: "POST", headers: { ...emptyBody, "X-HTTP-Method-Override": "GET" },
     });
-    await raw(tokenInfo(), "GET /tokeninfo with override header PUT", 405, {
+    await raw(tokenInfo(token), "GET /tokeninfo with override header PUT", 405, {
       headers: { "X-HTTP-Method-Override": "PUT" },
     });
 
@@ -1032,6 +1062,7 @@ test.describe("OAuth2 routing contract", () => {
   });
 
   test("path spelling is significant and resource_set accepts a trailing slash", async () => {
+    const token = await getRoutingToken();
     await raw("/tokeninfo/?access_token=" + encodeURIComponent(token), "GET /tokeninfo/ with token", 404);
     for (const [suffix, realm] of [
       [jwks + "/", "/connect"],
@@ -1056,10 +1087,11 @@ test.describe("OAuth2 routing contract", () => {
   });
 
   test("unknown Host prevents realm resolution on legacy and canonical routes", async () => {
+    const token = await getRoutingToken();
     const unknown = "not-a-real-host.invalid";
     for (const [endpoint, suffix, field, value] of [
-      ["/tokeninfo", tokenInfo(), "realm", "/"],
-      ["/realms/root/tokeninfo", tokenInfo("/realms/root"), "realm", "/"],
+      ["/tokeninfo", tokenInfo(token), "realm", "/"],
+      ["/realms/root/tokeninfo", tokenInfo(token, "/realms/root"), "realm", "/"],
       [discovery, discovery, "issuer", oauth2],
     ]) {
       // The target response for an unknown Host is 400 invalid_request.
