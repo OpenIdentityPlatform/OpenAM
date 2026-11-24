@@ -29,6 +29,10 @@ Use the public reverse proxy to expose the XUI sign-in flow for a policy-agent-p
 
 Configure the agent to send browser redirects to the public HTTPS URL and to reach OpenAM's agent services over the private network. Keep the backend, administrative console, and internal endpoints such as `/sessionservice`, `/policyservice`, `/namingservice`, and `/notifications` off the public listener. Configure the OpenAM site and servlet container for the public URL, and add the application's return URLs to Valid `goto` URL Resources. See xref:../install-guide/chap-install-multiple.adoc[Installation Considerations for Multiple Servers] and xref:../admin-guide/chap-auth-services.adoc#configure-valid-goto-url-resources[Configuring Valid goto URL Resources].
 
+The path rules cover the top-level realm's XUI requests. OpenAM can resolve the effective authentication realm independently of the path matched by the proxy. If public authentication must be limited to the top-level realm, use a backend with only that realm available for authentication or enforce the effective realm with a separate control in front of a shared backend.
+
+When an administrator signs in through the public listener, XUI can receive HTTP 403 on background requests for console data and display an incomplete page. Use the private administrative URL for console access.
+
 [#xui-proxy-requests]
 === Requests to Allow
 
@@ -56,6 +60,9 @@ The following paths are relative to the deployment path. A dash in the query col
 |`POST` |`/json/sessions` |`_action=getSessionInfo` or `_action=logout`
 |Session information and sign-out. XUI appends `&tokenId=…` when it can read the session token. With an HttpOnly session cookie, OpenAM obtains the token from the cookie.
 
+|`GET` |`/UI/Logout` (optional) |—
+|Allow when the policy agent redirects browsers to this logout URL. OpenAM redirects the browser to XUI, which then calls the session logout action. See xref:../admin-guide/chap-agents.adoc#j2ee-agent-logout-url-properties[Logout URL Properties].
+
 |`GET` |`/json/realms/root/users/\{id}` |—
 |Read the signed-in user's record before the redirect and display the self-service profile.
 |===
@@ -68,13 +75,20 @@ The user record rule allows requests for any matching ID. Before exposing it, ve
 
 These rules cover the standard sign-in and profile details flows. For sub-realms, CDSSO, extra profile tabs, or authentication modules with extra browser requests, capture the traffic for the selected feature and allow the specific requests it needs. For example, some CDSSO agents use `/cdcservlet`. See xref:../admin-guide/chap-cdsso.adoc[Configuring Cross-Domain Single Sign-On].
 
+Before exposing the public listener, configure every access log that records these requests, including any upstream proxy or backend access logs, to record the method, path, and status without the query string. A session request can carry a live session token in the query.
+
 [#xui-proxy-apache]
 === Apache HTTP Server 2.4
 
-Place these directives in a dedicated HTTPS virtual host for OpenAM. Load `mod_rewrite`, `mod_proxy`, and `mod_proxy_http`, and replace `am-backend.internal:8080` with the private backend. Uncomment the optional rules for the profile operations you want to expose.
+Place these directives in a dedicated HTTPS virtual host for OpenAM. Load `mod_rewrite`, `mod_proxy`, and `mod_proxy_http`, and replace `am-backend.internal:8080` with the private backend. Uncomment the optional rules for the flows you want to expose.
+
+Replace existing access log directives for this virtual host with the path-only format below. Check any additional logs, such as those configured with `GlobalLog`, for the same site. See link:https://httpd.apache.org/docs/2.4/mod/mod_log_config.html[Apache log formats].
 
 [source,apache]
 ----
+LogFormat "%h %t \"%m %U\" %>s" openam_xui
+CustomLog "logs/openam-xui-access.log" openam_xui
+
 ProxyRequests Off
 ProxyPreserveHost On
 ProxyErrorOverride Off
@@ -83,6 +97,10 @@ RewriteEngine On
 
 RewriteCond %{REQUEST_METHOD} =GET
 RewriteRule "^(/openam/(?:UI/Login|XUI(?:/(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*/)*(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*)?)?|json/(?:realms/root/)?serverinfo/\*))$" "http://am-backend.internal:8080$1" [P,L]
+
+# Optional logout URL for the policy agent
+# RewriteCond %{REQUEST_METHOD} =GET
+# RewriteRule "^(/openam/UI/Logout)$" "http://am-backend.internal:8080$1" [P,L]
 
 RewriteCond %{REQUEST_METHOD} =POST
 RewriteRule "^(/openam/json/(?:realms/root/)?authenticate)$" "http://am-backend.internal:8080$1" [P,L]
@@ -122,6 +140,8 @@ RewriteRule "^" "-" [F]
 
 Install URL Rewrite and Application Request Routing (ARR), enable ARR proxying, and configure it to preserve the public `Host` header. Place the following `web.config` at the root of a dedicated HTTPS site. Replace `am-backend.internal:8080` with the private backend. Set `enabled="true"` for the optional rules you need. If you enable `PUT`, check that WebDAV and request filtering on this site allow ARR to forward the request. See link:https://learn.microsoft.com/en-us/iis/extensions/url-rewrite-module/reverse-proxy-with-url-rewrite-v2-and-application-request-routing[Reverse Proxy with URL Rewrite and ARR].
 
+In IIS Manager, open *Logging* for this site, select the *W3C* format, and choose *Select Fields*. Clear *URI Query* and keep *Method*, *URI Stem*, and *HTTP Status*. Apply the changes. See link:https://learn.microsoft.com/en-us/iis/configuration/system.applicationhost/sites/site/logfile/[IIS site logging].
+
 [source,xml]
 ----
 <configuration>
@@ -131,6 +151,13 @@ Install URL Rewrite and Application Request Routing (ARR), enable ARR proxying, 
       <rules>
         <rule name="OpenAM XUI and public server settings" stopProcessing="true">
           <match url="^openam/(?:UI/Login|XUI(?:/(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*/)*(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*)?)?|json/(?:realms/root/)?serverinfo/\*)$" ignoreCase="false" />
+          <conditions>
+            <add input="{REQUEST_METHOD}" pattern="^GET$" />
+          </conditions>
+          <action type="Rewrite" url="http://am-backend.internal:8080/{R:0}" appendQueryString="true" />
+        </rule>
+        <rule name="OpenAM policy agent logout URL" enabled="false" stopProcessing="true">
+          <match url="^openam/UI/Logout$" ignoreCase="false" />
           <conditions>
             <add input="{REQUEST_METHOD}" pattern="^GET$" />
           </conditions>
@@ -206,7 +233,7 @@ Install URL Rewrite and Application Request Routing (ARR), enable ARR proxying, 
 [#xui-proxy-nginx]
 === NGINX
 
-Place this example inside the `http` block. Set the public hostname, certificate and key paths, and private backend address for your deployment. Uncomment the profile rules you need. The `map` directives check the method, normalized path, and query before `location /` proxies the request. Keep the trailing slash on `proxy_pass` so NGINX forwards the normalized path with the original query string. See link:https://nginx.org/en/docs/http/ngx_http_map_module.html[NGINX map] and link:https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass[NGINX proxy_pass].
+Place this example inside the `http` block. Set the public hostname, certificate and key paths, and private backend address for your deployment. Uncomment the optional rules for the flows you want to expose. The `map` directives check the method, normalized path, and query before `location /` proxies the request. Keep the trailing slash on `proxy_pass` so NGINX forwards the normalized path with the original query string. See link:https://nginx.org/en/docs/http/ngx_http_map_module.html[NGINX map] and link:https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass[NGINX proxy_pass].
 
 [source,nginx]
 ----
@@ -232,6 +259,9 @@ map "$request_method:$openam_xui_query:$uri" $openam_xui_allowed {
     "~^POST:validate_goto:/openam/json/users\z" 1;
     "~^POST:session:/openam/json/sessions\z" 1;
     "~^GET:empty:/openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*\z" 1;
+
+    # Optional logout URL for the policy agent
+    # "~^GET:[^:]+:/openam/UI/Logout\z" 1;
 
     # Optional profile attribute updates
     # "~^PUT:empty:/openam/json/realms/root/users/[A-Za-z0-9_-][A-Za-z0-9_.@-]*\z" $openam_xui_profile_update;
@@ -269,11 +299,13 @@ server {
 [#xui-proxy-validation]
 === Verify Your Deployment
 
-The examples accept simple ASCII asset paths and single-segment user IDs. If your deployment has different IDs or customized assets, adjust the corresponding path pattern for the characters you need. Keep the method, path, and `_action` checks and the final deny rule. Check parent and global proxy rules for any routes that would forward requests before this allowlist runs. If you record proxy requests for troubleshooting, omit query strings that carry session tokens.
+The examples accept simple ASCII asset paths and single-segment user IDs. If your deployment has different IDs or customized assets, adjust the corresponding path pattern for the characters you need. Keep the method, path, and `_action` checks and the final deny rule. Check parent and global proxy rules for any routes that would forward requests before this allowlist runs.
 
 . Open the protected application with a fresh browser session and preserve the network log in developer tools. Check that XUI loads, authentication sets the session cookie, the user record request succeeds, and the protected application accepts the session after the redirect.
-. Try an incorrect password and an account whose authentication chain prompts for a password change. Verify that XUI shows the expected failure or completes the callbacks through `/json/realms/root/authenticate`. Then sign out and confirm that opening the protected application requires a new login.
+. Try an incorrect password and an account whose authentication chain prompts for a password change. Verify that XUI shows the expected failure or completes the callbacks through `/json/realms/root/authenticate`.
+. Sign out from XUI and confirm that opening the protected application requires a new login. If the policy agent uses `/UI/Logout`, repeat the check by signing out from the protected application.
 . If you enable self-service operations, change an allowed profile attribute and the password of a test account. Sign in again with the new password.
+. Make a request to `/XUI/` with a harmless query marker such as `?proxyLogCheck=example`. Confirm that the access logs recording this request show the method, path, and status without the marker.
 . Check the proxy and backend logs. Public requests for the administrative console, agent services, user collection queries, and unlisted `_action` values should be rejected at the proxy. Use two regular test accounts to verify that reads and optional writes respect the deployment's profile access policy.
 
 Repeat these checks after changing the OpenAM version, realm, authentication chain, agent, or proxy configuration.
