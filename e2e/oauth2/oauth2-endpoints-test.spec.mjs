@@ -736,6 +736,8 @@ test.describe("/oauth2/resource_set", () => {
               for (const id of ids) {
                 const deleted = await deleteForCleanup(id, { context: otherRequest, headers: otherHeaders });
                 expect(deleted.status(), "Delete second owner's resource set").toBe(204);
+                const gone = await otherRequest.get(itemUrl(id), { headers: otherHeaders });
+                expect(gone.status(), "Second owner's resource set must be absent after DELETE").toBe(404);
               }
             }
           } finally {
