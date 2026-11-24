@@ -128,7 +128,9 @@ test.describe("/oauth2/resource_set", () => {
   async function expectResourceSetAbsent(name) {
     const rejectedName = runPrefix + name;
     for (const id of await listResourceSetIds()) {
-      const resource = await read(id);
+      const resource = await request.get(itemUrl(id), { headers: bearer() });
+      if (resource.status() === 404) continue;
+      expect(resource.status(), "Read resource set for absence check").toBe(200);
       expect((await resource.json()).name, `Rejected POST must not create resource set ${id}`).not.toBe(rejectedName);
     }
   }
@@ -524,10 +526,12 @@ test.describe("/oauth2/resource_set", () => {
     expect(createdId).not.toBe(id);
     expect(createdId).not.toBe((await star.json())._id);
 
-    const stale = await conditionalPost(itemUrl(id), "create at item with stale If-Match", {
+    const staleName = "create at item with stale If-Match";
+    const stale = await conditionalPost(itemUrl(id), staleName, {
       "If-Match": `W/${staleTag(etag)}`,
     });
     expect(stale.status()).toBe(412);
+    await expectResourceSetAbsent(staleName);
   });
 
   test("evaluates conditions on the collection without an ETag", async () => {
