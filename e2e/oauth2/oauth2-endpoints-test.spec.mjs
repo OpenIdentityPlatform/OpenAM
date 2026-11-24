@@ -94,7 +94,7 @@ test.describe("/oauth2/resource_set", () => {
             const failure = await clearLabelsForCleanup(id, resource).catch(() => "Request or JSON parsing failed");
             if (failure) failures.push(`${id}: Clear labels for cleanup: ${failure}`);
           }
-          const deleted = await deleteForCleanup(id, resource);
+          const deleted = await deleteForCleanup(id, { resource });
           if (deleted.status() !== 204 && deleted.status() !== 404) {
             failures.push(`${id}: DELETE returned ${deleted.status()}`);
           }
@@ -161,27 +161,27 @@ test.describe("/oauth2/resource_set", () => {
     if (!Array.isArray(remaining) || remaining.length !== 0) return "GET after PUT did not return empty labels";
   }
 
-  async function deleteForCleanup(id, resource) {
-    const response = await remove(id, "*");
+  async function deleteForCleanup(id, { resource, context = request, headers = bearer() }) {
+    const response = await remove(id, "*", context, headers);
     if (response.status() < 500 && (response.status() !== 400 || (await response.json()).error !== "server_error")) {
       return response;
     }
 
     // A failed registration hook may leave no resource type for the deletion hook to remove.
-    const headers = resourceTypeHeaders();
-    const type = await request.get(`${RESOURCE_TYPES}/${id}`, { headers });
+    const adminHeaders = resourceTypeHeaders();
+    const type = await request.get(`${RESOURCE_TYPES}/${id}`, { headers: adminHeaders });
     if (type.status() !== 404) return response;
 
-    const { name, scopes } = resource ?? await (await read(id)).json();
+    const { name, scopes } = resource ?? await (await read(id, context, headers)).json();
     const restored = await request.post(`${RESOURCE_TYPES}?_action=create`, {
-      headers,
+      headers: adminHeaders,
       data: {
         uuid: id, name: `${name} - ${id}`, patterns: ["uma://-*-"],
         actions: Object.fromEntries(scopes.map((scope) => [scope, true])),
       },
     });
     expect(restored.status(), "Restore the missing UMA resource type for cleanup").toBe(201);
-    return remove(id, "*");
+    return remove(id, "*", context, headers);
   }
 
   async function ensureCleanupResourceType() {
@@ -251,8 +251,8 @@ test.describe("/oauth2/resource_set", () => {
     expect(await response.json(), scenario).toEqual(requiredIfMatchError(action));
   }
 
-  async function remove(id, ifMatch) {
-    return request.delete(itemUrl(id), { headers: bearer({ "If-Match": ifMatch }) });
+  async function remove(id, ifMatch, context = request, headers = bearer()) {
+    return context.delete(itemUrl(id), { headers: { ...headers, "If-Match": ifMatch } });
   }
 
   async function deleteAndVerify(id, ifMatch) {
@@ -265,8 +265,8 @@ test.describe("/oauth2/resource_set", () => {
     ownedIds.delete(id);
   }
 
-  async function read(id) {
-    const response = await request.get(itemUrl(id), { headers: bearer() });
+  async function read(id, context = request, headers = bearer()) {
+    const response = await context.get(itemUrl(id), { headers });
     expect(response.status()).toBe(200);
     return response;
   }
@@ -734,9 +734,7 @@ test.describe("/oauth2/resource_set", () => {
               // The POST may store the resource set without returning its ID.
               const ids = otherId ? [otherId] : await resourceSetIdsNamed(otherName, otherRequest, otherHeaders);
               for (const id of ids) {
-                const deleted = await otherRequest.delete(itemUrl(id), {
-                  headers: { ...otherHeaders, "If-Match": "*" },
-                });
+                const deleted = await deleteForCleanup(id, { context: otherRequest, headers: otherHeaders });
                 expect(deleted.status(), "Delete second owner's resource set").toBe(204);
               }
             }
