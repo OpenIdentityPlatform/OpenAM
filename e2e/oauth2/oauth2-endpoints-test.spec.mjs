@@ -125,6 +125,14 @@ test.describe("/oauth2/resource_set", () => {
     return ids;
   }
 
+  async function expectResourceSetAbsent(name) {
+    const rejectedName = runPrefix + name;
+    for (const id of await listResourceSetIds()) {
+      const resource = await read(id);
+      expect((await resource.json()).name, `Rejected POST must not create resource set ${id}`).not.toBe(rejectedName);
+    }
+  }
+
   async function clearLabelsForCleanup(id, resource) {
     if (!resource) {
       const current = await request.get(itemUrl(id), { headers: bearer() });
@@ -502,9 +510,11 @@ test.describe("/oauth2/resource_set", () => {
   test("evaluates If-Match before creating a resource set", async () => {
     const star = await conditionalPost(RESOURCE_SET, "create with If-Match wildcard", { "If-Match": "*" });
     expect(star.status()).toBe(201);
-    const concrete = await conditionalPost(RESOURCE_SET, "create with concrete If-Match", { "If-Match": 'W/"0"' });
+    const rejectedName = "create with concrete If-Match";
+    const concrete = await conditionalPost(RESOURCE_SET, rejectedName, { "If-Match": 'W/"0"' });
     expect(concrete.status()).toBe(412);
     expect(await concrete.json()).toEqual({ error: "precondition_failed" });
+    await expectResourceSetAbsent(rejectedName);
 
     const { id } = await create("host for conditional create");
     const etag = await currentEtag(id);
@@ -539,11 +549,11 @@ test.describe("/oauth2/resource_set", () => {
     const concrete = await request.get(RESOURCE_SET, { headers: bearer({ "If-None-Match": etag }) });
     expect(concrete.status()).toBe(200);
 
-    const createIfAbsent = await conditionalPost(RESOURCE_SET, "create with If-None-Match wildcard", {
-      "If-None-Match": "*",
-    });
+    const rejectedName = "create with If-None-Match wildcard";
+    const createIfAbsent = await conditionalPost(RESOURCE_SET, rejectedName, { "If-None-Match": "*" });
     expect(createIfAbsent.status()).toBe(412);
     expect(await createIfAbsent.json()).toEqual({ error: "precondition_failed" });
+    await expectResourceSetAbsent(rejectedName);
   });
 
   test("compares If-None-Match tags by request method", async () => {
