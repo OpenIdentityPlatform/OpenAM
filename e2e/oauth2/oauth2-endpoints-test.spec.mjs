@@ -18,8 +18,8 @@ import { randomUUID } from "node:crypto";
 import { test, expect } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
 import {
-  ensureProviderConfig, ensureResourceServerClient, ensureUmaProvider, protectionApiToken,
-  registerResourceSet, uniqueName, unreportedRequest, warmUpResourceSetStore,
+  basicAuth, ensureProviderConfig, ensureResourceServerClient, ensureUmaProvider, protectionApiToken,
+  registerResourceSet, RS_CLIENT_SECRET, uniqueName, unreportedRequest, warmUpResourceSetStore,
 } from "../common/oauth2-fixtures.mjs";
 
 const CLIENT_ID = "test_client_rs_b5";
@@ -235,11 +235,15 @@ test.describe("/oauth2/resource_set", () => {
     }
   }
 
-  async function expectRequiredIfMatchError(response, action, scenario) {
-    expect(await response.json(), scenario).toEqual({
+  function requiredIfMatchError(action) {
+    return {
       error: "server_error",
       error_description: expect.stringContaining(`Require If-Match header to ${action} Resource Set`),
-    });
+    };
+  }
+
+  async function expectRequiredIfMatchError(response, action, scenario) {
+    expect(await response.json(), scenario).toEqual(requiredIfMatchError(action));
   }
 
   async function remove(id, ifMatch) {
@@ -631,8 +635,11 @@ test.describe("/oauth2/resource_set", () => {
       for (const [method, action] of [["put", "update"], ["delete", "delete"]]) {
         const scenario = `${method.toUpperCase()} /resource_set${suffix}`;
         const wildcard = await request[method](url, { headers: bearer({ "If-Match": "*" }), data });
-        expect(wildcard.status(), `${scenario} with wildcard`).toBe(400);
-        expect((await wildcard.json()).error, `${scenario} with wildcard`).toBe("server_error");
+        const wildcardScenario = `${scenario} with wildcard`;
+        expect(wildcard.status(), wildcardScenario).toBe(400);
+        const wildcardBody = await wildcard.json();
+        expect(wildcardBody.error, wildcardScenario).toBe("server_error");
+        expect(wildcardBody, wildcardScenario).not.toMatchObject(requiredIfMatchError(action));
 
         const tagged = await request[method](url, { headers: bearer({ "If-Match": '"12345"' }), data });
         expect(tagged.status(), `${scenario} with concrete tag`).toBe(412);
@@ -651,7 +658,9 @@ test.describe("/oauth2/resource_set", () => {
     const password = `B5a-${randomUUID()}`;
     const usersUrl = `${REALM}/users`;
     const headers = { iPlanetDirectoryPro: adminToken, "Accept-API-Version": "resource=3.0, protocol=2.1" };
+    const clientHeaders = { Authorization: basicAuth(CLIENT_ID, RS_CLIENT_SECRET) };
     const otherRequest = unreportedRequest.newContext({ ignoreHTTPSErrors, maxRedirects: 0 });
+    let tokens;
     try {
       const created = await otherRequest.post(`${usersUrl}?_action=create`, {
         headers,
@@ -662,20 +671,15 @@ test.describe("/oauth2/resource_set", () => {
       });
       expect(created.ok(), `Create second resource owner (HTTP ${created.status()})`).toBe(true);
 
-      // The shared token helper includes the response body in its errors. Keep only the HTTP status.
-      let tokenStatus;
-      const tokenRequest = {
-        async post(url, options) {
-          const response = await otherRequest.post(url, options);
-          tokenStatus = response.status();
-          return response;
-        },
-      };
-      const otherPat = await protectionApiToken(tokenRequest, CLIENT_ID, username, password).catch(() => {
-        throw new Error(`Obtain second resource owner PAT failed (HTTP ${tokenStatus ?? "status unavailable"})`);
+      const tokenResponse = await otherRequest.post(`${OPENAM_BASE}/oauth2/access_token`, {
+        headers: clientHeaders,
+        form: { grant_type: "password", username, password, scope: "uma_protection" },
       });
+      expect(tokenResponse.status(), "Obtain second resource owner PAT").toBe(200);
+      tokens = await tokenResponse.json();
+      const otherPat = tokens?.access_token;
       expect(typeof otherPat === "string" && otherPat.trim().length > 0,
-        `Obtain second resource owner PAT (HTTP ${tokenStatus})`).toBe(true);
+        "Second resource owner's PAT must be a nonempty string").toBe(true);
       expect(otherPat !== pat, "Second resource owner must receive a distinct PAT").toBe(true);
 
       const { id } = await create("first owner's resource set");
@@ -683,9 +687,7 @@ test.describe("/oauth2/resource_set", () => {
       const otherHeaders = { Authorization: `Bearer ${otherPat}` };
       const list = await otherRequest.get(`${RESOURCE_SET}/?_queryId=*`, { headers: otherHeaders });
       expect(list.status(), "List as second resource owner").toBe(200);
-      const ids = await list.json();
-      expect(Array.isArray(ids), "Second owner's resource set list must be a JSON array").toBe(true);
-      expect(ids).not.toContain(id);
+      expect(await list.json(), "Second owner's resource set list must be empty").toEqual([]);
 
       const writeHeaders = { ...otherHeaders, "If-Match": "*" };
       const update = { name: runPrefix + "second owner's update", scopes: ["read"] };
@@ -704,14 +706,25 @@ test.describe("/oauth2/resource_set", () => {
       expect(await (await read(id)).json()).toEqual(before);
     } finally {
       try {
-        // The server may create the user even if the request loses its response.
-        const deleted = await otherRequest.delete(`${usersUrl}/${encodeURIComponent(username)}`, { headers }).catch(() => {
-          throw new Error("Delete second resource owner failed (HTTP status unavailable)");
-        });
-        expect(deleted.ok() || deleted.status() === 404,
-          `Delete second resource owner (HTTP ${deleted.status()})`).toBe(true);
+        // Revoking a refresh token also revokes its associated access token.
+        const token = tokens?.refresh_token || tokens?.access_token;
+        if (tokens?.access_token !== pat && typeof token === "string" && token) {
+          const revoked = await otherRequest.post(`${OPENAM_BASE}/oauth2/token/revoke`, {
+            headers: clientHeaders, form: { token },
+          });
+          expect(revoked.status(), "Revoke second resource owner grant").toBe(200);
+        }
       } finally {
-        await otherRequest.dispose();
+        try {
+          // The server may create the user even if the request loses its response.
+          const deleted = await otherRequest.delete(`${usersUrl}/${encodeURIComponent(username)}`, { headers }).catch(() => {
+            throw new Error("Delete second resource owner failed (HTTP status unavailable)");
+          });
+          expect(deleted.ok() || deleted.status() === 404,
+            `Delete second resource owner (HTTP ${deleted.status()})`).toBe(true);
+        } finally {
+          await otherRequest.dispose();
+        }
       }
     }
   });
