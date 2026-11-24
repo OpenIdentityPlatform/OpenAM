@@ -82,12 +82,12 @@ Before exposing the public listener, configure every access log that records the
 
 Place these directives in a dedicated HTTPS virtual host for OpenAM. Load `mod_rewrite`, `mod_proxy`, and `mod_proxy_http`, and replace `am-backend.internal:8080` with the private backend. Uncomment the optional rules for the flows you want to expose.
 
-Replace existing access log directives for this virtual host with the path-only format below. Check any additional logs, such as those configured with `GlobalLog`, for the same site. See link:https://httpd.apache.org/docs/2.4/mod/mod_log_config.html[Apache log formats].
+Keep the existing access log destinations for this virtual host and use the `openam_xui` format below. For a new log, replace `/path/to/apache-log-directory` with the absolute path to an existing Apache log directory. Check any additional logs, such as those configured with `GlobalLog`, for the same site. See link:https://httpd.apache.org/docs/2.4/mod/mod_log_config.html[Apache log formats].
 
 [source,apache]
 ----
 LogFormat "%h %t \"%m %U\" %>s" openam_xui
-CustomLog "logs/openam-xui-access.log" openam_xui
+CustomLog "/path/to/apache-log-directory/openam-xui-access.log" openam_xui
 
 ProxyRequests Off
 ProxyPreserveHost On
@@ -303,7 +303,7 @@ The examples accept simple ASCII asset paths and single-segment user IDs. If you
 
 . Open the protected application with a fresh browser session and preserve the network log in developer tools. Check that XUI loads, authentication sets the session cookie, the user record request succeeds, and the protected application accepts the session after the redirect.
 . Try an incorrect password and an account whose authentication chain prompts for a password change. Verify that XUI shows the expected failure or completes the callbacks through `/json/realms/root/authenticate`.
-. Sign out from XUI and confirm that opening the protected application requires a new login. If the policy agent uses `/UI/Logout`, repeat the check by signing out from the protected application.
+. Sign out from XUI and confirm that opening the protected application requires a new login. If the policy agent uses `/UI/Logout`, repeat the check by signing out from the protected application. If the agent specifies a post-logout URL, also verify that the browser reaches it. OpenAM 16.1.4 can end the session without following a `goto` URL supplied in the `/UI/Logout` query string.
 . If you enable self-service operations, change an allowed profile attribute and the password of a test account. Sign in again with the new password.
 . Make a request to `/XUI/` with a harmless query marker such as `?proxyLogCheck=example`. Confirm that the access logs recording this request show the method, path, and status without the marker.
 . Check the proxy and backend logs. Public requests for the administrative console, agent services, user collection queries, and unlisted `_action` values should be rejected at the proxy. Use two regular test accounts to verify that reads and optional writes respect the deployment's profile access policy.
