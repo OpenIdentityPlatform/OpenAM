@@ -117,22 +117,27 @@ test.describe("/oauth2/resource_set", () => {
     }
   });
 
-  async function listResourceSetIds() {
-    const list = await request.get(`${RESOURCE_SET}/?_queryId=*`, { headers: bearer() });
+  async function listResourceSetIds(context = request, headers = bearer()) {
+    const list = await context.get(`${RESOURCE_SET}/?_queryId=*`, { headers });
     expect(list.status(), "List resource sets").toBe(200);
     const ids = await list.json();
     expect(Array.isArray(ids), "Resource set list must be a JSON array").toBe(true);
     return ids;
   }
 
-  async function expectResourceSetAbsent(name) {
-    const rejectedName = runPrefix + name;
-    for (const id of await listResourceSetIds()) {
-      const resource = await request.get(itemUrl(id), { headers: bearer() });
+  async function resourceSetIdsNamed(name, context = request, headers = bearer()) {
+    const ids = [];
+    for (const id of await listResourceSetIds(context, headers)) {
+      const resource = await context.get(itemUrl(id), { headers });
       if (resource.status() === 404) continue;
-      expect(resource.status(), "Read resource set for absence check").toBe(200);
-      expect((await resource.json()).name, `Rejected POST must not create resource set ${id}`).not.toBe(rejectedName);
+      expect(resource.status(), "Read listed resource set").toBe(200);
+      if ((await resource.json()).name === name) ids.push(id);
     }
+    return ids;
+  }
+
+  async function expectResourceSetAbsent(name) {
+    expect(await resourceSetIdsNamed(name), `Resource sets created by rejected POST for '${name}'`).toEqual([]);
   }
 
   async function clearLabelsForCleanup(id, resource) {
@@ -524,7 +529,7 @@ test.describe("/oauth2/resource_set", () => {
     const concrete = await conditionalPost(RESOURCE_SET, rejectedName, { "If-Match": 'W/"0"' });
     expect(concrete.status()).toBe(412);
     expect(await concrete.json()).toEqual({ error: "precondition_failed" });
-    await expectResourceSetAbsent(rejectedName);
+    await expectResourceSetAbsent(runPrefix + rejectedName);
 
     const { id } = await create("host for conditional create");
     const etag = await currentEtag(id);
@@ -539,7 +544,7 @@ test.describe("/oauth2/resource_set", () => {
       "If-Match": `W/${staleTag(etag)}`,
     });
     expect(stale.status()).toBe(412);
-    await expectResourceSetAbsent(staleName);
+    await expectResourceSetAbsent(runPrefix + staleName);
   });
 
   test("evaluates conditions on the collection without an ETag", async () => {
@@ -565,7 +570,7 @@ test.describe("/oauth2/resource_set", () => {
     const createIfAbsent = await conditionalPost(RESOURCE_SET, rejectedName, { "If-None-Match": "*" });
     expect(createIfAbsent.status()).toBe(412);
     expect(await createIfAbsent.json()).toEqual({ error: "precondition_failed" });
-    await expectResourceSetAbsent(rejectedName);
+    await expectResourceSetAbsent(runPrefix + rejectedName);
   });
 
   test("compares If-None-Match tags by request method", async () => {
@@ -594,6 +599,7 @@ test.describe("/oauth2/resource_set", () => {
     const name = "duplicate name";
     const first = await conditionalPost(RESOURCE_SET, name);
     expect(first.status(), "Initial resource set creation").toBe(201);
+    const { _id: id } = await first.json();
 
     const duplicate = await conditionalPost(RESOURCE_SET, name);
     expect(duplicate.status()).toBe(400);
@@ -601,6 +607,7 @@ test.describe("/oauth2/resource_set", () => {
     const body = await duplicate.json();
     expect(body.error).toBe("Bad Request");
     expect(body.error_description).toBe(`A shared item with the name '${runPrefix + name}' already exists`);
+    expect(await resourceSetIdsNamed(runPrefix + name), "Resource set IDs for the duplicate name").toEqual([id]);
   });
 
   test("validates required resource set attributes", async () => {
@@ -621,6 +628,7 @@ test.describe("/oauth2/resource_set", () => {
       const body = await response.json();
       expect(body.error, scenario).toBe("bad_request");
       expect(body.error_description, scenario).toBe(description);
+      if (data.name) await expectResourceSetAbsent(data.name);
     }
   });
 
@@ -660,7 +668,10 @@ test.describe("/oauth2/resource_set", () => {
     const headers = { iPlanetDirectoryPro: adminToken, "Accept-API-Version": "resource=3.0, protocol=2.1" };
     const clientHeaders = { Authorization: basicAuth(CLIENT_ID, RS_CLIENT_SECRET) };
     const otherRequest = unreportedRequest.newContext({ ignoreHTTPSErrors, maxRedirects: 0 });
+    const otherName = runPrefix + "second owner's resource set";
     let tokens;
+    let otherHeaders;
+    let otherId;
     try {
       const created = await otherRequest.post(`${usersUrl}?_action=create`, {
         headers,
@@ -684,10 +695,19 @@ test.describe("/oauth2/resource_set", () => {
 
       const { id } = await create("first owner's resource set");
       const before = await (await read(id)).json();
-      const otherHeaders = { Authorization: `Bearer ${otherPat}` };
-      const list = await otherRequest.get(`${RESOURCE_SET}/?_queryId=*`, { headers: otherHeaders });
-      expect(list.status(), "List as second resource owner").toBe(200);
-      expect(await list.json(), "Second owner's resource set list must be empty").toEqual([]);
+      otherHeaders = { Authorization: `Bearer ${otherPat}` };
+      const second = await otherRequest.post(RESOURCE_SET, {
+        headers: otherHeaders, data: { name: otherName, scopes: ["read"] },
+      });
+      expect(second.status(), "Create second owner's resource set").toBe(201);
+      const { _id: createdId } = await second.json();
+      expect(typeof createdId === "string" && createdId.trim().length > 0, "Second owner's resource set ID").toBe(true);
+      expect(createdId, "Resource set IDs must differ between fixtures").not.toBe(id);
+      otherId = createdId;
+
+      const ids = await listResourceSetIds(otherRequest, otherHeaders);
+      expect(ids, "Second owner's collection must include their resource set").toContain(otherId);
+      expect(ids, "Second owner's collection must exclude the first owner's resource set").not.toContain(id);
 
       const writeHeaders = { ...otherHeaders, "If-Match": "*" };
       const update = { name: runPrefix + "second owner's update", scopes: ["read"] };
@@ -709,10 +729,23 @@ test.describe("/oauth2/resource_set", () => {
         // Revoking a refresh token also revokes its associated access token.
         const token = tokens?.refresh_token || tokens?.access_token;
         if (tokens?.access_token !== pat && typeof token === "string" && token) {
-          const revoked = await otherRequest.post(`${OPENAM_BASE}/oauth2/token/revoke`, {
-            headers: clientHeaders, form: { token },
-          });
-          expect(revoked.status(), "Revoke second resource owner grant").toBe(200);
+          try {
+            if (otherHeaders) {
+              // The POST may store the resource set without returning its ID.
+              const ids = otherId ? [otherId] : await resourceSetIdsNamed(otherName, otherRequest, otherHeaders);
+              for (const id of ids) {
+                const deleted = await otherRequest.delete(itemUrl(id), {
+                  headers: { ...otherHeaders, "If-Match": "*" },
+                });
+                expect(deleted.status(), "Delete second owner's resource set").toBe(204);
+              }
+            }
+          } finally {
+            const revoked = await otherRequest.post(`${OPENAM_BASE}/oauth2/token/revoke`, {
+              headers: clientHeaders, form: { token },
+            });
+            expect(revoked.status(), "Revoke second resource owner grant").toBe(200);
+          }
         }
       } finally {
         try {
