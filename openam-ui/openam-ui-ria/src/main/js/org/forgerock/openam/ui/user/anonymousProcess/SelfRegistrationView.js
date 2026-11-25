@@ -12,6 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
+ * Portions copyright 2026 3A Systems, LLC.
  */
 
 define([
@@ -47,8 +48,11 @@ define([
         const realm = _.get(Configuration, "globalData.realm", "");
 
         if (shouldAutoLogin(response, destination)) {
+            // With an HttpOnly session cookie the server has already set the cookie and sends no tokenId
             const tokenId = _.get(response, "additions.tokenId");
-            SessionToken.set(tokenId);
+            if (tokenId) {
+                SessionToken.set(tokenId);
+            }
             RESTLoginView.handleExistingSession(response.additions);
 
         } else if (shouldRouteToLoginView(response, destination)) {

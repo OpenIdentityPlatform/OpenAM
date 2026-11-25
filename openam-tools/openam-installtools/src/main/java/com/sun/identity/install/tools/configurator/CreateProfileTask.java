@@ -25,6 +25,7 @@
  * $Id: CreateProfileTask.java,v 1.5 2008/08/19 19:13:02 veiming Exp $
  *
  * Portions Copyrighted 2016 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package com.sun.identity.install.tools.configurator;
 
@@ -39,6 +40,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.net.URLDecoder;
 import java.util.Map;
 
 /**
@@ -153,7 +155,7 @@ public class CreateProfileTask implements ITask, InstallConstants {
         String cookieName = getCookieName(serverURL);
 
         // get Agent Administrator's sso token
-        ssoToken = getSSOToken(serverURL, RESTEndpoint.AUTHENTICATION_URI, agentAdminName, agentAdminPassword);
+        ssoToken = getSSOToken(serverURL, RESTEndpoint.AUTHENTICATION_URI, agentAdminName, agentAdminPassword, cookieName);
         if (ssoToken == null) {
             Debug.log("CreateProfileTask.createAgentProfile() - cannot create Agent Administrator's sso token.");
             return null;
@@ -189,10 +191,12 @@ public class CreateProfileTask implements ITask, InstallConstants {
      * @param serviceURL the URL to be called for authentication
      * @param userName the name of the user
      * @param password the password of the user
+     * @param cookieName the configured session cookie name from serverinfo
      *
      * @return the SSO token as a string
      */
-    private String getSSOToken(String serviceURL, String authURL, String userName, String password) throws Exception {
+    private String getSSOToken(String serviceURL, String authURL, String userName, String password, String cookieName)
+            throws Exception {
 
         RESTEndpoint restEndpoint = new RESTEndpoint.RESTEndpointBuilder()
                 .path(serviceURL)
@@ -213,7 +217,31 @@ public class CreateProfileTask implements ITask, InstallConstants {
         if (response.getResponseCode() == HTTP_RESPONSE_OK) {
             Debug.log("Call to " + serviceURL + " succeeded with response " + response.toString());
             JSONObject jsonObject = new JSONObject(response.toString());
-            ssoToken = jsonObject.getString("tokenId");
+            Object bodyToken = jsonObject.opt("tokenId");
+            if (bodyToken instanceof String && !((String) bodyToken).trim().isEmpty()) {
+                ssoToken = (String) bodyToken;
+            } else {
+                // HttpOnly authentication delivers the session through Set-Cookie. As in MCP and STS,
+                // prefer the last non-empty session cookie, ignoring cookies that clear an old domain.
+                for (String setCookie : response.getSetCookieHeaders()) {
+                    String pair = setCookie.split(";", 2)[0];
+                    int equals = pair.indexOf('=');
+                    if (equals > 0 && pair.substring(0, equals).trim().equals(cookieName)) {
+                        String value = pair.substring(equals + 1).trim();
+                        // Raw session IDs never contain '%'; avoid decoding their literal '+' characters.
+                        if (value.indexOf('%') >= 0) {
+                            value = URLDecoder.decode(value, ENCODING_TYPE);
+                        }
+                        if (!value.isEmpty()) {
+                            ssoToken = value;
+                        }
+                    }
+                }
+                if (ssoToken == null) {
+                    throw new IllegalStateException("Authentication response contains neither a tokenId nor a non-empty "
+                            + cookieName + " cookie");
+                }
+            }
         } else {
             Debug.log("Call to " + serviceURL + " FAILED with response code " + response.getResponseCode());
         }

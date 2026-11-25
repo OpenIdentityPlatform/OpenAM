@@ -33,13 +33,16 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.apache.tomcat.util.http.ServerCookies;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
  * Verifies that {@link CookieUtils#isRedirectUrlValid} blocks the open redirect
  * described in GHSA-2pf8-52jh-5x3m while still allowing legitimate same-origin
- * and relative RelayState redirects, and that the preferred-IdP cookie gets
- * through the container's RFC 6265 cookie processor on the way out and back in.
+ * and relative RelayState redirects, that the preferred-IdP cookie gets
+ * through the container's RFC 6265 cookie processor on the way out and back in,
+ * and that the HttpOnly property is read with the same rule as the shared
+ * {@code CookieUtils}.
  */
 public class CookieUtilsTest {
 
@@ -276,5 +279,25 @@ public class CookieUtilsTest {
                     parsed.getCookie(i).getValue().toString());
         }
         return cookies;
+    }
+
+    @DataProvider
+    public Object[][] httpOnlyValues() {
+        return new Object[][] {
+            {null, true},
+            {"", true},
+            {"true", true},
+            {"TRUE", true},
+            {"yes", true},
+            {"1", true},
+            {"false", false},
+            {"FALSE", false},
+            {" false ", false},
+        };
+    }
+
+    @Test(dataProvider = "httpOnlyValues")
+    public void onlyFalseTurnsHttpOnlyOff(String value, boolean expected) {
+        assertEquals(CookieUtils.isHttpOnlyEnabled(value), expected);
     }
 }

@@ -31,6 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +111,13 @@ public final class RESTEndpoint {
 
             // read response
             response.setResponseCode(urlConnect.getResponseCode());
+            // Preserve wire order: getHeaderFields() reverses repeated headers on JDK 11 and 17.
+            // As in the STS client, HttpOnly values are visible while no global CookieHandler is installed.
+            for (int i = 0; urlConnect.getHeaderField(i) != null; i++) {
+                if ("Set-Cookie".equalsIgnoreCase(urlConnect.getHeaderFieldKey(i))) {
+                    response.setCookieHeaders.add(urlConnect.getHeaderField(i));
+                }
+            }
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnect.getInputStream()))) {
                 String line;
@@ -410,6 +418,14 @@ public final class RESTEndpoint {
     public static class RESTResponse {
         private int responseCode = -1;
         private List<String> content = null;
+        private final List<String> setCookieHeaders = new ArrayList<>();
+
+        /**
+         * @return the Set-Cookie response headers in wire order, without exposing them in {@link #toString()}
+         */
+        public List<String> getSetCookieHeaders() {
+            return Collections.unmodifiableList(setCookieHeaders);
+        }
 
         /**
          * @return All the text returned by the endpoint, as a list of lines

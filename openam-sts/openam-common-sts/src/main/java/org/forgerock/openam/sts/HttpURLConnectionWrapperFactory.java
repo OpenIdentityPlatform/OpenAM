@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS. All rights reserved.
- * Portions Copyrighted 2025 3A Systems, LLC.
+ * Portions Copyrighted 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.sts;
@@ -28,6 +28,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -117,10 +119,25 @@ public class HttpURLConnectionWrapperFactory {
                 throw e;
             }
             if (responseCode == expectedResponseCode) {
-                return new ConnectionResult(responseCode, getSuccessMessage());
+                return new ConnectionResult(responseCode, getSuccessMessage(), getSetCookieHeaders());
             } else {
-                return new ConnectionResult(responseCode, getErrorMessage());
+                return new ConnectionResult(responseCode, getErrorMessage(), getSetCookieHeaders());
             }
+        }
+
+        /*
+        Reads the headers by index rather than through getHeaderFields(), which returns the values of a repeated header
+        in reverse order on JDK 11 and 17. Note that HttpURLConnection hides HttpOnly cookies from these calls when a
+        JVM-wide CookieHandler is installed; OpenAM installs none.
+         */
+        private List<String> getSetCookieHeaders() {
+            List<String> setCookieHeaders = new ArrayList<>();
+            for (int i = 0; httpURLConnection.getHeaderField(i) != null; i++) {
+                if ("Set-Cookie".equalsIgnoreCase(httpURLConnection.getHeaderFieldKey(i))) {
+                    setCookieHeaders.add(httpURLConnection.getHeaderField(i));
+                }
+            }
+            return setCookieHeaders;
         }
 
         private String getSuccessMessage() throws IOException {

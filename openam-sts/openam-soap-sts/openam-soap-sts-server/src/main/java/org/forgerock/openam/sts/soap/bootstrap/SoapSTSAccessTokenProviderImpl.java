@@ -12,7 +12,7 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.sts.soap.bootstrap;
@@ -140,7 +140,7 @@ public class SoapSTSAccessTokenProviderImpl implements SoapSTSAccessTokenProvide
             } else {
                 try {
                     if (StringUtils.isEmpty(accessTokenRef.get())) {
-                        accessTokenRef.set(amTokenParser.getSessionFromAuthNResponse(connectionResult.getResult()));
+                        accessTokenRef.set(amTokenParser.getSessionFromAuthNResponse(connectionResult));
                     }
                     return accessTokenRef.get();
                 } catch (TokenValidationException e) {

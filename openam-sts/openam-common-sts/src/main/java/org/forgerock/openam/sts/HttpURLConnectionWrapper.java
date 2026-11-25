@@ -12,12 +12,15 @@
  * information: "Portions Copyrighted [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyrighted 2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.sts;
 
 import java.io.IOException;
 import java.net.ProtocolException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,15 +33,27 @@ public interface HttpURLConnectionWrapper {
     /**
      * Class which encapsulates the result of the HttpURLConnection invocation. The status code will specify the Http response
      * code, and the result will contain the contents of the response, from either the input stream, or the error stream,
-     * depending upon whether the statusCode was expected.
+     * depending upon whether the statusCode was expected. The Set-Cookie response headers are kept as well, as the
+     * OpenAM session of a rest authN response with an HttpOnly session cookie travels only in that cookie.
      */
     public static class ConnectionResult {
         private int statusCode;
         private String result;
+        private List<String> setCookieHeaders;
 
         ConnectionResult(int statusCode, String result) {
+            this(statusCode, result, Collections.<String>emptyList());
+        }
+
+        /**
+         * @param statusCode the Http response code.
+         * @param result the contents of the response.
+         * @param setCookieHeaders the values of the Set-Cookie response headers, in the order received.
+         */
+        public ConnectionResult(int statusCode, String result, List<String> setCookieHeaders) {
             this.statusCode = statusCode;
             this.result = result;
+            this.setCookieHeaders = Collections.unmodifiableList(setCookieHeaders);
         }
 
         public int getStatusCode() {
@@ -47,6 +62,13 @@ public interface HttpURLConnectionWrapper {
 
         public String getResult() {
             return result;
+        }
+
+        /**
+         * @return the values of the Set-Cookie response headers, in the order received. Never null.
+         */
+        public List<String> getSetCookieHeaders() {
+            return setCookieHeaders;
         }
     }
 
