@@ -18,7 +18,8 @@ import { randomUUID } from "node:crypto";
 import { test as base, expect } from "@playwright/test";
 import { OPENAM_BASE, getAdminToken, getAuthToken, PASSWORD, USERNAME } from "../common/openam-commons.mjs";
 import {
-  ensureClient, ensureOAuth2Provider, pkce, REDIRECT_URI, sessionContext, unreportedRequest,
+  ensureClient, ensureOAuth2Provider, ensureProviderConfig, pkce, readUserCommonName, REDIRECT_URI,
+  sessionContext, unreportedRequest, userNameValue,
 } from "../common/oauth2-fixtures.mjs";
 
 const CLIENT_ID = "test_client_oauth2_b5e_device";
@@ -127,18 +128,21 @@ async function htmlPage(response, status, label) {
 
 // Read the model from the inline script as text, without running it.
 function pageData(html) {
-  const model = /^\s*pageData\s*=\s*\{([\s\S]*?)^\s*\};/m.exec(html)?.[1];
-  requireNonempty(model, "pageData");
-  return model;
-}
-
-function hasField(model, name) {
-  return new RegExp("(?:^|[{,\\s])" + name + "\\s*:").test(model);
-}
-
-function stringField(model, name) {
-  const value = new RegExp('(?:^|[{,\\s])' + name + '\\s*:\\s*"((?:\\\\.|[^"\\\\])*)"').exec(model)?.[1];
-  return value?.replaceAll("\\/", "/");
+  const literal = /^\s*pageData\s*=\s*(\{[\s\S]*?^\s*\})(?:;|(?=\s*<\/script>))/m.exec(html)?.[1];
+  requireNonempty(literal, "pageData");
+  // The templates use bare property names and FreeMarker's JavaScript string escapes.
+  const json = literal.replace(/"(?:\\.|[^"\\])*"|(\w+)(\s*:)/g, (token, key, colon) => {
+    if (key) return JSON.stringify(key) + colon;
+    return token.replace(/\\(\\|['>]|x[\da-f]{2})/gi, (escape, value) => {
+      if (value === "\\") return escape;
+      return value.startsWith("x") ? "\\u00" + value.slice(1) : value;
+    });
+  });
+  try {
+    return JSON.parse(json);
+  } catch {
+    throw new Error("Invalid pageData object");
+  }
 }
 
 function expectMain(html, module) {
@@ -150,9 +154,9 @@ async function entryCsrf(response) {
   const html = await htmlPage(response, 200, "Public code entry form");
   expectMain(html, "main-device");
   const model = pageData(html);
-  expect(hasField(model, "errorCode"), "Code entry form has no error").toBe(false);
-  expect(hasField(model, "done"), "Code entry form is incomplete").toBe(false);
-  const csrf = stringField(model, "csrf");
+  expect(Object.hasOwn(model, "errorCode"), "Code entry form has no error").toBe(false);
+  expect(Object.hasOwn(model, "done"), "Code entry form is incomplete").toBe(false);
+  const csrf = model.csrf;
   requireNonempty(csrf, "Code entry CSRF");
   return csrf;
 }
@@ -185,14 +189,18 @@ async function consentPage(request, code, headers) {
   const html = await htmlPage(response, 200, "Device consent page");
   expectMain(html, "main-authorize");
   const model = pageData(html);
-  const oauth = /(?:^|,)\s*oauth2Data\s*:\s*\{([\s\S]*)\}\s*$/.exec(model);
-  expect(Boolean(oauth), "pageData contains oauth2Data").toBe(true);
-  const data = oauth[1];
-  const csrf = stringField(data, "csrf");
-  expect(stringField(data, "clientId") === CLIENT_ID, "Consent client ID").toBe(true);
-  expect(stringField(data, "userCode") === code.user_code, "Consent user code matches issuance").toBe(true);
-  requireNonempty(csrf, "Consent CSRF");
-  return { model: model.slice(0, oauth.index), data, csrf };
+  const data = model.oauth2Data;
+  expect(Boolean(data), "pageData contains oauth2Data").toBe(true);
+  expect(data.clientId === CLIENT_ID, "Consent client ID").toBe(true);
+  expect(data.userCode === code.user_code, "Consent user code matches issuance").toBe(true);
+  requireNonempty(data.csrf, "Consent CSRF");
+  return { model, data, csrf: data.csrf };
+}
+
+function submitDecision(request, code, fields) {
+  return request.post(DEVICE_USER, {
+    ...DIRECT, form: { user_code: code.user_code, save_consent: "off", ...fields },
+  });
 }
 
 function parseLocation(response, label) {
@@ -296,5 +304,88 @@ test.describe("OAuth2 device endpoints", () => {
   test("renders consent for an authenticated submission", async ({ deviceClient, owner }) => {
     const code = await codeForEntry(deviceClient);
     await consentPage(await owner(), code);
+  });
+
+  test("renders not_found for an unknown user code", async ({ anonymous, owner }) => {
+    async function expectUnknown(request) {
+      // Device codes use Base58. This value cannot collide with a live code.
+      const response = await submitCode(request, "not-a-valid-device-code");
+      const html = await htmlPage(response, 200, "Unknown user code");
+      expectMain(html, "main-device");
+      expect(pageData(html).errorCode === "not_found", "Unknown user code marker").toBe(true);
+      expect(response.headers()["location"] === undefined, "Unknown user code has no Location").toBe(true);
+    }
+    await test.step("anonymous", () => expectUnknown(anonymous));
+    await test.step("authenticated", async () => expectUnknown(await owner()));
+  });
+
+  test("renders the device consent model", async ({ admin, deviceClient, owner, page }) => {
+    await ensureProviderConfig(admin.token, admin.request);
+    const code = await codeForEntry(deviceClient, {
+      scope: "openid profile", state: "device-state", nonce: "device-nonce", ui_locales: "fr-CA",
+    });
+    const { model, data } = await consentPage(await owner(), code, { "Accept-Language": "en-US" });
+
+    expect(model.locale === "fr-CA", "Stored ui_locales takes precedence").toBe(true);
+    expect(model.realm === "/", "Consent model uses the root realm").toBe(true);
+    for (const [field, value] of Object.entries({
+      state: "device-state", nonce: "device-nonce", displayName: CLIENT_ID, responseType: "code",
+      formTarget: new URL(DEVICE_USER).pathname,
+    })) {
+      expect(data[field] === value, "Device consent " + field).toBe(true);
+    }
+    const scopes = ["openid", "profile"];
+    const scope = typeof data.scope === "string" ? data.scope.trim().split(/\s+/).sort() : [];
+    expect(JSON.stringify(scope) === JSON.stringify(scopes), "Device consent scope").toBe(true);
+    expect(Array.isArray(data.displayScopes), "Device consent has displayScopes").toBe(true);
+    expect(data.displayScopes.map(({ name }) => name).sort(), "Displayed scopes").toEqual(scopes);
+    expect(data.isSaveConsentEnabled === true, "Consent can be saved").toBe(true);
+
+    const commonName = await readUserCommonName(admin.token, admin.request, USERNAME);
+    requireNonempty(data.userName, "Device consent owner name");
+    expect(await userNameValue(page, "userName: " + JSON.stringify(data.userName)), "Device consent owner name")
+      .toBe(commonName);
+  });
+
+  test("renders the thanks page for allow and deny", async ({ deviceClient, owner }) => {
+    const session = await owner();
+    for (const decision of ["allow", "deny"]) {
+      await test.step(decision, async () => {
+        const code = await codeForEntry(deviceClient);
+        const { csrf } = await consentPage(session, code);
+        const response = await submitDecision(session, code, { decision, csrf });
+        const html = await htmlPage(response, 200, "Device consent " + decision);
+        const model = pageData(html);
+        expect(model.done === true, "Device consent is complete").toBe(true);
+        // CodeThanks.ftl currently appends /XUI to the realm. The realm field should identify the root realm as /.
+        expect(model.realm === "//XUI", "Thanks page realm").toBe(true);
+
+        if (decision === "allow") {
+          await expectPoll(deviceClient, code, 200);
+        } else {
+          await expectPoll(deviceClient, code, 403, "authorization_declined");
+        }
+      });
+    }
+  });
+
+  test("rejects missing and wrong consent CSRF", async ({ deviceClient, owner }) => {
+    const session = await owner();
+    for (const [name, fields] of [["missing", {}], ["wrong", { csrf: "not-the-token" }]]) {
+      await test.step(name, async () => {
+        const code = await codeForEntry(deviceClient);
+        await consentPage(session, code);
+        const response = await submitDecision(session, code, { decision: "allow", ...fields });
+        const html = await htmlPage(response, 400, "Device consent with " + name + " CSRF");
+        expect(html.includes("<title>OAuth2 Error Page</title>"), "OAuth2 error page title").toBe(true);
+        expect(pageData(html).error?.message === "bad_request", "CSRF OAuth2 error").toBe(true);
+        expect(response.headers()["location"] === undefined, "CSRF error has no Location").toBe(true);
+        await expectPoll(deviceClient, code, 400, "authorization_pending");
+      });
+    }
+  });
+
+  test("rejects PUT on the device verification endpoint", async ({ anonymous }) => {
+    expectStatus(await anonymous.put(DEVICE_USER, DIRECT), 405, "Device user PUT");
   });
 });
