@@ -172,14 +172,21 @@ test.describe("/oauth2/resource_set", () => {
         const response = await owner.context.get(itemUrl(id), { headers: owner.headers });
         if (!tracked && response.status() === 404) continue;
         expect(response.status(), "Read resource set before cleanup DELETE").toBe(200);
-        resource = await response.json();
+        const current = await response.json();
+        const hasId = nonemptyString(current?._id);
+        const hasName = nonemptyString(current?.name);
+        // An incomplete response can still identify a foreign resource.
+        if ((hasId && current._id !== id) || (hasName && !current.name.startsWith(owner.prefix))) {
+          if (tracked) failures.push(`${id}: Resource set does not belong to this owner run`);
+          continue;
+        }
+        if (!hasId || !hasName) {
+          throw new Error("Read resource set before cleanup DELETE returned an invalid ID or name");
+        }
+        resource = current;
       } catch (error) {
         failures.push(`${id}: ${error.message}`);
         if (!confirmed) continue;
-      }
-      if (resource !== undefined && !belongsToRun(id, resource, owner)) {
-        if (tracked) failures.push(`${id}: Resource set does not belong to this owner run`);
-        continue;
       }
 
       try {
