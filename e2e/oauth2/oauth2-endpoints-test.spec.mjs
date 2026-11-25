@@ -214,10 +214,15 @@ test.describe("/oauth2/resource_set", () => {
   async function resourceSetIdsNamed(name) {
     const ids = [];
     for (const id of await listResourceSetIds()) {
-      const resource = await request.get(itemUrl(id), { headers: bearer() });
-      if (resource.status() === 404) continue;
-      expect(resource.status(), "Read listed resource set").toBe(200);
-      if ((await resource.json()).name === name) ids.push(id);
+      const response = await request.get(itemUrl(id), { headers: bearer() });
+      if (response.status() === 404) continue;
+      expect(response.status(), "Read listed resource set").toBe(200);
+      const resource = await response.json();
+      if (belongsToRun(id, resource, firstOwner)) firstOwner.resources.set(id, resource);
+      if (resource.name === name) {
+        expect(resource._id, "Listed resource set ID").toBe(id);
+        ids.push(id);
+      }
     }
     return ids;
   }
@@ -893,7 +898,9 @@ test.describe("/oauth2/resource_set", () => {
       if (!firstOwner.resources.has(id) && response.status() === 404) continue;
       const scenario = id === control.id ? "Read successful resource set from collection" : "Read listed resource set";
       expect(response.status(), scenario).toBe(200);
-      const { name } = await response.json();
+      const resource = await response.json();
+      if (belongsToRun(id, resource, firstOwner)) firstOwner.resources.set(id, resource);
+      const { name } = resource;
       if (id === control.id) expect(name, scenario).toBe(control.name);
       if (names.includes(name)) created.push({ id, name });
     }
@@ -991,14 +998,15 @@ test.describe("/oauth2/resource_set", () => {
   }
 
   test("HEAD matches the item and collection GET metadata", async () => {
-    const { id } = await create("HEAD metadata");
+    const { id, name } = await create("HEAD metadata");
     for (const [scenario, url] of [
       ["item", itemUrl(id)],
       ["collection", RESOURCE_SET],
       ["collection with trailing slash", RESOURCE_SET + "/"],
     ]) {
       const head = await request.head(url, { headers: bearer() });
-      const get = await request.get(url, { headers: bearer() });
+      const isItem = scenario === "item";
+      const get = isItem ? await read(id) : await request.get(url, { headers: bearer() });
       expect(head.status(), scenario + " HEAD").toBe(200);
       expect(get.status(), scenario + " GET").toBe(200);
       expectJsonMediaType(head, scenario + " HEAD");
@@ -1007,8 +1015,8 @@ test.describe("/oauth2/resource_set", () => {
 
       const headTag = head.headers()["etag"];
       const getTag = get.headers()["etag"];
-      if (scenario === "item") {
-        expect((await get.json())._id).toBe(id);
+      if (isItem) {
+        expect((await get.json()).name, scenario + " GET").toBe(name);
         expect(getTag, scenario + " GET").toMatch(WEAK_DECIMAL_ETAG);
         expect(headTag, scenario + " HEAD").toBe(getTag);
       } else {
