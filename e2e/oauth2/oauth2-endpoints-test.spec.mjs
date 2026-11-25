@@ -709,6 +709,9 @@ test.describe("/oauth2/resource_set", () => {
       expect(ids, "Second owner's collection must include their resource set").toContain(otherId);
       expect(ids, "Second owner's collection must exclude the first owner's resource set").not.toContain(id);
 
+      const ownedResource = await otherRequest.get(itemUrl(otherId), { headers: otherHeaders });
+      expect(ownedResource.status(), "Read second owner's own resource set before DELETE").toBe(200);
+
       const writeHeaders = { ...otherHeaders, "If-Match": "*" };
       const update = { name: runPrefix + "second owner's update", scopes: ["read"] };
       for (const [method, options] of [
