@@ -1,0 +1,46 @@
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+
+  Copyright 2026 3A Systems, LLC.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360" viewBox="0 0 960 360" role="img" aria-labelledby="title description">
+  <title id="title">HTTPS ingress with backend TLS</title>
+  <desc id="description">Redundant ingress terminates public TLS and routes over validated HTTPS connections to two private OpenAM nodes.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#38536d"/>
+    </marker>
+    <marker id="arrow-back" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M10 0 L0 5 L10 10 Z" fill="#38536d"/>
+    </marker>
+  </defs>
+  <rect width="960" height="360" fill="#fff"/>
+  <g font-family="DejaVu Sans, sans-serif" fill="#152b43">
+  <rect x="300" y="18" width="360" height="64" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="480.0" y="57.0" text-anchor="middle" font-size="21" font-weight="700">Browsers and clients</text>
+  <path d="M480 82 V121" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <text x="496" y="108" text-anchor="start" font-size="18" font-weight="400">HTTPS</text>
+  <rect x="240" y="121" width="480" height="80" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="480.0" y="159.0" text-anchor="middle" font-size="21" font-weight="700">Redundant L7 ingress</text>
+  <text x="480.0" y="182.0" text-anchor="middle" font-size="18" font-weight="400">TLS termination · request routing · optional affinity</text>
+  <path d="M480 201 V232 H229 V272" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M480 232 H731 V272" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <text x="236" y="259" text-anchor="start" font-size="17" font-weight="400">HTTPS with backend certificate validation</text>
+  <rect x="45" y="272" width="368" height="70" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="229.0" y="305.0" text-anchor="middle" font-size="21" font-weight="700">OpenAM node 1</text>
+  <text x="229.0" y="328.0" text-anchor="middle" font-size="18" font-weight="400">Private backend</text>
+  <rect x="547" y="272" width="368" height="70" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="731.0" y="305.0" text-anchor="middle" font-size="21" font-weight="700">OpenAM node 2</text>
+  <text x="731.0" y="328.0" text-anchor="middle" font-size="18" font-weight="400">Private backend</text>
+  </g>
+</svg>

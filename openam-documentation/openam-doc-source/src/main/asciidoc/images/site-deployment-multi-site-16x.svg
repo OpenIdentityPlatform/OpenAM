@@ -1,0 +1,69 @@
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+
+  Copyright 2026 3A Systems, LLC.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="452" viewBox="0 0 960 452" role="img" aria-labelledby="title description">
+  <title id="title">Two sites with separate data replication paths</title>
+  <desc id="description">OpenAM uses its site&#x27;s data store connections. Configuration, CTS, and identity each have a separate inter-site replication path.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#38536d"/>
+    </marker>
+    <marker id="arrow-back" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M10 0 L0 5 L10 10 Z" fill="#38536d"/>
+    </marker>
+  </defs>
+  <rect width="960" height="452" fill="#fff"/>
+  <g font-family="DejaVu Sans, sans-serif" fill="#152b43">
+  <rect x="34" y="20" width="336" height="70" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="202.0" y="53.0" text-anchor="middle" font-size="21" font-weight="700">OpenAM · site A</text>
+  <text x="202.0" y="76.0" text-anchor="middle" font-size="18" font-weight="400">Local site URL and nodes</text>
+  <rect x="590" y="20" width="336" height="70" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="758.0" y="53.0" text-anchor="middle" font-size="21" font-weight="700">OpenAM · site B</text>
+  <text x="758.0" y="76.0" text-anchor="middle" font-size="18" font-weight="400">Local site URL and nodes</text>
+  <path d="M34 55 H15 V366" fill="none" stroke="#38536d" stroke-width="2.2"/>
+  <path d="M926 55 H945 V366" fill="none" stroke="#38536d" stroke-width="2.2"/>
+  <rect x="34" y="132" width="336" height="60" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="202.0" y="160.0" text-anchor="middle" font-size="21" font-weight="700">Configuration</text>
+  <text x="202.0" y="183.0" text-anchor="middle" font-size="18" font-weight="400">Settings and policies</text>
+  <rect x="590" y="132" width="336" height="60" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="758.0" y="160.0" text-anchor="middle" font-size="21" font-weight="700">Configuration</text>
+  <text x="758.0" y="183.0" text-anchor="middle" font-size="18" font-weight="400">Settings and policies</text>
+  <path d="M15 162 H34" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M945 162 H926" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M377 150 H583" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)" marker-start="url(#arrow-back)" stroke-dasharray="7 5"/>
+  <text x="480" y="181" text-anchor="middle" font-size="17" font-weight="400">Data replication</text>
+  <rect x="34" y="234" width="336" height="60" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="202.0" y="262.0" text-anchor="middle" font-size="21" font-weight="700">CTS</text>
+  <text x="202.0" y="285.0" text-anchor="middle" font-size="18" font-weight="400">Session and token data</text>
+  <rect x="590" y="234" width="336" height="60" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="758.0" y="262.0" text-anchor="middle" font-size="21" font-weight="700">CTS</text>
+  <text x="758.0" y="285.0" text-anchor="middle" font-size="18" font-weight="400">Session and token data</text>
+  <path d="M15 264 H34" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M945 264 H926" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M377 252 H583" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)" marker-start="url(#arrow-back)" stroke-dasharray="7 5"/>
+  <text x="480" y="283" text-anchor="middle" font-size="17" font-weight="400">Data replication</text>
+  <rect x="34" y="336" width="336" height="60" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="202.0" y="364.0" text-anchor="middle" font-size="21" font-weight="700">Identity</text>
+  <text x="202.0" y="387.0" text-anchor="middle" font-size="18" font-weight="400">Profiles and groups</text>
+  <rect x="590" y="336" width="336" height="60" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="758.0" y="364.0" text-anchor="middle" font-size="21" font-weight="700">Identity</text>
+  <text x="758.0" y="387.0" text-anchor="middle" font-size="18" font-weight="400">Profiles and groups</text>
+  <path d="M15 366 H34" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M945 366 H926" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M377 354 H583" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)" marker-start="url(#arrow-back)" stroke-dasharray="7 5"/>
+  <text x="480" y="385" text-anchor="middle" font-size="17" font-weight="400">Data replication</text>
+  <text x="480" y="429" text-anchor="middle" font-size="19" font-weight="400">Configure and monitor each replication path for your topology.</text>
+  </g>
+</svg>

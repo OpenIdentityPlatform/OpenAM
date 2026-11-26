@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -24,35 +24,18 @@
 [#preface]
 == Preface
 
-This guide helps you plan an OpenAM deployment, including performing the following high-level tasks:
-
-* Choose OpenAM software features for your deployment. OpenAM offers a wide-variety of features to meet the needs of any deployment.
-
-* Plan any customizations or extensions that are absolutely required.
-
-* Gather information about the services that your OpenAM deployment uses, and define what those services must provide for your deployment.
-
-* Gather information about the resources that OpenAM protects as well as the consumers of your OpenAM deployment.
-
-* Reach agreement with partners concerning federation and other deployments where multiple actors share control.
-
-* Define your objectives in terms of service levels including availability and security for different services.
-
-* Determine performance requirements and testing procedures to assure performance requirements are met.
-
-* Specify logical and physical deployment topologies, including site and multiple data center deployments.
-
-* Plan the deployment process, including implementing training teams and partners, customization and hardening, and development of a proof-of-concept implementation. Other tasks include performing integration with client applications, integration with auditing tools, automation and continuous integration when necessary, running functional and non-functional testing, documenting procedures and tracking changes, acceptance in production, maintaining and supporting the solution in production, and planning for expansion and upgrade.
-
+This guide helps architects, deployers, and project managers choose an OpenAM deployment topology, size it against service objectives, and define what to verify before production. Confirm the compatibility of the OpenAM release, servlet container, Java runtime, and integrations in the xref:../release-notes/index.adoc[Release Notes].
 
 [#who-should-use]
 === Who Should Use This Guide
 
-This guide is written for access management architects and project managers who plan OpenAM software deployments within their organizations.
+Choose the path that matches your availability and recovery requirements.
 
-This guide focuses on the tasks that need to be completed for successful OpenAM deployment. It does not show how to accomplish each individual technical task, such as installation, configuration, and maintenance.
+* *Evaluation.* Start with the xref:../getting-started/index.adoc[Getting Started Guide] for a single instance. Use the xref:chap-intro.adoc#chap-intro[integration overview] to choose the application flows to try.
+* *Single production site.* Review the xref:chap-topologies.adoc#openam-sites[site topology] and xref:chap-hw-sw-requirements.adoc#chap-hw-sw-requirements[platform and storage requirements]. Use xref:chap-sizing.adoc#chap-sizing[sizing] to verify capacity, including after loss of a node or dependency. Complete the xref:chap-high-level-start.adoc#chap-high-level-start[deployment checklist] before accepting traffic.
+* *Multiple sites.* Start with xref:chap-topologies.adoc#multi-sites[the multi-site topology] and decide which services and sessions must survive a site outage, how to route clients on failover, how to handle replication lag, and how to return to normal service. Apply the same sizing and acceptance checks under cross-site traffic and recovery conditions.
 
-Before using this guide, you should have a firm grounding in software deployment, in access management, and in OpenAM software itself.
+For installation and configuration procedures, see the xref:../install-guide/index.adoc[Installation Guide] and xref:../admin-guide/index.adoc[Administration Guide]. Use the xref:../upgrade-guide/index.adoc[Upgrade Guide] to rehearse changes to an existing deployment.
 
 include::../partials/sec-accessing-doc-online.adoc[]
 

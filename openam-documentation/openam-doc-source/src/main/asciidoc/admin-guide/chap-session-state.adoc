@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -37,7 +37,9 @@ OpenAM sessions are "stateful" or "stateless," and are described in detail in th
 [#session-state-stateful]
 ==== Stateful Sessions
 
-Stateful sessions are sessions that reside in the OpenAM server's memory and, if session failover is enabled, are also persisted in the Core Token Service's token store. OpenAM sends clients a reference to the session in OpenAM memory but it does not contain any of the session state information. The session reference is also known as an __SSO token__. For browser clients, OpenAM sets a cookie in the browser that contains the session reference. For REST clients, OpenAM returns the session reference in response to calls to the `authentication` endpoint.
+OpenAM persists authenticated stateful sessions in the Core Token Service (CTS) and can cache them in server memory.
+The client receives a reference to the session called an __SSO token__.
+OpenAM sends the reference in a cookie for browser clients and returns it from the `authenticate` endpoint for REST clients.
 
 Stateful sessions are malleable. The OpenAM server can modify various aspects of users' sessions during the sessions' lifetime.
 
@@ -61,9 +63,11 @@ There is, however, one exception to the per-realm session state configuration. W
 [#session-state-during-auth]
 ==== Session State During OpenAM Authentication
 
-During authentication, OpenAM maintains the authenticating user's session in its memory regardless of whether you have configured the realm to which the user is authenticating for stateful or stateless sessions.
+During authentication, OpenAM keeps in-progress session state in the handling server's memory for either session type.
+Route successive authentication steps to the same server.
+If that server fails before authentication completes, the user may need to start a new authentication flow.
 
-After authentication has completed, OpenAM deletes in-memory sessions for users authenticating to realms configured for stateless sessions. Sessions for users authenticating to realms configured for stateful sessions remain in OpenAM's memory heap.
+After successful authentication, OpenAM promotes a stateful session into persistent storage or issues a stateless session token and removes the temporary authentication state.
 
 
 [#session-state-session-customization]
@@ -114,9 +118,12 @@ Encrypting the JWT prevents man-in-the-middle attacks that could log the state o
 
 OpenAM uses the Core Token Service differently for stateful and stateless sessions.
 
-For stateful sessions, OpenAM uses the Core Token Service's token store to save user sessions when session failover is enabled. In the event of the failure of an OpenAM server, one or more backup servers can retrieve the sessions from the Core Token Service's token store to reestablish users login sessions during session failover.
+For stateful sessions, an OpenAM node can retrieve the session from CTS when it receives a valid session reference and the session state is available to that node.
+For failover, configure the nodes to use the same logical CTS and test access to all required replicas.
+See xref:../install-guide/chap-session-failover.adoc#chap-session-failover[Setting Up OpenAM Session Failover].
 
-With stateless sessions, OpenAM does not store user sessions in the Core Token Service's token store. Instead, OpenAM stores sessions in the `iPlanetDirectoryPro` cookie on the user's browser. If an OpenAM server fails, another server handling the user's request simply reads the stateless session from the `iPlanetDirectoryPro` cookie. Session failover need not be enabled for the other server to be able to read the session.
+For stateless sessions, OpenAM uses the JWT carried by the client as the session state.
+Another node can validate that token if it receives the cookie (by default `iPlanetDirectoryPro`) and uses compatible session settings and keys.
 
 Session blacklisting is an optional feature that maintains a list of logged out stateless sessions in the Core Token Service's token store. The next section describes session logout, including session blacklisting for stateless sessions.
 
@@ -138,7 +145,9 @@ With stateful sessions, OpenAM terminates sessions in four situations:
 
 * When a user is idle for longer than the maximum session idle time
 
-Under these circumstances, OpenAM responds by removing stateful sessions from the memory heap of the OpenAM server on which the session resides, and from the Core Token Service's token store (if session failover is enabled). With the user's stateful session no longer in memory, OpenAM forces the user to reauthenticate on subsequent attempts to access resources protected by OpenAM.
+Under these circumstances, OpenAM removes the stateful session from its cache and CTS.
+The user must reauthenticate after the session is invalidated.
+In a replicated deployment, verify how quickly logout and termination take effect across nodes and sites.
 
 When a user explicitly logs out of OpenAM, OpenAM also attempts to invalidate the `iPlanetDirectoryPro` cookie in users' browsers by sending a `Set-Cookie` header with an invalid session ID and a cookie expiration time that is in the past. In the case of administrator session termination and session timeout, OpenAM cannot invalidate the `iPlanetDirectoryPro` cookie until the next time the user accesses OpenAM.
 
@@ -146,7 +155,7 @@ Session termination differs for stateless sessions. Since stateless sessions are
 
 As with stateful sessions, OpenAM attempts to invalidate the `iPlanetDirectoryPro` cookie from a user's browser when the user logs out. When the maximum session time is exceeded, OpenAM also attempts to invalidate the `iPlanetDirectoryPro` cookie in the user's browser the next time the user accesses OpenAM.
 
-It is important to understand that OpenAM cannot guarantee cookie invalidation. For example, the HTTP response containing the `Set-Cookie` header might be lost. This is not an issue for stateful sessions, because a logged out stateful session no longer exists in OpenAM memory, and a user who attempts to reaccess OpenAM after previously logging out will be forced to reauthenticate.
+It is important to understand that OpenAM cannot guarantee cookie invalidation. For example, the HTTP response containing the `Set-Cookie` header might be lost. For stateful sessions the server-side session is also invalidated, so deleting the browser cookie is only one part of logout.
 
 However, the lack of a guarantee of cookie invalidation is an issue for deployments with stateless sessions. It could be possible for a logged out user to have an `iPlanetDirectoryPro` cookie. OpenAM could not determine that the user previously logged out. Therefore, OpenAM supports a feature that takes additional action when users log out of stateless sessions. OpenAM can maintain a list of logged out stateless sessions in a session blacklist in the Core Token Service's token store. Whenever users attempt to access OpenAM with stateless sessions, OpenAM checks the session blacklist to validate that the user has not, in fact, logged out.
 
@@ -156,13 +165,18 @@ For more information about session blacklist options, see xref:#session-state-co
 [#session-state-use-cases]
 === Choosing Between Stateful and Stateless Sessions
 
-With stateful sessions, OpenAM ties users' sessions to specific servers. Servers can be added to OpenAM sites, but as servers are added, the overall workload balances gradually, assuming a short session lifetime. If an OpenAM server fails, sessions are retrieved from the Core Token Service's token store, and performance can take some time to recover. Crosstalk, an expensive operation, is incurred whenever a user arrives at an OpenAM server that is not the user's home server. Adding servers to OpenAM sites does not improve performance in a horizontally scalable manner; as more servers are added to a site, coordination among the servers becomes more complex.
+With stateful sessions, route requests consistently to take advantage of node-local caches.
+A node with access to CTS can recover a session after failover or a cache miss.
+Include cache warm-up and CTS capacity in your scaling tests.
+With stateless sessions, include JWT processing costs, cookie size, and any CTS-backed revocation checks.
+Measure both session modes with the same authentication and application workloads.
 
 Stateless sessions provide the following advantages:
 --
 
 Elasticity and horizontal scalability::
-With stateless sessions, you can add and remove OpenAM servers to a site and the session load should balance horizontally. Elasticity is important for cloud deployments with very large numbers of users when there are significant differences between peak and normal system loads.
+Nodes with compatible keys and settings can validate established stateless sessions from the client token.
+This can simplify redistribution of validation traffic during changes in capacity.
 
 --
 Stateful sessions provide the following advantages:
@@ -172,7 +186,7 @@ Faster performance with equivalent hosts::
 Stateless sessions must send a larger cookie to the OpenAM server, and the JWT in the stateless session cookie must be decrypted. The decryption operation can significantly impact OpenAM server performance, reducing the number of session validations per second per host.
 
 +
-Because using stateless sessions provides horizontal scalability, overall performance on hosts using stateless sessions can be easily improved by adding more hosts to the OpenAM deployment.
+Measure the cost of cookie transmission and JWT processing separately from the cost of cache misses and CTS traffic.
 
 Full feature support::
 Stateful sessions support all OpenAM features. Stateless sessions do not. For information about restrictions on OpenAM usage with stateless sessions, see xref:#session-state-stateless-limitations["Limitations When Using Stateless Sessions"].
@@ -190,35 +204,31 @@ The following table contrasts the impact of using stateful and stateless session
 |Deployment Area |Stateful Session Deployment |Stateless Session Deployment 
 
 a|Hardware
-a|Higher RAM consumption
-a|Higher CPU consumption
-
-a|Logical Hosts
-a|Smaller number of hosts
-a|Variable or large number of hosts
+a|Budget cached state and CTS traffic.
+a|Budget JWT processing and larger request headers.
 
 a|Session Monitoring
 a|Available
 a|Not available
 
 a|Session Location
-a|In OpenAM server memory heap
-a|In a cookie in the user's browser
+a|In CTS with local caching.
+a|In a JWT carried by the client.
 
 a|Session Failover
-a|Requires session stickiness to be configured in the load balancer
-a|Does not require session stickiness
+a|Requires access to the saved session in CTS. Affinity helps cache utilization.
+a|Requires compatible keys and configuration. Plan affinity for in-progress authentication in either mode.
 
 a|Core Token Service Usage
-a|Supports session failover
-a|Supports session blacklisting for logged out sessions
+a|Stores authenticated sessions.
+a|Stores revocation records when session blacklisting is enabled.
 
 a|Core Token Service Demand
-a|Heavier
-a|Lighter
+a|Depends on session creation, updates, termination, and cache misses.
+a|Depends on revocation settings and other enabled services.
 
 a|Session Security
-a|Sessions are not accessible to users because they reside in memory on the OpenAM server.
+a|Session state remains on the server side.
 a|Sessions should be signed and encrypted.
 
 a|Policy Agents
@@ -238,7 +248,8 @@ Also, ensure the trust store used by OpenAM has the necessary certificates insta
 
 * If you are using RS256 signing, then a certificate is required to sign JWTs. (HMAC signing uses a shared secret.)
 
-The same certificates must be stored on all servers participating in an OpenAM site.
+Provision compatible signing and encryption material on every node that can handle these sessions, including any failover site.
+Include the associated private keys or shared secrets, as required by the selected algorithms.
 
 
 [#session-state-configure-stateless]
