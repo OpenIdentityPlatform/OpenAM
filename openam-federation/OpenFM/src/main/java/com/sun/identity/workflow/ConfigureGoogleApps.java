@@ -28,6 +28,7 @@
 
 /**
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2026 3A Systems LLC
  */
 package com.sun.identity.workflow;
 
@@ -46,7 +47,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 /**
  ** Configure GoogleApps.
@@ -90,20 +91,20 @@ public class ConfigureGoogleApps
                     samlManager.getEntityConfig(realm, entityId);
             IDPSSOConfigElement idpssoConfig =
                     samlManager.getIDPSSOConfig(realm, entityId);
-            List attrList = idpssoConfig.getAttribute();
             if (idpssoConfig != null) {
+                List attrList = idpssoConfig.getValue().getAttribute();
                 for (Iterator it = attrList.iterator(); it.hasNext();) {
                     AttributeElement avpnew = (AttributeElement) it.next();
-                    String name = avpnew.getName();
+                    String name = avpnew.getValue().getName();
                     if (name.equals("nameIDFormatMap")) {
-                        for (Iterator itt = avpnew.getValue().listIterator();
+                        for (Iterator itt = avpnew.getValue().getValue().listIterator();
                                 itt.hasNext();) {
                             String temp = (String) itt.next();
                             if (temp.contains("unspecified")) {
                                 itt.remove();
                             }
                         }
-                        avpnew.getValue().add(0, nameidMapping);
+                        avpnew.getValue().getValue().add(0, nameidMapping);
                     }
                 }
             }
@@ -132,7 +133,7 @@ public class ConfigureGoogleApps
         try {
             EntityDescriptorElement e =
                 SAML2MetaUtils.getEntityDescriptorElement(metadata);
-            String eId = e.getEntityID();
+            String eId = e.getValue().getEntityID();
             String metaAlias = generateMetaAliasForSP(realm);
             Map map = new HashMap();
             map.put(MetaTemplateParameters.P_SP, metaAlias);

@@ -25,7 +25,7 @@
  * $Id: FSSSOAndFedHandler.java,v 1.12 2009/11/04 00:06:11 exu Exp $ 
  *
  * Portions Copyrighted 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.federation.services.fednsso;
@@ -1150,7 +1150,7 @@ public abstract class FSSSOAndFedHandler {
 
         try {
             spDescriptor = metaManager.getSPDescriptor(realm, spEntityId);
-            spConfig = metaManager.getSPDescriptorConfig(realm, spEntityId);
+            spConfig = metaManager.getSPDescriptorConfig(realm, spEntityId).getValue();
             if (!metaManager.isTrustedProvider(
                 realm, hostedEntityId, spEntityId)) 
             { 
@@ -1513,7 +1513,7 @@ public abstract class FSSSOAndFedHandler {
              localDescriptor = metaManager.getSPDescriptor(
                  realm, hostedEntityId);
              localDescriptorConfig =
-                 metaManager.getSPDescriptorConfig(realm, hostedEntityId);
+                 metaManager.getSPDescriptorConfig(realm, hostedEntityId).getValue();
          } catch (Exception e) {
              FSUtils.debug.error(
                  "FSSSOAndFedHandler.sendProxyAuthnRequest:",e);

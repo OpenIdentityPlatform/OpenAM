@@ -67,7 +67,7 @@
     String spRealm = WSFederationMetaUtils.getRealmByMetaAlias(spMetaAlias);
     Map<String,List<String>> spConfig =
         WSFederationMetaUtils.getAttributes(
-        metaManager.getSPSSOConfig(spRealm,spEntityId));
+        metaManager.getSPSSOConfig(spRealm,spEntityId).getValue());
     String accountRealmCookieName =
         spConfig.get(WSFederationConstants.ACCOUNT_REALM_COOKIE_NAME).get(0);
 
@@ -246,7 +246,7 @@
                         getTokenIssuerName(idp);
 
                     String displayName =
-                        WSFederationMetaUtils.getAttribute(idpconfig,
+                        WSFederationMetaUtils.getAttribute(idpconfig.getValue(),
                         WSFederationConstants.DISPLAY_NAME);
 
                     if (debug.messageEnabled()) {

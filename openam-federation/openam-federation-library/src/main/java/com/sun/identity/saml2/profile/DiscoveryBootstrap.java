@@ -165,7 +165,7 @@ public class DiscoveryBootstrap {
          String univID = values[0];
 
         try {
-            ResourceOfferingType offering = discoEntry.getResourceOffering();
+            ResourceOfferingType offering = discoEntry.getValue().getResourceOffering().getValue();
             ServiceInstanceType serviceInstance = offering.getServiceInstance();
             String providerID = serviceInstance.getProviderID();
             if (!DiscoServiceManager.useImpliedResource()) {
@@ -202,7 +202,7 @@ public class DiscoveryBootstrap {
                 IDPSSODescriptorElement idpSSODesc = SAML2Utils
                     .getSAML2MetaManager().getIDPSSODescriptor(realm,
                     providerID);
-                EncInfo encInfo = KeyUtil.getEncInfo(idpSSODesc, wscID,
+                EncInfo encInfo = KeyUtil.getEncInfo(idpSSODesc.getValue(), wscID,
                     SAML2Constants.IDP_ROLE);
 
                 NameIdentifier ni =

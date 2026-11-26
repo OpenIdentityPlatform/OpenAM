@@ -27,6 +27,8 @@ import org.forgerock.openam.shared.security.whitelist.ValidDomainExtractor;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
+import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
+import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.meta.IDFFMetaException;
 import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaUtils;
@@ -79,9 +81,13 @@ public class ValidRelayStateExtractor
         final BaseConfigType config;
         try {
             if (IFSConstants.SP.equalsIgnoreCase(entityInfo.role)) {
-                config = metaManager.getSPDescriptorConfig(entityInfo.realm, entityInfo.entityID);
+                final SPDescriptorConfigElement spConfig =
+                    metaManager.getSPDescriptorConfig(entityInfo.realm, entityInfo.entityID);
+                config = (spConfig == null) ? null : spConfig.getValue();
             } else {
-                config = metaManager.getIDPDescriptorConfig(entityInfo.realm, entityInfo.entityID);
+                final IDPDescriptorConfigElement idpConfig =
+                    metaManager.getIDPDescriptorConfig(entityInfo.realm, entityInfo.entityID);
+                config = (idpConfig == null) ? null : idpConfig.getValue();
             }
         } catch (final IDFFMetaException ime) {
             throw new ConfigurationUnavailableException(

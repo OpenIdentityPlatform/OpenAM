@@ -26,7 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.sun.identity.federation.common.IFSConstants;
+import com.sun.identity.federation.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.federation.jaxb.entityconfig.AttributeType;
+import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType;
@@ -55,8 +57,7 @@ final class HostedProviderFixture {
         List<AttributeType> attributes = new ArrayList<AttributeType>();
         attributes.add(attribute(IFSConstants.PROVIDER_HOME_PAGE_URL, HOME_URL));
 
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
+        SPDescriptorConfigElement config = spConfig(attributes, null);
         return metaManagerFor(config);
     }
 
@@ -65,8 +66,7 @@ final class HostedProviderFixture {
         attributes.add(attribute(IFSConstants.RELAY_STATE_URL_LIST, ALLOWED_PATTERN));
         attributes.add(attribute(IFSConstants.PROVIDER_HOME_PAGE_URL, HOME_URL));
 
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
+        SPDescriptorConfigElement config = spConfig(attributes, null);
         return metaManagerFor(config);
     }
 
@@ -75,8 +75,7 @@ final class HostedProviderFixture {
         List<AttributeType> attributes = new ArrayList<AttributeType>();
         attributes.add(attribute(IFSConstants.RELAY_STATE_URL_LIST, ALLOWED_PATTERN));
 
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
+        SPDescriptorConfigElement config = spConfig(attributes, null);
         return metaManagerFor(config);
     }
 
@@ -111,9 +110,7 @@ final class HostedProviderFixture {
         attributes.add(
             attribute(IFSConstants.NAMEID_POLICY, IFSConstants.NAME_ID_POLICY_FEDERATED));
 
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
-        when(config.getMetaAlias()).thenReturn(META_ALIAS);
+        SPDescriptorConfigElement config = spConfig(attributes, META_ALIAS);
         IDFFMetaManager metaManager = mock(IDFFMetaManager.class);
         when(metaManager.getProviderRoleByMetaAlias(META_ALIAS)).thenReturn(IFSConstants.SP);
         when(metaManager.getEntityIDByMetaAlias(META_ALIAS)).thenReturn(SECOND_ENTITY);
@@ -132,13 +129,28 @@ final class HostedProviderFixture {
         attributes.add(
             attribute(IFSConstants.NAMEID_POLICY, IFSConstants.NAME_ID_POLICY_FEDERATED));
 
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenReturn(attributes);
-        when(config.getMetaAlias()).thenReturn(META_ALIAS);
+        SPDescriptorConfigElement config = spConfig(attributes, META_ALIAS);
         IDFFMetaManager metaManager = metaManagerFor(config);
         when(metaManager.getSPDescriptor(nullable(String.class), nullable(String.class)))
             .thenReturn(mock(SPDescriptorType.class));
         return metaManager;
+    }
+
+    /**
+     * The extended metadata of a hosted SP holding these attributes, wrapped the way the meta
+     * manager returns it.
+     */
+    private static SPDescriptorConfigElement spConfig(List<AttributeType> attributes,
+        String metaAlias) {
+
+        List<AttributeElement> elements = new ArrayList<AttributeElement>();
+        for (AttributeType attribute : attributes) {
+            elements.add(new AttributeElement(attribute));
+        }
+        BaseConfigType config = mock(BaseConfigType.class);
+        when(config.getAttribute()).thenReturn(elements);
+        when(config.getMetaAlias()).thenReturn(metaAlias);
+        return new SPDescriptorConfigElement(config);
     }
 
     private static AttributeType attribute(String name, String value) {

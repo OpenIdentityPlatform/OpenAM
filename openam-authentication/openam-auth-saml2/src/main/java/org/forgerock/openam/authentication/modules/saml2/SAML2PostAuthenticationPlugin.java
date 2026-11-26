@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2015-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 package org.forgerock.openam.authentication.modules.saml2;
 
@@ -54,8 +54,11 @@ import com.sun.identity.sm.DNMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.xml.bind.JAXBElement;
 import org.forgerock.guice.core.InjectorHolder;
 import org.forgerock.openam.federation.saml2.SAML2TokenRepositoryException;
 import org.forgerock.openam.saml2.SAML2Store;
@@ -178,7 +181,8 @@ public class SAML2PostAuthenticationPlugin implements AMPostAuthProcessInterface
         final String binding = SAML2Constants.HTTP_REDIRECT;
         final IDPSSODescriptorElement idpsso = sm.getIDPSSODescriptor(realm, idpEntityId);
 
-        final List<EndpointType> slosList = idpsso.getSingleLogoutService();
+        final List<EndpointType> slosList = idpsso.getValue().getSingleLogoutService().stream()
+                .map(JAXBElement::getValue).collect(Collectors.toList());
 
         EndpointType logoutEndpoint = null;
         for (EndpointType endpoint : slosList) {

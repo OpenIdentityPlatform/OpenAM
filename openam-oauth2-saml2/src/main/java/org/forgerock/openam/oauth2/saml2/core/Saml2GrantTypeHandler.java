@@ -12,7 +12,7 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions copyright 2025-2026 3A Systems LLC.
  */
 
 package org.forgerock.openam.oauth2.saml2.core;
@@ -179,7 +179,11 @@ public class Saml2GrantTypeHandler extends GrantTypeHandler {
         final Set<X509Certificate> verificationCerts;
         SAML2MetaManager metaManager = new SAML2MetaManager();
         final IDPSSODescriptorElement idpSsoDescriptor = metaManager.getIDPSSODescriptor(realm, idpEntityID);
-        verificationCerts = KeyUtil.getVerificationCerts(idpSsoDescriptor, idpEntityID, SAML2Constants.IDP_ROLE);
+        if (idpSsoDescriptor == null) {
+            logger.error("Saml2GrantTypeHandler.isValidAssertion(): No IDP descriptor found for issuer {}", idpEntityID);
+            throw new InvalidGrantException("Unknown assertion issuer");
+        }
+        verificationCerts = KeyUtil.getVerificationCerts(idpSsoDescriptor.getValue(), idpEntityID, SAML2Constants.IDP_ROLE);
 
 
         // The Assertion MUST be digitally signed or have a Message Authentication Code (MAC) applied by the issuer.

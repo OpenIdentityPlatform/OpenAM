@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: CreateHostedSP.java,v 1.9 2010/01/04 19:10:50 veiming Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 
@@ -122,7 +124,7 @@ public class CreateHostedSP
                     realm, entityId);
                 SPSSOConfigElement ssoConfig = manager.getSPSSOConfig(
                     realm, entityId);
-                Map attribConfig = SAML2MetaUtils.getAttributes(ssoConfig);
+                Map attribConfig = SAML2MetaUtils.getAttributes(ssoConfig.getValue());
                 List mappedAttributes = (List) attribConfig.get(
                     SAML2Constants.ATTRIBUTE_MAP);
                 mappedAttributes.addAll(attrMapping);

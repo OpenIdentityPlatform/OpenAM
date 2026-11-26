@@ -25,7 +25,7 @@
  * $Id: CreateMetaDataModelImpl.java,v 1.7 2010/01/06 23:11:25 veiming Exp $
  *
  * Portions Copyrighted 2015 ForgeRock AS.
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyrighted 2025-2026 3A Systems LLC.
  */
 
 package com.sun.identity.console.federation.model;
@@ -60,7 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import jakarta.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 public class CreateMetaDataModelImpl extends AMModelBase
     implements CreateMetaDataModel 
@@ -173,7 +173,7 @@ public class CreateMetaDataModelImpl extends AMModelBase
         
             FederationElement elt = (FederationElement) 
                 WSFederationMetaUtils.convertStringToJAXB(metadata);
-            String federationID = elt.getFederationID();
+            String federationID = elt.getValue().getFederationID();
             if (federationID == null) {
                 federationID = WSFederationConstants.DEFAULT_FEDERATION_ID;
             }

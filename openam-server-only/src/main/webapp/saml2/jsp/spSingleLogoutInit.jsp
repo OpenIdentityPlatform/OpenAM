@@ -151,7 +151,7 @@
                 SPSSOConfigElement spConfig = 
                     manager.getSPSSOConfig("/", spEntityID);
                 if (spConfig != null) {
-                    metaAlias = spConfig.getMetaAlias();
+                    metaAlias = spConfig.getValue().getMetaAlias();
                 }
             } 
         }

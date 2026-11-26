@@ -419,7 +419,7 @@ public class FSIntersiteTransferService extends HttpServlet {
             SPDescriptorType hostDesc = 
                 metaManager.getSPDescriptor(realm, hostEntityId);
             BaseConfigType hostConfig = 
-                metaManager.getSPDescriptorConfig(realm, hostEntityId);
+                metaManager.getSPDescriptorConfig(realm, hostEntityId).getValue();
             if (IDFFMetaUtils.getBooleanAttributeValueFromConfig(
                     hostConfig, IFSConstants.ENABLE_AFFILIATION))
             {

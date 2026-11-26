@@ -27,6 +27,7 @@
    $Id: header.jspf,v 1.1 2009/06/09 20:28:30 exu Exp $
 
    Portions Copyrighted 2013-2016 ForgeRock AS.
+   Portions Copyrighted 2026 3A Systems, LLC.
 -->
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils,
 com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement,
@@ -50,15 +51,15 @@ java.util.List"
             SAML2MetaManager manager = new SAML2MetaManager();
             IDPSSODescriptorElement idp =
                 manager.getIDPSSODescriptor("/", idpEntityID);
-            List ssoServiceList = idp.getSingleSignOnService();
+            List ssoServiceList = idp.getValue().getSingleSignOnService();
             if ((ssoServiceList != null)
                 && (!ssoServiceList.isEmpty())) {
                 Iterator i = ssoServiceList.iterator();
                 while (i.hasNext()) {
                     SingleSignOnServiceElement sso =
                         (SingleSignOnServiceElement) i.next();
-                    if ((sso != null) && (sso.getBinding() != null)) {
-                        String ssoURL = sso.getLocation();
+                    if ((sso != null) && (sso.getValue().getBinding() != null)) {
+                        String ssoURL = sso.getValue().getLocation();
                         int loc = ssoURL.indexOf("/metaAlias/");
                         if (loc == -1) {
                             continue;
@@ -89,14 +90,14 @@ java.util.List"
             SAML2MetaManager manager = new SAML2MetaManager();
             SPSSODescriptorElement sp =
                 manager.getSPSSODescriptor("/", spEntityID);
-            List acsList = sp.getAssertionConsumerService();
+            List acsList = sp.getValue().getAssertionConsumerService();
             if ((acsList != null) && (!acsList.isEmpty())) {
                 Iterator j = acsList.iterator();
                 while (j.hasNext()) {
                     AssertionConsumerServiceElement acs =
                         (AssertionConsumerServiceElement) j.next();
-                    if ((acs != null) && (acs.getBinding() != null)) {
-                        String acsURL = acs.getLocation();
+                    if ((acs != null) && (acs.getValue().getBinding() != null)) {
+                        String acsURL = acs.getValue().getLocation();
                         int loc = acsURL.indexOf(deployuri + "/");
                         if (loc == -1) {
                             continue;

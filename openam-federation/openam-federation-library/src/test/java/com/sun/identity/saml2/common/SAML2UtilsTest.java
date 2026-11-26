@@ -24,14 +24,23 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sun.identity.saml2.jaxb.assertion.AttributeElement;
+import com.sun.identity.saml2.jaxb.assertion.AttributeValueElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeType;
+import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement;
+import com.sun.identity.saml2.jaxb.metadata.IndexedEndpointType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorType;
+import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
+import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.shared.configuration.ISystemProperties;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.URLEncDec;
+import jakarta.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -142,15 +151,16 @@ public class SAML2UtilsTest {
     private SAML2MetaManager spPublishing(String... acsBindings) throws Exception {
         List<AssertionConsumerServiceElement> services = new ArrayList<>();
         for (String binding : acsBindings) {
-            AssertionConsumerServiceElement acs = mock(AssertionConsumerServiceElement.class);
+            IndexedEndpointType acs = mock(IndexedEndpointType.class);
             when(acs.getBinding()).thenReturn(binding);
-            services.add(acs);
+            services.add(new AssertionConsumerServiceElement(acs));
         }
-        SPSSODescriptorElement descriptor = mock(SPSSODescriptorElement.class);
+        SPSSODescriptorType descriptor = mock(SPSSODescriptorType.class);
         when(descriptor.getAssertionConsumerService()).thenReturn(services);
 
         SAML2MetaManager metaManager = mock(SAML2MetaManager.class);
-        when(metaManager.getSPSSODescriptor(REALM, SP_ENTITY_ID)).thenReturn(descriptor);
+        when(metaManager.getSPSSODescriptor(REALM, SP_ENTITY_ID))
+                .thenReturn(new SPSSODescriptorElement(descriptor));
         return metaManager;
     }
 
@@ -168,16 +178,17 @@ public class SAML2UtilsTest {
      * Extended metadata of a hosted SP holding the given attributes, as name, value pairs.
      */
     private SPSSOConfigElement spConfig(String... nameThenValue) {
-        List<AttributeType> attributes = new ArrayList<>();
+        // The entity config AttributeElement, not the assertion one imported for the tests below.
+        List<com.sun.identity.saml2.jaxb.entityconfig.AttributeElement> attributes = new ArrayList<>();
         for (int i = 0; i < nameThenValue.length; i += 2) {
             AttributeType attribute = mock(AttributeType.class);
             when(attribute.getName()).thenReturn(nameThenValue[i]);
             when(attribute.getValue()).thenReturn(Arrays.asList(nameThenValue[i + 1]));
-            attributes.add(attribute);
+            attributes.add(new com.sun.identity.saml2.jaxb.entityconfig.AttributeElement(attribute));
         }
-        SPSSOConfigElement config = mock(SPSSOConfigElement.class);
+        BaseConfigType config = mock(BaseConfigType.class);
         when(config.getAttribute()).thenReturn(attributes);
-        return config;
+        return new SPSSOConfigElement(config);
     }
 
     /**
@@ -633,5 +644,38 @@ public class SAML2UtilsTest {
                 .as("no skew configured").isEqualTo(1_000_000L);
         assertThat(SAML2Utils.bearerAcceptedUntil(null, 300))
                 .as("no NotOnOrAfter to start from").isNull();
+    }
+
+    @Test
+    public void getAttributeValueStringExtractsTextFromUnmarshalledValues() throws Exception {
+        String authnContext = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport";
+        String xml = "<mdattr:EntityAttributes"
+                + " xmlns:mdattr=\"urn:oasis:names:tc:SAML:metadata:attribute\""
+                + " xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">"
+                + "<saml:Attribute Name=\"idp-authncontext\""
+                + " NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified\">"
+                + "<saml:AttributeValue>" + authnContext + "</saml:AttributeValue>"
+                + "</saml:Attribute>"
+                + "</mdattr:EntityAttributes>";
+
+        EntityAttributesElement eael = (EntityAttributesElement) SAML2MetaUtils.convertStringToJAXB(xml);
+        AttributeElement attribute = (AttributeElement) eael.getValue().getAttributeOrAssertion().get(0);
+        AttributeValueElement value = (AttributeValueElement) attribute.getValue().getAttributeValue().get(0);
+
+        // the anyType-bound payload is a DOM node after unmarshalling; the helper must
+        // still return the text content the pre-JAXB3 code exposed directly
+        assertThat(SAML2Utils.getAttributeValueString(value)).isEqualTo(authnContext);
+    }
+
+    @Test
+    public void getAttributeValueStringHandlesPlainPayloads() {
+        assertThat(SAML2Utils.getAttributeValueString(null)).isNull();
+
+        QName name = new QName("urn:oasis:names:tc:SAML:2.0:assertion", "AttributeValue");
+        JAXBElement<Object> plain = new JAXBElement<>(name, Object.class, "plain-value");
+        assertThat(SAML2Utils.getAttributeValueString(plain)).isEqualTo("plain-value");
+
+        JAXBElement<Object> empty = new JAXBElement<>(name, Object.class, null);
+        assertThat(SAML2Utils.getAttributeValueString(empty)).isNull();
     }
 }

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: FSDiscoveryBootStrap.java,v 1.4 2008/12/05 00:18:00 exu Exp $
+ * 
+ * Portions Copyrighted 2026 3A Systems LLC
  *
  */
 
@@ -140,7 +142,7 @@ public class FSDiscoveryBootStrap {
         }
 
         try {
-            ResourceOfferingType offering = discoEntry.getResourceOffering();
+            ResourceOfferingType offering = discoEntry.getValue().getResourceOffering().getValue();
             ServiceInstanceType serviceInstance = offering.getServiceInstance();
             String providerID = serviceInstance.getProviderID();
             if (!DiscoServiceManager.useImpliedResource()) {
@@ -169,7 +171,7 @@ public class FSDiscoveryBootStrap {
                 offering.setResourceID(resourceID);
             }
 
-            List discoEntryList = new ArrayList();
+            List<DiscoEntryElement> discoEntryList = new ArrayList<>();
             discoEntryList.add(discoEntry);
             SessionSubject sessionSubject = null;
             if (DiscoServiceManager.encryptNIinSessionContext()) {

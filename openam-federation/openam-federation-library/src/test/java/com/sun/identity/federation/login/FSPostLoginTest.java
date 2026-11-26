@@ -52,6 +52,7 @@ import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.federation.common.FederationStaticsLock;
 import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.MetaManagerFailureFixture;
+import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
 import com.sun.identity.federation.meta.IDFFMetaException;
@@ -131,9 +132,10 @@ public class FSPostLoginTest {
     public void nullRoleRejectsARelayStateTheListWouldPermit() throws Exception {
         IDFFMetaManager metaManager = HostedProviderFixture.providerWithAllowList();
         List<?> allowList = metaManager
-            .getSPDescriptorConfig(REALM, HostedProviderFixture.ENTITY).getAttribute();
-        IDPDescriptorConfigElement idpConfig = mock(IDPDescriptorConfigElement.class);
-        doReturn(allowList).when(idpConfig).getAttribute();
+            .getSPDescriptorConfig(REALM, HostedProviderFixture.ENTITY).getValue().getAttribute();
+        BaseConfigType idpBaseConfig = mock(BaseConfigType.class);
+        doReturn(allowList).when(idpBaseConfig).getAttribute();
+        IDPDescriptorConfigElement idpConfig = new IDPDescriptorConfigElement(idpBaseConfig);
         when(metaManager.getIDPDescriptorConfig(REALM, HostedProviderFixture.ENTITY))
             .thenReturn(idpConfig);
         FSUtils.metaInstance = metaManager;
@@ -149,8 +151,9 @@ public class FSPostLoginTest {
     @Test
     public void allowListThatFailsToReadRejectsRatherThanThrows() throws Exception {
         IDFFMetaManager metaManager = HostedProviderFixture.providerWithAllowList();
-        SPDescriptorConfigElement config = mock(SPDescriptorConfigElement.class);
-        when(config.getAttribute()).thenThrow(new IllegalStateException("unreadable"));
+        BaseConfigType unreadable = mock(BaseConfigType.class);
+        when(unreadable.getAttribute()).thenThrow(new IllegalStateException("unreadable"));
+        SPDescriptorConfigElement config = new SPDescriptorConfigElement(unreadable);
         when(metaManager.getSPDescriptorConfig(nullable(String.class), nullable(String.class)))
             .thenReturn(config);
         FSUtils.metaInstance = metaManager;

@@ -28,7 +28,6 @@ import static org.mockito.Mockito.verify;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.URLEncDec;
-import com.sun.xml.bind.StringInputStream;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -108,7 +107,8 @@ public class SAML2ProxyTest {
 
     private String getFormAction(String html) {
         try {
-            final Document doc = XMLUtils.getSafeDocumentBuilder(false).parse(new StringInputStream(html));
+            final Document doc = XMLUtils.getSafeDocumentBuilder(false).parse(
+                    new java.io.ByteArrayInputStream(html.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
             return XPathFactory.newInstance().newXPath().evaluate("string(//form/@action)", doc);
         } catch (Exception e) {
             throw new RuntimeException(e);
