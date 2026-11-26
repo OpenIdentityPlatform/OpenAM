@@ -21,8 +21,14 @@
 :openam-version: x.y.z
 
 
+ifndef::env-site[]
 [#chap-realms]
+endif::[]
 == Configuring Realms
+
+ifdef::env-site[]
+anchor:chap-realms[]
+endif::[]
 
 This chapter shows how to configure OpenAM __realms__, which are used to group configuration and identities together. For example, you might have one realm for OpenAM administrators and agents, and another realm for users. In this two-realm setup, the OpenAM administrator can log in to the administrative realm to manage the services, but cannot authenticate as OpenAM administrator to the realm that protects web sites with HR and financial information.
 

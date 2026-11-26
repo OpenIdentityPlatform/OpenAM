@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -20,432 +20,126 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-hw-sw-requirements]
+endif::[]
 == OpenAM Hardware and Software Requirements
 
-You can configure OpenAM in a wide variety of deployments depending on your security requirements and network infrastructure.
+ifdef::env-site[]
+anchor:chap-hw-sw-requirements[]
+endif::[]
+
+Select a target OpenAM release, a deployment package, and a data store for each role before sizing the deployment. Use the release requirements for compatibility and xref:chap-sizing.adoc#chap-sizing[Sizing Hardware and Services for Deployment] to validate resource estimates under load.
 
 [#hardware-requirements]
 === Hardware Requirements
 
-This section covers hardware requirements for OpenAM.
-
 [#storage-requirements]
 ==== Disk Storage Requirements
-
-This section considers disk storage requirements for OpenAM server, OpenAM policy agents, and OpenIG gateway.
 
 [#storage-requirements-server]
 ===== Server Disk Storage Requirements
 
-Disk storage requirements for OpenAM servers depend partly on OpenAM itself and partly on your deployment. Disk storage requirements also depend on the space needed for binaries and configuration data, space for log files and rate of writes for logs, space for directory data and file system requirements when using an embedded OpenDJ directory server.
-For initial installation, a few hundred MB is sufficient, not including the downloaded files.
+Budget for the downloaded package, the deployed WAR and any expanded copy, container work and temporary files, and the previous version and staging space needed during an upgrade. Measure the actual files from the target release. For example, the OpenAM 16.1.4 WAR alone is about 293 MB and its full distribution ZIP is about 1 GB.
 
-* The OpenAM `.war` file size varies from release to release, but if your container holds one `.war` file and one directory with the contents of the `.war` file, the disk space required is on the order of 300 MB.
-+
-This space requirement remains stable as you use OpenAM.
+Allow separate capacity for the configuration directory, embedded directory data and replication logs if used, backups, and audit, debug, and container logs. The default CSV audit handler writes to `<configuration-base>/<context>/log/`. Debug logs default to `<configuration-base>/<context>/debug/`. Set rotation, retention, and collection for each destination. Allow for diagnostic logging during an incident. See the xref:../admin-guide/chap-audit-logging.adoc#chap-audit-logging[Audit Logging] and xref:../admin-guide/chap-monitoring.adoc#debug-logging[Debug Logging] chapters.
 
-* The OpenAM configuration directory initially fits in approximately 50 MB of disk space including the embedded OpenDJ directory server.
-+
-This space requirement grows as you use OpenAM.
-
-By default, OpenAM servers write audit logs to flat files under `config-dir/openam/logs/`. Alternatively, OpenAM servers can write audit logs to `syslog`, or to a relational database.
-
-When using flat-file audit logging, OpenAM lets you configure rotation and purging for logs under`openam/logs/`, so you can effectively cap the maximum disk space used for logs. Make sure, however, that you retain the information you need before logs are purged. Also make sure that your disk can keep pace with the volume of logging, which can be significant in high volume deployments, as OpenAM logs not only errors, but also access messages.
-
-For details about audit logging configuration, see xref:../admin-guide/chap-audit-logging.adoc#chap-audit-logging["Configuring Audit Logging"] in the __Administration Guide__.
-
-By default, OpenAM servers write debug logs to flat files under `config-dir/openam/debug/`. OpenAM lets you configure rotation for debug logs. As you can change debug log levels at runtime when investigating issues, debug log volume is not as predictable as for regular logs. Leave a margin in production environments, so that you can turn up debug log levels to diagnose problems.
-
-For details about debug logging configuration, see xref:../admin-guide/chap-monitoring.adoc#debug-logging["Debug Logging"] in the __Administration Guide__.
-When using the embedded OpenDJ directory server, take the following into account:
-
-* OpenDJ is designed to work with local storage for the database, but not for network file system (NFS) nor network-attached storage (NAS) due to some file system locking functions that OpenDJ needs. High performance storage, like solid state drives (SSD), is essential if you need to handle high write throughput.
-+
-By default, OpenAM's configuration directory resides under the `$HOME` directory of the user running the container. `$HOME` directories can be mounted over the network.
-+
-This is not an issue if you are using OpenDJ mainly for configuration data. It can however be a serious problem when you use OpenDJ to back the CTS in a high-volume deployment.
-
-* Embedded OpenDJ directory server log files are stored under `config-dir/opends/logs/`. As for OpenAM, you can configure OpenDJ directory server log rotation and purging. The default cap for access logs is 2 GB.
-
-* OpenAM stores policy information in the configuration directory. The space this takes up depends on the policies you have.
-
-* By default, OpenAM stores CTS information in the configuration directory. The space this takes up depends on the volume of traffic to the server and whether OpenAM is configured for stateless sessions.
-
-* With the default database implementation, OpenDJ database files handling sustained writes can grow to about double their initial size on disk.
-
-* For OpenDJ on Linux systems, enable file system write barriers and ensure the file system journaling mode is ordered to avoid directory database file corruption after crashes or power failures. For details on enabling write barriers and setting the journaling mode for data, see the options for your file system in the `mount` command manual page.
-
-* OpenDJ directory server uses file descriptors when handling connections.
-+
-Defaults can be limited to 1024 file descriptors per user on Linux systems. Consider increasing this limit to at least 64K. For details, see xref:../install-guide/chap-prepare-install.adoc#prerequisites-file-descriptors["Setting Maximum File Descriptors"] in the __Installation Guide__.
-
-
+Use storage that meets the directory server's file ownership, locking, and durability requirements for embedded database files. Network file systems such as NFS cannot guarantee the exclusive access OpenDJ requires. Check throughput, free space, and file descriptor limits under peak traffic and during replication catch-up and backups. See https://doc.openidentityplatform.org/opendj/admin-guide/chap-tuning[OpenDJ storage guidance] and xref:../install-guide/chap-prepare-install.adoc#prerequisites-file-descriptors[Setting Maximum File Descriptors].
 
 [#storage-requirements-pa]
 ===== Policy Agent Disk Storage Requirements
 
-Policy agents are implemented as libraries or Web applications, and so tend to be small on disk, not more than a few MB.
-
-You can configure policy agents to perform local logging to files, or to send log messages to OpenAM for remote logging. For details, see the __Configuration Reference__ for your policy agent.
-
-Debug messages are logged to local files, however, not remotely. Debug logging volume depends on log level. As for OpenAM, leave a margin in production environments so that you can turn up debug log levels to diagnose problems.
-
+Size for the selected agent release, local logs, and the diagnostic log volume expected during an incident. For each agent, determine how it collects audit events and who manages log retention.
 
 [#storage-requirements-openig]
 ===== OpenIG Disk Storage Requirements
 
-The OpenIG Web application can vary in size from release to release. On disk, the `.war` file is under 50 MB. For containers that keep both the `.war` file and an unpacked version, the total size is under 100 MB.
-
-By default, OpenIG configuration resides under the `$HOME` directory of the user who runs the container.
-
-If you use the default log sink, messages are sent to the container logs. Manage those as you would any container logs.
-
-Capture logging and any logging you perform from scriptable filters and handlers can potentially generate significant write traffic. Furthermore, OpenIG does not run rotation or purging for such logs. You must manage any logs OpenIG generates using a `CaptureFilter` or log messages from scriptable filters and handlers.
-
-Both normal log messages and debug messages go to the log sink. As for other components, debug logging volume depends on log level. Leave a margin in production environments so that you can turn up debug log levels to diagnose problems.
-
+Measure the selected https://github.com/OpenIdentityPlatform/OpenIG/releases[OpenIG release] and include the deployed application or container image, configuration, and logs. Include capture and script logging in diagnostics tests and budget retention at the configured log sink.
 
 [#storage-requirements-recommendations]
 ===== Disk Storage Recommendations
 
-The following are based on the preceding information in this section. When deciding on disk storage, keep the following recommendations in mind:
-
-* Plan enough space and enough disk I/O to comfortably absorb the load for logs.
-+
-Check your assumptions in testing. For example, make sure that logs are cleaned up so that they do not exceed your space threshold even in long-duration testing.
-
-* For deployments where an embedded OpenDJ directory service handles high throughput, make sure you use a local file system and that the user running the container has enough file descriptors.
-
-* When using local policy agent logs, make sure you have a mechanism in place to clean them up.
-
-* For OpenIG, make sure you turn off `CaptureFilter` logging, scriptable filter, and handler debug logging before moving to production.
-
-
-
+Measure the sustained write rate and peak space use for each directory and log destination. Include replication backlog, backups, retention, and room to stage a restore. Confirm that alerts and rotation operate before a volume fills and that disk latency stays within the service targets during a long-running load test.
 
 [#ram-requirements]
-==== Random Access Memory Requirements
+==== Memory and CPU Requirements
 
-OpenAM core services require a minimum JVM heap size of 1 GB and. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ.
+Size the JVM heap from the measured working set at peak traffic. Embedded OpenDJ runs in the OpenAM JVM, so include its backend cache and other directory activity in the measurement. With a separate directory server, size and monitor that process separately.
 
-[NOTE]
-====
-Ensure that the `Xms` and `Xmx` JVM parameters are set to the same value to prevent a large garbage collection as the memory profile increases from the default up to the `Xms` value. Also, setting `Xms` and `Xmx` to the same value ensures that small controlled garbage collection events minimize application unresponsiveness.
-====
-
-
+Budget memory beyond the heap for thread stacks, metaspace, direct buffers, the JVM and container, and the file system cache. In a container, leave room between the heap maximum and the container memory limit. Check resident memory, allocation rate, garbage collection pauses, and CPU throttling under sustained and burst traffic. Choose heap settings based on the target JDK, collector, and workload, then verify latency with a node unavailable.
 
 [#hw-and-sw-requirements]
 === Software Requirements
 
-The following sections list software requirements for deploying OpenAM server and policy agent software.
-
 [#os-requirements]
 ==== OpenAM Operating System Requirements
 
-Open Identity Platform Approved Vendors supports customers using OpenAM server software on the following operating system versions:
-
-[#am-os-requirements]
-.Supported Operating Systems
-[cols="50%,50%"]
-|===
-|Operating System |Version 
-
-a|Red Hat Enterprise Linux, Centos
-a|6, 7
-
-a|SuSE
-a|11
-
-a|Ubuntu
-a|12.04 LTS, 14.04 LTS
-
-a|Solaris x64
-a|10, 11
-
-a|Solaris Sparc
-a|10, 11
-
-a|Windows Server
-a|2008, 2008 R2, 2012, 2012 R2
-|===
-
+anchor:am-os-requirements[]
+Select a maintained operating system and processor architecture supported by the selected JDK, web container or container runtime, and any native agents or libraries you install. Record the exact combinations used for acceptance tests.
 
 [#sec-java-requirements]
 ==== Java Requirements
 
-
-[#am-java-requirements]
-.JDK Requirements
-[cols="50%,50%"]
-|===
-|Vendor |Version 
-
-a|Any JDK vendor, i.e. Oracle JDK, Eclipse Temurin, Amazon Coretto
-a|11 LTS or later
-|===
-
+anchor:am-java-requirements[]
+Choose a JDK release accepted by both OpenAM and the web application container. See xref:../release-notes/requirements-and-upgrade.adoc#release-requirements[Requirements and Upgrade Considerations] for the release matrix and xref:../install-guide/chap-prepare-install.adoc#prepare-java[Preparing a Java Environment] for the required module export options when running the WAR.
 
 [#web-container-requirements]
 ==== OpenAM Web Application Container Requirements
 
+anchor:am-web-containers[]
+Use the container and Java combinations listed in xref:../release-notes/requirements-and-upgrade.adoc#release-requirements[Requirements and Upgrade Considerations]. The OpenAM WAR uses Jakarta APIs from release 16.0.3. Validate custom filters, listeners, and other servlet extensions when moving from a Java EE deployment. Give the web container's service account write access to the designated OpenAM configuration directory and the container's work and temporary directories.
 
-[#am-web-containers]
-.Web Containers
-[cols="66%,34%"]
-|===
-|Web Container |Version 
+[#container-deployments]
+==== Container Deployments
 
-a|Apache Tomcat
-a|10.1.X, 11
+Use a versioned image and record its digest for repeatable deployment. Use a stable server identity, public hostname, and context path. The project image uses `/usr/openam/config` for OpenAM configuration by default. Persist that directory outside the container, give each instance its own writable directory, and verify that a replacement instance can start with the intended configuration. Plan external store persistence and backups separately. See xref:../how-to/how-to-persist-openam-docker-container-data-between-restarts.adoc#how-to-persist-openam-docker-container-data-between-restarts[Persist OpenAM Container Data].
 
-a|Oracle WebLogic Server
-a|12c
-
-a|JBoss Enterprise Application Platform
-a|6.1+
-
-a|JBoss Application Server
-a|7.2+
-
-a|WildFly AS
-a|9
-
-a|IBM WebSphere
-a|8.0, 8.5.5.8+
-|===
-The web application container must be able to write to its own home directory, where OpenAM stores configuration files.
-
+For orchestration, plan startup and readiness probes, a process-level liveness check, resource requests and limits, and controlled node replacement. Use the xref:../how-to/how-to-run-openam-in-kubernetes.adoc#how-to-run-openam-in-kubernetes[Kubernetes walkthrough] to evaluate setup on Minikube. For a production deployment, review xref:chap-topologies.adoc#chap-topologies[deployment topology] and the xref:chap-high-level-start.adoc#chap-high-level-start[deployment checklist].
 
 [#data-store-requirements]
 ==== Data Store Requirements
 
+Select a back end independently for each data role. Where roles initially share a directory, account for the impact of directory maintenance and outages on every dependent service.
 
 [#table-data-store-requirements]
-.Supported Data Stores
-[cols="28%,14%,15%,14%,14%,15%"]
+.Data Store Options by Role
+[cols="1,2,3",options="header"]
 |===
-|Data Store |Version |CTS Datastore |Config Datastore |User Datastore |UMA Datastore 
+|Role |Options |Planning Checks
 
-a|Embedded OpenDJ
-a|3.5
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+|Configuration
+|Bundled OpenDJ or external OpenDJ
+|Include OpenAM settings, realms, and policies in the backup and recovery plan. For example, the bundled OpenDJ version in OpenAM 16.1.4 is 5.2.0. For external OpenDJ, validate the target release, schema and index setup, and replication. See xref:../install-guide/chap-prepare-install.adoc#prepare-configuration-store[Preparing a Configuration Store].
 
-a|External OpenDJ
-a|2.6, 2.6.4, 3.0, 3.5
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
+|Core Token Service (CTS)
+|The configuration store's OpenDJ instance by default, a separate OpenDJ store, or the Cassandra CTS integration
+|Measure session and token writes, expiry and cleanup rates, and availability during node or store failure. A deployment with stateless sessions can still use CTS for other token data or logout blacklisting. See xref:../install-guide/chap-cts.adoc#chap-cts[Configuring the Core Token Service].
 
-a|Oracle Unified Directory
-a|11g
-a|
-a|
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|
+|User identities
+|Bundled or external OpenDJ, a directory with the appropriate LDAP identity repository plugin such as Active Directory, or a JDBC or Cassandra identity repository
+|Verify the provider version and plugin for the required schema, indexes, search, bind, and write operations. Plan the access rights needed for those operations. See xref:../install-guide/chap-prepare-install.adoc#prepare-identity-repository[Preparing an Identity Repository].
 
-a|Oracle Directory Server Enterprise Edition
-a|11g
-a|
-a|
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|
-
-a|Microsoft Active Directory
-a|2008, 2008 R2, 2012, 2012 R2
-a|
-a|
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|
-
-a|IBM Tivoli Directory Server
-a|6.3
-a|
-a|
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|
+|UMA data, where used
+|Default stores or dedicated external stores for UMA resource sets and audit information
+|Plan storage, access, and recovery for the parts of UMA used in the deployment. See xref:../admin-guide/chap-uma.adoc#to-configure-uma-external-rs-store[Configuring the UMA Resource Sets Store].
 |===
 
+See xref:../how-to/how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam.adoc#how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam[Using Cassandra for User and Session Data] for the Cassandra schema and integration example. Verify all required operations against the exact backend version before relying on an external store in production.
 
 [#sec-supported-clients]
-==== Supported Clients
+==== Browser and Client Compatibility
 
-The following table summarizes supported clients:
-
-[#am-supported-clients]
-.Supported Clients
-[cols="23%,15%,16%,15%,15%,16%"]
-|===
-|Client Platform |Native Apps |Chrome 16+ |IE 9+, Microsoft Edge |Firefox 3.6+ |Safari 5+ 
-
-a|Windows 7 or later
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-
-a|Mac OS X 10.8 or later
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|
-
-a|Ubuntu 12.04 LTS or later
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-
-a|iOS 7 or later
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|
-a|
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-
-a|Android 4.3 or later
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|image:images/thumb_Very-Basic-Checkmark-icon.png[]
-a|
-a|
-a|
-|===
-
+anchor:am-supported-clients[]
+Choose maintained browser and OS versions for your user population. Verify sign-in, sign-out, redirects, and session renewal on those versions through the production proxy and cookie configuration. Include cross-origin SAML, OIDC, or CDSSO flows, embedded pages, and WebAuthn where used. Record required browser policies, mobile variants, and the outcomes of your checks. Verify native and service clients against the protocol flows and library versions they will use.
 
 [#jee-pa-platform-requirements]
-==== Java EE Agents Platform Requirements
+==== Java Policy Agent Requirements
 
-The following table summarizes platform support.
-
-[#table-jee-pa-platform-requirements]
-.Supported Operating Systems & Web Application Containers
-[cols="33%,16%,51%"]
-|===
-|Operating Systems (OS) |OS Versions |Web Application Containers & Versions 
-
-a|[none]
-* CentOS
-* Red Hat Enterprise Linux
-* Oracle Linux
-a|[none]
-* 5, 6, 7
-a|[none]
-* Apache Tomcat 10.1.X, 11
-* IBM Web Sphere Application Server 8, 8.5
-* JBoss Enterprise Application Platform 6
-* JBoss Application Server 7
-* Jetty 8 (at least 8.1.13)
-* Oracle WebLogic Server 11g, 12c
-
-a|[none]
-* Microsoft Windows Server
-a|[none]
-* 2008, 2008 R2, 2012, 2012 R2
-a|[none]
-* Apache Tomcat 10.1.X, 11
-
-a|[none]
-* Oracle Solaris x64
-* Oracle Solaris SPARC
-a|[none]
-* 10, 11
-a|[none]
-* Apache Tomcat 10.1.X, 11
-* Oracle WebLogic Server 11g, 12c
-
-a|[none]
-* Ubuntu Linux
-a|[none]
-* 12.04 LTS, 14.04 LTS
-a|[none]
-* Apache Tomcat 10.1.X, 11
-* IBM Web Sphere Application Server 8, 8.5
-* JBoss Enterprise Application Platform 6
-* JBoss Application Server 7
-* Jetty 8 (at least 8.1.13)
-* Oracle WebLogic Server 11g, 12c
-|===
-
+anchor:table-jee-pa-platform-requirements[]
+Consult the https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents/releases[Java policy agent releases] for the selected agent. Verify its JDK and target servlet container combination, the Java EE or Jakarta namespace required by that combination, and interoperability with your OpenAM release.
 
 [#web-pa-platform-requirements]
-==== Web Policy Agents Platform Requirements
+==== Web Policy Agent Requirements
 
-The following table summarizes platform support.
-
-[#table-web-pa-platform-requirements]
-.Supported Operating Systems & Web Servers
-[cols="33%,16%,51%"]
-|===
-|Operating Systems (OS) |OS Versions |Web Servers & Versions 
-
-a|[none]
-* CentOS
-* Red Hat Enterprise Linux
-* Oracle Linux
-a|[none]
-* 5, 6, 7
-a|[none]
-* Apache HTTP Server 2.2
-* Apache HTTP Server 2.4
-
-.3+a|[none]
-* Microsoft Windows Server
-a|[none]
-* 2008 R2
-a|[none]
-* Microsoft IIS 7
-
-a|[none]
-* 2008 R2
-a|[none]
-* Microsoft IIS 7.5
-
-a|[none]
-* 2012, 2012 R2
-a|[none]
-* Microsoft IIS 8
-
-a|[none]
-* Oracle Solaris x64
-* Oracle Solaris SPARC
-a|[none]
-* 10, 11
-a|[none]
-* Apache HTTP Server 2.2
-* Apache HTTP Server 2.4
-
-a|[none]
-* Ubuntu Linux
-a|[none]
-* 12.04 LTS, 14.04 LTS
-a|[none]
-* Apache HTTP Server 2.2
-* Apache HTTP Server 2.4
-|===
---
-Before installing web policy agents on your platform, also make sure that the system provides the required components.
-
-All Systems::
-If agents use secure connections (SSL, TLS), then also make sure that OpenSSL is installed.
-
-Linux Systems::
-Before installing web policy agents on Linux, make sure the system can run `gcc` 4.4.7. `libc.so.6` must be available and it must support the GLIBC_2.3 ABI. You can check this by running the following command: `strings libc.so.6 | grep GLIBC_2`.
-
-Microsoft Windows Systems::
-Before installing the IIS 7 web policy agent on Microsoft IIS 7 or IIS 8, make sure that the optional Application Development component of Web Server (IIS) is installed. In the Windows Server 2012 Server Manager for example, Application Development is a component of Web Server (IIS) | Web Server.
-
-Oracle Solaris Systems::
-Before installing web policy agents on Solaris 10, make sure you have applied the latest shared library patch for C++, at least 119963-16 on SPARC or 119964-12 on x64. The library is bundled on Solaris 10 update 5 and later.
-
---
-
-
-
+anchor:table-web-pa-platform-requirements[]
+Consult the https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases[Web policy agent releases] for the relevant web server, OS, architecture, and native library dependencies. Use a currently maintained web server and verify the agent against the exact build you deploy. Check TLS trust, agent registration, policy enforcement, and access after OpenAM failover.

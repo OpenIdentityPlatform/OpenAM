@@ -1,0 +1,66 @@
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions copyright [year] [name of copyright owner]".
+
+  Copyright 2026 3A Systems, LLC.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="534" viewBox="0 0 960 534" role="img" aria-labelledby="title description">
+  <title id="title">Two-site OpenAM deployment</title>
+  <desc id="description">Public clients reach either site through global routing. Each site has HTTPS ingress, OpenAM nodes, protected applications, and data store connections.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#38536d"/>
+    </marker>
+    <marker id="arrow-back" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M10 0 L0 5 L10 10 Z" fill="#38536d"/>
+    </marker>
+  </defs>
+  <rect width="960" height="534" fill="#fff"/>
+  <g font-family="DejaVu Sans, sans-serif" fill="#152b43">
+  <rect x="295" y="18" width="370" height="64" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="480.0" y="57.0" text-anchor="middle" font-size="21" font-weight="700">Browsers and client applications</text>
+  <path d="M480 82 V110" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <rect x="295" y="110" width="370" height="68" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="480.0" y="142.0" text-anchor="middle" font-size="21" font-weight="700">Global traffic routing</text>
+  <text x="480.0" y="165.0" text-anchor="middle" font-size="18" font-weight="400">Public HTTPS URL</text>
+  <path d="M480 178 V207 H236 V245" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M480 207 H724 V245" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <rect x="40" y="245" width="392" height="68" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="236.0" y="277.0" text-anchor="middle" font-size="21" font-weight="700">Site A · HTTPS ingress</text>
+  <text x="236.0" y="300.0" text-anchor="middle" font-size="18" font-weight="400">Routes for OpenAM and applications</text>
+  <path d="M236 313 V334 H128 V354" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M236 334 H340 V354" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <rect x="40" y="354" width="176" height="65" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="128.0" y="393.5" text-anchor="middle" font-size="21" font-weight="700">OpenAM nodes</text>
+  <rect x="234" y="354" width="198" height="65" rx="8" fill="#f2f5f8" stroke="#38536d" stroke-width="1.6"/>
+  <text x="333.0" y="393.5" text-anchor="middle" font-size="21" font-weight="700">Protected apps</text>
+  <path d="M234 386 H216" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M128 419 V450" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <rect x="40" y="450" width="392" height="66" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="236.0" y="481.0" text-anchor="middle" font-size="21" font-weight="700">Site A data stores</text>
+  <text x="236.0" y="504.0" text-anchor="middle" font-size="18" font-weight="400">Configuration, CTS, and identity</text>
+  <rect x="528" y="245" width="392" height="68" rx="8" fill="#e7f2fc" stroke="#38536d" stroke-width="1.6"/>
+  <text x="724.0" y="277.0" text-anchor="middle" font-size="21" font-weight="700">Site B · HTTPS ingress</text>
+  <text x="724.0" y="300.0" text-anchor="middle" font-size="18" font-weight="400">Routes for OpenAM and applications</text>
+  <path d="M724 313 V334 H616 V354" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M724 334 H828 V354" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <rect x="528" y="354" width="176" height="65" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="616.0" y="393.5" text-anchor="middle" font-size="21" font-weight="700">OpenAM nodes</text>
+  <rect x="722" y="354" width="198" height="65" rx="8" fill="#f2f5f8" stroke="#38536d" stroke-width="1.6"/>
+  <text x="821.0" y="393.5" text-anchor="middle" font-size="21" font-weight="700">Protected apps</text>
+  <path d="M722 386 H704" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <path d="M616 419 V450" fill="none" stroke="#38536d" stroke-width="2.2" marker-end="url(#arrow)"/>
+  <rect x="528" y="450" width="392" height="66" rx="8" fill="#e5f4ee" stroke="#38536d" stroke-width="1.6"/>
+  <text x="724.0" y="481.0" text-anchor="middle" font-size="21" font-weight="700">Site B data stores</text>
+  <text x="724.0" y="504.0" text-anchor="middle" font-size="18" font-weight="400">Configuration, CTS, and identity</text>
+  </g>
+</svg>

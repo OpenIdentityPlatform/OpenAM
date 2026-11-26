@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -286,17 +286,12 @@ Password for the directory administrator user.
 
 --
 
-. In the Site Configuration screen, you can set up OpenAM as part of a site where the load is balanced across multiple OpenAM servers.
+. In the Site Configuration screen, set up OpenAM as part of a site if it will be behind a load balancer. Enter the site name and the URL clients use to reach OpenAM through the load balancer.
 +
-If you have a site configuration with a load balancer, you can enable session high availability persistence and failover.footnote:d14351e2811[You can configure OpenAM to store sessions __statefully__ or __statelessly__. Stateful sessions are stored in memory on the OpenAM server. They are also written to disk by thexref:chap-cts.adoc#chap-cts["Configuring the Core Token Service"]if you select the Enable Session HA and Persistence and Failover option in the Site Configuration screen. Stateless sessions are stored in HTTP cookies. The Enable Session HA and Persistence and Failover setting does not apply to stateless sessions. For more information about stateful and stateless sessions, seexref:../admin-guide/chap-session-state.adoc#chap-session-state["Configuring Session State"]in the__Administration Guide__.] OpenAM then stores sessions across server restarts, so that users do not have to login again.
-+
-If you then add additional servers to this OpenAM site, OpenAM performs __session failover__, storing session data in a directory service that is shared by different OpenAM servers. The shared storage means that if an OpenAM server fails, other OpenAM servers in the site have access to the user's session data and can serve requests about that user. As a result, the user does not have to log in again. If session failover is important for your deployment, also follow the instructions in xref:chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"].
-+
-
 [#figure-openam-conf-site]
-image::images/openam-conf-site.png[]
+image::images/openam-conf-site.png[OpenAM Site Configuration screen with site name and load balancer URL fields]
 +
-It is possible to set up a site after initial installation and configuration, as is described in xref:chap-session-failover.adoc#chap-session-failover["Setting Up OpenAM Session Failover"].
+You can also xref:chap-install-multiple.adoc#configure-site-after-installation[configure a site after installation]. OpenAM persists established stateful sessions in CTS. If the site has multiple servers, xref:chap-session-failover.adoc#chap-session-failover[configure and test session failover] using a CTS that is accessible to the surviving servers.
 
 . In the Agent Information screen, provide a password with at least eight characters to be used by policy agents to connect to OpenAM.
 +

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-deployments]
+endif::[]
 == Planning the Deployment Architecture
+
+ifdef::env-site[]
+anchor:chap-deployments[]
+endif::[]
 
 This chapter presents the elements involved in planning an OpenAM deployment architecture.
 
@@ -36,37 +42,13 @@ A deployment plan defines the goals, scope, roles, and responsibilities of key s
 [#deployment-considerations]
 === Deployment Planning Considerations
 
-When planning a deployment, you must consider some important questions regarding your system.
+Record the decisions that affect deployment capacity and the user experience during outages.
 
-* *What are you protecting?* You must determine which applications, resources, and levels of access to protect? Are there plans for additional services, either developed in-house or through future acquisitions that also require protected access?
-
-* *How many users are supported?* It is important to determine the number of users supported in your deployment based on system usage. Once you have determined the number of users, it is important to project future growth.
-
-* *What are your product service-level agreements?* In addition to planning for the growth of your user base, it is important to determine the production service-level agreements (SLAs) that help determine the current load requirements on your system and for future loads. The SLAs help define your scaling and high-availability requirements.
-+
-For example, suppose you have 100,000 active users today, and each user has an average of two devices (laptop, phone) that get a session each day. Suppose that you also have 20 protected applications, with each device hitting an average of seven protected resources an average of 1.4 times daily. Let's say that works out to about 200,000 sessions per day with 7 x 1.4 = ~10 updates to each session object. This can result in 200K session creations, 200K session deletions, and 2M session updates.
-+
-Now, imagine next year you still have the same number of active users, 100K, but each has an average of three devices (laptop, phone, tablet), and you have added another 20 protected applications. Assume the same average usage per application per device, or even a little less per device. You can see that although the number of users is unchanged, the whole system needs to scale up considerably.
-+
-You can scale your deployment using vertical or horizontal scaling. Vertical scaling involves increasing components to a single host server, such as increasing the number of CPUs or increasing heap memory to accommodate the number of users in your system. Horizontal scaling involves adding additional host servers, possibly behind a load balancer, so that the servers can function as a single unit. Configuring OpenAM to issue stateless sessions greatly simplifies deployment when using horizontal scaling.
-
-* *What are your high availability requirements?* High availability refers to your system's ability to operate continuously for a specified length of time. It is important to design your system to prevent single points of failure and for continuous availability. Based on the size of your deployment, you can create an architecture using a single-site configuration. For larger deployments, consider implementing a multi-site configuration with replication over WAN in combination with one of the following two alternatives:
-+
-
-** Stateless sessions
-
-** Sticky load-balancing and session failover
-
-+
-*Which type of clients will be supported?* The type of client determines the components required for the deployment. For example, applications supported in a Web server require the use of a Web policy agent. Applications deployed in Java EE containers require the use of a Java EE policy agent. An AJAX application can use the OpenAM's RESTful API. Legacy or custom applications can use the OpenIG Identity Gateway. Applications in an unsupported application server can use a reverse proxy with a policy agent. Third party applications can use federation or a fedlet, or an OpenID Connect or an OAuth 2.0 component.
-
-* *What are your SSL/TLS requirements?* There are two common approaches to handling SSL. First, using SSL through to the application servers themselves, for example, using SSL on the containers. Or second, using SSL offloading via a network device and running HTTP clear internally. You must determine the appropriate approach as each method requires different configurations. Determining SSL use early in the planning process is vitally __important__, as adding SSL later in the process is more complicated and could result in delays in your deployment.
-
-* *What are your other security requirements?* The use of firewalls provides an additional layer of security for your deployment. If you are planning to deploy the OpenAM server behind a firewall, you can deploy a reverse proxy, such as OpenIG. For another level of security, consider using multiple DNS infrastructures using zones; one zone for internal clients, another zone for external clients. To provide additional performance, you can deploy the DNS zones behind a load balancer.
-
-* *Ensure all stakeholders are engaged during the planning phase*. This effort includes but is not limited to delivery resources, such as project managers, architects, designers, implementers, testers, and service resources, such as service managers, production transition managers, security, support, and sustaining personnel. Input from all stakeholders ensures all viewpoints are considered at project inception, rather than downstream, when it may be too late.
-
-
+* *Protected resources and clients.* Identify the applications, APIs, administrative surfaces, and user populations. Select the xref:#plan-integration-with-apps[integration model] for each client and account for future applications and devices.
+* *Workload and service objectives.* Estimate peak authentication, policy evaluation, token exchange, and logout rates, as well as active sessions and expected growth. For example, 100,000 daily users with two devices that each start one session generate 200,000 session starts per day. If each device accesses seven protected resources 1.4 times on average, the applications handle about two million requests. Measure which of those requests actually reach OpenAM, and measure CTS operations independently. Session persistence, caches, token use, and the selected session model affect the relationship between application traffic and store load. See xref:chap-sizing.adoc#chap-sizing[Sizing Hardware and Services for Deployment].
+* *Availability and recovery.* Decide which failures the topology must tolerate, which flows must survive, and when users can be asked to sign in again. Model failure of a node, load balancer, store, network link, and site where applicable. See xref:chap-topologies.adoc#chap-topologies[Example Deployment Topology] and xref:#plan-disaster-recovery[Planning for Disaster Recovery].
+* *Public URLs and TLS.* Choose public and internal DNS names, the advertised scheme and port, the deployment context path, and where TLS terminates or is re-encrypted. Confirm the resulting issuer, redirect URLs, realm aliases, and cookie scope with client and federation owners.
+* *Ownership.* Assign people to application onboarding, directory services, infrastructure, security, rollout, and production operations. Agree on each team's handoff and escalation path.
 
 [#deployment-steps]
 === Deployment Planning Steps
@@ -90,23 +72,21 @@ The general deployment planning steps can be summarized as follows:
 
 ** Determine the use of products, map requirements to features, and ensure the architecture meets the functional requirements.
 
-** Ensure that the architecture is designed for ease of management and scale. TCO is directly proportional to the complexity of the deployment.
+** Review how operators will add capacity, replace a node, and restore service with the proposed topology.
 
 ** Determine how the Identity, Configuration, and Core Token Service (CTS) data stores are to be configured.
 
 ** Determine the Sites and Session Failover configuration.
 
-** Determine where SSL is used in the configuration and how to maintain and update the certificate keystore and truststore for OpenAM's components, such as the agent installer, `ssoadm` tool, agent server, and other OpenAM servers. Planning for SSL at this point can avoid more difficulty later in the process.
+** Plan TLS, trust, and certificate rotation for browsers, proxies, OpenAM, LDAP services, administrative tools, and any agents or gateways.
 
-** Determine if OpenAM will be deployed behind a load balancer with SSL offloading. If this is the case, you must ensure that the load balancer rewrites the protocol during redirection. If you have a policy agent behind a load balancer with SSL offloading, ensure that you set the policy agent's override request URL properties.
+** Configure OpenAM and the container to recognize the external scheme, host, and port behind trusted proxies. Verify generated redirects and protocol metadata against the public URL. Where an agent is also behind a proxy, apply its release-specific public URL settings.
 
-** For multiple OpenAM deployments, there is a requirement to deploy a layer 7 cookie-based load balancer and intelligent keep-alives (for example, `/openam/isAlive.jsp`). The network teams should design the appropriate solution in the architecting phase.
+** Select load balancing and health checks for each site. Prefer cookie affinity for stateful sessions, including mixed deployments with substantial stateful traffic. See xref:../install-guide/chap-install-multiple.adoc#configure-lb[Configuring Load Balancing] and xref:#plan-maintenance[Planning Maintenance and Support in Production].
 
-** Determine requirements for vertical scaling, which involves increasing the Java heap based on anticipated session, policy cache, federation session, and restricted token usage. Note that vertical scaling could come with performance cost, so this must be planned accordingly.
+** Size nodes and data stores for the expected traffic and failure scenarios. Use a load test to choose which components need more resources or more instances. See xref:chap-sizing.adoc#chap-sizing[Sizing Hardware and Services for Deployment].
 
-** Determine requirements for horizontal scaling, which involves adding additional OpenAM servers and load balancers for scalability and availability purposes.
-
-** Determine whether to configure OpenAM to issue stateful or stateless sessions. Stateless sessions allow for easier horizontal scaling but do not provide equivalent functionality to stateful sessions.
+** Choose stateful or stateless sessions per realm. Account for session features, persistence and revocation, cryptographic work, and request size in the capacity and failover tests. See xref:../admin-guide/chap-session-state.adoc#chap-session-state[Configuring Session State].
 
 ** Determine if any coding is required including extensions and plugins. Unless it is absolutely necessary, leverage the product features instead of implementing custom code. OpenAM provides numerous plugin points and REST endpoints.
 
@@ -128,16 +108,16 @@ The general deployment planning steps can be summarized as follows:
 * *Automation and Continuous Integration*. The Automation and Continuous Integration phase involves using tools for testing:
 +
 
-** Set up a continuous integration server, such as Jenkins, to ensure that builds are consistent by running unit tests and publishing Maven artifacts. Perform continuous integration unless your deployment includes no customization.
+** Version the deployment inputs, pin the software, and automate repeatable configuration and acceptance checks. Store secrets outside source control.
 
-** Ensure your custom code has unit tests to ensure nothing is broken.
+** Test custom code and package it against the target OpenAM release.
 
 
 * *Functional Testing*. The Functional Testing phase should test all functionality to deliver the solution without any failures. You must ensure that your customizations and configurations are covered in the test plan.
 
 * *Non-Functional Testing*. The Non-Functional Testing phase tests failover and disaster recovery procedures. Run load testing to determine the demand of the system and measure its responses. You can anticipate peak load conditions during the phase.
 
-* *Supportability*. The Supportability Phase involves creating the runbook for system administrators including procedures for backup and restores, debugging, change control, and other processes. If you have a Open Identity Platform Approved Vendor Support contract, it ensures everything is in place prior to your deployment.
+* *Operational handoff*. Prepare the runbook, including monitoring, escalation, backup, restore, debugging, and change control. Review it with the on-call team before rollout.
 
 
 
@@ -166,7 +146,7 @@ Open Identity Platform Approved Vendors offer training courses for OpenAM topics
 
 When you have determined who needs training and the timing of the training during the project, prepare a training schedule based on team member and course availability. Include the scheduled training plans in your deployment project plan.
 
-Open Identity Platform Approved Vendors also offer an accreditation program for partners, offering an in-depth assessment of business and technical skills for each Open Identity Platform product. This program is open to the partner community and ensures that best practices are followed during the design and deployment phases.
+Agree on which training and escalation services you need with the provider responsible for your deployment.
 
 
 [#plan-customization]
@@ -204,50 +184,16 @@ Plan the pilot around the key use cases that you must validate. Make sure to pla
 [#plan-security]
 ==== Planning Security Hardening
 
-When you first configure OpenAM, there are many options to evaluate, plus a number of ways to further increase levels of security. You can change the following default configuration properties:
+Use xref:../admin-guide/chap-securing.adoc#chap-securing[Securing OpenAM] and the xref:../release-notes/index.adoc[Release Notes] to review the behavior of the release you deploy. Cover the following items in the security plan.
 
-* The main OpenAM administrative account has a default user name, `amadmin`.
-
-* You can set up OpenAM using HTTPS rather than HTTP.
-
-* An OpenAM policy agent administrative account exists and has a default user name, `UrlAccessAgent`.
-
-* The primary session cookie has a default name, `iPlanetDirectoryPro`.
-
-* Initially, only the top-level realm exists. Other realms and fully qualified domain name realm/DNS aliases must be configured separately.
-
-* The top-level realm includes a demo user, `demo`, with the default password `changeit`. The account is created *inactive*, because that password is published in the OpenAM installer source; activate it and give it a password of your own if you intend to use it, and delete it otherwise.
-
-* Default keystores exist in the `config-dir/openam/` path, with several self-signed keys and identical passwords. For more information about the default keystores in OpenAM and their demo key aliases, see xref:../admin-guide/chap-certs-keystores.adoc#chap-certs-keystores["Managing Certificates and Keystores"] in the __Administration Guide__.
-
-* By default, OpenAM connects to directory servers as the directory root user, `cn=Directory Manager`.
-
-* By default, the list of `goto` and `gotoOnFail` URLs is not restricted.
-
-* On a server that includes OpenAM Console, all the endpoints defined in the Web application descriptor, `WEB-INF/web.xml`, are available for use.
-
-* To prevent cross-site scripting attacks, you can configure session cookies as HTTP Only by setting the property `com.sun.identity.cookie.httponly=true`. This property prevents third-party scripts from accessing the session cookie. Both the classic UI and the XUI support HttpOnly session cookies, so enabling it is recommended for browser-facing deployments; it defaults to `false` only to preserve the behaviour of existing integrations that read the session cookie, or the `tokenId` from the authentication response body, from script. Two consequences to plan for: the OpenID Connect session management OP iframe (`/oauth2/connect/checkSession`) reads the session cookie from JavaScript and so cannot observe the session while HttpOnly is enabled, and the property is read only at server startup. See xref:../admin-guide/chap-securing.adoc#secure-communications["Securing Communications"] in the __Administration Guide__. By default, OpenAM also sets `org.openidentityplatform.openam.cookie.samesite=Lax` to reduce cross-site request forgery (CSRF) exposure.
-
-* You can deploy a reverse proxy within delimitarized zone (DMZ) firewalls to limit exposure of service URLs to the end user as well as block access to back end configuration and user data stores to unauthorized users.
-
-You must therefore plan to secure the deployment as described in xref:../admin-guide/chap-securing.adoc#chap-securing["Securing OpenAM"] in the __Administration Guide__.
-At minimum, make sure you include the following tasks in the overall plan:
-
-* Change default settings and administrative user credentials.
-
-* Protect service ports (using firewalls, install a reverse proxy).
-
-* Disable unused endpoints.
-
-* Separate administrative access from client access.
-
-* Secure communications so that OpenAM clients access services over HTTPS.
-
-* Use secure cookies with cookie hijacking protection for CDSSO, so messages for federated configurations perform signing and encryption as necessary, and OpenAM accesses providers securely (for example using LDAP + StartTLS, or LDAPS to access directory services).
-
-* Secure processes and files (for example with SELinux, using a dedicated non-privileged user and port forwarding, and so forth).
-
-
+* Restrict access to administrative interfaces, the installer and upgrade interface, monitoring, and internal routes. At the proxy, expose only the routes required for your selected integrations. Leave unused services disabled and keep the OpenAM backend reachable only from authorized networks and proxies.
+* Manage the `amadmin` credential separately from routine delegated administration. Remove unused demo and shipped WS-Security identities when present. New installations create these identities inactive, and OpenAM 16.1.4 deactivates affected identities that still use their shipped passwords on upgrade. If an integration needs one, set a deployment-specific credential before activation.
+* Use dedicated LDAP bind identities with the privileges required by each LDAP-backed store. Agree who will apply schemas and indexes during installation and upgrades. See xref:../install-guide/chap-prepare-install.adoc#prepare-idrepo-considerations[Identity Repository Privileges], xref:../install-guide/chap-prepare-install.adoc#prepare-configuration-store[Preparing an External Configuration Data Store], and xref:../install-guide/chap-cts.adoc#chap-cts[Configuring the Core Token Service].
+* Use HTTPS for traffic from clients. Document TLS across proxies, backends, and directory connections, including LDAPS or StartTLS, certificate validation, and trust ownership. Accept forwarded headers only through trusted proxies. Configure those proxies to remove client-supplied values before setting the expected headers.
+* Replace demonstration signing and encryption keys with deployment-specific keys. Maintain required keys, certificates, and trust material across the affected site members. Plan rotation and verify token validation, federation metadata, and partner acceptance before retiring old keys. See xref:../admin-guide/chap-certs-keystores.adoc#chap-certs-keystores[Managing Certificates and Keystores].
+* Enable Secure session cookies and choose the narrowest cookie domain for the integration. Consider HttpOnly for browser-facing deployments to prevent scripts from reading the session cookie. Enabling it also removes `tokenId` from the authentication response body by default and requires a server restart. The OpenID Connect session management iframe cannot read an HttpOnly cookie. Test custom XUI and REST clients, cross-domain SSO, SAML POST, and OIDC flows with the intended cookie settings. OpenAM defaults SameSite to `Lax`. When a tested flow requires `SameSite=None`, use Secure cookies. See xref:../admin-guide/chap-securing.adoc#secure-communications[Securing Communications].
+* With the OpenAM 16.1.4 login redirect defaults, an empty allowlist permits relative URLs and URLs on a recognized OpenAM origin. Add explicit cross-origin destinations to each applicable realm's Valid goto URL Resources and check the separate return URL lists used by federated flows. Verify redirects through the public proxy. See xref:../admin-guide/chap-auth-services.adoc#configure-valid-goto-url-resources[Configuring Valid goto URL Resources] and xref:../admin-guide/chap-federation.adoc#sp-relay-state-url-list[SP RelayState URL List].
+* Run OpenAM as a dedicated, non-privileged account. Restrict file permissions for configuration, key material, diagnostic output, and backups. Use a controlled source for secrets and document how operators rotate or recover them.
 
 [#plan-with-providers]
 ==== Planning With Providers
@@ -271,7 +217,7 @@ CTS load tends to involve more write operations than configuration and policy lo
 +
 CTS can enable cross-site session failover by allowing a remote OpenAM server to retrieve a user session from the directory service backing the CTS. For this feature to work quickly in the event of a failure or network partition, CTS data must be replicated rapidly including across WAN links. This can affect network sizing for the directory service.
 +
-When configured to issue stateless sessions, OpenAM does __not__ write the stateless sessions to CTS. Instead, OpenAM uses CTS for session blacklists. Session blacklisting is an optional OpenAM feature that provides logout integrity.
+Stateless browser session contents travel in the session cookie. If session blacklisting is enabled, OpenAM uses CTS for revocation records. Account separately for other CTS-backed features, such as OAuth 2.0 tokens and SAML artifacts. See xref:../admin-guide/chap-session-state.adoc#chap-session-state[Configuring Session State] and xref:../install-guide/chap-cts.adoc#chap-cts[Configuring the Core Token Service].
 
 * SAML federation circles of trust require organizational and legal coordination before you can determine what the configuration looks like. Organizations must agree on which security data they share and how, and you must be involved to ensure that their expectations map to the security data that is actually available.
 +
@@ -287,50 +233,35 @@ For each provider you work with, add the necessary coordinated activities to you
 [#plan-integration-with-apps]
 ==== Planning Integration With Client Applications
 
-When planning integration with OpenAM client applications, the applications that are most relevant are those that register with OpenAM; therefore, you should make note of the following types of client applications registering with OpenAM:
+Choose the integration per application, and record its realm, public endpoints, service owner, and credential or certificate rotation schedule.
 
-* OpenAM policy agents reside with the applications they protect.
-+
-By default, OpenAM policy agents store their configuration profiles in OpenAM. OpenAM then sends policy agents notifications when their configurations change.
-+
-Policy agents authenticate to OpenAM with a user name and password.
-+
-To delegate administration of multiple policy agents, OpenAM lets you create a group profile for each realm to register the policy agent profiles.
-+
-While the OpenAM administration manages policy agent configuration, application administrators are often the ones who install policy agents. You must coordinate installation and upgrades with them.
+[cols="2,4,5",options="header"]
+|===
+|Integration |When to use |What to plan
 
-* OAuth 2.0 clients and OpenID Connect 1.0 relying parties also register profiles with OpenAM.
-+
-OpenAM optionally allows registration of such applications without prior authentication. By default, however, registration requires an access token granted to an OAuth 2.0 client with access to register profiles.
-+
-If you expect to allow dynamic registration, or if you have many clients registering with your deployment, then consider clearly documenting how to register the clients, and building a client to register clients.
+|OAuth 2.0 or OpenID Connect
+|An application delegates user sign-in using OpenID Connect, or a client requests scoped API access using OAuth 2.0.
+|For new interactive clients, prefer authorization code with PKCE using `S256` and register exact redirect URIs. Define allowed scopes, client authentication, and logout behavior. Choose and constrain machine-to-machine grants separately. Enable dynamic client registration only when needed, and plan who can register clients and how they are reviewed. See xref:../admin-guide/chap-oauth2.adoc#chap-oauth2[OAuth 2.0], xref:../admin-guide/chap-openid-connect.adoc#chap-openid-connect[OpenID Connect], and https://www.rfc-editor.org/rfc/rfc9700.html[RFC 9700].
 
-* You must configure Circles of Trust for SAML 2.0 federations, so registration happens at configuration time, rather than at runtime.
-+
-Address the necessary configuration as described in xref:#plan-with-providers["Planning With Providers"].
-+
-If your deployment functions as a SAML 2.0 Identity Provider (IDP) and shares Fedlets with Service Providers (SP), the SP administrators must install the Fedlets, and must update their Fedlets for changes in your IDP configuration. Consider at least clearly documenting how to do so, and if necessary, build installation and upgrade capabilities.
+|SAML 2.0
+|A federation partner integrates with OpenAM acting as an identity provider or service provider.
+|Exchange and verify metadata, certificates, entity IDs, and endpoints. Agree on the circle of trust, message signing and encryption, supported bindings, and sign-on and logout behavior. Assign ownership of partner certificate changes and coordinate deployment of any Fedlets. See xref:../admin-guide/chap-federation.adoc#chap-federation[Federation].
 
-* If you have custom client applications, consider how they are configured and how they must register with OpenAM.
+|Web or Java policy agent, or OpenIG
+|A supported server or reverse proxy enforces access policies for a protected application.
+|Verify the selected component's compatibility. Define the agent profile or gateway registration, its authentication and credential lifecycle, and how configuration changes are rolled out. See xref:../admin-guide/chap-agents.adoc#chap-agents[Configuring Policy Agent Profiles] and https://doc.openidentityplatform.org/openig/[OpenIG Documentation].
 
-* REST API client applications authenticate based on a user profile.
-+
-REST client applications can therefore authenticate using whatever authentication mechanisms you configure in OpenAM, and therefore do not require additional registration.
-
-For each client application whose integration with OpenAM requires coordination, add the relevant tasks to your overall plan.
-
+|OpenAM REST APIs
+|An application or operator calls OpenAM services directly.
+|Check the endpoint's documented authentication, permissions, API version, origin, and integration behavior. Use dedicated, minimally privileged identities for automation and manage credentials or tokens as secrets. See xref:../dev-guide/index.adoc[Developer's Guide].
+|===
 
 [#plan-integration-with-audit]
 ==== Planning Integration With Audit Tools
 
-OpenAM and policy agents can log audit information to flat files or alternatively, to a relational database. Log volumes depend on usage and on logging levels. By default, OpenAM generates both access and error messages for each service, providing the raw material for auditing the deployment. The xref:../reference/index.adoc[Reference] covers what you can expect to find in log messages.
+OpenAM's structured Audit Logging Service records access, activity, authentication, and configuration events. The default handler writes CSV. Select the handlers and audit topics for each environment and realm from xref:../admin-guide/chap-audit-logging.adoc#configuring-audit-event-handlers[Configuring Audit Event Handlers]. Plan collection from OpenAM, its proxies, and the agents and data stores that are part of the deployment.
 
-In order to analyze the raw material, however, you must use other software, such as link:http://www.splunk.com[Splunk, window=\_blank], which indexes machine-generated data for analysis.
-
-If you require integration with an audit tool, plan the tasks of setting up logging to work with the tool, and analyzing and monitoring the data once it has been indexed. Consider how you must retain and rotate log data once it has been consumed, as a high volume service can produce large volumes of log data.
-
-Include these plans in the overall plan.
-
+Use transaction IDs for correlation and verify that the chosen fields capture the required activity. Filter tokens, cookies, credentials, and sensitive personal data from exported logs. Assign owners for storage, access, rotation, retention, and incident response. During the pilot, test the limits of local disk and buffering and the effects of losing the downstream log destination.
 
 [#plan-tests]
 ==== Planning Tests
@@ -342,9 +273,9 @@ In addition to planning tests for each customized component, test the functional
 
 Functional testing validates that specified test cases work with the software considered as a black box.
 
-As Open Identity Platform Community already tests OpenAM and policy agents functionally, focus your functional testing on customizations and service-level functions. For each key service, devise automated functional tests. Automated tests make it easier to integrate new deliveries to take advantage of recent bug fixes and to check that fixes and new features do not cause regressions.
+Automate the client flows that the deployment depends on. Exercise sign-in, required MFA, authorization allow and deny decisions, token issue and revocation, and logout. Include configured SAML and OIDC clients, agents, scripts, and extensions through the public URL. Verify the behavior on all nodes and any distinct site.
 
-Tools for running functional testing include link:http://jmeter.apache.org/[Apache JMeter, window=\_blank] and link:http://seleniumhq.org/[Selenium, window=\_blank]. Apache JMeter is a load testing tool for Web applications. Selenium is a test framework for Web applications, particularly for UIs.
+Use API tests for protocol and service behavior and browser tests, such as https://www.selenium.dev/[Selenium], for cookie, redirect, and UI behavior.
 
 As part of the overall plan, include not only tasks to develop and maintain your functional tests, but also to provision and to maintain a test environment in which you run the functional tests before you significantly change anything in your deployment. For example, run functional tests whenever you upgrade OpenAM, OpenAM policy agents, or any custom components, and analyze the output to understand the effect on your deployment.
 
@@ -360,9 +291,9 @@ Iterative performance testing consists in identifying underperformance and the b
 
 Based on service level objectives and availability requirements, define acceptance criteria for performance testing, and iterate until you have eliminated underperformance.
 
-Tools for running performance testing include link:http://jmeter.apache.org/[Apache JMeter, window=\_blank], for which your loads should mimic what you expect in production, and link:http://gatling.io[Gatling, window=\_blank], which records load using a domain specific language for load testing. To mimic the production load, examine both the access patterns and also the data that OpenAM stores. The representative load should reflect the expected random distribution of client access, so that sessions are affected as in production. Consider authentication, authorization, logout, and session timeout events, and the lifecycle you expect to see in production.
+Tools for running performance testing include https://jmeter.apache.org/[Apache JMeter], for which your loads should mimic what you expect in production, and https://gatling.io/[Gatling], which records load using a domain specific language for load testing. To mimic the production load, examine both the access patterns and also the data that OpenAM stores. The representative load should reflect the expected random distribution of client access, so that sessions are affected as in production. Consider authentication, authorization, logout, and session timeout events, and the lifecycle you expect to see in production.
 
-Although you cannot use actual production data for testing, you can generate similar test data using tools, such as the OpenDJ `makeldif` command, which generates user profile data for directory services. OpenAM REST APIs can help with test provisioning for policies, users, and groups.
+Generate a representative test data set with tools such as OpenDJ `makeldif`. OpenAM REST APIs can help provision policies, users, and groups. Apply the deployment's data protection requirements to any sanitized data and credentials used for testing.
 
 As part of the overall plan, include not only tasks to develop and maintain performance tests, but also to provision and to maintain a pre-production test environment that mimics your production environment. Security measures in your test environment must also mimic your production environment, as changes to secure OpenAM as described in xref:#plan-security["Planning Security Hardening"], such as using HTTPS rather than HTTP, can impact performance.
 
@@ -376,7 +307,7 @@ Penetration testing involves attacking a system to expose security issues before
 
 When planning penetration testing, consider both white box and black box scenarios. Attackers can know something about how OpenAM works internally, and not only how it works from the outside. Also, consider both internal attacks from within your organization, and external attacks from outside your organization.
 
-As for other testing, take time to define acceptance criteria. Know that Open Identity Platform Community has performed penetration testing on the software for each enterprise release. Any customization, however, could be the source of security weaknesses, as could configuration to secure OpenAM.
+Define the authorized scope and acceptance criteria for security testing in the pre-production environment. Include the deployed configuration, integrations, customizations, and external and administrative route boundaries.
 
 You can also plan to perform penetration tests against the same hardened, pre-production test environment also used for performance testing.
 
@@ -384,15 +315,14 @@ You can also plan to perform penetration tests against the same hardened, pre-pr
 [#plan-deployment-tests]
 ===== Planning Deployment Testing
 
-Deployment testing is used as a description, and not a term in the context of this guide. It refers to the testing implemented within the deployment window after the system is deployed to the production environment, but before client applications and users access the system.
+Agree on the acceptance checks that must pass before the deployment receives production traffic. For each case, record the expected behavior, time or error budget, owner, and stop or rollback threshold. Run the rehearsals in an environment that mirrors production topology and protection.
 
-Plan for minimal changes between the pre-production test environment and the actual production environment. Then test that those changes have not cause any issues, and that the system generally behaves as expected.
+* Verify the public URL, TLS chain, redirect and cookie behavior, required login, policy, token, and logout flows, and audit receipt.
+* Test service routing after losing a node, a load balancer, and each store used by critical flows. If the deployment spans sites, test a site failure and a simulated network partition. Confirm behavior both for new requests and for existing sessions or tokens. Verify failback after replication and routing have recovered.
+* Test under the peak load profile with a node or site drained according to the availability design. Record how quickly checks remove or restore backends and whether the remaining deployment meets its objectives.
+* Verify that operators receive and can act on alerts. Rehearse restoring from backup and rolling back a deployment during the release window.
 
-Take the time to agree upfront with stakeholders regarding the acceptance criteria for deployment tests. When the production deployment window is small, and you have only a short time to deploy and test the deployment, you must trade off thorough testing for adequate testing. Make sure to plan enough time in the deployment window for performing the necessary tests and checks.
-
-Include preparation for this exercise in your overall plan, as well as time to check the plans close to the deployment date.
-
-
+Within the actual deployment window, run the agreed smoke tests before increasing traffic.
 
 [#plan-documentation]
 ==== Planning Documentation and Tracking Changes
@@ -420,57 +350,22 @@ Start by considering the service owners' acceptance criteria. If they have defin
 
 * Do they have any additional acceptance criteria for deployment tests, as described in xref:#plan-deployment-tests["Planning Deployment Testing"]?
 
-Also, plan back line support with Open Identity Platform Community Approved Vendor. The aim is to define clearly who handles production issues, and how production issues are escalated to a product specialist if necessary.
+Define the escalation contacts and response targets with the operations team and any contracted provider. Use the project https://github.com/OpenIdentityPlatform/OpenAM/discussions[discussions] for community help and the https://github.com/OpenIdentityPlatform/OpenAM/security/policy[security policy] for suspected vulnerabilities.
 
-Include a task in the overall plan to define the hand off to production, making sure there is clarity on who handles monitoring and issues.
+Distinguish startup and liveness checks, load balancer readiness checks, and synthetic client flows. The `/openam/isAlive.jsp` check reads a configuration entry. Add separate checks for the stores and protocol flows on which your applications depend. In Kubernetes, keep dependency outages from restarting every node by using a liveness probe that does not depend on a shared store. Readiness failures should control traffic admission.
+
+Monitor request rates, error rates and latency percentiles by flow, JVM heap and garbage collection, directory and CTS errors and latency, replication lag, disk use, certificate expiry, and audit delivery. Configure alerts against the agreed service and capacity thresholds. Restrict monitoring interfaces to the administrative network and use a dedicated account for authenticated monitoring. See xref:../admin-guide/chap-monitoring.adoc#chap-monitoring[Monitoring OpenAM Services].
 
 
 [#plan-rollout]
 ==== Planning Rollout Into Production
 
-In addition to planning for the hand off of the production system, also prepare plans to roll-out the system into production. Rollout into production calls for a well-choreographed operation, so these are likely the most detailed plans.
-Take at least the following items into account when planning the rollout:
+Agree on a rollout and a backout sequence before the deployment window.
 
-* Availability of all infrastructure that OpenAM depends upon the following elements:
-+
-
-** Server hosts and operating systems
-
-** Web application containers
-
-** Network links and configurations
-
-** Load balancers
-
-** Reverse proxy services to protect OpenAM
-
-** Data stores, such as directory services
-
-** Authentication providers
-
-
-* Installation for all OpenAM services.
-
-* Installation of OpenAM client applications:
-+
-
-** Policy agents
-
-** Fedlets
-
-** SDK applications
-
-** OAuth 2.0 applications
-
-** OpenID Connect 1.0 applications
-
-
-* Final tests and checks.
-
-* Availability of the personnel involved in the rollout.
-
-In your overall plan, leave time and resources to finalize rollout plans toward the end of the project.
-
+. Verify the availability of hosts, containers, data stores, DNS, proxies, and external providers. Confirm that backups, known-good binaries, configurations, and keys are available for the planned recovery.
+. Drain affected nodes or sites as the release plan requires. Install or configure clients, agents, and servers in the rehearsed order. Run smoke tests before sending user traffic.
+. Admit traffic in the agreed steps where the topology and release support it. Compare monitoring and test results to the acceptance criteria after each step. Record the decision to proceed, pause, or restore the previous deployment.
+. Verify the steady state, including monitoring and audit delivery. Hand over runbooks, version records, and open issues to the operations team.
 
 [#plan-growth]
 ==== Planning for Growth
@@ -479,11 +374,11 @@ Before rolling out into production, plan how to monitor the system to know when 
 
 Unless your system is embedded or otherwise very constrained, after your successful rollout of access management services, you can expect to add capacity at some point in the future. Therefore, you should plan to monitor system growth.
 
-You can grow many parts of the system by adding servers or adding clients. The parts of the system that you cannot expand so simply are those parts that depend on writing to the directory service, and those that can result in crosstalk between OpenAM servers.
+Use capacity measurements to decide whether to add OpenAM nodes, increase resources per node, or scale a dependency. Retest peak and degraded operation after changes. Adding OpenAM nodes can shift the limiting factor to CTS, the identity store, the load balancer, or another shared dependency.
 
-The directory service eventually replicates each write to all other servers. Therefore, adding servers simply adds the number of writes to perform. One simple way of getting around this limitation to working with the hierarchical nature of directory data to split a monolithic directory service into several. That said, directory services often are not a bottleneck for growth.
+Measure write throughput and replication lag for each replicated data store. Adding replicas can improve availability or read capacity. Include the cost of replicating writes when estimating the effect of additional replicas.
 
-Crosstalk between OpenAM servers can result when one OpenAM server authenticates a user, and a subsequent request regarding that user is sent to a second OpenAM server. In that case, the second server can communicate with the first server to handle the request, resulting in crosstalk from one server to another. A load balancing solution that offers server affinity or stickiness reduces crosstalk and contributes to a system that grows more smoothly.
+In a site that uses shared CTS for stateful sessions, a node can read a persisted session on a cache miss. Affinity can improve cache locality. Measure CTS reads, cache hit rates, and the impact of cold caches while traffic redistributes after a node is added or drained.
 
 When should you expand the deployed system? The time to expand the deployed system is when growth in usage causes the system to approach performance threshold levels that cause the service to underperform. For that reason, devise thresholds that can be monitored in production, and plan to monitor the deployment with respect to the thresholds. In addition to programming appropriate alerts to react to thresholds, also plan periodic reviews of system performance to uncover anything missing from regular monitoring results.
 
@@ -491,19 +386,44 @@ When should you expand the deployed system? The time to expand the deployed syst
 [#plan-upgrades]
 ==== Planning for Upgrades
 
-In this section, "upgrade" means moving to a more recent release, whether it is a patch, maintenance release, minor release, or major release. For definitions of the types of release, see xref:../admin-guide/appendix-interface-stability.adoc#appendix-interface-stability["Release Levels and Interface Stability"] in the __Administration Guide__.
+Review the xref:../release-notes/index.adoc[Release Notes] and the xref:../upgrade-guide/index.adoc[Upgrade Guide] for the installed and target versions. Verify the upgrade path, Java and container requirements, agent and gateway compatibility, and any changes to defaults, keys, realm configuration, or custom extensions. For example, when moving to 16.1.4, test the login and federation redirect allowlists, built-in account changes, and any customized OAuth device authorization pages.
 
-Upgrades generally bring fixes, or new features, or both. For each upgrade, you must build a new plan. Depending on the scope of the upgrade, that plan might include almost all of the original overall plan, or it might be abbreviated, for example, for a patch that fixes a single issue. In any case, adapt deployment plans, as each upgrade is a new deployment.
+Rehearse upgrades on a representative copy of the deployment. The documented xref:../upgrade-guide/chap-upgrade-servers.adoc#upgrade-server[server upgrade procedure] takes affected OpenAM servers out of production while updating the configuration model. Schedule downtime, or route to an alternate site after verifying its capacity and compatibility, including how it shares or replicates configuration data. Verify the intended version combination before relying on mixed versions in production.
 
-When planning an upgrade, pay particular attention to testing and to any changes necessary in your customizations. For testing, consider compatibility issues when not all agents and services are upgraded simultaneously. Choreography is particularly important, as upgrades are likely to happen in constrained low usage windows, and as users already have expectations about how the service should behave.
-
-When preparing your overall plan, include a regular review task to determine whether to upgrade, not only for patches or regular maintenance releases, but also to consider whether to upgrade to new minor and major releases.
-
+Retain the previous release's binaries, configuration data, local files, keystores, and customizations as a matched recovery set. Plan who can invoke rollback and how to restore compatible data before restarting the previous release. See xref:../upgrade-guide/chap-about-upgrades.adoc#post-upgrade-rollback[Plan for Rollback].
 
 [#plan-disaster-recovery]
 ==== Planning for Disaster Recovery
 
-Disaster recovery planning and a robust backup strategy is essential when server hardware fails, network connections go down, a site fails, and so on. Your team must determine the disaster recovery procedures to recover from such events.
+Set a recovery time objective (RTO) for each critical service and a recovery point objective (RPO) for the data it depends on. Agree on acceptable loss of active sessions, tokens, and recent configuration changes. Use the following inventory to assign owners, backup schedules, protected storage locations, and restore procedures.
 
+[cols="2,4,5",options="header"]
+|===
+|Asset |What to retain |What to verify on restore
 
+|OpenAM runtime and node configuration
+|The deployed WAR or image version, configuration directory and bootstrap files, container settings, customizations, and versioned deployment inputs.
+|Rebuild a node with the expected server URL and configuration, then verify it can join the intended site.
 
+|Configuration store
+|A version-compatible copy of configuration and policy data, including required schemas and indexes. Use the embedded or external store's applicable backup procedure.
+|Restore a coherent copy before starting affected servers. Plan recovery from administrative error separately from replacing a lost replica, and account for the directory replication purge delay and newer changes on peers.
+
+|Identity stores
+|Directory data, schemas, indexes, and dependencies within the identity provider's recovery scope.
+|Verify bind identities, user lookup, group membership, authentication, and delegated operations.
+
+|Core Token Service
+|The configured CTS backend's recovery procedure and any data required by your token recovery objectives.
+|Document which sessions and tokens will survive, expire, need reauthentication, or be revoked and reissued. Test the effect of older state on logout and revocation.
+
+|Keys, trust, and secrets
+|Required keystores, truststores, key aliases, password and encryption material, and recovery access to the secrets system.
+|Verify that restored servers can decrypt configuration and validate or issue the expected sessions, tokens, and federation messages.
+
+|Audit data
+|Records subject to retention, including the storage and access information needed to recover them.
+|Verify required audit history is available to authorized operators and that delivery and correlation resume after recovery.
+|===
+
+Treat replication as part of the availability design. Keep protected backups for recovery from corruption and accidental changes, which can also replicate. Rehearse restore in an isolated environment, then rehearse failover and failback with measured RPO and RTO results. See xref:../admin-guide/chap-backup-restore.adoc#chap-backup-restore[Backing Up and Restoring OpenAM Configurations] and the relevant external store documentation.

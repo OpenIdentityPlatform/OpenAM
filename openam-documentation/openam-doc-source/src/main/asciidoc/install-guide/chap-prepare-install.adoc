@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -21,8 +21,14 @@
 :openam-version: x.y.z
 
 
+ifndef::env-site[]
 [#chap-prepare-install]
+endif::[]
 == Preparing For Installation
+
+ifdef::env-site[]
+anchor:chap-prepare-install[]
+endif::[]
 
 This chapter covers prerequisites for installing OpenAM software, including how to prepare your application server to run OpenAM, how to prepare directory servers to store configuration data, and how to prepare an identity repository to handle OpenAM identities.
 
@@ -1341,7 +1347,8 @@ In this example the .war file to deploy is `/tmp/openam.war`.
 
 OpenAM examples often use Apache Tomcat (Tomcat) as the deployment container. Tomcat is installed on `openam.example.com`, and listens on the default ports without a Java Security Manager enabled.
 
-OpenAM core services require a minimum JVM heap size of 1 GB, and a permanent generation size of 256 MB. If you are including the embedded OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space is allocated to OpenDJ. See xref:#prepare-java["Preparing a Java Environment"] for details.
+Size the JVM for your workload and allow additional heap for the directory database cache if you use embedded OpenDJ.
+See xref:../deployment-planning/chap-hw-sw-requirements.adoc#ram-requirements[Memory Requirements] and xref:#prepare-java[Preparing a Java Environment].
 
 Open Identity Platform Community recommends that you edit the Tomcat <Connector> configuration to set `URIEncoding="UTF-8"`. UTF-8 URI encoding ensures that URL-encoded characters in the paths of URIs are correctly decoded by the container. This is particularly useful when applications use the OpenAM REST APIs, and some identifiers, such as user names can contain special characters.
 
@@ -1438,160 +1445,24 @@ Any other values apart from these three in the worker MPM can be customized. For
 
 
 [#prepare-jboss]
-=== Preparing OpenAM for JBoss and WildFly
+=== Evaluating JBoss or WildFly
 
-You can deploy OpenAM on JBoss AS, JBoss EAP, and WildFly. Some preparation is required to deploy on these application servers.
-
-The procedures listed here provide steps for configuring JBoss AS, JBoss EAP, and WildFly for OpenAM.
-
-After configuring JBoss or WildFly, you then prepare OpenAM for deployment by making a few changes to the contents of the OpenAM `.war` archive.
-
-* xref:#prep-jboss-for-openam["To Prepare JBoss or WildFly for OpenAM"]
-
-* xref:#prep-openam-for-jboss["To Prepare OpenAM for JBoss and WildFly"]
-
-
-[#prep-jboss-for-openam]
-.To Prepare JBoss or WildFly for OpenAM
-====
-
-. Stop JBoss or WildFly.
-
-. The default JVM settings do not allocate sufficient memory to OpenAM. This step shows one method that you can use to modify the JVM settings. For other methods, see either the link:https://developer.jboss.org/wiki/JBossapplicationserverofficialdocumentationpage[JBoss Application Server Official Documentation Page, window=\_blank] or the link:https://docs.jboss.org/author/display/WFLY9/JVM+settings[JVM Settings, window=\_blank] page in the WildFly documentation
-+
-
-.. Open the `standalone.conf` file in the `/path/to/jboss/bin` directory for JBoss or WildFly in standalone mode.
-
-.. Check the JVM settings associated with `JAVA_OPTS`.
-
-.. Set the following JVM `JAVA_OPTS` setting in the same file:
-+
-
-[source]
-----
--Dorg.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES=true
-----
-+
-Verify that the headers include the `Expires` attribute rather than only `Max-Age`, as some versions of Internet Explorer and Microsoft Edge do not support `Max-Age`.
-
-
-. Now deploy the `openam.war` file into the appropriate deployment directory. The directory varies depending on whether you are running in standalone or domain mode.
-
-====
-
-[#prep-openam-for-jboss]
-.To Prepare OpenAM for JBoss and WildFly
-====
-To prepare OpenAM to run with JBoss or WildFly, you should make a change to the OpenAM `war` file. JBoss and WildFly deploy applications from different temporary directories every time you restart the container, which would require reconfiguring OpenAM. To avoid problems, change the OpenAM `war` file as follows:
-
-. If you have not already done so, create a temporary directory and expand the `OpenAM-{openam-version}.war` file.
-+
-
-[source, console, subs="attributes"]
-----
-$ cd /tmp
-$ mkdir /tmp/openam ; cd /tmp/openam
-$ jar xvf ~/Downloads/OpenAM-{openam-version}.war
-----
-
-. Locate the `bootstrap.properties` file in the `WEB-INF/classes` directory of the expanded `war` archive. Update the `# configuration.dir=` line in this file to specify a path with read and write permissions, and then save the change.
-+
-
-[source, ini]
-----
-# This property should also be used when the system user that
-# is running the web/application server process does not have
-# a home directory. i.e. System.getProperty("user.home") returns
-# null.
-
-configuration.dir=/my/readwrite/config/dir
-----
-
-. If you are deploying OpenAM on JBoss AS or JBoss EAP, remove the `jboss-all.xml` file from the `WEB-INF` directory of the expanded `war` archive.
-+
-Be sure __not__ to remove this file if you are deploying OpenAM on WildFly.
-
-. Rebuild the `openam.war` file.
-+
-
-[source, console]
-----
-$ jar cvf ../openam.war *
-----
-
-. If you plan to deploy multiple cookie domains with WildFly, you must configure the `com.sun.identity.authentication.setCookieToAllDomains` property after you have installed the OpenAM server. See xref:chap-install-multiple.adoc#handle-multiple-cookie-domains-wildfly["Handling Multiple Cookie Domains When Using Wildfly"] for more information.
-
-====
-
+anchor:prep-jboss-for-openam[]
+anchor:prep-openam-for-jboss[]
+The OpenAM 16.x WAR uses Jakarta APIs. Confirm that the selected server release implements the required Jakarta Servlet API, supports the selected JDK, and can deploy this WAR.
+Use the server's documentation to configure a persistent OpenAM configuration directory with read and write access for the service account.
+See xref:../release-notes/requirements-and-upgrade.adoc#release-requirements[Requirements and Upgrade Considerations] for the OpenAM container combinations documented for the release.
 
 [#prepare-oracle-weblogic]
-=== Preparing Oracle WebLogic
+=== Evaluating Oracle WebLogic
 
-To deploy OpenAM in WebLogic, perform the following steps:
-
-. Update the JVM options as described in xref:#prepare-java["Preparing a Java Environment"].
-
-. Customize the `OpenAM-{openam-version}.war` file as described in xref:#prep-openam-for-weblogic["To Prepare OpenAM for Oracle WebLogic"].
-
-
-[#prep-openam-for-weblogic]
-.To Prepare OpenAM for Oracle WebLogic
-====
-To prepare OpenAM to run in WebLogic, change the OpenAM `war` file to ensure that the OpenAM upgrade process is able to find the OpenAM configuration files. Be sure to make this change whenever you deploy a new `war` file as part of an OpenAM upgrade.
-
-Change the OpenAM `war` file as follows:
-
-. Create a temporary directory and expand the `OpenAM-{openam-version}.war` file:
-+
-
-[source, console, subs="attributes"]
-----
-$ cd /tmp
-$ mkdir /tmp/openam ; cd /tmp/openam
-$ jar xvf ~/Downloads/OpenAM-{openam-version}.war
-----
-
-. Locate the `bootstrap.properties` file in the `WEB-INF/classes` directory of the expanded `war` file.
-
-. Update the `# configuration.dir=` line in the `bootstrap.properties` file to specify a path with read and write permissions. For example:
-+
-
-[source, ini]
-----
-# This property should also be used when the system user that
-# is running the web/application server process does not have
-# a home directory. i.e. System.getProperty("user.home") returns
-# null.
-
-  configuration.dir=/my/readwrite/config/dir
-----
-+
-If installing on Windows, the specified path should have slashes */* and not backslashes *\*.
-
-. Rebuild the `openam.war` file:
-+
-
-[source, console]
-----
-$ jar cvf ../openam.war *
-----
-
-====
-
+anchor:prep-openam-for-weblogic[]
+For a WebLogic deployment, verify the Jakarta Servlet API and JDK combination and consult the documentation for that WebLogic release.
+Verify class loading for the libraries bundled with OpenAM and any deployed extensions.
+See xref:../deployment-planning/chap-hw-sw-requirements.adoc#web-container-requirements[OpenAM Web Application Container Requirements].
 
 [#prepare-ibm-websphere]
-=== Preparing IBM WebSphere
+=== Evaluating IBM WebSphere
 
-Before you deploy OpenAM, use the Administrator console to update JVM options as described in xref:#prepare-java["Preparing a Java Environment"].
-In addition, configure WebSphere to load classes from OpenAM bundled libraries before loading classes from libraries delivered with WebSphere. The following steps must be completed after you deploy OpenAM into WebSphere.
-
-. In WebSphere administration console, browse to Application > Application Type > WebSphere enterprise applications > __OpenAM Name__ > Class loading and update detection.
-
-. Set Class loader order > Classes loaded with local class loader first (parent last).
-
-. Ensure that the value of the __WAR class loader policy__ property is set to the default value: `Class loader for each WAR file in application`.
-
-. Save your work.
-
-
-
+Verify the Jakarta Servlet API, JDK, and class loader configuration for the specific WebSphere product and release.
+See xref:../deployment-planning/chap-hw-sw-requirements.adoc#web-container-requirements[OpenAM Web Application Container Requirements].

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -238,98 +238,34 @@ a|This should be zero to ensure sessions are purged immediately.
 [#tuning-jvm-for-openam]
 === Java Virtual Machine Settings
 
-This section gives some initial guidance on configuring the JVM for running OpenAM. These settings provide a strong foundation to the JVM before a more detailed garbage collection tuning exercise, or as best practice configuration for production:
+Start with the defaults for your supported JDK and tune the JVM against a representative workload.
+For installation requirements, see xref:../install-guide/chap-prepare-install.adoc#prepare-java[Preparing a Java Environment].
 
 [#tuning-heap-size]
-.Heap Size Settings
-[cols="42%,29%,29%"]
-|===
-|JVM Parameters |Suggested Value |Description 
+==== Heap Size Settings
 
-a|`-Xms` & `-Xmx`
-a|At least 1 GB (2 GB with embedded OpenDJ), in production environments at least 2 GB to 3 GB. This setting depends on the available physical memory, and on whether a 32- or 64-bit JVM is used.
-a|-
-
-a|`-server`
-a|-
-a|Ensures the server JVM is used
-
-a|`-Dsun.net.client.defaultReadTimeout`
-a|60000
-a|Controls the read timeout in the Java HTTP client implementation
-
- This applies only to the Sun/Oracle HotSpot JVM.
-
-a|`-Dsun.net.client.defaultConnectTimeout`
-a|High setting: 30000
- (30 seconds)
-a|Controls the connect timeout in the Java HTTP client implementation
-
- When you have hundreds of incoming requests per second, reduce this value to avoid a huge connection queue.
-
- This applies only to the Sun/Oracle HotSpot JVM.
-|===
+Measure heap usage and allocation rates under load before choosing initial and maximum heap sizes (`-Xms` and `-Xmx`).
+Allow headroom outside the heap for metaspace, thread stacks, direct buffers, and the operating system.
+For containers, check the total process memory against the container limit.
+An embedded OpenDJ instance uses the same JVM and needs space for its database cache.
+See xref:../deployment-planning/chap-sizing.adoc#size-cpu-memory[Sizing System CPU and Memory].
 
 [#tuning-security]
-.Security Settings
-[cols="42%,29%,29%"]
-|===
-|JVM Parameters |Suggested Value |Description 
+==== Security Settings
 
-a|`-Dhttps.protocols`
-a|`TLSv1,TLSv1.1,TLSv1.2`
-a|Controls the protocols used for outbound HTTPS connections from OpenAM.
-
- This applies only to Sun/Oracle Java environments.
-|===
+Use the JDK and container TLS defaults for supported protocols and set any stricter policy on the applicable listener or client.
+Review outbound HTTPS, LDAP over TLS, trust stores, and certificate validation when changing JDKs.
+See xref:chap-securing.adoc#secure-communications[Securing Communications].
 
 [#tuning-garbage-collection]
-.Garbage Collection Settings
-[cols="42%,29%,29%"]
-|===
-|JVM Parameters |Suggested Value |Description 
+==== Garbage Collection Settings
 
-a|`-verbose:gc`
-a|-
-a|Verbose garbage collection reporting
+Use unified JVM logging, for example `-Xlog:gc*`, to measure pause times and garbage-collection frequency.
+Tune only after correlating that data with throughput, tail latency, and memory consumption.
+Consult the Java launcher documentation for your JDK before changing collector options.
 
-a|`-Xloggc:`
-a|`$CATALINA_HOME/logs/gc.log`
-a|Location of the verbose garbage collection log file
-
-a|`-XX:+PrintClassHistogram`
-a|-
-a|Prints a heap histogram when a SIGTERM signal is received by the JVM
-
-a|`-XX:+PrintGCDetails`
-a|-
-a|Prints detailed information about garbage collection
-
-a|`-XX:+PrintGCTimeStamps`
-a|-
-a|Prints detailed garbage collection timings
-
-a|`-XX:+HeapDumpOnOutOfMemoryError`
-a|-
-a|Out of Memory errors generate a heap dump automatically
-
-a|`-XX:HeapDumpPath`
-a|`$CATALINA_HOME/logs/heapdump.hprof`
-a|Location of the heap dump
-
-a|`-XX:+UseConcMarkSweepGC`
-a|-
-a|Use the concurrent mark sweep garbage collector
-
-a|`-XX:+UseCMSCompactAtFullCollection`
-a|-
-a|Aggressive compaction at full collection
-
-a|`-XX:+CMSClassUnloadingEnabled`
-a|-
-a|Allow class unloading during CMS sweeps
-|===
-
+If you enable `-XX:+HeapDumpOnOutOfMemoryError` and set `-XX:HeapDumpPath`, restrict access to the output and allow enough disk space for a heap dump.
+A dump can contain sensitive data.
 
 [#caching]
 === Caching in OpenAM

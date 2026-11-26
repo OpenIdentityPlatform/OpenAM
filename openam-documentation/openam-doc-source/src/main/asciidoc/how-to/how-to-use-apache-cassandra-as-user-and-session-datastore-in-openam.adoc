@@ -18,8 +18,14 @@ Copyright 2026 3A Systems, LLC.
 :example-caption!:
 :table-caption!:
 
+ifndef::env-site[]
 [#how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam]
+endif::[]
 == How to Use Apache Cassandra as User and Session DataStore in OpenAM
+
+ifdef::env-site[]
+anchor:how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam[]
+endif::[]
 
 [[how-to-use-apache-cassandra-as-user-and-session-datastore-in-openam-introduction]]
 === Introduction

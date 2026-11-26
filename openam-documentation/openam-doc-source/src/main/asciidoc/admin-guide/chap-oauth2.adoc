@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-oauth2]
+endif::[]
 == Managing OAuth 2.0 Authorization
+
+ifdef::env-site[]
+anchor:chap-oauth2[]
+endif::[]
 
 This chapter covers OpenAM support for the OAuth 2.0 authorization framework. The chapter begins by showing where OpenAM fits into the OAuth 2.0 authorization framework, and then shows how to configure the functionality.
 
