@@ -120,7 +120,7 @@ OpenAM authentication can use the client IP address for decisions such as adapti
 
 Use `X-Forwarded-For` if it reaches OpenAM intact. The Tomcat `RemoteIpValve`, enabled in the OpenAM container image, can remove this header before OpenAM handles the request. With the default valve settings, use a dedicated header such as `X-OpenAM-Client-IP` for OpenAM. The proxy can still supply `X-Forwarded-For` to Tomcat.
 
-Set `com.sun.identity.authentication.client.ipAddressHeader` to the chosen header under Deployment > Servers > __Server Name__ > Advanced on each OpenAM node that uses the client IP. Verify through the public URL that OpenAM uses the address set by the trusted proxy. See xref:../how-to/how-to-restrict-xui-access-with-a-reverse-proxy.adoc#how-to-restrict-xui-access-with-a-reverse-proxy[Restrict XUI Access with a Reverse Proxy].
+Set `com.sun.identity.authentication.client.ipAddressHeader` to the chosen header under Deployment > Servers > __Server Name__ > Advanced on each OpenAM node that uses the client IP. Verify through the public URL that OpenAM uses the verified client IP set by the trusted proxy even when the chosen header already has a value in the incoming request. See xref:../how-to/how-to-restrict-xui-access-with-a-reverse-proxy.adoc#how-to-restrict-xui-access-with-a-reverse-proxy[Restrict XUI Access with a Reverse Proxy].
 
 A node can forward a continuing classic login to the node that started authentication. On each node that can forward these requests, append the same header to `openam.retained.http.request.headers` in Advanced. With the default list and the dedicated header, set it to `X-DSAMEVersion,X-OpenAM-Client-IP`. Preserve any other headers already in the list. Restart the forwarding nodes to load the updated list.
 
