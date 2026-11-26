@@ -12,13 +12,12 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
-:openam-version: x.y.z
 
 
 [#chap-about-upgrades]
@@ -29,74 +28,64 @@ This chapter covers common aspects of upgrading an OpenAM deployment, whether yo
 Release levels, and how much change to expect in a maintenance, minor, or major release, are defined in xref:../admin-guide/appendix-interface-stability.adoc#release-levels["Product Release Levels"] in the __Administration Guide__. Release levels are identified by version number.
 
 [#sec-supported-upgrades]
-=== Supported Upgrade Paths
+=== Upgrade Paths
 
-The following table contains information about the supported upgrade paths to OpenAM {openam-version}:
+Use the exact source and target release and the configuration store type to select a path. Rehearse each upgrade on a copy of your deployment with the same directory versions, topology, and customizations.
 
 [#am-supported-upgrades]
-.Upgrade Paths
-[cols="50%,50%"]
+.Direct upgrades to OpenAM 16.1.4
+[cols="1,1,2,2",options="header"]
 |===
-|Version |Upgrade Supported? 
-
-a|OpenAM 9.0.x
-a|No
-
-a|OpenAM 9.5.x
-a|No
-
-a|OpenAM 10.0.x
-a|No
-
-a|OpenAM 11.0.x
-a|Yes
-
-a|OpenAM 12.0.x
-a|Yes
-
-a|OpenAM 13.x.x
-a|Yes
-
-a|OpenAM 14.x.x
-a|Yes
-
-a|OpenAM 15.x.x
-a|Yes
-
+|Source |Target |Embedded OpenDJ configuration store |External configuration store
+|16.1.3 |16.1.4 |Verified, OpenDJ 5.1.2 to 5.2.0 |Verified with external OpenDJ 5.2.0
+|15.2.2 |16.1.4 |Verified, OpenDJ 4.10.2 to 5.2.0 |Verified with external OpenDJ 5.2.0
 |===
+
+Verification covers a single OpenAM node with the WAR on JDK 21 and Tomcat 11.0.29 for the target release. The 15.2.2 tests used Tomcat 9.0.124 for the source release. The checks cover the upgrade report, the version after restart, administrator and user sign-in, and preservation of test configuration and profile data. The embedded 15.2.2 test also verified rollback to the previous WAR, container, and offline snapshot. Rehearse your own topology before upgrading production.
+
+For other version pairs, confirm the path for your topology before using the xref:chap-upgrade-servers.adoc#upgrade-server[server upgrade procedure]. See the https://github.com/OpenIdentityPlatform/OpenAM/security/policy#supported-versions[project support policy] for maintained release families and support options. See xref:chap-legacy-servers.adoc#upgrade-legacy[the legacy migration guidance] for older releases.
 
 [#upgrade-planning]
 === Planning the Upgrade
 
-How much you must do to upgrade OpenAM software depends on the magnitude of the differences between the version you currently use and the new version.
+Read the release notes for the target and all intervening releases. Review the xref:../release-notes/requirements-and-upgrade.adoc[platform requirements and compatibility changes] and the xref:chap-upgrade-servers.adoc#upgrade-released-changes[server upgrade notes] with your application owners. Test maintenance releases as well as major and minor releases. Check the versions of your policy agents and administration tools as part of the rehearsal.
 
-* Maintenance releases have a limited effect on current functionality but contain necessary bug and security fixes. You should keep up to date with maintenance releases as the fixes are important and the risk of affecting service is minimal.
+Run the Upgrade Wizard or the command-line upgrade tool to update OpenAM's configuration to the target version. Both methods follow the same xref:chap-upgrade-servers.adoc#upgrade-server[server upgrade procedure] for deployment, migration, restart, and validation.
 
-* When upgrading to a new major or minor release, always plan and test the changes before carrying out the upgrade in production. Make sure you read release notes for intervening versions with care, identifying any changes likely to affect your deployment, and then plan accordingly.
+[#pre-upgrade-runtime]
+==== Check Java and the Web Container
 
-* These suggestions are true both for OpenAM server components, and also for policy agents.
+OpenAM 16.1.4 requires Java 11 or later and a Jakarta EE web container. Tomcat 10.1 requires Java 11 or later. Tomcat 11 requires Java 17 or later, and the 16.1.4 Docker image pairs it with JRE 25. Use a version supported by both OpenAM and the container. Review the xref:../install-guide/chap-prepare-install.adoc#prepare-java[JVM settings] and xref:../install-guide/chap-prepare-install.adoc#prepare-apache-tomcat[Tomcat prerequisites].
 
-To upgrade from an OpenAM server, use the Upgrade wizard. The OpenAM server Upgrade wizard appears when you replace a deployed OpenAM server `.war` file with a newer version and browse to the deployment URL. The Upgrade wizard brings the OpenAM configuration, including the version number, up to date with the new version. The CLI counterpart of the Upgrade wizard is openam-upgrade-tool-{openam-version}.jar, which you install as described in xref:../install-guide/chap-install-tools.adoc#install-openam-config-tools["To Set Up Configuration Tools"] in the __Installation Guide__.
+When moving from a Java EE deployment, rebuild servlet-dependent custom code against the target release and migrate `javax.servlet` imports and descriptors to Jakarta APIs. Review JSPs, libraries, filters, listeners, and any customization of `web.xml`. A WAR built for Jakarta EE requires a Jakarta container such as Tomcat 10.1 or 11.
 
+[#pre-upgrade-external-stores]
+==== Check External Directory Stores
+
+Record the endpoints, base DNs, bind identities, certificate trust, schema, indexes, and replication arrangement of each external store. From the target runtime, check connectivity and TLS to each configured directory server, including failover servers.
+
+* *Configuration store*. Confirm that the target OpenAM release supports your LDAP server. Check that the bind identity can read and update OpenAM's configuration and has the privileges required for the operations performed by the upgrade. Coordinate any separate schema and index changes with the directory administrator. See xref:../install-guide/chap-prepare-install.adoc#prepare-configuration-store[Preparing an External Configuration Data Store].
+* *Identity stores*. Check authentication and user and group searches in each realm. Confirm schema and permissions for the writes the deployment uses, such as password changes, account lockout, or profile updates. See xref:../install-guide/chap-prepare-install.adoc#prepare-identity-repository[Preparing an External Identity Repository].
+* *Core Token Service (CTS)*. Check the directory version, credentials, schema, and indexes used for session and token operations. Verify replication and the expected failover behavior when you use multiple directory servers. See xref:../install-guide/chap-cts.adoc[Configuring the Core Token Service].
 
 [#upgrade-policies]
-=== Upgrading & Policies
+=== Legacy Policy Migrations
 
-When upgrading from OpenAM 11.0.x, the upgrade process changes how OpenAM represents policies. Most earlier policies transform directly to the newer representation.
+When a migration path crosses the policy format change introduced after OpenAM 11.0.x, the upgrade process changes how OpenAM represents policies. Most earlier policies transform directly to the newer representation.
 
 If however the upgrade process encounters problems during the transformation, it writes messages about the problems in the upgrade log. When you open a policy in the policy editor that caused problems during the upgrade process, the policy editor shows the issues, but does not let you fix them directly. Instead you must create equivalent, corrected policies in order to use them in OpenAM.
 
 You should therefore plan to test policy upgrade before upgrading the service, and to correct any problems encountered before using the upgraded service.
 
-For details on how to configure OpenAM policies, see xref:../admin-guide/chap-authz-policy.adoc#chap-authz-policy["Defining Authorization Policies"] in the __Administration Guide__.
+For details on how to configure OpenAM policies, see xref:../admin-guide/chap-authz-policy.adoc["Defining Authorization Policies"] in the __Administration Guide__.
 
 
 [#upgrade-authentication-defaults]
-=== Upgrading & Authentication Defaults
+=== Authentication Settings and Tools
 
-This release changes three authentication defaults: module-based authentication is disabled, account lockout is enabled, and the account lockout duration is 30 minutes rather than `0`. They apply to **new installations only**. An upgraded installation keeps the defaults it has, in every realm, and nothing in the upgrade rewrites an authentication setting — the behavior of your realms after upgrading is the behavior they had before it.
+OpenAM 16.1.4 disables module-based authentication and enables account lockout with a 30-minute duration on new installations. An upgraded installation retains the authentication settings of each realm.
 
-Adopting the new defaults in an existing deployment is worth doing, and is a decision to take per realm rather than a step to run blind, because disabling module-based authentication is a trade-off of availability against exposure. In a realm where it is disabled, the following stop working:
+Review the callers in each realm before adopting these defaults. Disabling module-based authentication prevents the following uses.
 
 * Login by module, using the `module=__module-name__` login parameter, or `authIndexType=module` in the REST API.
 
@@ -106,13 +95,13 @@ Adopting the new defaults in an existing deployment is worth doing, and is a dec
 
 The `Application` module and modules of type `Federation` are exempt from the switch, so policy agent authentication and federation flows continue to work. A federation deployment whose SAML v2 Authentication Context mapping names an ordinary module — an entry of the form `module=__module-name__` in the IdP extended metadata — is an exception: that login is made by module and is refused like any other. Map such a context onto a chain with `service=__chain-name__`, or leave its authentication scheme empty, which is what the shipped mapping does.
 
-The Liberty ID-WSF Authentication Service is another exception. Its PLAIN and CRAM-MD5 SASL mechanisms, exposed at `/openam/Liberty/*`, log in through `IndexType.MODULE_INSTANCE` against the top level realm, aimed at the modules named by `PlainMechanismAuthModule` and `CramMD5MechanismAuthModule` (both default to `DataStore`, and neither is `Application` nor of type `Federation`). Disabling module-based authentication in the top level realm therefore refuses every SASL request to that endpoint with `MODULE_BASED_AUTH_NOT_ALLOWED`. Where such an integration exists, leave module-based authentication enabled in the top level realm alone.
+If you enabled the legacy Liberty ID-WSF endpoints, check the Authentication Service. Its PLAIN and CRAM-MD5 SASL mechanisms, exposed at `/openam/Liberty/*`, log in through `IndexType.MODULE_INSTANCE` against the top level realm, aimed at the modules named by `PlainMechanismAuthModule` and `CramMD5MechanismAuthModule` (both default to `DataStore`). Disabling module-based authentication in the top level realm therefore refuses every SASL request to that endpoint with `MODULE_BASED_AUTH_NOT_ALLOWED`. Where such an integration exists, keep module-based authentication enabled in the top level realm.
 
-The Security Token Service is another. The default authentication target mappings of a REST STS instance validate OpenID Connect ID tokens against the `oidc` module and X.509 certificates against `cert_module` with `authIndexType=module`, and the default X.509 mapping of a SOAP STS instance does the same. In a realm where module-based authentication is disabled, these validations are refused with `MODULE_BASED_AUTH_NOT_ALLOWED`. Keep module-based authentication enabled in the realm of the STS instance, or map the token type onto a chain that contains the module, for example `OPENIDCONNECT|service|oidcChain|oidc_id_token_auth_target_header_key=oidc_id_token`. The SOAP STS agent logs in through the `Application` module and is unaffected.
+Check the Security Token Service (STS) mappings in each realm. The default authentication target mappings of a REST STS instance validate OpenID Connect ID tokens against the `oidc` module and X.509 certificates against `cert_module` with `authIndexType=module`, and the default X.509 mapping of a SOAP STS instance does the same. In a realm where module-based authentication is disabled, these validations are refused with `MODULE_BASED_AUTH_NOT_ALLOWED`. Keep module-based authentication enabled in the realm of the STS instance, or map the token type onto a chain that contains the module, for example `OPENIDCONNECT|service|oidcChain|oidc_id_token_auth_target_header_key=oidc_id_token`. The SOAP STS agent logs in through the `Application` module and is unaffected.
 
-Account lockout has a requirement of its own: keep the lockout duration above `0`. A duration of `0` selects physical locking, which sets `inetuserstatus=Inactive` on an account after five failed logins and leaves it switched off until an administrator re-enables it, so enabling lockout while the duration is `0` turns five bad passwords into a lasting denial of service against any account whose name can be guessed. That is why the two defaults moved together.
+Set a positive lockout duration when enabling timed account lockout. A duration of `0` selects physical locking, which sets `inetuserstatus=Inactive` after the configured number of failed logins and requires an administrator to reactivate the account.
 
-Once you have weighed both, apply them to a realm with:
+To apply these settings to a realm, use the following command.
 
 [source, console]
 ----
@@ -128,58 +117,36 @@ $ ssoadm set-realm-svc-attrs \
 
 The same settings are on the console page Realms > __Realm Name__ > Authentication > Settings, under the Security and Account Lockout tabs. For details of the attributes, see xref:../admin-guide/chap-auth-services.adoc#auth-core-security["Core Authentication Attributes - Security"] and xref:../admin-guide/chap-auth-services.adoc#auth-core-account-lockout["Core Authentication Attributes - Account Lockout"] in the __Administration Guide__.
 
-What the upgrade does do is deactivate the identities the configurator created with a password published in the OpenAM installer source — `demo`, `wsc`, `wsp`, `SecurityTokenService`, and `agentAuth` — where they still have that password and are still active. Their passwords are not changed. A deployment that uses WS-Security, the STS, or the agent authenticator with the shipped credentials must give the identity a password of its own and activate it again after upgrading; the upgrade report lists every identity that was switched off. The `anonymous` user of the Top Level Realm no longer authenticates with a password at all, which takes effect as soon as this version is deployed; the Anonymous authentication module is unaffected.
+The 16.1.4 configuration upgrade deactivates active built-in identities that still have their shipped passwords. This covers `demo`, `wsc`, `wsp`, `SecurityTokenService`, and `agentAuth`. Check the upgrade report for the affected identities. For an integration that still requires one of them, set a deployment-specific password, update the integration, and reactivate the identity. Beginning with 16.1.4, OpenAM rejects password-based login for the Top Level Realm's `anonymous` user. The Anonymous authentication module continues to provide anonymous access.
 
-`ssoadm` authenticates administrators against the Administrator Authentication Configuration of the top level realm — the chain that already serves a browser login to `/openam/console` — rather than by naming the `DataStore` module, so that it keeps working in a realm where module-based authentication is disabled. Where the realm names no administrator chain, it falls back to the Organization Authentication Configuration. It answers only user name and password callbacks, so a top level realm whose chain requires more than that — a one-time password, a choice, a confirmation — refuses `ssoadm` where the pinned module previously succeeded. If you pinned the mechanism with `org.forgerock.openam.ssoadm.auth.indexType` and `org.forgerock.openam.ssoadm.auth.indexName` in the `ssoadm` script, an `indexType` of `module_instance` only works while that realm allows module-based authentication; use `service` and the name of a chain that a user name and a password satisfy, or remove both properties and let `ssoadm` follow the administrator chain.
-
+Beginning with 16.1.4, `ssoadm` follows the Administrator Authentication Configuration of the top level realm and falls back to the Organization Authentication Configuration when no administrator chain is set. It supports chains that use only user name and password callbacks. If your `ssoadm` script sets `org.forgerock.openam.ssoadm.auth.indexType` and `org.forgerock.openam.ssoadm.auth.indexName`, an index type of `module_instance` requires module-based authentication in that realm. To use a password-only chain, set the index type to `service` and the index name to that chain. To use the default selection, remove both overrides.
 
 [#upgrade-best-practices]
 === Best Practices for Upgrades
 
-Be prepared before you begin an upgrade, even if the upgrade is for a maintenance release.
-
 [#plan-upgrade-downtime]
-==== Route Around Servers During Downtime
+==== Plan Downtime and Restrict Maintenance Access
 
-Upgrading servers takes at least one of your OpenAM sites down while the server configurations are being brought up to date with the newer version. Plan for this site to be down, routing client applications to another site until the upgrade process is complete and you have validated the result. Make sure client application owners are well aware of the change, and let them know what to expect.
+Take every OpenAM server that reads the same configuration store or its replicas out of service for the upgrade. That scope can span several OpenAM sites. Plan for mixed versions to be offline during configuration migration and until you have upgraded and validated each node. Send client traffic to another deployment only if its configuration is independent and its identity and session dependencies can safely continue serving traffic. Otherwise schedule an outage.
 
-If you only have a single OpenAM site, make sure the downtime happens in a low usage window, and make sure you let client application owners plan accordingly.
-
-During an upgrade you must restrict access to OpenAM Console: The Upgrade Wizard page does not require authorization; any user with access to OpenAM Console immediately after you deploy the new .war can therefore initiate the upgrade process.
-
+Before the first startup on the target version, use network or proxy access controls to limit the upgrade interface to the administrators and tools performing the work. The Upgrade Wizard can be initiated without an authenticated OpenAM session. Protect the direct node URLs and remove public routes to the upgrade interface, including any load balancer or ingress routes that bypass the maintenance controls. Use HTTPS with a trusted certificate for the management endpoint.
 
 [#pre-upgrade-backup]
 ==== Back Up the Deployment
 
-Always back up your deployment before you upgrade, as you must be able to roll back should something go wrong during the upgrade process.
+Capture a coordinated pre-upgrade recovery point after draining traffic and stopping the affected OpenAM servers. Quiesce writes to the stores being backed up as needed to obtain a consistent snapshot. Include the following in the backup.
 
-* Backing up your configuration as described in xref:../admin-guide/chap-backup-restore.adoc#chap-backup-restore["Backing Up and Restoring OpenAM Configurations"] in the __Administration Guide__ is good for production environments.
+* The previous WAR or container image and each node's configuration directory, bootstrap files, keystores and trust stores, encryption material, and local customizations. For a Tomcat WAR deployment, this can include `~/openam/` and `~/.openamcfg/`. For the OpenAM Docker image, back up each volume mounted at `/usr/openam/config`.
+* The embedded OpenDJ databases and configuration, or the external configuration directory's data, schema, and replication state. Use the directory server's backup and restore procedures. An LDIF export of the configuration suffix can supplement a full backup. See xref:../admin-guide/chap-backup-restore.adoc[Backing Up and Restoring OpenAM Configurations].
+* The data and schema of any identity and CTS stores affected by the upgrade. Coordinate recovery of shared stores with their owners and record which sessions or tokens may be lost during a restore.
+* The previous Java runtime and web container, and deployment settings for the container, proxy, or Docker service. Record host names, port and context path mappings, runtime configuration, and secrets. Keep copies of local administration tool changes and policy agent installation and configuration files where they are affected.
 
-* In preparation for upgrading OpenAM servers and their configurations, also take LDIF backups of the configuration store data in the directory servers. If possible, stop servers before upgrading and take a file system backup of the deployed servers and also of their configuration directories as well. This can make it easier to roll back from a failed upgrade.
-+
-For example, if you deploy OpenAM server in Apache Tomcat under `/openam`, you might take a file system backup of the following directories for each OpenAM server.
-+
-
-** `/path/to/tomcat/webapps/openam/`
-
-** `~/openam/`
-
-** `~/.openamcfg/`
-
-
-* When upgrading web policy agents, take a file system backup of the policy agent installation and configuration directories.
-+
-When upgrading Java EE policy agents, it can be easier to uninstall the new version and reinstall the old version than to restore from file system backup.
-
-* When upgrading tools, keep copies of any tools scripts that you have edited for your deployment. Also back up any trust stores used to connect securely.
-
-
+Verify that you can restore this recovery point on a test deployment before upgrading production.
 
 [#pre-upgrade-customization]
 ==== Apply Customization Before Upgrading
 
-Before you upgrade OpenAM servers, prepare a .war file that contains any customizations you require.
-Customizations include any changes you have made to the OpenAM server installation, such as the following.
+Start with the target WAR or image and reapply your customizations, using the target files and dependencies as the base. Test the rebuilt deployment on the target Java and container versions. Review these common customization points.
 
 * Plugins and extensions such as custom authentication modules, response attribute providers, post authentication plugins, SAML v2.0 attribute mappers, and OAuth 2.0 scope implementations
 +
@@ -187,14 +154,14 @@ These are described in the xref:../dev-guide/index.adoc[Developer's Guide].
 
 * Customized JSPs, redesigned login or service pages, additional CSS and visual content, and modified authentication module callback files
 +
-These are described in the xref:../install-guide/chap-custom-ui.adoc#chap-custom-ui["Customizing the OpenAM End User Pages"] in the __Installation Guide__.
+These are described in the xref:../install-guide/chap-custom-ui.adoc["Customizing the OpenAM End User Pages"] in the __Installation Guide__.
 
 * Any changes to OpenAM classes
 
 * Any changes or additional Java class libraries (such as .jar files in `WEB-INF/lib`)
 
 [#upgrade-device-flow-form]
-If you have customized the OAuth 2.0 device flow user code page, carry the CSRF token into your copy before you upgrade. The endpoint `/oauth2/device/user` refuses any submission without a valid `csrf` parameter with HTTP 400, and the stock page supplies that token through two lines that a customized copy made from an earlier release lacks. Without them, every user code a browser submits is refused.
+Beginning with 16.1.4, the OAuth 2.0 device flow requires a CSRF token on the user code page. Carry the token into your customized copy before upgrading. The endpoint `/oauth2/device/user` refuses any submission without a valid `csrf` parameter with HTTP 400, and the stock page supplies that token through two lines that a customized copy made from an earlier release lacks. Without them, every user code a browser submits is refused.
 
 * In a customized `CodeVerificationForm.ftl` (for example, one placed in `WEB-INF/classes/templates`), add the token to `pageData`:
 +
@@ -210,27 +177,19 @@ If you have customized the OAuth 2.0 device flow user code page, carry the CSRF 
 <input type="hidden" name="csrf" value="{{csrf}}">
 ----
 
-Users of the stock pages are covered by the same `.ftl`: it sets a `urlArgs` value on RequireJS so the browser stops reusing `DeviceTemplate.html` cached from the previous release (that file is served for a month, and its URL is not versioned otherwise), and it registers a submit-time listener that appends the CSRF token to any device form that reaches the DOM without it. Neither of these lines is included in a customized copy of `CodeVerificationForm.ftl` unless the customization brings them across.
+Carry over the stock form's RequireJS `urlArgs` setting to refresh any cached `DeviceTemplate.html` in the browser. Also keep its submit listener, which injects the CSRF token if the field is missing.
 
 Clients that post the user code directly, without the page, send their session ID as the `csrf` parameter. For details, see xref:../dev-guide/chap-client-dev.adoc#proc-device-flow-allow-access["To Grant Consent in the OAuth 2.0 Device Flow"] in the __Developer's Guide__.
 
 [#upgrade-device-flow-verification-uri-query]
-A link or QR code that opens the device verification page with the user code in the query string, such as `/oauth2/device/user?user_code=BDCT-HQKD`, now redirects (HTTP 303) to the same address without that parameter. The user types the code into the empty form the redirect leads to. The endpoint has no way to tell a code the user chose from one a foreign page chose for them, so the code has to be typed where only the user can type it. OpenAM itself does not produce this URL - `/oauth2/device/code` answers with a bare `verification_uri` and never issues `verification_uri_complete` - but any out-of-tree device app or QR code that appends `?user_code=<code>` to the verification URI is affected and must be updated to reflect that users now retype the code on arrival.
+In 16.1.4, a link or QR code that opens the device verification page with the user code in the query string, such as `/oauth2/device/user?user_code=BDCT-HQKD`, now redirects (HTTP 303) to the same address without that parameter. The user types the code into the empty form the redirect leads to. Update custom device apps and QR codes to present the verification URI and the user code separately.
 
 [#upgrade-consent-decision-body]
-`/oauth2/authorize` and `/oauth2/device/user` now read the consent decision (`decision`) and the "remember this choice" flag (`save_consent`) from the request body alone; values sent only in the query string are ignored. On `/oauth2/authorize`, a submission that carries no `decision` in the body fails closed as a denial; on `/oauth2/device/user` such a submission is the user code form itself: it leads to the consent page, or approves the device code at once when the client's consent is implied. The stock consent page and the documented headless `curl` invocations already send both in the body, so a deployment using either is unaffected; a bespoke client that put `decision=allow` in the URL of a redirect has to move it into the POST body.
-
+Beginning with 16.1.4, `/oauth2/authorize` and `/oauth2/device/user` read `decision` and `save_consent` from the POST body. Update custom clients that use the query string. A missing body decision denies authorization at `/oauth2/authorize`. At `/oauth2/device/user` it submits the user code form and leads to the consent page, or approves the device code when the client's consent is implied.
 
 [#post-upgrade-rollback]
 ==== Plan for Rollback
 
-Sometimes even a well-planned upgrade operation fails to go smoothly. In such cases, you need a plan to roll back smoothly to the pre-upgrade version.
+If validation fails, keep traffic drained and stop all nodes in the affected configuration scope. Restore the pre-upgrade WAR and runtime, or the previous image. Restore the matching per-node files and directory stores from the same recovery point. Coordinate the restoration of replicated stores so that a peer with newer data cannot overwrite the restored state. Recover affected identity and CTS data according to the recovery plan. Restart the old deployment only after the stores and local files are ready, then repeat the functional checks before restoring traffic.
 
-For OpenAM servers, you can roll back by restoring from file system backup. If you use an external configuration directory service, restore the old configuration from LDIF before restarting the old servers. For more information, see xref:../admin-guide/chap-backup-restore.adoc#chap-backup-restore["Backing Up and Restoring OpenAM Configurations"] in the __Administration Guide__.
-
-For web policy agents, you can roll back by restoring from file system backup. If you used configuration only available to newer agents, restore the pre-upgrade configuration before restarting the old agents.
-
-For Java EE policy agents, uninstall the newer agents and reinstall the older agents, including the old configurations.
-
-
-
+For web policy agents, restore the old installation and configuration, including any changed centrally stored agent configuration. For Java policy agents, reinstall the earlier agent and restore its configuration.
