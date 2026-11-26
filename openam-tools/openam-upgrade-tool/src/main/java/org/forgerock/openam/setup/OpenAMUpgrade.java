@@ -26,19 +26,18 @@
 /**
  * Portions Copyrighted 2012-2014 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
- * Portions Copyrighted 2025 3A Systems LLC.
+ * Portions Copyright 2025-2026 3A Systems, LLC.
  */
 
 package org.forgerock.openam.setup;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import jakarta.inject.Inject;
@@ -62,7 +61,7 @@ public class OpenAMUpgrade {
     private final LicensePresenter licensePresenter;
     private final ResourceBundle rb = ResourceBundle.getBundle(OPENAM_UPGRADE_PROPERTIES);
 
-    private boolean acceptLicense = false;
+    private boolean preAcceptLicenses;
 
     @Inject
     public OpenAMUpgrade(LicensePresenter licensePresenter) {
@@ -77,45 +76,48 @@ public class OpenAMUpgrade {
      */
     public void execute(String[] args) {
 
-        int configArg = 1; //most likely
+        if (args.length == 1 && ("--help".equals(args[0]) || "-?".equals(args[0]))) {
+            System.out.println(rb.getString("usage"));
+            return;
+        }
 
-        if (args.length < 2) {
+        String configFile = null;
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "--file":
+                case "-f":
+                case "--f":
+                    if (i + 1 == args.length) {
+                        System.out.println(rb.getString("usage"));
+                        System.exit(-1);
+                    }
+                    configFile = args[++i];
+                    break;
+                case "--acceptLicense":
+                    preAcceptLicenses = true;
+                    break;
+                default:
+                    System.out.println(rb.getString("usage"));
+                    System.exit(-1);
+            }
+        }
+        if (configFile == null) {
             System.out.println(rb.getString("usage"));
             System.exit(-1);
         }
 
-        for (int i = 0; i < args.length; i++) {
-            if((i < args.length - 1) && ("--file".equals(args[i]) || "--f".equals(args[i]))) {
-                configArg = i + 1;
-            } else if (args[i].equals("--acceptLicense")) {
-                acceptLicense = true;
-            }
-        }
-
         Properties config = new Properties();
-        FileInputStream fis = null;
-
-        try {
-            fis = new FileInputStream(args[configArg]);
-            config.load(fis);
+        try (FileInputStream input = new FileInputStream(configFile)) {
+            config.load(input);
         } catch (IOException ex) {
             System.out.println(rb.getString("errorConfig"));
             System.exit(-1);
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException ex) {
-                    System.out.println(rb.getString("errorConfig"));
-                    System.exit(-1);
-                }
-            }
         }
 
         String openAmURL = configure(config);
 
         try {
-            licensePresenter.presentLicenses(acceptLicense);
+            licensePresenter.presentLicenses(preAcceptLicenses);
         } catch (LicenseRejectedException e) {
             System.out.println(licensePresenter.getNotice());
             System.exit(-1);
@@ -125,13 +127,7 @@ public class OpenAMUpgrade {
         Thread readProgressThread = new Thread(sc);
         readProgressThread.start();
 
-        boolean success = getRequestToServer(readProgressThread, openAmURL);
-
-        if (success) {
-            System.exit(0);
-        } else {
-            System.exit(-1);
-        }
+        System.exit(getRequestToServer(readProgressThread, openAmURL) ? 0 : -1);
     }
 
     /**
@@ -144,12 +140,10 @@ public class OpenAMUpgrade {
      */
     private boolean getRequestToServer(Thread readProgress, String openAmURL) {
 
-        DataOutputStream os = null;
-        BufferedReader br = null;
         HttpURLConnection conn = null;
         try {
-            URL url = new URL(openAmURL + "/config/upgrade/upgrade.htm?actionLink=doUpgrade&acceptLicense="
-                    + acceptLicense);
+            // The license presenter has already obtained acceptance.
+            URL url = new URL(openAmURL + "/config/upgrade/upgrade.htm?actionLink=doUpgrade&acceptLicense=true");
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setUseCaches(false);
@@ -158,60 +152,40 @@ public class OpenAMUpgrade {
 
             int responseCode = conn.getResponseCode();
 
-            if (responseCode == 200) {
-                br = new BufferedReader(new InputStreamReader(
-                        conn.getInputStream()));
-                String str;
-                while ((str = br.readLine()) != null) {
-                    if (str.equals("true")) {
-                        System.out.println("\nUpgrade Complete.");
-                    } else {
-                        System.out.println("\nUpgrade Failed. Please check the amUpgrade debug file for errors");
-                    }
-                }
-            } else {
-                System.out.println(rb.getString("upgradeFailed"));
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                System.out.println(rb.getString("upgradeFailed") + " HTTP " + responseCode);
+                return false;
             }
-        } catch (ProtocolException ex) {
-            ex.printStackTrace();
+
+            try (BufferedReader response = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                if ("true".equals(response.readLine()) && response.readLine() == null) {
+                    System.out.println("\nUpgrade Complete.");
+                    return true;
+                }
+            }
+            System.out.println("\nUpgrade Failed. Please check the amUpgrade debug file for errors");
             return false;
         } catch (IOException ex) {
             ex.printStackTrace();
             return false;
         } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException ex) {
-                }
-            }
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException ex) {
-                }
+            if (conn != null) {
+                conn.disconnect();
             }
             try {
-                // wait 5 seconds if ReadProgress thread does not finished.
                 readProgress.join(5000);
             } catch (InterruptedException e) {
-            }
-            if (conn != null) {
-                try {
-                    conn.disconnect();
-                } catch (Exception ex) {
-                }
+                Thread.currentThread().interrupt();
             }
         }
-
-        return true;
     }
 
     /**
      * Sets up the Upgrader with the appropriate values read from the supplied file
      *
      * @param config the properties file to configure from
-     * @return the OpenAM URL to post data to
+     * @return the OpenAM deployment URL
      */
     private String configure(Properties config) {
 
@@ -219,7 +193,7 @@ public class OpenAMUpgrade {
         String deploymentURI = config.getProperty(DEPLOYMENT_URI);
 
         if (config.getProperty(ACCEPT_LICENSES) != null && !config.getProperty(ACCEPT_LICENSES).isEmpty()) {
-            acceptLicense = Boolean.parseBoolean(config.getProperty(ACCEPT_LICENSES));
+            preAcceptLicenses = Boolean.parseBoolean(config.getProperty(ACCEPT_LICENSES));
         }
 
         if (serverURL == null) {

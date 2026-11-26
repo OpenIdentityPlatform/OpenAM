@@ -12,58 +12,118 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
 :example-caption!:
 :table-caption!:
-:openam-version: x.y.z
 
 
 [#chap-upgrade-servers]
 == Upgrading OpenAM Servers
 
-This chapter covers upgrade from OpenAM core server 11.0.0 or later to the current version. For other OpenAM components, see xref:chap-upgrade-components.adoc#chap-upgrade-components["Upgrading OpenAM Components"].
+Select your version pair in the xref:chap-about-upgrades.adoc#sec-supported-upgrades[upgrade paths table] and rehearse the upgrade before applying it in production.
 
-OpenAM server upgrade relies on the Upgrade Wizard to make the necessary changes to the configuration store. You must then restart OpenAM or the container in which it runs. Even a version number change requires that you run the Upgrade Wizard, so needing to run the Upgrade Wizard says nothing about the significance of the changes that have been made to OpenAM. You must run the Upgrade Wizard even for maintenance releases.
+ifdef::env-site[]
+For agents and tools, see xref:chap-upgrade-components.adoc[Upgrading OpenAM Components].
+endif::[]
+ifndef::env-site[]
+For agents and tools, see xref:#chap-upgrade-components[Upgrading OpenAM Components].
+endif::[]
 
-Make sure you try upgrading OpenAM in a test environment before applying the upgrade in your production environment.
+[#upgrade-server]
+=== Upgrade the Servers
 
-* xref:#upgrade-server["To Upgrade From a Supported OpenAM Version"]
-
-* xref:#after-upgrading-from-11["To Complete Upgrade from OpenAM 11.0.x"]
-
-* xref:#after-upgrading-from-13["To Complete Upgrade from OpenAM 13.0.x"]
-
-
-[IMPORTANT]
-====
-Starting with this release, a failed write of an account-lockout counter or counter reset switches the affected identity to counters held in memory on that OpenAM server. Previously, a rejected counter write could prevent subsequent authentication failures from being counted at all. Other identities continue using the configured data store, and a read failure alone does not activate this fallback.
-
-The switch remains in effect until that server restarts, even if the write failure was transient and the store later recovers. Counters are independent on each server and are lost on restart. A successful login resets the in-memory counter but does not restore persistence. Positive lockout durations are preserved; a configured duration of zero changes from physical account deactivation to a temporary lock of 30 minutes. Once that lock expires, another sequence of failed attempts can lock the account again.
-
-Setting `inetuserstatus` to `Active` or clearing `sunAMAuthInvalidAttemptsData` in the directory does not clear an existing fallback lock. Allow the temporary lock to expire; restarting the affected server also discards its fallback counters. An existing physical account restriction in physical-locking mode remains effective and must still be cleared separately.
-
-Special identities, including `amadmin`, follow the same policy without name-based exemptions. Their rejected counter writes previously prevented lockout. With the current default account-lockout settings, five failed passwords can now lock `amadmin` on the affected server for 30 minutes. Review administrator access and recovery procedures before upgrading.
-
-Two related corrections also apply to writable stores and explicitly configured in-memory counters: a failure threshold of one now starts a timed lock on the first failure, and a duration multiplier of zero preserves the lock duration for later cycles instead of reducing it to zero.
-
-Disabling account lockout, or setting its failure count or failure interval to zero, stops enforcing existing temporary locks consistently across authentication index types. This does not clear the counters or restore persistence: re-enabling lockout before a temporary lock expires enforces that lock again. Physical account restrictions remain subject to the existing account and profile checks.
-
-Explicitly configured in-memory counters now invoke the account-lockout callback plugins for the login realm when the failure threshold is reached, without resolving the user from the identity store. Previously, this path sent the lockout notification but skipped the plugin callback because no identity had been resolved.
-====
+Use this procedure for all nodes sharing a configuration store, including nodes in different sites that read replicas of that store. Complete the xref:chap-about-upgrades.adoc#upgrade-planning[upgrade planning], rehearse this sequence, and select a primary node to perform the configuration migration.
 
 [IMPORTANT]
 ====
-If you are upgrading from an unsupported version of OpenAM to a later version, you must first upgrade to a supported version. In some cases, you may need to upgrade again depending on the upgrade path.
+Use the Upgrade Wizard or the command-line upgrade tool for configuration migration, including for maintenance releases. Importing an old service configuration with `ssoadm import-svc-config` can corrupt the installation.
 ====
+
+. Drain traffic from every server in the scope and restrict access to the upgrade interface. See xref:chap-about-upgrades.adoc#plan-upgrade-downtime[Plan Downtime and Restrict Maintenance Access].
+. Stop OpenAM on every affected node and take the xref:chap-about-upgrades.adoc#pre-upgrade-backup[coordinated backup]. Keep the peers stopped while migrating on the primary node.
+. Deploy the target release on the primary node using xref:#upgrade-server-deploy[the WAR or Docker instructions], then start that node. The first startup upgrades the embedded OpenDJ configuration store when its version requires it. Wait for this step to finish before opening the Upgrade Wizard or running the tool. If startup reports an embedded directory upgrade failure, keep traffic drained and investigate the container and `amSetupServlet` logs before proceeding.
+. Migrate the configuration once for the shared store.
++
+--
+* For an interactive upgrade, open the primary node's deployment URL over management HTTPS. If TLS terminates at a management proxy, route upgrade requests only to the primary node. In the Upgrade Wizard, review the versions and proposed changes, accept the license terms, and run the upgrade. Confirm that the wizard reports completion.
+* For an unattended upgrade, follow xref:#upgrade-server-cli[Run the Command-Line Upgrade Tool].
+--
+. Check the migration result as described in xref:#upgrade-server-verify[Verify the Upgrade]. Restart OpenAM or its container on the primary node after either upgrade method, then confirm that it starts on the target version. For an external configuration store, confirm that the migration has replicated to the directories the peers use before bringing them up.
+. Deploy the same target release on each stopped peer using xref:#upgrade-server-deploy[the WAR or Docker instructions] and start it against the upgraded configuration. For an embedded configuration store, allow each peer's local OpenDJ upgrade to finish and wait for replication to converge. If a peer presents the Upgrade Wizard, keep it out of service and check its connectivity and replication to the migrated configuration store.
+. Complete the xref:#upgrade-server-verify[post-restart checks] and the follow-ups for your configuration. Restore client traffic only after the checks pass for the deployment.
+
+[#upgrade-server-deploy]
+==== Deploy the Target WAR or Docker Image
+
+*WAR deployment.* With the container stopped, replace the deployed WAR with the target WAR and keep the same context path. Clear the container's old expanded application and work directory as needed. For example, on Tomcat remove the generated `webapps/openam/` and `work/Catalina/localhost/openam/` directories before deploying the new `webapps/openam.war`. Preserve the separate OpenAM configuration directory and bootstrap files. Deploy the WAR rebuilt with your customizations if you use one.
+
+The default bootstrap locator in the container user's home directory depends on the absolute path of the deployed web application. Keep the same container user and deployment directory where possible. If either changes, set the JVM properties `com.sun.identity.configuration.directory` and `com.iplanet.services.configpath` to the existing OpenAM configuration directory. If OpenAM displays the initial setup page, stop and check the bootstrap location before proceeding.
+
+*Docker deployment.* Use the image tagged with the exact target release, or the corresponding customized image. Recreate each stopped node with its existing persistent configuration volume or bind mount at `/usr/openam/config`. Preserve each node's host name, context path, ports, network and proxy settings, external directory connections, and the environment and secrets it needs. On a multi-node deployment, remount each node's own configuration volume. Make sure the container's service account can read and write the mounted files. If the old container kept its configuration in its writable layer, back up and move that directory to a persistent mount before replacing the container.
+
+[#upgrade-server-cli]
+==== Run the Command-Line Upgrade Tool
+
+. Extract the target release's `SSOConfiguratorTools` ZIP. Keep the JARs and the `lib/` directory together and run the tool from the extracted directory. Copy the bundled `sampleupgrade` to `upgrade.properties`.
+. Set `SERVER_URL` to a management HTTPS URL that routes only to the primary node. This can be the node's direct URL or a management proxy configured to send all requests to that node. Use a host name that matches the HTTPS certificate and make sure the Java runtime running the tool trusts it. Set `DEPLOYMENT_URI` to the deployed context path and set `ACCEPT_LICENSES` to `true` after accepting the license terms.
++
+[source,properties]
+----
+SERVER_URL=https://openam-node1.example.com:8443
+DEPLOYMENT_URI=/openam
+ACCEPT_LICENSES=true
+----
+. For the published 16.1.4 ZIP, use the explicit class path. The published JAR fails with `NoClassDefFoundError` when launched with `java -jar` from the extracted archive.
++
+[source,console]
+----
+$ java -cp 'openam-upgrade-tool-16.1.4.jar:lib/*' org.forgerock.openam.setup.Main --file upgrade.properties
+----
++
+On Windows, use a semicolon between the class path entries and double quotes around the class path. With the published 16.1.4 CLI, set `ACCEPT_LICENSES=true` in the file after accepting the license terms. Use the Upgrade Wizard if you want to review and accept the terms interactively.
++
+For a tools ZIP built from the 16.2.0 development branch with the launcher fix, use the JAR name in that ZIP.
++
+[source,console]
+----
+$ java -jar openam-upgrade-tool-16.2.0-SNAPSHOT.jar --file upgrade.properties
+----
+. Capture the console output and require the line `Upgrade Complete.` and a new server-side upgrade report for this run. The published 16.1.4 tool can exit with status zero when the response is empty, contains a failure result, or has HTTP status 503. Check the report and logs before restarting the primary node.
++
+See xref:../reference/openam-cli-tools.adoc#man-upgrade-jar[the upgrade tool reference].
+
+[#upgrade-server-verify]
+==== Verify the Upgrade
+
+Before restarting the primary node, check its `upgrade/upgradereport.*` under the OpenAM configuration directory. Inspect the `amUpgrade` debug log and the container logs for errors and unresolved warnings. Preserve the report and logs for recovery if needed.
+
+After the primary node and peers are on the target release, verify the following while customer traffic is still drained.
+
+* Confirm the version, console login and realm configuration on each node. Check LDAP replication status and confirm that nodes can read the migrated configuration.
+* In a representative realm, sign in with a test account, exercise session validation and logout, and check CTS reads and writes for stateful sessions and tokens. Test session failover if your deployment supports it.
+* Test the OAuth 2.0, OIDC, SAML, and other SSO flows that you use with representative clients and federation partners. Include sign-in, the expected return URLs, token issuance or redemption, and single logout where configured.
+* With representative policy agents, test agent authentication, access to protected resources, and expected allow and deny decisions. Check scripts, custom extensions, and the administration tool operations that your deployment depends on.
+
+Keep traffic drained if a required check fails. Investigate the error or use xref:chap-about-upgrades.adoc#post-upgrade-rollback[the rollback procedure] to restore service.
+
+For external directory prerequisites and CTS configuration, see xref:chap-about-upgrades.adoc#pre-upgrade-external-stores[Check External Directory Stores]. If an external configuration store needs an ACI for server-side sorting by the OpenAM bind identity, follow xref:../install-guide/chap-prepare-install.adoc#prepare-configuration-store[Preparing an External Configuration Data Store].
+
+[#upgrade-released-changes]
+=== Changes in Released Versions
+
+Review the changes for each release that your upgrade crosses, along with the xref:../release-notes/requirements-and-upgrade.adoc[release requirements and upgrade considerations].
+
+[#upgrade-federation-16-1-1]
+==== Liberty ID-WSF in 16.1.1
 
 [IMPORTANT]
 ====
-Starting with this release the legacy Liberty ID-WSF SOAP endpoints (`/Liberty/*` and `/WSPRedirectHandler/*`) are *disabled by default* as part of the GHSA-p462-xxwx-pqf4 hardening. Existing deployments that rely on Liberty ID-WSF, IDPP, Discovery, AuthnSvc, or Interaction services must explicitly opt in by setting the advanced server property `com.sun.identity.liberty.enabled=true`.
+Beginning with 16.1.1, the legacy Liberty ID-WSF SOAP endpoints (`/Liberty/*` and `/WSPRedirectHandler/*`) are *disabled by default*. Existing deployments that rely on Liberty ID-WSF, IDPP, Discovery, AuthnSvc, or Interaction services must explicitly opt in by setting the advanced server property `com.sun.identity.liberty.enabled=true`.
 
-Two related advanced server properties were also introduced and now default to a fail-close behaviour:
+Two advanced server properties also tighten the default SOAP authentication behavior.
 
 * `com.sun.identity.liberty.soap.sensitiveHandlers` (default `idpp,disco,authnsvc,interaction`) — list of SOAP RequestHandler keys that reject the unauthenticated `null:null` mechanism and the ANONYMOUS security profile.
 * `com.sun.identity.liberty.allowAnonymousWSC` (default `false`) — restores the legacy minting of an anonymous Web Service Client session for null-family mechanisms without a client credential.
@@ -71,78 +131,146 @@ Two related advanced server properties were also introduced and now default to a
 If your deployment depends on the previous (insecure) behaviour, review and adjust these properties before promoting the upgrade. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
 ====
 
-[IMPORTANT]
-====
-Starting with this release the SAML 2.0 and ID-FF IDP discovery reader and writer endpoints (`/saml2reader`, `/saml2writer`, `/idffreader`, `/idffwriter`) validate the `RelayState` redirect URL as part of the GHSA-2pf8-52jh-5x3m hardening. Relative and same-origin redirect URLs continue to work unchanged. Absolute URLs that point to a *different* host are now rejected with HTTP 400 unless they match the new advanced server property `org.openidentityplatform.openam.idpdiscovery.relaystate.whitelist` (a semicolon-separated list of URL patterns, empty by default).
-
-If your common-domain discovery deployment hosts service providers on a different host than OpenAM, add their return URLs to this property before promoting the upgrade. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
-====
+[#upgrade-idp-discovery-16-1-2]
+==== IdP Discovery in 16.1.2
 
 [IMPORTANT]
 ====
-Starting with this release the legacy Liberty ID-FF (Liberty Alliance 1.x) SOAP endpoint (`/SOAPReceiver/*`, served by `FSSOAPReceiver`) is *disabled by default* as part of the GHSA-qcqm-7432-wg7r hardening. Existing deployments that actively use Liberty ID-FF federation must explicitly opt in by setting the advanced server property `com.sun.identity.federation.services.soap.enabled=true`. The kill-switch disables the whole endpoint, including ID-FF browser-artifact single sign-on and LECP, not only the state-changing operations. In a multi-server site set this property on *every* server: cross-node single logout forwards the logout SOAP message to a peer server's own `/SOAPReceiver`, so a node where the endpoint is still disabled would reject the forwarded request with HTTP 404 and single logout would fail.
+Beginning with 16.1.2, the SAML 2.0 and ID-FF IdP discovery reader and writer endpoints (`/saml2reader`, `/saml2writer`, `/idffreader`, `/idffwriter`) validate the `RelayState` redirect URL. Relative URLs without an authority and URLs on the request's scheme, host, and port continue to work. A cross-origin URL receives HTTP 400 unless it matches `org.openidentityplatform.openam.idpdiscovery.relaystate.whitelist`, a semicolon-separated list of URL patterns that is empty by default.
 
-Also starting with this release, inbound ID-FF state-changing and disclosure operations (federation termination, name registration, single logout, and name-identifier mapping) require a verified XML signature by default (`com.sun.identity.federation.services.requireSignature`, default `true`), even when message signing is otherwise optional. This applies to the SOAP binding *and* to the HTTP-Redirect binding endpoints `/ProcessTermination/*`, `/ProcessLogout/*`, and `/ProcessRegistration/*`, which are reachable without authentication and act on the user named by an opaque handle in the request. Unlike the SOAP endpoint, the redirect binding is not disabled by default, so this change affects any deployment that uses ID-FF over the redirect binding.
+Add the legitimate cross-origin service provider return URLs to this property before upgrading. For the standalone IdP Discovery WAR, set it in `$HOME/libIDPDiscoveryConfig.properties` for the web container user and restart the discovery application. See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
+====
 
-*Enable message signing along with it.* OpenAM signs its own outbound ID-FF messages only when `XMLSigningOn` is enabled, and that setting is `false` on a stock installation. If you leave `com.sun.identity.federation.services.requireSignature` at its default without enabling signing, OpenAM's own single logout, federation termination, and name registration messages are sent unsigned and rejected by the receiving provider. Before promoting the upgrade, either:
+[#upgrade-liberty-idff-16-1-3]
+==== Liberty ID-FF in 16.1.3
 
-* set `XMLSigningOn` to `true` under the `sunFAMIDFFConfiguration` service (advanced server property `com.sun.identity.federation.services.signingOn`) and configure a signing certificate alias on every participating hosted provider, with the matching certificate published in the metadata each partner consumes. This setting is now read for each operation, so changing it takes effect without restarting the server; in earlier releases it was cached at startup and a restart was required; or
+[IMPORTANT]
+====
+Beginning with 16.1.3, the legacy Liberty ID-FF (Liberty Alliance 1.x) SOAP endpoint (`/SOAPReceiver/*`, served by `FSSOAPReceiver`) is *disabled by default*. Existing deployments that actively use Liberty ID-FF federation must explicitly opt in by setting the advanced server property `com.sun.identity.federation.services.soap.enabled=true`. This setting controls the entire endpoint, including ID-FF browser-artifact single sign-on and LECP. In a multi-server site set this property on *every* server. Cross-node single logout sends SOAP requests to peers' `/SOAPReceiver` endpoints.
 
-* set `com.sun.identity.federation.services.requireSignature=false` to restore the previous, insecure behaviour if your federation partners do not sign ID-FF messages.
+Beginning with 16.1.3, inbound ID-FF state-changing and disclosure operations (federation termination, name registration, single logout, and name-identifier mapping) require a verified XML signature by default (`com.sun.identity.federation.services.requireSignature`, default `true`), even when message signing is otherwise optional. This applies to the SOAP binding *and* to the HTTP-Redirect binding endpoints `/ProcessTermination/*`, `/ProcessLogout/*`, and `/ProcessRegistration/*`. The redirect binding remains enabled by default.
+
+*Enable outbound message signing.* The default configuration sends unsigned single logout, federation termination, and name registration messages. Receivers that enforce signatures reject these messages.
+
+Set `XMLSigningOn` to `true` under the `sunFAMIDFFConfiguration` service (advanced server property `com.sun.identity.federation.services.signingOn`) and configure a signing certificate alias on every participating hosted provider, with the matching certificate published in the metadata each partner consumes. OpenAM 16.1.3 and later read this setting for each operation. The change takes effect without restarting the server.
+
+If a federation partner cannot sign ID-FF messages during the migration, `com.sun.identity.federation.services.requireSignature=false` allows unsigned messages. Restore signature enforcement once the partner can sign.
 
 See xref:../reference/chap-config-ref.adoc#servers-advanced-configuration["Advanced"] in the __Reference__.
 ====
 
+[#upgrade-hybrid-pkce-16-1-3]
+==== Hybrid PKCE in 16.1.3
+
 [IMPORTANT]
 ====
-Starting with this release the OAuth 2.0 authorization endpoint applies the OAuth2 Provider property Code Verifier Parameter Required to every request whose `response_type` includes `code`, as part of the GHSA-5p2f-7vcr-6vfh hardening. Previously the OpenID Connect hybrid flows (`code token`, `code id_token`, and `code id_token token`) escaped the check and were issued authorization codes with no `code_challenge` bound to them. That property is *enabled by default*, so hybrid-flow clients that send no `code_challenge` now fail at `/oauth2/authorize`.
+Beginning with 16.1.3, the OAuth 2.0 authorization endpoint applies the OAuth2 Provider property Code Verifier Parameter Required to every request whose `response_type` includes `code`, as part of the GHSA-5p2f-7vcr-6vfh hardening. Previously the OpenID Connect hybrid flows (`code token`, `code id_token`, and `code id_token token`) escaped the check and were issued authorization codes with no `code_challenge` bound to them. That property is *enabled by default*, so hybrid-flow clients that send no `code_challenge` now fail at `/oauth2/authorize`.
 
-The token endpoint fails closed to match: while the property is enabled, an authorization code that carries no `code_challenge` is rejected at `/oauth2/access_token`. Authorization codes issued before the upgrade, or before the property was turned on, therefore stop being redeemable. The exposure lasts at most one authorization code lifetime (the OAuth2 Provider property Authorization Code Lifetime (seconds), 120 by default), so if in-flight codes matter, leave client traffic redirected elsewhere for that long before promoting the upgrade.
+At the token endpoint, while the property is enabled, an authorization code that carries no `code_challenge` is rejected at `/oauth2/access_token`. Authorization codes issued before the upgrade, or before the property was turned on, therefore stop being redeemable. Let in-flight codes finish or expire before stopping the old version if their redemption matters. The OAuth2 Provider property Authorization Code Lifetime (seconds) defaults to 120 seconds.
 
 Update hybrid-flow clients to send a `code_challenge` at the authorization endpoint and the matching `code_verifier` at the token endpoint, or disable Code Verifier Parameter Required for the realm. Disabling it never relaxes verification for codes that *were* issued with a challenge. See xref:../reference/chap-config-ref.adoc#oauth2-provider-configuration["OAuth2 Provider"] in the __Reference__.
 ====
 
+[#upgrade-scripting-service]
+==== ScriptingService Configuration in 16.1.3
+
+The upgrade from an earlier release adds the missing `ScriptingService` sub-configurations, including the OAuth 2.0 access token modification script type introduced in 16.1.1. Complete the configuration upgrade and confirm that the script type appears in the console. Exercise any token modification scripts in use. See the https://github.com/OpenIdentityPlatform/OpenAM/releases/tag/16.1.3[16.1.3 release record].
+
+[#upgrade-federation-16-1-4]
+==== SAML Assertions and Return URLs in 16.1.4
+
 [IMPORTANT]
 ====
-Starting with this release `debugconfig.properties` is validated more strictly. A file with `org.forgerock.openam.debug.rotation=-1`, or with a trailing space after a rotation value next to a suffix that is empty, too coarse or cannot be parsed, is now rejected as a whole: OpenAM prints "'/debugconfig.properties' isn't valid, the default configuration will be used instead" to the standard error output and uses no prefix and no rotation. Leave a rotation value empty to turn that rotation off. Trailing spaces are also removed from the prefix and the suffix, so they no longer appear in debug log file names. See xref:../admin-guide/chap-monitoring.adoc#log-rotate-debug["Rotating Debug Logs"] in the __Administration Guide__.
+Before upgrading a SAML 2.0 HTTP-Artifact deployment, configure the IdP to sign the assertions and test artifact single sign-on. For an OpenAM IdP, set `WantAssertionsSigned="true"` in the SP metadata and publish the updated metadata to the IdP. Check every relevant SP, including Fedlets. A default OpenAM IdP and SP can produce an unsigned response that 16.1.4 rejects. See xref:../admin-guide/chap-federation.adoc#saml2-sp-assertion-signature[Requiring Signed Assertions on the Service Provider] for the requirements for each binding and the narrowly scoped HTTP-Artifact fallback.
+====
+
+Inventory the return URLs used by login, logout, federation, and agents before the upgrade. OpenAM 16.1.4 checks these destinations even when the applicable list is empty. Configure and test the legitimate external destinations in each applicable list.
+
+* Set xref:../admin-guide/chap-auth-services.adoc#configure-valid-goto-url-resources[Valid goto URL Resources] in each affected realm for `goto`, `gotoOnFail`, SAML 1.x `TARGET`, and WS-Federation sign-in as a relying party.
+* Verify sign-in and return URLs through the production reverse proxy. If the proxy terminates TLS, configure OpenAM to recognize the public scheme, host, and port as described in the Valid goto URL Resources guidance.
+* Update the hosted xref:../admin-guide/chap-federation.adoc#idp-relay-state-url-list[IdP] and xref:../admin-guide/chap-federation.adoc#sp-relay-state-url-list[SP] RelayState URL lists and the hosted ID-FF provider's Relay State URL List where applicable.
+* Set the WS-Federation entity's `wreplyList`. For sign-in as a relying party, the destination also has to pass the realm's Valid goto URL Resources check.
+
+See the xref:../release-notes/release-16.1.4.adoc[OpenAM 16.1.4 release notes] for these and other compatibility changes.
+
+[#upgrade-other-changes-16-1-4]
+==== Other Changes in 16.1.4
+
+Review xref:chap-about-upgrades.adoc#upgrade-authentication-defaults[authentication defaults, built-in identities, and ssoadm] and the xref:chap-about-upgrades.adoc#upgrade-device-flow-form[custom device authorization pages] before deploying 16.1.4.
+
+[IMPORTANT]
+====
+Beginning with 16.1.4, `debugconfig.properties` is validated more strictly. A file with `org.forgerock.openam.debug.rotation=-1`, or with a trailing space after a rotation value next to a suffix that is empty, too coarse or cannot be parsed, is now rejected as a whole. OpenAM prints "'/debugconfig.properties' isn't valid, the default configuration will be used instead" to the standard error output and falls back to default logging with rotation disabled. Leave a rotation value empty to turn that rotation off. Trailing spaces are also removed from the prefix and the suffix, so they no longer appear in debug log file names. See xref:../admin-guide/chap-monitoring.adoc#log-rotate-debug["Rotating Debug Logs"] in the __Administration Guide__.
 ====
 
 [IMPORTANT]
 ====
-Starting with this release the OAuth 2.0 device flow verifies PKCE, as part of the GHSA-h93p-35jm-rj83 hardening. Previously a `code_challenge` sent to `/oauth2/device/code` was stored with the device code but never checked, so the device code could be redeemed without the `code_verifier`. Now every poll of `/oauth2/access_token` for such a device code must supply the matching `code_verifier`, and `/oauth2/device/code` rejects a `code_challenge` sent with a `code_challenge_method` other than `S256` or `plain`.
+Beginning with 16.1.4, the OAuth 2.0 device flow verifies PKCE, as part of the GHSA-h93p-35jm-rj83 hardening. Previously a `code_challenge` sent to `/oauth2/device/code` was stored with the device code but never checked, so the device code could be redeemed without the `code_verifier`. Now every poll of `/oauth2/access_token` for such a device code must supply the matching `code_verifier`, and `/oauth2/device/code` rejects a `code_challenge` sent with a `code_challenge_method` other than `S256` or `plain`.
 
-Device-flow clients that send no `code_challenge` are not affected: the Code Verifier Parameter Required property does not apply to the device flow. Clients that do send a `code_challenge` but never sent the `code_verifier` must be updated to send it.
+Update device-flow clients that send a challenge to supply the matching verifier. The Code Verifier Parameter Required property applies to authorization code flows.
 ====
 
 [IMPORTANT]
 ====
-Starting with this release the signature on a SAML v1.x assertion or response is verified against the signing certificate configured for its issuer, as part of the GHSA-j56q-q3r3-hg7f hardening. Previously a certificate carried in the `KeyInfo` element was accepted as long as it was present anywhere in OpenAM's keystore, so one trusted asserting party could sign messages on behalf of another.
+Beginning with 16.1.4, the signature on a SAML v1.x assertion or response is verified against the signing certificate configured for its issuer, as part of the GHSA-j56q-q3r3-hg7f hardening. Previously a certificate carried in the `KeyInfo` element was accepted as long as it was present anywhere in OpenAM's keystore, so one trusted asserting party could sign messages on behalf of another.
 
 A trusted asserting party therefore now needs its signing certificate alias configured. Signed assertions and responses from a partner whose alias is blank are rejected, and a certificate in the `KeyInfo` element must be the one of that alias. There is no property to restore the previous behaviour. Before promoting the upgrade, import each asserting party's signing certificate into OpenAM's keystore and enter its alias in the trusted partner configuration. See xref:../admin-guide/chap-saml-1.adoc#saml-1-configure-trusted-ap["To Configure a Trusted Asserting Party"] in the __Administration Guide__.
 ====
 
+[#upgrade-unreleased-16-2-0]
+=== Unreleased 16.2.0 Changes
+
+These changes apply to 16.2.0 development builds from the `master` branch.
+
+==== Account Lockout Fallback
+
 [IMPORTANT]
 ====
-Starting with this release a host name that is a DNS alias of a realm is accepted as a valid host name, as if it had its own `com.sun.identity.server.fqdnMap[<alias>]=<alias>` entry, unless the FQDN map maps it to another host name. The DNS aliases of the top-level realm hold the RDN value of the root suffix (for example `openam`) and the host name of every server and site that was created, so these host names are accepted as well.
+A failed write of an account-lockout counter or counter reset switches the affected identity to counters held in memory on that OpenAM server. Previously, a rejected counter write could prevent subsequent authentication failures from being counted at all. Other identities continue using the configured data store, and a read failure alone does not activate this fallback.
+
+The switch remains in effect until that server restarts, even if the store recovers. Each server has its own in-memory counters and discards them on restart. A successful login resets the in-memory counter while the fallback remains in effect. Positive lockout durations still apply. With a configured duration of zero, the fallback creates a 30-minute lock instead of physically deactivating the account. Once that lock expires, another sequence of failed attempts can lock the account again.
+
+Setting `inetuserstatus` to `Active` or clearing `sunAMAuthInvalidAttemptsData` in the directory does not clear an existing fallback lock. Allow the temporary lock to expire, or restart the affected server to discard its fallback counters. Clear any existing physical account restrictions separately.
+
+Special identities, including `amadmin`, follow the same policy without name-based exemptions. Their rejected counter writes previously prevented lockout. With the current default account-lockout settings, five failed passwords can now lock `amadmin` on the affected server for 30 minutes. Review administrator access and recovery procedures before upgrading.
+
+With writable stores or explicitly configured in-memory counters, a failure threshold of one starts a timed lock on the first failure. A duration multiplier of zero keeps the configured lock duration for later cycles.
+
+Disabling account lockout, or setting its failure count or failure interval to zero, stops enforcing existing temporary locks across authentication index types. The server retains the counters and keeps the same persistence mode. If you re-enable lockout before a temporary lock expires, OpenAM enforces that lock again. Physical account restrictions remain subject to the existing account and profile checks.
+
+Explicitly configured in-memory counters now invoke the account-lockout callback plugins for the login realm when the failure threshold is reached, without resolving the user from the identity store. Previously, this path sent the lockout notification but skipped the plugin callback because no identity had been resolved.
+====
+
+==== Realm DNS Aliases
+
+[IMPORTANT]
+====
+A host name that is a DNS alias of a realm is accepted as a valid host name, as if it had its own `com.sun.identity.server.fqdnMap[<alias>]=<alias>` entry, unless the FQDN map maps it to another host name. The DNS aliases of the top-level realm hold the RDN value of the root suffix (for example `openam`) and the host name of every server and site that was created, so these host names are accepted as well.
 
 OpenAM now removes the host name of a server or site from the DNS aliases of the top-level realm when the server or site is deleted, or when the primary URL of the site changes, unless the URL of another server or site has the same host name. If the host name cannot be removed at that moment, for example because the DNS aliases or the URLs of the other servers and sites cannot be read or updated, the server or site is still deleted or its URL still changed, OpenAM logs an error in the `amSetupServlet` debug log, and the host name stays. Servers and sites deleted before the upgrade, and site URLs changed before it, have left their host names behind. Before promoting the upgrade, review the DNS aliases of every realm and remove the host names that are no longer in use or no longer under your control. If you added a server or site host name to the DNS aliases of the top-level realm yourself, for example the host name of a load balancer, add it again after you delete the last server or site that has it.
 ====
 
+==== Restlet Servlet API
+
 [IMPORTANT]
 ====
-Starting with this release OpenAM no longer ships the Restlet Servlet extension (`org.restlet.ext.servlet`). The `web.xml` file of earlier releases names `org.restlet.ext.servlet.ServerServlet` for the `WebFinger` servlet, which this release no longer has. If your customized `.war` file keeps its own copy of `web.xml`, change it as the WebFinger note below describes.
+OpenAM no longer ships the Restlet Servlet extension (`org.restlet.ext.servlet`). The `web.xml` file of earlier releases names `org.restlet.ext.servlet.ServerServlet` for the `WebFinger` servlet, which this release no longer has. If your customized `.war` file keeps its own copy of `web.xml`, change it as the WebFinger note below describes.
 
 Custom code that calls `org.restlet.ext.servlet.ServletUtils` must call `org.forgerock.openam.rest.jakarta.servlet.ServletUtils` instead, which has the same `getRequest` and `getResponse` methods. Custom code that embeds Restlet in its own servlet through `org.restlet.ext.servlet.ServletAdapter` has no drop-in replacement, because OpenAM ships no counterpart of that class.
 ====
 
-[IMPORTANT]
-====
-Starting with this release WebFinger (`/.well-known/webfinger`) answers OpenID Connect issuer discovery requests again; earlier 16.x releases answered every request with HTTP status 500. It no longer looks up the account named in the `resource` parameter: for any `acct:` or `http(s)` resource it returns the issuer of the deployment, the same for every account. Releases 15.x and earlier answered HTTP status 404 for an account that did not exist, which told an anonymous caller whether the account existed.
-====
+==== WebFinger Discovery
 
 [IMPORTANT]
 ====
-Starting with this release OpenAM serves the XACML policy endpoint (`/xacml/*`) through the `OpenAM` servlet instead of the `ForgeRockRest` servlet. If your customized `.war` file keeps its own copy of `web.xml`, move the `<servlet-mapping>` whose `<url-pattern>` is `/xacml/*` from the `ForgeRockRest` servlet to the `OpenAM` servlet before you deploy. Otherwise every request to `/xacml/*` answers HTTP status 404.
+The WebFinger endpoint (`/.well-known/webfinger`) resumes answering OpenID Connect issuer discovery requests after returning HTTP 500 in earlier 16.x releases. For any supported `acct:` or `http(s)` resource, the endpoint returns the deployment's issuer without looking up the account named in the `resource` parameter. Releases 15.x and earlier returned HTTP 404 for unknown accounts.
+====
+
+==== XACML Endpoint
+
+[IMPORTANT]
+====
+OpenAM serves the XACML policy endpoint (`/xacml/*`) through the `OpenAM` servlet instead of the `ForgeRockRest` servlet. If your customized `.war` file keeps its own copy of `web.xml`, move the `<servlet-mapping>` whose `<url-pattern>` is `/xacml/*` from the `ForgeRockRest` servlet to the `OpenAM` servlet before you deploy. Otherwise every request to `/xacml/*` answers HTTP status 404.
 
 The endpoint otherwise behaves as before, with these changes:
 
@@ -159,9 +287,11 @@ The endpoint otherwise behaves as before, with these changes:
 Custom code that refers to `org.forgerock.openam.rest.service.XACMLServiceEndpointApplication`, `org.forgerock.openam.rest.service.XMLRestStatusService`, `org.forgerock.openam.rest.service.ResourceApiVersionRestlet` or `org.forgerock.openam.entitlement.rest.XacmlRouterProvider` must be changed, because these classes no longer exist. `org.forgerock.openam.xacml.v3.rest.XacmlService` is no longer a Restlet resource. Custom code that injects the Restlet `Router` bound as `@Named("XacmlRouter")`, for example to add routes under `/xacml`, must be changed as well, because that binding no longer exists.
 ====
 
+==== WebFinger Servlet Mapping
+
 [IMPORTANT]
 ====
-Starting with this release OpenAM serves WebFinger (`/.well-known/*`) through the `OpenAM` servlet instead of a servlet of its own. If your customized `.war` file keeps its own copy of `web.xml`, delete the `WebFinger` servlet and its `<servlet-mapping>`, and map the `<url-pattern>` `/.well-known/*` to the `OpenAM` servlet before you deploy. Otherwise the container cannot load the `WebFinger` servlet, because its classes no longer exist.
+OpenAM serves WebFinger (`/.well-known/*`) through the `OpenAM` servlet instead of a servlet of its own. If your customized `.war` file keeps its own copy of `web.xml`, delete the `WebFinger` servlet and its `<servlet-mapping>`, and map the `<url-pattern>` `/.well-known/*` to the `OpenAM` servlet before you deploy. Otherwise the container cannot load the `WebFinger` servlet, because its classes no longer exist.
 
 The endpoint otherwise behaves as before, with these changes:
 
@@ -173,161 +303,44 @@ The endpoint otherwise behaves as before, with these changes:
 Custom code that refers to `org.forgerock.openidconnect.restlet.WebFinger`, `org.forgerock.openidconnect.restlet.OpenIDConnectDiscovery` or `org.forgerock.oauth2.restlet.OAuth2StatusService` must be changed, because these classes no longer exist.
 ====
 
-[IMPORTANT]
-====
-Starting with this release an `http` redirection URI on `localhost`, `127.0.0.1` or `[::1]` that is registered without a port accepts the redirect URI on any port, as described in RFC 8252 section 7.3. Previously it matched only the same URI without a port, that is the default port 80. A loopback redirection URI registered with an explicit port still matches that port only. There is no setting to restore the previous match of a port-less loopback redirection URI. A client registered with a port pattern only, such as `+http://localhost:*/callback+`, must send the `redirect_uri` parameter, as a pattern cannot be used as the redirection destination.
-====
-
-[#upgrade-server]
-.To Upgrade From a Supported OpenAM Version
-====
-Follow these steps to upgrade a site of OpenAM servers.
-
-During the upgrade process, you must take the OpenAM servers in the site out of production, instead redirecting client application traffic elsewhere. This is required because upgrade involves making changes to OpenAM's configuration model. If the upgrade fails, you must be able to roll back before the configuration changes impact other sites.
+==== Loopback Redirect URIs
 
 [IMPORTANT]
-======
-Do __not__ perform an upgrade by deploying the new version and then importing an existing configuration by running the `ssoadm import-svc-config` command. Importing an outdated configuration can result in a corrupted installation.
-======
+====
+An `http` redirection URI on `localhost`, `127.0.0.1` or `[::1]` that is registered without a port accepts the redirect URI on any port, as described in RFC 8252 section 7.3. Previously it matched only the same URI without a port, that is the default port 80. A loopback redirection URI registered with an explicit port still matches that port only. There is no setting to restore the previous match of a port-less loopback redirection URI. A client registered with a port pattern only, such as `+http://localhost:*/callback+`, must send the `redirect_uri` parameter, as a pattern cannot be used as the redirection destination.
+====
 
-. Prepare your customized OpenAM server `.war` file.
+[#upgrade-legacy-follow-ups]
+=== Follow-up Tasks for Legacy Migrations
 
-. *Back up your deployment*.
+Apply these tasks when rehearsing the relevant step of a xref:chap-legacy-servers.adoc#upgrade-legacy[legacy migration].
 
-. Route client application traffic to another site during the upgrade.
+[#after-upgrading-referral-policies]
+==== Replace Referral Policies
 
-. For servers in the site, stop OpenAM, or if necessary stop the container where OpenAM runs.
+When an older release's configuration contains referral policies, the upgrade report warns that the migration must remove them.
 
-. For servers in the site, deploy your customized server .war file.
-+
-When you deploy the new `.war` file, you might have to delete working files left by the old installation. For example, if you deploy on Apache Tomcat, replacing `/path/to/tomcat/webapps/openam.war`, then also recursively delete the `/path/to/tomcat/webapps/openam/` and `/path/to/tomcat/work/Catalina/localhost/openam/` directories before restarting the server.
-
-. For servers in the site, restart OpenAM or the container where it runs.
-
-. To upgrade the data in the configuration store, perform one of the following actions in one of the servers in the site:
-+
-
-* Navigate to the OpenAM URL, for example `\https://openam.example.com:443/openam`, and follow the instructions in the Upgrade Wizard for an interactive upgrade.
-
-* Use the `openam-upgrade-tool-{openam-version}.jar` tool for an unattended upgrade:
-+
-
-.. Install the `openam-upgrade-tool-{openam-version}.jar` tool as described in xref:../install-guide/chap-install-tools.adoc#install-openam-config-tools["To Set Up Configuration Tools"] in the __Installation Guide__. A `sampleupgrade` file will be expanded in the directory where you install the tool.
-
-.. Create a configuration file for the `openam-upgrade-tool-{openam-version}.jar`. You can use the `sampleupgrade` file as a template to create a configuration file, for example `upgrade.properties`.
-+
-An upgrade configuration file may resemble the following:
-+
-
-[source, console]
-----
-$ grep -v "^#" upgrade.properties
-    SERVER_URL=http://openam.example.com:8080
-     DEPLOYMENT_URI=/openam
-     ACCEPT_LICENSES=true
-----
-
-.. Upgrade OpenAM by using the tool with the properties file following this example:
-+
-
-[source, console, subs="attributes"]
-----
-$ java -jar openam-upgrade-tool-{openam-version}.jar --file upgrade.properties
-
-Writing Backup; Done.
-Upgrading Services
-New service iPlanetAMAuthPersistentCookieService; Done.
-New service iPlanetAMAuthOpenIdConnectService; Done.
-New service OAuth2Provider; Done.
-New service iPlanetAMAuthDevicePrintModuleService; Done.
-New service crestPolicyService; Done.
-New service RestSecurity; Done.
-New service MailServer; Done.
-New service dashboardService; Done.
-New service iPlanetAMAuthOATHService; Done.
-Add Organization schema to sunFAMSAML2Configuration; Done.
-Upgrade sunAMAuthHOTPService; Done.
-Upgrade sunAMAuthADService; Done.
-Upgrade sunAMAuthOAuthService; Done.
-Upgrade iPlanetAMAuthCertService; Done.
-Upgrade sunIdentityRepositoryService; Done.
-Upgrade iPlanetAMPasswordResetService; Done.
-Upgrade iPlanetAMSessionService; Done.
-Upgrade iPlanetAMAuthService; Done.
-Upgrade iPlanetAMAuthLDAPService; Done.
-Upgrade sunAMAuthDataStoreService; Done.
-Upgrade AgentService; Done.
-New sub schema sunIdentityRepositoryService; Done.
-New sub schema AgentService; Done.
-Delete service sunFAMLibertyInteractionService; Done.
-Delete service sunFAMLibertySecurityService; Done.
-Creating entitlement application type crestPolicyService; Done.
-Creating entitlement application crestPolicyService; Done.
-Re-enabling Generic LDAPv3 Data Store; Done.
-Upgrading data store embedded; Done.
-Updating Platform Properties; Done.
-Writing Upgrade Log; Done.
-
-Upgrade Complete.
-----
-+
-For additional information about the command-line tool, see the reference documentation for xref:../reference/openam-cli-tools.adoc#man-upgrade-jar[upgrade.jar(1)] in the __Reference__.
-
-.. Restart OpenAM or the container where it runs.
-
-
-
-. (Optional) If you installed OpenAM using an external directory server as the configuration store, add an access control instruction (ACI) to the external directory to give the OpenAM administrative user server-side sorting privileges.
-+
-The ACI should be similar to the following:
-+
-
-[source, ldif]
-----
-aci: (targetcontrol="1.2.840.113556.1.4.473")(version 3.0;acl "Allow
- server-side sorting"; allow (read)(userdn = "ldap:///
- uid=openam,ou=admins,dc=example,dc=com");)
-----
-+
-See xref:../install-guide/chap-prepare-install.adoc#prepare-configuration-store["Preparing an External Configuration Data Store"] in the __Installation Guide__ for more information about using an external directory server as the OpenAM configuration store.
-
-. (Optional) If you want to configure the upgraded system for the Core Token Service (CTS), read xref:../install-guide/chap-cts.adoc#chap-cts["Configuring the Core Token Service"] in the __Installation Guide__.
-
-. Referral policies are not supported in OpenAM {openam-version}. If your OpenAM deployment has referral policies, the following warning message will appear when you upgrade your OpenAM server to OpenAM {openam-version}:
-+
---
 [source]
 ----
 Referrals found that require removing
 ----
 
-OpenAM will take the following actions during the upgrade:
-
-* Removing all referral policies from your OpenAM configuration.
-
-* Copying resource types and policy sets associated with removed referral policies to the realms targeted by the referral policies.
+The migration removes the referral policies and copies their resource types and policy sets to the target realms.
 
 For example, suppose you had an OpenAM 12 deployment with a referral policy in realm A, and that referral policy referred to policies in realm B. During an upgrade, OpenAM would delete the referral policy in realm A and copy all the resource types and policy sets associated with the deleted referral policy from realm A to realm B.
 
-After upgrading to OpenAM {openam-version}, you are responsible for reconfiguring OpenAM so that policy evaluation that previously depended upon referrals continues to function correctly. You might need to take one or both of the following actions:
+Reconfigure policy evaluation that depended on referrals. The following actions may apply.
 
-* Reconfiguring your policy agent with the realm and policy set footnote:d0e728[The agent configuration UI refers to a policy set as an application.] that contain policies to be evaluated when that agent requests a policy decision from OpenAM. Previously, you might have configured the agent to use a realm that contained a referral policy. Because referral policies are not supported in OpenAM {openam-version}, this is no longer possible.
+* Reconfigure each affected agent to use the target realm and policy set footnote:d0e728[The agent configuration UI refers to a policy set as an application.] that now hold its policies.
 
-For more information about configuring an agent with a realm and policy set, see xref:../admin-guide/chap-realms.adoc#realms-agents["Working With Realms and Policy Agents"] in the __Administration Guide__.
-
-* Copying or moving a policy or a group of policies. OpenAM {openam-version} has new REST API endpoints that let you copy and move policies. This functionality might be helpful when migrating away from policy deployments that use referral policies. For more information about the REST endpoints that let you copy and move policies, see xref:../dev-guide/chap-client-dev.adoc#rest-api-authz-policies-copy-move-policies["Copying and Moving Policies"] in the __Developer's Guide__.
---
-
-. Validate that the service is performing as expected.
-
-. Allow client application traffic to flow to the upgraded site.
-
-====
++
+See xref:../admin-guide/chap-realms.adoc#realms-agents[Working With Realms and Policy Agents].
+* Copy or move policies where needed. See xref:../dev-guide/chap-client-dev.adoc#rest-api-authz-policies-copy-move-policies[Copying and Moving Policies].
 
 [#after-upgrading-from-11]
-.To Complete Upgrade from OpenAM 11.0.x
-====
-After upgrade from OpenAM 11.0.x, all OAuth 2.0 client configurations inherit the default response types:
+==== Complete the Migration from OpenAM 11.0.x
+
+When a legacy migration upgrades OAuth 2.0 clients from the OpenAM 11.0.x configuration format, the clients inherit the following default response types.
 --
 * `code`
 
@@ -352,12 +365,10 @@ As part of a fix for OpenID Connect ID Token signing, the password storage forma
 +
 You can update the client password by using either OpenAM console or the `ssoadm update-agent` command with the `--attributevalues` option to update the value of the `userpassword` attribute.
 
-====
-
 [#after-upgrading-from-13]
-.To Complete Upgrade from OpenAM 13.0.x
-====
-If you configured one or more JDBC audit event handlers in OpenAM 13.0.x, make the following changes to the audit tables' schema:
+==== Complete the Migration from OpenAM 13.0.x
+
+If you configured one or more JDBC audit event handlers in OpenAM 13.0.x, update the audit tables' schema.
 
 . Run the following command on Oracle databases that support OpenAM audit event handlers:
 +
@@ -385,6 +396,4 @@ The commands change the name of the `configobjectid` column in the `am_auditconf
 If the `am_auditconfig` table has a column named `configobjectid`, change that column's name to `objectid`.
 +
 If the `am_auditaccess` table does not have a column named `response_detail`, add that column to the table's schema.
-
-====
 

@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -23,25 +23,23 @@
 [#chap-legacy-servers]
 == Migrating Legacy Servers
 
-Rather than upgrade legacy servers (running OpenSSO or Sun Access Manager, or an OpenAM version that is no longer supported), you instead manually migrate from your existing deployment to a new deployment.
+Use a parallel deployment and migrate manually when you cannot verify an upgrade path from your current release to the target release. This may apply to OpenSSO, Sun Access Manager, and older OpenAM deployments. See xref:chap-about-upgrades.adoc#sec-supported-upgrades[Upgrade Paths].
 
 For complex legacy deployments, Open Identity Platform Community link:https://github.com/OpenIdentityPlatform/.github/wiki/Approved-Vendor-List[Approved Vendors, window=\_blank] can assist you in the migration process.
 
 [#upgrade-legacy]
-.To Upgrade A Legacy Deployment
+.To Migrate a Legacy Deployment
 ====
 
-. Prepare your customized OpenAM server .war file.
+. Back up the existing deployment. Inventory realms, authentication modules and chains, policies, OAuth 2.0 and OpenID Connect clients, agent profiles, and federation metadata and partners. Record the keystores, key aliases, trust settings, identity data, and any custom code or configuration each integration uses.
 
-. Prepare a new deployment, installing servers from the new, customized .war file, starting with the instructions in xref:../install-guide/chap-install-core.adoc#chap-install-core["Installing OpenAM Core Services"] in the __Installation Guide__.
+. Install the target release in a separate deployment as described in xref:../install-guide/chap-install-core.adoc[Installing OpenAM Core Services]. Give it separate endpoints, configuration and session stores, and cookie settings that prevent interference with the existing deployment. Plan how to migrate identity data or connect to a compatible data store without affecting the legacy deployment during testing.
 
-. After installation, configure the new servers in the same way as the old servers, adapting as necessary.
-+
-You can use the `ssoadm do-batch` command to apply multiple changes with one command.
+. Recreate the settings and integrations you need using the target release's configuration tools. For individual objects, import only data whose format and semantics you have verified against the target release. Leave the new service configuration intact and apply the required settings individually. Review URL changes with application owners and federation partners, and migrate the keys and trust material required by the integrations you retain.
 
-. Validate that the new service is performing as expected.
+. Before switching traffic, test sign-in, logout, policy decisions, agent connectivity, and the OAuth 2.0, OpenID Connect, and federation flows you use. Verify the behavior of existing sessions and tokens during the transition and plan for users to sign in again if needed.
 
-. Redirect client application traffic from the old deployment to the new deployment.
+. Switch client application traffic during a planned cutover and monitor the new deployment. Keep the legacy deployment and its routing configuration available until the rollback window closes. Plan how to reconcile changes made during cutover if you need to route traffic back to the legacy deployment.
 
 ====
 

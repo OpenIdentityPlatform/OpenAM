@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2025 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -23,155 +23,98 @@
 [#chap-upgrade-components]
 == Upgrading OpenAM Components
 
-This chapter is concerned with upgrades for policy agents, OpenAM tools, and services.
+Check agent compatibility and update administrative tools as part of the server upgrade. Review the service settings below if you plan to adopt ECDSA or migrate a legacy user self-service keystore.
 
-* xref:#upgrade-web-policy-agents["To Upgrade Web Policy Agents"]
+* xref:#upgrade-web-policy-agents[Upgrading Web Policy Agents]
 
-* xref:#upgrade-java-ee-policy-agents["To Upgrade Java EE Policy Agents"]
+* xref:#upgrade-java-ee-policy-agents[Upgrading Java Policy Agents]
 
-* xref:#upgrade-tools["To Upgrade OpenAM Tools"]
+* xref:#upgrade-tools[Upgrading OpenAM Tools]
 
-* xref:#upgrade-elliptic-curve-algorithms[" To Upgrade to Elliptical Curve Signature Algorithms for Stateless Sessions and OpenID Connect "]
+* xref:#upgrade-elliptic-curve-algorithms[Adopting ECDSA for Stateless Sessions and OpenID Connect]
 
-* xref:#upgrade-user-services["To Upgrade User Self Services"]
+* xref:#upgrade-user-services[Migrating a User Self-Service Keystore]
 
 
 [#upgrade-web-policy-agents]
-.To Upgrade Web Policy Agents
+.Upgrading Web Policy Agents
 ====
 
-. Back up the policy agent installation and configuration directories.
-+
-Also back up the configuration if it is stored centrally in OpenAM.
+. Verify that the selected agent version is compatible with the target OpenAM release, web server version, operating system, and architecture. If both OpenAM releases will serve traffic during the upgrade, verify every agent and server combination that will handle requests. See the https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases[web policy agent releases] and https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents[agent project documentation].
 
-. Redirect client traffic away from the protected application.
+. Back up the agent installation, local agent configuration, web server configuration, and any agent profile or group settings stored in OpenAM.
 
-. Stop the web server where the policy agent is installed.
+. Stage the new agent on a test web server. Follow the selected release's upgrade procedure if it covers the existing installation. Otherwise, install the new agent and reapply compatible settings.
 
-. Remove the old policy agent as described in the xref:../web-users-guide/index.adoc[OpenAM Web Policy Agent User's Guide, window=\_blank].
-+
-If the uninstallation process has changed, refer to the version of the __Web Policy Agent Installation Guide__ that corresponds to your web policy agent.
+. Test sign-in, policy decisions for allowed and denied requests, logout, and session or policy notifications where configured.
 
-. Install the new policy agent using the existing configuration.
-
-. Start the web server where the policy agent is installed.
-+
-For new features, the policy agent uses the default configuration until you make changes.
-
-. Validate that the policy agent is performing as expected.
-
-. Allow client traffic to flow to the protected application.
+. Take each web server instance out of rotation before updating its agent. Verify the instance with the target OpenAM deployment before returning it to service.
 
 ====
 
 [#upgrade-java-ee-policy-agents]
-.To Upgrade Java EE Policy Agents
+.Upgrading Java Policy Agents
 ====
 
-. Back up the policy agent installation and configuration directories.
-+
-Also back up the configuration if it is stored centrally in OpenAM.
+. Verify that the selected agent version is compatible with the target OpenAM release and the protected application's Java runtime, container version, and servlet API (`javax.servlet` or `jakarta.servlet`). If both OpenAM releases will serve traffic during the upgrade, verify every agent and server combination that will handle requests. See the https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents/releases[Java policy agent releases] and https://github.com/OpenIdentityPlatform/OpenAM-JEE-Agents[agent project documentation].
 
-. Redirect client traffic away from the protected application.
+. Back up the agent installation, local agent configuration, affected application and container configuration, and any agent profile or group settings stored in OpenAM.
 
-. Uninstall the old policy agent.
+. Stage the new agent in a test container. Follow the selected release's upgrade procedure if it covers the existing installation. Otherwise, install the new agent and reapply compatible settings, including the agent filter configuration for each protected application.
 
-. Install the new policy agent.
-+
-For new features, the policy agent uses the default configuration until you make changes.
+. Test sign-in, policy decisions for allowed and denied requests, logout, and notifications where configured.
 
-. Validate that the policy agent is performing as expected.
-
-. Allow client traffic to flow to the protected application.
+. Redirect client traffic before updating each production container. Verify the protected applications with the target OpenAM deployment before restoring traffic.
 
 ====
 
 [#upgrade-tools]
-.To Upgrade OpenAM Tools
+.Upgrading OpenAM Tools
 ====
-Since OpenAM 10.1, the session tools are no longer needed. Upgrading other tools consists of installing new tools and customizing tools scripts as necessary.
 
-. Install new versions of the tools.
+. Install and configure the xref:../install-guide/chap-install-tools.adoc[OpenAM tools] from the target server release in a separate directory.
 
-. Apply any customizations you made to the scripts, referring to the old tools installation as necessary.
+. Reapply the environment settings, script customizations, and site URL mapping that your deployment needs. Configure the tools' Java truststore to trust the certificates used by the OpenAM endpoints and any LDAPS connections required by the tools.
 
-. Once the new tools are working, you can delete the old tools.
+. Run a read-only authenticated command with the new `ssoadm`, such as `ssoadm list-servers -u amadmin -f /path/to/password-file`, and confirm that it lists the expected servers. Verify the scripts and automation that use the tools before switching to the new installation.
 
 ====
 
 [#upgrade-elliptic-curve-algorithms]
-.To Upgrade to Elliptical Curve Signature Algorithms for Stateless Sessions and OpenID Connect
+.Adopting ECDSA for Stateless Sessions and OpenID Connect
 ====
-OpenAM supports Elliptic Curve Digital Signature Algorithms (ECDSA) for stateless sessions and OpenID Connect in OpenAM 13.5 or later.
 
-. Generate the public and private keys to use with the ECDSA algorithms using the standard curves parameters using `keytool` and configure stateless session to use ECDSA algorithms as shown in xref:../admin-guide/chap-session-state.adoc#session-state-configure-ecdsa-signing["Configuring Elliptic Curve Digital Signature Algorithms"] in the __Administration Guide__.
+Use this procedure if you plan to switch to signing with the Elliptic Curve Digital Signature Algorithm (ECDSA). Verify consumer support and back up the current keystores and configuration. Preserve keys and aliases that other integrations still use. Test how the change affects outstanding sessions and tokens, and plan for reauthentication or token reissuance if needed.
 
-. Manually add the ECDSA algorithms to OpenAM's OAuth2 provider as follows:
+. Create a key pair for each algorithm you plan to use (`ES256` with P-256, `ES384` with P-384, or `ES512` with P-521). Use the key generation procedure in xref:../admin-guide/chap-session-state.adoc#session-state-configure-ecdsa-signing[Configuring Elliptic Curve Digital Signature Algorithms]. On each OpenAM server that issues or verifies the sessions or tokens, configure the same key pairs under the same aliases.
+
+. To change stateless session signing, follow the session configuration steps in that procedure. Test newly issued sessions across the site's servers.
+
+. To change OpenID Connect ID token signing, configure the provider and client in their realm.
 +
-
-.. On the OpenAM console, navigate to Configure > Global Services > OAuth2 Provider, and scroll down to ID Token Signing Algorithms supported.
-
-.. In the New Value field, select `ES256`. Repeat the step to add `ES384` and `ES512`, respectively.
-
-.. For Token Signing Algorithm, select an ECDSA algorithm, such as ES256.
-
-.. In the Token Signing RSA/ECDSA public/private key pair field, enter the alias of the ECDSA signing key in the keystore.
-
-.. Click Save.
-
-
-. Update the OpenID Connect Client as follows:
+.. Under Services > OAuth2 Provider, add the algorithms you plan to offer to *ID Token Signing Algorithms supported*. In *Token Signing ECDSA public/private key pair alias*, map each algorithm to a key alias using the `algorithm|alias` format, such as `ES256|es256-signing`. The alias must refer to a key pair in the keystore configured by `com.sun.identity.saml.xmlsig.keystore`. Save the provider settings.
 +
+The provider's *OAuth2 Token Signing Algorithm* setting controls stateless OAuth 2.0 token signing. Change it only if you also plan to change how those tokens are signed.
 
-.. On the Top Level Realm, click Agents, and then click OAuth 2.0/OpenID Connect Client.
+.. Under Agents > OAuth 2.0/OpenID Connect Client, select the client profile and set *ID Token Signing Algorithm* to the chosen ECDSA algorithm. Save the profile.
 
-.. In the Agent box, select an existing OIDC client.
-
-.. In the ID Token Signed Response Algorithm field, enter the ECDSA algorithm. For example, `ES256`, `ES384`, or `ES512`.
-
-.. Click Save.
-
+.. Check that the realm's OpenID Connect discovery document advertises the algorithm and that its `jwks_uri` exposes the expected public key. Verify that the client can validate a newly issued ID token. See xref:../admin-guide/chap-oauth2.adoc#configure-digital-signing[To Configure Digital Signatures].
 
 ====
 
 [#upgrade-user-services]
-.To Upgrade User Self Services
+.Migrating a User Self-Service Keystore
 ====
-OpenAM 13.5 has an improved key management system that allows the user self-service feature to successfully operate in a multi-instance server deployment behind a load balancer. This key management system requires a JCEKS keystore that supports asymmetric and symmetric keys.
-
-To help you decide whether to enable a JCEKS keystore after upgrading to OpenAM 13.5, see the following table:
 
 [#self-services_upgrade]
-.User Self Service Feature Upgrade
-[cols="50%,50%"]
-|===
-|Upgrading from: |Enabling JCEKS required? 
+Use these steps if you are migrating a legacy keystore for REST-based user self-service. User self-service uses a JCEKS keystore with a key pair for encryption and a secret key for signing. Where the service already works with a suitable keystore, preserve its keys and aliases during the upgrade.
 
-a|Versions prior to OpenAM 13.0
-a|No
+. Back up the existing keystore and settings. Prepare a JCEKS keystore containing the required production keys. Preserve the other keys, certificates, and aliases used by the deployment before switching a shared keystore. Account for pending self-service links if the keys must change.
 
-a|OpenAM 13.0 with the REST-based user self-service feature disabled
-a|No
+. Under Configure > Server Defaults > Security > Key Store, set *Keystore File* to the prepared file and *Keystore Type* to `JCEKS`. Update any overrides under Deployment > Servers > _Server Name_ > Security > Key Store. Configure the same signing and encryption keys under the same aliases on every OpenAM server handling self-service requests for the deployment.
 
-a|OpenAM 13.0 with the legacy user self-service feature enabled
-a|No
+. Restart each affected server and configure the *Encryption Key Pair Alias* and *Signing Secret Key Alias* as described in xref:../admin-guide/chap-usr-selfservices.adoc#configuring-self-service-keys[To Configure Self Service Key Aliases].
 
-a|OpenAM 13.0 with the REST-based user self-service feature enabled
-a|__Yes__
-|===
-The following steps show how to set up the JCEKS keystore for user self-service:
-
-. In the OpenAM console, navigate to Configure > Server Defaults > Security > Key Store.
-
-. Change the Keystore File property to `%BASE_DIR%/%SERVER_URI%/keystore.jceks`.
-
-. Change the Keystore Type property to `JCEKS`.
-+
-These properties can also be modified on a per-server basis as required by navigating to Deployment > Servers > __Server Name__ > Security > Key Store.
-+
-For more information about inherited properties, see xref:../reference/chap-config-ref.adoc#servers-configuration["Configuring Servers"] in the __Reference__.
-
-. Restart the OpenAM server.
+. Before restoring traffic, test the self-service flows you use. In a load-balanced site, verify that a flow started on one server can complete on another.
 
 ====
-

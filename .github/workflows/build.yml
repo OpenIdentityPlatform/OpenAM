@@ -61,6 +61,10 @@ jobs:
       env:
         MAVEN_OPTS: ${{ matrix.os == 'ubuntu-latest' && '-Xmx6g' || '-Xmx4g' }} -Dhttps.protocols=TLSv1.2 -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Dmaven.wagon.http.retryHandler.count=10
       run: mvn --batch-mode --errors --update-snapshots verify --file pom.xml ${{ steps.maven-profile-flag.outputs.MAVEN_PROFILE_FLAG }}
+    - name: Test the packaged upgrade CLI
+      if: matrix.os == 'ubuntu-latest' && matrix.java == '11'
+      working-directory: openam-distribution/openam-distribution-ssoconfiguratortools
+      run: python3 src/test/python/check-upgrade-tool.py target/SSOConfiguratorTools-*.zip
     - name: Check How-To documentation links
       if: matrix.os == 'ubuntu-latest' && matrix.java == '11'
       run: |

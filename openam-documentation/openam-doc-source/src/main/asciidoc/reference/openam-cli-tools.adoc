@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -563,14 +563,21 @@ $ java \
 
 '''
 [#man-upgrade-jar]
-=== upgrade.jar — upgrade OpenAM using a configuration file
+=== openam-upgrade-tool — upgrade OpenAM using a configuration file
 
 ==== Synopsis
-`upgrade.jar` \{options\}
+
+For builds with the launcher fix, use this syntax.
+
+`java -jar openam-upgrade-tool-<version>.jar --file <configuration-file> [--acceptLicense]`
 
 [#d981e1307]
 ==== Description
-This executable jar file, openam-upgrade-tool-{openam-version}.jar, lets you perform a silent upgrade on a deployed OpenAM server by applying settings from a configuration file or using arguments. This capability allows you to include the `upgrade.jar` from a command line or in an upgrade script.
+Use the tool from the target release's `SSOConfiguratorTools` ZIP. Unpack the entire archive, including `lib/`, and run the tool against a running OpenAM instance that is ready for configuration upgrade. See the xref:../upgrade-guide/chap-upgrade-servers.adoc#upgrade-server[server upgrade procedure].
+
+The tool requires a properties file. Builds with the CLI fixes return exit status zero only when the server confirms success. Review the server's upgrade report and restart and validate the upgraded deployment before restoring traffic.
+
+The published 16.1.4 archive requires the xref:../upgrade-guide/chap-upgrade-servers.adoc#upgrade-server-cli[classpath workaround and verification steps]. Its CLI can return exit status zero after a failed upgrade.
 
 [#d981e1315]
 ==== Options
@@ -578,7 +585,7 @@ The following options are supported.
 --
 
 `-f | --file configuration-file`::
-Upgrade a deployed OpenAM web application archive using the specified configuration file. Upgrade configuration files are described in the sections below. Also, you can specify the system properties on the command line, instead of using the configuration file. See Example 2 below.
+Upgrade a deployed OpenAM server using the specified configuration file. The legacy alias `--f` also works.
 
 `--acceptLicense`::
 Auto-accept the software license agreement and suppress the display of the licence acceptance screen to the user. If the configuration file contains the `ACCEPT_LICENSES` property, it will have precedence over the command-line option.
@@ -595,7 +602,7 @@ Base your configuration on the `sampleupgrade` file delivered with OpenAM, and u
 --
 
 SERVER_URL::
-URL to the web container where OpenAM runs, such as `\http://openam.example.com:8080`.
+Scheme, host, and port for the upgrade, such as `\https://openam-node1.example.com:8443`. Use a management endpoint that routes requests only to the selected node.
 
 DEPLOYMENT_URI::
 URI where OpenAM is deployed on the web container, such as `/openam`.
@@ -607,48 +614,23 @@ Optional boolean property that can be set to always auto-accept the software lic
 
 [#d981e1394]
 ==== Examples
-The following example shows a configuration file and the commands to upgrade a server using the `upgrade.jar`. The configuration file is saved as `/tmp/upgrade.txt`.
+Save this example as `upgrade.properties` and adapt the URL to your deployment.
 
 [source]
 ----
-SERVER_URL=http://openam.example.com:8080
+SERVER_URL=https://openam-node1.example.com:8443
 DEPLOYMENT_URI=/openam
 ACCEPT_LICENSES=true
 ----
 
-[source, subs="attributes"]
-----
-$JAVA_HOME/bin/java -jar ~/openam/tools/openam-upgrade-tool-{openam-version}.jar \
- -f /tmp/upgrade.txt
-----
-The following example shows how to specify system properties with the `upgrade.jar`.
+Run the tool from the unpacked directory.
 
-[source]
+[source, console]
 ----
-SERVER_URL=http://openam.example.com:8080
-DEPLOYMENT_URI=/openam
-ACCEPT_LICENSES=true
+$JAVA_HOME/bin/java -jar openam-upgrade-tool-<version>.jar --file upgrade.properties
 ----
 
-[source, subs="attributes"]
-----
-$JAVA_HOME/bin/java -jar ~/openam/tools/openam-upgrade-tool-{openam-version}.jar \
- -DSERVER_URL=http://openam.example.com:8080 -DDEPLOYMENT_URI=/openam
-----
-The following example shows the use of the `--acceptLicense` option with the `upgrade.jar`.
-
-[source]
-----
-SERVER_URL=http://openam.example.com:8080
-DEPLOYMENT_URI=/openam
-----
-
-[source, subs="attributes"]
-----
-$JAVA_HOME/bin/java -jar ~/openam/tools/openam-upgrade-tool-{openam-version}.jar \
- -DSERVER_URL=http://openam.example.com:8080 -DDEPLOYMENT_URI=/openam \
- --acceptLicense
-----
+Replace `<version>` with the version of the unpacked tools. To accept the license on the command line, omit `ACCEPT_LICENSES` from the file and add `--acceptLicense` to this command.
 
 '''
 [#ssoadm-1]
