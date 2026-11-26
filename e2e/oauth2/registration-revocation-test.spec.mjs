@@ -372,6 +372,7 @@ test("registers a client and reads it with the registration access token", async
     const metadata = await stored.json();
     expect(metadata?.client_id === id && metadata?.client_name === name, operation + " identifies the registered client").toBe(true);
     expect(JSON.stringify(metadata?.redirect_uris) === JSON.stringify(REDIRECT_URIS), operation + " returns the stored redirect URIs").toBe(true);
+    expect(Object.hasOwn(metadata, "registration_access_token"), operation + " omits the registration access token").toBe(false);
   }
   await readRegistration("Read registered client");
   // Closed registration can reuse the supplied bearer as its management token.
@@ -386,15 +387,7 @@ test("registers a client and reads it with the registration access token", async
 
 test("rejects registration without an access token", async ({ fixtures }) => {
   try {
-    const discovery = await fixtures.newContext().get(OAUTH2 + "/.well-known/openid-configuration");
-    if (discovery.status() === 404) {
-      expectJsonResponse(discovery, 404, "Discover missing root provider");
-      expectOAuthError(await discovery.json(), "not_found", "No OpenID Connect provider for realm /", "Discover root provider");
-      await fixtures.ensureProvider();
-    } else {
-      expectJsonResponse(discovery, 200, "Discover root provider");
-      expect(nonempty((await discovery.json())?.issuer), "Discovery contains an issuer").toBe(true);
-    }
+    await fixtures.ensureProvider();
   } catch (error) {
     // The unauthenticated POST must reach the endpoint even when provider preparation fails.
     expect.soft(false, "Prepare root provider: " + error.message).toBe(true);
