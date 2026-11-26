@@ -35,7 +35,7 @@ The `XUI.enable` override applies to both the end-user interface and the adminis
 [[how-to-disable-xui-by-default-for-one-instance-in-cluster]]
 ==== For one instance in cluster
 
-Go to Deployment > Servers > __Server Name__ > Advanced and add the property.
+Go to Configuration > Servers and Sites, select the server by name, and add the property under Advanced.
 
 ....
 XUI.enable=false
@@ -51,7 +51,7 @@ You can also set the Java system property for the node's JVM.
 [[how-to-disable-xui-by-default-for-all-instances-in-cluster]]
 ==== For all instances in cluster
 
-Go to Configure > Server Defaults > Advanced and add the property. Check for per-server overrides.
+Go to Configuration > Servers and Sites > Default Server Settings > Advanced and add the property. Check for per-server overrides.
 
 ....
 XUI.enable=false

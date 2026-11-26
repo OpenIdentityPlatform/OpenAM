@@ -208,7 +208,7 @@ After you have completed one of these two procedures, continue by configuring yo
 ====
 Example commands throughout this section use default values for user IDs and port numbers. When running similar commands, be sure to use appropriate values for your directory server.
 
-The LDAP examples use LDAPS on port `1636` and a trust store containing the issuing CA. Replace the example secret file paths with operator-only files. Use `--startTLS` with the plain LDAP listener for directory utilities that explicitly use StartTLS. The OpenAM installer's SSL option uses the LDAPS listener.
+The LDAP examples use LDAPS on port `1636` and a trust store containing the issuing CA. Replace the example secret file paths with operator-only files. To use StartTLS on the LDAP listener, pass `--useStartTLS` to the OpenDJ client tools. The OpenAM installer's SSL option uses the LDAPS listener.
 ====
 
 [#prepare-idrepo-dynamic-schema]

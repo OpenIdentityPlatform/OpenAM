@@ -88,7 +88,7 @@ Use the *Top Level Realm* in the OpenAM console for the following configuration.
 
 anchor:create-web-policy-agent-profile[]
 . Go to *Subjects > User* and create two active users, `quickstart-user` for the browser and `quickstart-pep` for OpenIG. Use a different generated password for each user.
-. Under *Identities > Groups*, create `quickstart-policy-evaluators`. On the group page, add `quickstart-pep` as its only member.
+. Under *Subjects > Group*, create `quickstart-policy-evaluators`. On the group page, add `quickstart-pep` as its only member.
 . Under *Privileges*, select the group and grant only *REST calls for policy evaluation*. This lets OpenIG request decisions for the signed-in user's session. Save the privilege changes.
 
 [#configure-cookie-domain]

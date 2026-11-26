@@ -12,9 +12,11 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2014-2015 ForgeRock AS.
+ * Portions Copyright 2026 3A Systems, LLC.
  */
 package org.forgerock.openam.upgrade.steps;
 
+import static com.sun.identity.shared.Constants.LDAP_SERVER_TLS_VERSION;
 import static org.assertj.core.api.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import static org.mockito.Mockito.*;
@@ -59,6 +61,22 @@ public class UpgradeServerDefaultsStepTest {
                 getExistingDefaults(), asSet("a"));
         assertThat(modifiedDefaults).isNotNull().hasSize(1);
         assertThat(modifiedDefaults.get("a")).isNotNull().isEqualTo("b");
+    }
+
+    @Test
+    public void shouldUpgradeLegacyLdapProtocolDefault() {
+        Map<String, String> modifiedDefaults = upgradeStep.calculateModifiedServerDefaults(
+                Map.of(LDAP_SERVER_TLS_VERSION, "TLS"), Map.of(LDAP_SERVER_TLS_VERSION, "TLSv1"), Set.of());
+
+        assertThat(modifiedDefaults).containsOnly(entry(LDAP_SERVER_TLS_VERSION, "TLS"));
+    }
+
+    @Test
+    public void shouldPreserveCustomLdapProtocolDefault() {
+        Map<String, String> modifiedDefaults = upgradeStep.calculateModifiedServerDefaults(
+                Map.of(LDAP_SERVER_TLS_VERSION, "TLS"), Map.of(LDAP_SERVER_TLS_VERSION, "TLSv1.3"), Set.of());
+
+        assertThat(modifiedDefaults).isEmpty();
     }
 
     @Test

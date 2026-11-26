@@ -120,6 +120,10 @@ OpenAM authentication can use the client IP address for decisions such as adapti
 
 Set `com.sun.identity.authentication.client.ipAddressHeader` to `X-Forwarded-For` under Deployment > Servers > __Server Name__ > Advanced on each OpenAM server that receives the header. Verify through the public URL that OpenAM receives the intended address even when the client sends its own header. See xref:../how-to/how-to-restrict-xui-access-with-a-reverse-proxy.adoc#how-to-restrict-xui-access-with-a-reverse-proxy[Restrict XUI Access with a Reverse Proxy].
 
+A node can forward a continuing classic login to the node that started authentication. On each node that can forward these requests, append the header set by the trusted proxy to `openam.retained.http.request.headers` in Advanced. For example, append it to the default list as `X-DSAMEVersion,X-Forwarded-For`. Preserve any other headers already in the list. Restart the forwarding nodes to load the new list.
+
+In a test deployment, temporarily enable message-level debug logging on the original node. Start a multistep classic login that evaluates the client IP on that node and route a continuation request through another node while the original node is healthy. Confirm that the second node forwards the request and that the `amComm` log on the original node shows the verified client IP. Restore the previous debug level after the check.
+
 [#handle-multiple-cookie-domains-wildfly]
 === Handling Multiple Cookie Domains When Using Wildfly
 

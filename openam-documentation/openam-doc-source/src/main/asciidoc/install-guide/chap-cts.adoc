@@ -145,6 +145,8 @@ uid: openam_cts
 cn: OpenAM CTS
 sn: CTS
 userPassword: REPLACE_WITH_SERVICE_PASSWORD
+ds-rlim-size-limit: 5000
+ds-rlim-lookthrough-limit: 0
 
 dn: ou=famrecords,ou=openam-session,ou=tokens,dc=cts,dc=example,dc=com
 changetype: modify
@@ -181,7 +183,9 @@ CTS_PASSWORD_FILE=/secure/path/cts-service-password
   --baseDN "$CTS_ROOT_DN" --searchScope base '(objectClass=*)' ou
 ----
 +
-The search returns the entry with `ou: famrecords`. Remove the temporary LDIF file containing the password after provisioning. Tune resource limits for this account only if you observe limit errors during load testing. See link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-resource-limits[Setting Resource Limits].
+The search returns the entry with `ou: famrecords`. Remove the temporary LDIF file containing the password after provisioning.
++
+The CTS reaper requests pages of 1000 entries. Set the account's size limit above 1000 so OpenDJ honors the paged results control. The example disables the lookthrough limit for this account on the dedicated CTS directory so the reaper can evaluate large sets of candidates. If you set a finite limit, size it for peak token volume and validate it under load. See link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-resource-limits[Setting Resource Limits].
 
 ====
 
@@ -280,6 +284,7 @@ Drain all participating OpenAM servers from production traffic before changing t
 |Disabled for this primary/failover example
 |===
 
+. For OpenAM 16.1.4, set `org.forgerock.openam.ldap.secure.protocol.version` to `TLS` in the Advanced properties of each OpenAM node. The `TLS` setting uses the protocols enabled by the JVM. Make sure the LDAPS listener on each CTS replica supports one of those protocols.
 . Save the changes and check for per-server overrides. Restart all participating OpenAM servers to initialize their CTS connection pools with the saved settings. Check their logs for LDAPS connection or bind errors.
 +
 anchor:cts-global-attribute-settings[]
@@ -322,6 +327,46 @@ For example, schedule a daily online backup of the `userRoot` backend at 02:00 i
   --backendID "$CTS_BACKEND" --backupDirectory /path/to/opendj/bak/cts \
   --recurringTask '00 02 * * *'
 ----
+
+[#cts-recover-expired-token-backlog]
+=== Recovering From an Expired Token Backlog
+
+After an interruption, check the OpenAM reaper logs and the OpenDJ access logs for a rejected expiration search. In OpenDJ 5.2.0, a range search on `coreTokenExpirationDate` can exceed the index limit when more than 100,000 tokens have expired. If the directory cannot narrow the search using the search scope, OpenDJ treats it as unindexed. LDAP paging limits the entries returned per page after OpenDJ evaluates the search. Verify the CTS indexes before using the recovery procedure.
+
+Use the following procedure in a maintenance window on a dedicated CTS directory when an expired token backlog causes OpenDJ to reject the reaper's unindexed search.
+
+. On a writable replica, set `DJ_HOST` to that replica and use the LDAPS settings from xref:#cts-opendj-preparation[Prepare the OpenDJ Directory Service for CTS]. Temporarily grant `unindexed-search` to the CTS service account using a directory administrator.
++
+[source,bash]
+----
+CTS_BIND_DN="uid=openam_cts,ou=admins,$CTS_BASE_DN"
+./bin/ldapmodify --hostname "$DJ_HOST" --port 1636 --useSSL \
+  --trustStorePath "$DJ_TRUSTSTORE" \
+  --bindDN 'cn=Directory Manager' --bindPasswordFile "$DJ_ADMIN_PASSWORD_FILE" <<EOF
+dn: $CTS_BIND_DN
+changetype: modify
+add: ds-privilege-name
+ds-privilege-name: unindexed-search
+EOF
+----
+
+. Confirm the account change has replicated. Let the scheduled reaper continue using the CTS account. Check that the searches succeed, the count of expired entries falls, and directory load stays within operating limits.
+
+. Once the backlog has cleared, remove the temporary privilege and confirm the change has replicated.
++
+[source,bash]
+----
+./bin/ldapmodify --hostname "$DJ_HOST" --port 1636 --useSSL \
+  --trustStorePath "$DJ_TRUSTSTORE" \
+  --bindDN 'cn=Directory Manager' --bindPasswordFile "$DJ_ADMIN_PASSWORD_FILE" <<EOF
+dn: $CTS_BIND_DN
+changetype: modify
+delete: ds-privilege-name
+ds-privilege-name: unindexed-search
+EOF
+----
+
+. Verify that the next scheduled cleanup runs under the regular CTS account and removes newly expired tokens. In a test deployment, rehearse the procedure with an expired token backlog large enough to make the expiration search unindexed. Confirm that unexpired tokens remain available throughout the drill.
 
 [#cts-token-managing]
 === Managing CTS Tokens
