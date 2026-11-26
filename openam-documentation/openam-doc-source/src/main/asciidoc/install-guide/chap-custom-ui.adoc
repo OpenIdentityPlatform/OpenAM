@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -21,29 +21,22 @@
 :openam-version: x.y.z
 
 
+ifndef::env-site[]
 [#chap-custom-ui]
+endif::[]
 == Customizing the OpenAM End User Pages
+
+ifdef::env-site[]
+anchor:chap-custom-ui[]
+endif::[]
 
 When you deploy OpenAM to protect your web-based applications, users can be redirected to OpenAM pages for login and logout.
 
-The end user pages have Open Identity Platform styling and branding by default. You likely want to change at least the images to reflect your organization. You might want different customizations for different realms. This chapter addresses how to get started customizing OpenAM end user pages for your organizations and supported locales.
-You may want to change the default styling and branding as well as customize different realms.
+OpenAM uses XUI for end-user pages by default. You can customize XUI branding and layout by realm or authentication chain. OpenAM also bundles the deprecated classic UI for existing deployments. See xref:#update-classic-ui[Customizing the Classic User Interface (Legacy)].
 
-* By default, end users see the XUI pages.
-+
-See xref:#basic-xui-configuration["Customizing the End User Interface"] for details.
+To switch end-user pages to the classic UI across the deployment, go to Configure > Authentication > Core Attributes > Global Attributes in the OpenAM console, clear the XUI interface checkbox, and save. Test the login page in a new browser session. To override the defaults on one node, set the advanced server property `XUI.enable=false` on that node. This override applies to both end-user and administrative interfaces. See xref:../how-to/how-to-disable-xui-by-default.adoc#how-to-disable-xui-by-default-for-one-instance-in-cluster-1[For one instance in cluster].
 
-* For backwards compatibility, OpenAM bundles the classic UI pages as well. This can be useful when upgrading, as it allows you to use customizations developed with earlier versions of OpenAM.
-+
-See xref:#update-classic-ui["Customizing the Classic User Interface (Legacy)"] for details.
-+
-To enable the classic UI, disable the XUI.
-+
-You can disable XUI globally for an OpenAM server in OpenAM console under Configure > Authentication > Core Attributes > Global Attributes. Clear XUI Interface Enabled, save your work, and log out. When you return to the login page, you see the classic UI.
-
-While customizing the UI, you can set the advanced server property, `org.forgerock.openam.core.resource.lookup.cache.enabled`, to `false` to allow OpenAM immediately to pick up changes to the files as you customize them. This includes the XML callback files for authentication modules used by the XUI and also by the classic UI, and the JSP files used by the classic UI.
-
-You can set advanced server properties in the OpenAM console under Deployment > Servers > __Server Name__ > Advanced. Before using OpenAM in production, set `org.forgerock.openam.core.resource.lookup.cache.enabled` back to the default setting, `true`.
+During development, use a new browser session or reload the XUI assets without the browser cache after editing. Restart OpenAM after editing server-side authentication callbacks or classic JSPs. Package the tested changes in the WAR used to deploy each node.
 
 [#basic-xui-configuration]
 === Customizing the End User Interface
@@ -59,129 +52,35 @@ The XUI is built with the link:http://getbootstrap.com/[Bootstrap, window=\_top]
 
 Only user-facing XUI pages support themes. The OpenAM administration console cannot be themed.
 
-You can apply themes to specific realms, and also to specific authentication chains within those realms. OpenAM includes a __default__ theme, and an inverted __dark__ theme.
+You can apply themes to specific realms, and also to specific authentication chains within those realms. OpenAM includes the `default` and `fr-dark-theme` definitions. Activate the dark theme by adding a mapping or use it as a starting point for a custom theme.
 
 [#d14351e3933]
 .To Apply a Theme to the XUI
 ====
-This procedure demonstrates adding a custom Bootstrap theme to the XUI.
-
-. Copy your custom Bootstrap theme to a directory in `/path/to/tomcat/webapps/openam/XUI/themes/`. A custom Bootstrap theme should consist of one or more CSS files, and optionally media and font files.
+. Copy the bundled dark theme into a new directory under `XUI/themes`. In this example, the new theme is in `XUI/themes/my-theme/`. Edit the copies of the CSS, images, or fonts.
+. In `XUI/config/ThemeConfiguration.js`, add the following property to the existing `themes` object and keep the `default` theme. Paths are relative to `XUI`.
 +
-As an example, the __dark__ theme is available in: `/path/to/tomcat/webapps/openam/XUI/themes/dark/`.
-
-. Edit the `/XUI/config/ThemeConfiguration.js` file, to reference the CSS files in the theme, and to map the theme to realms and authentication chains:
-+
-
-.. Locate the `themes` element, and under it create a new element with the name of your theme. The following example adds a theme called `myTheme`:
-+
-
-[source]
+[source,javascript]
 ----
-define("config/ThemeConfiguration", {
-    themes: {
-        // There must be a theme named "default".
-        "default": { ... },
-        "fr-dark-theme": { ... },
-        "myTheme": {}
-    },
-    mappings: [ ... ]
-});
-----
-
-.. In the new theme element, create a `stylesheets` array containing the theme's two CSS files, followed by the required `css/structure.css` file.
-+
-
-[source]
-----
-define("config/ThemeConfiguration", {
-    themes: {
-        // There must be a theme named "default".
-        "default": { ... },
-        "fr-dark-theme": { ... },
-        "myTheme": {
-            stylesheets: [
-                "themes/dark/css/bootstrap.min.css",
-                "themes/dark/css/theme-dark.css",
-                "css/structure.css"
-            ]
-        }
-    },
-    mappings: [ ... ]
-});
-----
-+
-Note that you must specify paths relative to the `XUI` directory.
-+
-If required, specify additional settings specific to the new theme, such as the logos to use or the footer information. For information on the available settings, see xref:../reference/chap-xui-parameters.adoc#chap-xui-parameters["XUI Configuration Parameters"] in the __Reference__.
-
-.. Locate the `mappings` array, and create a new element under it to map your new theme to realms and authentication chains.
-+
-Elements in the `mappings` array are evaluated in order from top to bottom. The first theme that matches the current realm and/or authentication chain is applied. Any subsequent mappings, even if true, are ignored once a match is found.
-+
-If no match is found, the `default` theme is applied.
-+
-
-... Create a `theme` element, and set the value to the name of your new theme:
-+
-
-[source]
-----
-define("config/ThemeConfiguration", {
-    themes: { ... },
-    mappings: [
-        {
-            theme: "myTheme"
-        }
+"myTheme": {
+    stylesheets: [
+        "themes/my-theme/css/bootstrap.min.css",
+        "css/structure.css",
+        "themes/my-theme/css/theme-dark.css"
     ]
-});
-----
-
-... (Optional) Optionally, create a `realms` array, and include the realms the theme will apply to:
-+
-
-[source]
-----
-define("config/ThemeConfiguration", {
-    themes: { ... },
-    mappings: [
-        {
-            theme: "myTheme",
-            realms: ["/", "/test-realm", /^\/a/]
-        }
-    ]
-});
+}
 ----
 +
-You can use a regular expression to specify the realms the theme should apply to. For example `/^\/a/` will apply the theme to all realms that start with `/a`, including `/ab` and `/a/c`.
+For logo and footer settings, see xref:../reference/chap-xui-parameters.adoc[XUI Configuration Parameters].
+. Add a mapping to the existing `mappings` array before any broader matching entry. The first matching entry supplies the theme. If none matches, XUI uses the `default` theme.
 +
-If you do not include a realms array, the theme is applied to all realms.
-
-... (Optional) Optionally, create an `authenticationChains` array, and include the authentication chains the theme will apply to when used:
-+
-
-[source]
+[source,javascript]
 ----
-define("config/ThemeConfiguration", {
-    themes: { ... },
-    mappings: [
-        {
-            theme: "myTheme",
-            realms: ["/", "/test-realm", /^\/a/],
-            authenticationChains: ["auth-chain-one"]
-        }
-    ]
-});
+{ theme: "myTheme", realms: ["/test-realm"], authenticationChains: ["auth-chain-one"] }
 ----
 +
-If you specify both realms and authentication chains, the theme is only applied when both criteria are true.
-
-
-
-. Save your work.
-+
-The next time a user logs in to the XUI they will see the new theme applied:
-
+This entry matches `/test-realm` with the `auth-chain-one` authentication chain. Use `"/"` for the top-level realm. You can use a regular expression such as `/^\/a/` to match realms starting with `/a`. Omit `realms` to match any realm, and omit `authenticationChains` to match any chain.
+. Save the file. For this mapping, open `https://openam.example.com/openam/XUI/?realm=/test-realm&service=auth-chain-one#login/`. Reload the assets without the browser cache and verify that the theme is applied.
 
 [#figure-xui-dark-theme]
 image::images/xui-dark-theme.png[]
@@ -221,7 +120,7 @@ The following example copies the directory containing the default partials used 
 ----
 $ cd /path/to/tomcat/webapps/openam/XUI
 $ mkdir -p themes/dark/partials
-$ cp -r partials/login/ themes/dark/partials/
+$ cp -R partials/login themes/dark/partials/
 ----
 
 . Edit the copied template or partial files with the changes you require.
@@ -245,25 +144,15 @@ For example, to include an HTML `<hr/>` tag to create a horizontal line that ren
     {{#equals index 0}}autofocus{{/equals}}>
 ----
 
-. Edit the `/path/to/tomcat/webapps/openam/XUI/config/ThemeConfiguration.js` file, and add a `path` element that points to the newly edited templates or partials within the theme they will apply to.
+. In `XUI/config/ThemeConfiguration.js`, add `path: "themes/dark/"` to the existing `fr-dark-theme` definition. Keep the trailing slash. Add a mapping for this theme before any broader entry that would match your test login.
 +
-The following example alters the `fr-dark-theme` to use the custom login partials:
-+
-
-[source]
+[source,javascript]
 ----
-"fr-dark-theme": {
-     path: "themes/dark/",
-     stylesheets: [ ... ],
-     settings: { ... }
- }
+{ theme: "fr-dark-theme", realms: ["/"], authenticationChains: ["auth-chain-one"] }
 ----
 +
-Note that the trailing slash in the `path` value is required.
-
-. Save your work.
-+
-The next time a user visits the login page in the XUI they will see the new partial applied, with the horizontal line above the password field:
+Use the actual realm path and authentication chain for the login you are testing. Omit `authenticationChains` to apply the theme to every chain in that realm.
+. Save the file. For this mapping, open `https://openam.example.com/openam/XUI/?realm=/&service=auth-chain-one#login/` in a new browser session and verify that the password field has a horizontal line above it.
 
 
 [#figure-xui-dark-theme-partial]
@@ -278,7 +167,7 @@ image::images/xui-dark-theme-partial.png[]
 
 This section explains how to localize the text that is generated for the user-facing XUI pages.
 
-The text the XUI displays comes from from `translation.json` files located in locale-specific directories.
+The text the XUI displays comes from `translation.json` files located in locale-specific directories.
 
 To customize the English text, edit `/path/to/tomcat/webapps/openam/XUI/locales/en/translation.json` under the directory where OpenAM is deployed.
 
@@ -434,7 +323,7 @@ The following example replaces the library only in a deployed OpenAM server.
 
 [source, console, subs="attributes"]
 ----
-$ cp openam-core-{openam-version}.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/
+$ cp ../openam-core-{openam-version}.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/
 ----
 +
 When preparing for production deployment make the modification in the OpenAM war file, `OpenAM-{openam-version}.war`, instead.

@@ -20,45 +20,37 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-install-multiple]
+endif::[]
 == Installation Considerations for Multiple Servers
 
-This chapter covers what to do when installing multiple OpenAM servers.
+ifdef::env-site[]
+anchor:chap-install-multiple[]
+endif::[]
 
 [#considerations-multiple-servers]
 === Things to Consider When Installing Multiple Servers
 
-When installing multiple servers, consider the following points:
+An OpenAM site groups one or more OpenAM servers behind a load balancer. The load balancer sends requests to healthy nodes and can also terminate HTTPS and restrict which endpoints are public.
 
-* You generally install multiple servers to provide service availability. If one server is down for any reason, another server can respond instead. This means that you need some type of component, such as a load balancer or a proxying server, between incoming traffic and OpenAM to route around servers that are down.
-+
-OpenAM uses a __site__ for this purpose. In an OpenAM site, multiple OpenAM servers are configured in the same way, and accessed through a load balancer layer.footnote:d14351e3553[Technically, it is possible to configure a site with only one OpenAM server.] The load balancer can be implemented in hardware or software, but it is separate and independent from OpenAM software. When installed properly, a site configuration improves service availability, as the load balancer routes around OpenAM servers that are down, sending traffic to other servers in the site.
+Use distinct hostnames such as `am1.internal.example.com` and `am2.internal.example.com` for the OpenAM nodes. Configure the site's Primary URL as the public entry point, such as `https://lb.example.com/openam`. The cookie domain is a DNS name, such as `lb.example.com` or a shared domain such as `example.com` when an application also needs the cookie. Configure the cookie domain to match the public hostname and the scope needed by the deployment. See xref:../reference/chap-config-ref.adoc#system-platform-attrs[Platform].
 
-* Configure the cookie domain for the public hostnames that need the cookie. A cookie domain is a DNS domain without a scheme, port, or path.
-
-* You can use a load balancer layer to protect OpenAM services as well. The load balancer can restrict access to OpenAM services, throttle traffic, offload HTTPS encryption, and so forth.
-+
-As an alternative, or in addition, you can use a separate reverse proxy.
-
-* Restrict access to the OpenAM backends to the appropriate load balancers, proxies and operational clients. Configure proxy trust in the web container and OpenAM.
-
-* OpenAM authentication can depend on information about the user to authenticate, such as the IP address where the request originated. When OpenAM is accessed through a load balancer or proxy layer, pass this information along using request headers. Also, configure OpenAM to consume and to forward the headers as necessary. See xref:#handle-request-headers["Handling HTTP Request Headers"] for details.
-
-
+Keep the administrative console and internal endpoints on private listeners where the deployment allows it. See xref:../how-to/how-to-restrict-xui-access-with-a-reverse-proxy.adoc#how-to-restrict-xui-access-with-a-reverse-proxy[Restrict XUI Access with a Reverse Proxy].
 
 [#configure-sites]
 === Configuring OpenAM Sites
 
 The most expedient way to configure a server in a site is to set the site up during the initial OpenAM configuration. In the GUI configurator, this is done in the Site Configuration screen.
 
-It is also possible to configure a site separately. If you did not set up a site during initial configuration, perform the following steps to configure a site:
+You can also configure a site after installation.
 
 [#configure-site-after-installation]
 .To Configure a Site With a First OpenAM Server
 ====
 The following steps show how to set up the site for the first OpenAM server.
 
-. Login to OpenAM Console as administrator, by default `amadmin`, and then navigate to Deployment > Sites.
+. Sign in to the OpenAM console as an administrator and go to Deployment > Sites.
 
 . Click New to start configuring the new site.
 
@@ -94,10 +86,12 @@ A serving node can retrieve an established stateful session from CTS. Cookie aff
 [#configure-site-load-balancing]
 .To Configure Site Load Balancing for Deployments With Stateful Sessions
 ====
+
 . For each OpenAM server in the site, navigate to Deployment > Servers > __Server Name__ > General, set Parent Site to the site you created, and save.
 . If you use `amlbcookie` affinity, verify that the cookie value is unique for each server. The default is the server ID. Review `com.iplanet.am.lbcookie.value` in the server's Advanced settings. Verify any requirements of integrations using the server ID before changing the value. Restart each server whose value changed.
 . Configure the load balancer to map each cookie value to the corresponding server. Route requests with a missing or unknown value, or a value for an unavailable server, to a healthy node.
-. Verify that each node can reach the CTS store. Test requests without the affinity cookie and confirm that an established stateful session can resume after removing a node from service.
+. Verify that each node can reach the CTS store. Test requests without the affinity cookie and confirm that an established stateful session can resume after removing a node from service. See xref:chap-session-failover.adoc#chap-session-failover[Setting Up OpenAM Session Failover].
+
 ====
 
 [#lb-termination]
@@ -105,24 +99,26 @@ A serving node can retrieve an established stateful session from CTS. Cookie aff
 
 A load balancer or proxy needs to terminate TLS to read HTTP cookies. Use TLS to the backend and verify its certificate and hostname. If the first hop passes TLS through, apply the cookie affinity at the next hop that terminates TLS.
 
+Configure the proxy and servlet container to represent the public HTTPS scheme, host, port, and context path to OpenAM. Verify the resulting URL and redirects from the public endpoint. See xref:../admin-guide/chap-openid-connect.adoc#configure-base-url-source[Configuring the Base URL Source Service].
+
 [#lb-and-crosstalk]
 ===== Affinity and Authentication Requests
 
-REST clients may present a session token in an HTTP header and send no load balancer cookie. OpenAM can resolve their established stateful session using CTS. Before a session is established, test how the load balancer keeps requests in a multi-step authentication flow on the same node, including REST clients that do not retain cookies. Test how the client restarts the flow if that node becomes unavailable.
+REST clients that send the session token in a request header may omit `amlbcookie`. The load balancer can send these requests, and retries following a node failure, to any healthy node. The receiving OpenAM server can load a stateful session from the shared CTS. Test how queued writes and replication lag affect request routing and session recovery. See xref:chap-session-failover.adoc#test-openam-session-failover[To Test OpenAM Session Failover].
+
+Before a session is established, test how the load balancer keeps requests in a multi-step authentication flow on the same node, including REST clients that do not retain cookies. Test how the client restarts the flow if that node becomes unavailable.
 
 [#configure-lb-stateless]
 ==== Load Balancer Configuration for Stateless Sessions
 
-An established stateless session can be accepted by any available node that has compatible session settings and cryptographic material. Plan affinity separately for authentication exchanges that keep state on one node.
+Authenticated requests with stateless sessions can go to any healthy OpenAM server with the site's shared configuration and keys. The server validates the state in the client token. If you enable stateless session blacklisting, all nodes need access to the same CTS data. Plan affinity separately for authentication exchanges that keep state on one node.
 
 [#handle-request-headers]
 === Handling HTTP Request Headers
 
-OpenAM can use proxy-provided values such as the client IP address for risk-based authentication and the public URL when generating protocol URLs. Restrict forwarding-header trust to your proxy layer and replace client-provided forwarding headers at the trusted edge. Verify the resulting client address, scheme, host, port, context path, and redirects from the public endpoint.
+OpenAM authentication can use the client IP address for decisions such as adaptive authentication. If a proxy supplies the address in `X-Forwarded-For`, configure the trusted proxy to replace the incoming header with the verified client IP address. Restrict backend network access to trusted proxies and management hosts. Block direct public access to the backend.
 
-For example, use a container feature such as Tomcat's Remote IP Valve to derive the client address from trusted proxies. If you configure OpenAM itself to consume a client IP header, set `com.sun.identity.authentication.client.ipAddressHeader` under Deployment > Servers > __Server Name__ > Advanced to the header controlled by that trusted proxy layer. See xref:../admin-guide/chap-openid-connect.adoc#configure-base-url-source[Configuring the Base URL Source Service] for public URL settings.
-
-For classic login requests that OpenAM can forward between servers, add the same trusted header to the comma-separated list in `openam.retained.http.request.headers` under Advanced on each forwarding server. Keep the existing entries. With the default list and `X-Forwarded-For`, use `X-DSAMEVersion,X-Forwarded-For`. Restart the affected servers to load the updated list. Continue a multi-step classic login through a different node and verify that the original node uses the client address supplied by the trusted proxy.
+Set `com.sun.identity.authentication.client.ipAddressHeader` to `X-Forwarded-For` under Deployment > Servers > __Server Name__ > Advanced on each OpenAM server that receives the header. Verify through the public URL that OpenAM receives the intended address even when the client sends its own header. See xref:../how-to/how-to-restrict-xui-access-with-a-reverse-proxy.adoc#how-to-restrict-xui-access-with-a-reverse-proxy[Restrict XUI Access with a Reverse Proxy].
 
 [#handle-multiple-cookie-domains-wildfly]
 === Handling Multiple Cookie Domains When Using Wildfly

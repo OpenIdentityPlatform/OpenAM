@@ -18,22 +18,30 @@ Copyright 2026 3A Systems, LLC.
 :example-caption!:
 :table-caption!:
 
+ifndef::env-site[]
 [#how-to-disable-xui-by-default]
+endif::[]
 == How to disable XUI by default
+
+ifdef::env-site[]
+anchor:how-to-disable-xui-by-default[]
+endif::[]
 
 [[how-to-disable-xui-by-default-legacy-ui]]
 === Legacy UI
 
+The `XUI.enable` override applies to both the end-user interface and the administrative console.
+
 [[how-to-disable-xui-by-default-for-one-instance-in-cluster]]
 ==== For one instance in cluster
 
-Goto Configuration ++>++ Servers and Sites ++>++ Default Server Settings ++>++ Advanced and add:
+Go to Deployment > Servers > __Server Name__ > Advanced and add the property.
 
 ....
 XUI.enable=false
 ....
 
-or change java system property:
+You can also set the Java system property for the node's JVM.
 
 [source,bash]
 ----
@@ -43,7 +51,7 @@ or change java system property:
 [[how-to-disable-xui-by-default-for-all-instances-in-cluster]]
 ==== For all instances in cluster
 
-Goto Configuration ++>++ Servers and Sites ++>++ Select server ++>++ Advanced and add:
+Go to Configure > Server Defaults > Advanced and add the property. Check for per-server overrides.
 
 ....
 XUI.enable=false
@@ -55,7 +63,7 @@ XUI.enable=false
 [[how-to-disable-xui-by-default-for-one-instance-in-cluster-1]]
 ==== For one instance in cluster
 
-Goto Deployment ++>++ Servers ++>++ Choose server ++>++ Advanced and add:
+Go to Deployment > Servers > __Server Name__ > Advanced and add the property.
 
 ....
 XUI.enable=false
@@ -64,7 +72,7 @@ XUI.enable=false
 [[how-to-disable-xui-by-default-for-all-instances-in-cluster-1]]
 ==== For all instances in cluster
 
-Goto Configure ++>++ Server Defaults ++>++ Advanced and add:
+Go to Configure > Server Defaults > Advanced and add the property. Check for per-server overrides.
 
 ....
 XUI.enable=false

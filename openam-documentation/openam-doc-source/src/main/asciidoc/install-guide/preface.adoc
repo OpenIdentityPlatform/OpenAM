@@ -24,16 +24,16 @@
 [#preface]
 == Preface
 
-This guide shows you how to install core OpenAM services for access and federation management. Unless you are planning a throwaway evaluation or test installation, read the xref:../release-notes/index.adoc[Release Notes] before you get started.
+Use this guide to install OpenAM for access management and federation. Review the xref:../release-notes/requirements-and-upgrade.adoc[release requirements] before choosing a container and Java version.
 
 [#who-should-use]
 === Who Should Use This Guide
 
-This guide is written for anyone installing OpenAM to manage and federate access to web applications and web-based resources.
+For an evaluation, follow xref:../getting-started/index.adoc[Getting Started With OpenAM] to run a local instance and protect a test resource.
 
-This guide covers the install, upgrade, and uninstall procedures that you theoretically perform only once per version. This guide aims to provide you with at least some idea of what happens behind the scenes when you perform the steps.
+For a new deployment, start with xref:chap-prepare-install.adoc#before-production-installation[Before a Production Installation], then follow xref:chap-install-core.adoc[Installing OpenAM Core Services]. For a site with several OpenAM servers, also follow xref:chap-install-multiple.adoc[Installation Considerations for Multiple Servers].
 
-You do not need to be an OpenAM wizard to learn something from this guide, though a background in access management and maintaining web application software can help. You do need some background in managing services on your operating systems and in your application servers. You can nevertheless get started with this guide, and then learn more as you go along.
+For an existing deployment, follow the xref:../upgrade-guide/index.adoc[Upgrade Guide] for the target release.
 
 
 include::../partials/sec-formatting-conventions.adoc[]

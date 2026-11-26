@@ -33,7 +33,7 @@ OpenAM 16.x persists established stateful sessions in the Core Token Service (CT
 
 An authentication exchange can have node-local state before OpenAM establishes the session. If the node fails during that exchange, a user may have to start the flow again. Test affinity for multi-request authentication separately from failover of an established session.
 
-OpenAM stores stateless session data in a client-held JWT. A surviving server can accept the token when it has compatible settings and cryptographic material. When stateless-session revocation is enabled, its denylist uses CTS. See xref:../admin-guide/chap-session-state.adoc#chap-session-state[Configuring Session State].
+OpenAM stores stateless session data in a client-held JWT. A surviving server can accept the token when it has compatible settings and cryptographic material. When stateless-session revocation is enabled, its denylist uses CTS. See xref:../admin-guide/chap-session-state.adoc#chap-session-state[Configuring Session State] and xref:../admin-guide/chap-session-state.adoc#session-state-configure-blacklist[Configuring Session Blacklisting].
 
 For stateful session continuity across sites, configure the sites in one OpenAM deployment with consistent naming configuration. Every site must recognize the original server and site IDs carried in the session and be able to read the session record from the same logical CTS. If replication lags, a recently issued, modified, or revoked session may have a different state at the surviving site. Measure replication lag, DNS and traffic redirection time, and user-visible results during failover and failback.
 
@@ -41,19 +41,34 @@ For stateful session continuity across sites, configure the sites in one OpenAM 
 .Core Token Service for Cross-Site Session Failover
 image::images/site-deployment-multi-site-16x.svg["OpenAM sites with separate inter-site replication paths for configuration, CTS, and identity data"]
 
+See the OpenDJ 5.x guide for link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-replication[Managing Data Replication].
+
 [#enable-session-failover]
-=== Prepare an OpenAM Site for Session Failover
+.To Set Up Session Failover After Installation
+====
 
-. xref:chap-install-multiple.adoc#configure-sites[Configure a site] and add multiple OpenAM servers behind its load balancer. For cross-site failover, add all participating sites to the same deployment.
-. xref:chap-cts.adoc#chap-cts[Configure the CTS] so that all servers serving the same stateful sessions can read and write the same logical token store. Check store reachability and replication before admitting traffic.
-. xref:chap-install-multiple.adoc#configure-lb[Configure load balancing]. Validate the public URL, any authentication affinity rules, and routing around unavailable nodes.
-. Test session continuity through the site URL before releasing the site.
+. Configure two OpenAM nodes in the same site. Use one HTTPS site URL for clients and check that the load balancer stops routing requests to an unhealthy node. See xref:chap-install-multiple.adoc#configure-site-load-balancing[To Configure Site Load Balancing for Deployments With Stateful Sessions].
+. Configure both nodes to use the same CTS root suffix and directory replicas. See xref:chap-cts.adoc#chap-cts[Configuring the Core Token Service].
+. Check that the realm selected for testing uses stateful sessions. In the OpenAM console, open Realms > __Realm Name__ > Authentication > Settings > General and leave Use Stateless Sessions clear. See xref:../admin-guide/chap-session-state.adoc#session-state-configure-stateless[Configuring Stateless Sessions].
+. For cross-site failover, add all participating sites to the same deployment and verify that they can reach the same logical CTS.
+. Verify that session writes reach CTS and that both nodes can read from it. Run the test below before using the site for production traffic.
 
-[#verify-session-failover]
-=== Test Session Failover
+====
 
-. In a staging environment, establish a session through the site URL with a test user and identify the OpenAM node serving the session.
-. Remove that node from service. Keep the same site URL and client session. Issue a new request that requires authentication and verify that the expected surviving node accepts the session.
-. Check the behavior of logout and subsequent access across the nodes according to your revocation settings. Separately interrupt a multi-step login to verify how clients recover before a session is established.
-. Test loss of a CTS replica. For multi-site deployments, also test site redirection and failback. Record the time until requests succeed again and whether any test session requires reauthentication.
+[#test-openam-session-failover]
+.To Test OpenAM Session Failover
+====
+
+anchor:verify-session-failover[]
+Use a non-administrative test account and an endpoint that reports the current OpenAM session or returns authenticated user information. For example, use the XUI session information request, `POST /openam/json/sessions?_action=getSessionInfo`, with `Accept-API-Version: protocol=1.0,resource=2.0`. Run the test while both CTS replicas are healthy.
+
+. Sign in to the HTTPS site URL through the load balancer. From proxy or node logs, identify which node processed the sign-in and confirm that a request using the browser session succeeds on that node. If the protected application has its own session, also check an OpenAM endpoint that validates the OpenAM session.
+. Take the node that authenticated the user out of service. Before signing in again, send the same authenticated request from the same browser to the same site URL. Verify that the replacement node serves the request for the same user. Confirm the actual backend in the proxy or node logs, the successful authenticated response, and that the browser kept the original session cookie.
+. Record the time from failure to successful use of the existing session. Repeat with sessions created just before failure to measure the effect of write and replication delays. Restore the failed node and repeat with the nodes reversed.
+. Check revocation separately. With a test session accepted by both nodes, log out through one node. Use a controlled client in the test environment to verify that both nodes reject the original test session and record the delay. Also verify that an expired session is rejected. Protect test session tokens as credentials and keep them out of logs.
+. With both OpenAM nodes healthy again, test directory failure independently as described in xref:chap-cts.adoc#cts-testing-failover[Testing Failover].
+. Separately interrupt a multi-step login to verify how clients recover before a session is established.
+. For multi-site deployments, also test site redirection and failback. Record the time until requests succeed again and whether users must sign in again.
 . Restore the original routing and confirm normal operation.
+
+====
