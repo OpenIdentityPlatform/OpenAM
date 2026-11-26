@@ -211,6 +211,75 @@ export async function ensureOidcClient(adminToken, request, clientId) {
   });
 }
 
+/**
+ * Give each worker/run its own provider. No root-realm provider GET/PUT is performed,
+ * so this setup cannot overwrite settings being changed by the other OAuth/UMA specs.
+ */
+export async function createDevicePkceRealm(adminToken, request, realm, clientId, owner) {
+  const realmUrl = `${OPENAM_BASE}/json/realms/root/realms/${realm}`;
+  const oauthUrl = `${OPENAM_BASE}/oauth2/realms/root/realms/${realm}`;
+  const headers = adminHeaders(adminToken, CONFIG_VERSION);
+  async function requireSuccess(response, operation) {
+    if (!response.ok()) throw new Error(`${operation}: ${response.status()} ${await response.text()}`);
+  }
+  await requireSuccess(await request.post(`${OPENAM_BASE}/json/global-config/realms?_action=create`, {
+    headers, data: { name: realm, parentPath: "/", active: true, aliases: [] },
+  }), "create PKCE realm");
+  await requireSuccess(await request.post(`${realmUrl}/realm-config/services/oauth-oidc?_action=create`, {
+    headers,
+    data: {
+      advancedOAuth2Config: { clientsCanSkipConsent: true, supportedScopes: [SCOPE], defaultScopes: [SCOPE] },
+      advancedOIDCConfig: { allowDynamicRegistration: true },
+    },
+  }), "create PKCE provider");
+  // A new realm has no AgentService container. Dynamic registration creates it through
+  // the product's supported registration path before the admin API writes our client.
+  await requireSuccess(await request.post(`${oauthUrl}/connect/register`, {
+    data: { redirect_uris: [REDIRECT_URI], client_name: "PKCE realm bootstrap" },
+  }), "bootstrap PKCE AgentService");
+  await requireSuccess(await request.put(`${realmUrl}/realm-config/agents/OAuth2Client/${clientId}`, {
+    headers: adminHeaders(adminToken, AGENT_VERSION),
+    data: {
+      "com.forgerock.openam.oauth2provider.clientType": "Public",
+      "com.forgerock.openam.oauth2provider.scopes": [`[0]=${SCOPE}`],
+      "com.forgerock.openam.oauth2provider.defaultScopes": [`[0]=${SCOPE}`],
+      "com.forgerock.openam.oauth2provider.grantTypes": ["[0]=urn:ietf:params:oauth:grant-type:device_code"],
+      "com.forgerock.openam.oauth2provider.responseTypes": ["[0]=device_code"],
+      "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod": "none",
+      isConsentImplied: true,
+      sunIdentityServerDeviceStatus: "Active",
+    },
+  }), "create PKCE client");
+  // A fresh realm must provision its resource owner rather than rely on a root demo account.
+  await requireSuccess(await request.post(`${realmUrl}/users?_action=create`, {
+    headers: adminHeaders(adminToken, { "Accept-API-Version": "resource=3.0,protocol=2.1" }),
+    data: {
+      username: owner.username, userpassword: owner.password,
+      sn: "PKCE", cn: "PKCE Test User", givenName: "PKCE",
+    },
+  }), "create PKCE resource owner");
+  return { realmUrl, oauthUrl };
+}
+
+export async function deleteDevicePkceRealm(adminToken, request, realm, username) {
+  // Realm deletion does not remove entries from its shared LDAP identity store.
+  if (username) {
+    const user = await request.delete(`${OPENAM_BASE}/json/realms/root/realms/${realm}/users/${encodeURIComponent(username)}`, {
+      headers: adminHeaders(adminToken, { "Accept-API-Version": "resource=3.0,protocol=2.1" }),
+    });
+    if (!user.ok() && user.status() !== 404) {
+      throw new Error(`delete PKCE resource owner: ${user.status()} ${await user.text()}`);
+    }
+  }
+  const id = Buffer.from(`/${realm}`).toString("base64url");
+  const response = await request.delete(`${OPENAM_BASE}/json/global-config/realms/${id}`, {
+    headers: adminHeaders(adminToken, CONFIG_VERSION),
+  });
+  if (!response.ok() && response.status() !== 404) {
+    throw new Error(`delete PKCE realm: ${response.status()} ${await response.text()}`);
+  }
+}
+
 export async function ensureResourceServerClient(adminToken, request, clientId) {
   await ensureClient(adminToken, request, clientId, {
     "userpassword": RS_CLIENT_SECRET,
@@ -429,3 +498,4 @@ export async function protectionApiToken(request, clientId, username, password) 
 export async function authorizationApiToken(request, clientId, username, password) {
   return resourceServerToken(request, clientId, username, password, "uma_authorization");
 }
+
