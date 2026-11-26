@@ -12,11 +12,12 @@
  * information: "Portions copyright [year] [name of copyright owner]".
  *
  * Copyright 2013-2016 ForgeRock AS.
- * Portions copyright 2025 3A Systems LLC.
+ * Portions Copyright 2025-2026 3A Systems, LLC.
  */
 package org.forgerock.openam.upgrade.steps;
 
 import static com.sun.identity.common.configuration.ServerConfiguration.*;
+import static com.sun.identity.shared.Constants.LDAP_SERVER_TLS_VERSION;
 import static org.forgerock.openam.upgrade.UpgradeServices.*;
 
 import java.io.IOException;
@@ -112,8 +113,7 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
     }
 
     /**
-     * Only include in the list of modified attributes those that are listed in the serverupgrade.properites file;
-     * otherwise existing properties that have been locally modified would be over-written.
+     * Finds changes to server defaults listed in serverupgrade.properties and migrates the legacy LDAP TLS default.
      *
      * @param newDefaults The default server properties defined in the new version.
      * @param existingDefaults The default server properties defined in the current version.
@@ -131,6 +131,12 @@ public class UpgradeServerDefaultsStep extends AbstractUpgradeStep {
             if (newAttr != null && existingAttr != null && !newAttr.equals(existingAttr)) {
                 modifiedValues.put(attrName, newAttr);
             }
+        }
+
+        String newLdapProtocol = newDefaults.get(LDAP_SERVER_TLS_VERSION);
+        if (newLdapProtocol != null && !"TLSv1".equals(newLdapProtocol)
+                && "TLSv1".equals(existingDefaults.get(LDAP_SERVER_TLS_VERSION))) {
+            modifiedValues.put(LDAP_SERVER_TLS_VERSION, newLdapProtocol);
         }
 
         return modifiedValues;

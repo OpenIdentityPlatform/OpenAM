@@ -2,377 +2,224 @@
   The contents of this file are subject to the terms of the Common Development and
   Distribution License (the License). You may not use this file except in compliance with the
   License.
- 
+
   You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
   specific language governing permission and limitations under the License.
- 
+
   When distributing Covered Software, include this CDDL Header Notice in each file and include
   the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
   Header, with the fields enclosed by brackets [] replaced by your own identifying
   information: "Portions copyright [year] [name of copyright owner]".
- 
+
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
-:figure-caption!:
-:example-caption!:
-:table-caption!:
-
-
+ifndef::env-site[]
 [#chap-first-steps]
-== Protecting a Web Site With OpenAM
+endif::[]
+== Get Started with OpenAM
 
-This guide shows you how to quickly set up OpenAM and get started with access management. In reading and following the instructions in this guide, you will learn how to protect a Web page using OpenAM and a Web policy agent.
+ifdef::env-site[]
+anchor:chap-first-steps[]
+endif::[]
+
+Start OpenAM and sign in to its administration console. Then use OpenIG to protect a page with an OpenAM access policy. This example uses HTTP on your own machine for evaluation. For deployment, see the xref:../install-guide/index.adoc[Installation Guide].
 
 [#how-openam-helps-manage-access]
 === About OpenAM
 
-OpenAM provides a service called __access management__, which manages access to resources, such as a web page, an application, or a web service, available over the network. Once it is set up, OpenAM provides an infrastructure for managing users, roles, and access to resources. In this chapter, you manage access to a single web page.
-
-OpenAM centralizes access control by handling both __authentication__ and __authorization__. Authentication is the process of identifying an individual, for example, by confirming a successful login. Authorization is the process of granting access to resources to authenticated individuals.
-
-OpenAM centralizes authentication by using a variety of authentication modules that connect to identity repositories that store identities and provide authentication services. The identity repositories can be implemented as LDAP directories, relational databases, RADIUS, Windows authentication, one-time password services, and other standards-based access management systems.
-
-OpenAM lets you chain together the authentication services used. Authentication chains let you configure stronger authentication for more sensitive resources for example. They also let you set up modules that remember a device when the user logs in successfully. Or that evaluate the risk given the login circumstances and therefore can require more credentials when a user is logging in from an unusual location. This chapter uses OpenAM's built-in identity repository and authentication modules to make it easier to get started.
-
-OpenAM centralizes authorization by letting you use OpenAM to manage access policies separate from applications and resources. Instead of building access policy into a web application, you install a policy agent with the web application to request policy decisions from OpenAM. This way you can avoid issues that could arise when developers must embed policy decisions into their applications. With OpenAM, if policy changes or an issue is found after the application is deployed, you have only to change the policy definition in OpenAM, not deploy a new version of the application. OpenAM makes the authorization decisions, and policy agents enforce the decisions on OpenAM's behalf.
-
-The rest of this chapter has you demonstrate OpenAM access management by installing OpenAM, creating a policy, and installing a policy agent on a web server to enforce the policy for a web page.
-
+OpenAM authenticates users and decides whether they can access resources. OpenIG enforces those decisions at the gateway before responding to requests for the protected page.
 
 [#software-you-need]
-=== Software Requirements To Try Out OpenAM
+=== Before You Start
 
-The only software you need to install is Docker. If you don't have Docker on your computer follow the instructions from the following link: link:https://docs.docker.com/get-started/get-docker/#supported-platforms[https://docs.docker.com/get-started/get-docker/#supported-platforms, target=_blank].
-
-You will learn how to run OpenAM docker container, and how to install OpenAM Apache Policy Agent for the Apache HTTP Server.
-
-'''
-
-
-[#software-setup]
-=== Setting Up the Software
-
-This section includes the following procedures that detail how to set up OpenAM to protect a web page:
-
-* xref:#prepare-etc-hosts["To Prepare Your Hosts File"]
-
-* xref:#install-openam["To Run OpenAM Docker Image"]
-
-* xref:#configure-cookie-domain[To Configure Cookie Domain in OpenAM]
-
-* xref:#configure-policy["To Configure a Policy in OpenAM"]
-
-* xref:#create-web-policy-agent-profile["To Create a Web Policy Agent Profile"]
-
-* xref:#install-web-policy-agent["To Install OpenAM Web Policy Agent"]
-
-The procedures in this section are written for use on a Linux system. If you are running Microsoft Windows, adapt the examples accordingly.
+Install https://docs.docker.com/get-started/get-docker/[Docker] and make sure the Docker daemon is running. The OpenIG exercise also uses https://docs.docker.com/compose/install/[Docker Compose]. Use a Bash terminal for the commands. Make sure host port 8080 is available for OpenAM and 8081 for OpenIG.
 
 [#prepare-etc-hosts]
-.To Prepare Your Hosts File
+==== Configure Local Hostnames
 
-====
-OpenAM requires that you use fully qualified domain names when protecting web resources. This is because OpenAM uses link:http://en.wikipedia.org/wiki/HTTP_cookie[HTTP cookies, window=\_blank] to keep track of sessions for single sign-on (SSO), and setting and reading cookies depends on the server name and domain.
+Add both names to your hosts file. Edit `/etc/hosts` on Linux or macOS, or `C:\Windows\System32\drivers\etc\hosts` on Windows, with administrator privileges.
 
-You can get started with OpenAM without setting up separate systems for each fully qualified domain name. Give your system `openam.example.com` and `www.example.com` aliases by editing your link:http://en.wikipedia.org/wiki/Hosts_(file)[hosts file, window=\_blank].
-
-Alternatively, if you already have a DNS set up, you can use that instead of your hosts file.
-
-* Add the aliases to your hosts file using your preferred text editor.
-+
-
-[source, console]
+[source,text]
 ----
-$ sudo vi /etc/hosts
-Password:
-
-### Edit /etc/hosts ###
-
-$ cat /etc/hosts | grep openam
-127.0.0.1    localhost openam.example.com www.example.com
+127.0.0.1 openam.example.test app.example.test
 ----
 
-====
-
-
+Use these names in the browser. OpenAM and OpenIG share the `example.test` cookie domain in this exercise.
 
 [#install-openam]
-.To Install OpenAM
-====
+=== Start and Configure OpenAM
 
-Create a Docker network for OpenAM.
-[source, console]
+anchor:software-setup[]
+Create an isolated Docker network for the exercise and a named volume for OpenAM's configuration and embedded directory. Publish OpenAM on the loopback address.
+
+[source,shell]
 ----
-$ docker network create openam-quickstart
+docker network create openam-quickstart
+docker volume create openam-quickstart-data
+docker run -d --name openam-quickstart --hostname openam.example.test \
+  --network openam-quickstart --network-alias openam.example.test \
+  --publish 127.0.0.1:8080:8080 \
+  --mount type=volume,source=openam-quickstart-data,target=/usr/openam/config \
+  openidentityplatform/openam:16.1.4
 ----
 
-Run the OpenAM Docker image.
-[source, console]
+. Open http://openam.example.test:8080/openam/[the OpenAM configuration screen]. If the server is still starting, use `docker logs openam-quickstart` to check its progress.
+. Choose *Create Default Configuration* and accept the license agreement.
+. Set distinct passwords for the default OpenAM administrator (`amadmin`) and the default policy agent user. Generate new passwords for this exercise and keep them in a password manager.
+. Select *Create Configuration*. After configuration succeeds, request the readiness endpoint from your host terminal.
++
+[source,shell]
 ----
-$ docker run -h openam.example.com -p 8080:8080 --network openam-quickstart --name openam openidentityplatform/openam
+curl -fsS http://openam.example.test:8080/openam/isAlive.jsp | grep -F 'Server is ALIVE'
 ----
-You can access the web application in a browser at `\http://openam.example.com:8080/openam/`.
-
-. Browse to OpenAM in this example, `\http://openam.example.com:8080/openam/`, to configure the application.
-
-. On the OpenAM home page, click Create Default Configuration.
 +
+The endpoint should respond directly with HTTP 200 and include `Server is ALIVE`.
+. Select *Proceed to Login* and sign in as `amadmin` with the administrator password you set. Verify that the console shows *Top Level Realm*.
 
-[#figure-openam-home-page]
-image::images/openam-home-page.png[]
+[#protect-with-openig]
+=== Protect a Page with OpenIG
 
-. Review the software license agreement. If you agree to the license, click "I accept the license agreement", and then click Continue.
-+
+Use the *Top Level Realm* in the OpenAM console for the following configuration.
 
-[#figure-openam-license-default]
-image::images/openam-license-default.png[]
+[#create-quickstart-identities]
+==== Create the User and Service Account
 
-. Set the Default User [amAdmin] password to `changeit` and the Default Policy Agent [UrlAccessAgent] password to `secret12`, and then click Create Configuration to configure OpenAM.
-+
-
-[#figure-openam-default-configuration]
-image::images/openam-default-configuration.png[]
-+
-
-[NOTE]
-======
-If you were configuring OpenAM for real-world use, you would not use either of those passwords, but this is only to get started with OpenAM. The `amadmin` user is the OpenAM administrator, who is like a superuser in that `amadmin` has full control over the OpenAM configuration.
-======
-
-. Click the Proceed to Login link, then log in as `amadmin` with the password specified in the previous step, `changeit`.
-+
-After login, OpenAM should direct you to the Realms page.
-+
-
-[#figure-openam-common-tasks]
-image::images/openam-realms.png[]
-+
-OpenAM stores its configuration, including the embedded OpenDJ directory server in the folder named `~/openam/` in your home directory. The folder shares the same name as your server instance. It also has a hidden folder, `~/.openamcfg/`, with a file used by OpenAM when it starts up. If you ruin your configuration of OpenAM somehow, the quickest way to start over is to stop Tomcat, delete these two folders, and configure OpenAM again.
-+
-The OpenAM core server and OpenAM Console are now configured. Make sure you have successfully logged in to OpenAM Console before you proceed.
-
-====
+anchor:create-web-policy-agent-profile[]
+. Go to *Subjects > User* and create two active users, `quickstart-user` for the browser and `quickstart-pep` for OpenIG. Use a different generated password for each user.
+. Under *Subjects > Group*, create `quickstart-policy-evaluators`. On the group page, add `quickstart-pep` as its only member.
+. Under *Privileges*, select the group and grant only *REST calls for policy evaluation*. This lets OpenIG request decisions for the signed-in user's session. Save the privilege changes.
 
 [#configure-cookie-domain]
-.To Configure Cookie Domain in OpenAM
-====
-Navigate to Configure -> Global Services -> Platform -> Cookie Domain.
+==== Share the Session Cookie and Allow the Return URL
 
-Set the cookie domain to .example.com, and save your settings.
-====
+. Go to *Configure > Global Services > Platform* and set the cookie domain to `.example.test`. Save the setting. OpenAM's default session cookie is named `iPlanetDirectoryPro`.
+. Return to *Top Level Realm*. Under *Services*, add the *Validation Service* if it is missing. Add the exact URL `http://app.example.test:8081/protected` to *Valid goto URL Resources* and save. OpenAM can then return the browser to the protected page after login.
 
 [#configure-policy]
-.To Configure a Policy in OpenAM
-====
-OpenAM authenticates users and then makes authorization decisions based on access policies that indicate user entitlements. Follow these steps to create a policy that allows all authenticated users to perform an HTTP GET (for example, to browse) the Apache HTTP home page that you set up earlier.
+==== Allow GET Requests to the Protected URL
 
-. In the OpenAM console, select the Top Level Realm on the Realms page.
-+
-OpenAM allows you to organize identities, policies, and policy agent profiles into realms as described in xref:../admin-guide/chap-realms.adoc#chap-realms["Configuring Realms"] in the __Administration Guide__. For now, use the default Top Level Realm.
+. In *Top Level Realm*, go to *Authorization > Policy Sets > Default Policy Set > Add a Policy*.
+. Name the policy `Quickstart protected page`. Select the `URL` resource type, choose the `*://*:*/*` pattern, replace it with `http://app.example.test:8081/protected`, and select *Add*. Create the policy.
+. On the *Actions* tab, add *GET*, set it to *Allow*, and save your changes.
+. On the *Subjects* tab, edit the default subject to use *Authenticated Users*. Confirm the selection and save your changes.
 
-. On the Realm Overview page, navigate to Authorization > Policy Sets > `Default Policy Set` > Add a Policy.
-+
+[#start-openig]
+==== Start OpenIG
 
-[#figure-gsg-policies-add-a-new-policy]
-image::images/gsg-policies-add-a-new-policy.png[]
-+
-For more information on the relationship between realms, policy sets, and policies, see xref:../admin-guide/chap-authz-policy.adoc#what-is-authz["About Authorization in OpenAM"] in the __Administration Guide__.
+anchor:install-web-policy-agent[]
+In a new working directory, create the subdirectory `routes`. Save the following as `routes/10-protected.json`.
 
-. On the New Policy page, enter the following data:
-+
-
-.. In the Name field, give your new policy the name `Authenticated users can get Apache HTTP home page`.
-
-.. On the Resource Type drop-down list, select `URL`.
-
-.. On the Resources drop-down list, select the URL pattern for your policy. In this example, select `*://*:*/*`, then enter the resource URL: `\http://www.example.com:8000/*`, and then click Add.
-+
-
-[#figure-gsg-policies-new-policies-settings]
-image::images/gsg-policies-new-policies-settings.png[]
-
-.. Click Create to save your settings.
-+
-
-[#figure-gsg-policies-new-settings]
-image::images/gsg-policies-new-settings.png[]
-
-
-. On your policy page, select the Actions tab, and then enter the following information:
-+
-
-.. On the Add an action drop-down list, select `GET`.
-
-.. On the Add an action drop-down list, select `POST`.
-
-.. Save your changes.
-+
-
-[#figure-gsg-policies-actions]
-image::images/gsg-policies-actions.png[]
-
-
-. On your policy page, navigate to Subjects and enter the following data:
-+
-
-.. On the All of drop-down list, review the list and select `All of...`.
-
-.. On the Type section, click the Edit icon. On the Type drop-down list, select `Authenticated Users`, and then click the checkmark.
-
-.. Save your changes.
-+
-
-[#figure-gsg-policies-subjects]
-image::images/gsg-policies-subjects.png[]
-
-
-. Review your configuration. To make changes to the configuration, click the relevant tab and amend the configuration.
-
-====
-Next, you must create a web policy agent profile before installing the agent in Apache HTTP Server to enforce your new policy.
-
-[#create-web-policy-agent-profile]
-.To Create a Web Policy Agent Profile
-====
-OpenAM stores profile information about policy agents centrally by default. You can manage the policy agent profile through OpenAM Console. The policy agent retrieves its configuration from its OpenAM profile at installation and start up, and OpenAM notifies the policy agent of changes to its configuration. Follow these steps before installing the policy agent itself.
-
-. In OpenAM Console, browse to Realms > / Top Level Realm > Applications > Web Agents, and then click New in the Agents table.
-
-. In the page to configure your new web policy agent, set the following values.
-+
---
-
-Name::
-`WebAgent`
-
-Password::
-`password`
-
-Configuration::
-Keep the default, `Centralized`
-
-Server URL::
-`\http://openam.example.com:8080/openam`
-
-Agent URL::
-`\http://www.example.com:8000`
-+
-8000 is the port number you set previously for Apache HTTP Server.
-
---
-+
-
-[#figure-web-agent-profile]
-image::images/web-agent-profile.png[]
-
-. Click Create to save the new web policy agent profile in OpenAM.
-+
-Next, install a policy agent in Apache HTTP Server to enforce your new policy.
-
-====
-
-[#install-web-policy-agent]
-.To Install OpenAM Web Policy Agent
-
-====
-Create a Dockerfile on your machine folder with the following contents:
-
-[source, dockerfile]
+[source,json]
 ----
-FROM httpd:2.4.34
-
-ENV PA_PASSWORD secret12
-
-#Install pre-requisite packages
-RUN echo "deb [trusted=yes] http://archive.kernel.org/debian-archive/debian/ jessie main" >> /etc/apt/sources.list
-
-RUN apt-get update || true
-
-RUN apt-get install -y curl unzip
-
-#Install OpenAM Apache Agent
-RUN curl -L -o /tmp/Apache_v24_Linux_64bit_4.1.1.zip https://github.com/OpenIdentityPlatform/OpenAM-Web-Agents/releases/download/4.1.1/Apache_v24_Linux_64bit_4.1.1.zip
-
-RUN unzip /tmp/Apache_v24_Linux_64bit_4.1.1.zip -d /usr/
-
-RUN rm /tmp/Apache_v24_Linux_64bit_4.1.1.zip
-
-RUN echo $PA_PASSWORD > /tmp/pwd.txt
-
-RUN cat /tmp/pwd.txt
-
-RUN cat /etc/issue
-
-#Configure OpenAM Apache Agent
-RUN /usr/web_agents/apache24_agent/bin/agentadmin --s "/usr/local/apache2/conf/httpd.conf" "http://openam.example.com:8080/openam" "http://example.com:80" "/" "WebAgent" "/tmp/pwd.txt" --acceptLicence --changeOwner
+{
+  "condition": "${request.uri.path == '/protected'}",
+  "handler": {
+    "type": "Chain",
+    "config": {
+      "filters": [
+        {
+          "type": "SingleSignOnFilter",
+          "config": {
+            "openamUrl": "http://openam.example.test:8080/openam"
+          }
+        },
+        {
+          "type": "PolicyEnforcementFilter",
+          "config": {
+            "openamUrl": "http://openam.example.test:8080/openam",
+            "pepUsername": "quickstart-pep",
+            "pepPassword": "${env['OPENIG_PEP_PASSWORD']}",
+            "ssoTokenSubject": "${contexts.ssoToken.value}"
+          }
+        }
+      ],
+      "handler": {
+        "type": "StaticResponseHandler",
+        "config": {
+          "status": 200,
+          "headers": {
+            "Content-Type": ["text/plain; charset=utf-8"]
+          },
+          "entity": "Protected by OpenAM"
+        }
+      }
+    }
+  }
+}
 ----
 
-Build Apache Docker image with the preconfigured OpenAM Apache Policy Agent.
+Save the following as `compose.yaml` in the working directory. OpenIG joins the Docker network created earlier and reaches OpenAM by its network alias.
 
-[source, console]
+[source,yaml]
 ----
-docker build --network=host -t apache_agent -f Dockerfile .
+services:
+  openig:
+    image: openidentityplatform/openig:6.2.0
+    ports:
+      - "127.0.0.1:8081:8080"
+    environment:
+      - OPENIG_PEP_PASSWORD
+    volumes:
+      - ./routes:/var/openig/config/routes:ro
+    networks:
+      - quickstart
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--output", "/dev/null", "http://localhost:8080/protected"]
+      interval: 5s
+      start_period: 30s
+networks:
+  quickstart:
+    external: true
+    name: openam-quickstart
 ----
 
-Run the image:
+Enter the `quickstart-pep` password when prompted and wait for OpenIG to start.
 
-[source, console]
+[source,shell]
 ----
-docker run -it --name apache_agent -p 8000:80 -h www.example.com --shm-size 2G --network openam-quickstart  apache_agent
+(
+  IFS= read -rs -p 'Password for quickstart-pep: ' OPENIG_PEP_PASSWORD || exit
+  printf '\n'
+  export OPENIG_PEP_PASSWORD
+  docker compose up --wait
+)
 ----
-
-====
-
 
 [#try-it-out]
-=== Trying It Out
+=== Verify the Redirect, Access, and Logout
 
-Now that you have completed the steps above, you can access the protected web page to see OpenAM at work.
-
-. Log out of OpenAM Console.
-
-. Browse to `\http://www.example.com:8000` to attempt to access the Apache "It works!" page.
+. In your terminal, send an unauthenticated GET request to the protected URL. Expect HTTP 302 and a `Location` header pointing to OpenAM.
 +
-At this point, the policy agent intercepts your request for the page. Your browser does not return a cookie indicating an OpenAM session, so the policy agent redirects you to OpenAM to authenticate.
+[source,shell]
+----
+curl -sS -D - -o /dev/null http://app.example.test:8081/protected
+----
+. Sign out of the administrator console. In a browser, open http://app.example.test:8081/protected[the protected page] and sign in as `quickstart-user`. OpenAM should return you to the protected page. Check for HTTP 200 in the browser's Network panel and the text `Protected by OpenAM`.
+. While on the protected page and still signed in, run this request in the browser's developer console. Expect 403 because the policy grants only GET.
++
+[source,javascript]
+----
+fetch('/protected', { method: 'POST' }).then(response => console.log(response.status))
+----
+. Open http://openam.example.test:8080/openam/[OpenAM] in the same browser and select *Log out* from the user menu. Open the protected page again. Expect another HTTP 302 to OpenAM and a sign-in prompt.
 
-. Log in as the built-in OpenAM demonstration user `demo` with password `changeit`.
-+
-The `demo` account is created *inactive*, because `changeit` is a published default password and an active account carrying it would be usable by anyone who knows the product. Before this step, activate it in the OpenAM console under Realms > Top Level Realm > Identities > demo, keeping `changeit` as its password so that the steps below work as written. When you have finished the tutorial, delete the account — outside of a tutorial, an account whose password is published in the product source has no place in a deployment. See xref:../admin-guide/chap-securing.adoc#avoid-obvious-defaults["Avoiding Obvious Defaults"] in the __Administration Guide__.
-+
+[#quickstart-cleanup]
+=== Clean Up
 
-[#figure-openam-login]
-image::images/openam-login.png[]
-+
-On successful login, OpenAM sets a session cookie named `iPlanetDirectoryPro` in your browser for the domain `.example.com`. The cookie is then returned to servers in the `example.com` domain, such as `openam.example.com` and `www.example.com`.
-+
-If you examine this cookie in your browser, you see that it has a value, such as `AQIC5wM2LY4SfcwciyfvJcQDUIB7kIWEH187Df_txqLdAVc.*AAJTSQACMDEAAlNLABMxMDYwNzY1MjQ0NTE0ODI2NTkx*`. This is the SSO Token value. The value is in fact an encrypted reference to the session that is stored only by OpenAM. So, only OpenAM can determine whether you are actually logged in, or instead, that the session is no longer valid and you need to authenticate again.
-+
-The OpenAM session is used for SSO. When the browser presents the cookie to a server in the domain, the agent on the server can check with OpenAM using the SSO Token as a reference to the session. This lets OpenAM make policy decisions based on who is authenticated, or prompt for additional authentication, if necessary.
-+
-Your SSO session can end in a few ways. For example, when examining the cookie in your browser, you should notice that it expires when the browser session ends (when you shut down your browser). Alternatively, you can log out of OpenAM explicitly. Sessions can also expire. OpenAM sets two limits, one that causes your session to expire if it remains inactive for a configurable period of time (default: 30 minutes), and another that caps the session lifetime (default: 2 hours).
+Run `docker compose down` from the directory containing `compose.yaml` if you started OpenIG. Then remove the OpenAM container and the Docker network.
 
-. After successful login, you are redirected to the Apache "It works!" page.
-+
+[source,shell]
+----
+docker stop openam-quickstart
+docker rm openam-quickstart
+docker network rm openam-quickstart
+----
 
-[#figure-web-server-home-page-again]
-image::images/web-server-home-page.png[]
-+
-In the background, OpenAM redirected your browser again to the page you tried to access originally, `\http://www.example.com:8000`. This time, the web policy agent intercepted the request and found the SSO Token so it could request a policy decision from OpenAM regarding whether the user with the SSO Token has access to get `\http://www.example.com:8000/`. OpenAM replied to the policy agent that it could allow access, and the policy agent allowed Apache HTTP Server to send back the web page.
-
-Congratulations on protecting your first web site with OpenAM! Notice that you had only to install software and to configure OpenAM. You did not have to change your web site at all in order to add SSO and to set up access policies.
-
-OpenAM can do much more than protect web pages. Read the next chapter to learn more.
-
+The named volume retains your OpenAM configuration and directory. To delete that data, run `docker volume rm openam-quickstart-data`. Remove the local hosts file entries when you finish.
 
 [#try-out-stateless]
-=== Trying Out Stateless Sessions
+=== Explore Session Settings
 
-In the xref:#try-it-out["Trying It Out"] section, you successfully configured OpenAM and viewed the `iPlanetDirectoryPro` session cookie. The session cookie contains information for OpenAM or a policy agent to locate the session data object on the server from which the session originated. Sessions that are stored in a server's memory are called __stateful__, which is the default configuration at the realm level.
-
-OpenAM also supports __stateless__ sessions, in which the authenticated user's session is stored on the client-side (for example, in a browser), not in memory. The session cookie cannot be updated until the session ends, when the user logs out or the session expires.
-
-To try out stateless sessions, see xref:../admin-guide/chap-session-state.adoc#chap-session-state["Configuring Session State"] in the __Administration Guide__.
-
-
+The exercise uses the default stateful sessions. See xref:../admin-guide/chap-session-state.adoc[Configuring Session State] to learn about stateful and stateless sessions.

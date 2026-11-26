@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -20,74 +20,42 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-uninstall]
+endif::[]
 == Removing OpenAM Software
 
-This chapter shows you how to uninstall OpenAM core software. See the xref:../web-users-guide/index.adoc[OpenAM Web Policy Agent User's Guide], or the xref:../jee-users-guide/index.adoc[OpenAM Java EE Policy Agent User's Guide] for instructions on removing OpenAM agents.
+ifdef::env-site[]
+anchor:chap-uninstall[]
+endif::[]
+
+You can remove one node, reset an isolated lab instance, or retire the entire deployment. For removing policy agents, see the xref:../web-users-guide/chap-apache.adoc#uninstall-apache-agent[web agent guide] and the xref:../jee-users-guide/chap-apache-tomcat.adoc#uninstall-tomcat-agent[Java agent guide].
 
 [#uninstall-OpenAM-core]
-.To Remove OpenAM Core Software
-====
-After you have deployed and configured OpenAM core services, you may have as many as four locations where OpenAM files are stored on your system.
+=== Removing One OpenAM Node
 
-Following the steps below removes the OpenAM software and the internal configuration store. If you used an external configuration store, you can remove OpenAM configuration data after removing all the software.
-
-. Shut down the web application container in which you deployed OpenAM.
+. Identify the instance's server URL, context path, and base installation directory. In the console, check Deployment > Servers > _Server Name_ > General > System. Record its configuration store, identity store, and CTS endpoints and suffixes.
+. Remove the node from the load balancer and drain active requests. Back up its local configuration directory and keys, record any settings needed for rollback, and secure the backup. See xref:../upgrade-guide/chap-about-upgrades.adoc#pre-upgrade-backup[backup guidance].
+. If the node runs a replicated embedded OpenDJ instance, confirm that an up-to-date copy exists on the remaining nodes. Remove the retiring directory replica from the replication topology before shutting it down. See link:https://doc.openidentityplatform.org/opendj/admin-guide/chap-replication#stop-repl-permanent[Stopping Replication Permanently].
+. Stop the OpenAM application. If you use Tomcat dedicated to this node, stop the Tomcat service. In a shared container, undeploy only the intended application. Remove the instance's WAR, expanded web application, and any context descriptor that would redeploy the WAR. For Docker, stop and remove the matching container. Keep its volume until the retirement is confirmed.
+. If retiring the node from a site, remove its registered server URL from a remaining server in the site. See xref:../reference/openam-cli-tools.adoc#ssoadm-delete-server[`ssoadm delete-server`]. Verify that the remaining nodes serve requests.
+. Once the removal is confirmed, remove the instance's local configuration directory and its bootstrap locator file, if any. The locator is an individual file named `AMConfig<normalized-webapp-path>` under the container service account's `$HOME/.openamcfg/` or legacy `$HOME/.openssocfg/`. For example, an expanded Tomcat app at `/path/to/tomcat/webapps/openam/` can use `$HOME/.openamcfg/AMConfig_path_to_tomcat_webapps_openam_`. Inspect the locator and confirm it points to the recorded base directory before deleting it. A preset configuration directory can eliminate the locator. Leave sibling locator files in place.
 +
+Removing the local configuration directory or its Docker volume also removes its embedded OpenDJ data and keystores. Keep shared configuration, CTS and identity services intact when retiring a single node.
 
-[source, console]
-----
-$ /etc/init.d/tomcat stop
-Password:
-Using CATALINA_BASE:   /path/to/tomcat
-Using CATALINA_HOME:   /path/to/tomcat
-Using CATALINA_TMPDIR: /path/to/tomcat/temp
-Using JRE_HOME:        /path/to/jdk/jre
-Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
- /path/to/tomcat/bin/tomcat-juli.jar
-----
+[#reset-evaluation-installation]
+=== Resetting a Disposable Evaluation Instance
 
-. Unconfigure OpenAM by removing the configuration files found in the $HOME directory of the user running the web application container.
-+
-A full uninstall of OpenAM core services and configuration files consists of removing the following directories:
+This procedure applies to an isolated instance that uses disposable embedded stores. Its local realms, identities, tokens and keys are discarded.
 
-* The configuration directory, by default `$HOME/openam`. If you did not use the default configuration location, check the value of the Base installation directory property under Deployment > Servers > __Server Name__ > General > System.
+. Stop the web application or container.
+. Move the verified local configuration directory and only its matching bootstrap locator file out of the way. With Docker, recreate the container with a new, empty volume mounted at `/usr/openam/config`. Keep the original files or volume until you confirm the reset.
+. Start OpenAM with the same WAR or image and open the setup URL. Complete xref:chap-install-core.adoc#configure-openam-defaults[evaluation setup] again.
+. After verifying the new installation, dispose of the old lab files or volume securely.
 
-* The hidden directory that holds a file pointing to the configuration directory. For example, if you are using Apache Tomcat as the web container, this file could be `$HOME/.openamcfg/AMConfig_path_to_tomcat_webapps_openam_` OR `$HOME/.openssocfg/AMConfig_path_to_tomcat_webapps_openam_`.
-+
---
+[#purge-openam-deployment]
+=== Retiring an Entire Deployment
 
-[source, console]
-----
-$ rm -rf $HOME/openam $HOME/.openamcfg
-----
-
-Or:
-
-[source, console]
-----
-$ rm -rf $HOME/openam $HOME/.openssocfg
-----
-
-If you used an external configuration store, you must remove the configuration manually from your external directory server. The default base DN for the OpenAM configuration is `dc=openam,dc=forgerock,dc=org`.
-
-
-[NOTE]
-======
-At this point, you can restart the web container and configure OpenAM anew if you only want to start over with a clean configuration rather than removing OpenAM completely.
-======
---
-
-. Undeploy the OpenAM web application.
-+
-For example, if you are using Apache Tomcat as the web container, remove the `.war` file and expanded web application from the container.
-+
-
-[source, console]
-----
-$ cd /path/to/tomcat/webapps/
-$ rm -rf openam.war openam/
-----
-
-====
-
+. Inventory dependent agents, applications, OAuth and federation integrations, and any shared directory or CTS data. Schedule the cutover and confirm the retention policy for each data store.
+. Back up each node's local configuration and keys and export or back up the external OpenAM data. Confirm the backups can be restored. Remove all OpenAM nodes using xref:#uninstall-OpenAM-core[the node removal procedure].
+. Ask the directory owner to remove only the external data dedicated to the retired deployment, after confirming that no remaining node or application uses it. Use the deployed suffix from installation settings or the bootstrap configuration. The current default for OpenAM configuration is `dc=openam,dc=openidentityplatform,dc=org`. External stores and older installations may use a different DN. Directory servers, shared LDAP entries, user data, shared CTS data, and shared indexes or schema can serve other applications and should be preserved.

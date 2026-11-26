@@ -12,7 +12,7 @@
   information: "Portions copyright [year] [name of copyright owner]".
  
   Copyright 2017 ForgeRock AS.
-  Portions Copyright 2024-2026 3A Systems LLC.
+  Portions Copyright 2024-2026 3A Systems, LLC.
 ////
 
 :figure-caption!:
@@ -30,354 +30,113 @@ ifdef::env-site[]
 anchor:chap-install-tools[]
 endif::[]
 
-OpenAM tools are found in `.zip` files where you unpacked the archive of the entire package, such as `~/Downloads/openam`. A list and description of these files follows.
---
-
-`SSOAdminTools-{openam-version}.zip`::
-Administration tools: `ampassword`, `ssoadm`, and `amverifyarchive`
-
-+
-See xref:#install-openam-admin-tools["To Set Up Administration Tools"].
-
-`SSOConfiguratorTools-{openam-version}.zip`::
-Configuration and upgrade tools, alternatives to using the GUI configuration wizard
-
-+
-See xref:#install-openam-config-tools["To Set Up Configuration Tools"].
-
---
+Download the tool ZIPs for the same version as OpenAM, either as xref:chap-prepare-install.adoc#download-openam-software[separate release assets or from the full kit]. Extract each archive into its own directory. The commands below use standalone downloads in `$HOME/Downloads`. Set `JAVA_HOME` to a supported JDK before running them.
 
 [#install-openam-admin-tools]
-.To Set Up Administration Tools
-====
+=== Installing the Administration Tools
 
-. Verify that OpenAM is installed and running before proceeding.
-
-. Verify that the `JAVA_HOME` environment variable is set properly:
-+
-
-[source, console]
-----
-$ echo $JAVA_HOME
-/path/to/jdk
-----
-
-. Create a file system directory to unpack the tools:
-+
-
-[source, console]
-----
-$ mkdir -p /path/to/openam-tools/admin
-----
-
-. Unpack the tools:
-+
-
-[source, console, subs="attributes+"]
-----
-$ cd /path/to/openam-tools/admin
-$ unzip ~/Downloads/openam/SSOAdminTools-{openam-version}.zip
-----
-
-. Add `--acceptLicense` to the `java` command at the end of the `setup` or `setup.bat` script if you want to auto-accept the license agreement and suppress the license acceptance screen to the user:
-+
+If the endpoints use private CAs, configure the JVM used by setup and by `ssoadm` to trust the issuing CA for each connection it makes. HTTPS to OpenAM and LDAPS to its configuration directory can have different issuers. For example, set `JDK_JAVA_OPTIONS` for this tools session with the path to a certificates-only JKS trust store containing the relevant CA certificates.
 
 [source, shell]
 ----
-$JAVA_HOME/bin/java -D"load.config=yes" \
-                    -D"help.print=$help_print" \
-                    -D"path.AMConfig=$path_AMConfig" \
-                    -D"path.debug=$path_debug" \
-                    -D"path.log=$path_log" \
-                    -cp "$CLASSPATH" com.sun.identity.tools.bundles.Main \
-                    --acceptLicense
+export JDK_JAVA_OPTIONS="${JDK_JAVA_OPTIONS:+$JDK_JAVA_OPTIONS }-Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.trustStore=/secure/openam-tools-truststore.jks"
 ----
 
-. (Optional)  If you use IBM Java, add `-D"amCryptoDescriptor.provider=IBMJCE"` and `-D"amKeyGenDescriptor.provider=IBMJCE"` options to the `setup` or `setup.bat` script before you install the tools.
+The server JVM also needs its own trust configuration for the directory connections it makes.
+
+. Verify the server has completed setup and is xref:chap-install-core.adoc#verify-openam-installation[ready]. Run setup on a host that can read the server's local bootstrap configuration and reach the relevant directory and OpenAM endpoints.
 +
-The options should be set for the `java` command at the end of the script:
-+
-
-[source, console]
+[source, console, subs="attributes+"]
 ----
-$ tail setup
-CLASSPATH="$CLASSPATH:resources"
-
-$JAVA_HOME/bin/java -D"load.config=yes" \
-                    -D"help.print=$help_print" \
-                    -D"path.AMConfig=$path_AMConfig" \
-                    -D"path.debug=$path_debug" \
-                    -D"path.log=$path_log" \
-                    -D"amCryptoDescriptor.provider=IBMJCE" \
-                    -D"amKeyGenDescriptor.provider=IBMJCE" \
-                    -cp "$CLASSPATH" \
-                    com.sun.identity.tools.bundles.Main
-----
-
-. Run the `setup` utility (`setup.bat` on Windows), providing paths to the directories where OpenAM configuration files are located, and where debug and log information will be located:
-+
-
-[source, console]
-----
+$ mkdir -p "$HOME/openam-tools/admin"
+$ cd "$HOME/openam-tools/admin"
+$ unzip "$HOME/Downloads/SSOAdminTools-{openam-version}.zip"
 $ ./setup
-Path to config files of OpenAM server [/home/user/openam]:
-Debug Directory [/path/to/openam-tools/admin/debug]:
-Log Directory [/path/to/openam-tools/admin/log]:
-The scripts are properly setup under directory:
- /path/to/openam-tools/admin/openam
-Debug directory is /path/to/openam-tools/admin/debug.
-Log directory is /path/to/openam-tools/admin/log.
-The version of this tools.zip is: version and date
-The version of your server instance is: OpenAM version and date
 ----
 +
-After setup, the tools are located under a directory named after the instance of OpenAM:
+On Windows, run `setup.bat`. To accept the license noninteractively after reviewing it, use `./setup --acceptLicense` or `setup.bat --acceptLicense`. Specify the OpenAM base configuration directory, which contains the bootstrap data, and writable locations for the tools' logs and debug files. For a typical WAR installation at `/openam`, the base directory is `$HOME/openam` under the container service account's home.
 +
+Setup generates `ssoadm`, `ampassword`, and `amverifyarchive` in a directory named for the deployed instance, for example `openam/bin`. The generated Windows scripts use the `.bat` extension.
 
+. For a site deployment, set the generated `ssoadm` script's `com.iplanet.am.naming.map.site.to.server` Java system property before the main class invocation, on a single line. Map the site URL to the specific server whose configuration you used for this setup.
++
+[source, shell]
+----
+-D"com.iplanet.am.naming.map.site.to.server=https://lb.example.com/openam=https://openam.example.com:8443/openam"
+----
+
+. Create a password file readable only by the operator, containing the OpenAM administrator password on a single line. Use a secure editor or a secret mounted by your secret manager. Pass the file to `ssoadm` and remove a temporary copy when finished.
++
 [source, console]
 ----
-$ ls openam/bin/
-ampassword  amverifyarchive  ssoadm
+$ chmod 400 /secure/openam-admin.pwd
+$ ./openam/bin/ssoadm list-servers -u amadmin -f /secure/openam-admin.pwd
 ----
 +
-On Windows, these files are `.bat` scripts.
-
-. (Optional)  If your web container uses a self-signed certificate as described in xref:../admin-guide/chap-certs-keystores.adoc#openam-with-https-on-tomcat["To Set Up OpenAM With HTTPS and Self-Signed Certificates"] in the __Administration Guide__, then the `ssoadm` command will not trust the certificate when connecting to OpenAM over HTTPS, or when OpenAM connects to the configuration store over LDAPS.
-+
-To allow the `ssoadm` command to trust the certificate, add the `-D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.jks"` option to the `ssoadm` or `ssoadm.bat` script before using the script.
-+
-The option should be set before the call to `com.sun.identity.cli.CommandManager` at the end of the script:
-+
-
-[source, console]
-----
-$ tail -2 /path/to/openam-tools/admin/openam/bin/ssoadm
-    -D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.jks" \
-    com.sun.identity.cli.CommandManager "$@"
-----
-
-. (Optional)  If you use IBM Java, add `-D"amCryptoDescriptor.provider=IBMJCE"` and `-D"amKeyGenDescriptor.provider=IBMJCE"` options to the `ssoadm` or `ssoadm.bat` script before using the script.
-+
-The options should be set before the call to `com.sun.identity.cli.CommandManager` at the end of the script:
-+
-
-[source, console]
-----
-$ tail -3 /path/to/openam-tools/admin/openam/bin/ssoadm
-    -D"amCryptoDescriptor.provider=IBMJCE" \
-    -D"amKeyGenDescriptor.provider=IBMJCE" \
-    com.sun.identity.cli.CommandManager "$@"
-----
-
-. Check that the `ssoadm` command works properly:
-+
-
-.. Create a text file, for example `$HOME/.pwd.txt`, containing the OpenAM administrative user's password string in cleartext on a single line.
-
-.. Make the text file read-only:
-+
-
-[source, console]
-----
-$ chmod 400 $HOME/.pwd.txt
-----
-
-.. Run the `ssoadm` command to list the configured servers:
-+
-
-[source, console]
-----
-$ cd /path/to/openam-tools/admin/openam/bin/
-$ ./ssoadm list-servers -u amadmin -f $HOME/.pwd.txt
-http://openam.example.com:8080/openam
-----
-
-
-. If desired, enable the `ssoadm.jsp` page as described in xref:../admin-guide/chap-admin-tools.adoc#openam-ssoadm-jsp-overview["OpenAM ssoadm.jsp"] in the __Administration Guide__.
-+
-You can run most (but not all) of the `ssoadm` subcommands from the `ssoadm.jsp` page in OpenAM after the page has been enabled.
-
-. If you have deployed OpenAM in a site configuration, edit the `ssoadm` (`ssoadm.bat` on Windows) script to map the site URL to the OpenAM server URL.
-+
-To do this, set the `com.iplanet.am.naming.map.site.to.server` system property as a `java` command option in the script. The option takes the following form:
-+
-
-[source, console]
-----
--D"com.iplanet.am.naming.map.site.to.server=lb-url=openam-url[,
- other-lb-url=openam-url ...]"
-----
-+
-The property maps each __lb-url__ key to an __openam-url__ value, where __lb-url__ is the URL to a site load balancer, and __openam-url__ is the URL to the OpenAM server against which you set up the `ssoadm` command.
-+
-
-[IMPORTANT]
-======
-The `ssoadm` command is dependent on the OpenAM server against which you set it up, so always map site load balancer URLs to that server's __openam-url__.
-======
-+
-For example, if your site is behind `\https://lb.example.com:443/openam`, and the OpenAM server against which you set up the `ssoadm` command is at `\http://openam.example.com:8080/openam`, then add the following property to the `java` command (all on one line without spaces):
-+
-
-[source, console]
-----
--D"com.iplanet.am.naming.map.site.to.server=
- https://lb.example.com:443/openam=http://openam.example.com:8080/openam"
-----
-+
-Repeat this step for each OpenAM server in your site configuration. You can install all your instances of `ssoadm` on the same host, but in each case the command should manage only one OpenAM server.
-
-====
+Confirm that the result lists the expected server or site members. For the optional browser interface, see xref:../admin-guide/chap-admin-tools.adoc#openam-ssoadm-jsp-overview[OpenAM ssoadm.jsp].
 
 [#install-openam-config-tools]
-.To Set Up Configuration Tools
-====
+=== Configuring OpenAM with the CLI
 
-. Verify the `JAVA_HOME` environment variable is properly set.
-+
-
-[source, console]
-----
-$ echo $JAVA_HOME
-/path/to/jdk
-----
-
-. Create a file system directory to unpack the tools.
-+
-
-[source, console]
-----
-$ mkdir -p /path/to/openam-tools/config
-----
-
-. Unpack the tools from where you unzipped OpenAM.
-+
-
-[source, console, subs="attributes"]
-----
-$ cd /path/to/openam-tools/config
-$ unzip ~/Downloads/openam/SSOConfiguratorTools-{openam-version}.zip
-Archive:  ~/Downloads/openam/SSOConfiguratorTools-{openam-version}.zip
-   creating: legal-notices/
-  inflating: legal-notices/LICENSE.DOM-software.html
-  inflating: legal-notices/NOTICE.resolver.txt
-  inflating: legal-notices/LICENSE.DOM-documentation.html
-        ... (more output) ...
- extracting: lib/xml-apis-2.11.0.jar
- extracting: openam-configurator-tool-{openam-version}.jar
- extracting: lib/servlet-api-2.5.jar
-----
-
-. Configure OpenAM server in a silent mode by using the openam-configurator-tool-{openam-version}.jar tool after you deploy the `.war` file.
-+
-OpenAM server must be deployed and running, but not configured yet, when you use the tool.
-+
-The openam-configurator-tool-{openam-version}.jar relies on a properties file to specify the configuration for the OpenAM server. The following example shows the equivalent of a default configuration, which installs OpenAM to run as HTTP.
-+
-If you want implement HTTPS, see the next step.
-+
-
-[source, console]
-----
-$ cp sampleconfiguration config.properties
-$ vi config.properties
-$ $ grep -v "^#" config.properties | grep -v "^$"
-SERVER_URL=http://openam.example.com:8080
-DEPLOYMENT_URI=/openam
-BASE_DIR=/home/openam/openam
-locale=en_US
-PLATFORM_LOCALE=en_US
-AM_ENC_KEY=
-ADMIN_PWD=password
-AMLDAPUSERPASSWD=secret12
-COOKIE_DOMAIN=openam.example.com
-ACCEPT_LICENSES=true
-DATA_STORE=embedded
-DIRECTORY_SSL=SIMPLE
-DIRECTORY_SERVER=openam.example.com
-DIRECTORY_PORT=50389
-DIRECTORY_ADMIN_PORT=4444
-DIRECTORY_JMX_PORT=1689
-ROOT_SUFFIX=dc=openam,dc=forgerock,dc=org
-DS_DIRMGRDN=cn=Directory Manager
-DS_DIRMGRPASSWD=password
-----
-+
-When the OpenAM server `.war` file is deployed and running, you can configure it by using the tool with the properties file.
-+
+Use the configurator on a deployed and running instance that is still on its first-boot setup screen. The command sends the properties to the server's configurator over HTTP or HTTPS. `BASE_DIR` is a path on the server, and it must be writable by the web container service account.
 
 [source, console, subs="attributes+"]
 ----
-$ java -jar openam-configurator-tool-{openam-version}.jar --file config.properties
-Checking license acceptance...License terms accepted.
-Checking configuration directory /home/openam/openam....Success.
-Installing OpenAM configuration store...Success RSA/ECB/OAEPWithSHA1AndMGF1...
-Extracting OpenDJ, please wait...Complete
-Running OpenDJ setupSetup command: --cli --adminConnectorPort 4444
- --baseDN dc=openam,dc=forgerock,dc=org --rootUserDN cn=Directory Manager
- --ldapPort 50389 --skipPortCheck --rootUserPassword xxxxxxx --jmxPort 1689
- --no-prompt --doNotStart --hostname openam.example.com ...
-...Success
-Installing OpenAM configuration store in /home/openam/openam/... ...Success.
-Creating OpenAM suffixImport+task+ ... ...Success
-Tag swapping schema files....Success.
-Loading Schema opendj_config_schema.ldif...Success.
-
-...
-
-...Success.
-Reinitializing system properties....Done
-Registering service dashboardService.xml...Success.
-
-...
-
-Configuring system....Done
-Configuring server instance....Done
-Creating demo user....Done
-Creating Web Service Security Agents....Done
-Setting up monitoring authentication file.
-Configuration complete!
-----
-
-. To configure HTTPS, you create a properties file and include the `SERVER_URL` property with the HTTPS URL and set the `DIRECTORY_SSL` to `SIMPLE` as follows:
-+
-
-[source, console]
-----
+$ mkdir -p "$HOME/openam-tools/config"
+$ cd "$HOME/openam-tools/config"
+$ unzip "$HOME/Downloads/SSOConfiguratorTools-{openam-version}.zip"
+$ umask 077
 $ cp sampleconfiguration config.properties
-$ vi config.properties
-$ $ grep -v "^#" config.properties | grep -v "^$"
-SERVER_URL=https://openam.example.com:1443
+$ chmod 600 config.properties
+----
+
+Edit `config.properties` in a private directory and replace the sample secrets before use. For the project Docker image, set `BASE_DIR=/usr/openam/config` to use its persistent configuration mount. `SERVER_URL` is the scheme, host, and port of the web endpoint. Set `DEPLOYMENT_URI` separately, for example `/openam`. Set a unique administrator password and a distinct default agent password, then set `ACCEPT_LICENSES=true` once you have reviewed and accepted the license. Leave `AM_ENC_KEY` blank to generate a key for a standalone installation.
+
+For an embedded evaluation instance, use `DATA_STORE=embedded` and the embedded directory settings and ports in `sampleconfiguration`. Set `DIRECTORY_SERVER` to the directory host and ensure its chosen ports are free. `DIRECTORY_SSL=SIMPLE` in an embedded example describes the directory connection. It does not affect `https://` in `SERVER_URL`.
+
+The following complete example configures an external configuration store and a separate OpenDJ identity store. Prepare the xref:chap-prepare-install.adoc#prepare-configuration-store[configuration store] and xref:chap-prepare-install.adoc#prepare-identity-repository[identity store] first.
+
+[source, properties]
+----
+SERVER_URL=https://openam.example.com:8443
 DEPLOYMENT_URI=/openam
-BASE_DIR=/home/openam/openam
+BASE_DIR=/var/lib/openam
 locale=en_US
 PLATFORM_LOCALE=en_US
 AM_ENC_KEY=
-ADMIN_PWD=password
-AMLDAPUSERPASSWD=secret12
+ADMIN_PWD=REPLACE_WITH_ADMIN_SECRET
+AMLDAPUSERPASSWD=REPLACE_WITH_DIFFERENT_AGENT_SECRET
 COOKIE_DOMAIN=openam.example.com
 ACCEPT_LICENSES=true
-DATA_STORE=embedded
-DIRECTORY_SSL=SIMPLE
-DIRECTORY_SERVER=openam.example.com
-DIRECTORY_PORT=50389
-DIRECTORY_ADMIN_PORT=4444
-DIRECTORY_JMX_PORT=1689
-ROOT_SUFFIX=dc=openam,dc=forgerock,dc=org
-DS_DIRMGRDN=cn=Directory Manager
-DS_DIRMGRPASSWD=password
+
+DATA_STORE=dirServer
+DIRECTORY_SSL=SSL
+DIRECTORY_SERVER=config-ds.example.com
+DIRECTORY_PORT=1636
+ROOT_SUFFIX=dc=am-config,dc=example,dc=com
+DS_DIRMGRDN=uid=openam,ou=admins,dc=am-config,dc=example,dc=com
+DS_DIRMGRPASSWD=REPLACE_WITH_CONFIG_STORE_SECRET
+
+USERSTORE_TYPE=LDAPv3ForOpenDS
+USERSTORE_SSL=SSL
+USERSTORE_HOST=identity-ds.example.com
+USERSTORE_PORT=1636
+USERSTORE_SUFFIX=dc=example,dc=com
+USERSTORE_MGRDN=uid=openam-setup,ou=admins,dc=example,dc=com
+USERSTORE_PASSWD=REPLACE_WITH_IDENTITY_STORE_SECRET
 ----
 
-. Then, when the OpenAM `.war` file is deployed and the server is running, configure the server to use HTTPS using the openam-configurator-tool-{openam-version}.jar tool with the properties file as follows.
-+
+`DIRECTORY_SSL=SSL` and `USERSTORE_SSL=SSL` select LDAPS, using the corresponding LDAPS listener ports. The installer accepts `SSL` and `SIMPLE` for these settings. Configure the server JVM to trust the LDAP certificate issuers. The configurator JVM only needs HTTPS trust for its own connection to OpenAM.
 
-[source, console, subs="attributes"]
+Run the configurator with the edited properties file. This example uses a certificates-only JKS trust store. Omit the trust store options if the CLI JVM already trusts the OpenAM HTTPS issuer.
+
+[source, console, subs="attributes+"]
 ----
-java '-Djavax.net.ssl.trustStore=PATH_TO_JKS_TRUSTSTORE' \
-      -jar openam-configurator-tool-{openam-version}.jar \
-      --file config.properties
+$ "$JAVA_HOME/bin/java" -Djavax.net.ssl.trustStoreType=JKS \
+    -Djavax.net.ssl.trustStore=/secure/openam-https-truststore.jks \
+    -jar openam-configurator-tool-{openam-version}.jar --file config.properties
 ----
 
-====
-For additional information about the command-line tool, see the reference documentation for xref:../reference/openam-cli-tools.adoc#man-configurator-jar-1[configurator.jar(1)] in the __Reference__.
+Check the configurator output and server installation log, run the xref:chap-install-core.adoc#verify-openam-installation[readiness and sign-in checks], and remove the temporary properties file containing credentials.
 
+The tool configures OpenAM and can provision embedded OpenDJ. Prepare external directory backends, certificates, and account permissions in advance. When adding a node to an existing deployment, use its shared configuration store and the existing deployment's settings. The separate `USERSTORE_*` settings apply to the first node. See the comments in `sampleconfiguration` for `existingserverid` and site properties, and the xref:../reference/openam-cli-tools.adoc#man-configurator-jar-1[configurator.jar reference] for invocation details.
