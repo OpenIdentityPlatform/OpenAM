@@ -312,7 +312,9 @@ test.describe("OAuth2 device endpoints", () => {
       const response = await submitCode(request, "not-a-valid-device-code");
       const html = await htmlPage(response, 200, "Unknown user code");
       expectMain(html, "main-device");
-      expect(pageData(html).errorCode === "not_found", "Unknown user code marker").toBe(true);
+      const model = pageData(html);
+      expect(model.errorCode === "not_found", "Unknown user code marker").toBe(true);
+      requireNonempty(model.csrf, "Unknown user code form CSRF");
       expect(response.headers()["location"] === undefined, "Unknown user code has no Location").toBe(true);
     }
     await test.step("anonymous", () => expectUnknown(anonymous));
@@ -355,6 +357,7 @@ test.describe("OAuth2 device endpoints", () => {
         const { csrf } = await consentPage(session, code);
         const response = await submitDecision(session, code, { decision, csrf });
         const html = await htmlPage(response, 200, "Device consent " + decision);
+        expectMain(html, "main-device");
         const model = pageData(html);
         expect(model.done === true, "Device consent is complete").toBe(true);
         // CodeThanks.ftl currently appends /XUI to the realm. The realm field should identify the root realm as /.
