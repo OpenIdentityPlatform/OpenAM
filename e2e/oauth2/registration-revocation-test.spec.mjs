@@ -121,14 +121,12 @@ function agentUrl(id) {
   return AGENTS + "/" + encodeURIComponent(id);
 }
 
-async function readForCleanup(request, url, headers, confirmed) {
+async function readForCleanup(request, url, headers, retryNotFound) {
   const read = () => request.get(url, { headers });
-  if (confirmed) {
-    return read();
-  }
   const response = await read().catch(() => null);
   const status = response?.status();
-  return !response || status === 408 || status === 429 || status >= 500 ? read() : response;
+  return !response || (retryNotFound && status === 404) || status === 408 || status === 429 || status >= 500
+    ? read() : response;
 }
 
 const test = base.extend({
@@ -195,6 +193,7 @@ const test = base.extend({
         [CLIENT_ATTR + "scopes"]: ["[0]=profile"],
         sunIdentityServerDeviceStatus: "Active",
       }));
+      confirmed.add(id);
       return { id, name, secret };
     }
 
@@ -216,7 +215,9 @@ const test = base.extend({
       const response = await request.post(REGISTRATION, options);
       const body = await response.json();
       trackClient(body?.client_id, name);
-      trackToken(body?.registration_access_token, { id: body?.client_id, secret: body?.client_secret });
+      trackToken(body?.registration_access_token, {
+        id: body?.client_id, secret: body?.client_secret, registrationName: name,
+      });
       return { response, body };
     }
 
@@ -243,17 +244,66 @@ const test = base.extend({
         }
       }
 
+      const ownedClients = new Set();
+      const session = names.size ? await attempt(administrator) : undefined;
+      if (session) {
+        const { request, headers } = session;
+        const collection = await attempt(() => listClients(request, headers));
+        for (const record of collection ?? []) {
+          const name = clientNames(record).find((value) => names.has(value));
+          if (name) {
+            trackClient(record._id, name);
+          }
+        }
+        for (const [id, name] of clients) {
+          const listed = collection?.find((record) => record._id === id);
+          const knownOwner = listed ? isClient(listed, id, name) : confirmed.has(id);
+          const owned = await attempt(async () => {
+            const response = await readForCleanup(request, agentUrl(id), headers, Boolean(listed) || knownOwner);
+            if (response.status() === 404) {
+              const current = listed ? await attempt(() => listClients(request, headers)) : collection;
+              const record = current?.find((entry) => entry._id === id);
+              if (current && !record) {
+                return false;
+              }
+              failures.push("Cleanup GET 404 could not be confirmed by the OAuth2 client collection");
+              return record ? isClient(record, id, name) : knownOwner;
+            }
+            if (response.status() === 200 && !isClient(await response.json(), id, name)) {
+              failures.push("Cleanup found an OAuth2 client with an unexpected ID or name");
+              return false;
+            }
+            expectJsonResponse(response, 200, "Read OAuth2 client before cleanup");
+            return true;
+          });
+          if (owned ?? knownOwner) {
+            ownedClients.add(id);
+          }
+        }
+      }
+
       // Revoke while the token's issuing client still exists.
       for (const [token, credentials] of tokens) {
-        const alreadyInvalid = await attempt(async () => {
+        const { id, secret, registrationName } = credentials;
+        if (registrationName && (!ownedClients.has(id) || clients.get(id) !== registrationName || !nonempty(secret))) {
+          failures.push("Cannot confirm the registration token belongs to a test client");
+          continue;
+        }
+        const needsRevocation = await attempt(async () => {
           const response = await tokenInfo(clientRequest(), token);
-          if (response.status() === 200) {
+          if (response.status() !== 200) {
+            await expectInvalidToken(response, "Read token before cleanup");
             return false;
           }
-          await expectInvalidToken(response, "Read token before cleanup");
+          const body = await response.json();
+          if (body?.client_id !== id || body?.access_token !== token) {
+            failures.push("Cleanup token lookup returned an unexpected client or access token");
+            return false;
+          }
+          expectJsonResponse(response, 200, "Read token before cleanup");
           return true;
         });
-        if (alreadyInvalid) {
+        if (needsRevocation === false) {
           continue;
         }
         await attempt(async () => {
@@ -264,52 +314,23 @@ const test = base.extend({
         });
       }
 
-      if (names.size) {
-        const session = await attempt(administrator);
-        if (session) {
-          const { request, headers } = session;
-          const collection = await attempt(() => listClients(request, headers));
-          for (const record of collection ?? []) {
-            const name = clientNames(record).find((value) => names.has(value));
-            if (name) {
-              trackClient(record._id, name);
-            }
-          }
-          const deleted = new Set();
-          for (const [id, name] of clients) {
-            const url = agentUrl(id);
-            const before = await attempt(async () => {
-              const response = await readForCleanup(request, url, headers, confirmed.has(id));
-              if (response.status() === 404) {
-                if (!collection || collection.some((record) => record._id === id)) {
-                  failures.push("Cleanup GET 404 could not be confirmed by the OAuth2 client collection");
-                }
-                return "absent";
-              }
-              expectJsonResponse(response, 200, "Read OAuth2 client before cleanup");
-              return isClient(await response.json(), id, name) ? "owned" : "foreign";
-            });
-            if (before === "foreign") {
-              failures.push("Cleanup found an OAuth2 client with an unexpected ID or name");
-            }
-            if (before !== "owned" && !(before === undefined && confirmed.has(id))) {
-              continue;
-            }
-            deleted.add(id);
-            await attempt(async () => {
-              const response = await request.delete(url, { headers });
-              expect(response.ok(), "Delete OAuth2 client HTTP " + response.status()).toBe(true);
-            });
-            await attempt(async () => {
-              expect((await request.get(url, { headers })).status(), "Read OAuth2 client after cleanup").toBe(404);
-            });
-          }
+      if (session) {
+        const { request, headers } = session;
+        for (const id of ownedClients) {
+          const url = agentUrl(id);
           await attempt(async () => {
-            const remaining = await listClients(request, headers);
-            expect(remaining.some((record) => deleted.has(record._id) ||
-              clientNames(record).some((name) => names.has(name))), "No test OAuth2 clients remain after cleanup").toBe(false);
+            const response = await request.delete(url, { headers });
+            expect(response.ok(), "Delete OAuth2 client HTTP " + response.status()).toBe(true);
+          });
+          await attempt(async () => {
+            expect((await request.get(url, { headers })).status(), "Read OAuth2 client after cleanup").toBe(404);
           });
         }
+        await attempt(async () => {
+          const remaining = await listClients(request, headers);
+          expect(remaining.some((record) => ownedClients.has(record._id) ||
+            clientNames(record).some((name) => names.has(name))), "No test OAuth2 clients remain after cleanup").toBe(false);
+        });
       }
       for (const request of contexts) {
         await attempt(() => request.dispose());
@@ -339,6 +360,7 @@ test("registers a client and reads it with the registration access token", async
   expect(nonempty(id), "Registration returns a client ID").toBe(true);
   expect(nonempty(secret), "Registration returns a client secret").toBe(true);
   expect(nonempty(token), "Registration returns a registration access token").toBe(true);
+  expect(body.client_name === name, "Registration returns the supplied client name").toBe(true);
   expect(JSON.stringify(body.redirect_uris) === JSON.stringify(REDIRECT_URIS), "Registration returns the supplied redirect URIs").toBe(true);
   const uri = REGISTRATION + "?client_id=" + encodeURIComponent(id);
   expect(body.registration_client_uri === uri, "Registration returns its management URI").toBe(true);
