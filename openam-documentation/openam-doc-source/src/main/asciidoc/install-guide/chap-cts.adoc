@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-cts]
+endif::[]
 == Configuring the Core Token Service
+
+ifdef::env-site[]
+anchor:chap-cts[]
+endif::[]
 
 The Core Token Service (CTS) persists established stateful sessions and holds token data for services such as OAuth 2.0, SAML 2.0, and UMA according to their configuration. It also holds the revocation denylist when configured for stateless sessions.
 
@@ -40,12 +46,13 @@ CTS helps your deployment avoid single points of failure (SPOF). To reduce the i
 
 * *Determine the CTS Deployment Architecture*. With an external OpenDJ CTS store, choose between two connection strategies.
 +
-** *Active/passive*. OpenAM sends operations to a preferred directory server and uses another replica when that server is unavailable.
-** *Affinity*. OpenAM distributes operations across writable replicas and routes requests for the same token DN to the same server while that server is available.
+** *Active/passive*. Each OpenAM server uses the first available replica in its pool. It prioritizes replicas assigned to that server, then those assigned to its site, then the remaining replicas. Servers at different sites can therefore use different preferred replicas.
+** *Affinity*. Within a pool, OpenAM maps the hash of a token DN to a position in the ordered replica list. Requests for that DN start with the same replica, and the pool tries another replica if the first is unavailable.
 +
-List the directory servers directly in Connection String(s). OpenAM selects replicas using its CTS connection strategy and can prioritize different replicas for different servers or sites.
-An external LDAP load balancer hides the individual replicas from OpenAM.
-A read can reach a replica before the corresponding write arrives, including after failover or a change in the preferred site.
+Affinity across pools requires the same replicas in the same effective order. OpenAM shuffles replicas of equal priority when it builds each pool, so identical connection strings can produce different orders. If your deployment relies on cross-node affinity, verify that the same test DN selects the same initial replica on each node with the replicas available. Repeat after the pools are reinitialized.
++
+List the directory servers directly in Connection String(s). An external LDAP load balancer hides the individual replicas from OpenAM.
+A read can reach a different replica before the corresponding write arrives, including during failover or a change in the preferred site.
 Test response times, replication lag, and recovery for the selected strategy.
 
 The following example uses separate OpenDJ pools for configuration and CTS and sends CTS operations to a preferred replica. The load balancer serves the OpenAM HTTP tier.
@@ -459,23 +466,16 @@ Or, you can obtain a copy of a `dsconfig` batch file, which adds all of your ind
   --no-prompt
 ----
 
-. Rebuild all indexes and then verify them:
+. Stop the OpenDJ instance, rebuild all indexes offline, and verify them. Start the instance after verification succeeds.
 +
 
 [source, console]
 ----
-./rebuild-index \
-  --port 4444 \
-  --bindDN "cn=Directory Manager" \
-  --bindPassword password \
-  --baseDN "dc=cts,dc=example,dc=com" \
-  --rebuildAll \
-  --start 0
-
-./verify-index --baseDN "dc=cts,dc=example,dc=com"
+./stop-ds &&
+  ./rebuild-index --offline --baseDN "dc=cts,dc=example,dc=com" --rebuildAll &&
+  ./verify-index --baseDN "dc=cts,dc=example,dc=com" --countErrors &&
+  ./start-ds
 ----
-
-. Restart the OpenDJ instance.
 
 ====
 
@@ -484,6 +484,8 @@ Or, you can obtain a copy of a `dsconfig` batch file, which adds all of your ind
 ==== OpenAM CTS Configuration
 
 At this stage, you have successfully set up the external OpenDJ directory server. You must now set up the CTS repository on OpenAM using the OpenAM console.
+
+When switching a running deployment, schedule a coordinated cutover. Drain all participating OpenAM servers from production traffic before changing these settings and keep administrative access available.
 
 [#cts-openam-gui]
 .To Configure CTS in OpenAM
@@ -553,7 +555,10 @@ a|For production, this value needs to be tuned.
 +
 [#cts-global-attribute-settings]
 OpenAM 16.x uses CTS for stateful session persistence. Verify that all participating OpenAM servers have the intended CTS settings and can reach the configured directory replicas.
-. Validate the new store and test failover before directing production traffic to it.
+. Restart all participating OpenAM servers to initialize their CTS connection pools with the saved settings.
+. Sign in as a test user through a restarted node. In a multi-node site, use the load-balanced site URL and direct this sign-in to a specific node. Verify that the new stateful session record was written to external CTS.
+. In a multi-node site, stop the issuing node. Use the same site URL and client session to verify that a second restarted node reads the record from external CTS and resumes the session. Bring the issuing node back online after the check.
+. Restore production traffic after the applicable checks pass.
 ====
 
 [#cts-testing-failover]

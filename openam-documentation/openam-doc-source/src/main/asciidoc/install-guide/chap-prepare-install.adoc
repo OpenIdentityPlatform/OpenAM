@@ -21,8 +21,14 @@
 :openam-version: x.y.z
 
 
+ifndef::env-site[]
 [#chap-prepare-install]
+endif::[]
 == Preparing For Installation
+
+ifdef::env-site[]
+anchor:chap-prepare-install[]
+endif::[]
 
 This chapter covers prerequisites for installing OpenAM software, including how to prepare your application server to run OpenAM, how to prepare directory servers to store configuration data, and how to prepare an identity repository to handle OpenAM identities.
 

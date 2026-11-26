@@ -18,8 +18,14 @@ Copyright 2026 3A Systems, LLC.
 :example-caption!:
 :table-caption!:
 
+ifndef::env-site[]
 [#how-to-run-openam-in-kubernetes]
+endif::[]
 == How To Run OpenAM in Kubernetes
+
+ifdef::env-site[]
+anchor:how-to-run-openam-in-kubernetes[]
+endif::[]
 
 [[how-to-run-openam-in-kubernetes-preface]]
 === Preface

@@ -21,8 +21,14 @@
 :openam-version: x.y.z
 
 
+ifndef::env-site[]
 [#chap-intro]
+endif::[]
 == Introduction to Deployment Planning
+
+ifdef::env-site[]
+anchor:chap-intro[]
+endif::[]
 
 OpenAM provides authentication, session management, authorization, and federation. A deployment plan identifies the applications and users it serves, the protocols they use, and the infrastructure that keeps those services available. Start by selecting the integrations you need and identifying the dependencies each adds.
 

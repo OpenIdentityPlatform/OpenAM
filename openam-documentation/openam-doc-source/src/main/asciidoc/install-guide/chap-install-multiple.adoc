@@ -122,6 +122,8 @@ OpenAM can use proxy-provided values such as the client IP address for risk-base
 
 For example, use a container feature such as Tomcat's Remote IP Valve to derive the client address from trusted proxies. If you configure OpenAM itself to consume a client IP header, set `com.sun.identity.authentication.client.ipAddressHeader` under Deployment > Servers > __Server Name__ > Advanced to the header controlled by that trusted proxy layer. See xref:../admin-guide/chap-openid-connect.adoc#configure-base-url-source[Configuring the Base URL Source Service] for public URL settings.
 
+For classic login requests that OpenAM can forward between servers, add the same trusted header to the comma-separated list in `openam.retained.http.request.headers` under Advanced on each forwarding server. Keep the existing entries. With the default list and `X-Forwarded-For`, use `X-DSAMEVersion,X-Forwarded-For`. Restart the affected servers to load the updated list. Continue a multi-step classic login through a different node and verify that the original node uses the client address supplied by the trusted proxy.
+
 [#handle-multiple-cookie-domains-wildfly]
 === Handling Multiple Cookie Domains When Using Wildfly
 

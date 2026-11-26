@@ -21,8 +21,14 @@
 :openam-version: x.y.z
 
 
+ifndef::env-site[]
 [#chap-install-tools]
+endif::[]
 == Installing OpenAM Tools
+
+ifdef::env-site[]
+anchor:chap-install-tools[]
+endif::[]
 
 OpenAM tools are found in `.zip` files where you unpacked the archive of the entire package, such as `~/Downloads/openam`. A list and description of these files follows.
 --

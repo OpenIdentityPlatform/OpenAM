@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-high-level-start]
+endif::[]
 == Getting Started for Architects and Deployers
+
+ifdef::env-site[]
+anchor:chap-high-level-start[]
+endif::[]
 
 Use this checklist to prepare a deployment proposal, agree on acceptance criteria, and hand the service over to its operators.
 For an evaluation, start with a pilot that demonstrates the critical application flows. For production, complete the acceptance and recovery checks before admitting client traffic.

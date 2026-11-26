@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-topologies]
+endif::[]
 == Example Deployment Topology
+
+ifdef::env-site[]
+anchor:chap-topologies[]
+endif::[]
 
 This chapter shows how to deploy OpenAM 16.x behind a reverse proxy and load balancer. xref:#openam-sites[Sites] describes a single-site deployment. xref:#multi-sites[Multiple Sites] covers the additional decisions for operating across data centers.
 

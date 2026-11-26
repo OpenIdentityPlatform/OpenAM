@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-hw-sw-requirements]
+endif::[]
 == OpenAM Hardware and Software Requirements
+
+ifdef::env-site[]
+anchor:chap-hw-sw-requirements[]
+endif::[]
 
 Select a target OpenAM release, a deployment package, and a data store for each role before sizing the deployment. Use the release requirements for compatibility and xref:chap-sizing.adoc#chap-sizing[Sizing Hardware and Services for Deployment] to validate resource estimates under load.
 

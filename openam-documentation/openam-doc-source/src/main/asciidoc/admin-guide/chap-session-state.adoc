@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-session-state]
+endif::[]
 == Configuring Session State
+
+ifdef::env-site[]
+anchor:chap-session-state[]
+endif::[]
 
 OpenAM supports two types of sessions: __stateful__ and __stateless__.
 

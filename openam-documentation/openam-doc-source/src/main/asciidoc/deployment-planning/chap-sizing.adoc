@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-sizing]
+endif::[]
 == Sizing Hardware and Services for Deployment
+
+ifdef::env-site[]
+anchor:chap-sizing[]
+endif::[]
 
 Size OpenAM, its data stores, and the network paths between them against the workloads and failure scenarios in your deployment plan.
 Use measurements from the target release and topology, including external authentication providers, policy agents, gateways, and replicas.

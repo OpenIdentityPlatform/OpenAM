@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-openid-connect]
+endif::[]
 == Managing OpenID Connect 1.0 Authorization
+
+ifdef::env-site[]
+anchor:chap-openid-connect[]
+endif::[]
 
 This chapter covers OpenAM support for OpenID Connect 1.0. link:http://openid.net/connect/[OpenID Connect, window=\_blank] 1.0 is an authentication layer built on OAuth 2.0. OpenID Connect 1.0 is a specific implementation of OAuth 2.0 where the identity provider that runs the authorization server also holds the protected resource that the third-party application aims to access. This resource is the __UserInfo__, information about the authenticated end user expressed in a standard format. In this way, OpenID Connect 1.0 allows relying parties both to verify the identity of the end user and also to obtain user information using REST. This contrasts with OAuth 2.0, which only defines the authorization mechanism.
 The names used in OpenID Connect 1.0 differ from those used in OAuth 2.0. In OpenID Connect 1.0, the key entities are the following:

@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-deployments]
+endif::[]
 == Planning the Deployment Architecture
+
+ifdef::env-site[]
+anchor:chap-deployments[]
+endif::[]
 
 This chapter presents the elements involved in planning an OpenAM deployment architecture.
 

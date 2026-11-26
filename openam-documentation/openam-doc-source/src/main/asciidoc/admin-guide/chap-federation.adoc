@@ -21,8 +21,14 @@
 :openam-version: x.y.z
 
 
+ifndef::env-site[]
 [#chap-federation]
+endif::[]
 == Managing SAML v2.0 Federation
+
+ifdef::env-site[]
+anchor:chap-federation[]
+endif::[]
 
 This chapter addresses how to set up and manage SAML v2.0 for single sign-on (SSO) and single logout (SLO) across resources belonging to organizations participating in a circle of trust.
 

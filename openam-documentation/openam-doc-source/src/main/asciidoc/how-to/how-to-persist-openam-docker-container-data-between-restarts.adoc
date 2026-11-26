@@ -18,8 +18,14 @@ Copyright 2026 3A Systems, LLC.
 :example-caption!:
 :table-caption!:
 
+ifndef::env-site[]
 [#how-to-persist-openam-docker-container-data-between-restarts]
+endif::[]
 == How to Persist OpenAM Docker Container Data Between Restarts
+
+ifdef::env-site[]
+anchor:how-to-persist-openam-docker-container-data-between-restarts[]
+endif::[]
 
 Docker containers are stateless. So, if you want persist the OpenAM's configuration data, you need to specify a volume that maps `/usr/openam/config` container directory to a local directory. Example with `docker-compose.yaml`
 

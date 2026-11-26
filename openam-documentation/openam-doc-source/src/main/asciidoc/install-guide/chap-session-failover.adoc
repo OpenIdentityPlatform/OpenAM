@@ -20,8 +20,14 @@
 :table-caption!:
 
 
+ifndef::env-site[]
 [#chap-session-failover]
+endif::[]
 == Setting Up OpenAM Session Failover
+
+ifdef::env-site[]
+anchor:chap-session-failover[]
+endif::[]
 
 OpenAM 16.x persists established stateful sessions in the Core Token Service (CTS). A serving node can read a valid session from CTS when it is absent from its local cache. Session continuity requires both a load balancing layer that can route around failed nodes and a CTS store that remains accessible to the surviving nodes.
 
