@@ -169,7 +169,13 @@ test.describe("/oauth2/resource_set", () => {
       const confirmed = owner.resources.get(id);
       let resource;
       try {
-        const response = await owner.context.get(itemUrl(id), { headers: owner.headers });
+        const get = () => owner.context.get(itemUrl(id), { headers: owner.headers });
+        let response;
+        if (tracked && !confirmed) {
+          // A transient GET failure must get one retry before we skip an unconfirmed fixture.
+          response = await get().catch(() => undefined);
+        }
+        if (!response || response.status() >= 500) response = await get();
         if (!tracked && response.status() === 404) continue;
         expect(response.status(), "Read resource set before cleanup DELETE").toBe(200);
         const current = await response.json();
@@ -310,7 +316,7 @@ test.describe("/oauth2/resource_set", () => {
     const { response, name: registeredName } = await registerResourceSet(request, pat, runPrefix + name, extra);
     const id = await trackCreatedResourceSet(response, firstOwner);
     expect(response.status(), "Resource set registration").toBe(201);
-    return { id, name: registeredName, registration: await response.json(), etag: response.headers()["etag"], response };
+    return { id, name: registeredName, registration: await response.json(), etag: response.headers()["etag"] };
   }
 
   async function conditionalPost(url, name, headers) {
@@ -973,7 +979,12 @@ test.describe("/oauth2/resource_set", () => {
         checkHeaders(response, scenario);
       }
 
-      const { id, name, response: post } = await create(description);
+      const name = runPrefix + description;
+      const post = await request.post(RESOURCE_SET, {
+        headers: bearer({ "Content-Type": "application/json" }),
+        data: { name, scopes: ["read", "write"] },
+      });
+      const id = await trackCreatedResourceSet(post, firstOwner);
       check(post, 201, "POST");
       const url = itemUrl(id);
       const before = await read(id);
