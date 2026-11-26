@@ -95,6 +95,7 @@ image::images/securing-openam-rp.png[]
 +
 For a full list of endpoints, see xref:../reference/chap-endpoints.adoc#chap-endpoints["Service Endpoints"] in the __Reference__.
 
+For Apache, IIS, and NGINX examples covering XUI sign-in and profile self-service, see xref:../how-to/how-to-restrict-xui-access-with-a-reverse-proxy.adoc#how-to-restrict-xui-access-with-a-reverse-proxy[Restrict XUI Access with a Reverse Proxy].
 
 
 [#secure-openam-administration]
