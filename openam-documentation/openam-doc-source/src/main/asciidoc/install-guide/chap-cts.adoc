@@ -485,7 +485,13 @@ Or, you can obtain a copy of a `dsconfig` batch file, which adds all of your ind
 
 At this stage, you have successfully set up the external OpenDJ directory server. You must now set up the CTS repository on OpenAM using the OpenAM console.
 
-When switching a running deployment, schedule a coordinated cutover. Drain all participating OpenAM servers from production traffic before changing these settings and keep administrative access available.
+When switching a running deployment to a different CTS store, schedule a coordinated cutover. Existing CTS records remain in the source store when you change the store settings. With an empty destination, users with existing stateful sessions must sign in again, and clients that use CTS-backed tokens may need new tokens.
+
+Decide which session, token, and revocation records each enabled service needs after the switch. Plan for reauthentication and token reissue where disruption is acceptable. If you need to preserve records, rehearse the transfer and populate the destination store before restarting OpenAM. Account for changes to these records up to the cutover.
+
+If existing sessions must remain usable, establish a test stateful session before the switch and keep the same client session for validation. Allow for idle and maximum session timeouts so the session is still valid when you test it.
+
+Drain all participating OpenAM servers from production traffic before changing these settings and keep administrative access available.
 
 [#cts-openam-gui]
 .To Configure CTS in OpenAM
@@ -558,6 +564,7 @@ OpenAM 16.x uses CTS for stateful session persistence. Verify that all participa
 . Restart all participating OpenAM servers to initialize their CTS connection pools with the saved settings.
 . Sign in as a test user through a restarted node. In a multi-node site, use the load-balanced site URL and direct this sign-in to a specific node. Verify that the new stateful session record was written to external CTS.
 . In a multi-node site, stop the issuing node. Use the same site URL and client session to verify that a second restarted node reads the record from external CTS and resumes the session. Bring the issuing node back online after the check.
+. If existing sessions must remain usable, use the test session established before the switch to make a request that requires authentication through the same URL. Verify that the request succeeds without signing in again.
 . Restore production traffic after the applicable checks pass.
 ====
 
