@@ -58,13 +58,11 @@ function isClient(record, id, name) {
 
 // Shared fixtures include response bodies in failures. Keep only the operation and HTTP statuses.
 async function setup(request, operation, run) {
-  const failures = [];
+  const statuses = [];
   const safeRequest = Object.fromEntries(["get", "post", "put"].map((method) => [
     method, async (url, options) => {
       const response = await request[method](url, options);
-      if (!response.ok()) {
-        failures.push(response.status());
-      }
+      statuses.push(response.status());
       return {
         ...response, text: async () => "",
         json: async () => {
@@ -77,7 +75,7 @@ async function setup(request, operation, run) {
   try {
     return await run(safeRequest);
   } catch {
-    const status = failures.length ? " (HTTP " + failures.join(", ") + ")" : "";
+    const status = statuses.length ? " (HTTP " + statuses.join(", ") + ")" : "";
     throw new Error(operation + " failed" + status);
   }
 }
@@ -247,15 +245,22 @@ const test = base.extend({
 
       // Revoke while the token's issuing client still exists.
       for (const [token, credentials] of tokens) {
-        await attempt(async () => {
-          const request = clientRequest();
-          const current = await tokenInfo(request, token);
-          if (current.status() !== 401) {
-            await expectRevocation(await revoke(request, token, credentials), "Revoke token during cleanup");
-            await expectInvalidToken(await tokenInfo(request, token), "Verify token cleanup");
-          } else {
-            await expectInvalidToken(current, "Verify token already invalid");
+        const alreadyInvalid = await attempt(async () => {
+          const response = await tokenInfo(clientRequest(), token);
+          if (response.status() === 200) {
+            return false;
           }
+          await expectInvalidToken(response, "Read token before cleanup");
+          return true;
+        });
+        if (alreadyInvalid) {
+          continue;
+        }
+        await attempt(async () => {
+          await expectRevocation(await revoke(clientRequest(), token, credentials), "Revoke token during cleanup");
+        });
+        await attempt(async () => {
+          await expectInvalidToken(await tokenInfo(clientRequest(), token), "Verify token cleanup");
         });
       }
 
@@ -390,4 +395,42 @@ test("rejects registration without an access token", async ({ fixtures }) => {
     "Rejected registration stored no client with the submitted ID or name").toBe(false);
   await fixtures.readClient(control.id, control.name);
   expect((await request.get(agentUrl(id), { headers })).status(), "Direct read of the rejected ID").toBe(404);
+});
+
+test("revokes an access token so it stops validating", async ({ fixtures }) => {
+  await fixtures.ensureProvider();
+  const client = await fixtures.provisionClient(fixtures.prefix + "-revoke");
+  const token = await fixtures.issueToken(client);
+  const control = await fixtures.issueToken(client);
+  expect(token !== control, "The target and control access tokens differ").toBe(true);
+  const request = fixtures.clientRequest();
+  await expectValidToken(request, token, client.id, "Validate target token before revocation");
+  await expectValidToken(request, control, client.id, "Validate control token before revocation");
+
+  await expectRevocation(await revoke(request, token, client), "Revoke target access token");
+  await expectInvalidToken(await tokenInfo(request, token), "Validate revoked access token");
+  fixtures.forgetToken(token);
+  await expectValidToken(request, control, client.id, "Validate control token after revocation");
+});
+
+test("rejects revocation without the token parameter", async ({ fixtures }) => {
+  const response = await fixtures.newContext().post(REVOCATION, {
+    form: { client_id: fixtures.prefix + "-missing-token", client_secret: randomUUID() },
+  });
+  expectJsonResponse(response, 400, "Revoke without the token parameter");
+  expectOAuthError(await response.json(), "invalid_request", "Missing parameter: token", "Revoke without the token parameter");
+});
+
+test("rejects revocation with an incorrect client secret", async ({ fixtures }) => {
+  await fixtures.ensureProvider();
+  const client = await fixtures.provisionClient(fixtures.prefix + "-wrong-secret");
+  const token = await fixtures.issueToken(client);
+  const request = fixtures.clientRequest();
+  await expectValidToken(request, token, client.id, "Validate token before rejected revocation");
+
+  const response = await revoke(request, token, { id: client.id, secret: randomUUID() });
+  expectJsonResponse(response, 400, "Revoke with an incorrect client secret");
+  expectOAuthError(await response.json(), "invalid_client", "Client authentication failed", "Revoke with an incorrect client secret");
+  expect(response.headers()["www-authenticate"] === undefined, "Form authentication failure has no WWW-Authenticate header").toBe(true);
+  await expectValidToken(request, token, client.id, "Validate token after rejected revocation");
 });
