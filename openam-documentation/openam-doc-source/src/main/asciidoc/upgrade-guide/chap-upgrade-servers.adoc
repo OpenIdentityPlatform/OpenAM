@@ -52,7 +52,9 @@ Use the Upgrade Wizard or the command-line upgrade tool for configuration migrat
 * For an unattended upgrade, follow xref:#upgrade-server-cli[Run the Command-Line Upgrade Tool].
 --
 . Check the migration result as described in xref:#upgrade-server-verify[Verify the Upgrade]. Restart OpenAM or its container on the primary node after either upgrade method, then confirm that it starts on the target version. For an external configuration store, confirm that the migration has replicated to the directories the peers use before bringing them up.
-. Deploy the same target release on each stopped peer using xref:#upgrade-server-deploy[the WAR or Docker instructions] and start it against the upgraded configuration. For an embedded configuration store, allow each peer's local OpenDJ upgrade to finish and wait for replication to converge. If a peer presents the Upgrade Wizard, keep it out of service and check its connectivity and replication to the migrated configuration store.
+. Deploy the same target release on each stopped peer using xref:#upgrade-server-deploy[the WAR or Docker instructions] and start it against the upgraded configuration. For an embedded configuration store, allow each peer's local OpenDJ upgrade to finish. Verify directly on its local OpenDJ replica that the migrated configuration has replicated. Check that `com.iplanet.am.version` in the `server-default` configuration has the target version.
++
+If a peer with embedded OpenDJ presents the Upgrade Wizard, keep it out of service and check its connectivity and replication. Once its local replica has caught up, restart OpenAM or its container on that peer. Check the target version and sign in to the console directly on the restarted peer before restoring traffic.
 . Complete the xref:#upgrade-server-verify[post-restart checks] and the follow-ups for your configuration. Restore client traffic only after the checks pass for the deployment.
 
 [#upgrade-server-deploy]

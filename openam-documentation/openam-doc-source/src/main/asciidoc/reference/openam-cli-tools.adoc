@@ -627,10 +627,10 @@ Run the tool from the unpacked directory.
 
 [source, console]
 ----
-$JAVA_HOME/bin/java -jar openam-upgrade-tool-<version>.jar --file upgrade.properties
+$JAVA_HOME/bin/java -jar openam-upgrade-tool-16.2.0-SNAPSHOT.jar --file upgrade.properties
 ----
 
-Replace `<version>` with the version of the unpacked tools. To accept the license on the command line, omit `ACCEPT_LICENSES` from the file and add `--acceptLicense` to this command.
+Use the JAR filename from the unpacked tools ZIP. To accept the license on the command line, omit `ACCEPT_LICENSES` from the file and add `--acceptLicense` to this command.
 
 '''
 [#ssoadm-1]

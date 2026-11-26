@@ -24,6 +24,9 @@ from urllib.parse import parse_qs, urlsplit
 from zipfile import ZipFile
 
 
+REDIRECT_TARGET = "/redirected-upgrade"
+
+
 class UpgradeHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         request = urlsplit(self.path)
@@ -33,9 +36,14 @@ class UpgradeHandler(BaseHTTPRequestHandler):
                 status, body = self.server.upgrade_result
             else:
                 status, body = 400, b"License not accepted"
+        elif request.path == REDIRECT_TARGET:
+            self.server.redirect_requests += 1
+            status, body = 200, b"true"
         else:
             status, body = 200, b""
         self.send_response(status)
+        if status == 302:
+            self.send_header("Location", REDIRECT_TARGET)
         self.end_headers()
         self.wfile.write(body)
 
@@ -64,6 +72,7 @@ def main(archive):
 
         with ThreadingHTTPServer(("127.0.0.1", 0), UpgradeHandler) as server:
             server.upgrade_requests = 0
+            server.redirect_requests = 0
             worker = Thread(target=server.serve_forever, daemon=True)
             worker.start()
             try:
@@ -77,13 +86,17 @@ def main(archive):
                     ("--file", 200, b"false", False),
                     ("--file", 200, b"", False),
                     ("--file", 200, b"true\nfalse\n", False),
-                    ("--file", 302, b"true", False),
                     ("--file", 503, b"", False),
                 ]
                 for option, status, body, successful in cases:
                     server.upgrade_result = status, body
                     check([*command, option, "upgrade.properties"], directory, successful,
                           f"{option} HTTP {status} {body!r}")
+
+                server.upgrade_result = 302, b""
+                check([*command, "--file", "upgrade.properties"], directory, False, "upgrade redirect")
+                if server.redirect_requests:
+                    raise AssertionError("The CLI must not follow the upgrade redirect")
 
                 properties.write_text(settings + "ACCEPT_LICENSES=false\n", encoding="ascii")
                 server.upgrade_result = 200, b"true"
