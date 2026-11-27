@@ -200,6 +200,7 @@ export async function ensureClient(adminToken, request, clientId, data) {
     throw new Error(`Failed to write client ${clientId}: ${written.status()} ${await written.text()}`);
   }
   console.log(`OAuth2 client "${clientId}" written (${written.status()})`);
+  return written;
 }
 
 export async function ensureOidcClient(adminToken, request, clientId) {
@@ -650,7 +651,8 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
   const failures = [];
   let admin, oauth, headers, accessToken, refreshToken;
   let attemptedWrite = false;
-  let confirmedWrite = false;
+  let confirmedOwnership = false;
+  let primaryError;
 
   async function attempt(operation, action) {
     try {
@@ -704,26 +706,42 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
     return result;
   }
 
-  async function confirmClientOwnership() {
+  async function readClientBeforeCleanup() {
     const read = () => admin.get(url, { headers });
     let response = await read().catch(() => undefined);
     const status = response?.status();
-    if (!response || status === 408 || status === 429 || status >= 500 || (status === 404 && confirmedWrite)) {
+    if (!response || status === 408 || status === 429 || status >= 500 || (status === 404 && confirmedOwnership)) {
       response = await read();
     }
-    if (response.status() === 404) {
-      const matches = (await listClients()).filter(matchesClient);
-      if (matches.length === 0) return false;
-      failures.push("Cleanup GET returned HTTP 404 for a client still present in the OAuth2 client collection");
-      return matches.every(ownsClient);
-    }
+    if (response.status() === 404) return null;
     requireStatus(response, 200, "Read OAuth2 client before cleanup");
     requireJsonMediaType(response, "Read OAuth2 client before cleanup");
-    if (!ownsClient(await response.json())) {
+    const record = await response.json();
+    if (!isJsonObject(record)) throw new Error("OAuth2 client read must return a JSON object");
+    return record;
+  }
+
+  async function confirmClientOwnership() {
+    const record = await attempt("Verify OAuth2 client ownership", readClientBeforeCleanup);
+    if (record) {
+      if (ownsClient(record)) return true;
       failures.push("Cleanup found an OAuth2 client with an unexpected ID or name");
       return false;
     }
-    return true;
+
+    const matches = await attempt("Find OAuth2 client in collection", async () => (await listClients()).filter(matchesClient));
+    if (matches?.length) {
+      if (record === null) {
+        failures.push("Cleanup GET returned HTTP 404 for a client still present in the OAuth2 client collection");
+      }
+      if (matches.every(ownsClient)) return true;
+      failures.push("Cleanup found a collection entry with an unexpected OAuth2 client ID or name");
+      return false;
+    }
+    if (matches && confirmedOwnership) {
+      failures.push("Previously verified OAuth2 client is missing from the OAuth2 client collection before cleanup");
+    }
+    return confirmedOwnership;
   }
 
   async function readTokenState(token, type) {
@@ -731,6 +749,12 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
     if (isInactiveIntrospection(body)) return false;
     if (body?.active === true && body.client_id === id && body.token_type === type) return true;
     throw new Error("Expected an inactive token or an active token issued to the test client");
+  }
+
+  async function checkTokenBeforeRevocation(token, type) {
+    await attempt("Read " + type + " before cleanup", async () => {
+      if (!(await readTokenState(token, type))) throw new Error("Issued token is already inactive");
+    });
   }
 
   async function revokeAndVerify(token, type) {
@@ -765,7 +789,7 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
       throw new Error(`Provider must enable issueRefreshToken for the password grant fixture (HTTP ${provider.status()})`);
     }
     attemptedWrite = true;
-    await runClientSetup(admin, "Write OAuth2 client", (safeRequest) => ensureClient(adminToken, safeRequest, id, {
+    const written = await runClientSetup(admin, "Write OAuth2 client", (safeRequest) => ensureClient(adminToken, safeRequest, id, {
       userpassword: secret,
       [CLIENT_NAME]: ["[0]=" + name],
       [CLIENT_ATTR + "clientType"]: "Confidential",
@@ -774,39 +798,38 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
       [CLIENT_ATTR + "scopes"]: ["[0]=" + SCOPE],
       sunIdentityServerDeviceStatus: "Active",
     }));
-    confirmedWrite = true;
+    confirmedOwnership = ownsClient(await written.json());
+    if (!confirmedOwnership) throw new Error("OAuth2 client write did not confirm the test ID and name");
     if (grantType) await issue();
     await run({ id, accessToken, refreshToken, introspect });
+  } catch (error) {
+    primaryError = error;
+    throw error;
   } finally {
-    if (attemptedWrite) {
-      const owned = await attempt("Verify OAuth2 client ownership", confirmClientOwnership);
-      if (owned ?? confirmedWrite) {
-        if (accessToken) await attempt("Read access token before cleanup", () => readTokenState(accessToken, "access_token"));
-        if (refreshToken) {
-          await attempt("Read refresh token before cleanup", () => readTokenState(refreshToken, "refresh_token"));
-          await revokeAndVerify(refreshToken, "refresh_token");
-        }
-        if (accessToken) {
-          const active = refreshToken
-            ? await attempt("Read linked access token after refresh revocation", () => readTokenState(accessToken, "access_token"))
-            : true;
-          if (active !== false) await revokeAndVerify(accessToken, "access_token");
-        }
-        await attempt("Delete OAuth2 client", async () => {
-          const response = await admin.delete(url, { headers });
-          if (!response.ok()) throw new Error("HTTP " + response.status());
-        });
-        await attempt("Read OAuth2 client after cleanup", async () => {
-          requireStatus(await admin.get(url, { headers }), 404, "Read deleted OAuth2 client");
-        });
-        await attempt("Verify OAuth2 client collection after cleanup", async () => {
-          if ((await listClients()).some(matchesClient)) throw new Error("Test OAuth2 client is still present");
-        });
+    if (attemptedWrite && await confirmClientOwnership()) {
+      if (accessToken) await checkTokenBeforeRevocation(accessToken, "access_token");
+      if (refreshToken) {
+        await checkTokenBeforeRevocation(refreshToken, "refresh_token");
+        await revokeAndVerify(refreshToken, "refresh_token");
       }
+      // Refresh revocation can leave linked access tokens behind, and revoking an absent token is safe.
+      if (accessToken) await revokeAndVerify(accessToken, "access_token");
+      await attempt("Delete OAuth2 client", async () => {
+        const response = await admin.delete(url, { headers });
+        if (!response.ok()) throw new Error("HTTP " + response.status());
+      });
+      await attempt("Read OAuth2 client after cleanup", async () => {
+        requireStatus(await admin.get(url, { headers }), 404, "Read deleted OAuth2 client");
+      });
+      await attempt("Verify OAuth2 client collection after cleanup", async () => {
+        if ((await listClients()).some(matchesClient)) throw new Error("Test OAuth2 client is still present");
+      });
     }
     if (oauth) await attempt("Dispose OAuth2 request context", () => oauth.dispose());
     if (admin) await attempt("Dispose administrator request context", () => admin.dispose());
-    if (failures.length) throw new Error("OAuth2 fixture cleanup failed:\n" + failures.join("\n"));
+    if (failures.length) {
+      throw new Error("OAuth2 fixture cleanup failed:\n" + failures.join("\n"), { cause: primaryError });
+    }
   }
 }
 
