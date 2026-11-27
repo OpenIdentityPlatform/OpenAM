@@ -20,8 +20,9 @@
  * the only safe shape here.
  */
 
+import { randomUUID } from "node:crypto";
 import { MessageChannel, Worker } from "node:worker_threads";
-import { OPENAM_BASE } from "./openam-commons.mjs";
+import { getAdminToken, OPENAM_BASE, PASSWORD, USERNAME } from "./openam-commons.mjs";
 
 export const REALM = "root";
 export const SCOPE = "profile";
@@ -578,6 +579,236 @@ export const unreportedRequest = {
     };
   },
 };
+
+const INTROSPECTION_OAUTH2 = OPENAM_BASE + "/oauth2";
+const OAUTH2_CLIENTS = OPENAM_BASE + "/json/realms/" + REALM + "/realm-config/agents/OAuth2Client";
+const CLIENT_ATTR = "com.forgerock.openam.oauth2provider.";
+const CLIENT_NAME = CLIENT_ATTR + "clientName";
+
+function nonemptyString(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isJsonObject(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+export function isInactiveIntrospection(body) {
+  return isJsonObject(body) && body.active === false && Object.keys(body).length === 1;
+}
+
+function clientNames(record) {
+  return [record?.[CLIENT_NAME]].flat().filter(nonemptyString).map((name) => name.replace(/^\[\d+\]=/, ""));
+}
+
+function requireStatus(response, expected, operation) {
+  if (response.status() !== expected) {
+    throw new Error(`${operation}: expected HTTP ${expected}, received ${response.status()}`);
+  }
+}
+
+function requireJsonMediaType(response, operation) {
+  const mediaType = response.headers()["content-type"]?.split(";")[0].trim().toLowerCase();
+  if (mediaType !== "application/json") {
+    throw new Error(`${operation}: expected application/json (HTTP ${response.status()})`);
+  }
+}
+
+// The shared setup helpers can include response bodies in errors.
+async function runClientSetup(request, operation, run) {
+  const statuses = [];
+  const safeRequest = Object.fromEntries(["get", "post", "put"].map((method) => [
+    method, async (url, options) => {
+      const response = await request[method](url, options);
+      statuses.push(response.status());
+      return {
+        ...response,
+        text: async () => "",
+        json: async () => {
+          if (!response.ok()) throw new Error("Setup request failed");
+          return response.json();
+        },
+      };
+    },
+  ]));
+  try {
+    return await run(safeRequest);
+  } catch {
+    const status = statuses.length ? " (HTTP " + statuses.join(", ") + ")" : "";
+    throw new Error(operation + " failed" + status);
+  }
+}
+
+/** Own one introspection client and any tokens issued during the test. */
+export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, run) {
+  const id = "s7a-" + randomUUID();
+  const name = id + "-name";
+  const secret = randomUUID();
+  const url = OAUTH2_CLIENTS + "/" + id;
+  const credentials = { Authorization: basicAuth(id, secret) };
+  const options = { ignoreHTTPSErrors, maxRedirects: 0 };
+  const failures = [];
+  let admin, oauth, headers, accessToken, refreshToken;
+  let attemptedWrite = false;
+  let confirmedWrite = false;
+
+  async function attempt(operation, action) {
+    try {
+      return await action();
+    } catch (error) {
+      failures.push(operation + ": " + error.message);
+    }
+  }
+
+  async function issue() {
+    const form = { grant_type: grantType, scope: SCOPE };
+    if (grantType === "password") {
+      Object.assign(form, { username: USERNAME, password: PASSWORD });
+    }
+    const response = await oauth.post(INTROSPECTION_OAUTH2 + "/access_token", { headers: credentials, form });
+    const body = await response.json().catch(() => undefined);
+    if (nonemptyString(body?.access_token)) accessToken = body.access_token;
+    if (nonemptyString(body?.refresh_token)) refreshToken = body.refresh_token;
+    requireStatus(response, 200, "Issue introspection fixture tokens");
+    requireJsonMediaType(response, "Issue introspection fixture tokens");
+    if (!accessToken) throw new Error("Issued access_token must be a nonempty string");
+    if (grantType === "password") {
+      if (!refreshToken) throw new Error("Issued refresh_token must be a nonempty string");
+      if (refreshToken === accessToken) throw new Error("Issued access_token and refresh_token must differ");
+    }
+  }
+
+  async function introspect(token, hint, method, operation) {
+    const fields = { token };
+    if (hint !== undefined) fields.token_type_hint = hint;
+    const endpoint = INTROSPECTION_OAUTH2 + "/introspect";
+    const response = method === "GET"
+      ? await oauth.get(endpoint, { headers: credentials, params: fields })
+      : await oauth.post(endpoint, { headers: credentials, form: fields });
+    requireStatus(response, 200, operation);
+    requireJsonMediaType(response, operation);
+    return response.json();
+  }
+
+  const matchesClient = (record) => record?._id === id || clientNames(record).includes(name);
+  const ownsClient = (record) => record?._id === id && clientNames(record).includes(name);
+
+  async function listClients() {
+    const response = await admin.get(OAUTH2_CLIENTS, { headers, params: { _queryFilter: "true" } });
+    requireStatus(response, 200, "List OAuth2 clients");
+    requireJsonMediaType(response, "List OAuth2 clients");
+    const result = (await response.json())?.result;
+    if (!Array.isArray(result) || !result.every((record) => nonemptyString(record?._id))) {
+      throw new Error("OAuth2 client collection must contain a result array with client IDs");
+    }
+    return result;
+  }
+
+  async function confirmClientOwnership() {
+    const read = () => admin.get(url, { headers });
+    let response = await read().catch(() => undefined);
+    const status = response?.status();
+    if (!response || status === 408 || status === 429 || status >= 500 || (status === 404 && confirmedWrite)) {
+      response = await read();
+    }
+    if (response.status() === 404) {
+      const matches = (await listClients()).filter(matchesClient);
+      if (matches.length === 0) return false;
+      failures.push("Cleanup GET returned HTTP 404 for a client still present in the OAuth2 client collection");
+      return matches.every(ownsClient);
+    }
+    requireStatus(response, 200, "Read OAuth2 client before cleanup");
+    requireJsonMediaType(response, "Read OAuth2 client before cleanup");
+    if (!ownsClient(await response.json())) {
+      failures.push("Cleanup found an OAuth2 client with an unexpected ID or name");
+      return false;
+    }
+    return true;
+  }
+
+  async function readTokenState(token, type) {
+    const body = await introspect(token, type, "POST", "Inspect " + type + " during cleanup");
+    if (isInactiveIntrospection(body)) return false;
+    if (body?.active === true && body.client_id === id && body.token_type === type) return true;
+    throw new Error("Expected an inactive token or an active token issued to the test client");
+  }
+
+  async function revokeAndVerify(token, type) {
+    await attempt("Revoke " + type, async () => {
+      const response = await oauth.post(INTROSPECTION_OAUTH2 + "/token/revoke", {
+        form: { token, client_id: id, client_secret: secret },
+      });
+      requireStatus(response, 200, "Revoke token");
+      requireJsonMediaType(response, "Revoke token");
+      const body = await response.json();
+      if (!isJsonObject(body) || Object.keys(body).length !== 0) {
+        throw new Error("Revocation must return an empty JSON object");
+      }
+    });
+    await attempt("Verify " + type + " cleanup", async () => {
+      if (await readTokenState(token, type)) throw new Error("Token is still active");
+    });
+  }
+
+  try {
+    admin = unreportedRequest.newContext(options);
+    oauth = unreportedRequest.newContext(options);
+    const adminToken = await runClientSetup(admin, "Authenticate administrator", async (safeRequest) => {
+      const token = await getAdminToken(safeRequest);
+      if (!nonemptyString(token)) throw new Error("Administrator session is missing");
+      return token;
+    });
+    headers = adminHeaders(adminToken, AGENT_VERSION);
+    const provider = await runClientSetup(admin, "Ensure root OAuth2 provider",
+      (safeRequest) => ensureOAuth2Provider(adminToken, safeRequest));
+    if (grantType === "password" && (await provider.json())?.coreOAuth2Config?.issueRefreshToken !== true) {
+      throw new Error(`Provider must enable issueRefreshToken for the password grant fixture (HTTP ${provider.status()})`);
+    }
+    attemptedWrite = true;
+    await runClientSetup(admin, "Write OAuth2 client", (safeRequest) => ensureClient(adminToken, safeRequest, id, {
+      userpassword: secret,
+      [CLIENT_NAME]: ["[0]=" + name],
+      [CLIENT_ATTR + "clientType"]: "Confidential",
+      [CLIENT_ATTR + "grantTypes"]: ["[0]=" + (grantType ?? "client_credentials")],
+      [CLIENT_ATTR + "tokenEndPointAuthMethod"]: "client_secret_basic",
+      [CLIENT_ATTR + "scopes"]: ["[0]=" + SCOPE],
+      sunIdentityServerDeviceStatus: "Active",
+    }));
+    confirmedWrite = true;
+    if (grantType) await issue();
+    await run({ id, accessToken, refreshToken, introspect });
+  } finally {
+    if (attemptedWrite) {
+      const owned = await attempt("Verify OAuth2 client ownership", confirmClientOwnership);
+      if (owned ?? confirmedWrite) {
+        if (accessToken) await attempt("Read access token before cleanup", () => readTokenState(accessToken, "access_token"));
+        if (refreshToken) {
+          await attempt("Read refresh token before cleanup", () => readTokenState(refreshToken, "refresh_token"));
+          await revokeAndVerify(refreshToken, "refresh_token");
+        }
+        if (accessToken) {
+          const active = refreshToken
+            ? await attempt("Read linked access token after refresh revocation", () => readTokenState(accessToken, "access_token"))
+            : true;
+          if (active !== false) await revokeAndVerify(accessToken, "access_token");
+        }
+        await attempt("Delete OAuth2 client", async () => {
+          const response = await admin.delete(url, { headers });
+          if (!response.ok()) throw new Error("HTTP " + response.status());
+        });
+        await attempt("Read OAuth2 client after cleanup", async () => {
+          requireStatus(await admin.get(url, { headers }), 404, "Read deleted OAuth2 client");
+        });
+        await attempt("Verify OAuth2 client collection after cleanup", async () => {
+          if ((await listClients()).some(matchesClient)) throw new Error("Test OAuth2 client is still present");
+        });
+      }
+    }
+    if (oauth) await attempt("Dispose OAuth2 request context", () => oauth.dispose());
+    if (admin) await attempt("Dispose administrator request context", () => admin.dispose());
+    if (failures.length) throw new Error("OAuth2 fixture cleanup failed:\n" + failures.join("\n"));
+  }
+}
 
 /**
  * A Playwright request context whose cookie jar holds the given session, and nothing else.
