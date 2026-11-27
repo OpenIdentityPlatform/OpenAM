@@ -17,7 +17,7 @@
 import { randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
 import { OPENAM_BASE, USERNAME } from "../common/openam-commons.mjs";
-import { withIntrospectionClient } from "../common/oauth2-fixtures.mjs";
+import { unreportedRequest, withIntrospectionClient } from "../common/oauth2-fixtures.mjs";
 
 test.use({ trace: "off", screenshot: "off" });
 
@@ -63,4 +63,38 @@ test("ignores query access tokens and preserves supported transports", async ({ 
       }), "Bearer with query UserInfo");
       expect(combined, "Query token leaves the complete Bearer JSON unchanged").toEqual(bearer);
     });
+});
+
+test("rejects a JSON POST to userinfo", async ({ ignoreHTTPSErrors }) => {
+  const request = unreportedRequest.newContext({ ignoreHTTPSErrors, maxRedirects: 0 });
+  try {
+    const response = await request.post(USERINFO, {
+      headers: { ...JSON_HEADERS, "Content-Type": "application/json" },
+      data: { access_token: randomUUID() },
+    });
+    // Restlet selects the form POST handler by media type; only pin the framework status.
+    expect(response.status(), "Restlet rejects JSON POST").toBe(415);
+  } finally {
+    await request.dispose();
+  }
+});
+
+test("rejects userinfo without a bearer token", async ({ ignoreHTTPSErrors }) => {
+  const request = unreportedRequest.newContext({ ignoreHTTPSErrors, maxRedirects: 0 });
+  try {
+    await expectInvalidToken(await request.get(USERINFO, { headers: JSON_HEADERS }));
+  } finally {
+    await request.dispose();
+  }
+});
+
+test("rejects userinfo with an invalid bearer token", async ({ ignoreHTTPSErrors }) => {
+  const request = unreportedRequest.newContext({ ignoreHTTPSErrors, maxRedirects: 0 });
+  try {
+    await expectInvalidToken(await request.get(USERINFO, {
+      headers: { ...JSON_HEADERS, Authorization: "Bearer " + randomUUID() },
+    }));
+  } finally {
+    await request.dispose();
+  }
 });
