@@ -646,15 +646,24 @@ async function runClientSetup(request, operation, run) {
 }
 
 /** Own one introspection client and any tokens issued during the test. */
-export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, run) {
-  const id = "s7a-" + randomUUID();
+export async function withIntrospectionClient({
+  ignoreHTTPSErrors,
+  grantType,
+  prefix = "s7a",
+  additionalGrantTypes = [],
+  allowInactiveBeforeCleanup = false,
+}, run) {
+  const id = prefix + "-" + randomUUID();
   const name = id + "-name";
   const secret = randomUUID();
   const url = OAUTH2_CLIENTS + "/" + id;
   const credentials = { Authorization: basicAuth(id, secret) };
   const options = { ignoreHTTPSErrors, maxRedirects: 0 };
   const failures = [];
-  let admin, oauth, headers, accessToken, refreshToken;
+  const grantTypes = [grantType ?? "client_credentials", ...additionalGrantTypes];
+  const issuedTokens = { refresh_token: new Set(), access_token: new Set() };
+  let issuanceCount = 0;
+  let admin, oauth, headers;
   let attemptedWrite = false;
   let confirmedOwnership = false;
   let primaryError;
@@ -667,22 +676,29 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
     }
   }
 
-  async function issue() {
-    const form = { grant_type: grantType, scope: SCOPE };
-    if (grantType === "password") {
+  async function issueTokens(type, priorRefreshToken) {
+    const operation = `Issue ${type} grant tokens (#${++issuanceCount})`;
+    const form = { grant_type: type, scope: SCOPE };
+    if (type === "password") {
       Object.assign(form, { username: USERNAME, password: PASSWORD });
+    } else if (type === "refresh_token") {
+      form.refresh_token = priorRefreshToken;
     }
     const response = await oauth.post(INTROSPECTION_OAUTH2 + "/access_token", { headers: credentials, form });
     const body = await response.json().catch(() => undefined);
-    if (nonemptyString(body?.access_token)) accessToken = body.access_token;
-    if (nonemptyString(body?.refresh_token)) refreshToken = body.refresh_token;
-    requireStatus(response, 200, "Issue introspection fixture tokens");
-    requireJsonMediaType(response, "Issue introspection fixture tokens");
-    if (!accessToken) throw new Error("Issued access_token must be a nonempty string");
-    if (grantType === "password") {
-      if (!refreshToken) throw new Error("Issued refresh_token must be a nonempty string");
-      if (refreshToken === accessToken) throw new Error("Issued access_token and refresh_token must differ");
+    const accessToken = nonemptyString(body?.access_token) ? body.access_token : undefined;
+    const refreshToken = nonemptyString(body?.refresh_token) ? body.refresh_token : undefined;
+    if (accessToken) issuedTokens.access_token.add(accessToken);
+    if (refreshToken) issuedTokens.refresh_token.add(refreshToken);
+
+    requireStatus(response, 200, operation);
+    requireJsonMediaType(response, operation);
+    if (!accessToken) throw new Error(operation + ": access_token must be a nonempty string");
+    if (type === "password") {
+      if (!refreshToken) throw new Error(operation + ": refresh_token must be a nonempty string");
+      if (refreshToken === accessToken) throw new Error(operation + ": access_token and refresh_token must differ");
     }
+    return { accessToken, refreshToken };
   }
 
   async function introspect(token, hint, method, operation) {
@@ -757,17 +773,27 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
 
   async function checkTokenBeforeRevocation(token, type) {
     await attempt("Read " + type + " before cleanup", async () => {
-      if (!(await readTokenState(token, type))) throw new Error("Issued token is already inactive");
+      if (!(await readTokenState(token, type)) && !allowInactiveBeforeCleanup) {
+        throw new Error("Issued token is already inactive");
+      }
     });
+  }
+
+  function postRevocation(token) {
+    return oauth.post(INTROSPECTION_OAUTH2 + "/token/revoke", {
+      form: { token, client_id: id, client_secret: secret },
+    });
+  }
+
+  function getRevocation(token) {
+    return oauth.get(INTROSPECTION_OAUTH2 + "/token/revoke", { headers: credentials, params: { token } });
   }
 
   async function revokeAndVerify(token, type) {
     for (let retry = 0; retry < 2; retry++) {
       let response, revocationError;
       try {
-        response = await oauth.post(INTROSPECTION_OAUTH2 + "/token/revoke", {
-          form: { token, client_id: id, client_secret: secret },
-        });
+        response = await postRevocation(token);
         requireStatus(response, 200, "Revoke token");
         requireJsonMediaType(response, "Revoke token");
         const body = await response.json();
@@ -798,7 +824,7 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
     headers = adminHeaders(adminToken, AGENT_VERSION);
     const provider = await runClientSetup(admin, "Ensure root OAuth2 provider",
       (safeRequest) => ensureOAuth2Provider(adminToken, safeRequest));
-    if (grantType === "password" && (await provider.json())?.coreOAuth2Config?.issueRefreshToken !== true) {
+    if (grantTypes.includes("password") && (await provider.json())?.coreOAuth2Config?.issueRefreshToken !== true) {
       throw new Error(`Provider must enable issueRefreshToken for the password grant fixture (HTTP ${provider.status()})`);
     }
     attemptedWrite = true;
@@ -806,27 +832,27 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
       userpassword: secret,
       [CLIENT_NAME]: ["[0]=" + name],
       [CLIENT_ATTR + "clientType"]: "Confidential",
-      [CLIENT_ATTR + "grantTypes"]: ["[0]=" + (grantType ?? "client_credentials")],
+      [CLIENT_ATTR + "grantTypes"]: grantTypes.map((type, index) => `[${index}]=${type}`),
       [CLIENT_ATTR + "tokenEndPointAuthMethod"]: "client_secret_basic",
       [CLIENT_ATTR + "scopes"]: ["[0]=" + SCOPE],
       sunIdentityServerDeviceStatus: "Active",
     }));
     confirmedOwnership = ownsClient(await written.json());
     if (!confirmedOwnership) throw new Error("OAuth2 client write did not confirm the test ID and name");
-    if (grantType) await issue();
-    await run({ id, accessToken, refreshToken, introspect });
+    const { accessToken, refreshToken } = grantType ? await issueTokens(grantType) : {};
+    await run({ id, accessToken, refreshToken, introspect, issueTokens, postRevocation, getRevocation });
   } catch (error) {
     primaryError = error;
     throw error;
   } finally {
     if (attemptedWrite && await confirmClientOwnership()) {
-      if (accessToken) await checkTokenBeforeRevocation(accessToken, "access_token");
-      if (refreshToken) {
-        await checkTokenBeforeRevocation(refreshToken, "refresh_token");
-        await revokeAndVerify(refreshToken, "refresh_token");
+      for (const [type, tokens] of Object.entries(issuedTokens)) {
+        for (const token of tokens) await checkTokenBeforeRevocation(token, type);
       }
-      // Refresh revocation can leave linked access tokens behind, and revoking an absent token is safe.
-      if (accessToken) await revokeAndVerify(accessToken, "access_token");
+      // Revoke refresh tokens first, then explicitly revoke access tokens left outside a cascade.
+      for (const [type, tokens] of Object.entries(issuedTokens)) {
+        for (const token of tokens) await revokeAndVerify(token, type);
+      }
       let response, deletionError;
       try {
         try {
