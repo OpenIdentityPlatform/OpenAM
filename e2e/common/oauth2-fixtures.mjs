@@ -649,6 +649,7 @@ async function runClientSetup(request, operation, run) {
 export async function withIntrospectionClient({
   ignoreHTTPSErrors,
   grantType,
+  requireRefreshToken = true,
   prefix = "s7a",
   additionalGrantTypes = [],
   allowInactiveBeforeCleanup = false,
@@ -694,7 +695,7 @@ export async function withIntrospectionClient({
     requireStatus(response, 200, operation);
     requireJsonMediaType(response, operation);
     if (!accessToken) throw new Error(operation + ": access_token must be a nonempty string");
-    if (type === "password") {
+    if (type === "password" && (requireRefreshToken || Object.hasOwn(body, "refresh_token"))) {
       if (!refreshToken) throw new Error(operation + ": refresh_token must be a nonempty string");
       if (refreshToken === accessToken) throw new Error(operation + ": access_token and refresh_token must differ");
     }
@@ -824,7 +825,8 @@ export async function withIntrospectionClient({
     headers = adminHeaders(adminToken, AGENT_VERSION);
     const provider = await runClientSetup(admin, "Ensure root OAuth2 provider",
       (safeRequest) => ensureOAuth2Provider(adminToken, safeRequest));
-    if (grantTypes.includes("password") && (await provider.json())?.coreOAuth2Config?.issueRefreshToken !== true) {
+    if (grantTypes.includes("password") && requireRefreshToken
+      && (await provider.json())?.coreOAuth2Config?.issueRefreshToken !== true) {
       throw new Error(`Provider must enable issueRefreshToken for the password grant fixture (HTTP ${provider.status()})`);
     }
     attemptedWrite = true;
@@ -840,7 +842,7 @@ export async function withIntrospectionClient({
     confirmedOwnership = ownsClient(await written.json());
     if (!confirmedOwnership) throw new Error("OAuth2 client write did not confirm the test ID and name");
     const { accessToken, refreshToken } = grantType ? await issueTokens(grantType) : {};
-    await run({ id, accessToken, refreshToken, introspect, issueTokens, postRevocation, getRevocation });
+    await run({ id, accessToken, refreshToken, introspect, issueTokens, postRevocation, getRevocation, request: oauth });
   } catch (error) {
     primaryError = error;
     throw error;
