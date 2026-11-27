@@ -602,6 +602,11 @@ function clientNames(record) {
   return [record?.[CLIENT_NAME]].flat().filter(nonemptyString).map((name) => name.replace(/^\[\d+\]=/, ""));
 }
 
+function isTransientFailure(response) {
+  const status = response?.status();
+  return !response || status === 408 || status === 429 || status >= 500;
+}
+
 function requireStatus(response, expected, operation) {
   if (response.status() !== expected) {
     throw new Error(`${operation}: expected HTTP ${expected}, received ${response.status()}`);
@@ -709,8 +714,7 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
   async function readClientBeforeCleanup() {
     const read = () => admin.get(url, { headers });
     let response = await read().catch(() => undefined);
-    const status = response?.status();
-    if (!response || status === 408 || status === 429 || status >= 500 || (status === 404 && confirmedOwnership)) {
+    if (isTransientFailure(response) || (response.status() === 404 && confirmedOwnership)) {
       response = await read();
     }
     if (response.status() === 404) return null;
@@ -758,20 +762,27 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
   }
 
   async function revokeAndVerify(token, type) {
-    await attempt("Revoke " + type, async () => {
-      const response = await oauth.post(INTROSPECTION_OAUTH2 + "/token/revoke", {
-        form: { token, client_id: id, client_secret: secret },
-      });
-      requireStatus(response, 200, "Revoke token");
-      requireJsonMediaType(response, "Revoke token");
-      const body = await response.json();
-      if (!isJsonObject(body) || Object.keys(body).length !== 0) {
-        throw new Error("Revocation must return an empty JSON object");
+    for (let retry = 0; retry < 2; retry++) {
+      let response, revocationError;
+      try {
+        response = await oauth.post(INTROSPECTION_OAUTH2 + "/token/revoke", {
+          form: { token, client_id: id, client_secret: secret },
+        });
+        requireStatus(response, 200, "Revoke token");
+        requireJsonMediaType(response, "Revoke token");
+        const body = await response.json();
+        if (!isJsonObject(body) || Object.keys(body).length !== 0) {
+          throw new Error("Revocation must return an empty JSON object");
+        }
+      } catch (error) {
+        revocationError = error;
       }
-    });
-    await attempt("Verify " + type + " cleanup", async () => {
-      if (await readTokenState(token, type)) throw new Error("Token is still active");
-    });
+      const active = await attempt("Verify " + type + " cleanup", () => readTokenState(token, type));
+      if (retry === 0 && revocationError && isTransientFailure(response) && active === true) continue;
+      if (revocationError) failures.push("Revoke " + type + ": " + revocationError.message);
+      if (active === true) failures.push("Verify " + type + " cleanup: Token is still active");
+      return;
+    }
   }
 
   try {
@@ -815,7 +826,22 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
       // Refresh revocation can leave linked access tokens behind, and revoking an absent token is safe.
       if (accessToken) await revokeAndVerify(accessToken, "access_token");
       await attempt("Delete OAuth2 client", async () => {
-        const response = await admin.delete(url, { headers });
+        let response, deletionError;
+        try {
+          response = await admin.delete(url, { headers });
+        } catch (error) {
+          deletionError = error;
+        }
+        if (isTransientFailure(response)) {
+          const record = await attempt("Verify OAuth2 client ownership before retry", readClientBeforeCleanup);
+          if (record && ownsClient(record)) {
+            response = await admin.delete(url, { headers });
+            deletionError = undefined;
+          } else if (record) {
+            failures.push("Cleanup found an OAuth2 client with an unexpected ID or name before retry");
+          }
+        }
+        if (deletionError) throw deletionError;
         if (!response.ok()) throw new Error("HTTP " + response.status());
       });
       await attempt("Read OAuth2 client after cleanup", async () => {
