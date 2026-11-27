@@ -779,7 +779,9 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
       }
       const active = await attempt("Verify " + type + " cleanup", () => readTokenState(token, type));
       if (retry === 0 && revocationError && isTransientFailure(response) && active === true) continue;
-      if (revocationError) failures.push("Revoke " + type + ": " + revocationError.message);
+      if (revocationError && !(isTransientFailure(response) && active === false)) {
+        failures.push("Revoke " + type + ": " + revocationError.message);
+      }
       if (active === true) failures.push("Verify " + type + " cleanup: Token is still active");
       return;
     }
@@ -825,8 +827,8 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
       }
       // Refresh revocation can leave linked access tokens behind, and revoking an absent token is safe.
       if (accessToken) await revokeAndVerify(accessToken, "access_token");
-      await attempt("Delete OAuth2 client", async () => {
-        let response, deletionError;
+      let response, deletionError;
+      try {
         try {
           response = await admin.delete(url, { headers });
         } catch (error) {
@@ -843,13 +845,20 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
         }
         if (deletionError) throw deletionError;
         if (!response.ok()) throw new Error("HTTP " + response.status());
-      });
-      await attempt("Read OAuth2 client after cleanup", async () => {
+      } catch (error) {
+        deletionError = error;
+      }
+      const absent = await attempt("Read OAuth2 client after cleanup", async () => {
         requireStatus(await admin.get(url, { headers }), 404, "Read deleted OAuth2 client");
+        return true;
       });
-      await attempt("Verify OAuth2 client collection after cleanup", async () => {
+      const absentFromCollection = await attempt("Verify OAuth2 client collection after cleanup", async () => {
         if ((await listClients()).some(matchesClient)) throw new Error("Test OAuth2 client is still present");
+        return true;
       });
+      if (deletionError && !(isTransientFailure(response) && absent === true && absentFromCollection === true)) {
+        failures.push("Delete OAuth2 client: " + deletionError.message);
+      }
     }
     if (oauth) await attempt("Dispose OAuth2 request context", () => oauth.dispose());
     if (admin) await attempt("Dispose administrator request context", () => admin.dispose());
