@@ -41,6 +41,8 @@ test("revokes a refresh token and its linked access tokens", async ({ ignoreHTTP
     expect(typeof exchanged.refreshToken === "string" && exchanged.refreshToken.trim().length > 0,
       "Refresh token exchange issues a new refresh token").toBe(true);
     expect(exchanged.refreshToken !== refreshToken, "Refresh token exchange rotates the original refresh token").toBe(true);
+    const originalRefreshState = await introspect(refreshToken, "refresh_token", "POST", "Original refresh token after exchange");
+    expect(isInactiveIntrospection(originalRefreshState), "Original refresh token is inactive after exchange").toBe(true);
     const control = await issueTokens("password");
 
     const targets = [
