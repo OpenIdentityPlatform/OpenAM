@@ -646,7 +646,7 @@ async function runClientSetup(request, operation, run) {
 }
 
 /** Own one introspection client and any tokens issued during the test. */
-export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, run) {
+export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType, requireRefreshToken = true }, run) {
   const id = "s7a-" + randomUUID();
   const name = id + "-name";
   const secret = randomUUID();
@@ -679,7 +679,7 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
     requireStatus(response, 200, "Issue introspection fixture tokens");
     requireJsonMediaType(response, "Issue introspection fixture tokens");
     if (!accessToken) throw new Error("Issued access_token must be a nonempty string");
-    if (grantType === "password") {
+    if (grantType === "password" && (requireRefreshToken || Object.hasOwn(body, "refresh_token"))) {
       if (!refreshToken) throw new Error("Issued refresh_token must be a nonempty string");
       if (refreshToken === accessToken) throw new Error("Issued access_token and refresh_token must differ");
     }
@@ -798,7 +798,8 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
     headers = adminHeaders(adminToken, AGENT_VERSION);
     const provider = await runClientSetup(admin, "Ensure root OAuth2 provider",
       (safeRequest) => ensureOAuth2Provider(adminToken, safeRequest));
-    if (grantType === "password" && (await provider.json())?.coreOAuth2Config?.issueRefreshToken !== true) {
+    if (grantType === "password" && requireRefreshToken
+      && (await provider.json())?.coreOAuth2Config?.issueRefreshToken !== true) {
       throw new Error(`Provider must enable issueRefreshToken for the password grant fixture (HTTP ${provider.status()})`);
     }
     attemptedWrite = true;
@@ -814,7 +815,7 @@ export async function withIntrospectionClient({ ignoreHTTPSErrors, grantType }, 
     confirmedOwnership = ownsClient(await written.json());
     if (!confirmedOwnership) throw new Error("OAuth2 client write did not confirm the test ID and name");
     if (grantType) await issue();
-    await run({ id, accessToken, refreshToken, introspect });
+    await run({ id, accessToken, refreshToken, introspect, request: oauth });
   } catch (error) {
     primaryError = error;
     throw error;
