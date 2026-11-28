@@ -23,6 +23,7 @@ endif::[]
 
 ifdef::env-site[]
 anchor:quick-start-guide[]
+anchor:_quick_start_guide[]
 endif::[]
 
 Install OpenAM, sign in, and protect a page with OpenIG in the xref:../getting-started/index.adoc[Getting Started Guide].

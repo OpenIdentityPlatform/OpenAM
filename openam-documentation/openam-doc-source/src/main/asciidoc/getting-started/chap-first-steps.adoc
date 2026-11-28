@@ -24,6 +24,7 @@ endif::[]
 
 ifdef::env-site[]
 anchor:chap-first-steps[]
+anchor:_get_started_with_openam[]
 endif::[]
 
 Start OpenAM and sign in to its administration console. Then use OpenIG to protect a page with an OpenAM access policy. This example uses HTTP on your own machine for evaluation. For deployment, see the xref:../install-guide/index.adoc[Installation Guide].
