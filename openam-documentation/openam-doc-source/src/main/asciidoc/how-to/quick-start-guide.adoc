@@ -14,6 +14,8 @@ information: "Portions copyright [year] [name of copyright owner]".
 Copyright 2026 3A Systems, LLC.
 ////
 
+:table-caption!:
+
 ifndef::env-site[]
 [#quick-start-guide]
 endif::[]
@@ -21,6 +23,7 @@ endif::[]
 
 ifdef::env-site[]
 anchor:quick-start-guide[]
+anchor:_quick_start_guide[]
 endif::[]
 
 Install OpenAM, sign in, and protect a page with OpenIG in the xref:../getting-started/index.adoc[Getting Started Guide].

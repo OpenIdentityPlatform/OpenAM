@@ -94,8 +94,57 @@
                     <name>Linux</name>
                 </os>
             </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctorj</artifactId>
+                    <version>2.5.11</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.testng</groupId>
+                    <artifactId>testng</artifactId>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
+                    <!-- POM packaging does not bind test compilation. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>compile-antora-tests</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- The Antora pages are generated during package. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>test-antora-page-titles</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <includes>
+                                        <include>**/AntoraPageTitlesIT.java</include>
+                                    </includes>
+                                    <failIfNoTests>true</failIfNoTests>
+                                    <systemPropertyVariables>
+                                        <docBuildDirectory>${project.build.directory}/asciidoc</docBuildDirectory>
+                                    </systemPropertyVariables>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.openidentityplatform.commons</groupId>
                         <artifactId>doc-maven-plugin</artifactId>
